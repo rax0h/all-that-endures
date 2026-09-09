@@ -91,4 +91,4 @@ def magic_ecology_step(world,rng):
   if held and rr.random()<.008:
    peers=[q for q in world.people.values() if q.alive and q.id!=p.id and q.settlement==p.settlement and q.age>=16]
    if peers:
-    q=peers[int(rr.random()*len(peers))%len(peers)];r=held[int(rr.random()*len(held))%len(held)];Layer,Ref=layer_ref();e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',p.id),Ref('person',q.id)),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,kind=r.kind,key=r.key);world.magic_resources.transfer(r.id,'person',q.id,e.id,p.settlement)
+    q=peers[int(rr.random()*len(peers))%len(peers)];r=held[int(rr.random()*len(held))%len(held)];Layer,Ref=layer_ref();e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',p.id),Ref('person',q.id)),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key);world.magic_resources.transfer(r.id,'person',q.id,e.id,p.settlement)
