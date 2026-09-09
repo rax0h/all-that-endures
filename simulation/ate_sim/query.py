@@ -27,6 +27,12 @@ def reconstruct_cultural_pattern(world:World,sid:int,minimum=.12):
     for p in residents:
         for cid,v in world.communities.memberships_for(p.id).items():community_weight[cid]+=v
     communities=[{"id":cid,"weight":round(weight,2),"origin":world.communities.communities[cid].origin_settlement,"founded":world.communities.communities[cid].founded} for cid,weight in community_weight.most_common(8)]
-    return {"settlement":sid,"practices":practices,"institutions":institutions,"laws":laws,"communities":communities,"accommodation":accommodation(world,sid)}
+    expertise=Counter()
+    for p in residents:
+        for (pid,domain),skill in world.skills.skills.items():
+            if pid==p.id:expertise[domain]+=skill.level
+    expertise={k:round(v/max(1,len(residents)),3) for k,v in sorted(expertise.items())}
+    infrastructure=[{"id":a.id,"kind":a.kind,"condition":round(a.condition,3),"capacity":round(a.capacity,2),"built":a.built,"settlements":a.settlements} for a in world.infrastructure.assets.values() if sid in a.settlements]
+    return {"settlement":sid,"practices":practices,"institutions":institutions,"laws":laws,"communities":communities,"expertise":expertise,"infrastructure":infrastructure,"accommodation":accommodation(world,sid)}
 
-def present_summary(w):return {"seed":w.seed,"year":w.year,"people_alive":sum(p.alive for p in w.people.values()),"settlements":len(w.settlements),"events":len(w.events),"communities":len(w.communities.communities),"transmissions":len(w.transmission.records),"lineage_nodes":len(w.lineage.nodes),"digest":w.digest()}
+def present_summary(w):return {"seed":w.seed,"year":w.year,"people_alive":sum(p.alive for p in w.people.values()),"settlements":len(w.settlements),"events":len(w.events),"communities":len(w.communities.communities),"transmissions":len(w.transmission.records),"lineage_nodes":len(w.lineage.nodes),"skills":len(w.skills.skills),"infrastructure":len(w.infrastructure.assets),"digest":w.digest()}
