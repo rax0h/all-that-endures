@@ -17,8 +17,11 @@ class Simulation:
    if q.drought>.12:self.w.emit("drought",Layer.REALITY,location=Ref("settlement",sid),severity=q.drought)
    if q.flood>.05:self.w.emit("flood",Layer.REALITY,location=Ref("settlement",sid),severity=q.flood)
  def _production(self):
+  by_settlement={sid:[] for sid in self.w.settlements}
+  for p in self.w.people.values():
+   if p.alive:by_settlement[p.settlement].append(p)
   for sid,s in self.w.settlements.items():
-   people=[p for p in self.w.people.values() if p.alive and p.settlement==sid];c=self.w.cells[(s.x,s.y)];q=self.w.local[sid];labor=sum(compose_biology(p.species,profile(p.rank))["endurance"]*p.health for p in people);food=sum(compose_biology(p.species,profile(p.rank))["food_need"] for p in people);crop=(12+2*labor)*c.fertility*(.45+.75*q.rain)*(1+.5*s.irrigation);s.food_stock+=crop-food
+   people=by_settlement[sid];c=self.w.cells[(s.x,s.y)];q=self.w.local[sid];labor=sum(compose_biology(p.species,profile(p.rank))["endurance"]*p.health for p in people);food=sum(compose_biology(p.species,profile(p.rank))["food_need"] for p in people);crop=(12+2*labor)*c.fertility*(.45+.75*q.rain)*(1+.5*s.irrigation);s.food_stock+=crop-food
    if q.flood:s.food_stock-=20*q.flood;s.roads=max(0,s.roads-.08*q.flood)
    q.scarcity=max(0,min(1,(food*10-s.food_stock)/max(1,food*10)))
    if q.scarcity>.25:self.w.emit("food_scarcity",Layer.SOCIETY,location=Ref("settlement",sid),severity=q.scarcity)
@@ -38,7 +41,11 @@ class Simulation:
  def _capacity(self,sid):
   s=self.w.settlements[sid];c=self.w.cells[(s.x,s.y)];return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
  def _demography(self):
-  alive_by_settlement={sid:[p for p in self.w.people.values() if p.alive and p.settlement==sid] for sid in self.w.settlements}
+  alive_by_settlement={sid:[] for sid in self.w.settlements};dependent_count={}
+  for p in self.w.people.values():
+   if not p.alive:continue
+   alive_by_settlement[p.settlement].append(p)
+   if p.age<18 and len(p.parents)==2:dependent_count[tuple(sorted(p.parents))]=dependent_count.get(tuple(sorted(p.parents)),0)+1
   for pair,formed in sorted(self.w.social.partnerships.items()):
    a=self.w.people.get(pair[0]);b=self.w.people.get(pair[1])
    if not a or not b or not a.alive or not b.alive or a.settlement!=b.settlement:continue
@@ -46,19 +53,22 @@ class Simulation:
    reproductive=lambda p:18<=p.age<=int(52*species(p.species).baseline_longevity)
    if not reproductive(a) or not reproductive(b):continue
    density=len(residents)/cap;rr=self.rng.stream("birth",self.w.year,pair[0]*100000+pair[1]);fertility=(species(a.species).fertility+species(b.species).fertility)/2;resource=max(.05,1-.72*q.scarcity);density_factor=max(.05,min(1.35,1.25-density*.85));chance=.22*fertility*resource*density_factor
-   child_count=sum(1 for p in residents if set(p.parents)==set(pair) and p.age<18);chance*=1/(1+.30*child_count)
+   key=tuple(sorted(pair));child_count=dependent_count.get(key,0);chance*=1/(1+.30*child_count)
    if rr.random()>=chance:continue
    base=[a,b];hid=a.household if a.household==b.household else (a.household if len(self.w.households[a.household].members)<=len(self.w.households[b.household].members) else b.household);h=self.w.households[hid];pid=self.w.next_person;self.w.next_person+=1;r=rr
    def inh(attr):return max(0,min(1,sum(getattr(p,attr) for p in base)/2+r.gauss(0,.12)))
-   sp=a.species if a.species==b.species or rr.random()<.5 else b.species;p=Person(pid,self.w.year,sid,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=pair);self.w.people[pid]=p;h.members.append(pid);self.w.genealogy.birth(pid,pair);alive_by_settlement[sid].append(p);e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(formed,),household=hid,species=sp)
+   sp=a.species if a.species==b.species or rr.random()<.5 else b.species;p=Person(pid,self.w.year,sid,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=pair);self.w.people[pid]=p;h.members.append(pid);self.w.genealogy.birth(pid,pair);alive_by_settlement[sid].append(p);dependent_count[key]=child_count+1;e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(formed,),household=hid,species=sp)
    for parent in pair:self.w.social.record(parent,pid,e.id,trust=.15,attachment=.3,obligation=.25)
   for h in self.w.households.values():
    if h.alive and not any(self.w.people[i].alive for i in h.members):h.alive=False
  def _pressure(self):
+  by_settlement={sid:[] for sid in self.w.settlements}
+  for p in self.w.people.values():
+   if p.alive:by_settlement[p.settlement].append(p)
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("hazard",self.w.year,sid)
    if r.random()<.012*c.hazard:
-    residents=[p for p in self.w.people.values() if p.alive and p.settlement==sid];exposure=.5+.5*r.random();hp=sum(self.w.households[h].preparedness for h in s.households)/max(1,len(s.households));defenders=sum(military_value(p.rank,health=p.health)*species(p.species).strength for p in residents);rank_defense=min(.35,defenders/max(1,len(residents))*.025);preparedness=min(.95,.55*s.defense+.2*s.roads+.25*hp+rank_defense);severity=max(0,exposure*(1-preparedness)*c.hazard);attack=self.w.emit("monster_surge",Layer.REALITY,location=Ref("settlement",sid),severity=severity,preparedness=preparedness)
+    residents=by_settlement[sid];exposure=.5+.5*r.random();hp=sum(self.w.households[h].preparedness for h in s.households)/max(1,len(s.households));defenders=sum(military_value(p.rank,health=p.health)*species(p.species).strength for p in residents);rank_defense=min(.35,defenders/max(1,len(residents))*.025);preparedness=min(.95,.55*s.defense+.2*s.roads+.25*hp+rank_defense);severity=max(0,exposure*(1-preparedness)*c.hazard);attack=self.w.emit("monster_surge",Layer.REALITY,location=Ref("settlement",sid),severity=severity,preparedness=preparedness)
     for p in residents:
      resilience=profile(p.rank).injury_resilience*species(p.species).endurance
      if self.rng.stream("surge_person",self.w.year,p.id).random()<severity*.12/resilience:self._die(p,"monster_surge",(attack.id,))
