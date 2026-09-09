@@ -1,4 +1,5 @@
 from .core import *
+from .rank import annual_mortality, profile, effective_capacity, military_value
 
 class Simulation:
     def __init__(self,world): self.w=world; self.rng=RNG(world.seed)
@@ -14,16 +15,18 @@ class Simulation:
             s._rain=rain; s._drought=drought; s._flood=flood
     def _production(self):
         for sid,s in self.w.settlements.items():
-            c=self.w.cells[(s.x,s.y)]; pop=sum(self.w.people[p].alive for h in s.households for p in self.w.households[h].members); crop=(12+2*pop)*c.fertility*(.45+.75*s._rain)*(1+.5*s.irrigation); s.food_stock+=crop-pop*1.05
+            people=[self.w.people[p] for h in s.households for p in self.w.households[h].members if self.w.people[p].alive]
+            c=self.w.cells[(s.x,s.y)]; labor=sum(effective_capacity(p.rank,health=p.health) for p in people); food_need=sum(profile(p.rank).food_need for p in people)
+            crop=(12+2*labor)*c.fertility*(.45+.75*s._rain)*(1+.5*s.irrigation); s.food_stock+=crop-food_need
             if s._flood: s.food_stock-=20*s._flood; s.roads=max(0,s.roads-.08*s._flood)
-            s._scarcity=max(0,min(1,(pop*10-s.food_stock)/max(1,pop*10)))
+            s._scarcity=max(0,min(1,(food_need*10-s.food_stock)/max(1,food_need*10)))
             if s._scarcity>.25: self.w.emit("food_scarcity",Layer.SOCIETY,location=Ref("settlement",sid),severity=s._scarcity)
     def _people(self):
         for pid,p in list(self.w.people.items()):
             if not p.alive: continue
-            p.age+=1; s=self.w.settlements[p.settlement]; r=self.rng.stream("life",self.w.year,pid); mortality=.003+max(0,p.age-65)*.0018+.025*s._scarcity
+            p.age+=1; s=self.w.settlements[p.settlement]; r=self.rng.stream("life",self.w.year,pid); mortality=annual_mortality(p.age,p.rank,s._scarcity)
             if r.random()<mortality:
-                p.alive=False; e=self.w.emit("death",Layer.REALITY,(Ref("person",pid),),Ref("settlement",p.settlement),age=p.age); h=self.w.households[p.household]
+                p.alive=False; e=self.w.emit("death",Layer.REALITY,(Ref("person",pid),),Ref("settlement",p.settlement),age=p.age,rank=p.rank); h=self.w.households[p.household]
                 for opid in h.members:
                     if opid!=pid and self.w.people[opid].alive:
                         q=self.w.people[opid]; q.grief=min(1,q.grief+.2+.5*q.attachment); self.w.emit("bereavement",Layer.SOCIETY,(Ref("person",opid),Ref("person",pid)),Ref("settlement",p.settlement),(e.id,),grief=q.grief)
@@ -41,9 +44,10 @@ class Simulation:
         for sid,s in self.w.settlements.items():
             c=self.w.cells[(s.x,s.y)]; r=self.rng.stream("hazard",self.w.year,sid)
             if r.random()<.012*c.hazard:
-                exposure=.5+.5*r.random(); hp=sum(self.w.households[h].preparedness for h in s.households)/max(1,len(s.households)); preparedness=min(.95,.55*s.defense+.2*s.roads+.25*hp); severity=max(0,exposure*(1-preparedness)*c.hazard); attack=self.w.emit("monster_surge",Layer.REALITY,location=Ref("settlement",sid),severity=severity,preparedness=preparedness); casualties=0
-                for p in [p for p in self.w.people.values() if p.alive and p.settlement==sid]:
-                    if self.rng.stream("surge_person",self.w.year,p.id).random()<severity*.12: p.alive=False; casualties+=1; self.w.emit("death",Layer.REALITY,(Ref("person",p.id),),Ref("settlement",sid),(attack.id,),cause="monster_surge")
+                residents=[p for p in self.w.people.values() if p.alive and p.settlement==sid]; exposure=.5+.5*r.random(); hp=sum(self.w.households[h].preparedness for h in s.households)/max(1,len(s.households)); defenders=sum(military_value(p.rank,health=p.health) for p in residents); population=max(1,len(residents)); rank_defense=min(.35,defenders/population*.025); preparedness=min(.95,.55*s.defense+.2*s.roads+.25*hp+rank_defense); severity=max(0,exposure*(1-preparedness)*c.hazard); attack=self.w.emit("monster_surge",Layer.REALITY,location=Ref("settlement",sid),severity=severity,preparedness=preparedness,rank_defense=rank_defense); casualties=0
+                for p in residents:
+                    resilience=profile(p.rank).injury_resilience
+                    if self.rng.stream("surge_person",self.w.year,p.id).random()<severity*.12/resilience: p.alive=False; casualties+=1; self.w.emit("death",Layer.REALITY,(Ref("person",p.id),),Ref("settlement",sid),(attack.id,),cause="monster_surge",rank=p.rank)
                 s.memory["monster_surge"]=min(1,s.memory.get("monster_surge",0)+severity); s.defense=min(1,s.defense+.08*severity); s.prosperity=max(0,s.prosperity-.08*severity); self.w.emit("surge_aftermath",Layer.SOCIETY,location=Ref("settlement",sid),causes=(attack.id,),casualties=casualties)
     def _memory(self):
         for s in self.w.settlements.values():
