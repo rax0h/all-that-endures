@@ -6,13 +6,14 @@ from .civilization import civilization_step
 from .development import development_step
 from .agency import agency_step
 from .institutions import institution_step
+from .magic_resources import magic_ecology_step
 class Simulation:
  def __init__(self,world): self.w=world; self.rng=RNG(world.seed)
  def run(self,years):
   for _ in range(years):self.step()
   return self.w
  def step(self):
-  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); agency_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); self._memory()
+  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); magic_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("weather",self.w.year,sid);q=self.w.local[sid];q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38)));q.drought=max(0,.35-q.rain);q.flood=max(0,q.rain-.82)
