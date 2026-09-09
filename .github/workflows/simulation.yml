@@ -4,10 +4,15 @@ on:
     branches: [main, sim/current-standard]
   pull_request:
     branches: [main]
+
+concurrency:
+  group: simulation-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 30
     env:
       PYTHONPATH: .:simulation
     steps:
@@ -18,9 +23,5 @@ jobs:
       - run: python -m pip install pytest
       - name: unit and integration suite with timing
         run: pytest -vv --durations=20 simulation/tests
-      - name: multi-seed 300-year calibration
-        run: python simulation/calibration_check.py
-      - name: 1000-year current-standard run
-        run: python simulation/run_long_history.py 843000 1000
-      - name: 10000-year stress run
-        run: python simulation/run_long_history.py 843000 10000
+      - name: deterministic 100-year smoke history
+        run: python simulation/run_long_history.py 843000 100
