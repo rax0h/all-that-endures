@@ -8,14 +8,15 @@ def species(key): return SPECIES.get(key,SPECIES["human"])
 def reproductive_compatibility(a_key,b_key):
  """Canon-neutral compatibility until explicit interspecies rules are ratified."""
  return 1.0
+def reproductive_span(species_key):
+ """Current reproductive window scales with lifespan while annual opportunity is normalized elsewhere."""
+ return 34.*species(species_key).baseline_longevity
 def inherit_species(a_key,b_key,rng):
  """No invented hybrid species: a child takes one parental species."""
  return a_key if a_key==b_key or rng.random()<.5 else b_key
 def habitat_suitability(species_key,elevation,moisture,forest):
  """Embodied habitat fit only. This does not encode culture, homeland, or preference."""
  s=species(species_key)
- # Moisture and elevation provide the current kernel's coarse physical proxies for
- # heat exposure, cold exposure, forest cover, and reliable surface water.
  heat=max(0.,min(1.,.72-.40*elevation-.18*moisture))
  cold=max(0.,min(1.,.10+.72*elevation+.10*(1-moisture)))
  thermal=1/(1+.75*max(0.,heat-s.heat_tolerance/2)+.75*max(0.,cold-s.cold_tolerance/2))
