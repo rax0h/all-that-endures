@@ -1,5 +1,5 @@
 from __future__ import annotations
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, asdict, is_dataclass
 from enum import Enum
 import hashlib, json, random
 from typing import Any
@@ -8,6 +8,7 @@ from .social import SocialGraph
 from .economy import Economy
 from .knowledge import KnowledgeState
 from .culture import CulturalState
+
 class Layer(str,Enum): REALITY="reality"; SOCIETY="society"; KNOWLEDGE="knowledge"; NARRATIVE="narrative"
 @dataclass(frozen=True)
 class Ref: kind:str; id:int
@@ -24,14 +25,23 @@ class Settlement: id:int; x:int; y:int; households:list[int]=field(default_facto
 class Cell: x:int; y:int; elevation:float; moisture:float; fertility:float; forest:float; hazard:float
 @dataclass
 class LocalState: rain:float=.5; drought:float=0.; flood:float=0.; scarcity:float=0.
+
+def _canonical(value):
+ if is_dataclass(value): return _canonical(asdict(value))
+ if isinstance(value,Enum): return value.value
+ if isinstance(value,dict): return {repr(k):_canonical(v) for k,v in sorted(value.items(),key=lambda kv:repr(kv[0]))}
+ if isinstance(value,(list,tuple)): return [_canonical(v) for v in value]
+ if isinstance(value,set): return sorted((_canonical(v) for v in value),key=repr)
+ return value
+
 @dataclass
 class World:
- seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); events:list[Event]=field(default_factory=list); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
+ seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); events:list[Event]=field(default_factory=list); event_ids:set[int]=field(default_factory=set); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
  def emit(self,kind,layer,actors=(),location=None,causes=(),**data):
-  existing={e.id for e in self.events}
-  if any(c not in existing for c in causes): raise ValueError("event cause does not exist")
-  e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data); self.next_event+=1; self.events.append(e); return e
- def digest(self): return hashlib.sha256(json.dumps(asdict(self),sort_keys=True,default=str,separators=(",",":")).encode()).hexdigest()
+  if layer is None: raise ValueError("events require an explicit layer")
+  if any(c not in self.event_ids for c in causes): raise ValueError("event cause does not exist")
+  e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data); self.next_event+=1; self.events.append(e); self.event_ids.add(e.id); return e
+ def digest(self): return hashlib.sha256(json.dumps(_canonical(self),sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
 class RNG:
  def __init__(self,seed): self.seed=seed
  def stream(self,namespace,year=0,entity=0):
