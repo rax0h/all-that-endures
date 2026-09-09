@@ -54,12 +54,11 @@ def trade_step(world,rng):
             else:source,target=sa,sb;amount=min(24.,surplus_a*.16,max(4.,demand_b+4.));source.food_stock-=amount;target.food_stock+=amount
             route.exchanges+=1;route.last_used=world.year;route.strength=min(.75,route.strength+.006+.001*amount);sa.prosperity=min(1.,sa.prosperity+.001*(1+amount));sb.prosperity=min(1.,sb.prosperity+.001*(1+amount))
             e=world.emit("trade_exchange",Layer.SOCIETY,location=Ref("settlement",b),origin=a,destination=b,food=round(amount,3),route_strength=route.strength)
-            # Exchange exposes people to techniques, but adoption requires a carrier event and starts weakly.
             candidates=[]
             for (sid,pid),adoption in list(world.culture.adoption.items()):
                 if adoption>.35 and sid in (a,b):candidates.append((sid,pid,adoption))
             if candidates and rr.random()<.045*route.strength:
-                sid,pid,adoption=candidates[rr.randrange(len(candidates))];dest=b if sid==a else a;world.culture.adoption[(dest,pid)]=max(world.culture.adoption.get((dest,pid),0.),min(.16,.045+.08*adoption));world.emit("practice_transmitted",Layer.KNOWLEDGE,location=Ref("settlement",dest),(e.id,),practice=pid,origin=sid,destination=dest)
+                sid,pid,adoption=candidates[rr.randrange(len(candidates))];dest=b if sid==a else a;world.culture.adoption[(dest,pid)]=max(world.culture.adoption.get((dest,pid),0.),min(.16,.045+.08*adoption));world.emit("practice_transmitted",Layer.KNOWLEDGE,location=Ref("settlement",dest),causes=(e.id,),practice=pid,origin=sid,destination=dest)
             claim=world.knowledge.claim("trade_route",f"{a}:{b} is viable",True,e.id)
             for p in [x for x in world.people.values() if x.alive and x.settlement in (a,b)][:12]:world.knowledge.beliefs[(p.id,claim)]=min(.95,.55+.35*route.strength)
 
