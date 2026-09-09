@@ -24,7 +24,6 @@ class MagicResourceState:
  resources:dict[int,MagicResource]=field(default_factory=dict)
  owner_index:dict[tuple[str,int],set[int]]=field(default_factory=dict)
  next_id:int=1
-
  def _index_add(self,r):
   if r.owner_kind is not None and r.owner_id is not None:self.owner_index.setdefault((r.owner_kind,r.owner_id),set()).add(r.id)
  def _index_remove(self,r):
@@ -34,13 +33,11 @@ class MagicResourceState:
    bucket.discard(r.id)
    if not bucket:self.owner_index.pop(key,None)
  def create(self,kind,key,rarity,year,location=None,owner_kind=None,owner_id=None,origin_event=None):
-  rid=self.next_id;self.next_id+=1
-  r=MagicResource(rid,kind,key,rarity,location,owner_kind,owner_id,year,origin_event);self.resources[rid]=r;self._index_add(r);return r
+  rid=self.next_id;self.next_id+=1;r=MagicResource(rid,kind,key,rarity,location,owner_kind,owner_id,year,origin_event);self.resources[rid]=r;self._index_add(r);return r
  def available(self,rid):
   r=self.resources.get(rid);return r is not None and r.consumed_year is None
  def inventory(self,owner_kind,owner_id,kind=None):
-  ids=sorted(self.owner_index.get((owner_kind,owner_id),()))
-  return [self.resources[rid] for rid in ids if self.resources[rid].consumed_year is None and (kind is None or self.resources[rid].kind==kind)]
+  ids=sorted(self.owner_index.get((owner_kind,owner_id),()));return [self.resources[rid] for rid in ids if self.resources[rid].consumed_year is None and (kind is None or self.resources[rid].kind==kind)]
  def transfer(self,rid,owner_kind,owner_id,event_id,location=None):
   r=self.resources[rid]
   if r.consumed_year is not None:raise ValueError('consumed magical resource cannot be transferred')
@@ -53,13 +50,14 @@ class MagicResourceState:
   if r.owner_kind not in (None,'person') or (r.owner_kind=='person' and r.owner_id!=pid):raise ValueError('person does not possess magical resource')
   self._index_remove(r);r.consumed_year=year;r.consumed_by=pid;r.consumed_event=event_id;return r
 
-def person_context(p,sid):
- return (p.species,p.occupation,round(p.curiosity,2),round(p.temperament,2),round(p.attachment,2),round(p.inhibition,2),round(p.grief,2),round(p.fear,2),sid)
+def person_context(p,sid):return (p.species,p.occupation,round(p.curiosity,2),round(p.temperament,2),round(p.attachment,2),round(p.inhibition,2),round(p.grief,2),round(p.fear,2),sid)
 
 def absorb_essence_resource(world,pid,rid):
  r=world.magic_resources.resources[rid]
  if r.kind!='essence':raise ValueError('resource is not an essence')
- p=world.people[pid];Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key)
+ p=world.people[pid];path=world.advancement.path(pid)
+ if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
+ Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key)
  world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=max(1,world.advancement.rank(pid))
  for a in created:world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura)
  return path,created
@@ -67,34 +65,33 @@ def absorb_essence_resource(world,pid,rid):
 def use_awakening_stone(world,pid,rid,target_essence=None):
  r=world.magic_resources.resources[rid]
  if r.kind!='awakening_stone':raise ValueError('resource is not an awakening stone')
- p=world.people[pid];Layer,Ref=layer_ref();e=world.emit('awakening_stone_used',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,stone=r.key,target_essence=target_essence)
- world.magic_resources.consume(rid,pid,world.year,e.id);a=world.advancement.awaken_skill(pid,r.key,world.year,person_context(p,p.settlement),e.id,target_essence)
+ p=world.people[pid];path=world.advancement.path(pid)
+ if path is None:return None
+ available=[e for e in path.essences if len(path.abilities_for(e))<5]
+ if not available or (target_essence is not None and target_essence not in available):return None
+ Layer,Ref=layer_ref();e=world.emit('awakening_stone_used',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,stone=r.key,target_essence=target_essence)
+ a=world.advancement.awaken_skill(pid,r.key,world.year,person_context(p,p.settlement),e.id,target_essence)
  if a is None:return None
- world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura)
- return a
+ world.magic_resources.consume(rid,pid,world.year,e.id);world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura);return a
 
 def _discover(world,rng,sid,people):
  if not people:return None
  finder=people[int(rng.random()*len(people))%len(people)];Layer,Ref=layer_ref();kind='essence' if rng.random()<.58 else 'awakening_stone'
  if kind=='essence':key=ESSENCE_IDS[int(rng.random()*len(ESSENCE_IDS))%len(ESSENCE_IDS)];rarity=ESSENCES[key]['rarity']
  else:key=STONE_IDS[int(rng.random()*len(STONE_IDS))%len(STONE_IDS)];rarity=AWAKENING_STONES[key]['rarity']
- e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),resource_kind=kind,key=key,rarity=rarity)
- return world.magic_resources.create(kind,key,rarity,world.year,sid,'person',finder.id,e.id)
+ e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),resource_kind=kind,key=key,rarity=rarity);return world.magic_resources.create(kind,key,rarity,world.year,sid,'person',finder.id,e.id)
 
 def magic_ecology_step(world,rng):
  adults_by_settlement={sid:[] for sid in world.settlements}
  for p in world.people.values():
   if p.alive and p.age>=16:adults_by_settlement[p.settlement].append(p)
  for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
- # Discovery depends on people actually exploring hazardous, inhabited places. It is sparse by design.
  for sid in sorted(world.settlements):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);chance=.004+.012*c.hazard+.004*c.forest
   if rr.random()<chance:_discover(world,rr,sid,adults_by_settlement[sid])
- # Possession precedes use. Partial loadouts remain normal, and people may keep or trade resources instead.
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
-  rr=rng.stream('magic_use',world.year,p.id);path=world.advancement.path(p.id)
-  essences=world.magic_resources.inventory('person',p.id,'essence')
+  rr=rng.stream('magic_use',world.year,p.id);path=world.advancement.path(p.id);essences=world.magic_resources.inventory('person',p.id,'essence')
   if essences and (path is None or len(path.base_essences)<3) and rr.random()<.08:
    candidates=[r for r in essences if path is None or r.key not in path.base_essences]
    if candidates:absorb_essence_resource(world,p.id,candidates[int(rr.random()*len(candidates))%len(candidates)].id);path=world.advancement.path(p.id)
