@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
+from .core_types import layer_ref
 
 @dataclass
 class Institution:
@@ -102,22 +103,35 @@ def ensure_core_societies(world):
  if not world.settlements:return
  total=sum(1 for p in world.people.values() if p.alive)
  if total<20:return
- anchor=min(world.settlements)
+ Layer,Ref=layer_ref();anchor=min(world.settlements)
  for kind,name in (('adventure_society','Adventure Society'),('magic_society','Magic Society')):
   inst=world.institutions.institution_by_kind(kind)
   if inst is None:
-   e=world.emit('institution_founded',world.Layer.SOCIETY if hasattr(world,'Layer') else None,location=None) if False else None
-   inst=world.institutions.create_institution(kind,name,world.year,None)
+   e=world.emit('institution_founded',Layer.SOCIETY,location=Ref('settlement',anchor),institution_kind=kind,name=name)
+   inst=world.institutions.create_institution(kind,name,world.year,e.id);world.lineage.register('institution',inst.id,origin_event=e.id,origin_year=world.year)
   for sid in sorted(world.settlements):
    residents=sum(1 for p in world.people.values() if p.alive and p.settlement==sid)
    if residents>=8 and world.institutions.branch_for(kind,sid) is None:
-    world.institutions.create_branch(inst.id,sid,world.year,None,authority=min(.95,.35+residents/200))
+    be=world.emit('institution_branch_founded',Layer.SOCIETY,location=Ref('settlement',sid),causes=((inst.origin_event,) if inst.origin_event else ()),institution=inst.id,institution_kind=kind)
+    b=world.institutions.create_branch(inst.id,sid,world.year,be.id,authority=min(.95,.35+residents/200));world.lineage.register('institution_branch',b.id,(('institution',inst.id),),be.id,world.year)
+
+
+def register_magic_user(world,pid,disclosure='full'):
+ p=world.people[pid];path=world.advancement.path(pid)
+ if path is None:raise ValueError('person is not an essence user')
+ branch=world.institutions.branch_for('magic_society',p.settlement)
+ if branch is None:raise ValueError('no Magic Society branch in settlement')
+ Layer,Ref=layer_ref();e=world.emit('magic_user_registered',Layer.KNOWLEDGE,(Ref('person',pid),),Ref('settlement',p.settlement),essences=tuple(path.essences) if disclosure!='identity' else (),confluence=path.confluence_name if disclosure!='identity' else None,disclosure=disclosure)
+ rec=world.institutions.register_magic_user(branch.id,pid,path,world.year,e.id,disclosure);world.transmission.record(world.year,'institutional_record','magic_registration',rec.id,'person',pid,'institution_branch',branch.id,e.id,reliability=1.)
+ return rec
 
 
 def institution_step(world,rng):
- ensure_core_societies(world)
- # Adventure Society turns actual current-year threat events into persistent notices.
+ ensure_core_societies(world);Layer,Ref=layer_ref()
+ # Adventure Society turns objective current-year threats into persistent operational notices.
  for event in [e for e in world.events if e.year==world.year and e.kind in ('monster_surge','dangerous_magic','missing_person')]:
   if event.location is None or event.location.kind!='settlement':continue
   b=world.institutions.branch_for('adventure_society',event.location.id)
-  if b is not None:world.institutions.post_notice(b.id,world.year,event.kind,event.location.id,event.id)
+  if b is None:continue
+  n=world.institutions.post_notice(b.id,world.year,event.kind,event.location.id,event.id)
+  if not any(e.kind=='adventure_notice_posted' and e.data.get('notice')==n.id for e in world.events):world.emit('adventure_notice_posted',Layer.KNOWLEDGE,location=Ref('settlement',event.location.id),causes=(event.id,),notice=n.id,threat=event.kind)
