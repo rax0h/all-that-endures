@@ -23,6 +23,18 @@ def test_birth_inherits_overlapping_community_history():
     assert any(t.item_kind=="community_membership" and t.target_kind=="person" and t.target_id==child.id for t in w.transmission.records.values())
 
 
+def test_migration_can_found_traceable_diaspora():
+    w=generate_world(843000)
+    Simulation(w).run(300)
+    diasporas=[c for c in w.communities.communities.values() if c.kind=="diaspora"]
+    assert diasporas
+    for c in diasporas:
+        assert c.parent is not None
+        node=w.lineage.nodes[("community",c.id)]
+        assert ("community",c.parent) in node.parents
+    assert any(t.kind=="diaspora_formation" for t in w.transmission.records.values())
+
+
 def test_practice_variants_keep_parent_lineage_when_they_occur():
     w=generate_world(843000)
     Simulation(w).run(1000)
