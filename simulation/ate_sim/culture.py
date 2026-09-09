@@ -18,13 +18,22 @@ def seed_practices(world,state):
    pid=state.next_practice; state.next_practice+=1; state.practices[pid]=Practice(pid,domain,name,world.year,sid,{"fitness":min(1.,fit),"refinement":.1}); state.adoption[(sid,pid)]=max(.05,min(.8,fit*.55))
 def cultural_step(world,state,rng):
  from .core import Layer,Ref
+ institution_support={(inst.settlement,pid):max(.15,inst.legitimacy) for inst in state.institutions.values() for pid in inst.practices}
  for sid in world.settlements:
-  p=pressures(world,sid)
-  for (place,pid),adopt in list(state.adoption.items()):
-   if place!=sid:continue
-   pr=state.practices[pid]; rr=rng.stream("culture",world.year,sid*100000+pid); pressure={"construction":max(p["wet"],p["forest"]),"food":p["scarcity"],"defense":p["defense_need"],"agriculture":p["fertility"]}.get(pr.domain,.2); pr.traits["refinement"]=min(1.,pr.traits.get("refinement",.1)+.002*adopt*(.5+pressure)); state.adoption[(sid,pid)]=max(0.,min(1.,adopt+.01*(pressure-.25)+rr.uniform(-.008,.008)))
-   if adopt>.35 and rr.random()<.0015*(1+pressure):
-    nid=state.next_practice; state.next_practice+=1; state.practices[nid]=Practice(nid,pr.domain,pr.name+" variant",world.year,sid,dict(pr.traits),pid); state.practices[nid].traits["refinement"]=min(1.,pr.traits.get("refinement",.1)+rr.uniform(-.05,.12)); state.adoption[(sid,nid)]=.08; world.emit("practice_innovated",Layer.SOCIETY,location=Ref("settlement",sid),parent=pid,practice=nid,domain=pr.domain)
+  p=pressures(world,sid); local_items=[(pid,a) for (place,pid),a in state.adoption.items() if place==sid and a>.01]; active_count=len(local_items)
+  for pid,adopt in list(local_items):
+   pr=state.practices[pid]; rr=rng.stream("culture",world.year,sid*100000+pid); pressure={"construction":max(p["wet"],p["forest"]),"food":p["scarcity"],"defense":p["defense_need"],"agriculture":p["fertility"]}.get(pr.domain,.2)
+   support=institution_support.get((sid,pid),0.); fit=pr.traits.get("fitness",.3)
+   # Practices persist only when useful, taught, or institutionally supported.
+   retention=.0015*support+.001*fit; decay=.0035*max(0.,.35-pressure)*(1-support*.6)
+   noise=rr.uniform(-.004,.004); new=max(0.,min(1.,adopt+.006*(pressure-.25)+retention-decay+noise)); state.adoption[(sid,pid)]=new
+   if new<=.008:
+    del state.adoption[(sid,pid)]; world.emit("practice_lost",Layer.KNOWLEDGE,location=Ref("settlement",sid),practice=pid,domain=pr.domain); continue
+   pr.traits["refinement"]=min(1.,pr.traits.get("refinement",.1)+.0012*new*(.45+pressure))
+   # Innovation pressure falls as the local repertoire becomes crowded; branches need both adoption and a live problem.
+   saturation=max(.12,1/(1+active_count/18)); novelty=max(.05,pressure-.12)
+   if new>.42 and rr.random()<.0009*(1+novelty)*saturation:
+    nid=state.next_practice;state.next_practice+=1;state.practices[nid]=Practice(nid,pr.domain,pr.name+" variant",world.year,sid,dict(pr.traits),pid);state.practices[nid].traits["refinement"]=max(0.,min(1.,pr.traits.get("refinement",.1)+rr.uniform(-.06,.09)));state.adoption[(sid,nid)]=.06;world.emit("practice_innovated",Layer.SOCIETY,location=Ref("settlement",sid),parent=pid,practice=nid,domain=pr.domain)
 def accommodation(world,sid):
  from .species import accommodation_requirements
  return accommodation_requirements([p.species for p in world.people.values() if p.alive and p.settlement==sid])
