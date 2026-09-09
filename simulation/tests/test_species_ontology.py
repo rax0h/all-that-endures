@@ -1,5 +1,5 @@
 from ate_sim.rank import profile
-from ate_sim.species import species, compose_biology, architecture_requirements
+from ate_sim.species import species, compose_biology, architecture_requirements, reproductive_compatibility
 
 def test_species_not_personality():
     for key,p in __import__('ate_sim.species',fromlist=['SPECIES']).SPECIES.items():
@@ -21,3 +21,8 @@ def test_mixed_population_changes_accommodation():
     assert mixed['clearance']>human['clearance']
     assert mixed['load']>human['load']
     assert mixed['water_access']>0
+
+def test_reproductive_compatibility_is_embodied_not_cultural():
+    assert reproductive_compatibility('human','human')==1.0
+    assert 0<reproductive_compatibility('human','elf')<1.0
+    assert reproductive_compatibility('human','merfolk')<reproductive_compatibility('human','elf')
