@@ -17,24 +17,6 @@ jobs:
       - run: python -m pip install pytest
       - run: pytest -q simulation/tests
       - name: 300-year smoke run
-        run: |
-          python - <<'PY'
-          from ate_sim.worldgen import generate_world
-          from ate_sim.engine import Simulation
-          w=generate_world(843000)
-          Simulation(w).run(300)
-          print({
-            'year':w.year,
-            'alive':sum(p.alive for p in w.people.values()),
-            'people_total':len(w.people),
-            'households':len(w.households),
-            'events':len(w.events),
-            'practices':len(w.culture.practices),
-            'institutions':len(w.culture.institutions),
-            'laws':len(w.culture.laws),
-            'properties':len(w.economy.property),
-            'relationships':len(w.social.edges),
-            'genealogies':len(w.genealogy.parents),
-            'digest':w.digest(),
-          })
-          PY
+        run: python simulation/run_long_history.py 843000 300
+      - name: 1000-year current-standard run
+        run: python simulation/run_long_history.py 843000 1000
