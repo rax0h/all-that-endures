@@ -25,6 +25,9 @@ class Settlement: id:int; x:int; y:int; households:list[int]=field(default_facto
 class Cell: x:int; y:int; elevation:float; moisture:float; fertility:float; forest:float; hazard:float
 @dataclass
 class LocalState: rain:float=.5; drought:float=0.; flood:float=0.; scarcity:float=0.
+@dataclass
+class TradeRoute:
+ a:int; b:int; strength:float=.05; exchanges:int=0; last_used:int=0
 
 def _canonical(value):
  if is_dataclass(value): return _canonical(asdict(value))
@@ -36,7 +39,7 @@ def _canonical(value):
 
 @dataclass
 class World:
- seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); events:list[Event]=field(default_factory=list); event_ids:set[int]=field(default_factory=set); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
+ seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); trade_routes:dict[tuple[int,int],TradeRoute]=field(default_factory=dict); events:list[Event]=field(default_factory=list); event_ids:set[int]=field(default_factory=set); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
  def emit(self,kind,layer,actors=(),location=None,causes=(),**data):
   if layer is None: raise ValueError("events require an explicit layer")
   if any(c not in self.event_ids for c in causes): raise ValueError("event cause does not exist")
