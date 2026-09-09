@@ -2,6 +2,7 @@ from __future__ import annotations
 from math import hypot
 from .core import Layer, Ref, TradeRoute
 from .culture import Institution, Law
+from .species import habitat_suitability
 
 def _distance(world,a:int,b:int)->float:
     sa,sb=world.settlements[a],world.settlements[b]
@@ -11,6 +12,10 @@ def _household_living(world,hid:int): return [world.people[pid] for pid in world
 def _capacity(world,sid:int):
     s=world.settlements[sid];c=world.cells[(s.x,s.y)]
     return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
+def _household_habitat_fit(world,living,destination:int):
+    s=world.settlements[destination];c=world.cells[(s.x,s.y)]
+    if not living:return 1.
+    return sum(habitat_suitability(p.species,c.elevation,c.moisture,c.forest) for p in living)/len(living)
 
 def _move_household(world,hid:int,destination:int,cause:int|None=None):
     h=world.households[hid];origin=h.settlement
@@ -19,7 +24,7 @@ def _move_household(world,hid:int,destination:int,cause:int|None=None):
     world.settlements[destination].households.append(hid);h.settlement=destination
     living=_household_living(world,hid)
     for p in living:p.settlement=destination
-    causes=() if cause is None else (cause,);event=world.emit("household_migrated",Layer.SOCIETY,tuple(Ref("person",p.id) for p in living),Ref("settlement",destination),causes,household=hid,origin=origin,destination=destination)
+    causes=() if cause is None else (cause,);event=world.emit("household_migrated",Layer.SOCIETY,tuple(Ref("person",p.id) for p in living),Ref("settlement",destination),causes,household=hid,origin=origin,destination=destination,habitat_fit=round(_household_habitat_fit(world,living,destination),3))
     for (sid,pid),adoption in list(world.culture.adoption.items()):
         if sid==origin and adoption>.22:world.culture.adoption[(destination,pid)]=max(world.culture.adoption.get((destination,pid),0.),adoption*.22)
     return event
@@ -38,7 +43,7 @@ def migration_step(world,rng):
         options=[]
         for dest in ids:
             if dest==origin:continue
-            q=world.local[dest];s=world.settlements[dest];room=max(.05,1-pop[dest]/caps[dest]);attraction=((1-q.scarcity)*.35+s.prosperity*.25+s.roads*.12+s.defense*.08+room*.35)/(_distance(world,origin,dest)**.72);options.append((attraction,dest))
+            q=world.local[dest];s=world.settlements[dest];room=max(.05,1-pop[dest]/caps[dest]);fit=_household_habitat_fit(world,living,dest);attraction=((1-q.scarcity)*.35+s.prosperity*.25+s.roads*.12+s.defense*.08+room*.35)*(.70+.30*fit)/(_distance(world,origin,dest)**.72);options.append((attraction,dest))
         if options:
             dest=max(options)[1]; moved=len(living)
             if _move_household(world,hid,dest):pop[origin]-=moved;pop[dest]+=moved
