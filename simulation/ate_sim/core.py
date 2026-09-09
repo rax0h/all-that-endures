@@ -13,7 +13,7 @@ class Event:
     id:int; year:int; kind:str; layer:Layer; actors:tuple[Ref,...]=(); location:Ref|None=None; causes:tuple[int,...]=(); data:dict[str,Any]=field(default_factory=dict)
 @dataclass
 class Person:
-    id:int; born:int; settlement:int; household:int; alive:bool=True; age:int=0; wealth:float=0.; health:float=1.; temperament:float=.5; attachment:float=.5; curiosity:float=.5; inhibition:float=.5; grief:float=0.; fear:float=0.; rank:int=0; occupation:str="labor"
+    id:int; born:int; settlement:int; household:int; alive:bool=True; age:int=0; wealth:float=0.; health:float=1.; temperament:float=.5; attachment:float=.5; curiosity:float=.5; inhibition:float=.5; grief:float=0.; fear:float=0.; rank:int=0; species:str="human"; occupation:str="labor"
 @dataclass
 class Household:
     id:int; settlement:int; members:list[int]=field(default_factory=list); wealth:float=0.; food:float=10.; preparedness:float=.2; lineage:str=""; alive:bool=True
