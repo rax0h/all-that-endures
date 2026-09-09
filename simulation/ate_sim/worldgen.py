@@ -24,10 +24,13 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
  for c in chosen:
   sid=w.next_settlement;w.next_settlement+=1;s=Settlement(sid,c.x,c.y,food_stock=130+80*c.fertility,defense=.08+.12*c.hazard,irrigation=.08+.2*c.fertility,prosperity=.2+.3*c.fertility);w.settlements[sid]=s;w.local[sid]=LocalState();rr=r.stream("founders",0,sid);local=_local_peoples(rr,c)
   founded=w.emit("settlement_founded",Layer.REALITY,location=Ref("settlement",sid),fertility=c.fertility,species=tuple(sorted(local)),habitat_fit={key:round(habitat_suitability(key,c.elevation,c.moisture,c.forest),3) for key in local});w.lineage.register("settlement",sid,origin_event=founded.id,origin_year=0);community=w.communities.create("founder_network",0,sid,founded.id);w.lineage.register("community",community.id,origin_event=founded.id,origin_year=0)
+  irrigation=w.infrastructure.create("irrigation",(sid,),max(.15,s.irrigation),40+120*s.irrigation,0,founded.id);w.lineage.register("infrastructure",irrigation.id,(('settlement',sid),),founded.id,0)
   for _ in range(rr.randint(5,9)):
    hid=w.next_household;w.next_household+=1;h=Household(hid,sid,wealth=rr.uniform(15,90),food=rr.uniform(8,20),preparedness=rr.uniform(.05,.3),lineage=f"Line-{sid}-{hid}");w.households[hid]=h;s.households.append(hid);w.lineage.register("household",hid,(('community',community.id),),founded.id,0);sp0=rr.choice(local);prop=w.economy.create("homestead",sid,"household",hid,h.wealth*.7,0,founded.id);w.lineage.register("property",prop.id,(('household',hid),),founded.id,0)
    for _ in range(rr.randint(2,6)):
     pid=w.next_person;w.next_person+=1;age=rr.randint(0,45);sp=sp0 if rr.random()<.88 else rr.choice(local);p=Person(pid,-age,sid,hid,age=age,wealth=h.wealth/max(1,len(h.members)+1),temperament=rr.random(),attachment=rr.random(),curiosity=rr.random(),inhibition=rr.random(),species=sp);w.people[pid]=p;h.members.append(pid);w.communities.join(pid,community.id,1.0);w.lineage.register("person",pid,(('household',hid),),founded.id,-age)
+    if age>=18:
+     w.skills.practice(pid,"agriculture",rr.uniform(.8,3.2),founded.id);w.skills.practice(pid,"construction",rr.uniform(.2,1.4),founded.id)
   for h in s.households:
    hm=w.households[h].members
    for a,b in zip(hm,hm[1:]):w.social.record(a,b,founded.id,trust=.15,attachment=.15)
