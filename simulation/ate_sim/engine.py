@@ -1,6 +1,6 @@
 from .core import *
 from .rank import annual_mortality,profile,military_value
-from .species import compose_biology,species
+from .species import compose_biology,species,reproductive_compatibility,inherit_species
 from .culture import cultural_step
 from .households import household_step
 from .civilization import civilization_step
@@ -52,12 +52,12 @@ class Simulation:
    sid=a.settlement;q=self.w.local[sid];residents=alive_by_settlement[sid];cap=self._capacity(sid)
    reproductive=lambda p:18<=p.age<=int(52*species(p.species).baseline_longevity)
    if not reproductive(a) or not reproductive(b):continue
-   density=len(residents)/cap;rr=self.rng.stream("birth",self.w.year,pair[0]*100000+pair[1]);fertility=(species(a.species).fertility+species(b.species).fertility)/2;resource=max(.05,1-.72*q.scarcity);density_factor=max(.05,min(1.35,1.25-density*.85));chance=.22*fertility*resource*density_factor
+   density=len(residents)/cap;rr=self.rng.stream("birth",self.w.year,pair[0]*100000+pair[1]);fertility=(species(a.species).fertility+species(b.species).fertility)/2;compat=reproductive_compatibility(a.species,b.species);resource=max(.05,1-.72*q.scarcity);density_factor=max(.05,min(1.35,1.25-density*.85));chance=.22*fertility*compat*resource*density_factor
    key=tuple(sorted(pair));child_count=dependent_count.get(key,0);chance*=1/(1+.30*child_count)
    if rr.random()>=chance:continue
    base=[a,b];hid=a.household if a.household==b.household else (a.household if len(self.w.households[a.household].members)<=len(self.w.households[b.household].members) else b.household);h=self.w.households[hid];pid=self.w.next_person;self.w.next_person+=1;r=rr
    def inh(attr):return max(0,min(1,sum(getattr(p,attr) for p in base)/2+r.gauss(0,.12)))
-   sp=a.species if a.species==b.species or rr.random()<.5 else b.species;p=Person(pid,self.w.year,sid,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=pair);self.w.people[pid]=p;h.members.append(pid);self.w.genealogy.birth(pid,pair);alive_by_settlement[sid].append(p);dependent_count[key]=child_count+1;e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(formed,),household=hid,species=sp)
+   sp=inherit_species(a.species,b.species,rr);p=Person(pid,self.w.year,sid,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=pair);self.w.people[pid]=p;h.members.append(pid);self.w.genealogy.birth(pid,pair);alive_by_settlement[sid].append(p);dependent_count[key]=child_count+1;e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(formed,),household=hid,species=sp,reproductive_compatibility=compat)
    for parent in pair:self.w.social.record(parent,pid,e.id,trust=.15,attachment=.3,obligation=.25)
   for h in self.w.households.values():
    if h.alive and not any(self.w.people[i].alive for i in h.members):h.alive=False
