@@ -9,16 +9,19 @@ def partnership_step(world,rng):
     for a,b in world.social.partnerships:
         pa,pb=world.people.get(a),world.people.get(b)
         if pa and pb and pa.alive and pb.alive:paired.update((a,b))
+    ancestry={}
     for sid,people in by_settlement.items():
-        people=sorted(people,key=lambda p:p.id)
+        people=sorted(people,key=lambda p:p.id); n=len(people)
         for i,a in enumerate(people):
             if a.id in paired:continue
             rr=rng.stream("partnership",world.year,a.id)
             if rr.random()>.18:continue
-            candidates=[]
-            for b in people[i+1:]:
-                if b.id in paired or b.household==a.household:continue
-                aa=world.genealogy.ancestors(a.id,2);bb=world.genealogy.ancestors(b.id,2)
+            candidates=[]; aa=ancestry.setdefault(a.id,world.genealogy.ancestors(a.id,2))
+            # Bounded deterministic neighborhood keeps the system linear enough for millennium runs.
+            for offset in range(1,min(25,n)):
+                b=people[(i+offset)%n]
+                if b.id==a.id or b.id in paired or b.household==a.household:continue
+                bb=ancestry.setdefault(b.id,world.genealogy.ancestors(b.id,2))
                 if a.id in bb or b.id in aa or aa.intersection(bb):continue
                 rel=world.social.get(a.id,b.id);compatibility=1-abs(a.temperament-b.temperament)
                 score=.35*compatibility+.25*(a.attachment+b.attachment)/2+.20*rel.trust+.20*rel.familiarity
