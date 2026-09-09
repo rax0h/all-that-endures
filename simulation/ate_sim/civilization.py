@@ -8,7 +8,6 @@ def _distance(world,a:int,b:int)->float:
     return max(1.0,hypot(sa.x-sb.x,sa.y-sb.y))
 
 def _household_living(world,hid:int): return [world.people[pid] for pid in world.households[hid].members if world.people[pid].alive]
-def _settlement_population(world,sid:int): return sum(p.alive and p.settlement==sid for p in world.people.values())
 def _capacity(world,sid:int):
     s=world.settlements[sid];c=world.cells[(s.x,s.y)]
     return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
@@ -18,29 +17,39 @@ def _move_household(world,hid:int,destination:int,cause:int|None=None):
     if origin==destination:return None
     if hid in world.settlements[origin].households:world.settlements[origin].households.remove(hid)
     world.settlements[destination].households.append(hid);h.settlement=destination
-    for p in _household_living(world,hid):p.settlement=destination
-    causes=() if cause is None else (cause,);event=world.emit("household_migrated",Layer.SOCIETY,tuple(Ref("person",p.id) for p in _household_living(world,hid)),Ref("settlement",destination),causes,household=hid,origin=origin,destination=destination)
+    living=_household_living(world,hid)
+    for p in living:p.settlement=destination
+    causes=() if cause is None else (cause,);event=world.emit("household_migrated",Layer.SOCIETY,tuple(Ref("person",p.id) for p in living),Ref("settlement",destination),causes,household=hid,origin=origin,destination=destination)
     for (sid,pid),adoption in list(world.culture.adoption.items()):
         if sid==origin and adoption>.22:world.culture.adoption[(destination,pid)]=max(world.culture.adoption.get((destination,pid),0.),adoption*.22)
     return event
 
 def migration_step(world,rng):
-    ids=sorted(world.settlements)
+    ids=sorted(world.settlements);pop={sid:0 for sid in ids};caps={sid:_capacity(world,sid) for sid in ids}
+    for p in world.people.values():
+        if p.alive:pop[p.settlement]+=1
     for hid,h in list(world.households.items()):
         living=_household_living(world,hid)
         if not h.alive or not living:continue
-        origin=h.settlement;local=world.local[origin];s0=world.settlements[origin];crowd=max(0.,_settlement_population(world,origin)/_capacity(world,origin)-.78)
+        origin=h.settlement;local=world.local[origin];s0=world.settlements[origin];crowd=max(0.,pop[origin]/caps[origin]-.78)
         pressure=.50*local.scarcity+.20*max(0.,.18-h.preparedness)+.15*max(0.,.2-s0.prosperity)+.45*crowd
         rr=rng.stream("migration",world.year,hid)
         if rr.random()>=.035*min(1.5,pressure):continue
         options=[]
         for dest in ids:
             if dest==origin:continue
-            q=world.local[dest];s=world.settlements[dest];room=max(.05,1-_settlement_population(world,dest)/_capacity(world,dest));attraction=((1-q.scarcity)*.35+s.prosperity*.25+s.roads*.12+s.defense*.08+room*.35)/(_distance(world,origin,dest)**.72);options.append((attraction,dest))
-        if options:_move_household(world,hid,max(options)[1])
+            q=world.local[dest];s=world.settlements[dest];room=max(.05,1-pop[dest]/caps[dest]);attraction=((1-q.scarcity)*.35+s.prosperity*.25+s.roads*.12+s.defense*.08+room*.35)/(_distance(world,origin,dest)**.72);options.append((attraction,dest))
+        if options:
+            dest=max(options)[1]; moved=len(living)
+            if _move_household(world,hid,dest):pop[origin]-=moved;pop[dest]+=moved
 
 def trade_step(world,rng):
-    ids=sorted(world.settlements)
+    ids=sorted(world.settlements);living_by_settlement={sid:[] for sid in ids}
+    for p in world.people.values():
+        if p.alive:living_by_settlement[p.settlement].append(p)
+    adopted_by_settlement={sid:[] for sid in ids}
+    for (sid,pid),adoption in world.culture.adoption.items():
+        if adoption>.35:adopted_by_settlement.setdefault(sid,[]).append((pid,adoption))
     for i,a in enumerate(ids):
         for b in ids[i+1:]:
             sa,sb=world.settlements[a],world.settlements[b];distance=_distance(world,a,b);key=(a,b);route=world.trade_routes.get(key);base_connectivity=(sa.roads+sb.roads+.20)/(distance**.75)
@@ -54,13 +63,11 @@ def trade_step(world,rng):
             else:source,target=sa,sb;amount=min(24.,surplus_a*.16,max(4.,demand_b+4.));source.food_stock-=amount;target.food_stock+=amount
             route.exchanges+=1;route.last_used=world.year;route.strength=min(.75,route.strength+.006+.001*amount);sa.prosperity=min(1.,sa.prosperity+.001*(1+amount));sb.prosperity=min(1.,sb.prosperity+.001*(1+amount))
             e=world.emit("trade_exchange",Layer.SOCIETY,location=Ref("settlement",b),origin=a,destination=b,food=round(amount,3),route_strength=route.strength)
-            candidates=[]
-            for (sid,pid),adoption in list(world.culture.adoption.items()):
-                if adoption>.35 and sid in (a,b):candidates.append((sid,pid,adoption))
+            candidates=[(a,pid,ad) for pid,ad in adopted_by_settlement.get(a,())]+[(b,pid,ad) for pid,ad in adopted_by_settlement.get(b,())]
             if candidates and rr.random()<.045*route.strength:
                 sid,pid,adoption=candidates[rr.randrange(len(candidates))];dest=b if sid==a else a;world.culture.adoption[(dest,pid)]=max(world.culture.adoption.get((dest,pid),0.),min(.16,.045+.08*adoption));world.emit("practice_transmitted",Layer.KNOWLEDGE,location=Ref("settlement",dest),causes=(e.id,),practice=pid,origin=sid,destination=dest)
             claim=world.knowledge.claim("trade_route",f"{a}:{b} is viable",True,e.id)
-            for p in [x for x in world.people.values() if x.alive and x.settlement in (a,b)][:12]:world.knowledge.beliefs[(p.id,claim)]=min(.95,.55+.35*route.strength)
+            for p in (living_by_settlement[a]+living_by_settlement[b])[:12]:world.knowledge.beliefs[(p.id,claim)]=min(.95,.55+.35*route.strength)
 
 def institution_step(world,rng):
     for sid,s in world.settlements.items():
