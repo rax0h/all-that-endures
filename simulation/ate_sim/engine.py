@@ -1,6 +1,6 @@
 from .core import *
 from .rank import annual_mortality,profile,military_value
-from .species import compose_biology,species,reproductive_compatibility,inherit_species
+from .species import compose_biology,species,reproductive_compatibility,reproductive_span,inherit_species
 from .culture import cultural_step
 from .households import household_step
 from .civilization import civilization_step
@@ -49,10 +49,9 @@ class Simulation:
   for pair,formed in sorted(self.w.social.partnerships.items()):
    a=self.w.people.get(pair[0]);b=self.w.people.get(pair[1])
    if not a or not b or not a.alive or not b.alive or a.settlement!=b.settlement:continue
-   sid=a.settlement;q=self.w.local[sid];residents=alive_by_settlement[sid];cap=self._capacity(sid)
-   reproductive=lambda p:18<=p.age<=int(52*species(p.species).baseline_longevity)
-   if not reproductive(a) or not reproductive(b):continue
-   density=len(residents)/cap;rr=self.rng.stream("birth",self.w.year,pair[0]*100000+pair[1]);fertility=(species(a.species).fertility+species(b.species).fertility)/2;compat=reproductive_compatibility(a.species,b.species);resource=max(.05,1-.72*q.scarcity);density_factor=max(.05,min(1.35,1.25-density*.85));chance=.22*fertility*compat*resource*density_factor
+   sid=a.settlement;q=self.w.local[sid];residents=alive_by_settlement[sid];cap=self._capacity(sid);span_a=reproductive_span(a.species);span_b=reproductive_span(b.species)
+   if not (18<=a.age<=18+int(span_a) and 18<=b.age<=18+int(span_b)):continue
+   density=len(residents)/cap;rr=self.rng.stream("birth",self.w.year,pair[0]*100000+pair[1]);fertility=(species(a.species).fertility+species(b.species).fertility)/2;compat=reproductive_compatibility(a.species,b.species);span_factor=34./max(34.,(span_a+span_b)/2);resource=max(.05,1-.72*q.scarcity);density_factor=max(.05,min(1.35,1.25-density*.85));chance=.22*fertility*compat*span_factor*resource*density_factor
    key=tuple(sorted(pair));child_count=dependent_count.get(key,0);chance*=1/(1+.30*child_count)
    if rr.random()>=chance:continue
    base=[a,b];hid=a.household if a.household==b.household else (a.household if len(self.w.households[a.household].members)<=len(self.w.households[b.household].members) else b.household);h=self.w.households[hid];pid=self.w.next_person;self.w.next_person+=1;r=rr
