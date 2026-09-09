@@ -14,7 +14,7 @@ def partnership_step(world,rng):
         for i,a in enumerate(people):
             if a.id in paired:continue
             rr=rng.stream("partnership",world.year,a.id)
-            if rr.random()>.06:continue
+            if rr.random()>.18:continue
             candidates=[]
             for b in people[i+1:]:
                 if b.id in paired or b.household==a.household:continue
