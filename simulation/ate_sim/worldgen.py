@@ -1,7 +1,24 @@
 from .core import *
 from .culture import seed_practices
+from .species import habitat_suitability
 import math
 PEOPLES=("human","elf","celestine","leonid","smoulder","draconian","merfolk","runic")
+
+def _local_peoples(rr,cell):
+ weighted=[]
+ for key in PEOPLES:
+  fit=habitat_suitability(key,cell.elevation,cell.moisture,cell.forest)
+  # Geography changes opportunity, not destiny. Every non-outworlder people remains possible.
+  weighted.append((fit*rr.uniform(.72,1.28),key))
+ weighted.sort(reverse=True)
+ count=rr.randint(1,4)
+ # Usually take the best-fitting peoples, with one historical accident slot allowed.
+ local=[key for _,key in weighted[:count]]
+ if count>1 and rr.random()<.28:
+  outsider=rr.choice([key for _,key in weighted[count:] or weighted])
+  local[-1]=outsider
+ return tuple(dict.fromkeys(local))
+
 def generate_world(seed:int,width=24,height=18,settlements=5):
  w=World(seed); r=RNG(seed)
  for y in range(height):
@@ -12,13 +29,12 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
   if c.elevation>=.2 and all((c.x-o.x)**2+(c.y-o.y)**2>18 for o in chosen): chosen.append(c)
   if len(chosen)>=settlements: break
  for c in chosen:
-  sid=w.next_settlement; w.next_settlement+=1; s=Settlement(sid,c.x,c.y,food_stock=130+80*c.fertility,defense=.08+.12*c.hazard,irrigation=.08+.2*c.fertility,prosperity=.2+.3*c.fertility); w.settlements[sid]=s; w.local[sid]=LocalState(); rr=r.stream("founders",0,sid); local=rr.sample(PEOPLES,k=rr.randint(1,4))
-  founded=w.emit("settlement_founded",Layer.REALITY,location=Ref("settlement",sid),fertility=c.fertility,species=tuple(sorted(local)))
+  sid=w.next_settlement; w.next_settlement+=1; s=Settlement(sid,c.x,c.y,food_stock=130+80*c.fertility,defense=.08+.12*c.hazard,irrigation=.08+.2*c.fertility,prosperity=.2+.3*c.fertility); w.settlements[sid]=s; w.local[sid]=LocalState(); rr=r.stream("founders",0,sid); local=_local_peoples(rr,c)
+  founded=w.emit("settlement_founded",Layer.REALITY,location=Ref("settlement",sid),fertility=c.fertility,species=tuple(sorted(local)),habitat_fit={key:round(habitat_suitability(key,c.elevation,c.moisture,c.forest),3) for key in local})
   for _ in range(rr.randint(5,9)):
    hid=w.next_household; w.next_household+=1; h=Household(hid,sid,wealth=rr.uniform(15,90),food=rr.uniform(8,20),preparedness=rr.uniform(.05,.3),lineage=f"Line-{sid}-{hid}"); w.households[hid]=h; s.households.append(hid); sp0=rr.choice(local); w.economy.create("homestead",sid,"household",hid,h.wealth*.7,0,founded.id)
    for _ in range(rr.randint(2,6)):
     pid=w.next_person; w.next_person+=1; age=rr.randint(0,45); sp=sp0 if rr.random()<.88 else rr.choice(local); p=Person(pid,-age,sid,hid,age=age,wealth=h.wealth/max(1,len(h.members)+1),temperament=rr.random(),attachment=rr.random(),curiosity=rr.random(),inhibition=rr.random(),species=sp); w.people[pid]=p; h.members.append(pid)
-  members=[p.id for p in w.people.values() if p.settlement==sid]
   for h in s.households:
    hm=w.households[h].members
    for a,b in zip(hm,hm[1:]): w.social.record(a,b,founded.id,trust=.15,attachment=.15)
