@@ -7,6 +7,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     env:
       PYTHONPATH: .:simulation
     steps:
@@ -20,3 +21,5 @@ jobs:
         run: python simulation/calibration_check.py
       - name: 1000-year current-standard run
         run: python simulation/run_long_history.py 843000 1000
+      - name: 10000-year stress run
+        run: python simulation/run_long_history.py 843000 10000
