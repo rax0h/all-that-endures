@@ -25,8 +25,18 @@ def _move_household(world,hid:int,destination:int,cause:int|None=None):
     for (sid,pid),adoption in list(world.culture.adoption.items()):
         if sid==origin and adoption>.22:
             value=max(world.culture.adoption.get((destination,pid),0.),adoption*.22);world.culture.adoption[(destination,pid)]=value;world.transmission.record(world.year,"migration","practice",pid,"settlement",origin,"settlement",destination,event.id,reliability=value)
+    roots={}
     for p in living:
-        for cid,strength in world.communities.memberships_for(p.id).items():world.transmission.record(world.year,"migration","community_membership",cid,"person",p.id,"settlement",destination,event.id,reliability=strength)
+        memberships=world.communities.memberships_for(p.id)
+        for cid,strength in memberships.items():world.transmission.record(world.year,"migration","community_membership",cid,"person",p.id,"settlement",destination,event.id,reliability=strength)
+        if memberships:
+            parent=max(memberships.items(),key=lambda kv:(kv[1],-kv[0]))[0]
+            if world.communities.communities[parent].origin_settlement!=destination:roots[parent]=max(roots.get(parent,0.),memberships[parent])
+    for parent,strength in roots.items():
+        diaspora=world.communities.diaspora(parent,destination,world.year,event.id)
+        if ("community",diaspora.id) not in world.lineage.nodes:world.lineage.register("community",diaspora.id,(("community",parent),),event.id,world.year)
+        for p in living:
+            if parent in world.communities.memberships_for(p.id):world.communities.join(p.id,diaspora.id,min(.55,.18+.35*strength));world.transmission.record(world.year,"diaspora_formation","community_membership",diaspora.id,"community",parent,"person",p.id,event.id,reliability=min(.55,.18+.35*strength))
     return event
 
 def migration_step(world,rng):
