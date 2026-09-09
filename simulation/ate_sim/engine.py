@@ -3,13 +3,14 @@ from .biology import state as biology_state,mortality_risk,reproductive_window,p
 from .culture import cultural_step
 from .households import household_step
 from .civilization import civilization_step
+from .development import development_step
 class Simulation:
  def __init__(self,world): self.w=world; self.rng=RNG(world.seed)
  def run(self,years):
   for _ in range(years):self.step()
   return self.w
  def step(self):
-  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); self._memory()
+  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("weather",self.w.year,sid);q=self.w.local[sid];q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38)));q.drought=max(0,.35-q.rain);q.flood=max(0,q.rain-.82)
@@ -20,7 +21,7 @@ class Simulation:
   for p in self.w.people.values():
    if p.alive:by_settlement[p.settlement].append(p)
   for sid,s in self.w.settlements.items():
-   people=by_settlement[sid];c=self.w.cells[(s.x,s.y)];q=self.w.local[sid];bios=[biology_state(p) for p in people];labor=sum(b.endurance*p.health for b,p in zip(bios,people));food=sum(b.food_need for b in bios);crop=(12+2*labor)*c.fertility*(.45+.75*q.rain)*(1+.5*s.irrigation);s.food_stock+=crop-food
+   people=by_settlement[sid];c=self.w.cells[(s.x,s.y)];q=self.w.local[sid];bios=[biology_state(p) for p in people];labor=sum(b.endurance*p.health for b,p in zip(bios,people));food=sum(b.food_need for b in bios);adults=[p for p in people if p.age>=18];agri=sum(self.w.skills.get(p.id,"agriculture").level for p in adults)/max(1,len(adults));crop=(12+2*labor)*c.fertility*(.45+.75*q.rain)*(1+.5*s.irrigation)*(1+.22*agri);s.food_stock+=crop-food
    if q.flood:s.food_stock-=20*q.flood;s.roads=max(0,s.roads-.08*q.flood)
    q.scarcity=max(0,min(1,(food*10-s.food_stock)/max(1,food*10)))
    if q.scarcity>.25:self.w.emit("food_scarcity",Layer.SOCIETY,location=Ref("settlement",sid),severity=q.scarcity)
