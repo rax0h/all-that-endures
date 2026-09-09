@@ -2,7 +2,7 @@ from .core import *
 from .culture import seed_practices
 from .species import habitat_suitability
 import math
-PEOPLES=('human','elf','celestine','leonid','smoulder','draconian','merfolk','runic');ESSENCES=('fire','water','wind','earth','swift','might','renewal','knowledge','shadow','light','growth','harvest');STONES=('feast','eyes','mercy','adventure','stars','omens','reaper')
+PEOPLES=('human','elf','celestine','leonid','smoulder','draconian','merfolk','runic');ESSENCES=('fire','water','wind','earth','swift','might','renewal','knowledge','shadow','light','growth','harvest')
 def _local_peoples(rr,cell):
  weighted=[]
  for key in PEOPLES:weighted.append((habitat_suitability(key,cell.elevation,cell.moisture,cell.forest)*rr.uniform(.72,1.28),key))
@@ -27,8 +27,8 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
     if age>=18:
      w.skills.practice(pid,'agriculture',rr.uniform(.8,3.2),founded.id);w.skills.practice(pid,'construction',rr.uniform(.2,1.4),founded.id)
      if rr.random()<.18:
-      essence=rr.choice(ESSENCES);e=w.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',sid),(founded.id,),essence=essence);w.advancement.absorb_essence(pid,essence,0,(sp,p.occupation,round(p.curiosity,2),sid));stone=rr.choice(STONES);a=w.advancement.awaken_skill(pid,stone,0,(sp,p.occupation,round(p.curiosity,2),round(p.temperament,2),sid),e.id)
-      if a:p.rank=1;w.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',sid),(e.id,),essence=a.essence,stone=stone,ability=a.semantic_key)
+      essence=rr.choice(ESSENCES);e=w.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',sid),(founded.id,),essence=essence);context=(sp,'founder',p.occupation,round(p.curiosity,2),round(p.temperament,2),sid);path,created=w.advancement.absorb_essence(pid,essence,0,context,e.id);p.rank=1
+      for a in created:w.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',sid),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key)
   for h in s.households:
    hm=w.households[h].members
    for a,b in zip(hm,hm[1:]):w.social.record(a,b,founded.id,trust=.15,attachment=.15)
