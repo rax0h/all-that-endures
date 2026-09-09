@@ -10,7 +10,7 @@ class Simulation:
   for _ in range(years):self.step()
   return self.w
  def step(self):
-  self.w.year+=1; self._weather(); self._production(); self._people(); self._demography(); household_step(self.w,self.rng); self._pressure(); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); self._memory()
+  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)]; r=self.rng.stream("weather",self.w.year,sid); q=self.w.local[sid]; q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38))); q.drought=max(0,.35-q.rain); q.flood=max(0,q.rain-.82)
@@ -36,21 +36,34 @@ class Simulation:
    q=self.w.people[oid]; rel=self.w.social.get(p.id,oid); q.grief=min(1,q.grief+.12+.55*rel.attachment); self.w.social.record(p.id,oid,e.id,attachment=.01); self.w.emit("bereavement",Layer.SOCIETY,(Ref("person",oid),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),grief=q.grief)
   if survivors:
    children=[x for x in self.w.genealogy.children.get(p.id,[]) if self.w.people.get(x) and self.w.people[x].alive]; heir=min(children) if children else min(survivors); inherited=p.wealth; self.w.people[heir].wealth+=inherited; p.wealth=0.; self.w.emit("inheritance",Layer.SOCIETY,(Ref("person",heir),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),wealth=inherited)
+ def _capacity(self,sid):
+  s=self.w.settlements[sid]; c=self.w.cells[(s.x,s.y)]
+  return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
  def _demography(self):
-  for hid,h in list(self.w.households.items()):
-   if not h.alive:continue
-   living=[self.w.people[i] for i in h.members if self.w.people[i].alive]
-   adults=[p for p in living if 18<=p.age<=int(46*species(p.species).baseline_longevity)]
-   q=self.w.local[h.settlement]; r=self.rng.stream("birth",self.w.year,hid)
-   fertility=sum(species(p.species).fertility for p in adults)/max(1,len(adults))
-   chance=.10*min(1,len(adults)/2)*(1-.65*q.scarcity)*fertility
-   if len(living)<10 and adults and r.random()<chance:
-    anchor=adults[0]
-    parents=tuple(p.id for p in sorted(adults,key=lambda x:(-self.w.social.get(anchor.id,x.id).attachment if x.id!=anchor.id else -1,x.id))[:2]); base=[self.w.people[i] for i in parents]; pid=self.w.next_person;self.w.next_person+=1
-    def inh(a):return max(0,min(1,sum(getattr(p,a) for p in base)/len(base)+r.gauss(0,.12)))
-    sp=base[0].species if len({p.species for p in base})==1 or r.random()<.5 else base[-1].species; p=Person(pid,self.w.year,h.settlement,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=parents); self.w.people[pid]=p;h.members.append(pid);self.w.genealogy.birth(pid,parents); e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),)+tuple(Ref("person",x) for x in parents),Ref("settlement",h.settlement),household=hid,species=sp)
-    for x in parents:self.w.social.record(x,pid,e.id,trust=.15,attachment=.3,obligation=.25)
-   if not living:h.alive=False
+  alive_by_settlement={sid:[p for p in self.w.people.values() if p.alive and p.settlement==sid] for sid in self.w.settlements}
+  for pair,formed in sorted(self.w.social.partnerships.items()):
+   a=self.w.people.get(pair[0]); b=self.w.people.get(pair[1])
+   if not a or not b or not a.alive or not b.alive or a.settlement!=b.settlement:continue
+   sid=a.settlement; q=self.w.local[sid]; residents=alive_by_settlement[sid]; cap=self._capacity(sid)
+   reproductive=lambda p:18<=p.age<=int(46*species(p.species).baseline_longevity)
+   if not reproductive(a) or not reproductive(b):continue
+   density=len(residents)/cap; rr=self.rng.stream("birth",self.w.year,pair[0]*100000+pair[1])
+   fertility=(species(a.species).fertility+species(b.species).fertility)/2
+   resource=max(.05,1-.72*q.scarcity); density_factor=max(.08,min(1.25,1.15-density*.75))
+   chance=.145*fertility*resource*density_factor
+   # Recent household formation and existing dependent children reduce near-term replacement without imposing quotas.
+   child_count=sum(1 for p in residents if set(p.parents)==set(pair) and p.age<18)
+   chance*=1/(1+.22*child_count)
+   if rr.random()>=chance:continue
+   base=[a,b]; hid=a.household if a.household==b.household else (a.household if len(self.w.households[a.household].members)<=len(self.w.households[b.household].members) else b.household); h=self.w.households[hid]
+   pid=self.w.next_person;self.w.next_person+=1
+   def inh(attr):return max(0,min(1,sum(getattr(p,attr) for p in base)/2+r.gauss(0,.12)))
+   r=rr; sp=a.species if a.species==b.species or rr.random()<.5 else b.species
+   p=Person(pid,self.w.year,sid,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=pair); self.w.people[pid]=p;h.members.append(pid);self.w.genealogy.birth(pid,pair);alive_by_settlement[sid].append(p)
+   e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(formed,),household=hid,species=sp)
+   for parent in pair:self.w.social.record(parent,pid,e.id,trust=.15,attachment=.3,obligation=.25)
+  for h in self.w.households.values():
+   if h.alive and not any(self.w.people[i].alive for i in h.members):h.alive=False
  def _pressure(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("hazard",self.w.year,sid)
