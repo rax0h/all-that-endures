@@ -39,9 +39,14 @@ class Simulation:
  def _demography(self):
   for hid,h in list(self.w.households.items()):
    if not h.alive:continue
-   living=[self.w.people[i] for i in h.members if self.w.people[i].alive]; adults=[p for p in living if 18<=p.age<=42]; q=self.w.local[h.settlement]; r=self.rng.stream("birth",self.w.year,hid); fertility=sum(species(p.species).fertility for p in adults)/max(1,len(adults)); chance=.055*min(1,len(adults)/2)*(1-.75*q.scarcity)*fertility
-   if len(living)<8 and adults and r.random()<chance:
-    parents=tuple(p.id for p in sorted(adults,key=lambda x:(-self.w.social.get(adults[0].id,x.id).attachment if x.id!=adults[0].id else -1,x.id))[:2]); base=[self.w.people[i] for i in parents]; pid=self.w.next_person;self.w.next_person+=1
+   living=[self.w.people[i] for i in h.members if self.w.people[i].alive]
+   adults=[p for p in living if 18<=p.age<=int(46*species(p.species).baseline_longevity)]
+   q=self.w.local[h.settlement]; r=self.rng.stream("birth",self.w.year,hid)
+   fertility=sum(species(p.species).fertility for p in adults)/max(1,len(adults))
+   chance=.10*min(1,len(adults)/2)*(1-.65*q.scarcity)*fertility
+   if len(living)<10 and adults and r.random()<chance:
+    anchor=adults[0]
+    parents=tuple(p.id for p in sorted(adults,key=lambda x:(-self.w.social.get(anchor.id,x.id).attachment if x.id!=anchor.id else -1,x.id))[:2]); base=[self.w.people[i] for i in parents]; pid=self.w.next_person;self.w.next_person+=1
     def inh(a):return max(0,min(1,sum(getattr(p,a) for p in base)/len(base)+r.gauss(0,.12)))
     sp=base[0].species if len({p.species for p in base})==1 or r.random()<.5 else base[-1].species; p=Person(pid,self.w.year,h.settlement,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=parents); self.w.people[pid]=p;h.members.append(pid);self.w.genealogy.birth(pid,parents); e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),)+tuple(Ref("person",x) for x in parents),Ref("settlement",h.settlement),household=hid,species=sp)
     for x in parents:self.w.social.record(x,pid,e.id,trust=.15,attachment=.3,obligation=.25)
