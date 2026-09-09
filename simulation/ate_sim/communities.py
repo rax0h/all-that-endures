@@ -35,3 +35,22 @@ class CommunityState:
             for cid,v in self.memberships_for(pid).items():inherited[cid]=max(inherited.get(cid,0.),v*weight)
         for cid,v in inherited.items():self.join(child_id,cid,v)
         return inherited
+
+    def local_root(self,settlement):
+        roots=[c.id for c in self.communities.values() if c.kind=="founder_network" and c.origin_settlement==settlement]
+        return min(roots) if roots else None
+
+    def diaspora(self,parent_id,destination,year,event_id):
+        existing=[c for c in self.communities.values() if c.kind=="diaspora" and c.parent==parent_id and c.origin_settlement==destination]
+        if existing:return min(existing,key=lambda c:c.id)
+        return self.create("diaspora",year,destination,event_id,parent_id)
+
+def community_step(world):
+    for p in world.people.values():
+        if not p.alive:continue
+        local=world.communities.local_root(p.settlement)
+        if local is not None:
+            key=(p.id,local);current=world.communities.memberships.get(key,0.);world.communities.memberships[key]=min(1.,current+.012*(1-current))
+        for cid,v in list(world.communities.memberships_for(p.id).items()):
+            c=world.communities.communities[cid]
+            if c.origin_settlement!=p.settlement and c.kind!="diaspora":world.communities.memberships[(p.id,cid)]=max(.01,v*.9995)
