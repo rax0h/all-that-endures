@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
+from .rank_ecology import rank_ecology_step
 @dataclass
 class MotiveState:hunger:float=0.;safety:float=0.;belonging:float=0.;wealth:float=0.;curiosity:float=0.;legacy:float=0.;obligation:float=0.;status:float=0.
 @dataclass
@@ -42,3 +43,4 @@ def agency_step(world,rng):
   elif action=='work':p.wealth+=.03*strength
   world.agency.actions.append(ActionRecord(world.year,p.id,action,motive,strength,None if event is None else event.id))
  if len(world.agency.actions)>50000:world.agency.actions=world.agency.actions[-50000:]
+ rank_ecology_step(world,rng)
