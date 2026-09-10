@@ -1,6 +1,9 @@
 from collections import Counter
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
+from ate_sim.magic_resources import _aspiration,absorb_essence_resource
+from ate_sim.semantic_dictionary import ESSENCES
+from ate_sim.core import Layer,Ref
 
 
 def test_material_crafting_consumes_real_produced_lots():
@@ -20,19 +23,31 @@ def test_material_production_is_not_fixed_one_lot_per_settlement_year():
     produced=[e for e in w.events if e.kind=='material_produced']
     assert produced
     by_year_settlement=Counter((e.year,e.location.id) for e in produced if e.location is not None)
-    # The old implementation mechanically emitted exactly one lot for every settlement every year.
-    # Production should now respond to labor pool/economic pressure and therefore vary in density.
     assert any(count>1 for count in by_year_settlement.values())
     assert len(produced)!=40*len(w.settlements)
 
 
-def test_magic_aspiration_is_not_universal_and_can_stop_short_of_full_configuration():
+def test_magic_interest_is_not_universal_but_serious_aspirants_skew_to_completion():
     w=generate_world(843001);Simulation(w).run(40)
     aspirations=list(w.magic_resources.aspirations.values())
     assert aspirations
     assert any(a.desired_base_essences==0 for a in aspirations)
-    assert any(a.desired_base_essences in (1,2) for a in aspirations)
-    assert any(a.desired_base_essences==3 for a in aspirations)
+    interested=[a for a in aspirations if a.desired_base_essences>0]
+    assert interested
+    assert sum(a.completion_goal for a in interested)>len(interested)/2
+    assert all(a.desired_base_essences==3 and a.desired_abilities==20 for a in interested if a.completion_goal)
+    assert all(a.completion_goal for a in interested if a.adventurer_aspiration)
+
+
+def test_absorbing_first_essence_can_turn_serious_interest_into_full_completion_goal():
+    w=generate_world(843002);p=next(p for p in w.people.values() if p.alive and p.age>=18)
+    a=_aspiration(w,p);a.drive=.6;a.completion_goal=False;a.desired_base_essences=1;a.desired_abilities=5
+    found=w.emit('test_essence_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),essence='fire')
+    r=w.magic_resources.create('essence','fire',ESSENCES['fire']['rarity'],w.year,p.settlement,'person',p.id,found.id)
+    absorb_essence_resource(w,p.id,r.id)
+    assert a.completion_goal
+    assert a.desired_base_essences==3
+    assert a.desired_abilities==20
 
 
 def test_transcendent_craft_cannot_be_randomly_rolled_by_mortal():
