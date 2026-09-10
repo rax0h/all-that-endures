@@ -39,6 +39,9 @@ class MagicResourceState:
   self._index_remove(r);r.consumed_year=year;r.consumed_by=pid;r.consumed_event=event_id;return r
 
 def person_context(p,sid):return (p.species,p.occupation,round(p.curiosity,2),round(p.temperament,2),round(p.attachment,2),round(p.inhibition,2),round(p.grief,2),round(p.fear,2),sid)
+def _commit_to_full_path(a):
+ if a is None or a.completion_goal:return
+ a.completion_goal=True;a.desired_base_essences=3;a.desired_abilities=20;a.urgency=max(a.urgency,.55)
 def absorb_essence_resource(world,pid,rid):
  r=world.magic_resources.resources[rid]
  if r.kind!='essence':raise ValueError('resource is not an essence')
@@ -46,8 +49,10 @@ def absorb_essence_resource(world,pid,rid):
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
  Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=max(1,world.advancement.rank(pid))
  a=world.magic_resources.aspirations.get(pid)
- if a is not None and not a.completion_goal and a.drive>=.42:
-  a.completion_goal=True;a.desired_base_essences=3;a.desired_abilities=20;a.urgency=max(a.urgency,.55)
+ # Absorbing an essence is itself a major commitment. Most people who cross that threshold,
+ # and essentially all adventurer aspirants, now pursue the full configuration rather than
+ # becoming permanent partial users by arbitrary assignment.
+ if a is not None and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
  for ability in created:world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=ability.essence,source=ability.source,ability=ability.semantic_key,name=ability.name,special=ability.special,aura=ability.aura)
  return path,created
 def use_awakening_stone(world,pid,rid,target_essence=None):
@@ -87,7 +92,10 @@ def _aspiration(world,p):
  drive=max(0.,min(1.,.46*p.curiosity+.18*(1-p.inhibition)+.12*status+.10*min(2,family)+.05*min(3,contacts)))
  adventurer=(p.occupation in ('adventurer','guard','hunter','soldier')) or (drive>.68 and (p.curiosity>.58 or status>.42))
  interested=drive>=.34 or family>0 or contacts>=2
- completion=interested and (adventurer or drive>=.47 or family>0)
+ # Full configuration is the premier path for serious essence users. Partial use remains
+ # legitimate, but should arise mostly from weaker interest or from failure/access constraints.
+ serious=interested and (adventurer or drive>=.40 or family>0 or contacts>=2)
+ completion=serious
  if not interested:desired=0
  elif completion:desired=3
  else:desired=1
@@ -127,8 +135,9 @@ def magic_ecology_step(world,rng):
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
-  if path is not None and not a.completion_goal and a.drive>=.42:
-   a.completion_goal=True;a.desired_base_essences=3;a.desired_abilities=20;a.urgency=max(a.urgency,.55)
+  # Once somebody has actually become an essence user, continued full-path pursuit becomes
+  # the strong norm unless their original interest was exceptionally weak.
+  if path is not None and not a.completion_goal and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
   if a.desired_base_essences>base:
    a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive+.5*a.urgency));sought=None
    if rr.random()<.015*(.4+a.drive+.4*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
