@@ -38,10 +38,16 @@ jobs:
         run: python simulation/calibration_check.py
       - name: requested long history
         if: github.event_name == 'workflow_dispatch'
-        run: python simulation/run_long_history.py ${{ inputs.seed }} ${{ inputs.years }}
-      - name: millennium validation
+        run: python simulation/run_long_history.py ${{ inputs.seed }} ${{ inputs.years }} | tee long-history-report.jsonl
+      - name: focused millennium validation
         if: github.event_name == 'push'
-        run: python simulation/run_long_history.py 843000 1000
+        run: python simulation/run_long_history.py 843000 1000 | tee long-history-report.jsonl
+      - name: retain long-history diagnostics
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: long-history-diagnostics-${{ github.run_number }}
+          path: long-history-report.jsonl
       - name: narrative evidence audit
         if: github.event_name == 'push'
         run: |
