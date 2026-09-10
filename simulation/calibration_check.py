@@ -1,3 +1,4 @@
+import argparse
 from collections import Counter
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
@@ -36,12 +37,18 @@ def run_seed(seed,years=YEARS):
     assert event_counts['trade_exchange']>=10, result
     return result
 
-def main():
+def main(include_long=False):
     results=[run_seed(seed) for seed in SEEDS]
     assert sum(r['migration'] for r in results)>0, results
-    long=run_seed(LONG_SEED,LONG_YEARS)
-    assert long['surviving_species']>=max(3,(long['initial_species']+1)//2), long
-    assert long['occupied_settlements']==5, long
-    return results+[long]
+    if include_long:
+        long=run_seed(LONG_SEED,LONG_YEARS)
+        assert long['surviving_species']>=max(3,(long['initial_species']+1)//2), long
+        assert long['occupied_settlements']==5, long
+        results.append(long)
+    return results
 
-if __name__=='__main__':main()
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description='Run multi-seed calibration without duplicating the dedicated millennium validation.')
+    parser.add_argument('--include-long',action='store_true',help='also run the legacy 1000-year calibration check')
+    args=parser.parse_args()
+    main(include_long=args.include_long)
