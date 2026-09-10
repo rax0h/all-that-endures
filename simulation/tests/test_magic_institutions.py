@@ -7,7 +7,7 @@ from ate_sim.core import Layer,Ref,RNG
 
 
 def _adult(w):
- return next(p for p in w.people.values() if p.alive and p.age>=18)
+ return next(p for p in w.people.values() if p.alive and p.age>=18 and not w.advancement.essence_user(p.id))
 
 
 def test_essence_resource_must_exist_and_is_consumed_with_provenance():
