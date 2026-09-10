@@ -7,13 +7,15 @@ from .development import development_step
 from .agency import agency_step
 from .institutions import institution_step
 from .magic_resources import magic_ecology_step
+from .divinity import divine_step
+from .metaphysics import try_resurrection
 class Simulation:
  def __init__(self,world): self.w=world; self.rng=RNG(world.seed)
  def run(self,years):
   for _ in range(years):self.step()
   return self.w
  def step(self):
-  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); magic_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); self._memory()
+  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("weather",self.w.year,sid);q=self.w.local[sid];q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38)));q.drought=max(0,.35-q.rain);q.flood=max(0,q.rain-.82)
@@ -36,7 +38,9 @@ class Simulation:
    else:p.grief*=.94;p.fear*=.9
  def _die(self,p,cause,causes=()):
   if not p.alive:return
-  p.alive=False;e=self.w.emit("death",Layer.REALITY,(Ref("person",p.id),),Ref("settlement",p.settlement),causes,age=p.age,rank=p.rank,species=p.species,cause=cause);h=self.w.households[p.household];survivors=[i for i in h.members if i!=p.id and self.w.people[i].alive]
+  p.alive=False;e=self.w.emit("death",Layer.REALITY,(Ref("person",p.id),),Ref("settlement",p.settlement),causes,age=p.age,rank=p.rank,species=p.species,cause=cause);self.w.metaphysics.record_death(p.id)
+  if try_resurrection(self.w,p.id,e) is not None:return
+  h=self.w.households[p.household];survivors=[i for i in h.members if i!=p.id and self.w.people[i].alive]
   for oid in survivors:
    q=self.w.people[oid];rel=self.w.social.get(p.id,oid);q.grief=min(1,q.grief+.12+.55*rel.attachment);self.w.social.record(p.id,oid,e.id,attachment=.01);self.w.emit("bereavement",Layer.SOCIETY,(Ref("person",oid),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),grief=q.grief)
   if survivors:
@@ -59,7 +63,7 @@ class Simulation:
    if rr.random()>=chance:continue
    base=[a,b];hid=a.household if a.household==b.household else (a.household if len(self.w.households[a.household].members)<=len(self.w.households[b.household].members) else b.household);h=self.w.households[hid];pid=self.w.next_person;self.w.next_person+=1;r=rr
    def inh(attr):return max(0,min(1,sum(getattr(p,attr) for p in base)/2+r.gauss(0,.12)))
-   sp=child_species(a,b,rr);p=Person(pid,self.w.year,sid,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=pair);self.w.people[pid]=p;h.members.append(pid);self.w.genealogy.birth(pid,pair);alive_by_settlement[sid].append(p);dependent_count[key]=child_count+1;e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(formed,),household=hid,species=sp,reproductive_opportunity=bio_opportunity);self.w.lineage.register("person",pid,tuple(("person",x) for x in pair),e.id,self.w.year);inherited=self.w.communities.inherit(pid,pair)
+   sp=child_species(a,b,rr);p=Person(pid,self.w.year,sid,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=pair);self.w.people[pid]=p;self.w.metaphysics.soul(pid);h.members.append(pid);self.w.genealogy.birth(pid,pair);alive_by_settlement[sid].append(p);dependent_count[key]=child_count+1;e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(formed,),household=hid,species=sp,reproductive_opportunity=bio_opportunity);self.w.lineage.register("person",pid,tuple(("person",x) for x in pair),e.id,self.w.year);inherited=self.w.communities.inherit(pid,pair)
    for cid,strength in inherited.items():self.w.transmission.record(self.w.year,"parenting","community_membership",cid,"parents",min(pair),"person",pid,e.id,reliability=strength)
    for parent in pair:self.w.social.record(parent,pid,e.id,trust=.15,attachment=.3,obligation=.25)
   for h in self.w.households.values():
