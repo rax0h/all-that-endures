@@ -1,0 +1,60 @@
+name: canonical-endurance
+
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: 'Years to advance this existing world'
+        required: true
+        default: '1000'
+      reset:
+        description: 'Start a fresh canonical world instead of restoring the latest checkpoint'
+        required: true
+        type: boolean
+        default: false
+
+concurrency:
+  group: canonical-endurance
+  cancel-in-progress: false
+
+jobs:
+  advance-world:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore latest canonical checkpoint
+        if: ${{ !inputs.reset }}
+        uses: actions/cache/restore@v4
+        with:
+          path: canonical.ate
+          key: canonical-endurance-${{ github.run_id }}
+          restore-keys: |
+            canonical-endurance-
+      - name: Advance authoritative world
+        shell: bash
+        run: |
+          if [ -f canonical.ate ] && [ '${{ inputs.reset }}' != 'true' ]; then
+            mv canonical.ate previous.ate
+            python simulation/endurance.py --checkpoint previous.ate --years '${{ inputs.years }}' --out canonical.ate --report endurance-report.json
+          else
+            python simulation/endurance.py --seed 843000 --years '${{ inputs.years }}' --out canonical.ate --report endurance-report.json
+          fi
+      - name: Save canonical checkpoint for next increment
+        uses: actions/cache/save@v4
+        with:
+          path: canonical.ate
+          key: canonical-endurance-${{ github.run_id }}
+      - name: Retain checkpoint and longitudinal report
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-endurance-${{ github.run_number }}
+          path: |
+            canonical.ate
+            endurance-report.json
+          retention-days: 90
