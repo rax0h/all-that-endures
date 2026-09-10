@@ -1,5 +1,13 @@
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
+from ate_sim.culture import cultural_step
+
+
+class _ForcedInnovationRNG:
+    """Deterministic test RNG: force the innovation branch without a 1000-year wait."""
+    def stream(self,*args,**kwargs): return self
+    def random(self): return 0.0
+    def uniform(self,a,b): return (a+b)/2
 
 
 def test_founders_have_community_and_lineage():
@@ -36,14 +44,24 @@ def test_migration_can_found_traceable_diaspora():
 
 
 def test_practice_variants_keep_parent_lineage_when_they_occur():
+    # Test the invariant directly instead of hoping a rare random branch fires in 1000 years.
     w=generate_world(843000)
-    Simulation(w).run(1000)
-    variants=[p for p in w.culture.practices.values() if p.parent is not None]
+    sid=min(w.settlements)
+    parent=next(p for p in w.culture.practices.values() if p.origin_settlement==sid)
+    w.culture.adoption[(sid,parent.id)]=0.8
+    before=set(w.culture.practices)
+    w.year+=1
+    cultural_step(w,w.culture,_ForcedInnovationRNG())
+    variants=[p for p in w.culture.practices.values() if p.id not in before and p.parent is not None]
     assert variants
     for p in variants:
         node=w.lineage.nodes[("practice",p.id)]
+        assert node.origin_event in w.event_ids
         assert ("practice",p.parent) in node.parents
-        assert any(t.kind=="innovation" and t.item_kind=="practice" and t.item_id==p.id for t in w.transmission.records.values())
+        records=[t for t in w.transmission.records.values() if t.kind=="innovation" and t.item_kind=="practice" and t.item_id==p.id]
+        assert records
+        assert all(t.event_id in w.event_ids for t in records)
+        assert all(t.source_kind=="practice" and t.source_id==p.parent for t in records)
 
 
 def test_property_ownership_history_survives_transfer():
