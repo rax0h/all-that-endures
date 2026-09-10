@@ -1,7 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 
-# Canon-facing names are objective divine actors. Mortal doctrine remains separate.
 GOD_DEFINITIONS={
  'knowledge':('Knowledge',('knowledge','truth','learning')),
  'healer':('Healer',('healing','mercy','health')),
@@ -21,56 +20,43 @@ GOD_DEFINITIONS={
  'hearth':('Hearth',('home','family','hospitality')),
  'refuge':('Refuge',('shelter','safety','protection')),
 }
-
+GREAT_ASTRAL_BEINGS={
+ 'world_phoenix':('World-Phoenix',('worlds','passage','renewal')),
+ 'reaper':('Reaper',('death','ending','transition')),
+ 'builder':('Builder',('creation','construction','worlds')),
+}
 @dataclass
 class God:
- id:str
- name:str
- domains:tuple[str,...]
- ontology:str='god'
- transcendent:bool=True
- manifestations:list[int]=field(default_factory=list)
- relationships:dict[int,float]=field(default_factory=dict)
-
+ id:str;name:str;domains:tuple[str,...];ontology:str='god';transcendent:bool=True;manifestations:list[int]=field(default_factory=list);relationships:dict[int,float]=field(default_factory=dict)
+@dataclass
+class GreatAstralBeing:
+ id:str;name:str;authorities:tuple[str,...];ontology:str='great_astral_being';transcendent:bool=True;interventions:list[int]=field(default_factory=list);relationships:dict[int,float]=field(default_factory=dict)
 @dataclass
 class Church:
- id:int
- god:str
- settlement:int
- founded_year:int
- origin_event:int
- clergy:set[int]=field(default_factory=set)
- followers:set[int]=field(default_factory=set)
- authority:float=.25
- wealth:float=0.
- doctrine_claims:set[int]=field(default_factory=set)
-
+ id:int;god:str;settlement:int;founded_year:int;origin_event:int;clergy:set[int]=field(default_factory=set);followers:set[int]=field(default_factory=set);authority:float=.25;wealth:float=0.;doctrine_claims:set[int]=field(default_factory=set)
 @dataclass
 class DivineState:
- gods:dict[str,God]=field(default_factory=dict)
- churches:dict[int,Church]=field(default_factory=dict)
- next_church:int=1
-
+ gods:dict[str,God]=field(default_factory=dict);great_astral_beings:dict[str,GreatAstralBeing]=field(default_factory=dict);churches:dict[int,Church]=field(default_factory=dict);next_church:int=1
  def seed_pantheon(self):
-  if self.gods:return
-  for gid,(name,domains) in GOD_DEFINITIONS.items():self.gods[gid]=God(gid,name,domains)
-
+  if not self.gods:
+   for gid,(name,domains) in GOD_DEFINITIONS.items():self.gods[gid]=God(gid,name,domains)
+  if not self.great_astral_beings:
+   for eid,(name,authorities) in GREAT_ASTRAL_BEINGS.items():self.great_astral_beings[eid]=GreatAstralBeing(eid,name,authorities)
  def churches_for(self,god=None,settlement=None):
   out=list(self.churches.values())
   if god is not None:out=[c for c in out if c.god==god]
   if settlement is not None:out=[c for c in out if c.settlement==settlement]
   return out
-
  def create_church(self,god,settlement,year,event_id,authority=.25):
   existing=self.churches_for(god,settlement)
   if existing:return existing[0]
   cid=self.next_church;self.next_church+=1;c=Church(cid,god,settlement,year,event_id,authority=authority);self.churches[cid]=c;return c
 
+def seed_gods(world):world.divinity.seed_pantheon()
 
-def seed_gods(world):
- # Gods are part of objective world reality before mortal history; no fake founding event is emitted.
- world.divinity.seed_pantheon()
-
+def grant_world_phoenix_resurrection(world,pid,causes=()):
+ from .metaphysics import grant_resurrection_token
+ entity=world.divinity.great_astral_beings['world_phoenix'];token=grant_resurrection_token(world,pid,'great_astral_being','world_phoenix',causes);entity.interventions.append(token.grant_event);entity.relationships[pid]=max(entity.relationships.get(pid,0.),.25);world.metaphysics.mark(pid,'world_phoenix_touched','world_phoenix',.25);return token
 
 def _need_score(world,sid,gid):
  q=world.local[sid];s=world.settlements[sid]
@@ -83,9 +69,7 @@ def _need_score(world,sid,gid):
  if gid in ('justice','dominion','liberty'):return min(1.,.15+len(world.culture.laws)/30)
  return .2
 
-
 def _eligible_clergy(world,sid):return [p for p in world.people.values() if p.alive and p.age>=18 and p.settlement==sid]
-
 
 def divine_step(world,rng):
  from .core import Layer,Ref
@@ -97,26 +81,20 @@ def divine_step(world,rng):
    if world.divinity.churches_for(gid,sid):continue
    need=_need_score(world,sid,gid);rr=rng.stream('church_emergence',world.year,sid*1000+sum(map(ord,gid)))
    if world.year<12 or rr.random()>=.0012*(.25+need):continue
-   founder=max(residents,key=lambda p:(p.attachment+p.curiosity-.4*p.inhibition,-p.id))
-   e=world.emit('church_founded',Layer.SOCIETY,(Ref('person',founder.id),),Ref('settlement',sid),god=gid,need=round(need,4))
-   c=world.divinity.create_church(gid,sid,world.year,e.id,authority=.2+.3*need);c.clergy.add(founder.id);c.followers.add(founder.id);god.relationships[founder.id]=max(god.relationships.get(founder.id,0.),.25)
-   world.lineage.register('church',c.id,origin_event=e.id,origin_year=world.year)
+   founder=max(residents,key=lambda p:(p.attachment+p.curiosity-.4*p.inhibition,-p.id));e=world.emit('church_founded',Layer.SOCIETY,(Ref('person',founder.id),),Ref('settlement',sid),god=gid,need=round(need,4));c=world.divinity.create_church(gid,sid,world.year,e.id,authority=.2+.3*need);c.clergy.add(founder.id);c.followers.add(founder.id);god.relationships[founder.id]=max(god.relationships.get(founder.id,0.),.25);world.lineage.register('church',c.id,origin_event=e.id,origin_year=world.year)
   for c in world.divinity.churches_for(settlement=sid):
-   god=world.divinity.gods[c.god];rr=rng.stream('church_life',world.year,c.id)
-   candidates=[p for p in residents if p.id not in c.followers]
+   god=world.divinity.gods[c.god];rr=rng.stream('church_life',world.year,c.id);candidates=[p for p in residents if p.id not in c.followers]
    if candidates and rr.random()<.08:
     p=candidates[int(rr.random()*len(candidates))];c.followers.add(p.id);god.relationships[p.id]=min(1.,god.relationships.get(p.id,0.)+.08)
    for pid in list(c.followers):
     p=world.people.get(pid)
     if p is None or not p.alive:continue
-    devotion=god.relationships.get(pid,.1);god.relationships[pid]=min(1.,devotion+.002*(.4+p.attachment))
-    path=world.advancement.path(pid)
+    devotion=god.relationships.get(pid,.1);god.relationships[pid]=min(1.,devotion+.002*(.4+p.attachment));path=world.advancement.path(pid)
     if devotion>.55 and rr.random()<.00055:
      from .semantic_dictionary import ESSENCE_IDS,ESSENCES
      available=[x for x in ESSENCE_IDS if path is None or x not in path.base_essences]
      if available:
-      key=available[int(rr.random()*len(available))];e=world.emit('divine_essence_granted',Layer.REALITY,(Ref('person',pid),),Ref('settlement',sid),(c.origin_event,),god=c.god,essence=key)
-      world.magic_resources.create('essence',key,ESSENCES[key]['rarity'],world.year,sid,'person',pid,e.id)
+      key=available[int(rr.random()*len(available))];e=world.emit('divine_essence_granted',Layer.REALITY,(Ref('person',pid),),Ref('settlement',sid),(c.origin_event,),god=c.god,essence=key);world.magic_resources.create('essence',key,ESSENCES[key]['rarity'],world.year,sid,'person',pid,e.id)
     pressure=max(world.local[sid].scarcity,world.local[sid].flood,world.settlements[sid].memory.get('monster_surge',0.))
     if pressure>.7 and c.authority>.35 and rr.random()<.00015:
      e=world.emit('god_manifested',Layer.REALITY,(),Ref('settlement',sid),(c.origin_event,),god=c.god,pressure=round(pressure,4));god.manifestations.append(e.id)
