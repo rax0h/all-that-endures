@@ -98,14 +98,13 @@ def _transfer_to_seeker(world,r,holder,local,rng):
  e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',holder.id),Ref('person',q.id)),Ref('settlement',holder.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,reason='relationship gift' if gift else 'aspirant purchase',price=0 if gift else price);world.magic_resources.transfer(r.id,'person',q.id,e.id,holder.settlement);a.preparation=min(1.,a.preparation+.08);return True
 
 def magic_ecology_step(world,rng):
- _recover_dead_owner_resources(world);adults_by_settlement={sid:[] for sid in world.settlements}
+ Layer,Ref=layer_ref();_recover_dead_owner_resources(world);adults_by_settlement={sid:[] for sid in world.settlements}
  for p in world.people.values():
   if p.alive and p.age>=16:adults_by_settlement[p.settlement].append(p)
  for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
  for sid,people in sorted(adults_by_settlement.items()):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);chance=min(.06,.004+.000025*len(people)+.012*c.hazard+.004*c.forest)
   if rr.random()<chance:_discover(world,rr,sid,people)
-  # Settlement-held resources enter an actual local market; they do not teleport to users.
   for r in list(world.magic_resources.inventory('settlement',sid)):
    seekers=[p for p in people if _wants(world,p,r)]
    if seekers:
@@ -117,7 +116,7 @@ def magic_ecology_step(world,rng):
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
   if a.desired_base_essences>base:
    a.search_years+=1;a.preparation=min(1.,a.preparation+.002*(.5+a.drive));
-   if rr.random()<.012*a.drive:world.emit('magic_resource_sought',layer_ref()[0].SOCIETY,(layer_ref()[1]('person',p.id),),layer_ref()[1]('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),preparation=round(a.preparation,3))
+   if rr.random()<.012*a.drive:world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),preparation=round(a.preparation,3))
   essences=world.magic_resources.inventory('person',p.id,'essence')
   if essences and base<a.desired_base_essences and rr.random()<.12+.35*a.drive:
    candidates=[r for r in essences if path is None or r.key not in path.base_essences]
