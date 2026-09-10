@@ -39,9 +39,21 @@ def test_magic_interest_is_not_universal_but_serious_aspirants_skew_to_completio
     assert all(a.completion_goal for a in interested if a.adventurer_aspiration)
 
 
-def test_absorbing_first_essence_can_turn_serious_interest_into_full_completion_goal():
+def test_adventurer_aspirant_treats_full_configuration_as_the_goal():
+    w=generate_world(843004);p=next(p for p in w.people.values() if p.alive and p.age>=18)
+    p.occupation='adventurer';p.curiosity=.95;p.inhibition=.1
+    w.magic_resources.aspirations.pop(p.id,None)
+    a=_aspiration(w,p)
+    assert a.adventurer_aspiration
+    assert a.completion_goal
+    assert a.desired_base_essences==3
+    assert a.desired_abilities==20
+    assert a.urgency>=.55
+
+
+def test_absorbing_first_essence_turns_committed_interest_into_full_completion_goal():
     w=generate_world(843002);p=next(p for p in w.people.values() if p.alive and p.age>=18)
-    a=_aspiration(w,p);a.drive=.6;a.completion_goal=False;a.desired_base_essences=1;a.desired_abilities=5
+    a=_aspiration(w,p);a.drive=.35;a.completion_goal=False;a.desired_base_essences=1;a.desired_abilities=5
     found=w.emit('test_essence_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),essence='fire')
     r=w.magic_resources.create('essence','fire',ESSENCES['fire']['rarity'],w.year,p.settlement,'person',p.id,found.id)
     absorb_essence_resource(w,p.id,r.id)
