@@ -22,9 +22,24 @@ def test_essence_resource_must_exist_and_is_consumed_with_provenance():
  assert found.id in absorbed.causes and absorbed.data['resource']==r.id
 
 
+def test_three_real_essence_resources_form_confluence_immediately():
+ w=generate_world(843000);p=_adult(w);last=None
+ for key in ('fire','water','wind'):
+  found=w.emit('test_essence_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),essence=key)
+  r=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,p.settlement,'person',p.id,found.id)
+  last,_=absorb_essence_resource(w,p.id,r.id)
+  assert r.consumed_by==p.id
+ assert last is not None
+ assert last.base_essences==['fire','water','wind']
+ assert last.confluence is not None
+ assert len(last.essences)==4
+ assert len(last.abilities)==4
+ assert len(last.abilities_for(last.confluence))==1
+ assert last.abilities_for(last.confluence)[0].source=='confluence'
+
+
 def test_stone_is_real_property_and_fifth_slot_is_special():
  w=generate_world(843001);p=_adult(w)
- # Give this person a clean Fire path through a real essence object.
  f=w.emit('test_essence_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),essence='fire')
  er=w.magic_resources.create('essence','fire',ESSENCES['fire']['rarity'],w.year,p.settlement,'person',p.id,f.id)
  absorb_essence_resource(w,p.id,er.id)
@@ -56,7 +71,6 @@ def test_societies_have_causal_branches_notices_and_limited_registry_knowledge()
  assert adventure and magic and adventure.origin_event and magic.origin_event
  assert all(w.institutions.branches[b].origin_event for b in adventure.branches+magic.branches)
  p=_adult(w)
- # Establish an essence path through real possession; it is not automatically known to the Magic Society.
  found=w.emit('test_hidden_essence',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),essence='dark')
  r=w.magic_resources.create('essence','dark',ESSENCES['dark']['rarity'],w.year,p.settlement,'person',p.id,found.id);absorb_essence_resource(w,p.id,r.id)
  assert not w.institutions.records_for_person(p.id)
