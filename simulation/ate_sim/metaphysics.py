@@ -60,8 +60,6 @@ class MetaphysicalState:
 
  def transcendence_candidates(self,pid):
   s=self.soul(pid);out=[]
-  # Transcendence is an ontological transformation, not a post-Diamond XP rank.
-  # Multiple causal routes can satisfy these broad gates; no random ascension roll exists.
   if 'divine_domain_bound' in s.marks and any(k.startswith('divine:') for k in s.authorities):out.append('god')
   if 'astral_throne_claimed' in s.marks and any(k.startswith('astral:') for k in s.authorities):out.append('astral_king')
   if 'cosmic_role_embodied' in s.marks and any(k.startswith('cosmic:') for k in s.authorities):out.append('great_astral_being')
@@ -101,5 +99,5 @@ def attempt_transcendence(world,pid,kind,authorities=(),causes=()):
  from .core import Layer,Ref
  p=world.people[pid]
  if kind not in world.metaphysics.transcendence_candidates(pid):return None
- e=world.emit('ontological_transcendence',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),causes,kind=kind,authorities=tuple(authorities))
+ e=world.emit('ontological_transcendence',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),causes,ontology=kind,authorities=tuple(authorities))
  return world.metaphysics.transform(pid,kind,e.id,authorities)
