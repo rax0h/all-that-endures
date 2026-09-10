@@ -34,10 +34,14 @@ def reproductive_window(person)->bool:
     return 18<=person.age<=18+int(reproductive_span(person.species))
 
 def pair_reproductive_opportunity(a,b)->float:
-    span_a,span_b=reproductive_span(a.species),reproductive_span(b.species)
+    # Do not pre-discount today's reproductive opportunity because a long-lived
+    # species might have more opportunities decades from now. Scarcity, death,
+    # migration and partnership loss can prevent those hypothetical future
+    # years from ever being realized; doing so created a systematic extinction
+    # pressure on long-lived populations. Lifetime fertility now emerges from
+    # actual survived reproductive years and household circumstances.
     fertility=(species(a.species).fertility+species(b.species).fertility)/2
-    span_factor=34./max(34.,(span_a+span_b)/2)
-    return fertility*reproductive_compatibility(a.species,b.species)*span_factor
+    return fertility*reproductive_compatibility(a.species,b.species)
 
 def child_species(a,b,rng)->str:
     return inherit_species(a.species,b.species,rng)
