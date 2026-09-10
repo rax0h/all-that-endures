@@ -42,7 +42,7 @@ jobs:
       - name: millennium validation
         if: github.event_name == 'push'
         run: python simulation/run_long_history.py 843000 1000
-      - name: narrative writing audit
+      - name: narrative evidence audit
         if: github.event_name == 'push'
         run: |
           echo 'Narrative audit criteria:'
@@ -54,7 +54,7 @@ jobs:
           echo '- preserve uncertainty: objective history, remembered history, rumor, belief, and deliberate lies remain distinct'
           echo '- scenes should contain specific material/social consequences and individual motives rather than abstract lore summaries'
           echo '- judge voice differentiation, subtext, restraint, specificity, continuity, causal legibility, and literary quality'
-          python simulation/specific_test.py all 843000 100
+          python simulation/specific_test.py --section all --seed 843000 --years 100 --pretty
       - name: weekly 1000-year validation
         if: github.event_name == 'schedule'
         run: python simulation/run_long_history.py 843000 1000
