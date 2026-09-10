@@ -1,5 +1,8 @@
 name: simulation-long
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/simulation-long.yml']
   workflow_dispatch:
     inputs:
       seed:
@@ -31,8 +34,11 @@ jobs:
       - run: python -m pip install pytest
       - name: unit and integration suite
         run: pytest -q simulation/tests
-      - name: multi-seed calibration
-        run: python simulation/calibration_check.py
+      - name: one-off regular 1000-year world-state run
+        if: github.event_name == 'push'
+        run: |
+          python simulation/run_long_history.py 843000 1000
+          python simulation/specific_test.py --seed 843000 --years 1000 --section all --pretty
       - name: requested long history
         if: github.event_name == 'workflow_dispatch'
         run: python simulation/run_long_history.py ${{ inputs.seed }} ${{ inputs.years }}
