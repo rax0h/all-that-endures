@@ -15,13 +15,14 @@ from .magical_civilization import magical_civilization_step
 from .warfare import warfare_step
 from .society_careers import society_career_step
 from .craft_careers import craft_career_step
+from .society_accountability import accountability_step
 class Simulation:
  def __init__(self,world): self.w=world; self.rng=RNG(world.seed)
  def run(self,years):
   for _ in range(years):self.step()
   return self.w
  def step(self):
-  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
+  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("weather",self.w.year,sid);q=self.w.local[sid];q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38)));q.drought=max(0,.35-q.rain);q.flood=max(0,q.rain-.82)
@@ -79,13 +80,11 @@ class Simulation:
   for p in self.w.people.values():
    if p.alive:by_settlement[p.settlement].append(p)
   for sid,s in self.w.settlements.items():
-   c=self.w.cells[(s.x,s.y)];r=self.rng.stream("hazard",self.w.year,sid);ambient=self.w.ambient_magic.field(sid).level;surge_chance=.012*c.hazard*(1+max(0.,ambient-.55)*1.8)
-   if r.random()<surge_chance:
-    residents=by_settlement[sid];exposure=.5+.5*r.random();hp=sum(self.w.households[h].preparedness for h in s.households)/max(1,len(s.households));defenders=sum(combat_value(p) for p in residents);rank_defense=min(.35,defenders/max(1,len(residents))*.025);preparedness=min(.95,.55*s.defense+.2*s.roads+.25*hp+rank_defense);severity=max(0,exposure*(1-preparedness)*c.hazard*(1+max(0.,ambient-.72)*.8));attack=self.w.emit("monster_surge",Layer.REALITY,location=Ref("settlement",sid),severity=severity,preparedness=preparedness,ambient_magic=round(ambient,3))
-    for p in residents:
-     resilience=injury_resilience(p)
-     if self.rng.stream("surge_person",self.w.year,p.id).random()<severity*.12/resilience:self._die(p,"monster_surge",(attack.id,))
-    s.memory["monster_surge"]=min(1,s.memory.get("monster_surge",0)+severity);s.defense=min(1,s.defense+.08*severity)
+   people=by_settlement[sid];q=self.w.local[sid];c=self.w.cells[(s.x,s.y)];r=self.rng.stream("pressure",self.w.year,sid);danger=c.hazard*(1-s.defense);monster=danger*(.45+.75*self.w.ambient_magic.level(sid))
+   if r.random()<.035+.12*monster:
+    e=self.w.emit("monster_surge",Layer.REALITY,location=Ref("settlement",sid),severity=monster);s.memory["monster_surge"]=min(1,s.memory.get("monster_surge",0)+.25)
+    for p in list(people):
+     if p.alive and r.random()<.018*monster/max(.6,injury_resilience(p)):self._die(p,"monster",(e.id,))
  def _memory(self):
   for s in self.w.settlements.values():
-   for k in list(s.memory):s.memory[k]*=.992
+   for k in list(s.memory):s.memory[k]*=.985
