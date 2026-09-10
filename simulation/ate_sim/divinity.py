@@ -1,8 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 
-# Canon-facing names are represented as objective divine actors. Their exact portfolio
-# mechanics are intentionally compact here; mortal doctrine remains a separate layer.
+# Canon-facing names are objective divine actors. Mortal doctrine remains separate.
 GOD_DEFINITIONS={
  'knowledge':('Knowledge',('knowledge','truth','learning')),
  'healer':('Healer',('healing','mercy','health')),
@@ -69,10 +68,8 @@ class DivineState:
 
 
 def seed_gods(world):
+ # Gods are part of objective world reality before mortal history; no fake founding event is emitted.
  world.divinity.seed_pantheon()
- for gid,g in world.divinity.gods.items():
-  # Gods pre-exist simulated mortal history; this is ontology registration, not a mortal founding event.
-  world.metaphysics.soul(-100000-len(world.metaphysics.souls)-1,origin_world='transcendent').ontology='god'
 
 
 def _need_score(world,sid,gid):
@@ -87,14 +84,12 @@ def _need_score(world,sid,gid):
  return .2
 
 
-def _eligible_clergy(world,sid):
- return [p for p in world.people.values() if p.alive and p.age>=18 and p.settlement==sid]
+def _eligible_clergy(world,sid):return [p for p in world.people.values() if p.alive and p.age>=18 and p.settlement==sid]
 
 
 def divine_step(world,rng):
  from .core import Layer,Ref
  world.divinity.seed_pantheon()
- # Churches emerge from sustained mortal need/attention; they are not seeded automatically in every settlement.
  for sid in sorted(world.settlements):
   residents=_eligible_clergy(world,sid)
   if not residents:continue
@@ -106,7 +101,6 @@ def divine_step(world,rng):
    e=world.emit('church_founded',Layer.SOCIETY,(Ref('person',founder.id),),Ref('settlement',sid),god=gid,need=round(need,4))
    c=world.divinity.create_church(gid,sid,world.year,e.id,authority=.2+.3*need);c.clergy.add(founder.id);c.followers.add(founder.id);god.relationships[founder.id]=max(god.relationships.get(founder.id,0.),.25)
    world.lineage.register('church',c.id,origin_event=e.id,origin_year=world.year)
-  # Existing churches accumulate followers and can attract divine attention.
   for c in world.divinity.churches_for(settlement=sid):
    god=world.divinity.gods[c.god];rr=rng.stream('church_life',world.year,c.id)
    candidates=[p for p in residents if p.id not in c.followers]
@@ -116,15 +110,13 @@ def divine_step(world,rng):
     p=world.people.get(pid)
     if p is None or not p.alive:continue
     devotion=god.relationships.get(pid,.1);god.relationships[pid]=min(1.,devotion+.002*(.4+p.attachment))
-    # Rare, causal patronage can put real magical resources into circulation.
-    path=world.advancement.path(pid);owned=world.magic_resources.owned_by('person',pid)
+    path=world.advancement.path(pid)
     if devotion>.55 and rr.random()<.00055:
      from .semantic_dictionary import ESSENCE_IDS,ESSENCES
      available=[x for x in ESSENCE_IDS if path is None or x not in path.base_essences]
      if available:
       key=available[int(rr.random()*len(available))];e=world.emit('divine_essence_granted',Layer.REALITY,(Ref('person',pid),),Ref('settlement',sid),(c.origin_event,),god=c.god,essence=key)
       world.magic_resources.create('essence',key,ESSENCES[key]['rarity'],world.year,sid,'person',pid,e.id)
-    # Manifestation is exceptional and tied to major local pressure plus an established church.
     pressure=max(world.local[sid].scarcity,world.local[sid].flood,world.settlements[sid].memory.get('monster_surge',0.))
     if pressure>.7 and c.authority>.35 and rr.random()<.00015:
-     e=world.emit('god_manifested',Layer.REALITY,location=Ref('settlement',sid),(c.origin_event,),god=c.god,pressure=round(pressure,4));god.manifestations.append(e.id)
+     e=world.emit('god_manifested',Layer.REALITY,(),Ref('settlement',sid),(c.origin_event,),god=c.god,pressure=round(pressure,4));god.manifestations.append(e.id)
