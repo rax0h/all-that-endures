@@ -78,7 +78,7 @@ def _recover_dead_owner_resources(world):
 def _aspiration(world,p):
  a=world.magic_resources.aspirations.get(p.id)
  if a:return a
- family=sum(1 for x in p.parents if world.advancement.essence_user(x));contacts=sum(1 for r in world.social.edges.values() if p.id in (r.a,r.b) and world.advancement.essence_user(r.b if r.a==p.id else r.a));m=world.agency.motives.get(p.id);status=0 if m is None else m.status;drive=max(0.,min(1.,.46*p.curiosity+.18*(1-p.inhibition)+.12*status+.10*min(2,family)+.05*min(3,contacts)))
+ family=sum(1 for x in p.parents if world.advancement.essence_user(x));contacts=sum(1 for x in world.social.neighbors(p.id) if world.advancement.essence_user(x));m=world.agency.motives.get(p.id);status=0 if m is None else m.status;drive=max(0.,min(1.,.46*p.curiosity+.18*(1-p.inhibition)+.12*status+.10*min(2,family)+.05*min(3,contacts)))
  if drive<.36:desired=0
  elif drive<.54:desired=1
  elif drive<.68:desired=2
@@ -103,7 +103,8 @@ def magic_ecology_step(world,rng):
   if p.alive and p.age>=16:adults_by_settlement[p.settlement].append(p)
  for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
  for sid,people in sorted(adults_by_settlement.items()):
-  c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);chance=min(.06,.004+.000025*len(people)+.012*c.hazard+.004*c.forest)
+  c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
+  chance=min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
   if rr.random()<chance:_discover(world,rr,sid,people)
   for r in list(world.magic_resources.inventory('settlement',sid)):
    seekers=[p for p in people if _wants(world,p,r)]
@@ -124,6 +125,11 @@ def magic_ecology_step(world,rng):
   stones=world.magic_resources.inventory('person',p.id,'awakening_stone')
   if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity) and rr.random()<.12+.35*a.drive:use_awakening_stone(world,p.id,stones[int(rr.random()*len(stones))%len(stones)].id)
   held=world.magic_resources.inventory('person',p.id)
-  if held and rr.random()<.035:
+  if held:
    surplus=[r for r in held if not _wants(world,p,r)]
-   if surplus:_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,adults_by_settlement[p.settlement],rr)
+   if surplus:
+    local=adults_by_settlement[p.settlement];pressure=0.
+    for r in surplus:
+     seekers=[q for q in local if q.id!=p.id and _wants(world,q,r)]
+     if seekers:pressure=max(pressure,max(_aspiration(world,q).drive*(.35+.65*_aspiration(world,q).preparation) for q in seekers))
+    if rr.random()<.04+.18*pressure:_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,local,rr)
