@@ -58,12 +58,14 @@ def use_awakening_stone(world,pid,rid,target_essence=None):
  if a is None:return None
  world.magic_resources.consume(rid,pid,world.year,e.id);world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura);return a
 
-def _discover(world,rng,sid,people):
- if not people:return None
- finder=people[int(rng.random()*len(people))%len(people)];Layer,Ref=layer_ref();kind='essence' if rng.random()<.6 else 'awakening_stone'
+def _make_resource(world,rng,sid,finder,kind=None,cause=None,method='chance discovery'):
+ Layer,Ref=layer_ref();kind=kind or ('essence' if rng.random()<.6 else 'awakening_stone')
  if kind=='essence':key=ESSENCE_IDS[int(rng.random()*len(ESSENCE_IDS))%len(ESSENCE_IDS)];rarity=ESSENCES[key]['rarity']
  else:key=STONE_IDS[int(rng.random()*len(STONE_IDS))%len(STONE_IDS)];rarity=AWAKENING_STONES[key]['rarity']
- e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),resource_kind=kind,key=key,rarity=rarity);return world.magic_resources.create(kind,key,rarity,world.year,sid,'person',finder.id,e.id)
+ causes=() if cause is None else (cause,);e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),causes,resource_kind=kind,key=key,rarity=rarity,method=method);return world.magic_resources.create(kind,key,rarity,world.year,sid,'person',finder.id,e.id)
+def _discover(world,rng,sid,people):
+ if not people:return None
+ finder=people[int(rng.random()*len(people))%len(people)];return _make_resource(world,rng,sid,finder)
 def _recover_dead_owner_resources(world):
  Layer,Ref=layer_ref()
  for r in sorted(world.magic_resources.resources.values(),key=lambda x:x.id):
@@ -79,9 +81,9 @@ def _aspiration(world,p):
  a=world.magic_resources.aspirations.get(p.id)
  if a:return a
  family=sum(1 for x in p.parents if world.advancement.essence_user(x));contacts=sum(1 for x in world.social.neighbors(p.id) if world.advancement.essence_user(x));m=world.agency.motives.get(p.id);status=0 if m is None else m.status;drive=max(0.,min(1.,.46*p.curiosity+.18*(1-p.inhibition)+.12*status+.10*min(2,family)+.05*min(3,contacts)))
- if drive<.36:desired=0
- elif drive<.54:desired=1
- elif drive<.68:desired=2
+ if drive<.34:desired=0
+ elif drive<.49:desired=1
+ elif drive<.61:desired=2
  else:desired=3
  reason='curiosity' if p.curiosity>.7 else ('family tradition' if family else ('ambition' if status>.45 else 'capability'))
  a=MagicAspiration(drive,desired,0 if desired==0 else (5 if desired==1 else (10 if desired==2 else 20)),reason,world.year);world.magic_resources.aspirations[p.id]=a;return a
@@ -116,14 +118,20 @@ def magic_ecology_step(world,rng):
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
   if a.desired_base_essences>base:
-   a.search_years+=1;a.preparation=min(1.,a.preparation+.002*(.5+a.drive));
-   if rr.random()<.012*a.drive:world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),preparation=round(a.preparation,3))
+   a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive));sought=None
+   if rr.random()<.015*a.drive:
+    sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),preparation=round(a.preparation,3),search_years=a.search_years)
+   # A prepared aspirant can create an opportunity through sustained search. The resource type remains random;
+   # the simulation does not hand them the exact essence it knows they need.
+   search_chance=min(.009,.0004+.0022*a.drive+.0018*a.preparation+.00008*min(30,a.search_years))
+   if rr.random()<search_chance:
+    cause=None if sought is None else sought.id;_make_resource(world,rr,p.settlement,p,'essence',cause,'aspirant search')
   essences=world.magic_resources.inventory('person',p.id,'essence')
-  if essences and base<a.desired_base_essences and rr.random()<.12+.35*a.drive:
+  if essences and base<a.desired_base_essences and rr.random()<.15+.40*a.drive:
    candidates=[r for r in essences if path is None or r.key not in path.base_essences]
-   if candidates:absorb_essence_resource(world,p.id,candidates[int(rr.random()*len(candidates))%len(candidates)].id);path=world.advancement.path(p.id)
+   if candidates:absorb_essence_resource(world,p.id,candidates[int(rr.random()*len(candidates))%len(candidates)].id);path=world.advancement.path(p.id);base=len(path.base_essences)
   stones=world.magic_resources.inventory('person',p.id,'awakening_stone')
-  if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity) and rr.random()<.12+.35*a.drive:use_awakening_stone(world,p.id,stones[int(rr.random()*len(stones))%len(stones)].id)
+  if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity) and rr.random()<.15+.40*a.drive:use_awakening_stone(world,p.id,stones[int(rr.random()*len(stones))%len(stones)].id)
   held=world.magic_resources.inventory('person',p.id)
   if held:
    surplus=[r for r in held if not _wants(world,p,r)]
