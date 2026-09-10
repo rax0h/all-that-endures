@@ -76,8 +76,11 @@ def material_economy_step(world,rng):
   adults=[p for p in people if p.age>=16]
   if not adults:continue
   s=world.settlements[sid];rr=rng.stream('materials',world.year,sid);producers=sorted(adults,key=lambda p:(world.skills.get(p.id,'agriculture').level+world.skills.get(p.id,'craft').level,p.curiosity,-p.id),reverse=True)[:max(1,min(16,len(adults)))]
-  # Production scales with the actual labor pool and local economic pressure instead of exactly one lot/settlement/year.
-  base=max(1,len(adults)//90);pressure=world.local[sid].scarcity*.8+s.prosperity*.35;lot_count=min(8,base+(1 if pressure>.45 else 0)+(1 if pressure>.8 else 0))
+  # Batch count scales with available labor and local economic pressure. Typical settlements can now produce multiple independent lots without forcing a fixed per-year count.
+  pressure=world.local[sid].scarcity*.8+s.prosperity*.35
+  labor_batches=len(adults)//12
+  pressure_batches=int(pressure*2)
+  lot_count=min(8,max(1,1+labor_batches+pressure_batches))
   for n in range(lot_count):
    prng=rng.stream('material_producer',world.year,sid*100+n);producer=producers[int(prng.random()*len(producers))%len(producers)];_produce_lot(world,sid,producer,prng,Layer,Ref)
   crafters=sorted(adults,key=lambda p:(world.skills.get(p.id,'craft').level,p.curiosity,-p.id),reverse=True);qualified=[p for p in crafters if world.skills.get(p.id,'craft').level>=.7]
