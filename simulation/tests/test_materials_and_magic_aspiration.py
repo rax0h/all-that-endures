@@ -1,3 +1,4 @@
+from collections import Counter
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
 
@@ -12,6 +13,17 @@ def test_material_crafting_consumes_real_produced_lots():
             assert lot.origin_event in w.event_ids
             assert lot.consumed>0
             assert item.created_year>=lot.created_year
+
+
+def test_material_production_is_not_fixed_one_lot_per_settlement_year():
+    w=generate_world(843000);Simulation(w).run(40)
+    produced=[e for e in w.events if e.kind=='material_produced']
+    assert produced
+    by_year_settlement=Counter((e.year,e.location.id) for e in produced if e.location is not None)
+    # The old implementation mechanically emitted exactly one lot for every settlement every year.
+    # Production should now respond to labor pool/economic pressure and therefore vary in density.
+    assert any(count>1 for count in by_year_settlement.values())
+    assert len(produced)!=40*len(w.settlements)
 
 
 def test_magic_aspiration_is_not_universal_and_can_stop_short_of_full_configuration():
