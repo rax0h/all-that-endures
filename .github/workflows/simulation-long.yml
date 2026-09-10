@@ -32,8 +32,13 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest
+        if: github.event_name != 'push'
       - name: unit and integration suite
+        if: github.event_name != 'push'
         run: pytest -q simulation/tests
+      - name: multi-seed calibration
+        if: github.event_name != 'push'
+        run: python simulation/calibration_check.py
       - name: one-off regular 1000-year world-state run
         if: github.event_name == 'push'
         run: |
