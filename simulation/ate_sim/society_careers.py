@@ -5,8 +5,6 @@ from .magic_resources import _aspiration
 
 def society_career_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');mag=world.institutions.institution_by_kind('magic_society')
- # Registration is a record, not membership. Full users with a local Magic Society
- # branch may disclose independently; members are strongly likely to maintain a record.
  recorded={r.person for r in world.institutions.magic_records.values()}
  for p in sorted((x for x in world.people.values() if x.alive and full_essence_user(world,x.id)),key=lambda x:x.id):
   if p.id in recorded:continue
@@ -15,8 +13,6 @@ def society_career_step(world,rng):
   rr=rng.stream('magic_registry',world.year,p.id);member=mag is not None and p.id in mag.members
   if rr.random()<(.70 if member else .025):
    register_magic_user(world,p.id,'full' if member else ('essences' if rr.random()<.55 else 'identity'));recorded.add(p.id)
- # Failed candidates can improve and reapply after a real cooldown instead of being
- # permanently excluded by their first attempt.
  for society,inst in (('adventure_society',adv),('magic_society',mag)):
   if inst is None:continue
   latest={}
@@ -27,11 +23,9 @@ def society_career_step(world,rng):
    if a is None or a.passed is None or a.passed or world.year-a.applied_year<3:continue
    aspiration=_aspiration(world,p);intent=aspiration.adventurer_aspiration if society=='adventure_society' else (p.curiosity>.55 or world.skills.get(p.id,'knowledge').level>1 or world.skills.get(p.id,'craft').level>1)
    if not intent:continue
-   rr=rng.stream('society_reapply',world.year,p.id+(0 if society=='adventure_society' else 1000000))
-   if rr.random()<.18+.35*aspiration.persistence:
+   rr=rng.stream('society_reapply',world.year,p.id+(0 if society=='adventure_society' else 1000000));persistence=min(1.,.45*aspiration.drive+.35*aspiration.preparation+.20*aspiration.urgency)
+   if rr.random()<.18+.35*persistence:
     apply_for_society(world,p.id,society);world.emit('society_reapplication',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),society=society,previous_application=a.id)
- # Adventure notices become actual work. Members accept local contracts, resolve
- # them through capability/readiness, and receive traceable rewards.
  if adv is None:return
  for n in sorted(world.institutions.notices.values(),key=lambda x:x.id):
   if n.status=='open':
