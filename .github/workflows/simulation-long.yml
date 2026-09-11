@@ -1,5 +1,5 @@
 name: simulation-long
-# Validation trigger: deep-history systems pass, 2026-09-10
+# Validation trigger: post-PR2 rank/reward millennium, 2026-09-11
 on:
   workflow_dispatch:
     inputs:
