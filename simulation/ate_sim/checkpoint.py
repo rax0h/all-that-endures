@@ -2,7 +2,7 @@ from __future__ import annotations
 import hashlib,pickle
 from dataclasses import dataclass
 
-CHECKPOINT_SCHEMA=3
+CHECKPOINT_SCHEMA=4
 @dataclass
 class Checkpoint:
     schema:int
