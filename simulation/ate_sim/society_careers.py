@@ -2,6 +2,7 @@ from __future__ import annotations
 from .core_types import layer_ref
 from .institutions import apply_for_society,full_essence_user,register_magic_user
 from .magic_resources import _aspiration
+from .currency import ranked_reward,value_of
 
 def society_career_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');mag=world.institutions.institution_by_kind('magic_society')
@@ -37,6 +38,12 @@ def society_career_step(world,rng):
   if n.status=='assigned' and n.assigned_to in world.people:
    p=world.people[n.assigned_to]
    if not p.alive:n.status='open';n.assigned_to=None;continue
-   rr=rng.stream('notice_resolve',world.year,n.id);cap=.22+.10*world.advancement.rank(p.id)+.08*world.skills.get(p.id,'defense').level+.18*p.health
+   rr=rng.stream('notice_resolve',world.year,n.id);rank=world.advancement.rank(p.id);cap=.22+.10*rank+.08*world.skills.get(p.id,'defense').level+.18*p.health
    if rr.random()<min(.85,cap):
-    reward=2.+4.*cap;p.wealth+=reward;e=world.emit('adventure_notice_resolved',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',n.location),causes=(n.cause_event,),notice=n.id,reward=round(reward,2));n.status='resolved';n.resolved_event=e.id
+    # The Society pays at the adventurer's operative rank. The exact job amount varies with
+    # difficulty/capability, but denomination exchange values are invariant and higher ranks
+    # receive higher-rank magical coinage rather than enormous piles of low-rank currency.
+    coins=ranked_reward(rank,.75+cap);world.currency.credit(p.id,coins)
+    stipend=1.+2.*cap;p.wealth+=stipend
+    e=world.emit('adventure_notice_resolved',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',n.location),causes=(n.cause_event,),notice=n.id,stipend=round(stipend,2),coin_reward=coins,coin_value_lesser=value_of(coins),reward_rank=rank)
+    n.status='resolved';n.resolved_event=e.id
