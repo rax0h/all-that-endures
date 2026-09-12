@@ -43,12 +43,28 @@ def snapshot(world, include_digest=False):
 
 
 def main(seed=843000, years=1000):
-    world=generate_world(seed);sim=Simulation(world);marks=[m for m in (100,300,500,750,1000) if m<=years];last=0
-    for mark in marks:
-        sim.run(mark-last);print(json.dumps(snapshot(world,include_digest=(mark==years)),sort_keys=True));last=mark
-    if last<years:sim.run(years-last);print(json.dumps(snapshot(world,include_digest=True),sort_keys=True))
+    from time import perf_counter
+    from scaling_telemetry import ScalingTelemetry, BUCKET_ENDS
+    world=generate_world(seed);sim=Simulation(world)
+    marks=sorted(set([m for m in BUCKET_ENDS if m<=years]+[years]))
+    last=0;simulation_seconds=0.;diagnostic_seconds=0.
+    with ScalingTelemetry(world) as telemetry:
+        for mark in marks:
+            start=perf_counter()
+            sim.run(mark-last)
+            elapsed=perf_counter()-start;simulation_seconds+=elapsed
+            print(json.dumps(telemetry.report(last+1,elapsed),sort_keys=True),flush=True)
+            start=perf_counter()
+            report=snapshot(world,include_digest=False)
+            diagnostic_seconds+=perf_counter()-start
+            print(json.dumps(report,sort_keys=True),flush=True)
+            last=mark
+    start=perf_counter();digest=world.digest();digest_seconds=perf_counter()-start
+    start=perf_counter()
     if world.year!=years:raise SystemExit(f'expected year {years}, got {world.year}')
     if not all(c<e.id for e in world.events for c in e.causes):raise SystemExit('causal integrity failure')
+    validation_seconds=perf_counter()-start
+    print(json.dumps({'record':'benchmark','seed':seed,'years':years,'simulation_seconds':simulation_seconds,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest},sort_keys=True),flush=True)
     return world
 
 
