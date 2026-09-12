@@ -10,10 +10,21 @@ class CraftedItem:
  id:int;kind:str;quality:float;rarity:str;settlement:int;craftsperson:int;created_year:int;origin_event:int;materials:tuple[int,...];magical_properties:tuple[str,...]=();owner_kind:str='person';owner_id:int|None=None;item_rank:int=0;magical:bool=False
 @dataclass
 class MaterialEconomy:
- lots:dict[int,MaterialLot]=field(default_factory=dict);items:dict[int,CraftedItem]=field(default_factory=dict);lot_index:dict[int,list[int]]=field(default_factory=dict);next_lot:int=1;next_item:int=1
+ lots:dict[int,MaterialLot]=field(default_factory=dict);items:dict[int,CraftedItem]=field(default_factory=dict);lot_index:dict[int,list[int]]=field(default_factory=dict);active_lot_index:dict[int,set[int]]=field(default_factory=dict);next_lot:int=1;next_item:int=1
  def create_lot(self,kind,quantity,quality,sid,producer,year,event,properties=(),material_rank=0):
-  i=self.next_lot;self.next_lot+=1;l=MaterialLot(i,kind,quantity,quality,sid,producer,year,event,'person',producer,tuple(properties),0,[],material_rank);self.lots[i]=l;self.lot_index.setdefault(sid,[]).append(i);return l
- def available(self,sid,kind=None):return [self.lots[i] for i in self.lot_index.get(sid,()) if self.lots[i].quantity-self.lots[i].consumed>.01 and (kind is None or self.lots[i].kind==kind)]
+  i=self.next_lot;self.next_lot+=1;l=MaterialLot(i,kind,quantity,quality,sid,producer,year,event,'person',producer,tuple(properties),0,[],material_rank);self.lots[i]=l;self.lot_index.setdefault(sid,[]).append(i);self.active_lot_index.setdefault(sid,set()).add(i);return l
+ def available(self,sid,kind=None):
+  ids=self.active_lot_index.get(sid,())
+  return [self.lots[i] for i in ids if (kind is None or self.lots[i].kind==kind)]
+ def consume(self,lot,amount):
+  used=min(max(0.,amount),max(0.,lot.quantity-lot.consumed));lot.consumed+=used
+  if lot.quantity-lot.consumed<=.01:self.active_lot_index.get(lot.settlement,set()).discard(lot.id)
+  return used
+ def rebuild_active_index(self):
+  self.active_lot_index={}
+  for sid,ids in self.lot_index.items():
+   active={i for i in ids if i in self.lots and self.lots[i].quantity-self.lots[i].consumed>.01}
+   if active:self.active_lot_index[sid]=active
  def create_item(self,kind,quality,rarity,sid,crafter,year,event,materials,properties=(),item_rank=0,magical=False):
   i=self.next_item;self.next_item+=1;x=CraftedItem(i,kind,quality,rarity,sid,crafter,year,event,tuple(materials),tuple(properties),'person',crafter,item_rank,magical);self.items[i]=x;return x
 
@@ -54,7 +65,6 @@ def _magical_craft_permission(world,crafter,target_rank,craft_skill):
 
 def _produce_lot(world,sid,producer,rr,Layer,Ref):
  s=world.settlements[sid];cell=world.cells[(s.x,s.y)];kind=_raw_kind(cell,rr);skill=world.skills.get(producer.id,'agriculture' if kind in ('grain','wool','timber') else 'craft').level;quality=max(.05,min(1.25,.25+.08*skill+.2*rr.random()));props=_magic_property(world,producer,kind,sid,rr);mr=_material_rank(world,sid,props,rr)
- # A lot is a producer's batch, not one item. Productive skill, settlement prosperity and scarcity all affect batch size.
  demand=1+.45*world.local[sid].scarcity+.25*s.prosperity;qty=(2+skill+rr.random()*4)*demand;e=world.emit('material_produced',Layer.REALITY,(Ref('person',producer.id),),Ref('settlement',sid),material=kind,quantity=round(qty,2),quality=round(quality,3),magical_properties=props,material_rank=mr);return world.materials.create_lot(kind,qty,quality,sid,producer.id,world.year,e.id,props,mr)
 def _craft_once(world,sid,crafter,rr,Layer,Ref):
  craft_skill=world.skills.get(crafter.id,'craft').level;available=world.materials.available(sid)
@@ -64,7 +74,8 @@ def _craft_once(world,sid,crafter,rr,Layer,Ref):
   seller=world.people.get(lot.owner_id);price=max(.05,(1+lot.quality)*(1+.5*len(lot.magical_properties))*(1+.4*lot.material_rank))
   if seller is None or crafter.wealth<price:return False
   crafter.wealth-=price;seller.wealth+=price;t=world.emit('material_purchased',Layer.SOCIETY,(Ref('person',crafter.id),Ref('person',seller.id)),Ref('settlement',sid),(lot.origin_event,),material_lot=lot.id,price=round(price,3));lot.owner_id=crafter.id;lot.transfers.append(t.id)
- used=min(1.,lot.quantity-lot.consumed);lot.consumed+=used;rank=world.advancement.rank(crafter.id);q=max(.05,min(1.5,.45*lot.quality+.09*craft_skill+.04*rank+rr.uniform(-.08,.08)));target=max(0,min(lot.material_rank,rank+1));magical=bool(lot.magical_properties) and _magical_craft_permission(world,crafter,target,craft_skill);item_props=lot.magical_properties if magical else ();rarity=_rarity(q,rank,magical)
+ used=world.materials.consume(lot,1.);rank=world.advancement.rank(crafter.id);q=max(.05,min(1.5,.45*lot.quality+.09*craft_skill+.04*rank+rr.uniform(-.08,.08)));target=max(0,min(lot.material_rank,rank+1));magical=bool(lot.magical_properties) and _magical_craft_permission(world,crafter,target,craft_skill);item_props=lot.magical_properties if magical else ();rarity=_rarity(q,rank,magical)
+ if used<=0:return False
  if not magical and lot.magical_properties:rarity=_rarity(q,0,False)
  ce=world.emit('item_crafted',Layer.REALITY,(Ref('person',crafter.id),),Ref('settlement',sid),(lot.origin_event,),item_kind=_craft_kind(lot.kind),material_lots=(lot.id,),quality=round(q,3),rarity=rarity,magical=magical,item_rank=target if magical else 0,magical_properties=item_props,material_properties_retained=lot.magical_properties if not magical else ());world.materials.create_item(_craft_kind(lot.kind),q,rarity,sid,crafter.id,world.year,ce.id,(lot.id,),item_props,target if magical else 0,magical)
  if craft_skill>=2.5:crafter.occupation='craftsperson'
@@ -76,7 +87,6 @@ def material_economy_step(world,rng):
   adults=[p for p in people if p.age>=16]
   if not adults:continue
   s=world.settlements[sid];rr=rng.stream('materials',world.year,sid);producers=sorted(adults,key=lambda p:(world.skills.get(p.id,'agriculture').level+world.skills.get(p.id,'craft').level,p.curiosity,-p.id),reverse=True)[:max(1,min(16,len(adults)))]
-  # Batch count scales with available labor and local economic pressure. Typical settlements can now produce multiple independent lots without forcing a fixed per-year count.
   pressure=world.local[sid].scarcity*.8+s.prosperity*.35
   labor_batches=len(adults)//12
   pressure_batches=int(pressure*2)
@@ -85,8 +95,7 @@ def material_economy_step(world,rng):
    prng=rng.stream('material_producer',world.year,sid*100+n);producer=producers[int(prng.random()*len(producers))%len(producers)];_produce_lot(world,sid,producer,prng,Layer,Ref)
   crafters=sorted(adults,key=lambda p:(world.skills.get(p.id,'craft').level,p.curiosity,-p.id),reverse=True);qualified=[p for p in crafters if world.skills.get(p.id,'craft').level>=.7]
   if not qualified:continue
-  available_units=sum(max(0.,l.quantity-l.consumed) for l in world.materials.available(sid));craft_count=min(10,max(0,int(available_units//8)),max(1,len(qualified)//35))
+  available=world.materials.available(sid);available_units=sum(max(0.,l.quantity-l.consumed) for l in available);craft_count=min(10,max(0,int(available_units//8)),max(1,len(qualified)//35))
   for n in range(craft_count):
    crng=rng.stream('material_craft',world.year,sid*100+n);crafter=qualified[n%len(qualified)]
-   # Demand/readiness still matters; higher prosperity and scarcity both create reasons to commission practical work.
    if crng.random()<=min(.82,.28+.30*s.prosperity+.22*world.local[sid].scarcity):_craft_once(world,sid,crafter,crng,Layer,Ref)
