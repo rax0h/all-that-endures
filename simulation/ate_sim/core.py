@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field, asdict, is_dataclass
 from enum import Enum
-import hashlib, json, random
+import hashlib, json, math
 from typing import Any
 from .genealogy import Genealogy
 from .social import SocialGraph
@@ -64,7 +64,65 @@ class World:
    if p.alive:out[p.settlement].append(p)
   return out
  def digest(self):return hashlib.sha256(json.dumps(_canonical(self),sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()
+
+_MASK=(1<<64)-1
+class _FastRandom:
+ __slots__=('state','_gauss')
+ def __init__(self,seed):self.state=seed&_MASK or 0x9E3779B97F4A7C15;self._gauss=None
+ def _next(self):
+  self.state=(self.state+0x9E3779B97F4A7C15)&_MASK;z=self.state;z=((z^(z>>30))*0xBF58476D1CE4E5B9)&_MASK;z=((z^(z>>27))*0x94D049BB133111EB)&_MASK;return (z^(z>>31))&_MASK
+ def random(self):return (self._next()>>11)*(1.0/(1<<53))
+ def uniform(self,a,b):return a+(b-a)*self.random()
+ def getrandbits(self,k):
+  if k<=0:return 0
+  out=0;shift=0
+  while shift<k:
+   out|=self._next()<<shift;shift+=64
+  return out&((1<<k)-1)
+ def randrange(self,start,stop=None,step=1):
+  if stop is None:start,stop=0,start
+  if step==0:raise ValueError('zero step for randrange()')
+  n=(stop-start+step-(1 if step>0 else -1))//step if step>0 else (start-stop-step-1)//(-step)
+  if n<=0:raise ValueError('empty range for randrange()')
+  return start+(int(self.random()*n)%n)*step
+ def randint(self,a,b):return self.randrange(a,b+1)
+ def choice(self,seq):
+  if not seq:raise IndexError('cannot choose from an empty sequence')
+  return seq[int(self.random()*len(seq))%len(seq)]
+ def shuffle(self,x):
+  for i in range(len(x)-1,0,-1):
+   j=int(self.random()*(i+1))%(i+1);x[i],x[j]=x[j],x[i]
+ def gauss(self,mu=0.0,sigma=1.0):
+  if self._gauss is not None:z=self._gauss;self._gauss=None;return mu+z*sigma
+  u1=max(1e-15,self.random());u2=self.random();r=math.sqrt(-2.0*math.log(u1));theta=2.0*math.pi*u2;z0=r*math.cos(theta);self._gauss=r*math.sin(theta);return mu+z0*sigma
+ def sample(self,population,k):
+  if k<0 or k>len(population):raise ValueError('sample larger than population')
+  pool=list(population);out=[]
+  for _ in range(k):
+   i=int(self.random()*len(pool))%len(pool);out.append(pool.pop(i))
+  return out
+ def choices(self,population,weights=None,cum_weights=None,k=1):
+  if not population:raise IndexError('cannot choose from an empty sequence')
+  if weights is None and cum_weights is None:return [self.choice(population) for _ in range(k)]
+  if cum_weights is None:
+   total=0.;cum_weights=[]
+   for w in weights:total+=w;cum_weights.append(total)
+  total=cum_weights[-1];out=[]
+  for _ in range(k):
+   x=self.random()*total;i=0
+   while i<len(cum_weights)-1 and x>=cum_weights[i]:i+=1
+   out.append(population[i])
+  return out
+
 class RNG:
- def __init__(self,seed):self.seed=seed
+ def __init__(self,seed):self.seed=seed&_MASK;self._names={}
+ def _name_key(self,namespace):
+  key=self._names.get(namespace)
+  if key is not None:return key
+  h=0xCBF29CE484222325
+  for b in namespace.encode():h=((h^b)*0x100000001B3)&_MASK
+  self._names[namespace]=h;return h
  def stream(self,namespace,year=0,entity=0):
-  h=hashlib.blake2b(f'{self.seed}|{namespace}|{year}|{entity}'.encode(),digest_size=8).digest();return random.Random(int.from_bytes(h,'big'))
+  x=(self.seed^self._name_key(namespace)^((year*0xD6E8FEB86659FD93)&_MASK)^((entity*0xA5A3564E27F8862D)&_MASK))&_MASK
+  x=(x^(x>>30))*0xBF58476D1CE4E5B9&_MASK;x=(x^(x>>27))*0x94D049BB133111EB&_MASK;x^=x>>31
+  return _FastRandom(x)
