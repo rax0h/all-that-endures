@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from heapq import heappush, heappop, heapify
 from .core_types import layer_ref
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
 
@@ -157,13 +158,53 @@ def _wanted_resources(world,person,resources,wanted=True):
   if decisions[key]==wanted:result.append(resource)
  return result
 
-def _transfer_to_seeker(world,r,holder,local,rng):
+class _SettlementDemand:
+ """Current-step eligibility and pressure; no archival resource scan per holder."""
+ def __init__(self,world,people):
+  self.world=world;self.people=people;self.heaps={};self.resources={};self.versions={};self.states={}
+ def _state(self,p):
+  a=_aspiration(self.world,p);path=self.world.advancement.path(p.id)
+  return (a.drive,a.urgency,a.preparation,a.desired_base_essences,a.desired_abilities,
+          None if path is None else (tuple(path.base_essences),len(path.abilities),path.capacity))
+ def _score(self,p):
+  a=_aspiration(self.world,p)
+  return (a.drive+.5*a.urgency)*(.35+.65*a.preparation)
+ def refresh(self,p):
+  if not self.heaps:return
+  state=self._state(p)
+  if self.states.get(p.id)==state:return
+  self.states[p.id]=state;version=self.versions.get(p.id,0)+1;self.versions[p.id]=version
+  for key,heap in self.heaps.items():
+   if _wants(self.world,p,self.resources[key]):heappush(heap,(-self._score(p),p.id,version))
+ def pressure(self,resource,excluding):
+  key=_demand_key(resource)
+  if key not in self.heaps:
+   heap=[]
+   # Lazy initialization preserves when aspirations are first formed.
+   for p in self.people:
+    wants=_wants(self.world,p,resource)
+    if p.id not in self.states:self.states[p.id]=self._state(p)
+    if wants:heap.append((-self._score(p),p.id,self.versions.get(p.id,0)))
+   heapify(heap);self.heaps[key]=heap;self.resources[key]=resource
+  heap=self.heaps[key];excluded=None
+  while heap:
+   score,pid,version=heap[0]
+   if version!=self.versions.get(pid,0):heappop(heap);continue
+   if pid==excluding:excluded=heappop(heap);continue
+   break
+  result=-heap[0][0] if heap else 0.
+  if excluded is not None:heappush(heap,excluded)
+  return result
+
+def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
  Layer,Ref=layer_ref();candidates=[q for q in local if q.id!=holder.id and _wants(world,q,r)]
  if not candidates:return False
  q=max(candidates,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id));a=_aspiration(world,q);price=(8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity));gift=world.social.get(holder.id,q.id).attachment>.7
  if not gift and q.wealth<price:return False
  if not gift:q.wealth-=price;holder.wealth+=price
- e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',holder.id),Ref('person',q.id)),Ref('settlement',holder.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,reason='relationship gift' if gift else 'aspirant purchase',price=0 if gift else price);world.magic_resources.transfer(r.id,'person',q.id,e.id,holder.settlement);a.preparation=min(1.,a.preparation+.08);return True
+ e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',holder.id),Ref('person',q.id)),Ref('settlement',holder.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,reason='relationship gift' if gift else 'aspirant purchase',price=0 if gift else price);world.magic_resources.transfer(r.id,'person',q.id,e.id,holder.settlement);a.preparation=min(1.,a.preparation+.08)
+ if on_transfer is not None:on_transfer(q)
+ return True
 
 def magic_ecology_step(world,rng):
  Layer,Ref=layer_ref();_recover_dead_owner_resources(world);adults_by_settlement={sid:[] for sid in world.settlements}
@@ -183,6 +224,7 @@ def magic_ecology_step(world,rng):
     q=max(seekers,key=lambda p:(p.wealth,-p.id));price=(7 if r.kind=='essence' else 3)
     if q.wealth>=price:
      q.wealth-=price;e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price);world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
+ demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
@@ -192,15 +234,16 @@ def magic_ecology_step(world,rng):
    if rr.random()<.015*(.4+a.drive+.4*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
    search_chance=min(.012,.00035+.0018*a.drive+.0020*a.preparation+.0018*a.urgency+.00008*min(30,a.search_years))
    if rr.random()<search_chance:_make_resource(world,rr,p.settlement,p,'essence',None if sought is None else sought.id,'aspirant search')
-  essences=world.magic_resources.inventory('person',p.id,'essence')
+  essences=world.magic_resources.inventory('person',p.id,'essence') if base<a.desired_base_essences else []
   if essences and base<a.desired_base_essences and rr.random()<.15+.34*a.drive+.18*a.urgency:
    candidates=[r for r in essences if path is None or r.key not in path.base_essences]
    if candidates:
     take=a.compromise_tolerance if base>0 else max(.35,a.compromise_tolerance)
     if rr.random()<take:absorb_essence_resource(world,p.id,candidates[int(rr.random()*len(candidates))%len(candidates)].id);path=world.advancement.path(p.id);base=len(path.base_essences)
-  stones=world.magic_resources.inventory('person',p.id,'awakening_stone')
+  stones=world.magic_resources.inventory('person',p.id,'awakening_stone') if path is not None and len(path.abilities)<min(a.desired_abilities,path.capacity) else []
   if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity) and rr.random()<.15+.34*a.drive+.18*a.urgency:
    if rr.random()<max(.12,1-a.stone_selectiveness):use_awakening_stone(world,p.id,stones[int(rr.random()*len(stones))%len(stones)].id)
+  demand=demands[p.settlement];demand.refresh(p)
   held=world.magic_resources.inventory('person',p.id)
   if held:
    surplus=_wanted_resources(world,p,held,wanted=False)
@@ -209,7 +252,6 @@ def magic_ecology_step(world,rng):
     demand_types={}
     for r in surplus:demand_types.setdefault(_demand_key(r),r)
     for r in demand_types.values():
-     seekers=[q for q in local if q.id!=p.id and _wants(world,q,r)]
-     if seekers:pressure=max(pressure,max((_aspiration(world,q).drive+.5*_aspiration(world,q).urgency)*(.35+.65*_aspiration(world,q).preparation) for q in seekers))
+     pressure=max(pressure,demand.pressure(r,p.id))
     conditional=(.04+.16*min(1.,pressure))/.20
-    if rr.random()<conditional:_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,local,rr)
+    if rr.random()<conditional:_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,local,rr,on_transfer=demand.refresh)

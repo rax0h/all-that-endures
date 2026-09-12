@@ -47,3 +47,39 @@ def test_market_contenders_preserve_wealth_ties_and_ineligible_top_buyer():
             p.wealth = value
         reference = max(people, key=lambda p: (magic._aspiration(world,p).urgency, magic._aspiration(world,p).drive, magic._aspiration(world,p).preparation, p.wealth, -p.id))
         assert max(contenders, key=lambda p: (p.wealth, -p.id)) is reference
+
+def test_demand_pressure_updates_eligibility_preparation_and_exclusion():
+    world = generate_world(17)
+    people = [p for p in world.people.values() if p.age >= 18][:5]
+    for p in people:
+        world.magic_resources.aspirations[p.id] = magic.MagicAspiration(.7,3,20,"test",0,urgency=.8,preparation=.1)
+    essence = world.magic_resources.create("essence",ESSENCE_IDS[0],"common",0)
+    stone = world.magic_resources.create("awakening_stone",STONE_IDS[0],"common",0)
+    demand = magic._SettlementDemand(world,people)
+    def verify():
+        for resource in (essence,stone):
+            for holder in people:
+                expected = max(((magic._aspiration(world,p).drive+.5*magic._aspiration(world,p).urgency)*(.35+.65*magic._aspiration(world,p).preparation) for p in people if p.id!=holder.id and magic._wants(world,p,resource)),default=0.)
+                assert demand.pressure(resource,holder.id) == expected
+    verify()
+    for p in people:
+        a = magic._aspiration(world,p)
+        a.preparation=.9
+        demand.refresh(p)
+        verify()
+        world.advancement.absorb_essence(p.id,essence.key,world.year)
+        demand.refresh(p)
+        verify()
+        a.desired_abilities=1
+        demand.refresh(p)
+        verify()
+
+def test_duplicate_pressure_queries_use_one_local_eligibility_scan():
+    world = generate_world(17)
+    people = [p for p in world.people.values() if p.age >= 18][:5]
+    resource = world.magic_resources.create("essence",ESSENCE_IDS[0],"common",0)
+    demand = magic._SettlementDemand(world,people)
+    with patch.object(magic,"_wants",wraps=magic._wants) as wants:
+        for n in range(1000):
+            demand.pressure(resource,people[n % len(people)].id)
+        assert wants.call_count == len(people)

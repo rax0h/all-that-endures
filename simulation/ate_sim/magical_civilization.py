@@ -85,13 +85,13 @@ def _resource_circulation(world, rng, sid, people, users, magic):
         for holder in users:
             path = world.advancement.path(holder.id)
             a = _aspiration(world, holder)
-            ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence'))
+            ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if len(path.base_essences) < a.desired_base_essences else []
             if ess and len(path.base_essences) < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
                 viable = [r for r in ess if r.key not in path.base_essences]
                 if viable and rr.random() < max(.25, a.compromise_tolerance):
                     absorb_essence_resource(world, holder.id, viable[int(rr.random() * len(viable)) % len(viable)].id)
                     path = world.advancement.path(holder.id)
-            stones = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'awakening_stone'))
+            stones = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'awakening_stone')) if len(path.abilities) < min(a.desired_abilities, path.capacity) else []
             if stones and len(path.abilities) < min(a.desired_abilities, path.capacity):
                 # Selective users still wait sometimes, but a mature market gives them repeated real opportunities.
                 if rr.random() < max(.22, .82 - .55 * a.stone_selectiveness):

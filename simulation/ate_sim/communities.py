@@ -25,9 +25,18 @@ class CommunityState:
 
     def join(self,person_id,community_id,strength=1.0):
         self.memberships[(person_id,community_id)]=max(0.,min(1.,strength))
+        if hasattr(self,'_membership_index'):
+            self._membership_index.setdefault(person_id,{})[community_id]=None
+
+    def rebuild_membership_index(self):
+        self._membership_index={}
+        for pid,cid in self.memberships:
+            self._membership_index.setdefault(pid,{})[cid]=None
 
     def memberships_for(self,person_id,minimum=.01):
-        return {cid:v for (pid,cid),v in self.memberships.items() if pid==person_id and v>=minimum}
+        # IDs retain archive insertion order; strengths remain authoritative there.
+        if not hasattr(self,'_membership_index'):self.rebuild_membership_index()
+        return {cid:v for cid in self._membership_index.get(person_id,()) if (v:=self.memberships[(person_id,cid)])>=minimum}
 
     def inherit(self,child_id,parent_ids,weight=.72):
         inherited={}
@@ -50,7 +59,7 @@ def community_step(world):
         if not p.alive:continue
         local=world.communities.local_root(p.settlement)
         if local is not None:
-            key=(p.id,local);current=world.communities.memberships.get(key,0.);world.communities.memberships[key]=min(1.,current+.012*(1-current))
+            key=(p.id,local);current=world.communities.memberships.get(key,0.);world.communities.join(p.id,local,min(1.,current+.012*(1-current)))
         for cid,v in list(world.communities.memberships_for(p.id).items()):
             c=world.communities.communities[cid]
-            if c.origin_settlement!=p.settlement and c.kind!="diaspora":world.communities.memberships[(p.id,cid)]=max(.01,v*.9995)
+            if c.origin_settlement!=p.settlement and c.kind!="diaspora":world.communities.join(p.id,cid,max(.01,v*.9995))
