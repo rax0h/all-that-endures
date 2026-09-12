@@ -11,10 +11,10 @@ class AmbientMagicState:
  def field(self,sid):return self.fields.setdefault(sid,AmbientField())
 
 def ambient_magic_step(world,rng):
- Layer,Ref=layer_ref()
+ Layer,Ref=layer_ref();living=world.living_by_settlement()
  for sid,s in sorted(world.settlements.items()):
   f=world.ambient_magic.field(sid);local=world.local[sid];rr=rng.stream('ambient_magic',world.year,sid)
-  users=sum(1 for p in world.living_by_settlement()[sid] if world.advancement.essence_user(p.id))
+  users=sum(1 for p in living.get(sid,()) if world.advancement.essence_user(p.id))
   pressure=.0025+.004*world.cells[(s.x,s.y)].hazard+.002*local.flood+.00012*users
   dissipation=.0035+.002*max(0.,.5-local.scarcity)
   f.level=max(0.,min(1.5,f.level+pressure-dissipation+rr.uniform(-.006,.006)))
