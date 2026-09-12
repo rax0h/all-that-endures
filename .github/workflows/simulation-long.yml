@@ -40,13 +40,19 @@ jobs:
         run: python simulation/calibration_check.py
       - name: requested long history
         if: github.event_name == 'workflow_dispatch'
-        run: /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py ${{ inputs.seed }} ${{ inputs.years }} | tee long-history-report.jsonl
+        run: |
+          set -o pipefail
+          /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py ${{ inputs.seed }} ${{ inputs.years }} | tee long-history-report.jsonl
       - name: focused millennium benchmark
         if: github.event_name == 'push'
-        run: /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 | tee long-history-report.jsonl
+        run: |
+          set -o pipefail
+          /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 | tee long-history-report.jsonl
       - name: weekly 1000-year validation
         if: github.event_name == 'schedule'
-        run: /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 | tee long-history-report.jsonl
+        run: |
+          set -o pipefail
+          /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 | tee long-history-report.jsonl
       - name: retain long-history diagnostics
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         uses: actions/upload-artifact@v4
