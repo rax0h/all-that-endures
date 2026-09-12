@@ -47,7 +47,7 @@ jobs:
           set -o pipefail
           /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py ${{ inputs.seed }} ${{ inputs.years }} | tee long-history-report.jsonl
       - name: focused millennium benchmark
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           set -o pipefail
           /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 | tee long-history-report.jsonl
@@ -57,7 +57,7 @@ jobs:
           set -o pipefail
           /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 | tee long-history-report.jsonl
       - name: retain long-history diagnostics
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+        if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
         uses: actions/upload-artifact@v4
         with:
           name: long-history-diagnostics-${{ github.run_number }}
