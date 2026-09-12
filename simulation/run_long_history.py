@@ -38,12 +38,20 @@ def snapshot(world, include_digest=False):
         'material_lots_total':len(lots),'material_lots_per_year':round(len(lots)/year,3),'material_lots_per_100_living_people_year':round((len(lots)/year)/pop*100,3),'material_lots_by_settlement':dict(sorted(production_by_settlement.items())),'material_peak_lots_in_year':max(production_by_year.values(),default=0),'material_purchases':events['material_purchased'],'crafted_items_total':len(items),'crafted_items_per_100_living_households_year':round((len(items)/year)/households*100,3),'living_active_craftspeople':len(active_crafters),'supplier_relationships_observed':len(supplier_pairs),'magical_material_lots':sum(bool(l.magical_properties) for l in lots),'magical_items':sum(bool(i.magical) for i in items),
         'core_institutions':dict(sorted(inst_kinds.items())),'institution_branches':len(world.institutions.branches),'magic_registry_records':len(world.institutions.magic_records),'magic_registry_disclosure':dict(sorted(disclosures.items())),'adventure_notices':len(world.institutions.notices),'adventure_notice_status':dict(sorted(notice_status.items())),
     }
+    complete_users=[p for p in living_users if len(paths[p.id].abilities)==20]
+    incomplete_users=[p for p in living_users if len(paths[p.id].abilities)!=20]
+    result['completed_path_ranks']=dict(sorted(Counter(world.advancement.rank(p.id) for p in complete_users).items()))
+    result['incomplete_path_ranks']=dict(sorted(Counter(world.advancement.rank(p.id) for p in incomplete_users).items()))
     if include_digest:result['digest']=world.digest()
     return result
 
 
 def main(seed=843000, years=1000):
     from time import perf_counter
+    import os, cProfile, pstats, io
+    profile_tail=int(os.environ.get('ATE_PROFILE_TAIL','0'))
+    profiler=cProfile.Profile() if profile_tail else None
+    profiled_years=0
     from scaling_telemetry import ScalingTelemetry, BUCKET_ENDS
     world=generate_world(seed);sim=Simulation(world)
     marks=sorted(set([m for m in BUCKET_ENDS if m<=years]+[years]))
@@ -51,7 +59,14 @@ def main(seed=843000, years=1000):
     with ScalingTelemetry(world) as telemetry:
         for mark in marks:
             start=perf_counter()
-            sim.run(mark-last)
+            if profiler is not None and mark==years:
+                warm=max(0,years-last-profile_tail)
+                sim.run(warm)
+                profiled_years=years-last-warm
+                profiler.enable()
+                sim.run(profiled_years)
+                profiler.disable()
+            else:sim.run(mark-last)
             elapsed=perf_counter()-start;simulation_seconds+=elapsed
             print(json.dumps(telemetry.report(last+1,elapsed),sort_keys=True),flush=True)
             start=perf_counter()
@@ -59,12 +74,16 @@ def main(seed=843000, years=1000):
             diagnostic_seconds+=perf_counter()-start
             print(json.dumps(report,sort_keys=True),flush=True)
             last=mark
+    if profiler is not None:
+        stream=io.StringIO()
+        pstats.Stats(profiler,stream=stream).strip_dirs().sort_stats('cumtime').print_stats(50)
+        print(json.dumps({'record':'late_profile','profiled_years':profiled_years,'text':stream.getvalue()}),flush=True)
     start=perf_counter();digest=world.digest();digest_seconds=perf_counter()-start
     start=perf_counter()
     if world.year!=years:raise SystemExit(f'expected year {years}, got {world.year}')
     if not all(c<e.id for e in world.events for c in e.causes):raise SystemExit('causal integrity failure')
     validation_seconds=perf_counter()-start
-    print(json.dumps({'record':'benchmark','seed':seed,'years':years,'simulation_seconds':simulation_seconds,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest},sort_keys=True),flush=True)
+    print(json.dumps({'record':'benchmark','seed':seed,'years':years,'simulation_seconds':simulation_seconds,'profile_tail_requested':profile_tail,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest},sort_keys=True),flush=True)
     return world
 
 

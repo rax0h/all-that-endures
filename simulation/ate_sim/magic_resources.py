@@ -133,6 +133,30 @@ def _wants(world,p,r):
  a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences);abilities=0 if path is None else len(path.abilities)
  if r.kind=='essence':return base<a.desired_base_essences and (path is None or r.key not in path.base_essences)
  return path is not None and abilities<a.desired_abilities and abilities<path.capacity
+def _demand_key(resource):
+ # Stone identity/rarity does not enter _wants; essence identity does.
+ return (resource.kind, resource.key if resource.kind=='essence' else None)
+
+def _market_contenders(world,people,resource):
+ # During the settlement market only wealth changes. Preserve all ties in the
+ # fixed urgency/drive/preparation prefix; wealth and ID are compared at purchase.
+ contenders=[];best=None
+ for person in people:
+  if not _wants(world,person,resource):continue
+  a=_aspiration(world,person);priority=(a.urgency,a.drive,a.preparation)
+  if best is None or priority>best:best=priority;contenders=[person]
+  elif priority==best:contenders.append(person)
+ return contenders
+
+def _wanted_resources(world,person,resources,wanted=True):
+ # This query has no intervening advancement or aspiration mutation.
+ decisions={};result=[]
+ for resource in resources:
+  key=_demand_key(resource)
+  if key not in decisions:decisions[key]=_wants(world,person,resource)
+  if decisions[key]==wanted:result.append(resource)
+ return result
+
 def _transfer_to_seeker(world,r,holder,local,rng):
  Layer,Ref=layer_ref();candidates=[q for q in local if q.id!=holder.id and _wants(world,q,r)]
  if not candidates:return False
@@ -150,10 +174,13 @@ def magic_ecology_step(world,rng):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
   chance=min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
   if rr.random()<chance:_discover(world,rr,sid,people)
-  for r in list(world.magic_resources.inventory('settlement',sid)):
-   seekers=[p for p in people if _wants(world,p,r)]
+  market={}
+  for r in world.magic_resources.inventory('settlement',sid):
+   key=_demand_key(r)
+   if key not in market:market[key]=_market_contenders(world,people,r)
+   seekers=market[key]
    if seekers:
-    q=max(seekers,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id));price=(7 if r.kind=='essence' else 3)
+    q=max(seekers,key=lambda p:(p.wealth,-p.id));price=(7 if r.kind=='essence' else 3)
     if q.wealth>=price:
      q.wealth-=price;e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price);world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
@@ -176,10 +203,12 @@ def magic_ecology_step(world,rng):
    if rr.random()<max(.12,1-a.stone_selectiveness):use_awakening_stone(world,p.id,stones[int(rr.random()*len(stones))%len(stones)].id)
   held=world.magic_resources.inventory('person',p.id)
   if held:
-   surplus=[r for r in held if not _wants(world,p,r)]
+   surplus=_wanted_resources(world,p,held,wanted=False)
    if surplus and rr.random()<.20:
     local=adults_by_settlement[p.settlement];pressure=0.
-    for r in surplus:
+    demand_types={}
+    for r in surplus:demand_types.setdefault(_demand_key(r),r)
+    for r in demand_types.values():
      seekers=[q for q in local if q.id!=p.id and _wants(world,q,r)]
      if seekers:pressure=max(pressure,max((_aspiration(world,q).drive+.5*_aspiration(world,q).urgency)*(.35+.65*_aspiration(world,q).preparation) for q in seekers))
     conditional=(.04+.16*min(1.,pressure))/.20

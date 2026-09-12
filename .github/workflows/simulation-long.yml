@@ -26,6 +26,7 @@ jobs:
     timeout-minutes: 30
     env:
       PYTHONPATH: .:simulation
+      ATE_PROFILE_TAIL: '10'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

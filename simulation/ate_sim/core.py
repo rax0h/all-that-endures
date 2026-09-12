@@ -1,6 +1,8 @@
 from __future__ import annotations
-from dataclasses import dataclass, field, asdict, is_dataclass
+from dataclasses import dataclass, field, asdict, is_dataclass, fields
 from enum import Enum
+from bisect import bisect_left, bisect_right
+from operator import attrgetter
 import hashlib, json, math
 from typing import Any
 from .genealogy import Genealogy
@@ -44,7 +46,7 @@ class LocalState: rain:float=.5; drought:float=0.; flood:float=0.; scarcity:floa
 @dataclass
 class TradeRoute: a:int; b:int; strength:float=.05; exchanges:int=0; last_used:int=0
 def _canonical(value):
- if is_dataclass(value): return _canonical(asdict(value))
+ if is_dataclass(value): return _canonical({f.name:getattr(value,f.name) for f in fields(value)})
  if isinstance(value,Enum): return value.value
  if isinstance(value,dict): return {repr(k):_canonical(v) for k,v in sorted(value.items(),key=lambda kv:repr(kv[0]))}
  if isinstance(value,(list,tuple)): return [_canonical(v) for v in value]
@@ -57,6 +59,12 @@ class World:
   if layer is None:raise ValueError('events require an explicit layer')
   if any(c not in self.event_ids for c in causes):raise ValueError('event cause does not exist')
   e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id);return e
+ def events_between(self,first_year,last_year=None):
+  # Events append in simulation-year order; binary search touches no old payloads.
+  last_year=self.year if last_year is None else last_year
+  if last_year<first_year:return []
+  key=attrgetter('year');start=bisect_left(self.events,first_year,key=key);stop=bisect_right(self.events,last_year,key=key)
+  return self.events[start:stop]
  def living(self):return [p for p in self.people.values() if p.alive]
  def living_by_settlement(self):
   out={sid:[] for sid in self.settlements}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
+from heapq import heappush, heappop, heapify
 RARITIES=('common','uncommon','rare','epic','legendary','mythic','transcendent')
 @dataclass
 class MaterialLot:
@@ -12,19 +13,48 @@ class CraftedItem:
 class MaterialEconomy:
  lots:dict[int,MaterialLot]=field(default_factory=dict);items:dict[int,CraftedItem]=field(default_factory=dict);lot_index:dict[int,list[int]]=field(default_factory=dict);active_lot_index:dict[int,set[int]]=field(default_factory=dict);next_lot:int=1;next_item:int=1
  def create_lot(self,kind,quantity,quality,sid,producer,year,event,properties=(),material_rank=0):
-  i=self.next_lot;self.next_lot+=1;l=MaterialLot(i,kind,quantity,quality,sid,producer,year,event,'person',producer,tuple(properties),0,[],material_rank);self.lots[i]=l;self.lot_index.setdefault(sid,[]).append(i);self.active_lot_index.setdefault(sid,set()).add(i);return l
+  i=self.next_lot;self.next_lot+=1;l=MaterialLot(i,kind,quantity,quality,sid,producer,year,event,'person',producer,tuple(properties),0,[],material_rank);self.lots[i]=l;self.lot_index.setdefault(sid,[]).append(i);self.active_lot_index.setdefault(sid,set()).add(i)
+  if hasattr(self,'_selection_index'):
+   heaps,counts=self._selection_index;heappush(heaps.setdefault(sid,[]),self._selection_key(l));counts[sid]=counts.get(sid,0)+bool(l.magical_properties)
+  return l
  def available(self,sid,kind=None):
   ids=self.active_lot_index.get(sid,())
   return [self.lots[i] for i in ids if (kind is None or self.lots[i].kind==kind)]
  def consume(self,lot,amount):
   used=min(max(0.,amount),max(0.,lot.quantity-lot.consumed));lot.consumed+=used
-  if lot.quantity-lot.consumed<=.01:self.active_lot_index.get(lot.settlement,set()).discard(lot.id)
+  if lot.quantity-lot.consumed<=.01:
+   active=self.active_lot_index.get(lot.settlement,set())
+   if lot.id in active:
+    active.discard(lot.id)
+    if hasattr(self,'_selection_index'):
+     _,counts=self._selection_index;counts[lot.settlement]=counts.get(lot.settlement,0)-bool(lot.magical_properties)
   return used
  def rebuild_active_index(self):
+  self.__dict__.pop('_selection_index',None)
   self.active_lot_index={}
   for sid,ids in self.lot_index.items():
    active={i for i in ids if i in self.lots and self.lots[i].quantity-self.lots[i].consumed>.01}
    if active:self.active_lot_index[sid]=active
+ def _selection_key(self,lot):
+  return (-(lot.quality+(.2 if lot.magical_properties else 0.)),lot.id)
+ def _ensure_selection_index(self):
+  # Derived runtime state: excluded from canonical history, rebuilt for old checkpoints.
+  # Quality/properties are fixed after creation. Rebuild after explicit data repair.
+  if not hasattr(self,'_selection_index'):
+   heaps={};counts={}
+   for sid,ids in self.active_lot_index.items():
+    heaps[sid]=[self._selection_key(self.lots[i]) for i in ids];heapify(heaps[sid])
+    counts[sid]=sum(bool(self.lots[i].magical_properties) for i in ids)
+   self._selection_index=(heaps,counts)
+  return self._selection_index
+ def has_available(self,sid):
+  return bool(self.active_lot_index.get(sid))
+ def best_available(self,sid):
+  heaps,_=self._ensure_selection_index();heap=heaps.get(sid,[]);active=self.active_lot_index.get(sid,())
+  while heap and heap[0][1] not in active:heappop(heap)
+  return self.lots[heap[0][1]] if heap else None
+ def magical_available_count(self,sid):
+  return self._ensure_selection_index()[1].get(sid,0)
  def create_item(self,kind,quality,rarity,sid,crafter,year,event,materials,properties=(),item_rank=0,magical=False):
   i=self.next_item;self.next_item+=1;x=CraftedItem(i,kind,quality,rarity,sid,crafter,year,event,tuple(materials),tuple(properties),'person',crafter,item_rank,magical);self.items[i]=x;return x
 
@@ -67,9 +97,11 @@ def _produce_lot(world,sid,producer,rr,Layer,Ref):
  s=world.settlements[sid];cell=world.cells[(s.x,s.y)];kind=_raw_kind(cell,rr);skill=world.skills.get(producer.id,'agriculture' if kind in ('grain','wool','timber') else 'craft').level;quality=max(.05,min(1.25,.25+.08*skill+.2*rr.random()));props=_magic_property(world,producer,kind,sid,rr);mr=_material_rank(world,sid,props,rr)
  demand=1+.45*world.local[sid].scarcity+.25*s.prosperity;qty=(2+skill+rr.random()*4)*demand;e=world.emit('material_produced',Layer.REALITY,(Ref('person',producer.id),),Ref('settlement',sid),material=kind,quantity=round(qty,2),quality=round(quality,3),magical_properties=props,material_rank=mr);return world.materials.create_lot(kind,qty,quality,sid,producer.id,world.year,e.id,props,mr)
 def _craft_once(world,sid,crafter,rr,Layer,Ref):
- craft_skill=world.skills.get(crafter.id,'craft').level;available=world.materials.available(sid)
- if craft_skill<.7 or not available:return False
- lot=max(available,key=lambda l:(l.quality+(.2 if l.magical_properties else 0.),-l.id)) if craft_skill>=2 else available[int(rr.random()*len(available))%len(available)]
+ craft_skill=world.skills.get(crafter.id,'craft').level
+ if craft_skill<.7 or not world.materials.has_available(sid):return False
+ if craft_skill>=2:lot=world.materials.best_available(sid)
+ else:
+  available=world.materials.available(sid);lot=available[int(rr.random()*len(available))%len(available)]
  if lot.owner_kind=='person' and lot.owner_id!=crafter.id:
   seller=world.people.get(lot.owner_id);price=max(.05,(1+lot.quality)*(1+.5*len(lot.magical_properties))*(1+.4*lot.material_rank))
   if seller is None or crafter.wealth<price:return False
