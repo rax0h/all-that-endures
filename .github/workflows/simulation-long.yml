@@ -38,6 +38,9 @@ jobs:
       - name: multi-seed calibration
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: python simulation/calibration_check.py
+      - name: representative profiler
+        if: github.event_name == 'push' && github.ref == 'refs/heads/sim/ranked-threat-ecology'
+        run: /usr/bin/time -f 'profile_elapsed_seconds=%e' python simulation/profile_simulation.py 843000 150
       - name: requested long history
         if: github.event_name == 'workflow_dispatch'
         run: |
