@@ -49,9 +49,6 @@ def absorb_essence_resource(world,pid,rid):
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
  Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=max(1,world.advancement.rank(pid))
  a=world.magic_resources.aspirations.get(pid)
- # Absorbing an essence is itself a major commitment. Most people who cross that threshold,
- # and essentially all adventurer aspirants, now pursue the full configuration rather than
- # becoming permanent partial users by arbitrary assignment.
  if a is not None and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
  for ability in created:world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=ability.essence,source=ability.source,ability=ability.semantic_key,name=ability.name,special=ability.special,aura=ability.aura)
  return path,created
@@ -66,25 +63,54 @@ def use_awakening_stone(world,pid,rid,target_essence=None):
  if a is None:return None
  world.magic_resources.consume(rid,pid,world.year,e.id);world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura);return a
 
+def _environment_tags(world,sid):
+ s=world.settlements[sid];c=world.cells[(s.x,s.y)];q=world.local[sid];tags=[]
+ if c.forest>=.55:tags+=['wood','plant','growth','nature','leaf','forest','beast']
+ elif c.forest>=.25:tags+=['plant','nature','beast']
+ if c.fertility>=.58:tags+=['growth','life','plant','earth']
+ if c.elevation>=.58:tags+=['stone','earth','iron','metal','crystal','mountain']
+ elif c.elevation<=.25:tags+=['plain','wind']
+ if c.moisture>=.62 or q.rain>=.68:tags+=['water','rain','river','storm']
+ if q.flood>.04:tags+=['water','flood','river']
+ if c.moisture<=.28 or q.drought>.10:tags+=['sun','fire','dust','dry','wind']
+ if c.hazard>=.62:tags+=['danger','death','poison','blood','shadow']
+ if s.memory.get('monster_surge',0)>.12:tags+=['monster','fear','death']
+ if s.prosperity>=.55:tags+=['craft','trade','wealth','knowledge','order']
+ return tuple(dict.fromkeys(tags))
+def _environmental_essence(world,rng,sid):
+ tags=_environment_tags(world,sid);weighted=[]
+ for key in ESSENCE_IDS:
+  text=(key+' '+str(ESSENCES[key])).lower();hits=sum(1 for tag in tags if tag in text)
+  if hits:weighted.append((key,float(hits*hits)))
+ if not weighted:
+  return ESSENCE_IDS[int(rng.random()*len(ESSENCE_IDS))%len(ESSENCE_IDS)],tags
+ total=sum(w for _,w in weighted);x=rng.random()*total
+ for key,w in weighted:
+  x-=w
+  if x<=0:return key,tags
+ return weighted[-1][0],tags
+
 def _make_resource(world,rng,sid,finder,kind=None,cause=None,method='chance discovery'):
- Layer,Ref=layer_ref();kind=kind or ('essence' if rng.random()<.6 else 'awakening_stone')
- if kind=='essence':key=ESSENCE_IDS[int(rng.random()*len(ESSENCE_IDS))%len(ESSENCE_IDS)];rarity=ESSENCES[key]['rarity']
+ Layer,Ref=layer_ref();kind=kind or ('essence' if rng.random()<.6 else 'awakening_stone');tags=()
+ if kind=='essence':key,tags=_environmental_essence(world,rng,sid);rarity=ESSENCES[key]['rarity']
  else:key=STONE_IDS[int(rng.random()*len(STONE_IDS))%len(STONE_IDS)];rarity=AWAKENING_STONES[key]['rarity']
- causes=() if cause is None else (cause,);e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),causes,resource_kind=kind,key=key,rarity=rarity,method=method);return world.magic_resources.create(kind,key,rarity,world.year,sid,'person',finder.id,e.id)
+ causes=() if cause is None else (cause,);e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),causes,resource_kind=kind,key=key,rarity=rarity,method=method,environment_tags=tags,manifestation_basis='local magical ecology' if kind=='essence' else 'awakening resonance');return world.magic_resources.create(kind,key,rarity,world.year,sid,'person',finder.id,e.id)
 def _discover(world,rng,sid,people):
  if not people:return None
  finder=people[int(rng.random()*len(people))%len(people)];return _make_resource(world,rng,sid,finder)
 def _recover_dead_owner_resources(world):
- Layer,Ref=layer_ref()
- for r in sorted(world.magic_resources.resources.values(),key=lambda x:x.id):
-  if r.consumed_year is not None or r.owner_kind!='person' or r.owner_id is None:continue
-  owner=world.people.get(r.owner_id)
-  if owner is None or owner.alive:continue
-  household=world.households.get(owner.household);heirs=[] if household is None else [world.people[x] for x in household.members if world.people.get(x) and world.people[x].alive]
-  if heirs:
-   heir=min(heirs,key=lambda p:p.id);e=world.emit('magic_resource_inherited',Layer.SOCIETY,(Ref('person',heir.id),Ref('person',owner.id)),Ref('settlement',heir.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key);world.magic_resources.transfer(r.id,'person',heir.id,e.id,heir.settlement)
-  else:
-   e=world.emit('magic_resource_recovered',Layer.REALITY,location=Ref('settlement',r.location) if r.location in world.settlements else None,causes=((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key);world.magic_resources.transfer(r.id,'settlement',r.location,e.id,r.location)
+ Layer,Ref=layer_ref();owners=[key for key in world.magic_resources.owner_index if key[0]=='person']
+ for _,pid in sorted(owners,key=lambda x:x[1]):
+  owner=world.people.get(pid)
+  if owner is not None and owner.alive:continue
+  for rid in sorted(tuple(world.magic_resources.owner_index.get(('person',pid),()))):
+   r=world.magic_resources.resources[rid]
+   if r.consumed_year is not None:continue
+   household=None if owner is None else world.households.get(owner.household);heirs=[] if household is None else [world.people[x] for x in household.members if world.people.get(x) and world.people[x].alive]
+   if heirs:
+    heir=min(heirs,key=lambda p:p.id);e=world.emit('magic_resource_inherited',Layer.SOCIETY,(Ref('person',heir.id),Ref('person',pid)),Ref('settlement',heir.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key);world.magic_resources.transfer(r.id,'person',heir.id,e.id,heir.settlement)
+   else:
+    e=world.emit('magic_resource_recovered',Layer.REALITY,location=Ref('settlement',r.location) if r.location in world.settlements else None,causes=((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key);world.magic_resources.transfer(r.id,'settlement',r.location,e.id,r.location)
 def _aspiration(world,p):
  a=world.magic_resources.aspirations.get(p.id)
  if a:return a
@@ -92,8 +118,6 @@ def _aspiration(world,p):
  drive=max(0.,min(1.,.46*p.curiosity+.18*(1-p.inhibition)+.12*status+.10*min(2,family)+.05*min(3,contacts)))
  adventurer=(p.occupation in ('adventurer','guard','hunter','soldier')) or (drive>.68 and (p.curiosity>.58 or status>.42))
  interested=drive>=.34 or family>0 or contacts>=2
- # Full configuration is the premier path for serious essence users. Partial use remains
- # legitimate, but should arise mostly from weaker interest or from failure/access constraints.
  serious=interested and (adventurer or drive>=.40 or family>0 or contacts>=2)
  completion=serious
  if not interested:desired=0
@@ -135,8 +159,6 @@ def magic_ecology_step(world,rng):
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
-  # Once somebody has actually become an essence user, continued full-path pursuit becomes
-  # the strong norm unless their original interest was exceptionally weak.
   if path is not None and not a.completion_goal and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
   if a.desired_base_essences>base:
    a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive+.5*a.urgency));sought=None
@@ -147,7 +169,6 @@ def magic_ecology_step(world,rng):
   if essences and base<a.desired_base_essences and rr.random()<.15+.34*a.drive+.18*a.urgency:
    candidates=[r for r in essences if path is None or r.key not in path.base_essences]
    if candidates:
-    # High compromise tolerance means taking a viable available essence quickly; low tolerance waits more often.
     take=a.compromise_tolerance if base>0 else max(.35,a.compromise_tolerance)
     if rr.random()<take:absorb_essence_resource(world,p.id,candidates[int(rr.random()*len(candidates))%len(candidates)].id);path=world.advancement.path(p.id);base=len(path.base_essences)
   stones=world.magic_resources.inventory('person',p.id,'awakening_stone')
@@ -156,9 +177,10 @@ def magic_ecology_step(world,rng):
   held=world.magic_resources.inventory('person',p.id)
   if held:
    surplus=[r for r in held if not _wants(world,p,r)]
-   if surplus:
+   if surplus and rr.random()<.20:
     local=adults_by_settlement[p.settlement];pressure=0.
     for r in surplus:
      seekers=[q for q in local if q.id!=p.id and _wants(world,q,r)]
      if seekers:pressure=max(pressure,max((_aspiration(world,q).drive+.5*_aspiration(world,q).urgency)*(.35+.65*_aspiration(world,q).preparation) for q in seekers))
-    if rr.random()<.04+.16*min(1.,pressure):_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,local,rr)
+    conditional=(.04+.16*min(1.,pressure))/.20
+    if rr.random()<conditional:_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,local,rr)
