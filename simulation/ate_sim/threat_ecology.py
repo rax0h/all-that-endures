@@ -82,9 +82,9 @@ def threat_ecology_step(world,rng):
   ceiling=supported_rank(field.level,cell.hazard)
   chance=min(.20,.010+.030*field.level+.012*cell.hazard)
   if rr.random()<chance:
-   rank=_rank_roll(rr,ceiling);kind='monster' if rr.random()<.72 else ('magic_item' if rr.random()<.58 else 'phenomenon');form=_manifestation_form(kind,tags,rr)
-   e=world.emit('ranked_magic_manifested',Layer.REALITY,location=Ref('settlement',sid),kind=kind,form=form,environment_tags=tags,manifestation_basis='ambient magic expressing local conditions',rank=rank,rank_name=RANK_NAMES[rank],ambient=round(field.level,3),ecological_ceiling=RANK_NAMES[ceiling])
-   tid=state.next_id;state.next_id+=1;state.threats[tid]=MagicalThreat(tid,kind,rank,sid,world.year,field.level,origin_event=e.id,form=form,environment_tags=tags)
+   rank=_rank_roll(rr,ceiling);manifestation_kind='monster' if rr.random()<.72 else ('magic_item' if rr.random()<.58 else 'phenomenon');form=_manifestation_form(manifestation_kind,tags,rr)
+   e=world.emit('ranked_magic_manifested',Layer.REALITY,location=Ref('settlement',sid),manifestation_kind=manifestation_kind,form=form,environment_tags=tags,manifestation_basis='ambient magic expressing local conditions',rank=rank,rank_name=RANK_NAMES[rank],ambient=round(field.level,3),ecological_ceiling=RANK_NAMES[ceiling])
+   tid=state.next_id;state.next_id+=1;state.threats[tid]=MagicalThreat(tid,manifestation_kind,rank,sid,world.year,field.level,origin_event=e.id,form=form,environment_tags=tags)
   residents=[p for p in living.get(sid,()) if p.age>=16]
   responders=sorted(residents,key=lambda p:(effective_response_rank(world,p),world.advancement.rank(p.id) if world.advancement.essence_user(p.id) else 0,p.health),reverse=True)
   for threat in sorted(state.active(sid),key=lambda t:(-t.rank,t.id))[:3]:
@@ -94,6 +94,6 @@ def threat_ecology_step(world,rng):
    base={-4:.99,-3:.98,-2:.96,-1:.91,0:.72,1:.22}.get(gap,.02)
    teamwork=min(.18,.025*sum(1 for p in responders[:8] if effective_response_rank(world,p)>=max(0,threat.rank-1)))
    if rr.random()<min(.98,base+teamwork):
-    threat.status='resolved';world.emit('ranked_threat_resolved',Layer.SOCIETY,(Ref('person',best.id),),Ref('settlement',sid),((threat.origin_event,) if threat.origin_event else ()),threat=threat.id,kind=threat.kind,form=threat.form,threat_rank=threat.rank,threat_rank_name=RANK_NAMES[threat.rank],responder_rank=world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0,effective_rank=effective,punched_up=effective>=threat.rank and (world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0)<threat.rank)
+    threat.status='resolved';world.emit('ranked_threat_resolved',Layer.SOCIETY,(Ref('person',best.id),),Ref('settlement',sid),((threat.origin_event,) if threat.origin_event else ()),threat=threat.id,manifestation_kind=threat.kind,form=threat.form,threat_rank=threat.rank,threat_rank_name=RANK_NAMES[threat.rank],responder_rank=world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0,effective_rank=effective,punched_up=effective>=threat.rank and (world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0)<threat.rank)
    elif gap>=0 and rr.random()<.08+.05*gap:
     world.emit('ranked_threat_escalated',Layer.REALITY,location=Ref('settlement',sid),causes=((threat.origin_event,) if threat.origin_event else ()),threat=threat.id,form=threat.form,rank=threat.rank,rank_name=RANK_NAMES[threat.rank])
