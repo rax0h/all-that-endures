@@ -48,4 +48,4 @@ def cultural_step(world,state,rng):
     for pid,a in items:state.adoption[(sid,pid)]=a*scale
 def accommodation(world,sid):
  from .species import accommodation_requirements
- return accommodation_requirements([p.species for p in world.people.values() if p.alive and p.settlement==sid])
+ return accommodation_requirements([p.species for p in world.current_people() if p.alive and p.settlement==sid])

@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from .core_types import layer_ref
-from .magic_resources import _aspiration, _make_resource, _wants, absorb_essence_resource, use_awakening_stone
+from .magic_resources import _aspiration, _make_resource, _wants, _wanted_resources, absorb_essence_resource, use_awakening_stone
 from .materials import _produce_lot, _craft_once
 from .institutions import apply_for_society, full_essence_user
 
 
 def _living(world, sid):
-    return sorted((p for p in world.people.values() if p.alive and p.age >= 16 and p.settlement == sid), key=lambda p: p.id)
+    return sorted((p for p in world.current_people() if p.alive and p.age >= 16 and p.settlement == sid), key=lambda p: p.id)
 
 
 def _practitioners(world, people):
@@ -85,13 +85,13 @@ def _resource_circulation(world, rng, sid, people, users, magic):
         for holder in users:
             path = world.advancement.path(holder.id)
             a = _aspiration(world, holder)
-            ess = [r for r in world.magic_resources.inventory('person', holder.id, 'essence') if _wants(world, holder, r)]
+            ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if len(path.base_essences) < a.desired_base_essences else []
             if ess and len(path.base_essences) < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
                 viable = [r for r in ess if r.key not in path.base_essences]
                 if viable and rr.random() < max(.25, a.compromise_tolerance):
                     absorb_essence_resource(world, holder.id, viable[int(rr.random() * len(viable)) % len(viable)].id)
                     path = world.advancement.path(holder.id)
-            stones = [r for r in world.magic_resources.inventory('person', holder.id, 'awakening_stone') if _wants(world, holder, r)]
+            stones = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'awakening_stone')) if len(path.abilities) < min(a.desired_abilities, path.capacity) else []
             if stones and len(path.abilities) < min(a.desired_abilities, path.capacity):
                 # Selective users still wait sometimes, but a mature market gives them repeated real opportunities.
                 if rr.random() < max(.22, .82 - .55 * a.stone_selectiveness):
@@ -141,12 +141,12 @@ def _magical_workshops(world, rng, sid, people, users, magic):
     magical_crafters = [p for p in users if world.skills.get(p.id, 'craft').level >= .7]
     if not magical_crafters:
         return
-    magical_lots = [l for l in world.materials.available(sid) if l.magical_properties]
-    if not magical_lots:
+    magical_lot_count = world.materials.magical_available_count(sid)
+    if not magical_lot_count:
         return
     # A functioning Magic Society creates commissions, supplier information and apprenticeship
     # pressure. It does not grant crafting ability: the crafter must still pass normal permission rules.
-    commissions = min(12, len(magical_lots), len(magical_crafters) * (2 if magic is not None else 1))
+    commissions = min(12, magical_lot_count, len(magical_crafters) * (2 if magic is not None else 1))
     for n in range(commissions):
         crafter = magical_crafters[n % len(magical_crafters)]
         crng = rng.stream('magical_commission', world.year, sid * 100 + n)

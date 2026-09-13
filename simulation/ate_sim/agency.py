@@ -28,14 +28,13 @@ def _practice_path(world,p,rr,action,strength):
  if after>before:p.rank=after;Layer,Ref=layer_ref();world.emit('rank_advanced',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),from_rank=before,to_rank=after,practice_context=action)
 
 def agency_step(world,rng):
- attachments={}
- for r in world.social.edges.values():attachments[r.a]=max(attachments.get(r.a,0.),r.attachment);attachments[r.b]=max(attachments.get(r.b,0.),r.attachment)
  dependents={}
- for p in world.people.values():
+ for p in world.current_people():
   if p.alive and p.age<18:
    for parent in p.parents:dependents[parent]=dependents.get(parent,0)+1
- for p in sorted((x for x in world.people.values() if x.alive and x.age>=16),key=lambda x:x.id):
-  rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachments.get(p.id,0.),dependents.get(p.id,0));domain={'secure_food':'agriculture','prepare':'defense','work':'craft','learn':'knowledge','teach':'knowledge','build':'construction'}.get(action);event=None
+ for p in sorted((x for x in world.current_people() if x.alive and x.age>=16),key=lambda x:x.id):
+  attachment=max((world.social.edges[(p.id,other) if p.id<other else (other,p.id)].attachment for other in world.social.neighbors(p.id)),default=0.)
+  rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachment,dependents.get(p.id,0));domain={'secure_food':'agriculture','prepare':'defense','work':'craft','learn':'knowledge','teach':'knowledge','build':'construction'}.get(action);event=None
   if domain:world.skills.practice(p.id,domain,.12+.38*strength)
   _practice_path(world,p,rr,action,strength)
   if action=='secure_food':world.households[p.household].food+=.08+.2*strength

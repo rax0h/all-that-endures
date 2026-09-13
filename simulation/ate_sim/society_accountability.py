@@ -16,7 +16,7 @@ def _open(world,branch,trigger,severity):
  Layer,Ref=layer_ref();e=world.emit('society_inquiry_opened',Layer.SOCIETY,location=Ref('settlement',branch.settlement),causes=(trigger.id,),branch=branch.id,trigger=trigger.kind,severity=round(severity,3));qid=state.next_inquiry;state.next_inquiry+=1;state.inquiries[qid]=Inquiry(qid,branch.id,world.year,trigger.kind,trigger.id,severity,origin_event=e.id)
 
 def _close(world,q):
- branch=world.institutions.branches[q.branch];recent=[e for e in world.events if q.opened_year-4<=e.year<=world.year and e.location and e.location.kind=='settlement' and e.location.id==branch.settlement]
+ branch=world.institutions.branches[q.branch];recent=[e for e in world.events_between(q.opened_year-4,world.year) if e.location and e.location.kind=='settlement' and e.location.id==branch.settlement]
  deaths=sum(1 for e in recent if e.kind=='death' and e.data.get('cause') in ('war','monster','dangerous_magic'));failed=sum(1 for a in world.institutions.applications.values() if a.branch==branch.id and a.passed is False);findings=[]
  if deaths>=4:findings.append('inadequate_public_safety')
  if failed>=5:findings.append('training_or_selection_failure')
@@ -30,7 +30,7 @@ def _close(world,q):
 
 def accountability_step(world,rng):
  state=world.society_accountability
- current=[e for e in world.events if e.year==world.year and e.kind in ('monster_surge','dangerous_magic','missing_person','battle','adventure_notice_failed')]
+ current=[e for e in world.events_between(world.year,world.year) if e.kind in ('monster_surge','dangerous_magic','missing_person','battle','adventure_notice_failed')]
  for e in current:
   if e.location is None or e.location.kind!='settlement':continue
   branch=world.institutions.branch_for('adventure_society',e.location.id)

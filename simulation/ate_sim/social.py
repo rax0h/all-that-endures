@@ -22,5 +22,22 @@ class SocialGraph:
         r=self.get(a,b); r.familiarity=min(1.,r.familiarity+.03); r.trust=max(0.,min(1.,r.trust+trust)); r.attachment=max(0.,min(1.,r.attachment+attachment)); r.obligation=max(0.,min(1.,r.obligation+obligation)); r.resentment=max(0.,min(1.,r.resentment+resentment)); r.shared_history.append(event_id); return r
     def neighbors(self,pid): return self.adjacency.get(pid,())
     def relationships_for(self,pid): return (self.edges[self.key(pid,other)] for other in self.neighbors(pid))
-    def partner(self,a,b,event_id): self.partnerships[self.key(a,b)]=event_id
+    def partner(self,a,b,event_id):
+        key=self.key(a,b);self.partnerships[key]=event_id
+        if hasattr(self,'_partnership_index'):
+            for pid in key:self._partnership_index.setdefault(pid,set()).add(key)
+            self._partnership_count=len(self.partnerships)
+    def living_partnerships(self,people):
+        # Historical pairs remain authoritative; query through living endpoints.
+        # Rebuild on old checkpoints or direct additions/removals to the archive.
+        if not hasattr(self,'_partnership_index') or self._partnership_count!=len(self.partnerships):
+            self._partnership_index={}
+            for key in self.partnerships:
+                for pid in key:self._partnership_index.setdefault(pid,set()).add(key)
+            self._partnership_count=len(self.partnerships)
+        living={p.id for p in people if p.alive};pairs=set()
+        for pid in living:
+            for key in self._partnership_index.get(pid,()):
+                if key[0] in living and key[1] in living:pairs.add(key)
+        return {key:self.partnerships[key] for key in pairs}
     def is_partnered(self,a,b): return self.key(a,b) in self.partnerships
