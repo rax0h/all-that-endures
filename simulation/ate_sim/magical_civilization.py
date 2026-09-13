@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .core_types import layer_ref
-from .magic_resources import _aspiration, _make_resource, _wants, _wanted_resources, absorb_essence_resource, use_awakening_stone
+from .magic_resources import _aspiration, _make_resource, _wants, _wanted_resources, _transfer_to_seeker, absorb_essence_resource, use_awakening_stone
 from .materials import _produce_lot, _craft_once
 from .institutions import apply_for_society, full_essence_user
 
@@ -81,25 +81,36 @@ def _resource_circulation(world, rng, sid, people, users, magic):
     if not users:
         return
     rr = rng.stream('magical_circulation', world.year, sid)
+    people_by_id = {p.id:p for p in people}
     # Magic Society presence improves information/market matching, not resource creation.
-    # Mature communities get more matching opportunities, but every absorption/use still follows
-    # the normal aspiration, compatibility and selectiveness gates below.
+    # Mature communities get more matching opportunities, but every absorption/use and transfer
+    # still follows the normal aspiration, compatibility, wealth and selectiveness gates.
     rounds = 3 + (3 if magic is not None else 0)
     for _ in range(rounds):
-        for holder in users:
+        holder_ids = sorted(oid for (kind,oid),ids in world.magic_resources.owner_index.items()
+                            if kind=='person' and ids and oid in people_by_id)
+        for holder_id in holder_ids:
+            holder = people_by_id[holder_id]
             path = world.advancement.path(holder.id)
             a = _aspiration(world, holder)
-            ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if len(path.base_essences) < a.desired_base_essences else []
-            if ess and len(path.base_essences) < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
-                viable = [r for r in ess if r.key not in path.base_essences]
+            base = 0 if path is None else len(path.base_essences)
+            ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if base < a.desired_base_essences else []
+            if ess and base < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
+                viable = [r for r in ess if path is None or r.key not in path.base_essences]
                 if viable and rr.random() < max(.25, a.compromise_tolerance):
                     absorb_essence_resource(world, holder.id, viable[int(rr.random() * len(viable)) % len(viable)].id)
                     path = world.advancement.path(holder.id)
-            stones = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'awakening_stone')) if len(path.abilities) < min(a.desired_abilities, path.capacity) else []
-            if stones and len(path.abilities) < min(a.desired_abilities, path.capacity):
+            stones = [] if path is None else (_wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'awakening_stone')) if len(path.abilities) < min(a.desired_abilities, path.capacity) else [])
+            if path is not None and stones and len(path.abilities) < min(a.desired_abilities, path.capacity):
                 # Selective users still wait sometimes, but a mature market gives them repeated real opportunities.
                 if rr.random() < max(.22, .82 - .55 * a.stone_selectiveness):
                     use_awakening_stone(world, holder.id, stones[int(rr.random() * len(stones)) % len(stones)].id)
+            # Organized markets also move resources out of the hands of people who cannot or do
+            # not want to use them. Existing transfer rules preserve gifts, prices and seeker priority.
+            held = world.magic_resources.inventory('person', holder.id)
+            surplus = _wanted_resources(world, holder, held, wanted=False) if held else []
+            if surplus and rr.random() < (.58 if magic is not None else .28):
+                _transfer_to_seeker(world, surplus[int(rr.random() * len(surplus)) % len(surplus)], holder, people, rr)
 
 
 def _society_pipeline(world, rng, sid, people, adventure, magic):
