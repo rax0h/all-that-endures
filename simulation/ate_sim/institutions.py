@@ -90,9 +90,9 @@ def _advance_application(world,a,rng):
 
 def institution_step(world,rng):
  ensure_core_societies(world);Layer,Ref=layer_ref()
- # Ranked ecological manifestations are actionable threats too; post one notice at
- # manifestation time rather than generating duplicate notices for later resolution.
- for e in [x for x in world.events_between(world.year,world.year) if x.kind in ('monster_surge','dangerous_magic','missing_person','ranked_magic_manifested')]:
+ # Ranked manifestations and unsuccessful organized expeditions are actionable field work,
+ # alongside the original public-danger triggers. Each source event can create at most one notice.
+ for e in [x for x in world.events_between(world.year,world.year) if x.kind in ('monster_surge','dangerous_magic','missing_person','ranked_magic_manifested','magical_expedition_returned_empty')]:
   if e.location is None or e.location.kind!='settlement':continue
   b=world.institutions.branch_for('adventure_society',e.location.id)
   if b is None:continue
