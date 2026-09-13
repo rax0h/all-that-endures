@@ -183,7 +183,7 @@ class _SettlementMarket:
  """Fixed-priority groups, built once when the first resource is offered."""
  def __init__(self,world,people):
   self.world=world;self.people=people;self.groups=None
- def contenders(self,resource):
+ def contenders(self,resource,min_wealth=0.):
   if self.groups is None:
    groups={'essence':{},'awakening_stone':{}}
    for p in self.people:
@@ -193,7 +193,7 @@ class _SettlementMarket:
    self.groups={kind:[group for priority,group in sorted(values.items(),reverse=True)] for kind,values in groups.items()}
   kind='essence' if resource.kind=='essence' else 'awakening_stone'
   for group in self.groups[kind]:
-   candidates=[p for p,owned in group if kind!='essence' or resource.key not in owned]
+   candidates=[p for p,owned in group if p.wealth>=min_wealth and (kind!='essence' or resource.key not in owned)]
    if candidates:return candidates
   return []
 
@@ -238,9 +238,15 @@ class _SettlementDemand:
   return result
 
 def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
- Layer,Ref=layer_ref();candidates=[q for q in local if q.id!=holder.id and _wants(world,q,r)]
+ Layer,Ref=layer_ref();price=(8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity))
+ # Rank only feasible transactions. Eligibility checks must not create social edges.
+ candidates=[]
+ for q in local:
+  if q.id==holder.id or not _wants(world,q,r):continue
+  relationship=world.social.edges.get(world.social.key(holder.id,q.id))
+  if q.wealth>=price or (relationship is not None and relationship.attachment>.7):candidates.append(q)
  if not candidates:return False
- q=max(candidates,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id));a=_aspiration(world,q);price=(8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity));gift=world.social.get(holder.id,q.id).attachment>.7
+ q=max(candidates,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id));a=_aspiration(world,q);gift=world.social.get(holder.id,q.id).attachment>.7
  if not gift and q.wealth<price:return False
  if not gift:q.wealth-=price;holder.wealth+=price
  e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',holder.id),Ref('person',q.id)),Ref('settlement',holder.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,reason='relationship gift' if gift else 'aspirant purchase',price=0 if gift else price);world.magic_resources.transfer(r.id,'person',q.id,e.id,holder.settlement);a.preparation=min(1.,a.preparation+.08)
@@ -258,11 +264,14 @@ def magic_ecology_step(world,rng):
   if rr.random()<chance:_discover(world,rr,sid,people)
   market={};matching=_SettlementMarket(world,people)
   for r in world.magic_resources.inventory('settlement',sid):
-   key=_demand_key(r)
-   if key not in market:market[key]=matching.contenders(r)
-   seekers=market[key]
+   key=_demand_key(r);price=(7 if r.kind=='essence' else 3)
+   if key not in market:market[key]=matching.contenders(r,price)
+   seekers=[p for p in market[key] if p.wealth>=price]
+   # Wealth only decreases in this phase. Retry lower priority groups after the
+   # cached group is exhausted; an empty result remains valid for the phase.
+   if not seekers and market[key]:market[key]=seekers=matching.contenders(r,price)
    if seekers:
-    q=max(seekers,key=lambda p:(p.wealth,-p.id));price=(7 if r.kind=='essence' else 3)
+    q=max(seekers,key=lambda p:(p.wealth,-p.id))
     if q.wealth>=price:
      q.wealth-=price;e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price);world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
  demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}

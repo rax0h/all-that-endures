@@ -20,7 +20,8 @@ def legacy_magic_ecology_step(world,rng):
   chance=RESOURCE_DISCOVERY_RATE*min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
   if rr.random()<chance:_discover(world,rr,sid,people)
   for r in list(world.magic_resources.inventory('settlement',sid)):
-   seekers=[p for p in people if _wants(world,p,r)]
+   price=(7 if r.kind=='essence' else 3)
+   seekers=[p for p in people if _wants(world,p,r) and p.wealth>=price]
    if seekers:
     q=max(seekers,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id));price=(7 if r.kind=='essence' else 3)
     if q.wealth>=price:
