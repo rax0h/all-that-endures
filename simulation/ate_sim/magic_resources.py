@@ -5,6 +5,8 @@ from heapq import heappush, heappop, heapify
 from .core_types import layer_ref
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
 
+RESOURCE_DISCOVERY_RATE=.45
+
 @dataclass
 class MagicAspiration:
  drive:float;desired_base_essences:int;desired_abilities:int;reason:str;formed_year:int;preparation:float=0.;search_years:int=0;completion_goal:bool=False;urgency:float=.0;compromise_tolerance:float=.5;stone_selectiveness:float=.5;risk_tolerance:float=.5;adventurer_aspiration:bool=False
@@ -252,7 +254,7 @@ def magic_ecology_step(world,rng):
  for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
  for sid,people in sorted(adults_by_settlement.items()):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
-  chance=min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
+  chance=RESOURCE_DISCOVERY_RATE*min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
   if rr.random()<chance:_discover(world,rr,sid,people)
   market={};matching=_SettlementMarket(world,people)
   for r in world.magic_resources.inventory('settlement',sid):
@@ -271,7 +273,7 @@ def magic_ecology_step(world,rng):
   if a.desired_base_essences>base:
    a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive+.5*a.urgency));sought=None
    if rr.random()<.015*(.4+a.drive+.4*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
-   search_chance=min(.012,.00035+.0018*a.drive+.0020*a.preparation+.0018*a.urgency+.00008*min(30,a.search_years))
+   search_chance=RESOURCE_DISCOVERY_RATE*min(.012,.00035+.0018*a.drive+.0020*a.preparation+.0018*a.urgency+.00008*min(30,a.search_years))
    if rr.random()<search_chance:_make_resource(world,rr,p.settlement,p,'essence',None if sought is None else sought.id,'aspirant search')
   essences=world.magic_resources.inventory('person',p.id,'essence') if base<a.desired_base_essences else []
   if essences and base<a.desired_base_essences and rr.random()<.15+.34*a.drive+.18*a.urgency:
