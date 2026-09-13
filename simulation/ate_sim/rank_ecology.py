@@ -35,7 +35,9 @@ def _career_training(world,p,path,asp,member,strength):
   # Gold adventurers need both institutional/field continuity and exceptional personal
   # commitment. The Diamond gate is still enforced in AdvancementState.practice.
   if not member or ambition<.56:return None
-  return ('all',1.05+.35*strength+.45*ambition,20,.72+.28*p.curiosity)
+  # Diamond remains attainable, but Gold training is intentionally much slower than the
+  # earlier ranks so a living population does not accumulate dozens of near-routine Diamonds.
+  return ('all',.72+.25*strength+.30*ambition,20,.72+.28*p.curiosity)
  return None
 
 def rank_ecology_step(world,rng):
