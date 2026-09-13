@@ -5,6 +5,8 @@ from .magic_resources import _aspiration, _make_resource, _wants, _wanted_resour
 from .materials import _produce_lot, _craft_once
 from .institutions import apply_for_society, full_essence_user
 
+EXPEDITION_ACTIVITY_RATE = .62
+
 
 def _living(world, sid):
     return sorted((p for p in world.current_people() if p.alive and p.age >= 16 and p.settlement == sid), key=lambda p: p.id)
@@ -42,7 +44,7 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
 
     rr = rng.stream('magical_field_economy', world.year, sid)
     pressure = max(0., ambient - .30) + .35 * cell.hazard + .08 * min(10, field_capacity)
-    attempts = min(8, int(pressure * (1.2 + len(people) / 90.0)))
+    attempts = min(8, int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0)))
     if attempts <= 0:
         return
 
@@ -80,7 +82,9 @@ def _resource_circulation(world, rng, sid, people, users, magic):
         return
     rr = rng.stream('magical_circulation', world.year, sid)
     # Magic Society presence improves information/market matching, not resource creation.
-    rounds = 2 + (2 if magic is not None else 0)
+    # Mature communities get more matching opportunities, but every absorption/use still follows
+    # the normal aspiration, compatibility and selectiveness gates below.
+    rounds = 3 + (3 if magic is not None else 0)
     for _ in range(rounds):
         for holder in users:
             path = world.advancement.path(holder.id)
