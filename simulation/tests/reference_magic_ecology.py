@@ -1,8 +1,12 @@
-"""Frozen market loop from 216c2660 for differential stabilization tests."""
+"""Frozen pre-index market loop used for differential stabilization tests.
+
+The control flow stays intentionally unoptimized. Shared balance constants are imported from
+production so this test compares indexing against the same calibrated simulation rules.
+"""
 from simulation.ate_sim.magic_resources import (
  _recover_dead_owner_resources, _discover, _wants, _aspiration,
  _commit_to_full_path, _make_resource, absorb_essence_resource,
- use_awakening_stone, _transfer_to_seeker,
+ use_awakening_stone, _transfer_to_seeker, RESOURCE_DISCOVERY_RATE,
 )
 from simulation.ate_sim.core_types import layer_ref
 
@@ -13,7 +17,7 @@ def legacy_magic_ecology_step(world,rng):
  for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
  for sid,people in sorted(adults_by_settlement.items()):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
-  chance=min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
+  chance=RESOURCE_DISCOVERY_RATE*min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
   if rr.random()<chance:_discover(world,rr,sid,people)
   for r in list(world.magic_resources.inventory('settlement',sid)):
    seekers=[p for p in people if _wants(world,p,r)]
@@ -28,7 +32,7 @@ def legacy_magic_ecology_step(world,rng):
   if a.desired_base_essences>base:
    a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive+.5*a.urgency));sought=None
    if rr.random()<.015*(.4+a.drive+.4*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
-   search_chance=min(.012,.00035+.0018*a.drive+.0020*a.preparation+.0018*a.urgency+.00008*min(30,a.search_years))
+   search_chance=RESOURCE_DISCOVERY_RATE*min(.012,.00035+.0018*a.drive+.0020*a.preparation+.0018*a.urgency+.00008*min(30,a.search_years))
    if rr.random()<search_chance:_make_resource(world,rr,p.settlement,p,'essence',None if sought is None else sought.id,'aspirant search')
   essences=world.magic_resources.inventory('person',p.id,'essence')
   if essences and base<a.desired_base_essences and rr.random()<.15+.34*a.drive+.18*a.urgency:
