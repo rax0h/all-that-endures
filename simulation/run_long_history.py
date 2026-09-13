@@ -48,7 +48,7 @@ def snapshot(world, include_digest=False):
 
 def main(seed=843000, years=1000, max_seconds=None):
     from time import perf_counter
-    import os, cProfile, pstats, io
+    import os, cProfile, pstats, io, platform
     profile_tail=int(os.environ.get('ATE_PROFILE_TAIL','0'))
     if years<=0:raise ValueError('years must be positive')
     if max_seconds is not None and (max_seconds<=0 or profile_tail):
@@ -86,7 +86,7 @@ def main(seed=843000, years=1000, max_seconds=None):
     if world.year!=years:raise SystemExit(f'expected year {years}, got {world.year}')
     if not all(c<e.id for e in world.events for c in e.causes):raise SystemExit('causal integrity failure')
     validation_seconds=perf_counter()-start
-    print(json.dumps({'record':'benchmark','seed':seed,'years':years,'simulation_seconds':simulation_seconds,'profile_tail_requested':profile_tail,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest,'max_seconds':max_seconds,'performance_passed':None if max_seconds is None else simulation_seconds<=max_seconds},sort_keys=True),flush=True)
+    print(json.dumps({'record':'benchmark','python_version':platform.python_version(),'platform':platform.platform(),'seed':seed,'years':years,'simulation_seconds':simulation_seconds,'profile_tail_requested':profile_tail,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest,'max_seconds':max_seconds,'performance_passed':None if max_seconds is None else simulation_seconds<=max_seconds},sort_keys=True),flush=True)
     if max_seconds is not None and simulation_seconds>max_seconds:
         raise SystemExit(f'simulation exceeded {max_seconds:.2f}s budget: {simulation_seconds:.2f}s')
     return world

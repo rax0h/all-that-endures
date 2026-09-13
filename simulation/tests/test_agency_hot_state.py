@@ -23,3 +23,31 @@ def test_agency_does_not_scan_global_relationships():
         def values(self): raise AssertionError("global relationship scan")
     world.social.edges = NoValues(world.social.edges)
     agency_step(world,RNG(world.seed))
+
+def test_relationship_reference_index_tracks_mutations_additions_and_checkpoint():
+    import pickle
+    from simulation.ate_sim.social import SocialGraph
+    graph=SocialGraph()
+    a=graph.get(1,2)
+    assert list(graph.relationships_for(1))==[a]
+    a.attachment=.8
+    assert max(r.attachment for r in graph.relationships_for(1))==.8
+    b=graph.record(1,3,1,attachment=.9)
+    assert set(id(r) for r in graph.relationships_for(1))=={id(a),id(b)}
+    graph.record(1,3,2,attachment=-.5)
+    assert max(r.attachment for r in graph.relationships_for(1))==.8
+    restored=pickle.loads(pickle.dumps(graph))
+    restored.edges[(1,2)].attachment=.1
+    assert max(r.attachment for r in restored.relationships_for(1))==.4
+
+def test_relationship_reference_index_empty_endpoints_and_legacy_rebuild():
+    from simulation.ate_sim.social import SocialGraph
+    graph=SocialGraph()
+    assert list(graph.relationships_for(1))==[]
+    assert list(graph.relationships_for(2))==[]
+    edge=graph.get(2,1)
+    assert list(graph.relationships_for(1))==[edge]
+    assert list(graph.relationships_for(2))==[edge]
+    del graph._relationships  # Checkpoints created before this derived cache.
+    assert list(graph.relationships_for(2))==[edge]
+    assert list(graph.relationships_for(1))==[edge]

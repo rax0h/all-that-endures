@@ -27,3 +27,8 @@ Do not invent missing historical result files. The preserved foundation did not 
 ## Direction
 
 Treat the existing closed-loop mechanics as evidence and reusable simulation logic, not as a declaration that simulation design is complete. New work must obey `docs/PROJECT_CONSTITUTION.md` and integrate through causal state rather than adding disconnected event generators.
+
+## Millennium performance
+
+See [PERFORMANCE.md](PERFORMANCE.md) for the measured scaling pass, preserved-world
+evidence, index validity rules, and the enforced 120-second simulation benchmark.
