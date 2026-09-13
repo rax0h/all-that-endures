@@ -76,6 +76,29 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
+def _society_transfer_to_seeker(world, resource, holder, local, rng):
+    """Magic Society brokerage lowers transaction friction without giving resources away."""
+    Layer, Ref = layer_ref()
+    candidates = [q for q in local if q.id != holder.id and _wants(world, q, resource)]
+    if not candidates:
+        return False
+    seeker = max(candidates, key=lambda p: (_aspiration(world,p).urgency, _aspiration(world,p).drive, _aspiration(world,p).preparation, p.wealth, -p.id))
+    aspiration = _aspiration(world, seeker)
+    rare = ('Rare' in resource.rarity or 'Epic' in resource.rarity)
+    legendary = 'Legendary' in resource.rarity
+    price = (2 if resource.kind == 'essence' else 1) * (1 + .35 * rare + .8 * legendary)
+    gift = world.social.get(holder.id, seeker.id).attachment > .7
+    if not gift and seeker.wealth < price:
+        return False
+    if not gift:
+        seeker.wealth -= price
+        holder.wealth += price
+    event = world.emit('magic_resource_transferred', Layer.SOCIETY, (Ref('person',holder.id), Ref('person',seeker.id)), Ref('settlement',holder.settlement), ((resource.origin_event,) if resource.origin_event else ()), resource=resource.id, resource_kind=resource.kind, key=resource.key, reason='relationship gift' if gift else 'society-mediated exchange', price=0 if gift else price)
+    world.magic_resources.transfer(resource.id, 'person', seeker.id, event.id, holder.settlement)
+    aspiration.preparation = min(1., aspiration.preparation + .08)
+    return True
+
+
 def _resource_circulation(world, rng, sid, people, users, magic):
     """Make established magical communities actually use and circulate the resources they recover."""
     if not users:
@@ -105,12 +128,14 @@ def _resource_circulation(world, rng, sid, people, users, magic):
                 # Selective users still wait sometimes, but a mature market gives them repeated real opportunities.
                 if rr.random() < max(.22, .82 - .55 * a.stone_selectiveness):
                     use_awakening_stone(world, holder.id, stones[int(rr.random() * len(stones)) % len(stones)].id)
-            # Organized markets also move resources out of the hands of people who cannot or do
-            # not want to use them. Existing transfer rules preserve gifts, prices and seeker priority.
             held = world.magic_resources.inventory('person', holder.id)
             surplus = _wanted_resources(world, holder, held, wanted=False) if held else []
             if surplus and rr.random() < (.58 if magic is not None else .28):
-                _transfer_to_seeker(world, surplus[int(rr.random() * len(surplus)) % len(surplus)], holder, people, rr)
+                resource = surplus[int(rr.random() * len(surplus)) % len(surplus)]
+                if magic is not None:
+                    _society_transfer_to_seeker(world, resource, holder, people, rr)
+                else:
+                    _transfer_to_seeker(world, resource, holder, people, rr)
 
 
 def _society_pipeline(world, rng, sid, people, adventure, magic):
