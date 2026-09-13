@@ -63,7 +63,7 @@ class Simulation:
    if not p.alive:continue
    alive_by_settlement[p.settlement].append(p)
    if p.age<18 and len(p.parents)==2:dependent_count[tuple(sorted(p.parents))]=dependent_count.get(tuple(sorted(p.parents)),0)+1
-  for pair,formed in sorted(self.w.social.partnerships.items()):
+  for pair,formed in sorted(self.w.social.living_partnerships(self.w.current_people()).items()):
    a=self.w.people.get(pair[0]);b=self.w.people.get(pair[1])
    if not a or not b or not a.alive or not b.alive or a.settlement!=b.settlement:continue
    sid=a.settlement;q=self.w.local[sid];residents=alive_by_settlement[sid];cap=self._capacity(sid)

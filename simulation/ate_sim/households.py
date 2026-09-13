@@ -5,7 +5,7 @@ def partnership_step(world,rng):
     adults=[p for p in world.current_people() if p.alive and p.age>=18];by_settlement={}
     for p in adults:by_settlement.setdefault(p.settlement,[]).append(p)
     paired=set()
-    for a,b in world.social.partnerships:
+    for a,b in world.social.living_partnerships(world.current_people()):
         pa,pb=world.people.get(a),world.people.get(b)
         if pa and pb and pa.alive and pb.alive:paired.update((a,b))
     ancestry={}

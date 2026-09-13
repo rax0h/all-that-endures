@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from functools import lru_cache
 from heapq import heappush, heappop, heapify
 from .core_types import layer_ref
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
@@ -78,11 +79,19 @@ def _environment_tags(world,sid):
  if s.memory.get('monster_surge',0)>.12:tags+=['monster','fear','death']
  if s.prosperity>=.55:tags+=['craft','trade','wealth','knowledge','order']
  return tuple(dict.fromkeys(tags))
-def _environmental_essence(world,rng,sid):
- tags=_environment_tags(world,sid);weighted=[]
+@lru_cache(maxsize=512)
+def _environment_weights(tags):
+ # The semantic dictionary is immutable simulation-version data. Cache complete
+ # weights by the exact composed context, never by settlement or ambient rank.
+ # Explicit dictionary hot reloads must call _environment_weights.cache_clear().
+ weighted=[]
  for key in ESSENCE_IDS:
   text=(key+' '+str(ESSENCES[key])).lower();hits=sum(1 for tag in tags if tag in text)
   if hits:weighted.append((key,float(hits*hits)))
+ return tuple(weighted)
+
+def _environmental_essence(world,rng,sid):
+ tags=_environment_tags(world,sid);weighted=_environment_weights(tags)
  if not weighted:
   return ESSENCE_IDS[int(rng.random()*len(ESSENCE_IDS))%len(ESSENCE_IDS)],tags
  total=sum(w for _,w in weighted);x=rng.random()*total
