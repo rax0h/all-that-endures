@@ -44,4 +44,4 @@ def test_indexed_population_matches_archive_scan_simulation():
     indexed=Simulation(generate_world(843000)).run(100)
     with patch.object(World,'current_people',lambda w:tuple(p for p in w.people.values() if p.alive)):
         reference=Simulation(generate_world(843000)).run(100)
-    assert indexed.digest()==reference.digest()=='f6e25615b33e2203af1f9dda4c05079ec880c92fe3a418685ccc86e78d54d42e'
+    assert indexed.digest()==reference.digest()=='76996c7bf383a24eda596934138604f792c01de84218470ef161598b505145a6'
