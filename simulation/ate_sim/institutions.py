@@ -90,7 +90,9 @@ def _advance_application(world,a,rng):
 
 def institution_step(world,rng):
  ensure_core_societies(world);Layer,Ref=layer_ref()
- for e in [x for x in world.events_between(world.year,world.year) if x.kind in ('monster_surge','dangerous_magic','missing_person')]:
+ # Ranked ecological manifestations are actionable threats too; post one notice at
+ # manifestation time rather than generating duplicate notices for later resolution.
+ for e in [x for x in world.events_between(world.year,world.year) if x.kind in ('monster_surge','dangerous_magic','missing_person','ranked_magic_manifested')]:
   if e.location is None or e.location.kind!='settlement':continue
   b=world.institutions.branch_for('adventure_society',e.location.id)
   if b is None:continue
