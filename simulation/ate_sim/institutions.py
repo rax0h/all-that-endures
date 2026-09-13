@@ -91,13 +91,13 @@ def _advance_application(world,a,rng):
 def institution_step(world,rng):
  ensure_core_societies(world);Layer,Ref=layer_ref()
  # Magical civilization runs after institutions, so review the prior year as well. Notice
- # creation is idempotent by cause_event, preserving same-year threat handling without duplicates.
+ # creation is idempotent by cause_event; a newly created notice is identifiable by its year.
  for e in [x for x in world.events_between(max(0,world.year-1),world.year) if x.kind in ('monster_surge','dangerous_magic','missing_person','ranked_magic_manifested','magical_expedition_returned_empty')]:
   if e.location is None or e.location.kind!='settlement':continue
   b=world.institutions.branch_for('adventure_society',e.location.id)
   if b is None:continue
   n=world.institutions.post_notice(b.id,world.year,e.kind,e.location.id,e.id)
-  if not any(x.kind=='adventure_notice_posted' and x.data.get('notice')==n.id for x in world.events):world.emit('adventure_notice_posted',Layer.KNOWLEDGE,location=Ref('settlement',e.location.id),causes=(e.id,),notice=n.id,threat=e.kind)
+  if n.year==world.year:world.emit('adventure_notice_posted',Layer.KNOWLEDGE,location=Ref('settlement',e.location.id),causes=(e.id,),notice=n.id,threat=e.kind)
  applied={(a.person,a.society) for a in world.institutions.applications.values()}
  for p in sorted(world.current_people(),key=lambda x:x.id):
   if not p.alive or not full_essence_user(world,p.id):continue
