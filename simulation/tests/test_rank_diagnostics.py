@@ -1,6 +1,7 @@
 from ate_sim.worldgen import generate_world
 from ate_sim.advancement import AbilityProgress, EssencePath
 from run_long_history import snapshot
+from ate_sim.diagnostics import world_snapshot
 
 def test_rank_diagnostics_separate_complete_and_incomplete_paths():
     world = generate_world(843000)
@@ -14,3 +15,7 @@ def test_rank_diagnostics_separate_complete_and_incomplete_paths():
     assert result["essence_user_ranks"] == {5:2}
     assert result["completed_path_ranks"] == {5:1}
     assert result["incomplete_path_ranks"] == {5:1}
+
+    standard=world_snapshot(world)
+    assert standard["completed_path_ranks"] == {5:1}
+    assert standard["incomplete_path_ranks"] == {5:1}

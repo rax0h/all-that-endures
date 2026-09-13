@@ -26,7 +26,6 @@ jobs:
     timeout-minutes: 30
     env:
       PYTHONPATH: .:simulation
-      ATE_PROFILE_TAIL: '10'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -39,9 +38,6 @@ jobs:
       - name: multi-seed calibration
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         run: python simulation/calibration_check.py
-      - name: representative profiler
-        if: github.event_name == 'push' && github.ref == 'refs/heads/sim/ranked-threat-ecology'
-        run: /usr/bin/time -f 'profile_elapsed_seconds=%e' python simulation/profile_simulation.py 843000 150
       - name: requested long history
         if: github.event_name == 'workflow_dispatch'
         run: |
@@ -51,14 +47,14 @@ jobs:
         if: github.event_name == 'push'
         run: |
           set -o pipefail
-          /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 | tee long-history-report.jsonl
+          /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 --max-seconds 120 | tee long-history-report.jsonl
       - name: weekly 1000-year validation
         if: github.event_name == 'schedule'
         run: |
           set -o pipefail
-          /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 | tee long-history-report.jsonl
+          /usr/bin/time -f 'elapsed_seconds=%e' python simulation/run_long_history.py 843000 1000 --max-seconds 120 | tee long-history-report.jsonl
       - name: retain long-history diagnostics
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: long-history-diagnostics-${{ github.run_number }}

@@ -55,7 +55,7 @@ class CommunityState:
         return self.create("diaspora",year,destination,event_id,parent_id)
 
 def community_step(world):
-    for p in world.people.values():
+    for p in world.current_people():
         if not p.alive:continue
         local=world.communities.local_root(p.settlement)
         if local is not None:

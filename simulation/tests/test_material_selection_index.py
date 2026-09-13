@@ -85,15 +85,15 @@ def test_saturated_crafting_capacity_never_scans_stock_after_index_build():
     for _ in range(100):
         assert state.crafting_capacity(1,10) == 10
 
-def test_selection_pool_tracks_exact_active_set_order_and_only_invalidates_on_membership_change():
+def test_selection_ids_tracks_exact_active_set_order_and_only_invalidates_on_membership_change():
     state = MaterialEconomy()
     for n in range(100):
         state.create_lot("ore",2.,.5,1,1,n,n)
-    pool=state.selection_pool(1)
-    assert list(pool) == state.available(1)
-    state.consume(pool[0],.5)
-    assert state.selection_pool(1) is pool
-    state.consume(pool[0],2.)
-    assert list(state.selection_pool(1)) == state.available(1)
+    pool=state.selection_ids(1)
+    assert list(pool) == [l.id for l in state.available(1)]
+    state.consume(state.lots[pool[0]],.5)
+    assert state.selection_ids(1) is pool
+    state.consume(state.lots[pool[0]],2.)
+    assert list(state.selection_ids(1)) == [l.id for l in state.available(1)]
     state.create_lot("stone",3.,.6,1,1,101,101)
-    assert list(state.selection_pool(1)) == state.available(1)
+    assert list(state.selection_ids(1)) == [l.id for l in state.available(1)]

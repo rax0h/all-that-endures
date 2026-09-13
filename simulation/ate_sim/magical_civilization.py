@@ -7,7 +7,7 @@ from .institutions import apply_for_society, full_essence_user
 
 
 def _living(world, sid):
-    return sorted((p for p in world.people.values() if p.alive and p.age >= 16 and p.settlement == sid), key=lambda p: p.id)
+    return sorted((p for p in world.current_people() if p.alive and p.age >= 16 and p.settlement == sid), key=lambda p: p.id)
 
 
 def _practitioners(world, people):

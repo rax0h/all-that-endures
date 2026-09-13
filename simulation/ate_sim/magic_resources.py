@@ -158,42 +158,72 @@ def _wanted_resources(world,person,resources,wanted=True):
   if decisions[key]==wanted:result.append(resource)
  return result
 
-class _SettlementDemand:
- """Current-step eligibility and pressure; no archival resource scan per holder."""
+def _demand_state(world,p):
+ a=_aspiration(world,p);path=world.advancement.path(p.id)
+ return (a.drive,a.urgency,a.preparation,a.desired_base_essences,a.desired_abilities,
+         None if path is None else (tuple(path.base_essences),len(path.abilities),path.capacity))
+
+def _eligible_kind(state,kind):
+ path=state[5]
+ if kind=='essence':return (0 if path is None else len(path[0]))<state[3]
+ return path is not None and path[1]<state[4] and path[1]<path[2]
+
+class _SettlementMarket:
+ """Fixed-priority groups, built once when the first resource is offered."""
  def __init__(self,world,people):
-  self.world=world;self.people=people;self.heaps={};self.resources={};self.versions={};self.states={}
- def _state(self,p):
-  a=_aspiration(self.world,p);path=self.world.advancement.path(p.id)
-  return (a.drive,a.urgency,a.preparation,a.desired_base_essences,a.desired_abilities,
-          None if path is None else (tuple(path.base_essences),len(path.abilities),path.capacity))
- def _score(self,p):
-  a=_aspiration(self.world,p)
-  return (a.drive+.5*a.urgency)*(.35+.65*a.preparation)
+  self.world=world;self.people=people;self.groups=None
+ def contenders(self,resource):
+  if self.groups is None:
+   groups={'essence':{},'awakening_stone':{}}
+   for p in self.people:
+    state=_demand_state(self.world,p);priority=(state[1],state[0],state[2]);path=state[5]
+    for kind in groups:
+     if _eligible_kind(state,kind):groups[kind].setdefault(priority,[]).append((p,() if path is None else path[0]))
+   self.groups={kind:[group for priority,group in sorted(values.items(),reverse=True)] for kind,values in groups.items()}
+  kind='essence' if resource.kind=='essence' else 'awakening_stone'
+  for group in self.groups[kind]:
+   candidates=[p for p,owned in group if kind!='essence' or resource.key not in owned]
+   if candidates:return candidates
+  return []
+
+class _SettlementDemand:
+ """Two current eligibility heaps; essence identity is an exclusion at lookup.
+
+ A person's eligibility/preparation is refreshed after their turn or a transfer.
+ Candidate state never depends on accumulated resource identities or history size.
+ """
+ def __init__(self,world,people):
+  self.world=world;self.people=people;self.heaps={};self.versions={};self.states={}
  def refresh(self,p):
   if not self.heaps:return
-  state=self._state(p)
+  state=_demand_state(self.world,p)
   if self.states.get(p.id)==state:return
   self.states[p.id]=state;version=self.versions.get(p.id,0)+1;self.versions[p.id]=version
-  for key,heap in self.heaps.items():
-   if _wants(self.world,p,self.resources[key]):heappush(heap,(-self._score(p),p.id,version))
+  score=(state[0]+.5*state[1])*(.35+.65*state[2])
+  for kind,heap in self.heaps.items():
+   if _eligible_kind(state,kind):heappush(heap,(-score,p.id,version))
  def pressure(self,resource,excluding):
-  key=_demand_key(resource)
-  if key not in self.heaps:
+  kind='essence' if resource.kind=='essence' else 'awakening_stone'
+  if kind not in self.heaps:
    heap=[]
-   # Lazy initialization preserves when aspirations are first formed.
+   # Match the original first local eligibility scan's aspiration timing.
    for p in self.people:
-    wants=_wants(self.world,p,resource)
-    if p.id not in self.states:self.states[p.id]=self._state(p)
-    if wants:heap.append((-self._score(p),p.id,self.versions.get(p.id,0)))
-   heapify(heap);self.heaps[key]=heap;self.resources[key]=resource
-  heap=self.heaps[key];excluded=None
+    if p.id not in self.states:self.states[p.id]=_demand_state(self.world,p)
+    state=self.states[p.id]
+    if _eligible_kind(state,kind):
+     score=(state[0]+.5*state[1])*(.35+.65*state[2])
+     heap.append((-score,p.id,self.versions.get(p.id,0)))
+   heapify(heap);self.heaps[kind]=heap
+  heap=self.heaps[kind];excluded=[]
   while heap:
    score,pid,version=heap[0]
    if version!=self.versions.get(pid,0):heappop(heap);continue
-   if pid==excluding:excluded=heappop(heap);continue
+   path=self.states[pid][5]
+   if pid==excluding or (kind=='essence' and path is not None and resource.key in path[0]):
+    excluded.append(heappop(heap));continue
    break
   result=-heap[0][0] if heap else 0.
-  if excluded is not None:heappush(heap,excluded)
+  for entry in excluded:heappush(heap,entry)
   return result
 
 def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
@@ -208,17 +238,17 @@ def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
 
 def magic_ecology_step(world,rng):
  Layer,Ref=layer_ref();_recover_dead_owner_resources(world);adults_by_settlement={sid:[] for sid in world.settlements}
- for p in world.people.values():
+ for p in world.current_people():
   if p.alive and p.age>=16:adults_by_settlement[p.settlement].append(p)
  for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
  for sid,people in sorted(adults_by_settlement.items()):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
   chance=min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
   if rr.random()<chance:_discover(world,rr,sid,people)
-  market={}
+  market={};matching=_SettlementMarket(world,people)
   for r in world.magic_resources.inventory('settlement',sid):
    key=_demand_key(r)
-   if key not in market:market[key]=_market_contenders(world,people,r)
+   if key not in market:market[key]=matching.contenders(r)
    seekers=market[key]
    if seekers:
     q=max(seekers,key=lambda p:(p.wealth,-p.id));price=(7 if r.kind=='essence' else 3)

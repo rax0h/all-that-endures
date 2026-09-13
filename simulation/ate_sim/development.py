@@ -4,7 +4,7 @@ from .core import Layer,Ref
 def development_step(world,rng):
     world.infrastructure.decay(.0007)
     adults_by_settlement={sid:[] for sid in world.settlements}
-    for p in world.people.values():
+    for p in world.current_people():
         if p.alive and p.age>=18:adults_by_settlement[p.settlement].append(p)
     for sid,s in world.settlements.items():
         adults=adults_by_settlement[sid]

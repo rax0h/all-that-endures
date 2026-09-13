@@ -54,10 +54,11 @@ def test_demand_pressure_updates_eligibility_preparation_and_exclusion():
     for p in people:
         world.magic_resources.aspirations[p.id] = magic.MagicAspiration(.7,3,20,"test",0,urgency=.8,preparation=.1)
     essence = world.magic_resources.create("essence",ESSENCE_IDS[0],"common",0)
+    other = world.magic_resources.create("essence",ESSENCE_IDS[1],"common",0)
     stone = world.magic_resources.create("awakening_stone",STONE_IDS[0],"common",0)
     demand = magic._SettlementDemand(world,people)
     def verify():
-        for resource in (essence,stone):
+        for resource in (essence,other,stone):
             for holder in people:
                 expected = max(((magic._aspiration(world,p).drive+.5*magic._aspiration(world,p).urgency)*(.35+.65*magic._aspiration(world,p).preparation) for p in people if p.id!=holder.id and magic._wants(world,p,resource)),default=0.)
                 assert demand.pressure(resource,holder.id) == expected
@@ -79,7 +80,7 @@ def test_duplicate_pressure_queries_use_one_local_eligibility_scan():
     people = [p for p in world.people.values() if p.age >= 18][:5]
     resource = world.magic_resources.create("essence",ESSENCE_IDS[0],"common",0)
     demand = magic._SettlementDemand(world,people)
-    with patch.object(magic,"_wants",wraps=magic._wants) as wants:
+    with patch.object(magic,"_demand_state",wraps=magic._demand_state) as wants:
         for n in range(1000):
             demand.pressure(resource,people[n % len(people)].id)
         assert wants.call_count == len(people)

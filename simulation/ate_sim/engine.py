@@ -23,7 +23,8 @@ class Simulation:
   for _ in range(years):self.step()
   return self.w
  def step(self):
-  self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
+  with self.w.current_people_scope():
+   self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("weather",self.w.year,sid);q=self.w.local[sid];q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38)));q.drought=max(0,.35-q.rain);q.flood=max(0,q.rain-.82)
@@ -31,7 +32,7 @@ class Simulation:
    if q.flood>.05:self.w.emit("flood",Layer.REALITY,location=Ref("settlement",sid),severity=q.flood)
  def _production(self):
   by_settlement={sid:[] for sid in self.w.settlements}
-  for p in self.w.people.values():
+  for p in self.w.current_people():
    if p.alive:by_settlement[p.settlement].append(p)
   for sid,s in self.w.settlements.items():
    people=by_settlement[sid];c=self.w.cells[(s.x,s.y)];q=self.w.local[sid];bios=[biology_state(p) for p in people];labor=sum(b.endurance*p.health for b,p in zip(bios,people));food=sum(b.food_need for b in bios);adults=[p for p in people if p.age>=18];agri=sum(self.w.skills.get(p.id,"agriculture").level for p in adults)/max(1,len(adults));crop=(12+2*labor)*c.fertility*(.45+.75*q.rain)*(1+.5*s.irrigation)*(1+.22*agri);s.food_stock+=crop-food
@@ -39,7 +40,8 @@ class Simulation:
    q.scarcity=max(0,min(1,(food*10-s.food_stock)/max(1,food*10)))
    if q.scarcity>.25:self.w.emit("food_scarcity",Layer.SOCIETY,location=Ref("settlement",sid),severity=q.scarcity)
  def _people(self):
-  for pid,p in list(self.w.people.items()):
+  for p in self.w.current_people():
+   pid=p.id
    if not p.alive:continue
    p.age+=1;q=self.w.local[p.settlement];r=self.rng.stream("life",self.w.year,pid);risk=mortality_risk(p,q.scarcity)
    if r.random()<risk:self._die(p,"natural")
@@ -57,7 +59,7 @@ class Simulation:
   s=self.w.settlements[sid];c=self.w.cells[(s.x,s.y)];return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
  def _demography(self):
   alive_by_settlement={sid:[] for sid in self.w.settlements};dependent_count={}
-  for p in self.w.people.values():
+  for p in self.w.current_people():
    if not p.alive:continue
    alive_by_settlement[p.settlement].append(p)
    if p.age<18 and len(p.parents)==2:dependent_count[tuple(sorted(p.parents))]=dependent_count.get(tuple(sorted(p.parents)),0)+1
@@ -78,7 +80,7 @@ class Simulation:
    if h.alive and not any(self.w.people[i].alive for i in h.members):h.alive=False
  def _pressure(self):
   by_settlement={sid:[] for sid in self.w.settlements}
-  for p in self.w.people.values():
+  for p in self.w.current_people():
    if p.alive:by_settlement[p.settlement].append(p)
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("hazard",self.w.year,sid);ambient=self.w.ambient_magic.field(sid).level;surge_chance=.012*c.hazard*(1+max(0.,ambient-.55)*1.8)

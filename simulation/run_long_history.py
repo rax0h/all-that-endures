@@ -46,10 +46,13 @@ def snapshot(world, include_digest=False):
     return result
 
 
-def main(seed=843000, years=1000):
+def main(seed=843000, years=1000, max_seconds=None):
     from time import perf_counter
     import os, cProfile, pstats, io
     profile_tail=int(os.environ.get('ATE_PROFILE_TAIL','0'))
+    if years<=0:raise ValueError('years must be positive')
+    if max_seconds is not None and (max_seconds<=0 or profile_tail):
+        raise ValueError('performance gates require a positive limit and an unprofiled run')
     profiler=cProfile.Profile() if profile_tail else None
     profiled_years=0
     from scaling_telemetry import ScalingTelemetry, BUCKET_ENDS
@@ -83,9 +86,17 @@ def main(seed=843000, years=1000):
     if world.year!=years:raise SystemExit(f'expected year {years}, got {world.year}')
     if not all(c<e.id for e in world.events for c in e.causes):raise SystemExit('causal integrity failure')
     validation_seconds=perf_counter()-start
-    print(json.dumps({'record':'benchmark','seed':seed,'years':years,'simulation_seconds':simulation_seconds,'profile_tail_requested':profile_tail,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest},sort_keys=True),flush=True)
+    print(json.dumps({'record':'benchmark','seed':seed,'years':years,'simulation_seconds':simulation_seconds,'profile_tail_requested':profile_tail,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest,'max_seconds':max_seconds,'performance_passed':None if max_seconds is None else simulation_seconds<=max_seconds},sort_keys=True),flush=True)
+    if max_seconds is not None and simulation_seconds>max_seconds:
+        raise SystemExit(f'simulation exceeded {max_seconds:.2f}s budget: {simulation_seconds:.2f}s')
     return world
 
 
 if __name__ == '__main__':
-    seed=int(sys.argv[1]) if len(sys.argv)>1 else 843000;years=int(sys.argv[2]) if len(sys.argv)>2 else 1000;main(seed,years)
+    import argparse
+    parser=argparse.ArgumentParser(description='Deterministic simulation benchmark; archive diagnostics and digest are timed separately.')
+    parser.add_argument('seed',nargs='?',type=int,default=843000)
+    parser.add_argument('years',nargs='?',type=int,default=1000)
+    parser.add_argument('--max-seconds',type=float,help='Fail if actual simulation wall time exceeds this limit; incompatible with ATE_PROFILE_TAIL.')
+    args=parser.parse_args()
+    main(args.seed,args.years,args.max_seconds)

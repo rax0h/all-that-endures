@@ -2,7 +2,7 @@ from __future__ import annotations
 from .core import Household, Layer, Ref
 
 def partnership_step(world,rng):
-    adults=[p for p in world.people.values() if p.alive and p.age>=18];by_settlement={}
+    adults=[p for p in world.current_people() if p.alive and p.age>=18];by_settlement={}
     for p in adults:by_settlement.setdefault(p.settlement,[]).append(p)
     paired=set()
     for a,b in world.social.partnerships:
@@ -15,11 +15,14 @@ def partnership_step(world,rng):
             if a.id in paired:continue
             rr=rng.stream("partnership",world.year,a.id)
             if rr.random()>.18:continue
-            candidates=[];aa=ancestry.setdefault(a.id,world.genealogy.ancestors(a.id,2))
+            candidates=[]
+            if a.id not in ancestry:ancestry[a.id]=world.genealogy.ancestors(a.id,2)
+            aa=ancestry[a.id]
             for offset in range(1,min(25,n)):
                 b=people[(i+offset)%n]
                 if b.id==a.id or b.id in paired or b.household==a.household:continue
-                bb=ancestry.setdefault(b.id,world.genealogy.ancestors(b.id,2))
+                if b.id not in ancestry:ancestry[b.id]=world.genealogy.ancestors(b.id,2)
+                bb=ancestry[b.id]
                 if a.id in bb or b.id in aa or aa.intersection(bb):continue
                 rel=world.social.get(a.id,b.id);compatibility=1-abs(a.temperament-b.temperament);score=.35*compatibility+.25*(a.attachment+b.attachment)/2+.20*rel.trust+.20*rel.familiarity;candidates.append((score,b))
             if not candidates:continue
@@ -36,6 +39,7 @@ def partnership_step(world,rng):
 
 def household_split_step(world,rng):
     for hid,h in list(world.households.items()):
+        if len(h.members)<8:continue
         living=[world.people[p] for p in h.members if world.people[p].alive];adults=[p for p in living if p.age>=18]
         if len(living)<8 or len(adults)<3:continue
         rr=rng.stream("household_split",world.year,hid)

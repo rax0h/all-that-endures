@@ -69,7 +69,7 @@ def _need_score(world,sid,gid):
  if gid in ('justice','dominion','liberty'):return min(1.,.15+len(world.culture.laws)/30)
  return .2
 
-def _eligible_clergy(world,sid):return [p for p in world.people.values() if p.alive and p.age>=18 and p.settlement==sid]
+def _eligible_clergy(world,sid):return [p for p in world.current_people() if p.alive and p.age>=18 and p.settlement==sid]
 
 def divine_step(world,rng):
  from .core import Layer,Ref

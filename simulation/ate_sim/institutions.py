@@ -49,14 +49,18 @@ def society_eligible(world,pid,society):
  p=world.people.get(pid);return bool(p and p.alive and full_essence_user(world,pid))
 
 def ensure_core_societies(world):
- if not world.settlements or sum(p.alive for p in world.people.values())<20:return
+ if not world.settlements:return
+ populations={sid:0 for sid in world.settlements}
+ for p in world.current_people():
+  if p.alive:populations[p.settlement]+=1
+ if sum(populations.values())<20:return
  Layer,Ref=layer_ref();anchor=min(world.settlements)
  for kind,name in (('adventure_society','Adventure Society'),('magic_society','Magic Society')):
   inst=world.institutions.institution_by_kind(kind)
   if inst is None:
    e=world.emit('institution_founded',Layer.SOCIETY,location=Ref('settlement',anchor),institution_kind=kind,name=name);inst=world.institutions.create_institution(kind,name,world.year,e.id);world.lineage.register('institution',inst.id,origin_event=e.id,origin_year=world.year)
   for sid in sorted(world.settlements):
-   residents=sum(p.alive and p.settlement==sid for p in world.people.values())
+   residents=populations[sid]
    if residents>=8 and world.institutions.branch_for(kind,sid) is None:
     causes=(inst.origin_event,) if inst.origin_event else ();e=world.emit('institution_branch_founded',Layer.SOCIETY,location=Ref('settlement',sid),causes=causes,institution=inst.id,institution_kind=kind);b=world.institutions.create_branch(inst.id,sid,world.year,e.id,min(.95,.35+residents/200));world.lineage.register('institution_branch',b.id,(('institution',inst.id),),e.id,world.year)
 
@@ -93,7 +97,7 @@ def institution_step(world,rng):
   n=world.institutions.post_notice(b.id,world.year,e.kind,e.location.id,e.id)
   if not any(x.kind=='adventure_notice_posted' and x.data.get('notice')==n.id for x in world.events):world.emit('adventure_notice_posted',Layer.KNOWLEDGE,location=Ref('settlement',e.location.id),causes=(e.id,),notice=n.id,threat=e.kind)
  applied={(a.person,a.society) for a in world.institutions.applications.values()}
- for p in sorted(world.people.values(),key=lambda x:x.id):
+ for p in sorted(world.current_people(),key=lambda x:x.id):
   if not p.alive or not full_essence_user(world,p.id):continue
   for society in ('adventure_society','magic_society'):
    i=world.institutions.institution_by_kind(society)

@@ -45,7 +45,7 @@ def rank_ecology_step(world,rng):
  for rec in reversed(world.agency.actions):
   if rec.year!=world.year:break
   latest.setdefault(rec.person,rec)
- for p in sorted((x for x in world.people.values() if x.alive),key=lambda x:x.id):
+ for p in sorted((x for x in world.current_people() if x.alive),key=lambda x:x.id):
   path=world.advancement.path(p.id)
   if path is None or not path.abilities:continue
   rec=latest.get(p.id);action='work' if rec is None else rec.action;strength=.35 if rec is None else rec.strength;relevant=ACTION_FUNCTIONS.get(action,set())

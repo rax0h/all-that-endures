@@ -3,6 +3,8 @@ from dataclasses import dataclass, field, asdict, is_dataclass, fields
 from enum import Enum
 from bisect import bisect_left, bisect_right
 from operator import attrgetter
+from functools import lru_cache
+from contextlib import contextmanager
 import hashlib, json, math
 from typing import Any
 from .genealogy import Genealogy
@@ -45,12 +47,16 @@ class Cell: x:int; y:int; elevation:float; moisture:float; fertility:float; fore
 class LocalState: rain:float=.5; drought:float=0.; flood:float=0.; scarcity:float=0.
 @dataclass
 class TradeRoute: a:int; b:int; strength:float=.05; exchanges:int=0; last_used:int=0
+@lru_cache(maxsize=None)
+def _canonical_fields(cls):
+ return tuple((repr(f.name),f.name) for f in sorted(fields(cls),key=lambda f:repr(f.name)))
 def _canonical(value):
- if is_dataclass(value): return _canonical({f.name:getattr(value,f.name) for f in fields(value)})
- if isinstance(value,Enum): return value.value
- if isinstance(value,dict): return {repr(k):_canonical(v) for k,v in sorted(value.items(),key=lambda kv:repr(kv[0]))}
- if isinstance(value,(list,tuple)): return [_canonical(v) for v in value]
- if isinstance(value,set): return sorted((_canonical(v) for v in value),key=repr)
+ if value is None or type(value) in (str,int,float,bool):return value
+ if isinstance(value,Enum):return value.value
+ if is_dataclass(value):return {key:_canonical(getattr(value,name)) for key,name in _canonical_fields(type(value))}
+ if isinstance(value,dict):return {repr(k):_canonical(v) for k,v in sorted(value.items(),key=lambda kv:repr(kv[0]))}
+ if isinstance(value,(list,tuple)):return [_canonical(v) for v in value]
+ if isinstance(value,set):return sorted((_canonical(v) for v in value),key=repr)
  return value
 @dataclass
 class World:
@@ -58,6 +64,7 @@ class World:
  def emit(self,kind,layer,actors=(),location=None,causes=(),**data):
   if layer is None:raise ValueError('events require an explicit layer')
   if any(c not in self.event_ids for c in causes):raise ValueError('event cause does not exist')
+  if kind in ('birth','death','resurrection'):self.__dict__.pop('_living_cache',None)
   e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id);return e
  def events_between(self,first_year,last_year=None):
   # Events append in simulation-year order; binary search touches no old payloads.
@@ -65,10 +72,25 @@ class World:
   if last_year<first_year:return []
   key=attrgetter('year');start=bisect_left(self.events,first_year,key=key);stop=bisect_right(self.events,last_year,key=key)
   return self.events[start:stop]
- def living(self):return [p for p in self.people.values() if p.alive]
+ @contextmanager
+ def current_people_scope(self):
+  # A step-local index: direct edits between steps and loaded checkpoints need
+  # no invalidation. Birth/death/resurrection events invalidate during a step.
+  self._index_current_people=True
+  try:yield
+  finally:
+   self.__dict__.pop('_index_current_people',None)
+   self.__dict__.pop('_living_cache',None)
+ def current_people(self):
+  cached=self.__dict__.get('_living_cache')
+  if cached is None:
+   cached=tuple(p for p in self.people.values() if p.alive)
+   if self.__dict__.get('_index_current_people'):self._living_cache=cached
+  return cached
+ def living(self):return list(self.current_people())
  def living_by_settlement(self):
   out={sid:[] for sid in self.settlements}
-  for p in self.people.values():
+  for p in self.current_people():
    if p.alive:out[p.settlement].append(p)
   return out
  def digest(self):return hashlib.sha256(json.dumps(_canonical(self),sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()

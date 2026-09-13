@@ -13,7 +13,7 @@ class WarfareState:
  def active(self):return [c for c in self.conflicts.values() if c.status=='war']
 
 def _pair(a,b):return (a,b) if a<b else (b,a)
-def _residents(world,sid):return [p for p in world.people.values() if p.alive and p.age>=16 and p.settlement==sid]
+def _residents(world,sid):return [p for p in world.current_people() if p.alive and p.age>=16 and p.settlement==sid]
 def _strength(world,sid):
  people=_residents(world,sid);s=world.settlements[sid];members=world.institutions.institution_by_kind('adventure_society');member_ids=set() if members is None else members.members
  force=sum(combat_value(p)*(1.25 if p.id in member_ids else 1.) for p in people);return max(1.,force)*(0.55+0.45*s.defense)*(0.7+0.3*s.roads)

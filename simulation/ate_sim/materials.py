@@ -16,7 +16,7 @@ class MaterialEconomy:
   i=self.next_lot;self.next_lot+=1;l=MaterialLot(i,kind,quantity,quality,sid,producer,year,event,'person',producer,tuple(properties),0,[],material_rank);self.lots[i]=l;self.lot_index.setdefault(sid,[]).append(i);self.active_lot_index.setdefault(sid,set()).add(i)
   if hasattr(self,'_selection_index'):
    heaps,counts=self._selection_index;heappush(heaps.setdefault(sid,[]),self._selection_key(l));counts[sid]=counts.get(sid,0)+bool(l.magical_properties)
-  if hasattr(self,'_selection_pool'):self._selection_pool.pop(sid,None)
+  if hasattr(self,'_selection_ids'):self._selection_ids.pop(sid,None)
   if hasattr(self,'_whole_units'):self._whole_units[sid]=self._whole_units.get(sid,0)+int(max(0.,l.quantity-l.consumed))
   return l
  def available(self,sid,kind=None):
@@ -29,7 +29,7 @@ class MaterialEconomy:
    active=self.active_lot_index.get(lot.settlement,set())
    if lot.id in active:
     active.discard(lot.id)
-    if hasattr(self,'_selection_pool'):self._selection_pool.pop(lot.settlement,None)
+    if hasattr(self,'_selection_ids'):self._selection_ids.pop(lot.settlement,None)
     if hasattr(self,'_selection_index'):
      _,counts=self._selection_index;counts[lot.settlement]=counts.get(lot.settlement,0)-bool(lot.magical_properties)
   if hasattr(self,'_whole_units'):self._whole_units[lot.settlement]=self._whole_units.get(lot.settlement,0)+int(max(0.,lot.quantity-lot.consumed))-old_whole
@@ -37,7 +37,7 @@ class MaterialEconomy:
  def rebuild_active_index(self):
   self.__dict__.pop('_selection_index',None)
   self.__dict__.pop('_whole_units',None)
-  self.__dict__.pop('_selection_pool',None)
+  self.__dict__.pop('_selection_ids',None)
   self.active_lot_index={}
   for sid,ids in self.lot_index.items():
    active={i for i in ids if i in self.lots and self.lots[i].quantity-self.lots[i].consumed>.01}
@@ -62,12 +62,12 @@ class MaterialEconomy:
   return self.lots[heap[0][1]] if heap else None
  def magical_available_count(self,sid):
   return self._ensure_selection_index()[1].get(sid,0)
- def selection_pool(self,sid):
+ def selection_ids(self,sid):
   # Internal immutable pool preserves the exact active-set iteration order.
   # Rebuild only when creation or exhaustion changes that set.
-  if not hasattr(self,'_selection_pool'):self._selection_pool={}
-  if sid not in self._selection_pool:self._selection_pool[sid]=tuple(self.available(sid))
-  return self._selection_pool[sid]
+  if not hasattr(self,'_selection_ids'):self._selection_ids={}
+  if sid not in self._selection_ids:self._selection_ids[sid]=tuple(self.active_lot_index.get(sid,()))
+  return self._selection_ids[sid]
  def crafting_capacity(self,sid,limit):
   # Integer lower bound proves saturation without summing the growing stockpile.
   # Near a decision boundary, retain the original ordered floating-point sum.
@@ -122,7 +122,7 @@ def _craft_once(world,sid,crafter,rr,Layer,Ref):
  if craft_skill<.7 or not world.materials.has_available(sid):return False
  if craft_skill>=2:lot=world.materials.best_available(sid)
  else:
-  available=world.materials.selection_pool(sid);lot=available[int(rr.random()*len(available))%len(available)]
+  available=world.materials.selection_ids(sid);lot=world.materials.lots[available[int(rr.random()*len(available))%len(available)]]
  if lot.owner_kind=='person' and lot.owner_id!=crafter.id:
   seller=world.people.get(lot.owner_id);price=max(.05,(1+lot.quality)*(1+.5*len(lot.magical_properties))*(1+.4*lot.material_rank))
   if seller is None or crafter.wealth<price:return False
