@@ -19,8 +19,7 @@ def craft_career_step(world,rng):
   # Masters with real material supply produce repeat work. This increases low-rank
   # magical goods through careers and commissions, not through an item spawn bonus.
   for m in masters:
-   available=world.materials.available(sid)
-   if not available:continue
+   if not world.materials.has_available(sid):continue
    rr=rng.stream('craft_career',world.year,m.id);demand=.18+.25*world.settlements[sid].prosperity+.15*world.local[sid].scarcity
    magic_branch=world.institutions.branch_for('magic_society',sid)
    if magic_branch is not None:demand+=.18

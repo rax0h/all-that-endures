@@ -11,7 +11,7 @@ class AgencyState:
  motives:dict[int,MotiveState]=field(default_factory=dict);actions:list[ActionRecord]=field(default_factory=list)
  def assess(self,world,p,attachment=None,dependents=None):
   q=world.local[p.settlement];h=world.households[p.household]
-  if attachment is None:attachment=max((r.attachment for r in world.social.edges.values() if p.id in (r.a,r.b)),default=0.)
+  if attachment is None:attachment=max((r.attachment for r in world.social.relationships_for(p.id)),default=0.)
   if dependents is None:dependents=sum(1 for x in world.genealogy.children.get(p.id,[]) if world.people.get(x) and world.people[x].alive and world.people[x].age<18)
   m=MotiveState(max(0.,min(1.,q.scarcity+max(0.,(5-h.food)/10))),max(0.,min(1.,world.cells[(world.settlements[p.settlement].x,world.settlements[p.settlement].y)].hazard*(1-h.preparedness)+p.fear)),max(0.,1-attachment),max(0.,min(1.,1-p.wealth/120.)),p.curiosity,max(0.,min(1.,p.age/80))*p.attachment,min(1.,dependents*.18+p.grief*.2),max(0.,min(1.,.65-p.wealth/250.))*(.5+.5*(1-p.inhibition)));self.motives[p.id]=m;return m
  def choose(self,world,p,rng,attachment=None,dependents=None):
@@ -28,14 +28,13 @@ def _practice_path(world,p,rr,action,strength):
  if after>before:p.rank=after;Layer,Ref=layer_ref();world.emit('rank_advanced',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),from_rank=before,to_rank=after,practice_context=action)
 
 def agency_step(world,rng):
- attachments={}
- for r in world.social.edges.values():attachments[r.a]=max(attachments.get(r.a,0.),r.attachment);attachments[r.b]=max(attachments.get(r.b,0.),r.attachment)
  dependents={}
- for p in world.people.values():
+ for p in world.current_people():
   if p.alive and p.age<18:
    for parent in p.parents:dependents[parent]=dependents.get(parent,0)+1
- for p in sorted((x for x in world.people.values() if x.alive and x.age>=16),key=lambda x:x.id):
-  rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachments.get(p.id,0.),dependents.get(p.id,0));domain={'secure_food':'agriculture','prepare':'defense','work':'craft','learn':'knowledge','teach':'knowledge','build':'construction'}.get(action);event=None
+ for p in sorted((x for x in world.current_people() if x.alive and x.age>=16),key=lambda x:x.id):
+  attachment=max((r.attachment for r in world.social.relationships_for(p.id)),default=0.)
+  rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachment,dependents.get(p.id,0));domain={'secure_food':'agriculture','prepare':'defense','work':'craft','learn':'knowledge','teach':'knowledge','build':'construction'}.get(action);event=None
   if domain:world.skills.practice(p.id,domain,.12+.38*strength)
   _practice_path(world,p,rr,action,strength)
   if action=='secure_food':world.households[p.household].food+=.08+.2*strength

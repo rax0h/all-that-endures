@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from functools import lru_cache
 from .rank import profile, annual_mortality, military_value
 from .species import species, compose_biology, reproductive_compatibility, reproductive_span, inherit_species
 
@@ -24,8 +25,14 @@ class BiologyState:
     built_scale:float
 
 def state(person)->BiologyState:
-    values=compose_biology(person.species,profile(person.rank))
-    return BiologyState(person.species,person.rank,**values)
+    # Cache by immutable rule profiles as well as identity, so rule replacement
+    # and rank/species changes cannot return a stale biological composition.
+    return _state(person.species,person.rank,species(person.species),profile(person.rank))
+
+@lru_cache(maxsize=512)
+def _state(species_key,rank,species_profile,rank_profile):
+    values=compose_biology(species_key,rank_profile)
+    return BiologyState(species_key,rank,**values)
 
 def mortality_risk(person,scarcity:float=0.,trauma:float=0.)->float:
     return annual_mortality(person.age,person.rank,scarcity,trauma)/max(.4,species(person.species).baseline_longevity)

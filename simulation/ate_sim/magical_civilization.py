@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 from .core_types import layer_ref
-from .magic_resources import _aspiration, _make_resource, _wants, absorb_essence_resource, use_awakening_stone
+from .magic_resources import _aspiration, _make_resource, _wants, _wanted_resources, _transfer_to_seeker, absorb_essence_resource, use_awakening_stone
 from .materials import _produce_lot, _craft_once
 from .institutions import apply_for_society, full_essence_user
 
+EXPEDITION_ACTIVITY_RATE = .62
+
 
 def _living(world, sid):
-    return sorted((p for p in world.people.values() if p.alive and p.age >= 16 and p.settlement == sid), key=lambda p: p.id)
+    return sorted((p for p in world.current_people() if p.alive and p.age >= 16 and p.settlement == sid), key=lambda p: p.id)
 
 
 def _practitioners(world, people):
@@ -42,7 +44,7 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
 
     rr = rng.stream('magical_field_economy', world.year, sid)
     pressure = max(0., ambient - .30) + .35 * cell.hazard + .08 * min(10, field_capacity)
-    attempts = min(8, int(pressure * (1.2 + len(people) / 90.0)))
+    attempts = min(8, int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0)))
     if attempts <= 0:
         return
 
@@ -79,23 +81,33 @@ def _resource_circulation(world, rng, sid, people, users, magic):
     if not users:
         return
     rr = rng.stream('magical_circulation', world.year, sid)
+    people_by_id = {p.id:p for p in people}
     # Magic Society presence improves information/market matching, not resource creation.
-    rounds = 2 + (2 if magic is not None else 0)
+    # Mature communities get more matching opportunities, but every absorption/use and transfer
+    # still follows the normal aspiration, compatibility, wealth and selectiveness gates.
+    rounds = 3 + (3 if magic is not None else 0)
     for _ in range(rounds):
-        for holder in users:
+        holder_ids = sorted(oid for (kind,oid),ids in world.magic_resources.owner_index.items()
+                            if kind=='person' and ids and oid in people_by_id)
+        for holder_id in holder_ids:
+            holder = people_by_id[holder_id]
             path = world.advancement.path(holder.id)
             a = _aspiration(world, holder)
-            ess = [r for r in world.magic_resources.inventory('person', holder.id, 'essence') if _wants(world, holder, r)]
-            if ess and len(path.base_essences) < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
-                viable = [r for r in ess if r.key not in path.base_essences]
+            base = 0 if path is None else len(path.base_essences)
+            ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if base < a.desired_base_essences else []
+            if ess and base < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
+                viable = [r for r in ess if path is None or r.key not in path.base_essences]
                 if viable and rr.random() < max(.25, a.compromise_tolerance):
                     absorb_essence_resource(world, holder.id, viable[int(rr.random() * len(viable)) % len(viable)].id)
                     path = world.advancement.path(holder.id)
-            stones = [r for r in world.magic_resources.inventory('person', holder.id, 'awakening_stone') if _wants(world, holder, r)]
-            if stones and len(path.abilities) < min(a.desired_abilities, path.capacity):
-                # Selective users still wait sometimes, but a mature market gives them repeated real opportunities.
-                if rr.random() < max(.22, .82 - .55 * a.stone_selectiveness):
-                    use_awakening_stone(world, holder.id, stones[int(rr.random() * len(stones)) % len(stones)].id)
+            stones = [] if path is None else (_wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'awakening_stone')) if len(path.abilities) < min(a.desired_abilities, path.capacity) else [])
+            if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity):
+                if rr.random()<max(.22,.82-.55*a.stone_selectiveness):
+                    use_awakening_stone(world,holder.id,stones[int(rr.random()*len(stones))%len(stones)].id)
+            held=world.magic_resources.inventory('person',holder.id)
+            surplus=_wanted_resources(world,holder,held,wanted=False) if held else []
+            if surplus and rr.random()<(.58 if magic is not None else .28):
+                _transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],holder,people,rr)
 
 
 def _society_pipeline(world, rng, sid, people, adventure, magic):
@@ -141,12 +153,12 @@ def _magical_workshops(world, rng, sid, people, users, magic):
     magical_crafters = [p for p in users if world.skills.get(p.id, 'craft').level >= .7]
     if not magical_crafters:
         return
-    magical_lots = [l for l in world.materials.available(sid) if l.magical_properties]
-    if not magical_lots:
+    magical_lot_count = world.materials.magical_available_count(sid)
+    if not magical_lot_count:
         return
     # A functioning Magic Society creates commissions, supplier information and apprenticeship
     # pressure. It does not grant crafting ability: the crafter must still pass normal permission rules.
-    commissions = min(12, len(magical_lots), len(magical_crafters) * (2 if magic is not None else 1))
+    commissions = min(12, magical_lot_count, len(magical_crafters) * (2 if magic is not None else 1))
     for n in range(commissions):
         crafter = magical_crafters[n % len(magical_crafters)]
         crng = rng.stream('magical_commission', world.year, sid * 100 + n)

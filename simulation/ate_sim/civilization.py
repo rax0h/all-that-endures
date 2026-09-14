@@ -41,11 +41,12 @@ def _move_household(world,hid:int,destination:int,cause:int|None=None):
 
 def migration_step(world,rng):
     ids=sorted(world.settlements);pop={sid:0 for sid in ids};caps={sid:_capacity(world,sid) for sid in ids}
-    for p in world.people.values():
+    for p in world.current_people():
         if p.alive:pop[p.settlement]+=1
     for hid,h in list(world.households.items()):
+        if not h.alive:continue
         living=_household_living(world,hid)
-        if not h.alive or not living:continue
+        if not living:continue
         origin=h.settlement;local=world.local[origin];s0=world.settlements[origin];crowd=max(0.,pop[origin]/caps[origin]-.78);pressure=.50*local.scarcity+.20*max(0.,.18-h.preparedness)+.15*max(0.,.2-s0.prosperity)+.45*crowd;rr=rng.stream("migration",world.year,hid)
         if rr.random()>=.035*min(1.5,pressure):continue
         options=[]
@@ -58,7 +59,7 @@ def migration_step(world,rng):
 
 def trade_step(world,rng):
     ids=sorted(world.settlements);living_by_settlement={sid:[] for sid in ids}
-    for p in world.people.values():
+    for p in world.current_people():
         if p.alive:living_by_settlement[p.settlement].append(p)
     adopted_by_settlement={sid:[] for sid in ids}
     for (sid,pid),adoption in world.culture.adoption.items():

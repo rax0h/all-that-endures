@@ -7,7 +7,7 @@ from .currency import ranked_reward,value_of
 def society_career_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');mag=world.institutions.institution_by_kind('magic_society')
  recorded={r.person for r in world.institutions.magic_records.values()}
- for p in sorted((x for x in world.people.values() if x.alive and full_essence_user(world,x.id)),key=lambda x:x.id):
+ for p in sorted((x for x in world.current_people() if x.alive and full_essence_user(world,x.id)),key=lambda x:x.id):
   if p.id in recorded:continue
   b=world.institutions.branch_for('magic_society',p.settlement)
   if b is None:continue
@@ -19,7 +19,7 @@ def society_career_step(world,rng):
   latest={}
   for a in world.institutions.applications.values():
    if a.society==society and (a.person not in latest or a.id>latest[a.person].id):latest[a.person]=a
-  for p in sorted((x for x in world.people.values() if x.alive and full_essence_user(world,x.id) and x.id not in inst.members),key=lambda x:x.id):
+  for p in sorted((x for x in world.current_people() if x.alive and full_essence_user(world,x.id) and x.id not in inst.members),key=lambda x:x.id):
    a=latest.get(p.id)
    if a is None or a.passed is None or a.passed or world.year-a.applied_year<3:continue
    aspiration=_aspiration(world,p);intent=aspiration.adventurer_aspiration if society=='adventure_society' else (p.curiosity>.55 or world.skills.get(p.id,'knowledge').level>1 or world.skills.get(p.id,'craft').level>1)
