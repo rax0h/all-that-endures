@@ -3,6 +3,17 @@ from ate_sim.magic_resources import absorb_essence_resource, use_awakening_stone
 from ate_sim.magic_progression import practice_ability, record_body_transition
 from ate_sim.checkpoint import dumps, loads
 from ate_sim.history_archive import export_archive, HistoryArchive
+from validate_magic_progression import validate
+import pytest
+
+
+def test_absorption_cannot_mutate_history_or_path_without_ownership():
+    world=generate_world(843000)
+    p=next(p for p in world.people.values() if world.advancement.path(p.id) is None)
+    resource=world.magic_resources.create('essence','fire','Common',0,p.settlement,'settlement',p.settlement)
+    before=world.digest()
+    with pytest.raises(ValueError):absorb_essence_resource(world,p.id,resource.id)
+    assert world.digest()==before
 
 
 def test_absorption_readiness_milestones_survive_checkpoint_and_archive(tmp_path):
@@ -38,6 +49,7 @@ def test_absorption_readiness_milestones_survive_checkpoint_and_archive(tmp_path
     archive = tmp_path / 'magic.sqlite'
     export_archive(restored, archive)
     with HistoryArchive(archive) as history:
+        assert validate(history)['valid']
         recorded = history.event(transition.id)
         assert recorded['causes'] == list(transition.causes)
         assert len(history.record('path', p.id)['abilities']) == 20

@@ -4,6 +4,8 @@ from functools import lru_cache
 from heapq import heappush, heappop, heapify
 from .core_types import layer_ref
 from .magic_progression import record_body_transition
+from .currency import can_pay_tier
+from math import ceil
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
 
 RESOURCE_DISCOVERY_RATE=.45
@@ -47,9 +49,14 @@ def person_context(p,sid):return (p.species,p.occupation,round(p.curiosity,2),ro
 def _commit_to_full_path(a):
  if a is None or a.completion_goal:return
  a.completion_goal=True;a.desired_base_essences=3;a.desired_abilities=20;a.urgency=max(a.urgency,.55)
+def _validate_absorption_owner(resource,pid):
+ if resource.consumed_year is not None:raise ValueError('magical resource already consumed')
+ if resource.owner_kind!='person' or resource.owner_id!=pid:raise ValueError('person must own resource before absorption')
 def absorb_essence_resource(world,pid,rid):
  r=world.magic_resources.resources[rid]
  if r.kind!='essence':raise ValueError('resource is not an essence')
+ _validate_absorption_owner(r,pid)
+ if r.key not in ESSENCES:raise ValueError('unknown essence')
  p=world.people[pid];path=world.advancement.path(pid);before=world.advancement.rank(pid)
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
  Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
@@ -64,6 +71,8 @@ def absorb_essence_resource(world,pid,rid):
 def use_awakening_stone(world,pid,rid,target_essence=None):
  r=world.magic_resources.resources[rid]
  if r.kind!='awakening_stone':raise ValueError('resource is not an awakening stone')
+ _validate_absorption_owner(r,pid)
+ world.advancement._stone(r.key)
  p=world.people[pid];path=world.advancement.path(pid)
  if path is None:return None
  available=[e for e in path.essences if len(path.abilities_for(e))<5]
@@ -249,12 +258,15 @@ def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
  for q in local:
   if q.id==holder.id or not _wants(world,q,r):continue
   relationship=world.social.edges.get(world.social.key(holder.id,q.id))
-  if q.wealth>=price or (relationship is not None and relationship.attachment>.7):candidates.append(q)
+  if q.wealth>=price or can_pay_tier(world,q.id,'iron',ceil(price)) or (relationship is not None and relationship.attachment>.7):candidates.append(q)
  if not candidates:return False
  q=max(candidates,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id));a=_aspiration(world,q);gift=world.social.get(holder.id,q.id).attachment>.7
- if not gift and q.wealth<price:return False
- if not gift:q.wealth-=price;holder.wealth+=price
- e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',holder.id),Ref('person',q.id)),Ref('settlement',holder.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,reason='relationship gift' if gift else 'aspirant purchase',price=0 if gift else price);world.magic_resources.transfer(r.id,'person',q.id,e.id,holder.settlement);a.preparation=min(1.,a.preparation+.08)
+ coins={}
+ if not gift:
+  if q.wealth>=price:q.wealth-=price;holder.wealth+=price
+  elif can_pay_tier(world,q.id,'iron',ceil(price)):coins=world.currency.transfer(q.id,holder.id,{'iron':ceil(price)})
+  else:return False
+ e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',holder.id),Ref('person',q.id)),Ref('settlement',holder.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,reason='relationship gift' if gift else 'aspirant purchase',price=0 if gift else price,coin_transfer=coins,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,holder.settlement);a.preparation=min(1.,a.preparation+.08)
  if on_transfer is not None:on_transfer(q)
  return True
 

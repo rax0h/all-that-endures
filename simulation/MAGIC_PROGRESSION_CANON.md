@@ -1,8 +1,9 @@
 # Magic progression: source audit and engineering specification
 
-Status: **first progression implementation; higher-rank design pending**.
-This is not a completed canon specification or a claim that main is canonically
-valid. Audited base: `9551c9c314b8cdbd15f5b6e0c22e95b203d848e2`.
+Status: **implemented progression foundation, with explicit ATE approximations**.
+The final millennium audit is recorded in `MAGIC_PROGRESSION_VALIDATION.md`.
+This does not claim that unpublished Diamond mechanics have been established
+as book canon. Audited base: `9551c9c314b8cdbd15f5b6e0c22e95b203d848e2`.
 Branch: `sim/canonical-magic-progression`. Audit date: 2026-09-14.
 
 ## Current agreed design and implementation progress
@@ -42,11 +43,58 @@ Implemented first increment:
 - Checkpoint schema 5 rejects old-schema worlds rather than silently rewriting
   impossible history. Existing archives remain readable.
 
-Still pending: replace legacy shared revelation/integration scalars with the
-agreed understanding model; explicit core-taint gating; distinct Diamond biology
-and cognitive consequences; longevity; economic transactions and task-relative
-rewards; final canonical validation. Existing upper-rank scalar tests are
-temporary compatibility tests, not the accepted final Diamond design.
+Implemented second increment:
+
+- Each ability now has bounded understanding evidence and applied integration,
+  replacing the shared path-wide revelation counters. Silver-to-Gold requires
+  two distinct contexts from at least two experience families; Gold-to-Diamond
+  requires four. These thresholds are ATE approximations, not book rules.
+- Eligible events are actual crafting, learning, migration, expedition outcomes
+  and ranked threat resolutions. Identical contexts cannot add evidence. At
+  most eight contexts are retained per ability/tier, with at most three from
+  one family so one repeated career cannot crowd out all other experiences.
+  Craft experience applies only to compatible ability functions. Other exposure
+  remains a broad approximation, not proof that the specific power was used in
+  the original event. Applied practice and reflection integrate that exposure
+  at 0.08 times the smaller input, capped by retained evidence.
+- Each new ability tier resets its understanding evidence. A revelation event
+  records the integrated contexts and original cause IDs; body transitions then
+  link the ability milestones. No prose insight is generated.
+- Any retained core taint blocks the Gold-to-Diamond ability transition. Ordinary
+  practice cannot cleanse it. No cleansing remedy is implemented yet; users of
+  cores remain blocked until a separately sourced/designed remedy exists. Current
+  annual systems do not consume monster cores; the explicit practice API supports
+  core use and the invariant is tested there.
+- Gold and Diamond have separate physical profiles. Diamond has no age-related
+  mortality but can die from external harm. Numerical aging curves are ATE
+  approximations fitted to the owner's qualitative direction, not mortality data
+  extracted from the books. Existing species modifiers remain provisional.
+- Attention, sensory integration and magical modeling capacities are represented
+  separately. Magical modeling reduces crafting error in proportion to actual
+  craft expertise. Physical capacity affects existing production/defense models.
+  Broader anticipatory reasoning and player-facing expression remain future work.
+- Ranked-threat advantages cannot stack into an unexplained two-tier gap. An
+  existing exceptional one-tier advantage remains possible. Physical harvesting
+  creates a provenance-linked material lot at the defeated monster's rank;
+  ordinary harvesting does not magically generate coins.
+- Society notices retain a required rank derived from their source event. Named
+  ranked threats require the claimant's real resolution before payment. Reward
+  denomination follows task rank, not the recipient's rank. Non-ranked severity
+  mapping and exact reward amounts are explicit economic approximations.
+- Denomination-preserving transfers conserve coins and never mint change.
+  Inheritance includes wallets. Bronze-or-higher material trades require the
+  relevant coin denomination. Person-to-person essence/stone sales can accept an
+  Iron-coin quote when ordinary wealth is insufficient. Quote quantities reuse
+  existing price scales rounded up; they are provisional prices, not source
+  currency conversions. Settlement resource sales still use ordinary wealth.
+  Cross-tier exchange, coin farms, sustenance and full institutional treasuries
+  are not implemented. Society credits retain the existing abstract issuance
+  model, now with task/resolution provenance.
+
+These limitations matter: this is a foundation with testable prerequisites, not
+an implementation of literal superhuman thought or every source-setting economic
+mechanism. The final historical report must disclose any missing high-rank
+examples rather than fabricate them or tune a population quota.
 
 ## Subsequent project-owner clarification
 
@@ -146,7 +194,7 @@ exposes a contents list; its linked “Iron Rank” and “The Perks of Being an
 User” preview pages did not expose readable book text through the available
 retrieval. These failed accesses are not evidence about the rules themselves.
 
-## Rule-to-code audit
+## Original rule-to-code audit (before implementation)
 
 | Area | Evidence status | Current ATE representation | Required disposition |
 | --- | --- | --- | --- |
@@ -215,7 +263,7 @@ archives as evidence, distinguish legacy snapshots, and validate corrected world
 through new deterministic runs. No broad economy, personhood or language refactor
 belongs in this phase.
 
-## Blocking source questions
+## Original source questions (subsequently narrowed by owner decisions)
 
 These are foundational rather than requests to choose a tuning constant:
 

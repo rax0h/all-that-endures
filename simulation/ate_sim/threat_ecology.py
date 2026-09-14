@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
+from .currency import denomination_for_rank
 
 RANK_NAMES=('mundane','iron','bronze','silver','gold','diamond','transcendent')
 
@@ -11,6 +12,7 @@ class MagicalThreat:
 @dataclass
 class ThreatEcologyState:
  threats:dict[int,MagicalThreat]=field(default_factory=dict);next_id:int=1
+ resolutions:dict[int,int]=field(default_factory=dict)
  def active(self,sid=None):
   return [t for t in self.threats.values() if t.status=='active' and (sid is None or t.location==sid)]
 
@@ -90,10 +92,15 @@ def threat_ecology_step(world,rng):
   for threat in sorted(state.active(sid),key=lambda t:(-t.rank,t.id))[:3]:
    if not responders:continue
    best=responders[0];effective=effective_response_rank(world,best);gap=threat.rank-effective
-   if gap>1:continue
+   actual=world.advancement.rank(best.id);difference=threat.rank-actual
+   if gap>0 or difference>1:continue
    base={-4:.99,-3:.98,-2:.96,-1:.91,0:.72,1:.22}.get(gap,.02)
    teamwork=min(.18,.025*sum(1 for p in responders[:8] if effective_response_rank(world,p)>=max(0,threat.rank-1)))
    if rr.random()<min(.98,base+teamwork):
-    threat.status='resolved';world.emit('ranked_threat_resolved',Layer.SOCIETY,(Ref('person',best.id),),Ref('settlement',sid),((threat.origin_event,) if threat.origin_event else ()),threat=threat.id,manifestation_kind=threat.kind,form=threat.form,threat_rank=threat.rank,threat_rank_name=RANK_NAMES[threat.rank],responder_rank=world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0,effective_rank=effective,punched_up=effective>=threat.rank and (world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0)<threat.rank)
+    threat.status='resolved';resolution=world.emit('ranked_threat_resolved',Layer.SOCIETY,(Ref('person',best.id),),Ref('settlement',sid),((threat.origin_event,) if threat.origin_event else ()),threat=threat.id,manifestation_kind=threat.kind,form=threat.form,threat_rank=threat.rank,threat_rank_name=RANK_NAMES[threat.rank],responder_rank=world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0,effective_rank=effective,punched_up=effective>=threat.rank and (world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0)<threat.rank)
+    if threat.origin_event is not None:state.resolutions[threat.origin_event]=resolution.id
+    if threat.kind=='monster':
+     harvested=world.emit('monster_remains_harvested',Layer.REALITY,(Ref('person',best.id),),Ref('settlement',sid),(resolution.id,),threat=threat.id,material_rank=threat.rank,valuation_denomination=denomination_for_rank(threat.rank),mechanism='physical_harvest',quantity=1.)
+     world.materials.create_lot('monster_remains',1.,.5+.05*threat.rank,sid,best.id,world.year,harvested.id,(threat.form,),threat.rank)
    elif gap>=0 and rr.random()<.08+.05*gap:
     world.emit('ranked_threat_escalated',Layer.REALITY,location=Ref('settlement',sid),causes=((threat.origin_event,) if threat.origin_event else ()),threat=threat.id,form=threat.form,rank=threat.rank,rank_name=RANK_NAMES[threat.rank])

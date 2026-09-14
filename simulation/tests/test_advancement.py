@@ -55,15 +55,22 @@ def test_rank_requires_every_actually_awakened_skill():
 def test_gold_to_diamond_requires_revelation_and_integration():
  a=full_path();p=a.path(1)
  for ability in p.abilities:ability.rank=5
- p.abilities[0].rank=4;p.abilities[0].level=9;p.abilities[0].progress=.99;a.practice(1,0,1.,reflection=0.);assert a.rank(1)==4;p.revelation=p.integrated=1.;a.practice(1,0,1.,reflection=1.);assert a.rank(1)==5
+ p.abilities[0].rank=4;p.abilities[0].level=9;p.abilities[0].progress=.99;a.practice(1,0,1.,reflection=0.);assert a.rank(1)==4;ready_understanding(p.abilities[0]);a.practice(1,0,1.,reflection=1.);assert a.rank(1)==5
 
-def test_monster_core_dependence_impedes_gold_revelation():
- a=full_path();b=full_path()
- for _ in range(100):b.practice(1,0,0.,core=1.)
- for state in (a,b):
-  for ability in state.path(1).abilities:ability.rank=4;ability.level=0;ability.progress=0.
- for _ in range(100):a.practice(1,0,0.,reflection=1.);b.practice(1,0,0.,reflection=1.)
- assert a.path(1).revelation>b.path(1).revelation
+def test_core_taint_cannot_be_removed_by_routine_reflection():
+ a=full_path();p=a.path(1)
+ a.practice(1,0,0.,core=1.)
+ for skill in p.abilities:
+  skill.rank=4;skill.level=9;skill.progress=.99
+  ready_understanding(skill)
+ for _ in range(1000):a.practice(1,0,1.,reflection=1.)
+ assert a.rank(1)==4 and p.core_fraction>0
+ assert 'core_taint' in a.blockers(1)
+
+
+def ready_understanding(skill):
+ skill.understanding.evidence={'learning:a':1,'learning:b':2,'exploration:a':3,'exploration:b':4}
+ skill.understanding.integration=4.
 
 
 def full_path():
@@ -94,8 +101,8 @@ def test_single_ability_cannot_carry_incomplete_body_to_diamond():
 def test_all_twenty_abilities_gate_each_body_transition_and_ceiling():
  a=full_path();path=a.path(1)
  # Upper-rank understanding is tested separately; isolate structural readiness.
- path.revelation=path.integrated=1.
  for target in range(2,6):
+  for skill in path.abilities:ready_understanding(skill)
   for i in range(19):
    a.practice(1,i,100000.)
    assert a.rank(1)==target-1

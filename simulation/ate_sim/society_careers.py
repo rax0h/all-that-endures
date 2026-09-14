@@ -30,7 +30,7 @@ def society_career_step(world,rng):
  if adv is None:return
  for n in sorted(world.institutions.notices.values(),key=lambda x:x.id):
   if n.status=='open':
-   candidates=[world.people[pid] for pid in adv.members if pid in world.people and world.people[pid].alive and world.people[pid].settlement==n.location]
+   candidates=[world.people[pid] for pid in adv.members if pid in world.people and world.people[pid].alive and world.people[pid].settlement==n.location and world.advancement.rank(pid)>=n.required_rank]
    if candidates:
     candidates.sort(key=lambda p:(world.advancement.rank(p.id),world.skills.get(p.id,'defense').level,p.health,-p.id),reverse=True);leader=candidates[0];rr=rng.stream('notice_accept',world.year,n.id)
     if rr.random()<.45:
@@ -38,12 +38,16 @@ def society_career_step(world,rng):
   if n.status=='assigned' and n.assigned_to in world.people:
    p=world.people[n.assigned_to]
    if not p.alive:n.status='open';n.assigned_to=None;continue
+   resolution=world.threat_ecology.resolutions.get(n.cause_event)
+   if n.kind=='ranked_magic_manifested':
+    if resolution is None:continue
+    event=world.events[resolution-1]
+    if not any(ref.kind=='person' and ref.id==p.id for ref in event.actors):continue
    rr=rng.stream('notice_resolve',world.year,n.id);rank=world.advancement.rank(p.id);cap=.22+.10*rank+.08*world.skills.get(p.id,'defense').level+.18*p.health
    if rr.random()<min(.85,cap):
-    # The Society pays at the adventurer's operative rank. The exact job amount varies with
-    # difficulty/capability, but denomination exchange values are invariant and higher ranks
-    # receive higher-rank magical coinage rather than enormous piles of low-rank currency.
-    coins=ranked_reward(rank,.75+cap);world.currency.credit(p.id,coins)
+    # Job difficulty sets the denomination. A known ranked threat must really
+    # have been resolved by this claimant before the Society can pay.
+    coins=ranked_reward(n.required_rank,.75+min(cap,1.));world.currency.credit(p.id,coins)
     stipend=1.+2.*cap;p.wealth+=stipend
-    e=world.emit('adventure_notice_resolved',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',n.location),causes=(n.cause_event,),notice=n.id,stipend=round(stipend,2),coin_reward=coins,coin_value_lesser=value_of(coins),reward_rank=rank)
+    e=world.emit('adventure_notice_resolved',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',n.location),causes=(n.cause_event,) if resolution is None else (n.cause_event,resolution),notice=n.id,stipend=round(stipend,2),coin_reward=coins,coin_value_lesser=value_of(coins),reward_rank=n.required_rank,responder_rank=rank)
     n.status='resolved';n.resolved_event=e.id

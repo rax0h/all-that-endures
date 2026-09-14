@@ -2,14 +2,26 @@ from __future__ import annotations
 from dataclasses import dataclass,field
 import hashlib,re
 from .semantic_dictionary import ESSENCES,AWAKENING_STONES,stone as stone_semantics
-RANKS=('ordinary','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
+RANKS=('unranked','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
+@dataclass
+class Understanding:
+ # Bounded evidence for the current tier, not prose or a lifetime event scan.
+ evidence:dict[str,int]=field(default_factory=dict)
+ integration:float=0.
+ def ready(self,rank):
+  required=2 if rank==3 else 4
+  return len(self.evidence)>=required and len({k.split(':',1)[0] for k in self.evidence})>=2 and self.integration>=required
+ def reflect(self,application,reflection):
+  if application>0 and reflection>0:
+   self.integration=min(float(len(self.evidence)),self.integration+min(application,reflection)*.08)
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
  milestone_event:int|None=None
+ understanding:Understanding=field(default_factory=Understanding)
 @dataclass
 class EssencePath:
- base_essences:list[str]=field(default_factory=list);confluence:str|None=None;confluence_name:str|None=None;confluence_concepts:tuple[str,...]=();abilities:list[AbilityProgress]=field(default_factory=list);core_fraction:float=0.;revelation:float=0.;integrated:float=0.
+ base_essences:list[str]=field(default_factory=list);confluence:str|None=None;confluence_name:str|None=None;confluence_concepts:tuple[str,...]=();abilities:list[AbilityProgress]=field(default_factory=list);core_fraction:float=0.
  @property
  def essences(self):return tuple(self.base_essences)+(() if self.confluence is None else (self.confluence,))
  @property
@@ -93,12 +105,24 @@ class AdvancementState:
   if r>=ceiling:return a
   gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
   if core>0:gain+=core*(.8,.65,.5,.3,.0,.0)[min(r,5)];p.core_fraction=min(1.,p.core_fraction+core*.01)
-  if r==4:p.revelation=min(1.,p.revelation+max(0.,reflection)*.004*(1-.75*p.core_fraction));p.integrated=min(1.,p.integrated+max(0.,reflection)*.002)
+  if r>=3:a.understanding.reflect(meaningful_use,reflection)
   a.progress+=gain
   while a.progress>=1 and a.rank<5:
    a.progress-=1;a.level+=1
    if a.level>=10:
-    if a.rank==4 and min(p.revelation,p.integrated)<.92:a.level=9;a.progress=.999;break
-    a.rank+=1;a.level=0
+    if a.rank>=3 and (not a.understanding.ready(a.rank) or (a.rank==4 and p.core_fraction>0)):
+     a.level=9;a.progress=.999;break
+    a.rank+=1;a.level=0;a.understanding=Understanding()
     if a.rank>=ceiling:a.progress=0.;break
   return a
+ def blockers(self,pid):
+  p=self.paths.get(pid)
+  if p is None:return ('no_essences',)
+  if len(p.base_essences)!=3 or p.confluence is None:return ('incomplete_essences',)
+  if len(p.abilities)!=20:return ('unawakened_abilities',)
+  rank=self.rank(pid)
+  if rank==5:return ()
+  out=['ability_readiness'] if any(a.rank<=rank for a in p.abilities) else []
+  if rank>=3 and any(a.rank==rank and not a.understanding.ready(rank) for a in p.abilities):out.append('understanding')
+  if rank==4 and p.core_fraction>0:out.append('core_taint')
+  return tuple(out)

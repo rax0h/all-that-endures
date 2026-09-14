@@ -1,4 +1,244 @@
-# Magic progression validation: audit and implementation increments
+# Magic progression validation
+
+## Final implementation candidate
+
+Base main: `9551c9c314b8cdbd15f5b6e0c22e95b203d848e2`.
+Branch: `sim/canonical-magic-progression`. Source-established rules, owner
+clarifications and ATE approximations are distinguished in
+[MAGIC_PROGRESSION_CANON.md](MAGIC_PROGRESSION_CANON.md).
+The earlier audit/increment results below are historical, superseded by this section.
+
+### Tests and deterministic validation
+
+- Complete suite: **132 passed in 69.74 seconds** (`PYTHONPATH=.:simulation python -m pytest -q simulation/tests`).
+- Targeted configuration, understanding, core-taint, history/checkpoint, ownership,
+  currency, mortality and rank-mismatch tests passed before the full suite.
+- Both normal workflow smoke checks passed: `specific_test.py --seed 843000 --years 10 --section all`
+  (causal integrity true, no bad events), and `run_long_history.py 843000 100`.
+- 100-year simulation: **1.461866738 seconds**. New golden:
+  `0ecc032d0315931a8d312b6eb3256aaa85cd83451a7ab03fe0089d470ed9d808`.
+  Indexed and archive-scan runs independently agree. Existing deterministic archive
+  and checkpoint round-trip tests pass; no millennium replay was burned for a duplicate proof.
+- Intermediate 300-year history: **9.904 seconds** including profiling the last five years;
+  chronology/currency audit passed. The 0.485-second tail profile showed no new
+  dominant history-scan hotspot; no further performance refactor was necessary.
+- Exactly one stable canonical millennium was run, with no tail-profiler overhead:
+
+```sh
+PYTHONPATH=.:simulation python simulation/run_long_history.py 843000 1000 --max-seconds 120 --archive /tmp/ate-magic-843000-1000.sqlite
+PYTHONPATH=.:simulation python simulation/validate_magic_progression.py /tmp/ate-magic-843000-1000.sqlite
+```
+
+| Measurement | Result |
+| --- | ---: |
+| Simulation | 68.856643808 seconds |
+| Gate | PASS, <=120 seconds |
+| Diagnostics | 0.318701843 seconds |
+| Causal validation | 0.054245137 seconds, passed |
+| Whole-world digest | 13.895982661 seconds |
+| Archive generation, separately timed | 60.199821945 seconds |
+| SQLite archive | 672,485,376 bytes |
+| Historical people / events | 16,870 / 246,524 |
+| Living population / essence users | 1,323 / 60 |
+| Completed twenty-ability loadouts | 10 |
+| Magical resources total / unused | 5,029 / 2,057 |
+| Society notices / resolved | 1,205 / 1,144 |
+
+Runtime was measured on Linux x86_64, Python 3.12.14 in the local validation
+environment. It is not a claim of the same timing on every CI host.
+
+Canonical world digest:
+`479962681b60f429f28cb5ec74692fc757f78d18e11933681504c172ee6bca2f`.
+
+Archive logical digest:
+`e1aaa1086067875bd4b52c045f0b0ccbdeac8b47032856e8df3616aeec4bd1eb`.
+
+The old digest intentionally changes: partial users lose premature ranked biology;
+full configurations and individual ability readiness gate body advancement;
+higher-rank evidence and persistent taint replace generic path counters; mortality,
+physical profiles, task-ranked rewards, physical harvesting and real wallet transfers
+alter causal outcomes. New milestone/evidence state also participates in serialization.
+No unrelated RNG stream was replaced, performance gate weakened, or magic population
+quota imposed. The lower magic population and resulting ecology/resource counts are
+consequences of the corrected model, not a claim of finished balance calibration.
+
+### Complete historical audit
+
+`validate_magic_progression.py` reconstructed every person's body-rank chronology
+and every wallet from retained acquisition/use, ability, body and monetary events.
+Result: **valid; zero violations** across all 150 body transitions, all 5 living
+Diamonds and both living Golds. Every higher-body transition had four essences,
+twenty abilities, five per essence, all at the requisite tier. Ability milestones
+obeyed the one-tier ceiling and had the required retained understanding evidence;
+Diamond transitions retained zero core taint. Snapshot body ranks and wallet balances
+matched their histories. This validates the implemented ATE invariants, not an
+independent proof of unpublished book canon or simulated philosophical consciousness.
+
+| Living body rank | Count |
+| --- | ---: |
+| Unranked | 1,306 (43 have partial magic paths) |
+| Iron | 8 |
+| Bronze | 0 |
+| Silver | 2 |
+| Gold | 2 |
+| Diamond | 5 |
+
+No living Bronze exists at the final snapshot; Bronze histories are present in the
+higher-rank examples below. The inspector also examined living Iron persons 15128,
+15229 and 15273, and both Silvers 12504 and 15531. Their actual progression is
+included in the machine-readable audit. No missing example is invented.
+
+### Actual Gold and Diamond histories
+
+Economic tier below means the highest nonzero **historical wallet denomination**,
+not body rank or an estimate made from the person's final wallet. Essence names
+remain constant after the listed configuration forms. Iron may show more than
+four abilities because earlier essences can receive stones before confluence.
+It may include Bronze abilities without a Bronze body, as explicitly permitted.
+
+#### Person 11334 — draconian, gold, age 308
+
+Final ordinary wealth: 16.34828207326987. Final wallet: `{"iron": 222, "lesser": 352}`.
+
+| Year | Age | Body event | Essence configuration | Ability state | Body rank | Economic tier |
+| --- | --- | --- | --- | --- | --- | --- |
+| 729 | 37 | 166919 | confluence-9fe1281fa628, earth, life, sword | 12 iron | iron | no recorded coins |
+| 734 | 42 | 168192 | confluence-9fe1281fa628, earth, life, sword | 20 bronze | bronze | no recorded coins |
+| 746 | 54 | 171516 | confluence-9fe1281fa628, earth, life, sword | 20 silver | silver | no recorded coins |
+| 818 | 126 | 192335 | confluence-9fe1281fa628, earth, life, sword | 20 gold | gold | no recorded coins |
+
+#### Person 3132 — human, diamond, age 779
+
+Final ordinary wealth: 433.93253481837996. Final wallet: `{"bronze": 64, "iron": 1989, "lesser": 4694, "silver": 7}`.
+
+| Year | Age | Body event | Essence configuration | Ability state | Body rank | Economic tier |
+| --- | --- | --- | --- | --- | --- | --- |
+| 247 | 26 | 39092 | confluence-4cb02efbcc0f, earth, knowledge, magic | 8 iron | iron | no recorded coins |
+| 267 | 46 | 43748 | confluence-4cb02efbcc0f, earth, knowledge, magic | 20 bronze | bronze | iron |
+| 279 | 58 | 46769 | confluence-4cb02efbcc0f, earth, knowledge, magic | 20 silver | silver | bronze |
+| 335 | 114 | 60418 | confluence-4cb02efbcc0f, earth, knowledge, magic | 20 gold | gold | bronze |
+| 577 | 356 | 124846 | confluence-4cb02efbcc0f, earth, knowledge, magic | 20 diamond | diamond | bronze |
+
+#### Person 5437 — human, diamond, age 644
+
+Final ordinary wealth: 1459.2394576168388. Final wallet: `{"bronze": 13, "iron": 777, "lesser": 1866}`.
+
+| Year | Age | Body event | Essence configuration | Ability state | Body rank | Economic tier |
+| --- | --- | --- | --- | --- | --- | --- |
+| 383 | 27 | 72962 | confluence-4c08bb4ea823, growth, plant, tentacle | 9 iron | iron | no recorded coins |
+| 400 | 44 | 77232 | confluence-4c08bb4ea823, growth, plant, tentacle | 20 bronze | bronze | no recorded coins |
+| 412 | 56 | 80256 | confluence-4c08bb4ea823, growth, plant, tentacle | 20 silver | silver | no recorded coins |
+| 533 | 177 | 112303 | confluence-4c08bb4ea823, growth, plant, tentacle | 20 gold | gold | iron |
+| 791 | 435 | 184461 | confluence-4c08bb4ea823, growth, plant, tentacle | 20 diamond | diamond | bronze |
+
+#### Person 5454 — runic, diamond, age 643
+
+Final ordinary wealth: 9.617093615683432. Final wallet: `{"bronze": 7, "iron": 1118, "lesser": 2778}`.
+
+| Year | Age | Body event | Essence configuration | Ability state | Body rank | Economic tier |
+| --- | --- | --- | --- | --- | --- | --- |
+| 446 | 89 | 89212 | confluence-514491ddd4e7, iron, renewal, visage | 2 bronze, 10 iron | iron | no recorded coins |
+| 454 | 97 | 91422 | confluence-514491ddd4e7, iron, renewal, visage | 20 bronze | bronze | iron |
+| 467 | 110 | 94885 | confluence-514491ddd4e7, iron, renewal, visage | 20 silver | silver | iron |
+| 549 | 192 | 116953 | confluence-514491ddd4e7, iron, renewal, visage | 20 gold | gold | iron |
+| 793 | 436 | 185109 | confluence-514491ddd4e7, iron, renewal, visage | 20 diamond | diamond | iron |
+
+#### Person 8094 — draconian, diamond, age 490
+
+Final ordinary wealth: 17.4561619628828. Final wallet: `{"bronze": 5, "iron": 748, "lesser": 1936}`.
+
+| Year | Age | Body event | Essence configuration | Ability state | Body rank | Economic tier |
+| --- | --- | --- | --- | --- | --- | --- |
+| 533 | 23 | 112452 | confluence-78627f1933ae, earth, plant, sand | 8 iron | iron | no recorded coins |
+| 541 | 31 | 114783 | confluence-78627f1933ae, earth, plant, sand | 20 bronze | bronze | iron |
+| 553 | 43 | 118130 | confluence-78627f1933ae, earth, plant, sand | 20 silver | silver | bronze |
+| 598 | 88 | 130876 | confluence-78627f1933ae, earth, plant, sand | 20 gold | gold | bronze |
+| 841 | 331 | 199085 | confluence-78627f1933ae, earth, plant, sand | 20 diamond | diamond | bronze |
+
+#### Person 9134 — draconian, diamond, age 432
+
+Final ordinary wealth: 86.86264404143128. Final wallet: `{"bronze": 7, "iron": 609, "lesser": 1538}`.
+
+| Year | Age | Body event | Essence configuration | Ability state | Body rank | Economic tier |
+| --- | --- | --- | --- | --- | --- | --- |
+| 590 | 22 | 128748 | confluence-2c9b833a2150, dust, iron, sand | 5 iron | iron | no recorded coins |
+| 617 | 49 | 136183 | confluence-2c9b833a2150, dust, iron, sand | 20 bronze | bronze | iron |
+| 629 | 61 | 139394 | confluence-2c9b833a2150, dust, iron, sand | 20 silver | silver | iron |
+| 676 | 108 | 152026 | confluence-2c9b833a2150, dust, iron, sand | 20 gold | gold | iron |
+| 925 | 357 | 223763 | confluence-2c9b833a2150, dust, iron, sand | 20 diamond | diamond | iron |
+
+#### Person 9774 — draconian, gold, age 396
+
+Final ordinary wealth: 5.1920828661763565. Final wallet: `{"bronze": 28, "iron": 254, "lesser": 592, "silver": 6}`.
+
+| Year | Age | Body event | Essence configuration | Ability state | Body rank | Economic tier |
+| --- | --- | --- | --- | --- | --- | --- |
+| 652 | 48 | 145617 | confluence-1e15b2bf3ed6, dark, plant, renewal | 2 bronze, 6 iron | iron | no recorded coins |
+| 678 | 74 | 152578 | confluence-1e15b2bf3ed6, dark, plant, renewal | 20 bronze | bronze | no recorded coins |
+| 690 | 86 | 155834 | confluence-1e15b2bf3ed6, dark, plant, renewal | 20 silver | silver | no recorded coins |
+| 831 | 227 | 196245 | confluence-1e15b2bf3ed6, dark, plant, renewal | 20 gold | gold | no recorded coins |
+
+### Traceable understanding examples
+
+Person 3132's first listed ability reaches Diamond at event **124300**, year 575,
+through prior Gold milestone **60409** and integration event **124299**. The latter
+retains eight contexts and their original event IDs: **60554, 60797, 61064, 63362,
+76302, 76305, 76550, 91402**, spanning crafting, exploration, confrontation and
+migration. The body waits until **124846**, year 577, when all twenty abilities
+are ready. This is an auditable ATE evidence/integration approximation, not prose
+claiming what the individual philosophically thought.
+
+Person 5437's ability milestone **183853**, year 789, is labeled `teach`, but it
+cannot advance on teaching alone: it references prior Gold milestone **112296**
+and integration event **183852**, whose six causes are **112418, 112689, 112958,
+118119, 129715, 130867**, spanning confrontation and expedition recovery. The
+body advances at **184461**, year 791, only after the final ability. The teaching
+label is an application context, not an independent metaphysical shortcut.
+
+### Lifespan and economy observations
+
+Never-magical Human outliers in the completed history include persons 8064
+(age 115 at death), 8688 (112), 130 (110), 26, 5068 and 7512 (109). None survived
+indefinitely awaiting magic. These are extreme survivors across a millennium,
+not expected lifespans. Human Diamonds 3132 and 5437 reached Iron at 26 and 27,
+Bronze at 46 and 44, Silver at 58 and 56, then Gold at 114 and 177. Their subsequent
+ages follow ranked longevity. Species-specific modifiers are preserved but are
+not claimed to be fully sourced species lifespan tables.
+
+The final wallet ledger agrees exactly with retained credits/transfers for every
+person. Sixty-seven physical monster harvests retain threat-resolution causes
+and matching material ranks; harvesting creates material, not a magical coin drop.
+Targeted tests exercise Diamond materials and funded denomination transfers.
+
+**This canonical run does not demonstrate a mature Diamond-tier economy.** None
+of the living Diamonds resolved a Gold/Diamond threat. Person 3132 resolved
+fourteen Iron, six Bronze and one Silver threat; person 5437 resolved eleven Iron
+and two Bronze. Their lower-tier coins therefore do not justify inventing a
+Diamond fortune. Other living Diamonds similarly faced only Iron/Bronze threats.
+High-rank materials preserve their tier, and task-tier rewards avoid paying
+Diamond coins for trivial work. Institutional budgets, coin production/sustenance,
+explicit cross-tier exchange and a broader high-rank contract/consumption ecology
+remain incomplete. These limitations deserve review before calling the entire
+source-setting economy faithfully simulated.
+
+### Remaining limitations and review status
+
+This is a reviewable progression foundation. It does not finish every ambition in
+the phase prompt. Bounded exposure plus applied reflection is an explicit ATE
+approximation; non-craft events do not yet prove the specific ability was used.
+The game has no implemented rare core-cleansing remedy, no prose revelation
+engine, and no player-facing superhuman conversation. Cognitive modeling currently
+has a concrete craft-precision effect; deeper anticipation and comprehension are
+future work. No Stage B personhood or language work was begun.
+
+Prices, non-ranked task severity and species aging remain documented approximations.
+The new world is not retuned to recover the previous 18-Diamond population. Old
+checkpoint schema 4 is rejected by schema 5; old read-only archives remain readable.
+Normal PR CI status is reported separately on GitHub. Do not merge automatically.
+
+---
+
+## Historical audit and intermediate results (superseded)
 
 ## First implementation increment
 

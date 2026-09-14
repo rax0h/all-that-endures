@@ -24,9 +24,24 @@ class RankedCurrencyState:
   return dict(coins)
  def balance_value(self,pid):
   return sum(COIN_VALUE[d]*n for d,n in self.wallets.get(pid,{}).items())
+ def transfer(self,payer,payee,coins):
+  """Transfer actual denominations; valuation alone never makes change."""
+  coins=dict(coins)
+  if any(d not in COIN_VALUE or type(n) is not int or n<0 for d,n in coins.items()):raise ValueError('invalid coin transfer')
+  source=self.wallets.get(payer,{})
+  if any(source.get(d,0)<n for d,n in coins.items()):raise ValueError('insufficient denomination balance')
+  if not any(coins.values()):return coins
+  if payer==payee:return coins
+  destination=self.wallet(payee)
+  for d,n in coins.items():
+   if n:source[d]-=n;destination[d]=destination.get(d,0)+n
+  return coins
 
 def denomination_for_rank(rank):return RANK_DENOMINATION[max(0,min(5,int(rank)))]
 def value_of(coins):return sum(COIN_VALUE[d]*int(n) for d,n in coins.items())
+
+def can_pay_tier(world,pid,denomination,count):
+ return world.currency.wallets.get(pid,{}).get(denomination,0)>=count
 
 def ranked_reward(rank,scale=1.,include_change=True):
  """Return a rank-appropriate reward package without ever paying above the recipient/job rank.
