@@ -43,58 +43,108 @@ Implemented first increment:
 - Checkpoint schema 5 rejects old-schema worlds rather than silently rewriting
   impossible history. Existing archives remain readable.
 
-Implemented second increment:
+## Current economic and understanding implementation (supersedes initial PR #5 model)
 
-- Each ability now has bounded understanding evidence and applied integration,
-  replacing the shared path-wide revelation counters. Silver-to-Gold requires
-  two distinct contexts from at least two experience families; Gold-to-Diamond
-  requires four. These thresholds are ATE approximations, not book rules.
-- Eligible events are actual crafting, learning, migration, expedition outcomes
-  and ranked threat resolutions. Identical contexts cannot add evidence. At
-  most eight contexts are retained per ability/tier, with at most three from
-  one family so one repeated career cannot crowd out all other experiences.
-  Craft experience applies only to compatible ability functions. Other exposure
-  remains a broad approximation, not proof that the specific power was used in
-  the original event. Applied practice and reflection integrate that exposure
-  at 0.08 times the smaller input, capped by retained evidence.
-- Each new ability tier resets its understanding evidence. A revelation event
-  records the integrated contexts and original cause IDs; body transitions then
-  link the ability milestones. No prose insight is generated.
-- Any retained core taint blocks the Gold-to-Diamond ability transition. Ordinary
-  practice cannot cleanse it. No cleansing remedy is implemented yet; users of
-  cores remain blocked until a separately sourced/designed remedy exists. Current
-  annual systems do not consume monster cores; the explicit practice API supports
-  core use and the invariant is tested there.
-- Gold and Diamond have separate physical profiles. Diamond has no age-related
-  mortality but can die from external harm. Numerical aging curves are ATE
-  approximations fitted to the owner's qualitative direction, not mortality data
-  extracted from the books. Existing species modifiers remain provisional.
-- Attention, sensory integration and magical modeling capacities are represented
-  separately. Magical modeling reduces crafting error in proportion to actual
-  craft expertise. Physical capacity affects existing production/defense models.
-  Broader anticipatory reasoning and player-facing expression remain future work.
-- Ranked-threat advantages cannot stack into an unexplained two-tier gap. An
-  existing exceptional one-tier advantage remains possible. Physical harvesting
-  creates a provenance-linked material lot at the defeated monster's rank;
-  ordinary harvesting does not magically generate coins.
-- Society notices retain a required rank derived from their source event. Named
-  ranked threats require the claimant's real resolution before payment. Reward
-  denomination follows task rank, not the recipient's rank. Non-ranked severity
-  mapping and exact reward amounts are explicit economic approximations.
-- Denomination-preserving transfers conserve coins and never mint change.
-  Inheritance includes wallets. Bronze-or-higher material trades require the
-  relevant coin denomination. Person-to-person essence/stone sales can accept an
-  Iron-coin quote when ordinary wealth is insufficient. Quote quantities reuse
-  existing price scales rounded up; they are provisional prices, not source
-  currency conversions. Settlement resource sales still use ordinary wealth.
-  Cross-tier exchange, coin farms, sustenance and full institutional treasuries
-  are not implemented. Society credits retain the existing abstract issuance
-  model, now with task/resolution provenance.
+Body rank, ability rank and within-rank ability level remain distinct. The
+`challenge_complexity`/`difficulty` field describes a task's coupled constraints,
+**not** its magical energy tier. A lower-tier task can be conceptually demanding;
+no requirement forces combat to advance a healing, crafting or support ability.
 
-These limitations matter: this is a foundation with testable prerequisites, not
-an implementation of literal superhuman thought or every source-setting economic
-mechanism. The final historical report must disclose any missing high-rank
-examples rather than fabricate them or tune a population quota.
+### Ability-specific application and held-out transfer
+
+The earlier two/four exposure-context gate has been removed. Generic migration,
+teaching and expedition participation credit no ability. Actual task producers
+must identify which ability they applied: a threat response uses up to three
+compatible abilities and their within-rank levels affect resolution probability;
+a crafted item identifies one helper whose level affects quality; healing,
+provision, protection and instruction services identify the applied function and
+change the client's health, food, preparedness or skill; a working coin farm
+identifies its operator ability. No nearby observer receives the same evidence.
+
+Each ability/tier retains at most six successful applications and two transfer
+proofs. A constraint signature is derived from the real task (material properties,
+terrain/form, embodiment, scarcity and similar relevant conditions). Repeating
+the same case supplies no new evidence. Reflection can integrate retained work,
+but cannot invent either a task or a successful outcome.
+
+A held-out transfer requires two earlier applications of **this ability**, in
+other constraints, using the same outcome metric, at lower challenge complexity.
+Those applications must have been integrated before the new task. Their compact
+performance rule retains the ability function and minimum demonstrated output.
+The unfamiliar, harder application must meet that output floor. Its event records
+the original task, two earlier application causes, metric, difficulty, output
+and rule. Silver-to-Gold requires one such transfer at complexity >=3;
+Gold-to-Diamond requires two distinct held-outs at complexity >=4, plus integrated
+application and zero core taint. New tiers reset these structures.
+
+These are explicit **ATE structural approximations** of reusable mastery, not
+book-established numerical thresholds or a claim to simulate consciousness.
+Success, relevance, integration, retained effectiveness and increasing challenge
+are all required; merely visiting event categories is insufficient. Difficulty
+may reflect coupled weather/terrain/civilian constraints in a threat or injury,
+scarcity and environmental conditions in a service. Exact couplings and rates are
+simulation policy. Unsupported ability/task combinations fail closed rather
+than receiving generic mastery credit. More detailed ability resolution can
+refine this without changing the prerequisite architecture.
+
+### Real supply, funding and spending
+
+**100 lesser = 1 Iron; every further denomination is ten times the prior one.**
+This is the active owner instruction. Integer denomination balances are retained;
+ordinary wealth does not silently become high-rank coins.
+
+Spirit-coin farms are explicit infrastructure, constructed with an owned/purchased
+material lot and ordinary capital. A skilled, ranked operator must work the farm;
+output tier is limited by the ambient site, operator body and applied ability.
+The current annual yield is 24 coins times farm condition, not a bonus for every
+high-ranker. Half enters the Society treasury under a recorded protection/funding
+agreement; half stays with the producer. Those amounts, construction costs and
+agreement are ATE economic approximations, not asserted canonical tax law.
+Farm production and every treasury contribution are separately archived.
+
+A Society resolution debits four coins of the task's denomination from that
+finite treasury. There is no resolution-time minting or unfunded ordinary stipend.
+Insufficient funds leave a claim unpaid. A named threat claim is attributed to
+its actual resolver, correcting the prior wrong-assignee deadlock. Where no local
+qualified member exists, Silver-or-higher notices can recruit a qualified member
+connected by an existing road. The temporary response journey is recorded; it
+does not fabricate permanent migration. Manifestation odds/ambient progression
+have **not** been increased to force high-rank encounters.
+
+Monster harvesting still produces physical remains of the defeated tier, with
+resolution provenance, and never creates coins. High-rank craftspeople query
+rank-indexed material stock, choose a tier they can use and afford, pay actual
+coins and preserve the material tier in the finished item. The exceptional
+one-tier crafting threshold is now .85 on the existing 0..1 craft skill scale;
+the previous 2.5 threshold was unreachable. Exact quotes remain ATE prices.
+Essences and stones retain existing provenance and configuration rules; a high
+rank does not manufacture extra essence drops.
+
+Paid magical services transfer actual client coins and change actual client
+state; no completed service or ability evidence is emitted without payment,
+capability, compatible function and need. Safe own-tier coin supplements may
+be consumed when ambient magic is below the individual's body tier, restoring
+a small health reserve. This annual supplement is an ATE abstraction, not a
+claim that one coin is a literal yearly diet or that lack of coins immediately
+kills a Gold. It supplies a real use for retaining appropriate-tier currency.
+Higher-tier overdraw is not offered by the normal consumption policy.
+
+Explicit exchange requires a counterparty holding the requested change, exact
+value equality and sufficient denominations on both sides. It neither mints
+change nor makes lower-tier coins equivalent to higher-tier reagent capacity.
+Current annual markets do not automatically liquidate wallets downward: clients
+retain coins for tiered materials, services and safe supplements. Inheritance
+continues transferring real wallets. Supplies, consumption, treasuries and all
+person balances survive checkpoints/archives and are reconciled after the run.
+
+Checkpoint schema **6** rejects prior serialized simulations whose understanding
+and currency states lack these semantics. Earlier read-only archives remain
+readable. All archive work and economic history inspection remain post-run.
+
+Gold/Diamond physiology and expertise-dependent craft precision from the first
+revision remain intact. No core-cleansing remedy, dialogue, language or personhood
+Stage B work is added here. Core taint still requires an explicitly implemented
+remedy before a tainted path could proceed; ordinary reflection cannot clear it.
 
 ## Subsequent project-owner clarification
 
@@ -132,11 +182,10 @@ The original audit and its observations remain historical evidence.
   absorption, with no known removal across twelve books. Do not add a removal
   or replacement mechanic without evidence; absence of a known exception does
   not establish that none exists anywhere in canon.
-- The supplied coin recollection is 100 lesser = 10 Iron, then 10 Iron =
-  1 Bronze and tenfold steps thereafter. This differs from current ATE's
-  100 lesser = 1 Iron. Verify this discrepancy before changing denomination
-  values; do not silently reinterpret the owner's numbers or certify either
-  recollection as primary-source fact.
+- **Superseded recollection:** the earlier statement "100 lesser = 10 Iron"
+  was corrected by the owner. The sole active ATE rule is **100 lesser = 1 Iron**,
+  then tenfold steps through Diamond. No stronger inspected primary source
+  contradicts this instruction. The old recollection is not an alternative rule.
 - Coin ownership/payment is distinct from consuming a coin as magical
   sustenance. Higher-tier consumption can boost and then harm a user; an extreme
   mismatch can kill. Downward trade is possible but not necessarily desirable.

@@ -70,6 +70,8 @@ def test_core_taint_cannot_be_removed_by_routine_reflection():
 
 def ready_understanding(skill):
  skill.understanding.evidence={'learning:a':1,'learning:b':2,'exploration:a':3,'exploration:b':4}
+ skill.understanding.applications={str(i):{'event':i,'difficulty':1} for i in range(5)}
+ skill.understanding.transfers=[{'event':5,'difficulty':4},{'event':6,'difficulty':4}]
  skill.understanding.integration=4.
 
 

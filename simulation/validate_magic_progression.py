@@ -18,12 +18,22 @@ def validate(archive):
     violations=[]
     examples=defaultdict(list)
     wallets=defaultdict(Counter)
+    treasuries=defaultdict(Counter)
     for row in archive.db.execute('SELECT payload FROM events ORDER BY year,id'):
         e=json.loads(row[0]);data=e['data'];kind=e['kind']
         actors=[a['id'] for a in e['actors'] if a['kind']=='person']
         if not actors:continue
         pid=actors[0]
-        for denomination,count in data.get('coin_reward',{}).items():wallets[pid][denomination]+=count
+        for denomination,count in data.get('coin_created',{}).items():wallets[pid][denomination]+=count
+        for denomination,count in data.get('coin_deposit',{}).items():
+            wallets[pid][denomination]-=count;treasuries[data['institution']][denomination]+=count
+        for denomination,count in data.get('coin_consumed',{}).items():wallets[pid][denomination]-=count
+        for denomination,count in data.get('coin_reward',{}).items():
+            wallets[pid][denomination]+=count
+            if 'treasury' in data:
+                treasuries[data['treasury']][denomination]-=count
+                if treasuries[data['treasury']][denomination]<0:violations.append({'event':e['id'],'issue':'unfunded Society reward'})
+        if any(v<0 for v in wallets[pid].values()):violations.append({'person':pid,'event':e['id'],'issue':'unfunded deposit or consumption'})
         coins=data.get('coin_transfer',{})
         if coins and len(actors)>=2:
             payer,payee=(actors[0],actors[1]) if kind=='material_purchased' else (actors[1],actors[0])
@@ -34,12 +44,23 @@ def validate(archive):
             essences[pid].add(data.get('essence',data.get('confluence')))
         elif kind=='ability_awakened':
             abilities[pid][data['ability']]=(data['essence'],1)
+        elif kind=='ability_applied':
+            task=archive.event(data['task_event'])
+            keys=() if task is None else task['data'].get('used_abilities',(task['data'].get('ability'),))
+            if task is None or data['ability'] not in keys or task['id']>=e['id'] or data['outcome']<=0:
+                violations.append({'person':pid,'event':e['id'],'issue':'unsubstantiated ability application'})
+            if data['generalization']:
+                premises=[archive.event(c) for c in e['causes'][1:]]
+                if len(premises)!=2 or not all(x and x['kind']=='ability_applied' and x['data']['ability']==data['ability'] and x['data']['difficulty']<data['difficulty'] and x['data']['constraint']!=data['constraint'] and x['data']['metric']==data['metric'] for x in premises):
+                    violations.append({'person':pid,'event':e['id'],'issue':'invalid held-out generalization'})
+                elif data['outcome']<min(x['data']['outcome'] for x in premises):
+                    violations.append({'person':pid,'event':e['id'],'issue':'transfer lost prior performance'})
         elif kind=='essence_revelation_integrated':
-            contexts=data['experience_contexts'];required=2 if data['ability_rank']=='silver' else 4
-            sources=[archive.event(c) for c in e['causes']]
-            valid=(len(contexts)>=required and len({k.split(':',1)[0] for k in contexts})>=2
-                   and data['integration']>=required and len(sources)==len(contexts)
-                   and all(s and s['id']<e['id'] and any(a['kind']=='person' and a['id']==pid for a in s['actors']) for s in sources))
+            rank=RANKS.index(data['ability_rank']);proofs=data.get('transfer_proofs',[])
+            valid=len(proofs)>=(1 if rank==3 else 2) and data['integration']>=rank
+            for proof in proofs:
+                source=archive.event(proof['event'])
+                valid=valid and source is not None and source['id']<e['id'] and source['kind']=='ability_applied' and source['data']['ability']==data['ability'] and source['data']['generalization'] and source['data']['difficulty']>=rank and source['id'] in e['causes']
             if not valid:violations.append({'person':pid,'event':e['id'],'issue':'understanding evidence'})
         elif kind=='ability_rank_advanced':
             key=data['ability'];before=RANKS.index(data['ability_rank_before']);after=RANKS.index(data['ability_rank_after'])
@@ -85,6 +106,9 @@ def validate(archive):
             high.append({'person':p['id'],'species':p['species'],'age':p['age'],'body_rank':RANKS[p['rank']],
                 'wealth':p['wealth'],'wallet':archive.record('wallet',p['id']),
                 'progression':examples[p['id']]})
+    for row in archive.db.execute("SELECT id,payload FROM records WHERE kind='treasury'"):
+        actual=json.loads(row[1]);expected=treasuries[int(row[0])]
+        if {d:n for d,n in actual.items() if n}!={d:n for d,n in expected.items() if n}:violations.append({'institution':row[0],'issue':'treasury disagrees with recorded transfers'})
     return {'world_digest':archive.metadata()['world_digest'],'valid':not violations,
             'violations':violations,'living_ranks':dict(sorted(living.items())),
             'living_gold_and_diamond':high,'lower_rank_examples':dict(lower),

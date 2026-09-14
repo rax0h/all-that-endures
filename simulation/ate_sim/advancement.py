@@ -5,15 +5,17 @@ from .semantic_dictionary import ESSENCES,AWAKENING_STONES,stone as stone_semant
 RANKS=('unranked','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
 @dataclass
 class Understanding:
- # Bounded evidence for the current tier, not prose or a lifetime event scan.
+ # At most six successful applications and two held-out transfer proofs per tier.
  evidence:dict[str,int]=field(default_factory=dict)
+ applications:dict[str,dict]=field(default_factory=dict)
+ transfers:list[dict]=field(default_factory=list)
  integration:float=0.
  def ready(self,rank):
-  required=2 if rank==3 else 4
-  return len(self.evidence)>=required and len({k.split(':',1)[0] for k in self.evidence})>=2 and self.integration>=required
+  # Reflection cannot fabricate application or generalization evidence.
+  return len(self.transfers)>=(1 if rank==3 else 2) and all(t['difficulty']>=rank for t in self.transfers) and self.integration>=rank
  def reflect(self,application,reflection):
   if application>0 and reflection>0:
-   self.integration=min(float(len(self.evidence)),self.integration+min(application,reflection)*.08)
+   self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*.08)
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.

@@ -11,6 +11,8 @@ RANK_DENOMINATION={0:'lesser',1:'iron',2:'bronze',3:'silver',4:'gold',5:'diamond
 class RankedCurrencyState:
  wallets:dict[int,dict[str,int]]=field(default_factory=dict)
  minted:dict[str,int]=field(default_factory=dict)
+ treasuries:dict[int,dict[str,int]]=field(default_factory=dict)
+ consumed:dict[str,int]=field(default_factory=dict)
  def wallet(self,pid):
   return self.wallets.setdefault(pid,{})
  def credit(self,pid,coins):
@@ -36,6 +38,27 @@ class RankedCurrencyState:
   for d,n in coins.items():
    if n:source[d]-=n;destination[d]=destination.get(d,0)+n
   return coins
+
+ def treasury_transfer(self,institution,pid,coins,*,deposit=False):
+  treasury=self.treasuries.setdefault(institution,{})
+  source=self.wallets.get(pid,{}) if deposit else treasury
+  if any(d not in COIN_VALUE or type(n) is not int or n<0 for d,n in coins.items()):raise ValueError('invalid treasury transfer')
+  if any(source.get(d,0)<n for d,n in coins.items()):raise ValueError('unfunded treasury transfer')
+  destination=treasury if deposit else self.wallet(pid)
+  for d,n in coins.items():source[d]=source.get(d,0)-n;destination[d]=destination.get(d,0)+n
+  return dict(coins)
+ def consume(self,pid,coins):
+  source=self.wallets.get(pid,{})
+  if any(d not in COIN_VALUE or type(n) is not int or n<0 for d,n in coins.items()):raise ValueError('invalid consumption')
+  if any(source.get(d,0)<n for d,n in coins.items()):raise ValueError('insufficient coins')
+  for d,n in coins.items():source[d]-=n;self.consumed[d]=self.consumed.get(d,0)+n
+  return dict(coins)
+ def exchange(self,payer,counterparty,give,receive):
+  if value_of(give)!=value_of(receive):raise ValueError('unequal exchange value')
+  for owner,coins in ((payer,give),(counterparty,receive)):
+   if any(d not in COIN_VALUE or type(n) is not int or n<0 for d,n in coins.items()):raise ValueError('invalid exchange')
+   if any(self.wallets.get(owner,{}).get(d,0)<n for d,n in coins.items()):raise ValueError('unfunded exchange')
+  self.transfer(payer,counterparty,give);self.transfer(counterparty,payer,receive)
 
 def denomination_for_rank(rank):return RANK_DENOMINATION[max(0,min(5,int(rank)))]
 def value_of(coins):return sum(COIN_VALUE[d]*int(n) for d,n in coins.items())

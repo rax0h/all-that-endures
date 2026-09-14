@@ -1,3 +1,244 @@
+# PR #5 follow-up: economy and mastery validation
+
+## Acceptance status: not yet the completed original phase
+
+This revision preserves legal configurations and records a finite, conserved
+ranked economy plus stricter ability-specific transfer evidence. It does **not**
+yet demonstrate the requested complete high-rank lives. The one final canonical
+run produced no Gold or Diamond bodies, and its application audit exposes missing
+activity coverage. Do not interpret a green test suite or zero impossible ranks
+as proof that this phase is finished. No additional millennium was run to tune
+away this outcome; no threshold was lowered or Diamond fight forced afterward.
+
+Starting head was verified as `2e9eea31c6d0505fdd3d2faca22336b154a5e219`.
+All earlier results below are retained as historical comparisons, not the current
+candidate's metrics. Active mechanics and approximations are specified in
+[MAGIC_PROGRESSION_CANON.md](MAGIC_PROGRESSION_CANON.md).
+
+## What was diagnosed and corrected
+
+The previous archive generated 93 Iron, 15 Bronze and 2 Silver manifestations,
+all resolved, and **zero Gold/Diamond threats**. Local ecology and sample size
+explain the absent high-rank encounters; spawning rates were not raised.
+A separate defect assigned some resolved-threat notices to the wrong claimant.
+Claims now follow the actual solver, and existing roads allow regional responses
+for higher-rank notices when no local member qualifies.
+
+Society payment now debits real treasury coins supplied by worked, site-limited
+coin farms and recorded contributions. It cannot mint a reward or ordinary
+stipend on resolution. Person transfers, inheritance, material payments and
+services retain their denominations. Safe own-tier reserve consumption has a
+recorded purpose/effect. Counterparty exchange requires actual change. The
+higher-tier craft exception now uses .85 on the actual 0..1 skill scale (old 2.5
+was unreachable). Rank-indexed stock queries avoid a historical-lot scan.
+
+The old category-count understanding gate is removed. Real task producers name
+the applied ability and its effect. Two prior applications must be integrated
+before a harder, different held-out case retains their demonstrated output in
+the same metric. Gold requires one such proof; Diamond requires two. Generic
+migration, teaching selection and expedition participation give no evidence.
+Bounded memory retains six applications and two transfer proofs per ability/tier.
+
+## Tests, runtime, digest and archive
+
+- Stable full local suite: **139 passed in 66.29 seconds**.
+- Subsequently added supply/treasury archive reconciliation regression: the
+  full focused economy file passed **8 tests**, including that new test.
+- Both normal smoke commands passed; 10-year causal integrity was clean.
+- Stable 100-year simulation: **1.176330879 seconds**, digest
+  `eb27509cb0827bd703e5f568bb256bad00469ead0b17fdbfbeef4f11c1b046ca`.
+  Indexed and archive-scan deterministic executions agreed in the full suite.
+- Intermediate 300-year history: **9.446812838 seconds**, clean chronology and
+  treasury reconciliation; four farms, 106 paid notices and 290 real services.
+- Exactly one final seed-843000 millennium was run after stable tests.
+
+| Final canonical measurement | Result |
+| --- | ---: |
+| Simulation | 67.691279730 seconds |
+| Existing <=120-second gate | PASS |
+| Diagnostics | 0.281881849 seconds |
+| Causal integrity validation | 0.057566167 seconds; passed |
+| Whole-world digest computation | 13.710622758 seconds |
+| Archive export, separately timed | 58.733643823 seconds |
+| SQLite archive size | 704,688,128 bytes |
+| Events / living people | 263,515 / 1,338 |
+| Living essence users / complete loadouts | 69 / 15 |
+| Resources total / unused | 5,375 / 1,367 |
+| Society notices / paid resolutions | 1,405 / 1,362 |
+
+World digest:
+`0b8072df556f05e0ded796ea35a46020253108ee8a895caf50757461876472d7`.
+
+Archive logical digest:
+`13fd744bb7040a32f3bf3e79aba5a1aec1e9d796a68755a450dc101b39c9ee7f`.
+
+The digest intentionally changes with funded rewards/consumption, actual services,
+ability application outcomes, corrected craft eligibility and new state/events.
+Archive analysis after simulation did not alter it. Checkpoint schema is now 6;
+prior archives remain read-only queryable. Runtime is measured locally on Linux
+x86_64/Python 3.12.14, not claimed to be identical on all runners.
+
+## Rank population and legality
+
+| Living body rank | People |
+| --- | ---: |
+| Unranked | 1,314 |
+| Iron | 9 |
+| Bronze | 1 |
+| Silver | 14 |
+| Gold | 0 |
+| Diamond | 0 |
+
+Chronological validator: **zero violations**. Configurations, body gates,
+ability ceilings, source-linked application evidence and currency ledgers pass.
+This is not a claim that zero Diamonds is the desired calibration.
+There are **no canonical Diamond ability histories** to present; none are
+invented from the targeted tests.
+
+## Opportunity and resolution evidence
+
+| Threat rank | Manifested | Resolved | Physical monster harvests |
+| --- | ---: | ---: | ---: |
+| Iron | 95 | 95 | 59 |
+| Bronze | 16 | 16 | 11 |
+| Silver | 2 | 2 | 1 |
+| Gold | 1 | 1 | 1 |
+| Diamond | 0 | 0 | 0 |
+
+At manifestation time the normal ecological ceiling was Iron on 49 rolls,
+Bronze on 33, Silver on 22, Gold on 8 and Diamond on 2. Thus Diamond-capable
+conditions actually existed. The unchanged Diamond weight is .004 among the
+full rank distribution, so two eligible rolls usually produce none. Gold sites
+also retain the pre-existing rare one-tier exceptional possibility. This run
+provides no evidence that increasing spawn rates is necessary.
+
+In **year 983**, person **12538** (Silver body) resolved Gold threat **110**, a
+drain-nesting crawler, at event **257630**, caused by manifestation **257629**.
+Three applied abilities are recorded in the resolution. The existing preparation/
+complete-path advantage supplies effective response tier 4, so the one-tier
+challenge is explicit, not a two-tier mismatch or an invented Diamond responder.
+Gold material lot **93659**, harvested at **257632**, was consumed in the same
+year to create Gold item **6870** at **257730**. The Silver craftsperson qualified
+for the corrected exceptional one-tier crafting rule; ownership and both links
+survive in the archive. This is a genuine high-rank material consequence even
+without a Gold coin payment. Its Gold-denominated Society
+claim remains assigned/unpaid: the treasury owns no Gold coins. Lower-tier balances
+have not silently been converted into Gold payment or magical reagent capacity.
+
+No Gold/Diamond person fought a Gold/Diamond threat because no body reached those
+ranks. There was one Gold encounter by a Silver. There was no Diamond encounter
+because no Diamond threat was drawn, despite eligible ecological conditions.
+
+### Participation: responder body tier -> threat tier
+
+| Pair/denomination/tier | Count |
+| --- | ---: |
+| 1 -> 1 | 45 |
+| 1 -> 2 | 2 |
+| 2 -> 2 | 1 |
+| 3 -> 1 | 50 |
+| 3 -> 2 | 13 |
+| 3 -> 3 | 2 |
+| 3 -> 4 | 1 |
+
+### Paid contracts: task tier -> recipient body tier
+
+| Pair/denomination/tier | Count |
+| --- | ---: |
+| 1 -> 1 | 323 |
+| 1 -> 2 | 76 |
+| 1 -> 3 | 945 |
+| 2 -> 2 | 2 |
+| 2 -> 3 | 14 |
+| 3 -> 3 | 2 |
+
+### Coins actually paid for contracts
+
+| Pair/denomination/tier | Count |
+| --- | ---: |
+| bronze | 64 |
+| iron | 5376 |
+| silver | 8 |
+
+### Paid services by task tier
+
+| Pair/denomination/tier | Count |
+| --- | ---: |
+| 1 | 1685 |
+| 2 | 667 |
+| 3 | 243 |
+
+## Supply and purchasing power
+
+All six denomination conservation residuals are **zero**: recorded coin production
+minus recorded consumption minus every archived person's balance minus treasury
+balances. No reward is funded by an implicit high-rank bonus.
+
+| Denomination | Created | Consumed | Treasury balance |
+| --- | ---: | ---: | ---: |
+| lesser | 0 | 0 | 0 |
+| iron | 42932 | 0 | 15220 |
+| bronze | 20493 | 4 | 9737 |
+| silver | 12328 | 236 | 5888 |
+| gold | 0 | 0 | 0 |
+| diamond | 0 | 0 | 0 |
+
+Living wallet totals by body rank (absent denominations are zero):
+
+| Body rank | Lesser | Iron | Bronze | Silver | Gold | Diamond |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| unranked | 0 | 3 | 4 | 0 | 0 | 0 |
+| iron | 0 | 1 | 10 | 0 | 0 | 0 |
+| bronze | 0 | 0 | 0 | 0 | 0 | 0 |
+| silver | 0 | 2234 | 3460 | 3912 | 0 | 0 |
+| gold | 0 | 0 | 0 | 0 | 0 | 0 |
+| diamond | 0 | 0 | 0 | 0 | 0 | 0 |
+
+There are no canonical Gold/Diamond coin transactions to showcase. Focused tests
+exercise actual farm-limited Diamond production, treasury-funded Diamond contract
+payment, Diamond-material purchase/crafting, counterparty exchange and paid
+healing. They are controlled tests, not fabricated canonical historical examples.
+Actual canonical service payments span Iron through Silver.
+
+## Mastery evidence and the remaining architectural gap
+
+Across the millennium, **1,585 Silver-ability applications and 49 Gold-ability
+applications** were recorded. Ten successful held-out transfers supported ten
+individual Silver-to-Gold ability milestones. No Gold-to-Diamond proof occurred.
+The existence of some Gold abilities does not imply a Gold body.
+
+Three actual transfer examples:
+
+| Year | Person | Application event | Ability function | Metric | Prior application causes | Harder complexity | Output / retained floor |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 411 | 3132 | 82847 | detection | protection | 47302, 77957 | 3 | 0.038 / 0.020 |
+| 484 | 3132 | 103793 | communication | instruction | 78238, 83124 | 3 | 0.038 / 0.038 |
+| 514 | 6370 | 112519 | creation | protection | 102303, 111660 | 3 | 0.036 / 0.020 |
+
+At the final snapshot, the 14 living Silvers collectively have 280 Silver abilities:
+**128 have no successful modeled application; 152 have applications but no harder
+held-out transfer proof**. None of their abilities is Gold. This is not explained
+solely by rare monster spawning: healing, movement, sensory and exchange abilities
+also lack sufficient realized tasks. Existing service selection and narrow task
+models do not yet expose enough ability-specific practice situations across a
+whole twenty-ability configuration. Several uncommon semantic functions have no
+modeled application producer at all. These gaps were previously hidden by generic
+exposure/reflection credit.
+
+The structural gate now fails closed correctly, but its feeding activity model
+is not yet broad enough to demonstrate complete higher-rank lives. **PR #5 does
+not yet satisfy the original phase's historical acceptance standard.** The next
+necessary implementation is ability-specific task/opportunity coverage and
+matching, with real effects and varied challenges; lowering gates, inserting
+synthetic proofs or forcing high-rank wealth/fights would conceal the issue.
+The one-final-millennium budget was respected. This result is reported as an
+unresolved architectural limitation, not represented as completed work or a
+request to approve an invented canon rule. PR #5 remains unmerged.
+
+---
+
+# Historical prior revision (superseded)
+
 # Magic progression validation
 
 ## Final implementation candidate

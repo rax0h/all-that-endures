@@ -1,15 +1,14 @@
 from ate_sim.advancement import AdvancementState
 from ate_sim.worldgen import generate_world
 from ate_sim.core import Layer,Ref
-from ate_sim.magic_progression import practice_ability
+from ate_sim.magic_progression import practice_ability,record_application
 
 
 def configured_world():
     world=generate_world(91)
     person=next(iter(world.people.values()))
     world.advancement=AdvancementState()
-    for essence in ('fire','water','wind'):
-        world.advancement.absorb_essence(person.id,essence,0)
+    for essence in ('fire','water','wind'):world.advancement.absorb_essence(person.id,essence,0)
     path=world.advancement.path(person.id)
     for essence in path.essences:
         for _ in range(4):world.advancement.awaken_skill(person.id,'eyes',0,target_essence=essence)
@@ -18,48 +17,58 @@ def configured_world():
     return world,person,path
 
 
-def experience(world,p,kind,**data):
-    return world.emit(kind,Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),**data)
+def application(world,p,a,constraint,difficulty):
+    # A task-producer fixture: explicitly names the actually applied ability.
+    event=world.emit('magical_service_completed',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),ability=a.semantic_key,task_rank=difficulty,output=.02)
+    record_application(world,p,a,event,constraint=constraint,difficulty=difficulty,outcome=.02)
+    return event
 
 
-def test_repeated_teaching_and_reflection_cannot_generate_diamond():
-    world,p,path=configured_world()
-    for _ in range(500):
-        experience(world,p,'skill_taught',domain='craft')
-        practice_ability(world,p,0,100.,100.,context='teach')
+def test_migration_teaching_and_participation_do_not_credit_any_ability():
+    w,p,path=configured_world()
+    for kind in ('skill_taught','household_migrated','magical_expedition_resource_recovered'):
+        w.emit(kind,Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),domain='craft')
+    for _ in range(100):practice_ability(w,p,0,100,100,context='teach')
     assert path.abilities[0].rank==4
-    assert len(path.abilities[0].understanding.evidence)==1
+    assert all(not a.understanding.evidence for a in path.abilities)
 
 
-def test_distinct_experience_integration_has_actual_causal_evidence():
-    world,p,path=configured_world()
-    causes=[]
-    for domain in ('craft','knowledge'):
-        causes.append(experience(world,p,'skill_taught',domain=domain).id)
-    for key in ('fire','water'):
-        causes.append(experience(world,p,'magical_expedition_resource_recovered',key=key).id)
-    practice_ability(world,p,0,100.,100.,context='learn')
-    assert path.abilities[0].rank==5
-    revelation=next(e for e in world.events if e.kind=='essence_revelation_integrated')
-    assert set(revelation.causes)==set(causes)
-    assert 'approximation' in revelation.data['model']
-    assert world.events[-1].causes[-1]==revelation.id
-    assert world.advancement.rank(p.id)==4
+def test_easy_variety_and_reflection_do_not_substitute_for_harder_transfer():
+    w,p,path=configured_world();a=path.abilities[0]
+    for i in range(100):
+        application(w,p,a,str(i),1)
+        practice_ability(w,p,0,100,100,context='learn')
+    assert a.rank==4 and len(a.understanding.evidence)==6
+    assert not a.understanding.transfers
+    assert all(not b.understanding.evidence for b in path.abilities[1:])
 
 
-def test_evidence_is_bounded_and_leaves_room_for_a_second_family():
-    world,p,path=configured_world()
-    for i in range(100):experience(world,p,'skill_taught',domain=str(i))
-    assert len(path.abilities[0].understanding.evidence)==3
-    for i in range(100):experience(world,p,'magical_expedition_resource_recovered',key=str(i))
-    assert len(path.abilities[0].understanding.evidence)==6
+def test_gold_requires_two_harder_held_out_applications_after_integration():
+    w,p,path=configured_world();a=path.abilities[0]
+    application(w,p,a,'initial-a',2);application(w,p,a,'initial-b',3)
+    practice_ability(w,p,0,100,100,context='learn')
+    application(w,p,a,'transfer-a',4)
+    practice_ability(w,p,0,100,100,context='learn')
+    assert a.rank==4
+    # Repeating the same held-out problem adds nothing.
+    application(w,p,a,'transfer-a',4)
+    assert len(a.understanding.transfers)==1
+    application(w,p,a,'transfer-b',4)
+    practice_ability(w,p,0,100,100,context='learn')
+    assert a.rank==5 and w.advancement.rank(p.id)==4
+    revelation=next(e for e in w.events if e.kind=='essence_revelation_integrated')
+    assert len(revelation.data['transfer_proofs'])==2
+    for proof in revelation.data['transfer_proofs']:
+        event=w.events[proof['event']-1]
+        assert len(event.causes)==3 and event.data['generalization']
+        assert all(w.events[i-1].data['difficulty']<event.data['difficulty'] for i in proof['premises'])
+    assert a.understanding.evidence=={}
 
 
-def test_gold_evidence_does_not_carry_over_from_silver():
-    world,p,path=configured_world()
-    for ability in path.abilities:ability.rank=3
-    experience(world,p,'skill_taught',domain='craft')
-    experience(world,p,'magical_expedition_resource_recovered',key='fire')
-    practice_ability(world,p,0,100.,100.,context='learn')
-    assert path.abilities[0].rank==4
-    assert path.abilities[0].understanding.evidence=={}
+def test_uncredited_ability_and_failed_output_cannot_supply_evidence():
+    w,p,path=configured_world();a,b=path.abilities[:2]
+    e=application(w,p,a,'a',2)
+    record_application(w,p,b,e,constraint='b',difficulty=2,outcome=1)
+    record_application(w,p,a,e,constraint='failed',difficulty=2,outcome=0)
+    assert not b.understanding.evidence
+    assert 'failed' not in a.understanding.evidence

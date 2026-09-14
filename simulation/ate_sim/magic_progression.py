@@ -38,12 +38,12 @@ def practice_ability(world, person, index, meaningful_use, reflection=0., *, con
     if before>=3:
         revelation=world.emit('essence_revelation_integrated',Layer.REALITY,
             (Ref('person',person.id),),Ref('settlement',person.settlement),
-            tuple(dict.fromkeys(understanding.evidence.values())),
+            tuple(dict.fromkeys((*understanding.evidence.values(),*(t['event'] for t in understanding.transfers)))),
             ability=ability.semantic_key,essence=ability.essence,
             ability_rank=RANKS[before],
             experience_contexts=tuple(sorted(understanding.evidence)),
-            integration=understanding.integration,
-            model='ATE evidence and applied reflection approximation')
+            integration=understanding.integration,transfer_proofs=understanding.transfers,
+            model='ATE relevant application and held-out generalization approximation')
         causes=(*causes,revelation.id)
     event = world.emit('ability_rank_advanced', Layer.REALITY,
                        (Ref('person', person.id),), Ref('settlement', person.settlement),
@@ -56,30 +56,48 @@ def practice_ability(world, person, index, meaningful_use, reflection=0., *, con
     ability.understanding = Understanding()
 
 
-# Only consequential, actually recorded experiences supply opportunities. Generic
-# annual work/teach selections are deliberately absent. Repeating an identical
-# context cannot add evidence; application/reflection alone cannot create it.
-EXPERIENCE_KINDS = {
-    'item_crafted': 'craft', 'ranked_threat_resolved': 'confrontation',
-    'magical_expedition_resource_recovered': 'exploration',
-    'magical_expedition_returned_empty': 'exploration',
-    'skill_taught': 'learning', 'household_migrated': 'migration',
-}
-
-
 def observe_experience(world,event):
-    family=EXPERIENCE_KINDS.get(event.kind)
-    if family is None:return
-    data=event.data
-    aspect=data.get('item_kind',data.get('form',data.get('key',data.get('domain',event.kind))))
-    sid=None if event.location is None else event.location.id
-    signature=f'{family}:{aspect}:{sid}'
-    for ref in event.actors:
-        if ref.kind!='person':continue
-        path=world.advancement.path(ref.id)
-        if path is None:continue
-        for ability in path.abilities:
-            if ability.rank not in (3,4):continue
-            if family=='craft' and ability.function not in ('creation','enhancement','control','transformation','repair','manipulation','support'):continue
-            evidence=ability.understanding.evidence
-            if signature not in evidence and len(evidence)<8 and sum(k.split(':',1)[0]==family for k in evidence)<3:evidence[signature]=event.id
+    # Mere participation/exposure supplies no mastery. Producers must explicitly
+    # resolve an ability-relevant application and record its outcome.
+    return
+
+
+def record_application(world,person,ability,source,*,constraint,difficulty,outcome):
+    """A successful use in a real task. A later held-out task tests a compact rule.
+
+    A rule summarizes two earlier successful applications of this same ability,
+    including different constraints. Transfer must succeed under a new constraint
+    at a strictly harder problem tier; Gold requires two independent held-outs.
+    This is structural generalization evidence, not simulated consciousness.
+    """
+    if ability.rank not in (3,4) or outcome<=0:return
+    if ability not in world.advancement.path(person.id).abilities:return
+    keys=source.data.get('used_abilities',(source.data.get('ability'),))
+    recorded_rank=source.data.get('challenge_complexity',source.data.get('task_rank',source.data.get('item_rank',source.data.get('threat_rank'))))
+    if ability.semantic_key not in keys or recorded_rank!=difficulty:return
+    if not any(a.kind=='person' and a.id==person.id for a in source.actors):return
+    u=ability.understanding
+    if constraint in u.applications:return
+    Layer,Ref=layer_ref()
+    priors=list(u.applications.values())
+    metric=source.data.get('service',source.kind)
+    challenging=[x for x in priors if x['difficulty']<difficulty and x['metric']==metric]
+    output_floor=min((x['outcome'] for x in challenging[-2:]),default=float('inf'))
+    transfer=len(challenging)>=2 and outcome>=output_floor and u.integration>=2+len(u.transfers) and difficulty>=ability.rank and len(u.transfers)<(1 if ability.rank==3 else 2)
+    # Once the bounded sample is full, retain only a harder held-out application.
+    if len(priors)>=6 and not transfer:return
+    causes=(source.id,)
+    if transfer:causes+=tuple(x['event'] for x in challenging[-2:])
+    e=world.emit('ability_applied',Layer.REALITY,(Ref('person',person.id),),source.location,causes,
+        ability=ability.semantic_key,essence=ability.essence,function=ability.function,domain=ability.domain,
+        ability_rank=RANKS[ability.rank],ability_level=ability.level,task_event=source.id,
+        constraint=constraint,difficulty=difficulty,outcome=outcome,
+        generalization=transfer,principle=ability.function if transfer else None,
+        metric=metric,output_floor=output_floor if transfer else None,
+        basis='same ability, distinct constraints, harder held-out application')
+    if len(u.applications)>=6:
+        oldest=min(u.applications,key=lambda k:(u.applications[k]['difficulty'],u.applications[k]['event']))
+        del u.applications[oldest];u.evidence.pop(oldest,None)
+    u.applications[constraint]={'event':e.id,'difficulty':difficulty,'outcome':outcome,'metric':metric}
+    u.evidence[constraint]=e.id
+    if transfer:u.transfers.append({'event':e.id,'difficulty':difficulty,'premises':list(causes[1:])})
