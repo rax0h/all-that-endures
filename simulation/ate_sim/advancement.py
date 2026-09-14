@@ -97,12 +97,12 @@ class AdvancementState:
  def rank(self,pid):
   p=self.paths.get(pid)
   if p is None or len(p.base_essences)!=3 or p.confluence is None:return 0
-  if len(p.abilities)!=MAX_SKILLS:return 1
+  if len(p.abilities)!=MAX_SKILLS:return 0
   counts={e:0 for e in p.essences}
   for a in p.abilities:
-   if a.essence not in counts:return 1
+   if a.essence not in counts:return 0
    counts[a.essence]+=1
-  if len(counts)!=4 or any(n!=SKILLS_PER_ESSENCE for n in counts.values()):return 1
+  if len(counts)!=4 or any(n!=SKILLS_PER_ESSENCE for n in counts.values()):return 0
   return min(a.rank for a in p.abilities)
  def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.):
   p=self.paths.get(pid)
