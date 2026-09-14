@@ -23,7 +23,7 @@ def test_absorption_readiness_milestones_survive_checkpoint_and_archive(tmp_path
         r = world.magic_resources.create('essence', key, 'Common', 0,
                                         p.settlement, 'person', p.id)
         absorb_essence_resource(world, p.id, r.id)
-    assert p.rank == 1
+    assert p.rank == 0
     path = world.advancement.path(p.id)
     assert len(path.abilities) == 4
     assert any(e.kind == 'confluence_absorbed' for e in world.events)
@@ -32,6 +32,8 @@ def test_absorption_readiness_milestones_survive_checkpoint_and_archive(tmp_path
             r = world.magic_resources.create('awakening_stone', 'eyes', 'Common',
                                             0, p.settlement, 'person', p.id)
             use_awakening_stone(world, p.id, r.id, target_essence=essence)
+    assert len(path.abilities) == 20
+    assert p.rank == 1
     for i in range(20):
         before = world.advancement.rank(p.id)
         practice_ability(world, p, i, 1000., context='test_training')
