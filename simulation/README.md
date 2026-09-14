@@ -32,3 +32,11 @@ Treat the existing closed-loop mechanics as evidence and reusable simulation log
 
 See [PERFORMANCE.md](PERFORMANCE.md) for the measured scaling pass, preserved-world
 evidence, index validity rules, and the enforced 120-second simulation benchmark.
+
+## Individual history inspection
+
+See [PERSONHOOD_HISTORY_EXPRESSION.md](PERSONHOOD_HISTORY_EXPRESSION.md) for the
+implemented archive schema, coverage limits, personhood contracts and staged roadmap.
+`run_long_history.py --archive NEW_PATH.sqlite` exports after timed simulation;
+`history_inspect.py NEW_PATH.sqlite --help` lists read-only queries. Archive time
+and bytes are reported separately. Existing files are never overwritten.

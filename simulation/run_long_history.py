@@ -46,7 +46,7 @@ def snapshot(world, include_digest=False):
     return result
 
 
-def main(seed=843000, years=1000, max_seconds=None):
+def main(seed=843000, years=1000, max_seconds=None, archive=None):
     from time import perf_counter
     import os, cProfile, pstats, io, platform
     profile_tail=int(os.environ.get('ATE_PROFILE_TAIL','0'))
@@ -87,6 +87,9 @@ def main(seed=843000, years=1000, max_seconds=None):
     if not all(c<e.id for e in world.events for c in e.causes):raise SystemExit('causal integrity failure')
     validation_seconds=perf_counter()-start
     print(json.dumps({'record':'benchmark','python_version':platform.python_version(),'platform':platform.platform(),'seed':seed,'years':years,'simulation_seconds':simulation_seconds,'profile_tail_requested':profile_tail,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest,'max_seconds':max_seconds,'performance_passed':None if max_seconds is None else simulation_seconds<=max_seconds},sort_keys=True),flush=True)
+    if archive is not None:
+        from ate_sim.history_archive import export_archive
+        print(json.dumps(export_archive(world, archive, digest=digest), sort_keys=True), flush=True)
     if max_seconds is not None and simulation_seconds>max_seconds:
         raise SystemExit(f'simulation exceeded {max_seconds:.2f}s budget: {simulation_seconds:.2f}s')
     return world
@@ -98,5 +101,6 @@ if __name__ == '__main__':
     parser.add_argument('seed',nargs='?',type=int,default=843000)
     parser.add_argument('years',nargs='?',type=int,default=1000)
     parser.add_argument('--max-seconds',type=float,help='Fail if actual simulation wall time exceeds this limit; incompatible with ATE_PROFILE_TAIL.')
+    parser.add_argument('--archive', help='Create a new indexed SQLite history archive after simulation; timed separately.')
     args=parser.parse_args()
-    main(args.seed,args.years,args.max_seconds)
+    main(args.seed,args.years,args.max_seconds,args.archive)
