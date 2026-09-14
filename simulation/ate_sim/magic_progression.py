@@ -85,7 +85,16 @@ def record_application(world,person,ability,source,*,constraint,difficulty,outco
     output_floor=min((x['outcome'] for x in challenging[-2:]),default=float('inf'))
     transfer=len(challenging)>=2 and outcome>=output_floor and u.integration>=2+len(u.transfers) and difficulty>=ability.rank and len(u.transfers)<(1 if ability.rank==3 else 2)
     # Once the bounded sample is full, retain only a harder held-out application.
-    if len(priors)>=6 and not transfer:return
+    if len(priors)>=6 and not transfer:
+        # Reserve a pair for a new application metric; unrelated early samples
+        # must not permanently prevent a later mastery route from being learned.
+        same=sum(x['metric']==metric for x in priors)
+        if same>=2:return
+        counts={x['metric']:sum(y['metric']==x['metric'] for y in priors) for x in priors}
+        redundant=[k for k,x in u.applications.items() if counts[x['metric']]>2]
+        if not redundant:return
+        oldest=min(redundant,key=lambda k:u.applications[k]['event'])
+        del u.applications[oldest];u.evidence.pop(oldest,None)
     causes=(source.id,)
     if transfer:causes+=tuple(x['event'] for x in challenging[-2:])
     e=world.emit('ability_applied',Layer.REALITY,(Ref('person',person.id),),source.location,causes,

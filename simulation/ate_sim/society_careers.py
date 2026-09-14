@@ -3,7 +3,7 @@ from .core_types import layer_ref
 from .institutions import apply_for_society,full_essence_user,register_magic_user
 from .magic_resources import _aspiration
 from .currency import ranked_reward,value_of
-from .magic_economy import spirit_economy_step,magical_services_step
+from .magic_economy import spirit_economy_step,magical_services_step,apprenticeship_step
 
 def society_career_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');mag=world.institutions.institution_by_kind('magic_society')
@@ -30,6 +30,7 @@ def society_career_step(world,rng):
     apply_for_society(world,p.id,society);world.emit('society_reapplication',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),society=society,previous_application=a.id)
  if adv is None:return
  spirit_economy_step(world,rng)
+ apprenticeship_step(world)
  magical_services_step(world,rng)
  for n in sorted(world.institutions.notices.values(),key=lambda x:x.id):
   resolution=world.threat_ecology.resolutions.get(n.cause_event)

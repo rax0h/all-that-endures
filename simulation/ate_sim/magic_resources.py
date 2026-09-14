@@ -207,7 +207,7 @@ class _SettlementMarket:
    self.groups={kind:[group for priority,group in sorted(values.items(),reverse=True)] for kind,values in groups.items()}
   kind='essence' if resource.kind=='essence' else 'awakening_stone'
   for group in self.groups[kind]:
-   candidates=[p for p,owned in group if p.wealth>=min_wealth and (kind!='essence' or resource.key not in owned)]
+   candidates=[p for p,owned in group if (p.wealth>=min_wealth or can_pay_tier(self.world,p.id,'iron',ceil(min_wealth))) and (kind!='essence' or resource.key not in owned)]
    if candidates:return candidates
   return []
 
@@ -283,14 +283,19 @@ def magic_ecology_step(world,rng):
   for r in world.magic_resources.inventory('settlement',sid):
    key=_demand_key(r);price=(7 if r.kind=='essence' else 3)
    if key not in market:market[key]=matching.contenders(r,price)
-   seekers=[p for p in market[key] if p.wealth>=price]
+   seekers=[p for p in market[key] if p.wealth>=price or can_pay_tier(world,p.id,'iron',price)]
    # Wealth only decreases in this phase. Retry lower priority groups after the
    # cached group is exhausted; an empty result remains valid for the phase.
    if not seekers and market[key]:market[key]=seekers=matching.contenders(r,price)
    if seekers:
     q=max(seekers,key=lambda p:(p.wealth,-p.id))
-    if q.wealth>=price:
-     q.wealth-=price;e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price);world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
+    institution=world.institutions.institution_by_kind('adventure_society')
+    coins={}
+    if q.wealth>=price:q.wealth-=price
+    elif institution is not None:
+     coins=world.currency.treasury_transfer(institution.id,q.id,{'iron':price},deposit=True)
+    else:continue
+    e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price,coin_deposit=coins,institution=None if institution is None else institution.id,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
  demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:

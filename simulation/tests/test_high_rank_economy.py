@@ -152,3 +152,28 @@ def test_archive_economy_reconciles_supply_treasury_and_detects_unrecorded_credi
     path=tmp_path/'unrecorded.sqlite';export_archive(w,path)
     with HistoryArchive(path) as archive:
         assert inspect(archive)['currency_conservation_residual']['diamond']==-1
+
+
+def test_apprentice_pay_requires_funded_useful_work_and_releases_complete_paths():
+    from ate_sim.magic_economy import apprenticeship_step
+    from ate_sim.magic_resources import MagicAspiration
+    w,p,path,adv=economy_world()
+    for q in w.people.values():
+        w.magic_resources.aspirations[q.id]=MagicAspiration(0,0,0,'test',0)
+    path.abilities=path.abilities[:1]
+    w.magic_resources.aspirations[p.id]=MagicAspiration(1,3,20,'committed',0,completion_goal=True)
+    asset=next(iter(w.infrastructure.assets.values()));asset.condition=.5
+    apprenticeship_step(w)
+    assert asset.condition==.5
+    assert not [e for e in w.events if e.kind=='society_apprentice_work']
+    w.currency.credit(p.id,{'iron':8});w.currency.treasury_transfer(adv.id,p.id,{'iron':8},deposit=True)
+    apprenticeship_step(w)
+    assert asset.condition>.5
+    assert w.currency.wallets[p.id]['iron']==4
+    assert w.currency.treasuries[adv.id]['iron']==4
+    assert w.currency.minted=={'iron':8}
+    event=next(e for e in w.events if e.kind=='society_apprentice_work')
+    assert event.data['infrastructure']==asset.id and event.data['improvement']>0
+    path.abilities=path.abilities*20
+    apprenticeship_step(w)
+    assert w.currency.treasuries[adv.id]['iron']==4

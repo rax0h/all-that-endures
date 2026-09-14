@@ -1,6 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 import hashlib,re
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+ from .mastery_training import ResponseModel
 from .semantic_dictionary import ESSENCES,AWAKENING_STONES,stone as stone_semantics
 RANKS=('unranked','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
 @dataclass
@@ -19,8 +22,13 @@ class Understanding:
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
+ response_model:ResponseModel|None=None
  milestone_event:int|None=None
  understanding:Understanding=field(default_factory=Understanding)
+ def __post_init__(self):
+  if self.response_model is None:
+   from .mastery_training import ResponseModel
+   self.response_model=ResponseModel()
 @dataclass
 class EssencePath:
  base_essences:list[str]=field(default_factory=list);confluence:str|None=None;confluence_name:str|None=None;confluence_concepts:tuple[str,...]=();abilities:list[AbilityProgress]=field(default_factory=list);core_fraction:float=0.
@@ -115,6 +123,8 @@ class AdvancementState:
     if a.rank>=3 and (not a.understanding.ready(a.rank) or (a.rank==4 and p.core_fraction>0)):
      a.level=9;a.progress=.999;break
     a.rank+=1;a.level=0;a.understanding=Understanding()
+    from .mastery_training import ResponseModel
+    a.response_model=ResponseModel()
     if a.rank>=ceiling:a.progress=0.;break
   return a
  def blockers(self,pid):

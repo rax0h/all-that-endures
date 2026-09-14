@@ -19,6 +19,7 @@ def inspect(archive):
             counts['ecological_ceiling_at_manifestation'][d['ecological_ceiling']]+=1
         if k=='ranked_threat_resolved':
             counts['resolutions_by_threat_rank'][str(d['threat_rank'])]+=1
+            counts['resolutions_by_kind_and_rank'][f"{d.get('manifestation_kind','unknown')}: {d['threat_rank']}"]+=1
             counts['participation_body_and_threat'][f"{d['responder_rank']} -> {d['threat_rank']}"]+=1
             if pid in high:counts['living_high_rankers_lifetime_threats'][f"person {pid}: threat {d['threat_rank']}"]+=1
             if d['threat_rank']>=4:examples['high_threat_resolutions'].append(e)
@@ -36,6 +37,7 @@ def inspect(archive):
             if len(examples['diamond_ability_evidence'])<6:examples['diamond_ability_evidence'].append(e)
         if any(COIN_VALUE.get(denom,0)>=COIN_VALUE['gold'] and n>0 for denom,n in d.get('coin_transfer',{}).items()):
             if len(examples['high_rank_transactions'])<12:examples['high_rank_transactions'].append(e)
+            if d.get('coin_transfer',{}).get('diamond',0)>0 and len(examples['diamond_transactions'])<6:examples['diamond_transactions'].append(e)
         for field,category in [('coin_created','created'),('coin_consumed','consumed'),('coin_deposit','treasury_deposits')]:
             for denom,n in d.get(field,{}).items():counts[category][denom]+=n
     balances=defaultdict(Counter);all_wallets=Counter()

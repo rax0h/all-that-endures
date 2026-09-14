@@ -40,6 +40,16 @@ def validate(archive):
             for denomination,count in coins.items():
                 wallets[payer][denomination]-=count;wallets[payee][denomination]+=count
                 if wallets[payer][denomination]<0:violations.append({'person':payer,'event':e['id'],'issue':'unfunded coin transfer'})
+        if kind=='ability_control_trial':
+            from types import SimpleNamespace
+            from ate_sim.mastery_training import response
+            model=SimpleNamespace(semantic_key=data['ability'],function=data['function'],domain=data['domain'])
+            actual=response(model,data['inputs'])
+            if abs(actual-data['measured_response'])>1e-8:violations.append({'person':pid,'event':e['id'],'issue':'invalid measured ability response'})
+            if data['held_out']:
+                predicted=sum(c*x for c,x in zip(data['model_parameters'],data['inputs']))
+                if len(data['model_parameters'])!=len(data['inputs']) or abs(predicted-data['prediction'])>1e-8 or abs(abs(predicted-actual)-data['prediction_error'])>1e-8:
+                    violations.append({'person':pid,'event':e['id'],'issue':'invalid held-out prediction'})
         if kind in ('essence_absorbed','confluence_absorbed'):
             essences[pid].add(data.get('essence',data.get('confluence')))
         elif kind=='ability_awakened':

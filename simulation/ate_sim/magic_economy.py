@@ -114,3 +114,40 @@ def magical_services_step(world,rng):
                 # Disease/embodiment, ecology and household conditions define cases.
                 constraint=f'{kind}:{client.species}:{sid}:{int(world.local[sid].scarcity*4)}'
                 if magical_service(world,p,client,ability,kind=kind,difficulty=difficulty,constraint=constraint):break
+
+
+def apprenticeship_step(world):
+    """Paid public work supports committed trainees; no essence is handed out.
+
+    Three places per existing Society branch, funded from its actual treasury.
+    Incomplete trainees have continuity; completion releases the place. Wages
+    buy real market stock at normal prices and support repeated generations.
+    """
+    from .magic_resources import _aspiration
+    Layer,Ref=layer_ref();inst=world.institutions.institution_by_kind('adventure_society')
+    if inst is None:return
+    for sid,people in sorted(world.living_by_settlement().items()):
+        branch=world.institutions.branch_for('adventure_society',sid)
+        if branch is None:continue
+        candidates=[]
+        for p in people:
+            if not p.alive or p.age<16:continue
+            path=world.advancement.path(p.id)
+            if path and len(path.abilities)==20:continue
+            aspiration=_aspiration(world,p)
+            if not aspiration.completion_goal or aspiration.drive<.4:continue
+            candidates.append(p)
+        candidates.sort(key=lambda p:(-(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),-_aspiration(world,p).preparation,-p.curiosity,p.id))
+        for p in candidates[:3]:
+            if world.currency.treasuries.get(inst.id,{}).get('iron',0)<4:break
+            # Existing infrastructure continuously needs maintenance; saturating
+            # a permanent defense scalar must not erase work for later centuries.
+            assets=[a for a in world.infrastructure.assets.values() if sid in a.settlements and a.condition<1.]
+            if not assets:continue
+            asset=min(assets,key=lambda a:(a.condition,a.id));before=asset.condition
+            world.infrastructure.maintain(asset.id,.2*(.5+p.health));effect=asset.condition-before
+            if effect<=0:continue
+            world.skills.practice(p.id,'construction',.2)
+            coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':4})
+            world.emit('society_apprentice_work',Layer.SOCIETY,(Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
+                branch=branch.id,work='public infrastructure maintenance',infrastructure=asset.id,improvement=effect,coin_reward=coins,treasury=inst.id,eligibility='committed incomplete path')

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 # Legacy worlds contain impossible magical histories; do not silently migrate
 # their rank snapshots into the corrected progression model.
-CHECKPOINT_SCHEMA=6
+CHECKPOINT_SCHEMA=7
 @dataclass
 class Checkpoint:
     schema:int

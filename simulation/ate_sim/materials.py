@@ -168,7 +168,7 @@ def _craft_once(world,sid,crafter,rr,Layer,Ref):
  path=world.advancement.path(crafter.id)
  helpers=[a for a in path.abilities if a.function in ('creation','transformation','enhancement','control','repair') and a.rank>=target] if magical and path else []
  helper=min(helpers,key=lambda a:(len(a.understanding.applications),a.semantic_key)) if helpers else None
- if helper:q=min(1.5,q+.005*helper.level)
+ if helper:q=min(1.5,q+.005*helper.level+.005*helper.response_model.validated)
  ce=world.emit('item_crafted',Layer.REALITY,(Ref('person',crafter.id),),Ref('settlement',sid),(lot.origin_event,),used_abilities=() if helper is None else (helper.semantic_key,),item_kind=_craft_kind(lot.kind),craft_precision=precision,material_lots=(lot.id,),quality=round(q,3),rarity=rarity,magical=magical,item_rank=target if magical else 0,magical_properties=item_props,material_properties_retained=lot.magical_properties if not magical else ());world.materials.create_item(_craft_kind(lot.kind),q,rarity,sid,crafter.id,world.year,ce.id,(lot.id,),item_props,target if magical else 0,magical)
  if helper:
   record_application(world,crafter,helper,ce,constraint=f'{lot.kind}:{lot.magical_properties}:{sid}',difficulty=target,outcome=q)

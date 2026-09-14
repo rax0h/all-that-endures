@@ -1,3 +1,230 @@
+# PR #5 current candidate: restored high-rank development
+
+## Status: ready for user testing; original phase not fully complete
+
+This candidate restores legitimate high-rank development: **20 living Diamonds,
+12 Golds, zero chronological progression violations**, and a **92.04-second**
+canonical simulation. It meets the requested Diamond range, but not the roughly
+75-Gold target. It also exposes an unresolved denomination-liquidity bottleneck
+that suppresses subsequent generations and low-tier Society payments. Therefore
+this report does not claim that PR #5 satisfies the entire original phase.
+Do not merge automatically. Earlier results below are historical and superseded.
+
+Verified starting PR head: `7179501da5f50433fa8a06c671563acfa27dddd1`.
+The response-model and paid-access changes are specified in the canon document.
+They preserve complete configuration/all-twenty-ability gates and core taint.
+No production/price/ordinary-income adjustment, rank quota or year-1000 trigger
+was added. New state uses checkpoint schema 7. The new digest intentionally
+reflects paid maintenance, coin purchases, control trials and their causal links.
+
+## Validation and performance
+
+- Stable full suite: **143 passed in 80.77 seconds**.
+- Added funded-maintenance/completed-path-release regression afterward: the
+  complete focused economy test file passed **9 tests in 0.35 seconds**.
+- Both normal workflow smokes passed; 10-year causal integrity passed.
+- Stable 100-year digest:
+  `0c08a7decdc0b913a2ca16ff7cae8d39fbaaea10d4016f571ac379edabcc22a0`.
+  Indexed/reference executions and the independent full-scan market agree.
+- Medium 500-year history: 28.752931356 seconds, 14 Golds, 27 completed paths,
+  zero progression/ledger violations. Final trial origin-cause links were added
+  afterward, so that intermediate digest is not the final golden.
+- One final seed-843000 millennium was run after stable tests. No post-result
+  calibration experiment or second millennium was performed.
+
+| Canonical measurement | Result |
+| --- | ---: |
+| Simulation seconds | 92.03864281500137 |
+| 120-second gate | PASS |
+| Diagnostics seconds | 0.3673826429985638 |
+| Causal validation seconds (passed) | 0.08258054399993853 |
+| World digest seconds | 19.246182868999313 |
+| Archive export seconds (separate) | 70.58232688499993 |
+| Archive bytes | 846430208 |
+| Living people | 1402 |
+| Living essence users | 84 |
+| Completed loadouts | 33 |
+| Resources total / unused | 9,854 / 5,271 |
+| Society notices / paid resolutions | 1,891 / 35 |
+
+World digest: `2d05d0f0660766cccd3907b480e9cacbe9dbff404f38f90c306434f9d38be14d`.
+
+Archive logical digest: `06b3397c46f193cae0f059e3058f61c73763c92b60f82071087881b9b19c889a`.
+
+| Living body rank | Count |
+| --- | ---: |
+| unranked | 1369 |
+| iron | 0 |
+| bronze | 0 |
+| silver | 1 |
+| gold | 12 |
+| diamond | 20 |
+
+## Every high-rank history audited
+
+The chronological validator checks all historical progression and every final
+body, including all 20 living Diamonds and 12 Golds. Zero violations: four-essence
+configuration, five slots per essence, all twenty ability readiness milestones,
+ability ceilings, core taint, actual application causes and recorded currency
+balances. Control-trial response/prediction arithmetic is independently checked.
+This validates the documented ATE model, not unpublished book mechanics.
+
+Two actual living Diamond histories follow. Economic tier means the highest
+held coin denomination at that event; it is not inferred from body rank.
+Partial users may awaken further abilities before confluence, hence an Iron
+transition can have more than the four automatically awakened abilities.
+
+### Person 10143: human, age 431
+
+| Year | Age | Event ID | Essence configuration | Ability state | Body rank | Economic tier |
+| --- | ---: | ---: | --- | --- | --- | --- |
+| 609 | 40 | 188769 | confluence-d7e3495330ab, earth, life, plant | {'iron': 9} | iron | no recorded coins |
+| 614 | 45 | 190706 | confluence-d7e3495330ab, earth, life, plant | {'bronze': 20} | bronze | no recorded coins |
+| 626 | 57 | 195522 | confluence-d7e3495330ab, earth, life, plant | {'silver': 20} | silver | no recorded coins |
+| 747 | 178 | 244686 | confluence-d7e3495330ab, earth, life, plant | {'gold': 20} | gold | gold |
+| 993 | 424 | 343972 | confluence-d7e3495330ab, earth, life, plant | {'diamond': 20} | diamond | diamond |
+
+Final wallet: `{'bronze': 27, 'diamond': 0, 'gold': 354, 'silver': 1}`. Ordinary wealth: `23.37763609060265`.
+
+### Person 2225: celestine, age 839
+
+| Year | Age | Event ID | Essence configuration | Ability state | Body rank | Economic tier |
+| --- | ---: | ---: | --- | --- | --- | --- |
+| 189 | 28 | 27429 | confluence-48fef3a363bb, dust, life, renewal | {'iron': 9} | iron | no recorded coins |
+| 216 | 55 | 35106 | confluence-48fef3a363bb, dust, life, renewal | {'bronze': 20} | bronze | iron |
+| 228 | 67 | 38827 | confluence-48fef3a363bb, dust, life, renewal | {'silver': 20} | silver | iron |
+| 326 | 165 | 73032 | confluence-48fef3a363bb, dust, life, renewal | {'gold': 20} | gold | iron |
+| 572 | 411 | 173877 | confluence-48fef3a363bb, dust, life, renewal | {'diamond': 20} | diamond | bronze |
+
+Final wallet: `{'bronze': 1758, 'gold': 344, 'iron': 638, 'silver': 1348}`. Ordinary wealth: `20.278136688858723`.
+
+### Recorded understanding proofs for living Diamonds
+
+- Person 10143, year 950, integration event 326574, `ability-e6de84fbb4a1477fbedcb24de08fa911` (life): integration 6.0; proofs event 256795 at complexity 4, prior application events [223143, 227264]; event 261550 at complexity 4, prior application events [223143, 227264].
+- Person 10143, year 952, integration event 327412, `ability-052d4d83955afa12c86122e1f894267e` (confluence-d7e3495330ab): integration 6.0; proofs event 257648 at complexity 4, prior application events [231458, 236571]; event 262327 at complexity 4, prior application events [231458, 236571].
+- Person 2225, year 521, integration event 153234, `ability-83f1b5e1708a4e251b1030cff3cd17f0` (confluence-48fef3a363bb): integration 6.0; proofs event 85268 at complexity 4, prior application events [53307, 72586]; event 89988 at complexity 4, prior application events [53307, 72586].
+- Person 2225, year 521, integration event 153236, `ability-bb05a2c358c8fe3b2c9d4a47368dd2f0` (renewal): integration 6.0; proofs event 82008 at complexity 4, prior application events [56300, 76752]; event 86520 at complexity 4, prior application events [56300, 76752].
+
+Each linked proof identifies the particular applied ability and actual task.
+Control proofs preserve observed baselines, fitted parameters, held-out inputs,
+independently measured response and prediction error. The bounded response law
+is an explicit practical-learning approximation; it does not certify literal
+philosophical consciousness or express intelligence through generated prose.
+
+## Rank-relative economy and ecology
+
+Counts below distinguish generic ranked manifestations from monsters. The Gold
+resolution was **a naturally condensed wood focus (magic item)**, not a Gold
+monster kill: Person 5356, Diamond body, year 789, event 261541, cause 261540.
+It received a real funded four-Gold Society payment. No Diamond manifestation
+and no Gold/Diamond monster occurred; no high-rank fight is claimed. Ecological
+ceilings reached Diamond at 38 manifestation sites/times, but the stochastic
+selection produced lower-tier opportunities. Targeted tests exercise genuine
+Diamond monster remains, purchases and funded contracts without forcing a
+canonical spawn. This seed does not demonstrate a mature high-tier monster loop.
+
+| Resolution body rank -> task rank | Count |
+| --- | ---: |
+| 1 -> 1 | 22 |
+| 1 -> 2 | 1 |
+| 2 -> 1 | 5 |
+| 3 -> 1 | 13 |
+| 3 -> 2 | 1 |
+| 4 -> 1 | 27 |
+| 4 -> 2 | 10 |
+| 4 -> 3 | 3 |
+| 5 -> 1 | 56 |
+| 5 -> 2 | 15 |
+| 5 -> 3 | 3 |
+| 5 -> 4 | 1 |
+
+| Manifestation kind / rank resolved | Count |
+| --- | ---: |
+| magic_item: 1 | 23 |
+| magic_item: 2 | 5 |
+| magic_item: 3 | 2 |
+| magic_item: 4 | 1 |
+| monster: 1 | 80 |
+| monster: 2 | 18 |
+| monster: 3 | 4 |
+| phenomenon: 1 | 20 |
+| phenomenon: 2 | 4 |
+
+| Paid contract task rank -> recipient body rank | Count |
+| --- | ---: |
+| 2 -> 2 | 1 |
+| 2 -> 3 | 2 |
+| 2 -> 4 | 10 |
+| 2 -> 5 | 15 |
+| 3 -> 4 | 3 |
+| 3 -> 5 | 3 |
+| 4 -> 5 | 1 |
+
+| Monster remains rank | Physical quantity harvested |
+| --- | ---: |
+| 1 | 80.0 |
+| 2 | 18.0 |
+| 3 | 4.0 |
+
+| Service task rank | Paid services |
+| --- | ---: |
+| 1 | 2119 |
+| 2 | 656 |
+| 3 | 669 |
+| 4 | 886 |
+| 5 | 348 |
+
+| Living body rank | Wallet denominations retained |
+| --- | --- |
+| diamond | {'bronze': 5408, 'diamond': 7573, 'gold': 5461, 'iron': 5548, 'silver': 5009} |
+| gold | {'bronze': 37, 'diamond': 6, 'gold': 712, 'iron': 48, 'silver': 17} |
+| silver | {'gold': 12} |
+| unranked | {'bronze': 121, 'gold': 80, 'iron': 188, 'silver': 25} |
+
+Coin conservation residuals: `{'bronze': 0, 'diamond': 0, 'gold': 0, 'iron': 0, 'lesser': 0, 'silver': 0}`. All zero.
+
+- Year 721, event 234321: Person 3714 paid Person 3261 {'diamond': 2} for protection; real output 0.02, task rank 5.
+- Year 747, event 244773: Person 3714 paid Person 6259 {'diamond': 2} for protection; real output 0.02, task rank 5.
+
+## Remaining bottleneck: low-denomination liquidity
+
+Paid apprenticeships last ran in **year 481**, after 2,647 genuine maintenance
+jobs. They require four Iron coins. Farms always select the highest supported
+operator/output tier, and stop supplying Iron as operators advance. The final
+Society treasury holds only **3 Iron**, alongside **8,347 Bronze, 8,809 Silver,
+8,257 Gold and 6,996 Diamond**. Coins are real separate denominations; the code
+does not silently flatten those balances into freely spendable Iron. There is
+no autonomous exchange/demand policy to bridge this liquidity gap. Meanwhile,
+5,271 magical resources remain unused, including 3,651 awakening stones.
+
+This suppresses the next generation of complete users and leaves **1,854 Iron
+notices assigned but unpaid**, plus one open. Only 33 living full loadouts exist,
+so 75 Golds plus 20–25 Diamonds is structurally impossible in this result.
+This is a measured access/economy limitation, not evidence to weaken metaphysical
+prerequisites. It also means this candidate does not yet establish healthy
+multi-millennium renewal. A subsequent focused liquidity/settlement change must
+preserve coin conservation and legitimate counterparties, not award rank wealth.
+
+## Run your own tests
+
+```sh
+git fetch origin
+git switch sim/canonical-magic-progression
+git pull --ff-only
+PYTHONPATH=.:simulation python -m pytest -q simulation/tests
+PYTHONPATH=.:simulation python simulation/run_long_history.py 843000 1000 --max-seconds 120 --archive /tmp/ate-your-history.sqlite
+PYTHONPATH=.:simulation python simulation/validate_magic_progression.py /tmp/ate-your-history.sqlite
+PYTHONPATH=.:simulation python simulation/inspect_magic_economy.py /tmp/ate-your-history.sqlite
+```
+
+Use a new archive path per run. Longer durations use the positional years value;
+the 120-second contract is specifically for 1,000 years. The two inspector reports
+are read-only and run after the timed simulation. Do not merge PR #5 automatically.
+
+---
+
+# Historical follow-up results (superseded)
+
 # PR #5 follow-up: economy and mastery validation
 
 ## Acceptance status: not yet the completed original phase

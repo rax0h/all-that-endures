@@ -43,6 +43,50 @@ Implemented first increment:
 - Checkpoint schema 5 rejects old-schema worlds rather than silently rewriting
   impossible history. Existing archives remain readable.
 
+## Current calibration: practical mastery and paid access
+
+The year-1000 design targets are approximately 75 living Golds and 20–25 living
+Diamonds. They are observations to calibrate against, not quotas, population
+caps, or triggers. No rule reads those counts or stops developing at year 1000.
+Later millennia retain the same advancement, mortality and opportunity rules.
+
+The stricter application model exposed two bottlenecks: some semantic abilities
+had no implemented activity producer, and committed incomplete users could not
+spend their earned Iron coins in settlement markets. This revision adds:
+
+- **Deliberate control trials** for every ability function. A small response law
+  specific to ability/essence/function/domain generates actual measurements.
+  The learner fits three parameters at Silver and five interacting parameters
+  at Gold, then predicts held-out inputs before measuring them. Successful
+  predictions supply bounded, source-linked generalization evidence. Two trial
+  attempts per eligible person/year compete for practice time; models retain at
+  most five observations and two validated transfers. Validated control also
+  improves the existing crafting helper's precision.
+- **Evidence retention repair:** a new metric can replace redundant observations
+  from an older metric; six filled slots cannot permanently exclude a legitimate
+  alternative route. Two independent baselines and the harder held-out test are
+  still required. Ability milestones reset the tier-specific model.
+- **Paid apprenticeships:** each existing Society branch can fund three committed
+  incomplete trainees performing actual maintenance on existing infrastructure.
+  Four Iron coins come from the real treasury only after useful work. Completed
+  paths release places; recurring maintenance supports later generations.
+- **Denominated settlement purchases:** the unchanged seven/three prices may be
+  paid with earned Iron coins when ordinary wealth is insufficient. The Society
+  receives and records the market proceeds. Ownership, absorption eligibility,
+  production, ordinary annual income and body prerequisites remain unchanged.
+
+These response laws, trial budgets, wage amounts and institutional capacities
+are **ATE approximations**, not published canon. Solving a small response model
+is a computational representation of practical compression/generalization; it
+is not a claim to simulate literal philosophical consciousness or godlike
+intelligence. The law does not read the fitted model, and the archive validator
+independently recomputes measurements and predictions. Trials are recorded as
+controlled practice, never mislabeled as combat, field feats or authored insight.
+Gold/Diamond still require the existing integration/transfer gates on all twenty
+abilities, their within-rank development, and freedom from core taint where
+required. No single trial advances a body. Checkpoint schema **7** is current;
+older schema references below describe earlier revisions.
+
 ## Current economic and understanding implementation (supersedes initial PR #5 model)
 
 Body rank, ability rank and within-rank ability level remain distinct. The
