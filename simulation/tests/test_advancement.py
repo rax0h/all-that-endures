@@ -83,13 +83,16 @@ def full_path():
  return a
 
 
-def test_iron_requires_four_essences_but_only_four_innate_abilities():
+def test_iron_requires_four_essences_and_all_twenty_abilities():
  a=AdvancementState()
  for essence in ('fire','water'):
   a.absorb_essence(1,essence,0)
   assert a.rank(1)==0
  a.absorb_essence(1,'wind',0)
- assert len(a.path(1).abilities)==4 and a.rank(1)==1
+ assert len(a.path(1).abilities)==4 and a.rank(1)==0
+ for essence in a.path(1).essences:
+  for _ in range(4):a.awaken_skill(1,'eyes',1,target_essence=essence)
+ assert len(a.path(1).abilities)==20 and a.rank(1)==1
 
 
 def test_single_ability_cannot_carry_incomplete_body_to_diamond():
@@ -120,4 +123,4 @@ def test_twenty_abilities_with_wrong_group_distribution_do_not_qualify():
  a=full_path()
  for skill in a.path(1).abilities:skill.rank=2
  a.path(1).abilities[-1].essence='fire'
- assert a.rank(1)==1
+ assert a.rank(1)==0
