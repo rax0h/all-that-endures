@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from heapq import heappush, heappop, heapify
 from .core_types import layer_ref
+from .magic_progression import record_body_transition
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
 
 RESOURCE_DISCOVERY_RATE=.45
@@ -49,12 +50,16 @@ def _commit_to_full_path(a):
 def absorb_essence_resource(world,pid,rid):
  r=world.magic_resources.resources[rid]
  if r.kind!='essence':raise ValueError('resource is not an essence')
- p=world.people[pid];path=world.advancement.path(pid)
+ p=world.people[pid];path=world.advancement.path(pid);before=world.advancement.rank(pid)
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
- Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=max(1,world.advancement.rank(pid))
+ Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
  a=world.magic_resources.aspirations.get(pid)
  if a is not None and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
+ if any(a.source=='confluence' for a in created):
+  formation=world.emit('confluence_formed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),base_essences=tuple(path.base_essences),confluence=path.confluence)
+  world.emit('confluence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(formation.id,),confluence=path.confluence,mechanism='touch',automatic_acceptance=True)
  for ability in created:world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=ability.essence,source=ability.source,ability=ability.semantic_key,name=ability.name,special=ability.special,aura=ability.aura)
+ record_body_transition(world,p,before,context="essence_absorption",causes=(e.id,))
  return path,created
 def use_awakening_stone(world,pid,rid,target_essence=None):
  r=world.magic_resources.resources[rid]

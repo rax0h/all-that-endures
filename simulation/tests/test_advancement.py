@@ -11,7 +11,7 @@ def test_full_semantic_catalog_is_loaded():
   e=ESSENCES[key];assert e['source_innate'] and e['semantic_core'] and e['suggested_domains'] and e['suggested_functions'] and e['guardrail']
 
 def test_absorbing_essence_intrinsically_awakens_catalog_innate():
- a=AdvancementState();p,created=a.absorb_essence(1,'fire',0,('farmer','neutral','farmer'));assert p.capacity==5 and len(p.abilities)==1 and created[0].name=='Flame Bolt' and not created[0].special and a.rank(1)==1
+ a=AdvancementState();p,created=a.absorb_essence(1,'fire',0,('farmer','neutral','farmer'));assert p.capacity==5 and len(p.abilities)==1 and created[0].name=='Flame Bolt' and not created[0].special and a.rank(1)==0
 
 def test_every_catalog_essence_can_be_absorbed():
  for i,e in enumerate(ESSENCE_IDS):
@@ -50,14 +50,65 @@ def test_unknown_essence_and_stone_are_rejected():
 def test_rank_requires_every_actually_awakened_skill():
  a=path_with_one_skill();a.awaken_skill(1,'eyes',1,('farmer',));first=a.path(1).abilities[0]
  for _ in range(200):a.practice(1,0,1.)
- assert first.rank>1 and a.rank(1)==1
+ assert first.rank==2 and a.rank(1)==0
 
 def test_gold_to_diamond_requires_revelation_and_integration():
- a=path_with_one_skill();p=a.path(1);p.abilities[0].rank=4;p.abilities[0].level=9;p.abilities[0].progress=.99;a.practice(1,0,1.,reflection=0.);assert a.rank(1)==4;p.revelation=p.integrated=1.;a.practice(1,0,1.,reflection=1.);assert a.rank(1)==5
+ a=full_path();p=a.path(1)
+ for ability in p.abilities:ability.rank=5
+ p.abilities[0].rank=4;p.abilities[0].level=9;p.abilities[0].progress=.99;a.practice(1,0,1.,reflection=0.);assert a.rank(1)==4;p.revelation=p.integrated=1.;a.practice(1,0,1.,reflection=1.);assert a.rank(1)==5
 
 def test_monster_core_dependence_impedes_gold_revelation():
- a=path_with_one_skill();b=path_with_one_skill()
+ a=full_path();b=full_path()
  for _ in range(100):b.practice(1,0,0.,core=1.)
- a.path(1).abilities[0].rank=b.path(1).abilities[0].rank=4
+ for state in (a,b):
+  for ability in state.path(1).abilities:ability.rank=4;ability.level=0;ability.progress=0.
  for _ in range(100):a.practice(1,0,0.,reflection=1.);b.practice(1,0,0.,reflection=1.)
  assert a.path(1).revelation>b.path(1).revelation
+
+
+def full_path():
+ a=AdvancementState()
+ for essence in ('fire','water','wind'):a.absorb_essence(1,essence,0)
+ for essence in a.path(1).essences:
+  for _ in range(4):a.awaken_skill(1,'eyes',1,target_essence=essence)
+ return a
+
+
+def test_iron_requires_four_essences_but_only_four_innate_abilities():
+ a=AdvancementState()
+ for essence in ('fire','water'):
+  a.absorb_essence(1,essence,0)
+  assert a.rank(1)==0
+ a.absorb_essence(1,'wind',0)
+ assert len(a.path(1).abilities)==4 and a.rank(1)==1
+
+
+def test_single_ability_cannot_carry_incomplete_body_to_diamond():
+ a=path_with_one_skill()
+ for _ in range(1000):a.practice(1,0,100.,reflection=100.)
+ skill=a.path(1).abilities[0]
+ assert (skill.rank,skill.level,skill.progress)==(2,0,0.)
+ assert a.rank(1)==0
+
+
+def test_all_twenty_abilities_gate_each_body_transition_and_ceiling():
+ a=full_path();path=a.path(1)
+ # Upper-rank understanding is tested separately; isolate structural readiness.
+ path.revelation=path.integrated=1.
+ for target in range(2,6):
+  for i in range(19):
+   a.practice(1,i,100000.)
+   assert a.rank(1)==target-1
+   skill=path.abilities[i]
+   assert (skill.rank,skill.level,skill.progress)==(target,0,0.)
+   a.practice(1,i,100000.)
+   assert (skill.rank,skill.level,skill.progress)==(target,0,0.)
+  a.practice(1,19,100000.)
+  assert a.rank(1)==target
+
+
+def test_twenty_abilities_with_wrong_group_distribution_do_not_qualify():
+ a=full_path()
+ for skill in a.path(1).abilities:skill.rank=2
+ a.path(1).abilities[-1].essence='fire'
+ assert a.rank(1)==1

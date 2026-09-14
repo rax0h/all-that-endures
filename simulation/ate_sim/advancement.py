@@ -6,6 +6,7 @@ RANKS=('ordinary','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
+ milestone_event:int|None=None
 @dataclass
 class EssencePath:
  base_essences:list[str]=field(default_factory=list);confluence:str|None=None;confluence_name:str|None=None;confluence_concepts:tuple[str,...]=();abilities:list[AbilityProgress]=field(default_factory=list);core_fraction:float=0.;revelation:float=0.;integrated:float=0.
@@ -72,11 +73,25 @@ class AdvancementState:
    raw='|'.join(p.essences)+'|'+stone_name+'|'+'|'.join(map(str,semantic_context))+'|'+str(len(p.abilities));key=hashlib.blake2b(raw.encode(),digest_size=8).hexdigest();essence=available[int(key[:8],16)%len(available)] if available else None
   return None if essence is None else self._semantic_ability(p,essence,'stone:'+stone_name,year,semantic_context,origin_event)
  def rank(self,pid):
-  p=self.paths.get(pid);return 0 if p is None or not p.abilities else min(a.rank for a in p.abilities)
+  p=self.paths.get(pid)
+  if p is None or len(p.base_essences)!=3 or p.confluence is None:return 0
+  if len(p.abilities)!=MAX_SKILLS:return 1
+  counts={e:0 for e in p.essences}
+  for a in p.abilities:
+   if a.essence not in counts:return 1
+   counts[a.essence]+=1
+  if len(counts)!=4 or any(n!=SKILLS_PER_ESSENCE for n in counts.values()):return 1
+  return min(a.rank for a in p.abilities)
  def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.):
   p=self.paths.get(pid)
   if p is None or not p.abilities:return None
-  a=p.abilities[ability%len(p.abilities)];r=a.rank;gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
+  a=p.abilities[ability%len(p.abilities)];r=a.rank
+  # Partial essence users can develop a Bronze ability without gaining bodily
+  # Iron benefits. An ability waits at the next tier's entry until the body
+  # catches up; practice cannot bank progress beyond that ceiling.
+  ceiling=min(5,max(1,self.rank(pid))+1)
+  if r>=ceiling:return a
+  gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
   if core>0:gain+=core*(.8,.65,.5,.3,.0,.0)[min(r,5)];p.core_fraction=min(1.,p.core_fraction+core*.01)
   if r==4:p.revelation=min(1.,p.revelation+max(0.,reflection)*.004*(1-.75*p.core_fraction));p.integrated=min(1.,p.integrated+max(0.,reflection)*.002)
   a.progress+=gain
@@ -85,4 +100,5 @@ class AdvancementState:
    if a.level>=10:
     if a.rank==4 and min(p.revelation,p.integrated)<.92:a.level=9;a.progress=.999;break
     a.rank+=1;a.level=0
+    if a.rank>=ceiling:a.progress=0.;break
   return a

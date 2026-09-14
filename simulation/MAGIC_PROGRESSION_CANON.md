@@ -1,14 +1,114 @@
 # Magic progression: source audit and engineering specification
 
-Status: **audit checkpoint, implementation blocked on source verification**.
+Status: **first progression implementation; higher-rank design pending**.
 This is not a completed canon specification or a claim that main is canonically
 valid. Audited base: `9551c9c314b8cdbd15f5b6e0c22e95b203d848e2`.
 Branch: `sim/canonical-magic-progression`. Audit date: 2026-09-14.
 
+## Current agreed design and implementation progress
+
+The owner subsequently confirmed **100 lesser = 1 Iron**, leaving existing coin
+values intact. The owner authorized an explicitly ATE-designed model where
+Diamond's unpublished details cannot be established. Lack of a complete source
+formula is no longer a blocker for that documented design. Earlier source
+questions below describe the audit at the time, not renewed requests for permission.
+
+The agreed direction separates power, practical mastery and understanding.
+Higher-rank development requires relevant experience, conceptual breakthroughs
+and demonstrated application under unfamiliar conditions. Repeating familiar
+practice or a profound sentence cannot substitute for understanding. Core taint
+is a persistent obstruction: ordinary elapsed time/reflection must not erase it;
+any remedy requires a rare, explicit causal mechanism. No remedy is invented or
+implemented in this first increment. Moral goodness, verbal eloquence and
+suffering are not universal requirements. Crafters and other noncombatants must
+have meaningful paths where their abilities and opportunities support them.
+
+High-rank cognitive capacities must have observable effects on perception,
+anticipation, precision and outcomes within developed expertise. These capacities
+remain distinct from knowledge, personality and universal wisdom. Future
+expression must describe simulated achievements, never invent proof of genius.
+This is a game-design requirement, not a sourced quantitative intelligence multiplier.
+
+Implemented first increment:
+
+- Partial essence users have body rank zero; four essences grant Iron with four
+  innate abilities. All twenty correctly distributed abilities gate higher ranks.
+- Abilities wait at the next tier's entry point without banking surplus practice.
+- World-facing practice emits linked ability rank milestones. Body transitions
+  record prerequisite abilities, ranks, named body ranks and causal milestone IDs.
+- Third essence absorption records confluence formation and absorption. Immediate
+  acceptance is the current simulation policy; touch is represented as the
+  absorption mechanism, not a separate interactive scene.
+- Checkpoint schema 5 rejects old-schema worlds rather than silently rewriting
+  impossible history. Existing archives remain readable.
+
+Still pending: replace legacy shared revelation/integration scalars with the
+agreed understanding model; explicit core-taint gating; distinct Diamond biology
+and cognitive consequences; longevity; economic transactions and task-relative
+rewards; final canonical validation. Existing upper-rank scalar tests are
+temporary compatibility tests, not the accepted final Diamond design.
+
+## Subsequent project-owner clarification
+
+The project owner supplied the following reading-based explanation after the
+initial audit. It resolves implementation questions but is not a newly inspected
+book excerpt. Keep that provenance distinct from the primary sources below.
+The original audit and its observations remain historical evidence.
+
+- Third normal essence absorption produces an external confluence, which is
+  touched and absorbed. Four absorbed essences, each with its innate ability,
+  trigger the bodily purge and Iron transition. All twenty abilities are **not**
+  needed for Iron. A later sentence in the explanation mentions all skills at
+  Iron; use the explicit four-ability transition described at its beginning.
+- One or two essences do not grant whole-body rank benefits: the individual
+  retains species biology and gains only the particular magical abilities.
+- Missing slots do not prevent practice of an existing ability. Each ability
+  may reach the next tier's starting point but cannot progress within that tier
+  before the body catches up. A partial, unranked essence user can have a Bronze
+  ability; account for this explicitly rather than treating unranked body rank
+  plus one as the universal ability ceiling.
+- All twenty abilities must individually reach Bronze before the automatic
+  Bronze body transition. Subsequent transitions likewise depend on the full
+  configuration and ability readiness, with additional inner development.
+- Meaningful application, training, learning and meditation develop abilities.
+  Silver-to-Gold requires understanding and soul development, with requirements
+  relevant to the ability, essence and individual. Exact final Diamond
+  prerequisites remain to be established; “rare” is not an eligibility rule.
+- Most people use rituals for initial essence/stone absorption. Later body
+  transitions occur automatically once their prerequisites are satisfied.
+- Approximate lifespan recollections: Iron 100–110, Bronze 150–175, Silver
+  200–300, Gold around 500, Diamond ageless; species and outliers matter.
+  These are not hard age cutoffs or verified mortality distributions. Advancement
+  can rejuvenate a survivor; it cannot retroactively save someone who died first.
+- The owner describes person-dependent confluence outcomes and permanent
+  absorption, with no known removal across twelve books. Do not add a removal
+  or replacement mechanic without evidence; absence of a known exception does
+  not establish that none exists anywhere in canon.
+- The supplied coin recollection is 100 lesser = 10 Iron, then 10 Iron =
+  1 Bronze and tenfold steps thereafter. This differs from current ATE's
+  100 lesser = 1 Iron. Verify this discrepancy before changing denomination
+  values; do not silently reinterpret the owner's numbers or certify either
+  recollection as primary-source fact.
+- Coin ownership/payment is distinct from consuming a coin as magical
+  sustenance. Higher-tier consumption can boost and then harm a user; an extreme
+  mismatch can kill. Downward trade is possible but not necessarily desirable.
+  The food-to-coin transition and precise consumption rates need verification.
+- Ordinary adventurers do not automatically generate Jason-style magical loot.
+  A looting ability is required for that mechanism. Ordinary acquisition and
+  harvesting must remain separate. Monster materials/cores normally follow the
+  monster's rank; exceptional higher-rank yields require an actual cause.
+- Society reward depends on task difficulty/rank; standing with the Society can
+  affect bonuses. Recipient rank alone is not the reward's causal basis.
+
+Follow-up source requests can now focus on the exact Diamond transition,
+lesser-to-Iron exchange, species longevity and concrete prices/harvesting rules.
+The core configuration and readiness corrections need not wait for price examples.
+
 The source books are authoritative for this phase. Earlier ATE documents calling
-mechanics “canon-inspired” do not establish those mechanics as book canon. No
-simulation rules, golden digests, balance constants or performance gates have
-been changed at this checkpoint.
+mechanics “canon-inspired” do not establish those mechanics as book canon. The
+original audit changed no simulation rules. The first implementation above
+deliberately changes progression semantics; golden digests have not been refreshed
+and performance gates remain unchanged.
 
 ## Evidence classifications
 

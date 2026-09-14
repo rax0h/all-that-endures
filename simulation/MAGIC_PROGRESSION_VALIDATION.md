@@ -1,4 +1,29 @@
-# Magic progression validation: pre-implementation audit
+# Magic progression validation: audit and implementation increments
+
+## First implementation increment
+
+The owner has authorized an ATE design for unresolved higher-rank mechanics.
+The source questions below are historical audit context. Configuration/body
+gates, next-tier ability ceilings, milestone events and checkpoint schema 5 are
+implemented; the higher-rank understanding/economy/longevity work is not complete.
+
+Targeted advancement, progression-history, diagnostic and resource-eligibility
+tests: **25 passed**. The new chronology test proves that the Bronze body
+transition references twenty ability milestones and that those references
+survive checkpoint restoration and archive export.
+
+First full-suite run: **122 passed, 1 failed** in 70.87 seconds. The only failure
+was the old 100-year golden in `test_current_people`: indexed and archive-scan
+simulations agreed, but intentionally differed from the old world. That reference
+is now `b1838563864e60a8782ed0d87d21996ec41a8f03828a31229bb2f55f3734a503`.
+The change is caused by removing premature Iron biology from partial users,
+requiring full ability readiness, enforcing ability ceilings, and recording
+new progression state/events. It is not a new millennium golden.
+
+No final millennium validation has been run. No claim is made yet about the
+finished phase's performance, Diamond population or complete historical validity.
+
+## Original pre-implementation audit
 
 Status: **not a completed corrected-world validation**. See
 [the source audit](MAGIC_PROGRESSION_CANON.md) for blocking primary-source questions.

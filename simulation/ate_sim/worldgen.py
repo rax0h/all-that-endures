@@ -19,7 +19,7 @@ def _seed_essence_for_person(w,rr,p,sid,founded):
  essence=rr.choice(ESSENCES_AVAILABLE);found=w.emit('essence_resource_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(founded.id,),essence=essence,provenance='founder-era local discovery')
  resource=w.magic_resources.create('essence',essence,ESSENCES[essence]['rarity'],0,sid,'person',p.id,found.id)
  absorbed=w.emit('essence_absorbed',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(found.id,),resource=resource.id,essence=essence)
- w.magic_resources.consume(resource.id,p.id,0,absorbed.id);path,created=w.advancement.absorb_essence(p.id,essence,0,_context(p,sid),absorbed.id);p.rank=1
+ w.magic_resources.consume(resource.id,p.id,0,absorbed.id);path,created=w.advancement.absorb_essence(p.id,essence,0,_context(p,sid),absorbed.id);p.rank=w.advancement.rank(p.id)
  for a in created:w.emit('ability_awakened',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(absorbed.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura)
  if rr.random()<.12:
   skey=rr.choice(STONE_IDS);sf=w.emit('awakening_stone_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(founded.id,),stone=skey,provenance='founder-era local discovery');w.magic_resources.create('awakening_stone',skey,AWAKENING_STONES[skey]['rarity'],0,sid,'person',p.id,sf.id)
