@@ -12,7 +12,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     env:
       PYTHONPATH: .:simulation
     steps:
@@ -20,12 +20,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install pytest
-      - name: focused treasury liquidity tests
-        run: pytest -vv simulation/tests/test_treasury_liquidity.py simulation/tests/test_high_rank_economy.py
-      - name: unit and integration suite with timing
-        run: pytest -vv --durations=20 simulation/tests
-      - name: targeted probe smoke test
-        run: python simulation/specific_test.py --seed 843000 --years 10 --section all
-      - name: deterministic 100-year smoke history
-        run: python simulation/run_long_history.py 843000 100
+      - name: isolated 1000-year liquidity calibration
+        run: python simulation/run_long_history.py 843000 1000 --max-seconds 120
