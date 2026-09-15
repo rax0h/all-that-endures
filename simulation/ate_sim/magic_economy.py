@@ -4,7 +4,7 @@ Farm yields, tax shares and service prices are explicit ATE approximations.
 Harvesting monsters does not call any currency production function.
 """
 from .core_types import layer_ref
-from .currency import denomination_for_rank
+from .currency import denomination_for_rank,COIN_VALUE
 from .threat_ecology import supported_rank
 from .magic_progression import record_application
 
@@ -41,7 +41,6 @@ def spirit_economy_step(world,rng):
         ambient=world.ambient_magic.field(sid).level
         tier=min(farmer.rank,operator.rank,supported_rank(ambient),5)
         if farm.condition<.5:continue
-        # One working operator, one annual harvest, limited by site AND operator.
         denomination=denomination_for_rank(tier);coins={denomination:max(1,int(24*farm.condition))}
         world.currency.credit(farmer.id,coins)
         e=world.emit('spirit_coins_cultivated',Layer.REALITY,(Ref('person',farmer.id),),Ref('settlement',sid),(farm.origin_event,),farm=farm.id,ambient=ambient,production_rank=tier,challenge_complexity=tier,used_abilities=(operator.semantic_key,),coin_created=coins,mechanism='worked ambient coin cultivation')
@@ -52,8 +51,6 @@ def spirit_economy_step(world,rng):
         world.infrastructure.maintain(farm.id,.03)
     for p in world.current_people():
         if not p.alive or p.rank<2:continue
-        # An annual reserve supplement where local magic cannot support the body.
-        # Not an assertion about literal meals/day; higher-tier overdraw is forbidden.
         denomination=denomination_for_rank(p.rank)
         if supported_rank(world.ambient_magic.field(p.settlement).level)>=p.rank:continue
         if world.currency.wallets.get(p.id,{}).get(denomination,0)<1:continue
@@ -63,12 +60,7 @@ def spirit_economy_step(world,rng):
 
 
 def magical_service(world,provider,client,ability,*,kind,difficulty,constraint):
-    """A priced service changes a real client/household state; no work, no proof.
-
-    Function eligibility, actual need, tier capability, liquidity and successful
-    output all precede evidence. Lower-tier clients cannot buy higher-tier work
-    using a flattened ordinary-wealth scalar.
-    """
+    """A priced service changes a real client/household state; no work, no proof."""
     Layer,Ref=layer_ref()
     functions={'healing':{'recovery','healing','restoration'},
                'protection':{'control','support','enhancement','detection','sense','creation','defense','preservation','storage','environmental control'},
@@ -86,8 +78,6 @@ def magical_service(world,provider,client,ability,*,kind,difficulty,constraint):
     elif kind=='healing':client.health+=output
     elif kind=='protection':h.preparedness+=output
     else:h.food+=output
-    # Difficulty of understanding is distinct from energy/body tier. Multiple
-    # coupled constraints can make lower-tier work conceptually demanding.
     local=world.local[client.settlement]
     complexity=min(5,max(difficulty,1+int(need>.25)+int(local.scarcity>.2)+int(local.flood>.04)+int(client.grief>.2)))
     e=world.emit('magical_service_completed',Layer.REALITY,(Ref('person',provider.id),Ref('person',client.id)),Ref('settlement',client.settlement),
@@ -104,25 +94,36 @@ def magical_services_step(world,rng):
         for p in providers:
             path=world.advancement.path(p.id)
             if path is None:continue
-            # One actual service per provider/year; no all-pairs marketplace.
             rr=rng.stream('magical_service',world.year,p.id)
             client=clients[int(rr.random()*len(clients))%len(clients)]
             if client.id==p.id:continue
             kind='instruction' if world.skills.get(client.id,'knowledge').level<.7 and world.year%2==0 else 'healing' if client.health<.9 else ('provision' if world.households[client.household].food<3 else 'protection')
             difficulty=max(1,client.rank if kind=='healing' else supported_rank(world.ambient_magic.field(sid).level))
             for ability in sorted(path.abilities,key=lambda a:(a.rank,a.level,a.semantic_key)):
-                # Disease/embodiment, ecology and household conditions define cases.
                 constraint=f'{kind}:{client.species}:{sid}:{int(world.local[sid].scarcity*4)}'
                 if magical_service(world,p,client,ability,kind=kind,difficulty=difficulty,constraint=constraint):break
 
 
-def apprenticeship_step(world):
-    """Paid public work supports committed trainees; no essence is handed out.
+def _source_iron_change(world,inst,sid,people,needed=4):
+    """Acquire Iron for the Society from an actual local holder at exact coin value."""
+    treasury=world.currency.treasuries.setdefault(inst.id,{})
+    if treasury.get('iron',0)>=needed:return True
+    Layer,Ref=layer_ref()
+    for denomination in ('bronze','silver','gold','diamond'):
+        if treasury.get(denomination,0)<1:continue
+        iron_needed=COIN_VALUE[denomination]//COIN_VALUE['iron']
+        counterparties=sorted((p for p in people if p.alive and world.currency.wallets.get(p.id,{}).get('iron',0)>=iron_needed),key=lambda p:(-world.currency.wallets[p.id].get('iron',0),p.id))
+        if not counterparties:continue
+        counterparty=counterparties[0]
+        give={denomination:1};receive={'iron':iron_needed}
+        world.currency.treasury_exchange(inst.id,counterparty.id,give,receive)
+        world.emit('society_money_changed',Layer.SOCIETY,(Ref('person',counterparty.id),Ref('institution',inst.id)),Ref('settlement',sid),institution=inst.id,coin_from_treasury=give,coin_to_treasury=receive,mechanism='local exact-value denomination exchange')
+        return treasury.get('iron',0)>=needed
+    return False
 
-    Three places per existing Society branch, funded from its actual treasury.
-    Incomplete trainees have continuity; completion releases the place. Wages
-    buy real market stock at normal prices and support repeated generations.
-    """
+
+def apprenticeship_step(world):
+    """Paid public work supports committed trainees; no essence is handed out."""
     from .magic_resources import _aspiration
     Layer,Ref=layer_ref();inst=world.institutions.institution_by_kind('adventure_society')
     if inst is None:return
@@ -139,9 +140,7 @@ def apprenticeship_step(world):
             candidates.append(p)
         candidates.sort(key=lambda p:(-(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),-_aspiration(world,p).preparation,-p.curiosity,p.id))
         for p in candidates[:3]:
-            if world.currency.treasuries.get(inst.id,{}).get('iron',0)<4:break
-            # Existing infrastructure continuously needs maintenance; saturating
-            # a permanent defense scalar must not erase work for later centuries.
+            if world.currency.treasuries.get(inst.id,{}).get('iron',0)<4 and not _source_iron_change(world,inst,sid,people,4):break
             assets=[a for a in world.infrastructure.assets.values() if sid in a.settlements and a.condition<1.]
             if not assets:continue
             asset=min(assets,key=lambda a:(a.condition,a.id));before=asset.condition
