@@ -1,7 +1,7 @@
 name: simulation
 on:
   push:
-    branches: [main, sim/current-standard]
+    branches: [main, sim/current-standard, sim/magic-liquidity-exchange]
   pull_request:
     branches: [main]
 
