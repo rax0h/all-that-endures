@@ -45,6 +45,6 @@ def test_indexed_population_matches_archive_scan_simulation():
     with patch.object(World,'current_people',lambda w:tuple(p for p in w.people.values() if p.alive)):
         reference=Simulation(generate_world(843000)).run(100)
     # Stage 0.5 intentionally changes canonical history through strict 20/20 body
-    # rank semantics plus conserved denomination exchange. Keep this fixture pinned
-    # to the integrated candidate so population indexing is still proven history-neutral.
-    assert indexed.digest()==reference.digest()=='2b7db1e4515d47ad32bdb129126b6c3741549c931a9b7f98265ca1e29a13aef7'
+    # rank semantics plus conserved denomination exchange. This digest was measured
+    # from both indexed and archive-scan execution on the integrated candidate.
+    assert indexed.digest()==reference.digest()=='d950f4a51a1df5dfaa9a29b19d8ca37dc0857ca06e5dd0e8f0d5b3a47ebfc510'
