@@ -19,6 +19,8 @@ class AdvancementState:
  paths:dict[int,EssencePath]=field(default_factory=dict)
  def path(self,pid):return self.paths.get(pid)
  def essence_user(self,pid):return pid in self.paths
+ def completed_path(self,pid):
+  p=self.paths.get(pid);return p is not None and len(p.base_essences)==MAX_BASE_ESSENCES and p.confluence is not None and len(p.essences)==4 and len(p.abilities)==MAX_SKILLS and all(len(p.abilities_for(e))==SKILLS_PER_ESSENCE for e in p.essences)
  def _pick(self,v,k,o=0):return v[(int(k[o:o+8],16) if len(k)>=o+8 else int(k[:8],16))%len(v)] if v else 'manifestation'
  def _tokens(self,context):
   out=[]
@@ -72,7 +74,7 @@ class AdvancementState:
    raw='|'.join(p.essences)+'|'+stone_name+'|'+'|'.join(map(str,semantic_context))+'|'+str(len(p.abilities));key=hashlib.blake2b(raw.encode(),digest_size=8).hexdigest();essence=available[int(key[:8],16)%len(available)] if available else None
   return None if essence is None else self._semantic_ability(p,essence,'stone:'+stone_name,year,semantic_context,origin_event)
  def rank(self,pid):
-  p=self.paths.get(pid);return 0 if p is None or not p.abilities else min(a.rank for a in p.abilities)
+  p=self.paths.get(pid);return 0 if not self.completed_path(pid) else min(a.rank for a in p.abilities)
  def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.):
   p=self.paths.get(pid)
   if p is None or not p.abilities:return None
