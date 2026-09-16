@@ -51,7 +51,7 @@ def absorb_essence_resource(world,pid,rid):
  if r.kind!='essence':raise ValueError('resource is not an essence')
  p=world.people[pid];path=world.advancement.path(pid)
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
- Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=max(1,world.advancement.rank(pid))
+ Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
  a=world.magic_resources.aspirations.get(pid)
  if a is not None and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
  for ability in created:world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=ability.essence,source=ability.source,ability=ability.semantic_key,name=ability.name,special=ability.special,aura=ability.aura)
@@ -65,7 +65,7 @@ def use_awakening_stone(world,pid,rid,target_essence=None):
  if not available or (target_essence is not None and target_essence not in available):return None
  Layer,Ref=layer_ref();e=world.emit('awakening_stone_used',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,stone=r.key,target_essence=target_essence);a=world.advancement.awaken_skill(pid,r.key,world.year,person_context(p,p.settlement),e.id,target_essence)
  if a is None:return None
- world.magic_resources.consume(rid,pid,world.year,e.id);world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura);return a
+ world.magic_resources.consume(rid,pid,world.year,e.id);p.rank=world.advancement.rank(pid);world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura);return a
 
 def _environment_tags(world,sid):
  s=world.settlements[sid];c=world.cells[(s.x,s.y)];q=world.local[sid];tags=[]
@@ -83,9 +83,6 @@ def _environment_tags(world,sid):
  return tuple(dict.fromkeys(tags))
 @lru_cache(maxsize=512)
 def _environment_weights(tags):
- # The semantic dictionary is immutable simulation-version data. Cache complete
- # weights by the exact composed context, never by settlement or ambient rank.
- # Explicit dictionary hot reloads must call _environment_weights.cache_clear().
  weighted=[]
  for key in ESSENCE_IDS:
   text=(key+' '+str(ESSENCES[key])).lower();hits=sum(1 for tag in tags if tag in text)
@@ -94,8 +91,7 @@ def _environment_weights(tags):
 
 def _environmental_essence(world,rng,sid):
  tags=_environment_tags(world,sid);weighted=_environment_weights(tags)
- if not weighted:
-  return ESSENCE_IDS[int(rng.random()*len(ESSENCE_IDS))%len(ESSENCE_IDS)],tags
+ if not weighted:return ESSENCE_IDS[int(rng.random()*len(ESSENCE_IDS))%len(ESSENCE_IDS)],tags
  total=sum(w for _,w in weighted);x=rng.random()*total
  for key,w in weighted:
   x-=w
@@ -145,13 +141,8 @@ def _wants(world,p,r):
  a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences);abilities=0 if path is None else len(path.abilities)
  if r.kind=='essence':return base<a.desired_base_essences and (path is None or r.key not in path.base_essences)
  return path is not None and abilities<a.desired_abilities and abilities<path.capacity
-def _demand_key(resource):
- # Stone identity/rarity does not enter _wants; essence identity does.
- return (resource.kind, resource.key if resource.kind=='essence' else None)
-
+def _demand_key(resource):return (resource.kind, resource.key if resource.kind=='essence' else None)
 def _market_contenders(world,people,resource):
- # During the settlement market only wealth changes. Preserve all ties in the
- # fixed urgency/drive/preparation prefix; wealth and ID are compared at purchase.
  contenders=[];best=None
  for person in people:
   if not _wants(world,person,resource):continue
@@ -159,30 +150,22 @@ def _market_contenders(world,people,resource):
   if best is None or priority>best:best=priority;contenders=[person]
   elif priority==best:contenders.append(person)
  return contenders
-
 def _wanted_resources(world,person,resources,wanted=True):
- # This query has no intervening advancement or aspiration mutation.
  decisions={};result=[]
  for resource in resources:
   key=_demand_key(resource)
   if key not in decisions:decisions[key]=_wants(world,person,resource)
   if decisions[key]==wanted:result.append(resource)
  return result
-
 def _demand_state(world,p):
  a=_aspiration(world,p);path=world.advancement.path(p.id)
- return (a.drive,a.urgency,a.preparation,a.desired_base_essences,a.desired_abilities,
-         None if path is None else (tuple(path.base_essences),len(path.abilities),path.capacity))
-
+ return (a.drive,a.urgency,a.preparation,a.desired_base_essences,a.desired_abilities,None if path is None else (tuple(path.base_essences),len(path.abilities),path.capacity))
 def _eligible_kind(state,kind):
  path=state[5]
  if kind=='essence':return (0 if path is None else len(path[0]))<state[3]
  return path is not None and path[1]<state[4] and path[1]<path[2]
-
 class _SettlementMarket:
- """Fixed-priority groups, built once when the first resource is offered."""
- def __init__(self,world,people):
-  self.world=world;self.people=people;self.groups=None
+ def __init__(self,world,people):self.world=world;self.people=people;self.groups=None
  def contenders(self,resource,min_wealth=0.):
   if self.groups is None:
    groups={'essence':{},'awakening_stone':{}}
@@ -196,51 +179,36 @@ class _SettlementMarket:
    candidates=[p for p,owned in group if p.wealth>=min_wealth and (kind!='essence' or resource.key not in owned)]
    if candidates:return candidates
   return []
-
 class _SettlementDemand:
- """Two current eligibility heaps; essence identity is an exclusion at lookup.
-
- A person's eligibility/preparation is refreshed after their turn or a transfer.
- Candidate state never depends on accumulated resource identities or history size.
- """
- def __init__(self,world,people):
-  self.world=world;self.people=people;self.heaps={};self.versions={};self.states={}
+ def __init__(self,world,people):self.world=world;self.people=people;self.heaps={};self.versions={};self.states={}
  def refresh(self,p):
   if not self.heaps:return
   state=_demand_state(self.world,p)
   if self.states.get(p.id)==state:return
-  self.states[p.id]=state;version=self.versions.get(p.id,0)+1;self.versions[p.id]=version
-  score=(state[0]+.5*state[1])*(.35+.65*state[2])
+  self.states[p.id]=state;version=self.versions.get(p.id,0)+1;self.versions[p.id]=version;score=(state[0]+.5*state[1])*(.35+.65*state[2])
   for kind,heap in self.heaps.items():
    if _eligible_kind(state,kind):heappush(heap,(-score,p.id,version))
  def pressure(self,resource,excluding):
   kind='essence' if resource.kind=='essence' else 'awakening_stone'
   if kind not in self.heaps:
    heap=[]
-   # Match the original first local eligibility scan's aspiration timing.
    for p in self.people:
     if p.id not in self.states:self.states[p.id]=_demand_state(self.world,p)
     state=self.states[p.id]
-    if _eligible_kind(state,kind):
-     score=(state[0]+.5*state[1])*(.35+.65*state[2])
-     heap.append((-score,p.id,self.versions.get(p.id,0)))
+    if _eligible_kind(state,kind):heap.append((-(state[0]+.5*state[1])*(.35+.65*state[2]),p.id,self.versions.get(p.id,0)))
    heapify(heap);self.heaps[kind]=heap
   heap=self.heaps[kind];excluded=[]
   while heap:
    score,pid,version=heap[0]
    if version!=self.versions.get(pid,0):heappop(heap);continue
    path=self.states[pid][5]
-   if pid==excluding or (kind=='essence' and path is not None and resource.key in path[0]):
-    excluded.append(heappop(heap));continue
+   if pid==excluding or (kind=='essence' and path is not None and resource.key in path[0]):excluded.append(heappop(heap));continue
    break
   result=-heap[0][0] if heap else 0.
   for entry in excluded:heappush(heap,entry)
   return result
-
 def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
- Layer,Ref=layer_ref();price=(8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity))
- # Rank only feasible transactions. Eligibility checks must not create social edges.
- candidates=[]
+ Layer,Ref=layer_ref();price=(8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity));candidates=[]
  for q in local:
   if q.id==holder.id or not _wants(world,q,r):continue
   relationship=world.social.edges.get(world.social.key(holder.id,q.id))
@@ -252,7 +220,6 @@ def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
  e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',holder.id),Ref('person',q.id)),Ref('settlement',holder.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,reason='relationship gift' if gift else 'aspirant purchase',price=0 if gift else price);world.magic_resources.transfer(r.id,'person',q.id,e.id,holder.settlement);a.preparation=min(1.,a.preparation+.08)
  if on_transfer is not None:on_transfer(q)
  return True
-
 def magic_ecology_step(world,rng):
  Layer,Ref=layer_ref();_recover_dead_owner_resources(world);adults_by_settlement={sid:[] for sid in world.settlements}
  for p in world.current_people():
@@ -267,15 +234,11 @@ def magic_ecology_step(world,rng):
    key=_demand_key(r);price=(7 if r.kind=='essence' else 3)
    if key not in market:market[key]=matching.contenders(r,price)
    seekers=[p for p in market[key] if p.wealth>=price]
-   # Wealth only decreases in this phase. Retry lower priority groups after the
-   # cached group is exhausted; an empty result remains valid for the phase.
    if not seekers and market[key]:market[key]=seekers=matching.contenders(r,price)
    if seekers:
     q=max(seekers,key=lambda p:(p.wealth,-p.id))
-    if q.wealth>=price:
-     q.wealth-=price;e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price);world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
- demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}
- adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
+    if q.wealth>=price:q.wealth-=price;e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price);world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
+ demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()};adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
   if path is not None and not a.completion_goal and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
@@ -293,15 +256,11 @@ def magic_ecology_step(world,rng):
   stones=world.magic_resources.inventory('person',p.id,'awakening_stone') if path is not None and len(path.abilities)<min(a.desired_abilities,path.capacity) else []
   if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity) and rr.random()<.15+.34*a.drive+.18*a.urgency:
    if rr.random()<max(.12,1-a.stone_selectiveness):use_awakening_stone(world,p.id,stones[int(rr.random()*len(stones))%len(stones)].id)
-  demand=demands[p.settlement];demand.refresh(p)
-  held=world.magic_resources.inventory('person',p.id)
+  demand=demands[p.settlement];demand.refresh(p);held=world.magic_resources.inventory('person',p.id)
   if held:
    surplus=_wanted_resources(world,p,held,wanted=False)
    if surplus and rr.random()<.20:
-    local=adults_by_settlement[p.settlement];pressure=0.
-    demand_types={}
+    local=adults_by_settlement[p.settlement];pressure=0.;demand_types={}
     for r in surplus:demand_types.setdefault(_demand_key(r),r)
-    for r in demand_types.values():
-     pressure=max(pressure,demand.pressure(r,p.id))
-    conditional=(.04+.16*min(1.,pressure))/.20
-    if rr.random()<conditional:_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,local,rr,on_transfer=demand.refresh)
+    for r in demand_types.values():pressure=max(pressure,demand.pressure(r,p.id))
+    if rr.random()<(.04+.16*min(1.,pressure))/.20:_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,local,rr,on_transfer=demand.refresh)
