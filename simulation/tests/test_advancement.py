@@ -1,8 +1,17 @@
-from ate_sim.advancement import AdvancementState
+from ate_sim.advancement import AdvancementState,MAX_SKILLS
 from ate_sim.magic_catalog import ESSENCES,ESSENCE_IDS
 
 def path_with_one_skill():
  a=AdvancementState();a.absorb_essence(1,'fire',0,('farmer','neutral','farmer'));return a
+
+def completed_path():
+ a=AdvancementState()
+ for e in ('fire','water','wind'):a.absorb_essence(1,e,0,('farmer','neutral','farmer'))
+ p=a.path(1)
+ for e in p.essences:
+  while len(p.abilities_for(e))<5:a.awaken_skill(1,'eyes',len(p.abilities)+1,('farmer',),target_essence=e)
+ assert len(p.abilities)==MAX_SKILLS and a.completed_path(1)
+ return a
 
 def test_full_semantic_catalog_is_loaded():
  assert len(ESSENCES)==62
@@ -10,18 +19,19 @@ def test_full_semantic_catalog_is_loaded():
  for key in ESSENCE_IDS:
   e=ESSENCES[key];assert e['source_innate'] and e['semantic_core'] and e['suggested_domains'] and e['suggested_functions'] and e['guardrail']
 
-def test_absorbing_essence_intrinsically_awakens_catalog_innate():
- a=AdvancementState();p,created=a.absorb_essence(1,'fire',0,('farmer','neutral','farmer'));assert p.capacity==5 and len(p.abilities)==1 and created[0].name=='Flame Bolt' and not created[0].special and a.rank(1)==1
+def test_absorbing_essence_intrinsically_awakens_catalog_innate_but_does_not_rank_partial_path():
+ a=AdvancementState();p,created=a.absorb_essence(1,'fire',0,('farmer','neutral','farmer'));assert p.capacity==5 and len(p.abilities)==1 and created[0].name=='Flame Bolt' and not created[0].special and a.rank(1)==0 and not a.completed_path(1)
 
 def test_every_catalog_essence_can_be_absorbed():
  for i,e in enumerate(ESSENCE_IDS):
   a=AdvancementState();p,created=a.absorb_essence(i,e,0,('tester','neutral','tester'));assert len(created)==1 and created[0].name==ESSENCES[e]['source_innate']
 
-def test_three_base_essences_form_person_shaped_confluence_and_innate():
+def test_three_base_essences_form_person_shaped_confluence_and_innate_but_remain_rank_zero_until_20_skills():
  a=AdvancementState();created=[]
  for e in ('fire','water','wind'):p,new=a.absorb_essence(1,e,0,('guardian','good','smith'));created+=new
  assert len(p.base_essences)==3 and p.confluence and p.confluence_name and p.capacity==20 and len(p.abilities)==4 and len(created)==4
  assert p.abilities_for(p.confluence)[0].source=='confluence'
+ assert a.rank(1)==0 and not a.completed_path(1)
 
 def test_confluence_changes_with_class_alignment_and_profession():
  a=AdvancementState();b=AdvancementState()
@@ -47,13 +57,25 @@ def test_unknown_essence_and_stone_are_rejected():
  try:a.awaken_skill(1,'not-real',1);assert False
  except ValueError:pass
 
-def test_rank_requires_every_actually_awakened_skill():
- a=path_with_one_skill();a.awaken_skill(1,'eyes',1,('farmer',));first=a.path(1).abilities[0]
+def test_rank_requires_all_twenty_skills_even_if_partial_abilities_advance():
+ a=path_with_one_skill();first=a.path(1).abilities[0]
  for _ in range(200):a.practice(1,0,1.)
- assert first.rank>1 and a.rank(1)==1
+ assert first.rank>1 and a.rank(1)==0 and not a.completed_path(1)
+
+def test_completed_path_enters_iron_and_uses_minimum_of_all_twenty_abilities():
+ a=completed_path();p=a.path(1);assert a.rank(1)==1
+ p.abilities[0].rank=3
+ assert a.rank(1)==1
+ for ability in p.abilities:ability.rank=2
+ assert a.rank(1)==2
 
 def test_gold_to_diamond_requires_revelation_and_integration():
- a=path_with_one_skill();p=a.path(1);p.abilities[0].rank=4;p.abilities[0].level=9;p.abilities[0].progress=.99;a.practice(1,0,1.,reflection=0.);assert a.rank(1)==4;p.revelation=p.integrated=1.;a.practice(1,0,1.,reflection=1.);assert a.rank(1)==5
+ a=completed_path();p=a.path(1)
+ for ability in p.abilities:ability.rank=4;ability.level=9;ability.progress=.99
+ a.practice(1,0,1.,reflection=0.);assert a.rank(1)==4
+ p.revelation=p.integrated=1.
+ for i in range(len(p.abilities)):a.practice(1,i,1.,reflection=1.)
+ assert a.rank(1)==5
 
 def test_monster_core_dependence_impedes_gold_revelation():
  a=path_with_one_skill();b=path_with_one_skill()
