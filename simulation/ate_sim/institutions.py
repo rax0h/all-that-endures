@@ -42,7 +42,7 @@ class InstitutionState:
   aid=self.next_application;self.next_application+=1;a=SocietyApplication(aid,society,person,branch,year,eligible,origin_event=origin_event);self.applications[aid]=a;return a
 
 def full_essence_user(world,pid):
- p=world.advancement.path(pid);return p is not None and p.confluence is not None and len(p.essences)==4
+ return world.advancement.completed_path(pid)
 
 def society_eligible(world,pid,society):
  if society not in ('adventure_society','magic_society'):raise ValueError('unknown society')
@@ -90,8 +90,6 @@ def _advance_application(world,a,rng):
 
 def institution_step(world,rng):
  ensure_core_societies(world);Layer,Ref=layer_ref()
- # Magical civilization runs after institutions, so review the prior year as well. Notice
- # creation is idempotent by cause_event; a newly created notice is identifiable by its year.
  for e in [x for x in world.events_between(max(0,world.year-1),world.year) if x.kind in ('monster_surge','dangerous_magic','missing_person','ranked_magic_manifested','magical_expedition_returned_empty')]:
   if e.location is None or e.location.kind!='settlement':continue
   b=world.institutions.branch_for('adventure_society',e.location.id)
