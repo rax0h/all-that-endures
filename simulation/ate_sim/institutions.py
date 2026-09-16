@@ -42,7 +42,10 @@ class InstitutionState:
   aid=self.next_application;self.next_application+=1;a=SocietyApplication(aid,society,person,branch,year,eligible,origin_event=origin_event);self.applications[aid]=a;return a
 
 def full_essence_user(world,pid):
- p=world.advancement.path(pid);return p is not None and p.confluence is not None and len(p.essences)==4
+ # Society eligibility is a ranked-magic gate, not merely a four-essence gate.
+ # Advancement.rank() is authoritative and remains 0 until the canonical 20/20
+ # path exists (3 base essences, confluence, five abilities in each essence).
+ return world.advancement.rank(pid)>=1
 
 def society_eligible(world,pid,society):
  if society not in ('adventure_society','magic_society'):raise ValueError('unknown society')
