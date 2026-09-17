@@ -22,13 +22,69 @@ def _institutional_capacity(world, sid):
     return adventure, magic
 
 
+def _review_magic_demand(world, people, adventure, magic):
+    """Let existing aspirations respond to a changing magical civilization.
+
+    MagicAspiration is durable decision state, but PR #5 formed it from one snapshot and then
+    effectively froze it. This review does not assign magic or target a prevalence. It lets real
+    later conditions alter demand: magical relatives/neighbors, magic-relevant work, objective
+    local danger, and institutions that make training/procurement credible.
+    """
+    user_ids = {p.id for p in people if world.advancement.essence_user(p.id)}
+    for p in people:
+        a = _aspiration(world, p)
+        path = world.advancement.path(p.id)
+        if path is not None:
+            # Once someone has crossed the threshold into magic, ordinary life can create reasons
+            # to continue. Preserve selectivity; do not hand them a completed path.
+            a.desired_base_essences = max(a.desired_base_essences, min(3, len(path.base_essences) + 1))
+            a.desired_abilities = max(a.desired_abilities, min(20, max(5, len(path.abilities) + 2)))
+
+        family = sum(1 for x in p.parents if x in user_ids)
+        contacts = sum(1 for x in world.social.neighbors(p.id) if x in user_ids)
+        occupation_need = p.occupation in (
+            'adventurer', 'guard', 'hunter', 'soldier', 'farmer', 'crafter', 'smith',
+            'healer', 'merchant', 'scholar', 'builder', 'architect'
+        )
+        settlement = world.settlements[p.settlement]
+        cell = world.cells[(settlement.x, settlement.y)]
+        pressure = max(cell.hazard, settlement.memory.get('monster_surge', 0.0))
+        institutional_access = adventure is not None or magic is not None
+
+        # These are causes, not a population target. A person with no exposure, need or pressure
+        # is left alone. A person whose world changed can revise an old decision.
+        reason = None
+        if family or contacts >= 2:
+            reason = 'social magical exposure'
+        elif occupation_need and institutional_access:
+            reason = 'occupational capability'
+        elif pressure >= .45 and institutional_access:
+            reason = 'local magical pressure'
+        if reason is None:
+            continue
+
+        a.drive = min(1., max(a.drive, .34 + .05 * min(3, family + contacts) + (.06 if occupation_need else 0.)))
+        a.urgency = min(1., max(a.urgency, .30 + .28 * pressure + (.10 if occupation_need else 0.)))
+        a.desired_base_essences = max(a.desired_base_essences, 1)
+        a.desired_abilities = max(a.desired_abilities, 5)
+        if a.reason == 'capability' or a.desired_base_essences == 1:
+            a.reason = reason
+
+        # Full-path commitment remains selective. Professional/adventuring need plus sustained
+        # exposure can justify it; merely living near a Society cannot.
+        if a.adventurer_aspiration or (occupation_need and (family + contacts) >= 2 and a.drive >= .44):
+            a.completion_goal = True
+            a.desired_base_essences = 3
+            a.desired_abilities = 20
+
+
 def _expedition_step(world, rng, sid, people, users, adventure, magic):
     """Turn magical ecology into recoverable resources through actual expeditions and field work.
 
     Ambient magic determines what the landscape can yield. Population, experienced essence users,
-    Society branches, preparation and local danger determine how much of that potential people can
-    safely find. Resources are still random discoveries with provenance; nobody is handed the exact
-    essence or stone they want.
+    civilian demand, Society branches, preparation and local danger determine how much of that
+    potential people can safely find. Resources remain random physical discoveries with provenance;
+    nobody is handed the exact essence or stone they want.
     """
     if not people:
         return
@@ -38,7 +94,12 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
     aspirants = [p for p in people if _aspiration(world, p).desired_base_essences > 0]
     adventurer_aspirants = [p for p in aspirants if _aspiration(world, p).adventurer_aspiration]
     member_count = 0 if adventure is None else sum(1 for p in people if p.id in world.institutions.institution_by_kind('adventure_society').members)
-    field_capacity = len(users) + len(adventurer_aspirants) * .45 + member_count * 1.5
+
+    # Civilian demand matters to an extraction economy. Existing users and adventurers are still
+    # more effective in the field, while established branches contribute bounded institutional
+    # capacity even during generational troughs.
+    institutional = (0. if adventure is None else 2.0 * adventure.authority) + (0. if magic is None else 1.5 * magic.authority)
+    field_capacity = len(users) + len(adventurer_aspirants) * .45 + len(aspirants) * .08 + member_count * 1.5 + institutional
     if field_capacity <= 0:
         return
 
@@ -49,6 +110,11 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         return
 
     candidates = sorted(users + [p for p in adventurer_aspirants if p not in users], key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
+    if not candidates:
+        # A mature branch can organize a civilian field party instead of requiring an existing
+        # essence user to bootstrap every generation. Choose willing aspirants; discovery rules
+        # and danger remain unchanged.
+        candidates = sorted(aspirants, key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
     if not candidates:
         return
     Layer, Ref = layer_ref()
@@ -66,8 +132,6 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         if erng.random() > min(.86, readiness + .16 * ambient):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,))
             continue
-        # Mature magical societies recover both essences and stones. Stones become increasingly
-        # important once a population of partial/full users exists, without tailoring the stone.
         incomplete = sum(1 for p in users if len(world.advancement.path(p.id).abilities) < world.advancement.path(p.id).capacity)
         stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
         kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
@@ -77,14 +141,11 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
 
 
 def _resource_circulation(world, rng, sid, people, users, magic):
-    """Make established magical communities actually use and circulate the resources they recover."""
-    if not users:
+    """Make established magical communities actually use and circulate recovered resources."""
+    if not people:
         return
     rr = rng.stream('magical_circulation', world.year, sid)
     people_by_id = {p.id:p for p in people}
-    # Magic Society presence improves information/market matching, not resource creation.
-    # Mature communities get more matching opportunities, but every absorption/use and transfer
-    # still follows the normal aspiration, compatibility, wealth and selectiveness gates.
     rounds = 3 + (3 if magic is not None else 0)
     for _ in range(rounds):
         holder_ids = sorted(oid for (kind,oid),ids in world.magic_resources.owner_index.items()
@@ -120,7 +181,6 @@ def _society_pipeline(world, rng, sid, people, adventure, magic):
         targets = []
         if aspiration.adventurer_aspiration:
             targets.append(('adventure_society', adventure, .72))
-        # Curious, knowledge-oriented and craft-oriented full users have an organic Magic Society path.
         craft = world.skills.get(p.id, 'craft').level
         knowledge = world.skills.get(p.id, 'knowledge').level
         if p.curiosity > .52 or craft >= 1.2 or knowledge >= 1.2:
@@ -141,8 +201,6 @@ def _magical_workshops(world, rng, sid, people, users, magic):
         return
     settlement = world.settlements[sid]
     rr = rng.stream('magical_workshops', world.year, sid)
-    # Ordinary economic batches scale with real labor; this represents market-relevant producer
-    # batches, not every board, fleece or sack of grain made by the settlement.
     producers = sorted(people, key=lambda p: (world.skills.get(p.id, 'agriculture').level + world.skills.get(p.id, 'craft').level, p.health, -p.id), reverse=True)
     extra_batches = min(24, max(0, len(people) // 18 + int(settlement.prosperity * 3) - 1))
     Layer, Ref = layer_ref()
@@ -156,8 +214,6 @@ def _magical_workshops(world, rng, sid, people, users, magic):
     magical_lot_count = world.materials.magical_available_count(sid)
     if not magical_lot_count:
         return
-    # A functioning Magic Society creates commissions, supplier information and apprenticeship
-    # pressure. It does not grant crafting ability: the crafter must still pass normal permission rules.
     commissions = min(12, magical_lot_count, len(magical_crafters) * (2 if magic is not None else 1))
     for n in range(commissions):
         crafter = magical_crafters[n % len(magical_crafters)]
@@ -174,8 +230,8 @@ def magical_civilization_step(world, rng):
             continue
         users = _practitioners(world, people)
         adventure, magic = _institutional_capacity(world, sid)
+        _review_magic_demand(world, people, adventure, magic)
         _expedition_step(world, rng, sid, people, users, adventure, magic)
-        # Recompute because expeditions can put resources into practitioners' hands.
         users = _practitioners(world, people)
         _resource_circulation(world, rng, sid, people, users, magic)
         _society_pipeline(world, rng, sid, people, adventure, magic)
