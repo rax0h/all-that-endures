@@ -282,23 +282,10 @@ def magic_ecology_step(world,rng):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
   chance=RESOURCE_DISCOVERY_RATE*min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
   if rr.random()<chance:_discover(world,rr,sid,people)
-  market={};matching=_SettlementMarket(world,people)
-  for r in world.magic_resources.inventory('settlement',sid):
-   key=_demand_key(r);price=(7 if r.kind=='essence' else 3)
-   if key not in market:market[key]=matching.contenders(r,price)
-   seekers=[p for p in market[key] if p.wealth>=price or can_pay_tier(world,p.id,'iron',price)]
-   # Wealth only decreases in this phase. Retry lower priority groups after the
-   # cached group is exhausted; an empty result remains valid for the phase.
-   if not seekers and market[key]:market[key]=seekers=matching.contenders(r,price)
-   if seekers:
-    q=max(seekers,key=lambda p:(p.wealth,-p.id))
-    institution=world.institutions.institution_by_kind('adventure_society')
-    coins={}
-    if q.wealth>=price:q.wealth-=price
-    elif institution is not None:
-     coins=world.currency.treasury_transfer(institution.id,q.id,{'iron':price},deposit=True)
-    else:continue
-    e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price,coin_deposit=coins,institution=None if institution is None else institution.id,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
+  # Settlement-owned stock is retailed by magic_trade_step, where people
+  # browse literal persistent shop inventory. Ecology owns discovery, recovery,
+  # aspiration and use; it no longer allocates shelf goods through a priority
+  # matcher before shoppers get a chance to see them.
  demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
