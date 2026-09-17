@@ -1,8 +1,13 @@
 from __future__ import annotations
 from .core_types import layer_ref
 from .materials import _craft_once
+from .magic_access import institutional_magic_access_step
 
 def craft_career_step(world,rng):
+ # Institutions have already been updated this year by the engine. Give ordinary
+ # people access to Society stock/orders before career resolution so magic is
+ # part of civilian life rather than a separate adventurer lottery.
+ institutional_magic_access_step(world,rng)
  Layer,Ref=layer_ref()
  for sid,people in sorted(world.living_by_settlement().items()):
   adults=[p for p in people if p.age>=16]
