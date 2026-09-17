@@ -5,6 +5,7 @@ settlement inventory, people browse that literal persistent stock and purchase
 what they can use, and bounded travelling merchants redistribute unsold stock
 along established trade routes. A failed sale never consumes the opportunity.
 """
+from heapq import heapify, heappop, heappush
 from math import ceil
 from .core_types import layer_ref
 from .currency import can_pay_tier
@@ -55,41 +56,53 @@ def _retail_browse(world,adults):
  """Let people shop persistent local inventory instead of being market-matched.
 
 A settlement's inventory is literal shelf stock. An adult with unmet magical
-needs can inspect the distinct goods actually present and buy one affordable,
-usable item per year. Priority, aspiration score and preparation never reserve
-stock or decide who is allowed to shop. Those states determine what the person
-wants; money and actual shelf availability determine whether a purchase occurs.
+needs can inspect the goods actually present and buy one affordable, usable item
+per year. Priority, aspiration score and preparation never reserve stock or
+decide who is allowed to shop. Those states determine what the person wants;
+money and actual shelf availability determine whether a purchase occurs.
 
-The shelf index is bounded by distinct demand identities, not accumulated copies.
-A buyer who already holds an item they currently want waits to use it rather than
-hoarding more stock before absorption.
+Shelf lookup is indexed by kind/key so runtime depends on shoppers and distinct
+goods, not centuries of accumulated copies. Since all retail essences share one
+price and all stones share one price, browsing preserves the same choice rule:
+cheapest usable kind first, then oldest resource id.
  """
  Layer,Ref=layer_ref()
  institution=world.institutions.institution_by_kind('adventure_society')
  for sid,people in sorted(adults.items()):
   stock=world.magic_resources.inventory('settlement',sid)
   if not stock:continue
-  shelves={}
-  for r in stock:shelves.setdefault(_demand_key(r),[]).append(r)
-  for goods in shelves.values():goods.sort(key=lambda r:r.id,reverse=True)
-  shelf_keys=sorted(shelves,key=lambda k:(k[0],'' if k[1] is None else k[1]))
+  essence_by_key={};stone_heap=[]
+  for r in stock:
+   if r.kind=='essence':essence_by_key.setdefault(r.key,[]).append(r.id)
+   else:stone_heap.append(r.id)
+  for heap in essence_by_key.values():heapify(heap)
+  heapify(stone_heap)
+  # One heap entry per distinct essence identity. After a sale, refresh only
+  # that identity's next-oldest copy rather than rebuilding or rescanning stock.
+  essence_front=[]
+  for key,heap in essence_by_key.items():
+   if heap:heappush(essence_front,(heap[0],key))
   for p in people:
-   # Owning a currently useful resource is already a successful acquisition;
-   # give the person a chance to absorb/use it before another retail purchase.
    held=world.magic_resources.inventory('person',p.id)
    if any(_wants(world,p,r) for r in held):continue
-   choices=[]
-   for key in shelf_keys:
-    goods=shelves.get(key)
-    if not goods:continue
-    r=goods[-1]
-    if not _wants(world,p,r):continue
-    price=_retail_price(r)
-    if p.wealth>=price or can_pay_tier(world,p.id,'iron',ceil(price)):
-     choices.append((price,r.id,key,r))
-   if not choices:continue
-   price,_,key,r=min(choices,key=lambda x:(x[0],x[1]))
-   coins={}
+   a=_aspiration(world,p);path=world.advancement.path(p.id)
+   base=0 if path is None else len(path.base_essences)
+   abilities=0 if path is None else len(path.abilities)
+   wants_essence=base<a.desired_base_essences
+   wants_stone=path is not None and abilities<a.desired_abilities and abilities<path.capacity
+   choice=None
+   # Stones are cheaper than essences, matching the prior min(price,id) rule.
+   if wants_stone and stone_heap and (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):
+    rid=stone_heap[0];choice=(3,rid,'stone',None)
+   if choice is None and wants_essence and essence_front and (p.wealth>=7 or can_pay_tier(world,p.id,'iron',7)):
+    owned=set() if path is None else set(path.base_essences)
+    skipped=[]
+    while essence_front and essence_front[0][1] in owned:skipped.append(heappop(essence_front))
+    if essence_front:
+     rid,key=essence_front[0];choice=(7,rid,'essence',key)
+    for entry in skipped:heappush(essence_front,entry)
+   if choice is None:continue
+   price,rid,kind,key=choice;r=world.magic_resources.resources[rid];coins={}
    if p.wealth>=price:p.wealth-=price
    elif institution is not None and can_pay_tier(world,p.id,'iron',ceil(price)):
     coins=world.currency.treasury_transfer(institution.id,p.id,{'iron':ceil(price)},deposit=True)
@@ -101,7 +114,13 @@ hoarding more stock before absorption.
                 price_domain='ranked_coin' if coins else 'ordinary_wealth',
                 channel='local essence dealer',mechanism='browsed shelf stock')
    world.magic_resources.transfer(r.id,'person',p.id,e.id,sid)
-   shelves[key].pop()
+   if kind=='stone':heappop(stone_heap)
+   else:
+    # Consume this identity's current front and expose its next copy, if any.
+    front_rid,front_key=heappop(essence_front)
+    assert front_rid==rid and front_key==key
+    heap=essence_by_key[key];removed=heappop(heap);assert removed==rid
+    if heap:heappush(essence_front,(heap[0],key))
 
 
 def _route_neighbors(world,sid):
