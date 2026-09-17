@@ -10,11 +10,8 @@ from math import ceil
 from .core_types import layer_ref
 from .currency import can_pay_tier
 
-# Common and uncommon magic is a normal working-person purchase in a mature
-# magical economy. Rarity, specificity and high-end resources carry the steep
-# price curve; entry itself is not an elite luxury.
-RARITY_PRICE={'Common':.25,'Uncommon':.75,'Rare':6.,'Epic':20.,'Legendary':80.,
- 'common':.25,'uncommon':.75,'rare':6.,'epic':20.,'legendary':80.}
+RARITY_PRICE={'Common':1.,'Uncommon':2.,'Rare':8.,'Epic':24.,'Legendary':80.,
+ 'common':1.,'uncommon':2.,'rare':8.,'epic':24.,'legendary':80.}
 MAGIC_WORLD_ADOPTION_FLOOR=.75
 MAGIC_WORLD_ADOPTION_EXPECTED=.80
 
