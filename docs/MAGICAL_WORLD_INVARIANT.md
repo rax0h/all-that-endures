@@ -11,6 +11,7 @@ ATE simulates a magical world, not a mundane world with a rare magical career la
 - Resource conservation remains authoritative. Markets, orders, and sponsorship move existing resources; they do not create them.
 - Three base essences still form the confluence normally. Exact canonical 20/20 completion remains mandatory before Iron rank.
 - For mature, institutionally connected societies, at least 75% of eligible/adult people entering an essence path is the Stage 0.5 calibration expectation, with 75-80% as the initial normal band. This is a diagnostic expectation, not a quota, cap, or forced assignment. Causal cultures/regions may fall below it and healthy worlds may exceed it.
+- The calibration denominator is the eligible/adult population, not infants and young children who have not yet reached normal path-entry age.
 - "Magic user" for prevalence diagnostics means a living eligible person who has absorbed at least one essence. Full 20/20 completion and rank distributions are measured separately.
 
 Cosmological cause remains intentionally unspecified until the cosmology phase.
