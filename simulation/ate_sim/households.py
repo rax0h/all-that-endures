@@ -51,11 +51,15 @@ def household_split_step(world,rng):
         e=world.emit("household_split",Layer.SOCIETY,tuple(Ref("person",p.id) for p in movers),Ref("settlement",h.settlement),origin_household=hid,new_household=nhid);world.lineage.register("household",nhid,(("household",hid),),e.id,world.year);prop=world.economy.create("dwelling",h.settlement,"household",nhid,max(5.,share*.5),world.year,e.id);world.lineage.register("property",prop.id,(("household",nhid),),e.id,world.year)
 
 def inheritance_property_step(world):
-    for prop in world.economy.property.values():
-        if prop.owner_kind!="household":continue
-        h=world.households.get(prop.owner_id)
-        if h and h.alive:continue
-        heirs=[]
+    # Only household-owned property can qualify. The owner index avoids
+    # rescanning the centuries-long property archive every year. Sort ids to
+    # preserve the original insertion/id event order exactly.
+    candidates=[]
+    for hid,ids in world.economy.owner_buckets("household"):
+        h=world.households.get(hid)
+        if h is None or not h.alive:candidates.extend(ids)
+    for prop_id in sorted(candidates):
+        prop=world.economy.property[prop_id];h=world.households.get(prop.owner_id);heirs=[]
         if h:
             for pid in h.members:heirs.extend(world.genealogy.children.get(pid,[]))
         heirs=[pid for pid in heirs if pid in world.people and world.people[pid].alive]
