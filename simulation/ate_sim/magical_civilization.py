@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .core_types import layer_ref
-from .magic_resources import _aspiration, _make_resource, _wanted_resources, _transfer_to_seeker, _wants, absorb_essence_resource, use_awakening_stone
+from .magic_resources import _aspiration, _make_resource, _wanted_resources, _transfer_to_seeker, absorb_essence_resource, use_awakening_stone
 from .materials import _produce_lot, _craft_once
 from .institutions import apply_for_society, full_essence_user
 
@@ -87,53 +87,15 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
-def _kinship_circulation(world, sid, people):
-    """Pass useful inherited/surplus magic through families before it stagnates.
-
-    This is not a prevalence controller: it creates no resources and changes no
-    aspirations. It only lets a willing holder give an existing resource to a
-    local household member or direct parent/child who already wants it.
-
-    Kin candidates are indexed once per settlement pass. This preserves the old
-    ascending-person ordering without rescanning every adult for every holder.
-    """
-    Layer, Ref = layer_ref(); by_id = {p.id: p for p in people}; by_household = {}; children = {}
-    for q in people:
-        by_household.setdefault(q.household, []).append(q)
-        for parent in q.parents:
-            if parent in by_id: children.setdefault(parent, []).append(q)
-    for holder in people:
-        held = world.magic_resources.inventory('person', holder.id)
-        if not held: continue
-        surplus = _wanted_resources(world, holder, held, wanted=False)
-        if not surplus: continue
-        kin_by_id = {q.id: q for q in by_household.get(holder.household, ()) if q.id != holder.id}
-        for parent in holder.parents:
-            q = by_id.get(parent)
-            if q is not None and q.id != holder.id: kin_by_id[q.id] = q
-        for q in children.get(holder.id, ()):
-            if q.id != holder.id: kin_by_id[q.id] = q
-        kin = [kin_by_id[pid] for pid in sorted(kin_by_id)]
-        if not kin: continue
-        for resource in surplus:
-            seekers = [q for q in kin if _wants(world, q, resource)]
-            if not seekers: continue
-            recipient = max(seekers, key=lambda q: (_aspiration(world, q).urgency, _aspiration(world, q).drive, _aspiration(world, q).preparation, -q.id))
-            event = world.emit('magic_resource_transferred', Layer.SOCIETY, (Ref('person', holder.id), Ref('person', recipient.id)), Ref('settlement', sid), ((resource.origin_event,) if resource.origin_event else ()), resource=resource.id, resource_kind=resource.kind, key=resource.key, reason='family transmission', price=0, coin_transfer={}, price_domain='gift')
-            world.magic_resources.transfer(resource.id, 'person', recipient.id, event.id, sid)
-            _aspiration(world, recipient).preparation = min(1., _aspiration(world, recipient).preparation + .08)
-            break
-
-
 def _resource_circulation(world, rng, sid, people, users, magic):
     if not people: return
-    rr = rng.stream('magical_circulation', world.year, sid); people_by_id = {p.id:p for p in people}; rounds = 3 + (3 if magic is not None else 0)
+    rr = rng.stream('magical_circulation', world.year, sid); rounds = 3 + (3 if magic is not None else 0)
     for _ in range(rounds):
-        # People are already id-sorted. Probe the owner index directly instead of
-        # rescanning every owner bucket once per round and settlement.
-        holder_ids = [p.id for p in people if world.magic_resources.owner_index.get(('person', p.id))]
-        for holder_id in holder_ids:
-            holder = people_by_id[holder_id]; path = world.advancement.path(holder.id); a = _aspiration(world, holder); base = 0 if path is None else len(path.base_essences)
+        # People are already id-sorted. Probe each person's owner bucket directly;
+        # avoid rebuilding holder lists/maps every circulation round.
+        for holder in people:
+            if not world.magic_resources.owner_index.get(('person', holder.id)): continue
+            path = world.advancement.path(holder.id); a = _aspiration(world, holder); base = 0 if path is None else len(path.base_essences)
             ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if base < a.desired_base_essences else []
             if ess and base < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
                 viable = [r for r in ess if path is None or r.key not in path.base_essences]
@@ -189,7 +151,6 @@ def magical_civilization_step(world, rng):
         users = _practitioners(world, people); adventure, magic = _institutional_capacity(world, sid)
         _review_magic_demand(world, people, adventure, magic)
         _expedition_step(world, rng, sid, people, users, adventure, magic)
-        _kinship_circulation(world, sid, people)
         users = _practitioners(world, people)
         _resource_circulation(world, rng, sid, people, users, magic)
         _society_pipeline(world, rng, sid, people, adventure, magic)
