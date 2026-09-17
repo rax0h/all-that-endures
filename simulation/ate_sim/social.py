@@ -39,9 +39,12 @@ class SocialGraph:
     def relationships_for(self,pid):
         # Retain references, not copies of mutable weights. Direct relationship
         # edits remain visible; new edges extend already materialized adjacency.
+        # Validate adjacency before materializing the reference cache because a
+        # rebuild deliberately invalidates that cache.
+        self._ensure_adjacency_index()
         if not hasattr(self,'_relationships'):self._relationships={}
         if pid not in self._relationships:
-            self._relationships[pid]={other:self.edges[self.key(pid,other)] for other in self.neighbors(pid)}
+            self._relationships[pid]={other:self.edges[self.key(pid,other)] for other in self.adjacency.get(pid,())}
         return self._relationships[pid].values()
     def partner(self,a,b,event_id):
         key=self.key(a,b);self.partnerships[key]=event_id
