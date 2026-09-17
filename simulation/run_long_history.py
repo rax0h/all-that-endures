@@ -4,6 +4,7 @@ import sys
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
 from ate_sim.currency import can_pay_tier
+from ate_sim.magic_trade import _retail_price
 
 
 def lineage_depth(world, pid, memo):
@@ -44,7 +45,12 @@ def snapshot(world, include_digest=False):
                 local=shop_essence_by_settlement.get(p.settlement,())
                 if local:
                     zero_with_local_stock.append(p)
-                    if p.wealth>=7 or can_pay_tier(world,p.id,'iron',7):zero_affordable_local.append(p)
+                    affordable=False
+                    for r in local:
+                        price=_retail_price(r)
+                        if p.wealth>=price or can_pay_tier(world,p.id,'iron',__import__('math').ceil(price)):
+                            affordable=True;break
+                    if affordable:zero_affordable_local.append(p)
             elif useful_held:
                 partial_with_held_wanted.append(p)
     zero_wealth=sorted(p.wealth for p in zero_user_aspirants)
