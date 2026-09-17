@@ -10,15 +10,12 @@ from math import ceil
 from .core_types import layer_ref
 from .currency import can_pay_tier
 
-RARITY_PRICE={'Common':1.,'Uncommon':2.,'Rare':8.,'Epic':24.,'Legendary':80.,
- 'common':1.,'uncommon':2.,'rare':8.,'epic':24.,'legendary':80.}
+RARITY_PRICE={'Common':1.,'Uncommon':2.,'Rare':8.,'Epic':24.,'Legendary':80.,'common':1.,'uncommon':2.,'rare':8.,'epic':24.,'legendary':80.}
 MAGIC_WORLD_ADOPTION_FLOOR=.75
 MAGIC_WORLD_ADOPTION_EXPECTED=.80
 
-
 def _price(r):return RARITY_PRICE.get(r.rarity,4.)*(1. if r.kind=='essence' else .55)
 def _professional_interest(p):return p.occupation in {'adventurer','guard','hunter','soldier','farmer','labor','smith','crafter','artisan','cook','chef','healer','builder','architect','merchant','scholar'}
-
 
 def _threat_pressure(world):
  pressure={sid:0. for sid in world.settlements};state=getattr(world,'threat_ecology',None)
@@ -29,9 +26,7 @@ def _threat_pressure(world):
   pressure[threat.location]+=kind+.045*max(1,threat.rank)+.012*min(10,age)
  return {sid:min(1.,value) for sid,value in pressure.items()}
 
-
 def _field_recovery(world,rng,adults):
- """Magic Society supply responds to unmet demand through physical field work."""
  from .magic_resources import _aspiration,_make_resource
  Layer,Ref=layer_ref();by_sid={sid:[] for sid in world.settlements}
  for p in adults:by_sid[p.settlement].append(p)
@@ -53,15 +48,8 @@ def _field_recovery(world,rng,adults):
    e=world.emit('magic_society_resource_recovered',Layer.SOCIETY,(Ref('person',finder.id),),Ref('settlement',sid),(r.origin_event,),resource=r.id,resource_kind=r.kind,key=r.key,rarity=r.rarity,mechanism='demand-funded field recovery')
    world.magic_resources.transfer(r.id,'settlement',sid,e.id,sid)
 
-
 def _broker_stock(world):
- """Build one-year offer indexes.
-
- Grouping by semantic resource key lets a buyer inspect only the cheapest viable
- offer in each bounded key bucket. Taking the minimum of those bucket heads is
- exactly the same choice as scanning the globally price-sorted archive, without
- making buyer cost grow with centuries of accumulated stock.
- """
+ """Build bounded one-year offer indexes plus mutable exhausted-prefix cursors."""
  from .magic_resources import _wants
  by_key={};by_local_key={};private={};active=set();state=world.magic_resources
  for (owner_kind,owner_id),ids in sorted(state.owner_index.items(),key=lambda x:(x[0][0],x[0][1])):
@@ -81,8 +69,7 @@ def _broker_stock(world):
  for values in by_key.values():values.sort(key=lambda r:(_price(r),r.id))
  for values in by_local_key.values():values.sort(key=lambda r:(_price(r),r.id))
  keys={kind:tuple(sorted(k for kkind,k in by_key if kkind==kind)) for kind in ('essence','awakening_stone')}
- return by_key,by_local_key,keys,private,active
-
+ return by_key,by_local_key,keys,private,active,{},{}
 
 def _can_afford(world,p,price):return p.wealth>=price or can_pay_tier(world,p.id,'iron',ceil(price))
 def _sponsor(world,p,a,pressure=0.):
@@ -102,25 +89,31 @@ def _offer_valid(world,p,r,kind,private,owned,a,pressure):
  price=_price(r);sponsored=r.owner_kind=='settlement' and _sponsor(world,p,a,pressure) is not None and r.rarity.lower() in ('common','uncommon')
  return sponsored or _can_afford(world,p,price)
 
-def _first_valid(world,p,offers,kind,private,active,owned,a,pressure,remote=False):
- for r in offers:
+def _first_valid(world,p,offers,kind,private,active,owned,a,pressure,cursors,cursor_key,remote=False):
+ # Offers transferred earlier this same annual pass can form a very large dead
+ # prefix. Advance that prefix once per bucket instead of rescanning it for every
+ # later buyer. Active offers invalid only for this buyer are still examined and
+ # retained, preserving affordability/self/owned-essence semantics.
+ i=cursors.get(cursor_key,0);n=len(offers)
+ while i<n and offers[i].id not in active:i+=1
+ cursors[cursor_key]=i
+ for j in range(i,n):
+  r=offers[j]
   if r.id not in active or (remote and r.location==p.settlement):continue
   if _offer_valid(world,p,r,kind,private,owned,a,pressure):return r
  return None
 
-def _candidate(world,p,kind,by_key,by_local_key,keys,private,active,a,pressure):
+def _candidate(world,p,kind,by_key,by_local_key,keys,private,active,a,pressure,global_cursors,local_cursors):
  path=world.advancement.path(p.id);owned=set(() if path is None else path.base_essences);choices=[]
- # Preserve local-first market semantics. The cheapest valid offer from every
- # key bucket is sufficient; the minimum of those is the old global-scan winner.
  for key in keys[kind]:
   if kind=='essence' and key in owned:continue
-  r=_first_valid(world,p,by_local_key.get((p.settlement,kind,key),()),kind,private,active,owned,a,pressure)
+  bucket=(p.settlement,kind,key);r=_first_valid(world,p,by_local_key.get(bucket,()),kind,private,active,owned,a,pressure,local_cursors,bucket)
   if r is not None:choices.append(r)
  if choices:return min(choices,key=lambda r:(_price(r),r.id))
  choices=[]
  for key in keys[kind]:
   if kind=='essence' and key in owned:continue
-  r=_first_valid(world,p,by_key.get((kind,key),()),kind,private,active,owned,a,pressure,True)
+  bucket=(kind,key);r=_first_valid(world,p,by_key.get(bucket,()),kind,private,active,owned,a,pressure,global_cursors,bucket,True)
   if r is not None:choices.append(r)
  return min(choices,key=lambda r:(_price(r),r.id)) if choices else None
 
@@ -159,7 +152,6 @@ def _use_owned_essence(world,p,a):
   c.sort(key=lambda r:(_price(r),r.id));absorb_essence_resource(world,p.id,c[0].id);path=world.advancement.path(p.id);base=len(path.base_essences)
  return path,base
 
-
 def institutional_magic_access_step(world,rng):
  from .magic_resources import _aspiration,use_awakening_stone,_commit_to_full_path
  magic=world.institutions.institution_by_kind('magic_society')
@@ -169,7 +161,7 @@ def institutional_magic_access_step(world,rng):
  prevalence=sum(1 for p in adults if world.advancement.essence_user(p.id))/len(adults);pressure_by_settlement=_threat_pressure(world)
  for p in adults:_aspiration(world,p)
  _field_recovery(world,rng,adults)
- by_key,by_local_key,keys,private,active=_broker_stock(world)
+ by_key,by_local_key,keys,private,active,global_cursors,local_cursors=_broker_stock(world)
  for p in sorted(adults,key=lambda x:x.id):
   rr=rng.stream('institutional_magic_access',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);pressure=pressure_by_settlement.get(p.settlement,0.)
   if pressure>0:
@@ -182,7 +174,7 @@ def institutional_magic_access_step(world,rng):
    a.desired_base_essences=3;a.desired_abilities=20;a.compromise_tolerance=max(a.compromise_tolerance,.72+.25*pressure);a.stone_selectiveness=min(a.stone_selectiveness,.35-.20*min(1.,pressure))
   path,base=_use_owned_essence(world,p,a)
   while base<a.desired_base_essences:
-   choice=_candidate(world,p,'essence',by_key,by_local_key,keys,private,active,a,pressure)
+   choice=_candidate(world,p,'essence',by_key,by_local_key,keys,private,active,a,pressure,global_cursors,local_cursors)
    if choice is None or not _acquire(world,p,choice,a,active,pressure):break
    path,newbase=_use_owned_essence(world,p,a)
    if newbase<=base:break
@@ -191,6 +183,6 @@ def institutional_magic_access_step(world,rng):
   if path is not None and len(path.abilities)<min(a.desired_abilities,path.capacity):
    stones=world.magic_resources.inventory('person',p.id,'awakening_stone')
    if not stones:
-    choice=_candidate(world,p,'awakening_stone',by_key,by_local_key,keys,private,active,a,pressure)
+    choice=_candidate(world,p,'awakening_stone',by_key,by_local_key,keys,private,active,a,pressure,global_cursors,local_cursors)
     if choice is not None and _acquire(world,p,choice,a,active,pressure):stones=world.magic_resources.inventory('person',p.id,'awakening_stone')
    if stones:stones.sort(key=lambda r:(_price(r),r.id));use_awakening_stone(world,p.id,stones[0].id)
