@@ -3,6 +3,7 @@ import json
 import sys
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
+from ate_sim.currency import can_pay_tier
 
 
 def lineage_depth(world, pid, memo):
@@ -26,6 +27,29 @@ def snapshot(world, include_digest=False):
 
     resources=list(world.magic_resources.resources.values());available=[r for r in resources if r.consumed_year is None];resource_kinds=Counter(r.kind for r in resources);available_kinds=Counter(r.kind for r in available);inst_kinds=Counter(i.kind for i in world.institutions.institutions.values());notice_status=Counter(n.status for n in world.institutions.notices.values());disclosures=Counter(r.disclosure for r in world.institutions.magic_records.values())
 
+    # First-acquisition diagnostics: distinguish stock, affordability and
+    # post-purchase/ownership delay without changing simulation behavior.
+    shop_essence_by_settlement={sid:world.magic_resources.inventory('settlement',sid,'essence') for sid in world.settlements}
+    zero_user_aspirants=[];zero_with_held=[];zero_with_local_stock=[];zero_affordable_local=[];partial_with_held_wanted=[]
+    for p in alive:
+        a=world.magic_resources.aspirations.get(p.id);path=paths.get(p.id)
+        base=0 if path is None else len(path.base_essences)
+        if a is not None and a.desired_base_essences>base:
+            held=world.magic_resources.inventory('person',p.id,'essence')
+            owned=set() if path is None else set(path.base_essences)
+            useful_held=[r for r in held if r.key not in owned]
+            if base==0:
+                zero_user_aspirants.append(p)
+                if useful_held:zero_with_held.append(p)
+                local=shop_essence_by_settlement.get(p.settlement,())
+                if local:
+                    zero_with_local_stock.append(p)
+                    if p.wealth>=7 or can_pay_tier(world,p.id,'iron',7):zero_affordable_local.append(p)
+            elif useful_held:
+                partial_with_held_wanted.append(p)
+    zero_wealth=sorted(p.wealth for p in zero_user_aspirants)
+    zero_median_wealth=0.0 if not zero_wealth else zero_wealth[len(zero_wealth)//2]
+
     lots=list(world.materials.lots.values());items=list(world.materials.items.values());year=max(1,world.year);pop=max(1,len(alive));households=max(1,living_households)
     production_by_year=Counter(l.created_year for l in lots);production_by_settlement=Counter(l.settlement for l in lots);active_crafters={i.craftsperson for i in items if world.people.get(i.craftsperson) and world.people[i.craftsperson].alive}
     supplier_pairs={(l.producer,i.craftsperson) for i in items for lid in i.materials for l in [world.materials.lots.get(lid)] if l is not None and l.producer!=i.craftsperson}
@@ -35,6 +59,7 @@ def snapshot(world, include_digest=False):
         'essence_users_living':len(living_users),'essence_user_base_essences':dict(sorted(base_counts.items())),'essence_user_abilities':dict(sorted(ability_counts.items())),'essence_user_ranks':dict(sorted(rank_counts.items())),'living_confluences':confluences,'completed_loadouts':completed,'living_auras':auras,
         'magic_aspirants_living':len(aspirations),'magic_interested_living':len(interested),'magic_completion_goal_living':len(completion),'magic_adventurer_aspirants_living':len(adventurers),'magic_completion_goal_share':round(len(completion)/len(interested),4) if interested else 0.0,'magic_adventurer_completion_share':round(sum(a.completion_goal for a in adventurers)/len(adventurers),4) if adventurers else 0.0,
         'magic_resources_total':len(resources),'magic_resources_by_kind':dict(sorted(resource_kinds.items())),'magic_resources_available':len(available),'magic_resources_available_by_kind':dict(sorted(available_kinds.items())),'magic_resource_purchases':events['magic_resource_purchased'],'magic_resource_transfers':events['magic_resource_transferred'],'essence_absorptions':events['essence_absorbed'],'awakening_stones_used':events['awakening_stone_used'],'abilities_awakened':events['ability_awakened'],
+        'magic_zero_user_aspirants_living':len(zero_user_aspirants),'magic_zero_user_with_held_essence':len(zero_with_held),'magic_zero_user_with_local_essence_stock':len(zero_with_local_stock),'magic_zero_user_affordable_local_essence':len(zero_affordable_local),'magic_zero_user_blocked_by_affordability':len(zero_with_local_stock)-len(zero_affordable_local),'magic_zero_user_median_wealth':round(zero_median_wealth,3),'magic_partial_user_with_held_wanted_essence':len(partial_with_held_wanted),'magic_shop_essence_stock':sum(len(v) for v in shop_essence_by_settlement.values()),
         'material_lots_total':len(lots),'material_lots_per_year':round(len(lots)/year,3),'material_lots_per_100_living_people_year':round((len(lots)/year)/pop*100,3),'material_lots_by_settlement':dict(sorted(production_by_settlement.items())),'material_peak_lots_in_year':max(production_by_year.values(),default=0),'material_purchases':events['material_purchased'],'crafted_items_total':len(items),'crafted_items_per_100_living_households_year':round((len(items)/year)/households*100,3),'living_active_craftspeople':len(active_crafters),'supplier_relationships_observed':len(supplier_pairs),'magical_material_lots':sum(bool(l.magical_properties) for l in lots),'magical_items':sum(bool(i.magical) for i in items),
         'core_institutions':dict(sorted(inst_kinds.items())),'institution_branches':len(world.institutions.branches),'magic_registry_records':len(world.institutions.magic_records),'magic_registry_disclosure':dict(sorted(disclosures.items())),'adventure_notices':len(world.institutions.notices),'adventure_notice_status':dict(sorted(notice_status.items())),
     }
