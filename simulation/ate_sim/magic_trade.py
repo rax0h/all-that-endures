@@ -36,9 +36,7 @@ so this is bounded by living adults rather than resources x people.
    surplus=[r for r in held if not _wants(world,p,r)]
    if not surplus:continue
    r=min(surplus,key=lambda x:x.id)
-   wholesale=4.0 if r.kind=='essence' else 1.5
-   if 'Rare' in r.rarity or 'Epic' in r.rarity:wholesale*=1.35
-   if 'Legendary' in r.rarity:wholesale*=1.8
+   wholesale=round(_retail_price(r)*.55,2) if r.kind=='essence' else 1.5
    p.wealth+=wholesale
    e=world.emit('magic_resource_listed',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',sid),
                 ((r.origin_event,) if r.origin_event else ()),resource=r.id,
@@ -49,7 +47,21 @@ so this is bounded by living adults rather than resources x people.
 
 
 def _retail_price(resource):
- return 7 if resource.kind=='essence' else 3
+ """Civilian shelf price in ordinary wealth.
+
+ Common/uncommon essences are entry-level goods in a mature magical economy;
+ rarity, rather than basic access to magic, carries the steep price curve.
+ """
+ if resource.kind!='essence':return 3
+ rarity=str(resource.rarity).lower()
+ if 'transcendent' in rarity:return 21.
+ if 'mythic' in rarity:return 13.
+ if 'legendary' in rarity:return 8.
+ if 'epic' in rarity:return 5.
+ if 'rare' in rarity:return 3.
+ if 'uncommon' in rarity:return 1.5
+ if 'common' in rarity:return 1.
+ return 2.
 
 
 def _retail_browse(world,adults):
@@ -62,9 +74,8 @@ decide who is allowed to shop. Those states determine what the person wants;
 money and actual shelf availability determine whether a purchase occurs.
 
 Shelf lookup is indexed by kind/key so runtime depends on shoppers and distinct
-goods, not centuries of accumulated copies. Since all retail essences share one
-price and all stones share one price, browsing preserves the same choice rule:
-cheapest usable kind first, then oldest resource id.
+goods, not centuries of accumulated copies. Shoppers compare the current front
+of each usable essence identity by actual shelf price, then resource age/id.
  """
  Layer,Ref=layer_ref()
  institution=world.institutions.institution_by_kind('adventure_society')
@@ -90,15 +101,18 @@ cheapest usable kind first, then oldest resource id.
    wants_essence=base<a.desired_base_essences
    wants_stone=path is not None and abilities<a.desired_abilities and abilities<path.capacity
    choice=None
-   # Stones are cheaper than essences, matching the prior min(price,id) rule.
    if wants_stone and stone_heap and (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):
     rid=stone_heap[0];choice=(3,rid,'stone',None)
-   if choice is None and wants_essence and essence_front and (p.wealth>=7 or can_pay_tier(world,p.id,'iron',7)):
+   if choice is None and wants_essence and essence_front:
     owned=set() if path is None else set(path.base_essences)
-    candidates=((rid,key) for key,rid in essence_front.items() if key not in owned)
-    candidate=min(candidates,default=None)
-    if candidate is not None:
-     rid,key=candidate;choice=(7,rid,'essence',key)
+    candidates=[]
+    for key,rid in essence_front.items():
+     if key in owned:continue
+     r=world.magic_resources.resources[rid];price=_retail_price(r)
+     if p.wealth>=price or can_pay_tier(world,p.id,'iron',ceil(price)):
+      candidates.append((price,rid,key))
+    if candidates:
+     price,rid,key=min(candidates);choice=(price,rid,'essence',key)
    if choice is None:continue
    price,rid,kind,key=choice;r=world.magic_resources.resources[rid];coins={}
    if p.wealth>=price:p.wealth-=price
