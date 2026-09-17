@@ -35,26 +35,31 @@ def _threat_pressure(world):
 
 
 def _broker_stock(world):
- """Index market stock once per year; private entries are frozen offers.
+ """Index only live owner buckets once per year.
 
- The old access pass rebuilt local/remote candidate lists by scanning every
- resource for every buyer and every essence slot. Besides being quadratic, an
- unaffordable first candidate could block a later affordable resource. This
- index preserves local-first sourcing while allowing the broker to skip an
- infeasible offer and continue to the next real piece of stock.
+ Historical consumed resources remain in the provenance registry for the full
+ millennium. Scanning that registry for every annual market pass made access
+ progressively slower even though those resources can never be traded. The
+ owner index is the authoritative set of active physical holdings, so this pass
+ scales with current stock rather than all historical discoveries.
  """
  from .magic_resources import _wants
  by_kind={'essence':[],'awakening_stone':[]};by_local={};private={}
- for r in world.magic_resources.resources.values():
-  if r.consumed_year is not None:continue
-  offered=False
-  if r.owner_kind=='settlement':offered=True
-  elif r.owner_kind=='person':
-   owner=world.people.get(r.owner_id)
-   if owner is not None and owner.alive and not _wants(world,owner,r):
-    offered=True;private[r.id]=r.owner_id
-  if not offered or r.kind not in by_kind:continue
-  by_kind[r.kind].append(r);by_local.setdefault((r.location,r.kind),[]).append(r)
+ state=world.magic_resources
+ for (owner_kind,owner_id),ids in sorted(state.owner_index.items(),key=lambda x:(x[0][0],x[0][1])):
+  if owner_kind=='settlement':offer_ids=ids
+  elif owner_kind=='person':
+   owner=world.people.get(owner_id)
+   if owner is None or not owner.alive:continue
+   offer_ids=ids
+  else:continue
+  for rid in sorted(offer_ids):
+   r=state.resources[rid]
+   if r.consumed_year is not None or r.kind not in by_kind:continue
+   if owner_kind=='person':
+    if _wants(world,owner,r):continue
+    private[r.id]=r.owner_id
+   by_kind[r.kind].append(r);by_local.setdefault((r.location,r.kind),[]).append(r)
  for values in by_kind.values():values.sort(key=lambda r:(_price(r),r.id))
  for values in by_local.values():values.sort(key=lambda r:(_price(r),r.id))
  return by_kind,by_local,private
