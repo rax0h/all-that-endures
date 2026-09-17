@@ -44,4 +44,7 @@ def test_indexed_population_matches_archive_scan_simulation():
     indexed=Simulation(generate_world(843000)).run(100)
     with patch.object(World,'current_people',lambda w:tuple(p for p in w.people.values() if p.alive)):
         reference=Simulation(generate_world(843000)).run(100)
-    assert indexed.digest()==reference.digest()=='aeb7587391273311b085c7f79771c9ca5a3bcf796a5b2eb2d8b89e3c31625a40'
+    # The causal-rebuild branch intentionally changes world history. Keep this
+    # fixture branch-local while still proving the living-population index is
+    # semantically identical to a full archive scan.
+    assert indexed.digest()==reference.digest()=='041fc1562b05bcc56d92c4213cd20038ba9a1179eec1361fc7a789d0c3a1c193'
