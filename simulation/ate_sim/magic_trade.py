@@ -1,13 +1,13 @@
 """Persistent magical-goods circulation for mature settlements.
 
-This module moves existing resources only.  Local dealers buy unwanted goods into
+This module moves existing resources only. Local dealers buy unwanted goods into
 settlement inventory, and bounded travelling merchants redistribute that stock
-along established trade routes.  The existing magic ecology market remains the
+along established trade routes. The existing magic ecology market remains the
 authoritative retail buyer: failed sales therefore leave stock available for a
 later buyer instead of consuming the opportunity.
 """
 from .core_types import layer_ref
-from .magic_resources import _wants, _aspiration
+from .magic_resources import _wants, _aspiration, _demand_key
 
 
 def _adults_by_settlement(world):
@@ -22,8 +22,8 @@ def _dealer_intake(world,adults):
  """Put person-held surplus into persistent local shop stock.
 
 Ordinary wealth is the existing non-ranked civilian economy, not conserved
-ranked coin.  Dealers pay a modest wholesale price; retail spread represents
-storage, brokerage and transport.  At most one item/person/year enters stock,
+ranked coin. Dealers pay a modest wholesale price; retail spread represents
+storage, brokerage and transport. At most one item/person/year enters stock,
 so this is bounded by living adults rather than resources x people.
  """
  Layer,Ref=layer_ref()
@@ -33,8 +33,6 @@ so this is bounded by living adults rather than resources x people.
    if not held:continue
    surplus=[r for r in held if not _wants(world,p,r)]
    if not surplus:continue
-   # Stable oldest-first inventory disposal prevents a random annual lottery
-   # from trapping an unwanted resource indefinitely.
    r=min(surplus,key=lambda x:x.id)
    wholesale=4.0 if r.kind=='essence' else 1.5
    if 'Rare' in r.rarity or 'Epic' in r.rarity:wholesale*=1.35
@@ -50,15 +48,13 @@ so this is bounded by living adults rather than resources x people.
 
 def _route_neighbors(world,sid):
  neighbors=[]
- for key,route in world.trade_routes.items():
+ for route in world.trade_routes.values():
   if route.a==sid:neighbors.append((route.strength,route.b,route))
   elif route.b==sid:neighbors.append((route.strength,route.a,route))
  return sorted(neighbors,key=lambda x:(-x[0],x[1]))
 
 
 def _demand_score(world,people,r):
- # Merchant batches are tiny, so this bounded local scan is cheaper than a
- # global resource-person market and preserves actual essence compatibility.
  score=0.0
  for p in people:
   if _wants(world,p,r):
@@ -67,24 +63,36 @@ def _demand_score(world,people,r):
 
 
 def _travelling_merchants(world,adults):
- """Move persistent shop stock toward demand through real trade routes."""
+ """Move persistent shop stock toward demand through real trade routes.
+
+Demand is memoized by settlement and resource demand identity for this merchant
+pass. Persistent inventory can grow for centuries; rescanning every local adult
+for every copy of the same essence made the old pass scale with accumulated
+stock rather than with the bounded set of distinct goods actually considered.
+ """
  if world.year%3:return
  Layer,Ref=layer_ref()
- # Snapshot prevents the same item hopping through many settlements in one year.
  stock={sid:list(world.magic_resources.inventory('settlement',sid)) for sid in world.settlements}
+ demand_cache={}
+ def score(sid,r):
+  key=(sid,_demand_key(r))
+  if key not in demand_cache:demand_cache[key]=_demand_score(world,adults[sid],r)
+  return demand_cache[key]
  for sid in sorted(world.settlements):
   inventory=stock[sid]
   if len(inventory)<=4:continue
   neighbors=_route_neighbors(world,sid)
   if not neighbors:continue
   moved=0
+  # At most two goods move from a settlement in a merchant year. We may inspect
+  # persistent stock to find them, but repeated goods reuse cached demand.
   for r in inventory:
    if moved>=2:break
-   local_score=_demand_score(world,adults[sid],r)
+   local_score=score(sid,r)
    choices=[]
    for strength,dst,route in neighbors:
-    score=_demand_score(world,adults[dst],r)
-    if score>local_score:choices.append((score,strength,-dst,dst,route))
+    dst_score=score(dst,r)
+    if dst_score>local_score:choices.append((dst_score,strength,-dst,dst,route))
    if not choices:continue
    _,_,_,dst,route=max(choices)
    e=world.emit('magic_resource_merchant_moved',Layer.SOCIETY,location=Ref('settlement',dst),
