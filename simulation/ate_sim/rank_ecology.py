@@ -18,19 +18,15 @@ def _career_training(world,p,path,asp,member,strength):
  """Deliberate whole-path training for people actually pursuing rank mastery.
 
  A complete path makes a person Iron; it does not put them on an automatic
- conveyor to Diamond. Iron is the broad completed-path population. Bronze takes
- sustained use, Silver a serious career, Gold elite deliberate mastery, and
- Diamond exceptional long-lived integration. These are causal effort gates, not
- population quotas: an extraordinary cohort may still produce extraordinary
- results.
+ conveyor to Diamond. Bronze is sustained use, Silver a serious career, Gold
+ elite deliberate mastery, and Diamond exceptional long-lived integration.
+ The gates are causal effort/evidence requirements rather than population caps.
  """
  rank=world.advancement.rank(p.id);complete=len(path.abilities)==20
  if not complete:return None
  ambition=max(0.,min(1.,.45*asp.drive+.30*asp.urgency+.25*p.curiosity))
  combat=asp.adventurer_aspiration or p.occupation in ('adventurer','guard','hunter','soldier')
  professional=member or combat
- # Ordinary complete-path users can become Bronze through years of real work,
- # but only people with strong commitment receive broad deliberate training.
  if rank==1:
   if not professional and ambition<.58:return None
   return ('all',2.15+.70*strength+.45*ambition,12,.14+.18*p.curiosity)
@@ -38,15 +34,16 @@ def _career_training(world,p,path,asp,member,strength):
   if not professional or ambition<.42:return None
   return ('all',1.05+.38*strength+.32*ambition,10,.22+.24*p.curiosity)
  if rank==3:
-  # Gold is elite: institutional continuity plus unusual commitment. Real-task
-  # understanding/transfer evidence in AdvancementState remains mandatory.
-  if not member or ambition<.68:return None
-  return ('all',.42+.16*strength+.20*ambition,6,.42+.30*p.curiosity)
+  # Gold should exist in a millennium world, but only among established Society
+  # members with sustained above-normal commitment and real transfer evidence.
+  if not member or ambition<.55:return None
+  return ('all',.72+.24*strength+.28*ambition,10,.46+.32*p.curiosity)
  if rank==4:
-  # Diamond is not a retirement destination. Only exceptional Golds continue
-  # enough broad deliberate practice to even approach the revelation gate.
-  if not member or ambition<.82 or p.curiosity<.68:return None
-  return ('all',.10+.05*strength+.07*ambition,3,.78+.20*p.curiosity)
+  # Diamond remains a historical-person result: an exceptional Gold must keep
+  # training broadly for years and independently satisfy the stricter two-proof
+  # revelation/integration gate in AdvancementState.
+  if not member or ambition<.72 or p.curiosity<.60:return None
+  return ('all',.16+.06*strength+.08*ambition,4,.80+.18*p.curiosity)
  return None
 
 def rank_ecology_step(world,rng):
@@ -72,16 +69,13 @@ def rank_ecology_step(world,rng):
    exposure=.24+.16*strength;uses=min(len(candidates),5)
   else:
    candidates=[x for x in indexed if x[1].function in relevant] or indexed
-   # Ordinary life develops useful abilities but should not rapidly level an
-   # entire twenty-ability path in lockstep.
    exposure=.11+.14*strength;uses=min(len(candidates),3)
   rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates);before=world.advancement.rank(p.id)
   for i,a in candidates[:uses]:
    reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity)
    practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action)
-  # Expensive mastery trials are only useful once a complete path has reached
-  # Silver/Gold. Running them for every complete Iron/Bronze was pure hot-path
-  # work and could not contribute to their next rank.
+  # Understanding trials are relevant only to Silver/Gold advancement. Keeping
+  # them out of the Iron/Bronze hot path preserves the millennium performance gate.
   body_rank=world.advancement.rank(p.id)
   if len(path.abilities)==20 and body_rank>=3 and (member or action in ('work','learn','teach','build','prepare')):
    mastery_training_step(world,p,path,rng.stream('mastery_training',world.year,p.id))
