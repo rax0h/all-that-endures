@@ -48,4 +48,4 @@ After each coherent change: focused tests -> full suite/smoke -> deterministic m
 
 If the first hypothesis does not materially improve the funnel, diagnose the next causal bottleneck. Do not stack compensating mechanisms on top of a failed hypothesis.
 
-Validation trigger: PR #12 causal-rebuild hypothesis 1.
+Validation trigger: PR #12 causal-rebuild hypothesis 1, main-targeted CI.
