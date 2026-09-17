@@ -39,6 +39,8 @@ PR #5 already has substantial resource abundance and a civilizational feedback l
 1. Aspirations formed once currently remain effectively frozen even when a person's family, neighbors, occupation, institutions and danger change over decades.
 2. Organized field recovery gives civilian demand almost no extraction capacity and can stall when there are no existing practitioners/adventurer aspirants.
 3. Person-to-person circulation exits entirely when a settlement has no current practitioners, even if it has holders and new aspirants.
+4. A mature magical founding population is seeded once at the observation boundary; later prevalence must be reproduced by the civilization rather than maintained by a quota.
+5. Existing inherited/surplus magical resources must be able to move through households and direct parent/child relationships without requiring family members to buy their own inheritance from one another.
 
 Repair those feedback paths *inside the existing magical-civilization owner*. Measure before adding anything else.
 
@@ -48,4 +50,4 @@ After each coherent change: focused tests -> full suite/smoke -> deterministic m
 
 If the first hypothesis does not materially improve the funnel, diagnose the next causal bottleneck. Do not stack compensating mechanisms on top of a failed hypothesis.
 
-Validation trigger: PR #12 causal-rebuild hypothesis 1, main-targeted CI.
+Validation trigger: PR #12 generational-circulation experiment, main-targeted CI.
