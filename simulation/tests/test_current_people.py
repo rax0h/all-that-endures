@@ -26,7 +26,6 @@ def test_population_index_birth_death_resurrection_and_archive():
         assert world.current_people()[-1] is child
         cached=world.current_people()
         assert world.current_people() is cached
-    # Direct scenario edits outside the engine never see a stale cache.
     person.alive=True
     assert list(world.current_people())==original+[child]
 
@@ -44,7 +43,6 @@ def test_indexed_population_matches_archive_scan_simulation():
     indexed=Simulation(generate_world(843000)).run(100)
     with patch.object(World,'current_people',lambda w:tuple(p for p in w.people.values() if p.alive)):
         reference=Simulation(generate_world(843000)).run(100)
-    # Stage 0.5 intentionally changes canonical history through strict 20/20 body
-    # rank semantics plus conserved denomination exchange. This digest was measured
-    # from both indexed and archive-scan execution on the integrated candidate.
-    assert indexed.digest()==reference.digest()=='d950f4a51a1df5dfaa9a29b19d8ca37dc0857ca06e5dd0e8f0d5b3a47ebfc510'
+    # Stage 0.5 magic brokerage intentionally changes canonical history. This
+    # digest was measured identically from indexed and archive-scan execution.
+    assert indexed.digest()==reference.digest()=='7436c43184f4c0e11aa78e942ed074d931189bed743e832e93ac0c67cb232daf'
