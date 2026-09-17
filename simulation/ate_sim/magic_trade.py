@@ -5,7 +5,7 @@ settlement inventory, people browse that literal persistent stock and purchase
 what they can use, and bounded travelling merchants redistribute unsold stock
 along established trade routes. A failed sale never consumes the opportunity.
 """
-from heapq import heapify, heappop, heappush
+from heapq import heapify, heappop
 from math import ceil
 from .core_types import layer_ref
 from .currency import can_pay_tier
@@ -77,11 +77,10 @@ cheapest usable kind first, then oldest resource id.
    else:stone_heap.append(r.id)
   for heap in essence_by_key.values():heapify(heap)
   heapify(stone_heap)
-  # One heap entry per distinct essence identity. After a sale, refresh only
-  # that identity's next-oldest copy rather than rebuilding or rescanning stock.
-  essence_front=[]
-  for key,heap in essence_by_key.items():
-   if heap:heappush(essence_front,(heap[0],key))
+  # One current shelf-front id per distinct essence identity. A buyer scans only
+  # these distinct fronts, never accumulated copies. This also avoids mutating a
+  # shared heap merely to skip identities the current buyer already absorbed.
+  essence_front={key:heap[0] for key,heap in essence_by_key.items() if heap}
   for p in people:
    held=world.magic_resources.inventory('person',p.id)
    if any(_wants(world,p,r) for r in held):continue
@@ -96,11 +95,10 @@ cheapest usable kind first, then oldest resource id.
     rid=stone_heap[0];choice=(3,rid,'stone',None)
    if choice is None and wants_essence and essence_front and (p.wealth>=7 or can_pay_tier(world,p.id,'iron',7)):
     owned=set() if path is None else set(path.base_essences)
-    skipped=[]
-    while essence_front and essence_front[0][1] in owned:skipped.append(heappop(essence_front))
-    if essence_front:
-     rid,key=essence_front[0];choice=(7,rid,'essence',key)
-    for entry in skipped:heappush(essence_front,entry)
+    candidates=((rid,key) for key,rid in essence_front.items() if key not in owned)
+    candidate=min(candidates,default=None)
+    if candidate is not None:
+     rid,key=candidate;choice=(7,rid,'essence',key)
    if choice is None:continue
    price,rid,kind,key=choice;r=world.magic_resources.resources[rid];coins={}
    if p.wealth>=price:p.wealth-=price
@@ -116,11 +114,9 @@ cheapest usable kind first, then oldest resource id.
    world.magic_resources.transfer(r.id,'person',p.id,e.id,sid)
    if kind=='stone':heappop(stone_heap)
    else:
-    # Consume this identity's current front and expose its next copy, if any.
-    front_rid,front_key=heappop(essence_front)
-    assert front_rid==rid and front_key==key
     heap=essence_by_key[key];removed=heappop(heap);assert removed==rid
-    if heap:heappush(essence_front,(heap[0],key))
+    if heap:essence_front[key]=heap[0]
+    else:essence_front.pop(key,None)
 
 
 def _route_neighbors(world,sid):
