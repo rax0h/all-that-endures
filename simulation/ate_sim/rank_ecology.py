@@ -24,16 +24,18 @@ def _career_training(world,p,path,asp,member,strength):
   return (.14+.05*strength+.07*commitment,4,.82+.16*p.curiosity)
  return None
 
-def _physical_indices(world):
- cores={};catalysts={}
- for sid,ids in world.materials.active_lot_index.items():
-  local=[world.materials.lots[i] for i in ids if world.materials.lots[i].kind=='monster_core' and world.materials.lots[i].quantity-world.materials.lots[i].consumed>.01]
-  if local:cores[sid]=sorted(local,key=lambda x:(x.material_rank,x.created_year,x.id))
+def _local_cores(world,sid):
+ ids=world.materials.active_lot_index.get(sid,())
+ return sorted((world.materials.lots[i] for i in ids if world.materials.lots[i].kind=='monster_core' and world.materials.lots[i].quantity-world.materials.lots[i].consumed>.01),key=lambda x:(x.material_rank,x.created_year,x.id))
+
+def _owned_catalyst(world,pid):
+ # Items are sparse; only Silver people call this, avoiding a global annual item
+ # scan for the overwhelmingly Iron/Bronze/unranked population.
+ best=None
  for item in world.materials.items.values():
-  if item.owner_kind=='person' and item.owner_id is not None and item.magical and item.rarity in RARITY_CATALYST:
-   old=catalysts.get(item.owner_id)
-   if old is None or (RARITY_CATALYST[item.rarity],item.item_rank,-item.id)>(RARITY_CATALYST[old.rarity],old.item_rank,-old.id):catalysts[item.owner_id]=item
- return cores,catalysts
+  if item.owner_kind!='person' or item.owner_id!=pid or not item.magical or item.rarity not in RARITY_CATALYST:continue
+  if best is None or (RARITY_CATALYST[item.rarity],item.item_rank,-item.id)>(RARITY_CATALYST[best.rarity],best.item_rank,-best.id):best=item
+ return best
 
 def _use_core(world,p,path,cores):
  if len(path.abilities)!=20 or not cores:return None
@@ -56,7 +58,7 @@ def _apply_catalyst(world,p,path,ability,item):
   Layer,Ref=layer_ref();world.emit('path_integration_catalyzed',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),(item.origin_event,),ability=ability.semantic_key,item=item.id,rarity=item.rarity,mechanism='rare magical item amplifying earned introspection')
 
 def rank_ecology_step(world,rng):
- Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');members=set() if adv is None else adv.members;latest={};cores,catalysts=_physical_indices(world)
+ Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');members=set() if adv is None else adv.members;latest={};core_cache={}
  for rec in reversed(world.agency.actions):
   if rec.year!=world.year:break
   latest.setdefault(rec.person,rec)
@@ -70,10 +72,13 @@ def rank_ecology_step(world,rng):
    if len(candidates)<4:candidates=sorted(indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))[:8]
    exposure=.24+.16*strength;uses=min(len(candidates),5)
   else:candidates=[x for x in indexed if x[1].function in relevant] or indexed;exposure=.11+.14*strength;uses=min(len(candidates),3)
-  rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates);before=world.advancement.rank(p.id)
+  rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates);before=world.advancement.rank(p.id);body_rank=before;catalyst=_owned_catalyst(world,p.id) if body_rank==3 else None
   for i,a in candidates[:uses]:
-   reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity);practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action);_apply_catalyst(world,p,path,a,catalysts.get(p.id))
-  if len(path.abilities)==20 and rr.random()<min(.55,.08+.28*asp.drive+.12*asp.urgency):_use_core(world,p,path,cores.get(p.settlement,()))
+   reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity);practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action);_apply_catalyst(world,p,path,a,catalyst)
+  if len(path.abilities)==20 and rr.random()<min(.55,.08+.28*asp.drive+.12*asp.urgency):
+   local=core_cache.get(p.settlement)
+   if local is None:local=core_cache[p.settlement]=_local_cores(world,p.settlement)
+   _use_core(world,p,path,local)
   body_rank=world.advancement.rank(p.id)
   if len(path.abilities)==20 and body_rank>=3 and (member or action in ('work','learn','teach','build','prepare')):mastery_training_step(world,p,path,rng.stream('mastery_training',world.year,p.id))
   after=world.advancement.rank(p.id);p.rank=after;record_body_transition(world,p,before,context=action)
