@@ -28,14 +28,14 @@ def _local_cores(world,sid):
  ids=world.materials.active_lot_index.get(sid,())
  return sorted((world.materials.lots[i] for i in ids if world.materials.lots[i].kind=='monster_core' and world.materials.lots[i].quantity-world.materials.lots[i].consumed>.01),key=lambda x:(x.material_rank,x.created_year,x.id))
 
-def _owned_catalyst(world,pid):
- # Items are sparse; only Silver people call this, avoiding a global annual item
- # scan for the overwhelmingly Iron/Bronze/unranked population.
- best=None
+def _catalyst_index(world):
+ # One linear pass per year. Never scan the growing item archive per person.
+ out={}
  for item in world.materials.items.values():
-  if item.owner_kind!='person' or item.owner_id!=pid or not item.magical or item.rarity not in RARITY_CATALYST:continue
-  if best is None or (RARITY_CATALYST[item.rarity],item.item_rank,-item.id)>(RARITY_CATALYST[best.rarity],best.item_rank,-best.id):best=item
- return best
+  if item.owner_kind!='person' or item.owner_id is None or not item.magical or item.rarity not in RARITY_CATALYST:continue
+  old=out.get(item.owner_id)
+  if old is None or (RARITY_CATALYST[item.rarity],item.item_rank,-item.id)>(RARITY_CATALYST[old.rarity],old.item_rank,-old.id):out[item.owner_id]=item
+ return out
 
 def _use_core(world,p,path,cores):
  if len(path.abilities)!=20 or not cores:return None
@@ -58,7 +58,7 @@ def _apply_catalyst(world,p,path,ability,item):
   Layer,Ref=layer_ref();world.emit('path_integration_catalyzed',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),(item.origin_event,),ability=ability.semantic_key,item=item.id,rarity=item.rarity,mechanism='rare magical item amplifying earned introspection')
 
 def rank_ecology_step(world,rng):
- Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');members=set() if adv is None else adv.members;latest={};core_cache={}
+ Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');members=set() if adv is None else adv.members;latest={};core_cache={};catalysts=_catalyst_index(world)
  for rec in reversed(world.agency.actions):
   if rec.year!=world.year:break
   latest.setdefault(rec.person,rec)
@@ -72,7 +72,7 @@ def rank_ecology_step(world,rng):
    if len(candidates)<4:candidates=sorted(indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))[:8]
    exposure=.24+.16*strength;uses=min(len(candidates),5)
   else:candidates=[x for x in indexed if x[1].function in relevant] or indexed;exposure=.11+.14*strength;uses=min(len(candidates),3)
-  rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates);before=world.advancement.rank(p.id);body_rank=before;catalyst=_owned_catalyst(world,p.id) if body_rank==3 else None
+  rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates);before=world.advancement.rank(p.id);catalyst=catalysts.get(p.id) if before==3 else None
   for i,a in candidates[:uses]:
    reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity);practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action);_apply_catalyst(world,p,path,a,catalyst)
   if len(path.abilities)==20 and rr.random()<min(.55,.08+.28*asp.drive+.12*asp.urgency):
