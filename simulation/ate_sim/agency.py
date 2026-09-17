@@ -3,6 +3,12 @@ from dataclasses import dataclass,field
 from .core_types import layer_ref
 from .magic_progression import practice_ability,record_body_transition
 from .rank_ecology import rank_ecology_step
+
+# Ordinary wealth is the civilian market scale. The old .03 work payout made a
+# seven-unit common essence cost centuries of labor for descendants born at zero.
+# Half a unit per full-strength work year keeps ordinary goods and wages on the
+# same scale without granting magic, resources, or rank directly.
+ORDINARY_WORK_INCOME = .50
 @dataclass
 class MotiveState:hunger:float=0.;safety:float=0.;belonging:float=0.;wealth:float=0.;curiosity:float=0.;legacy:float=0.;obligation:float=0.;status:float=0.
 @dataclass
@@ -40,7 +46,7 @@ def agency_step(world,rng):
   _practice_path(world,p,rr,action,strength)
   if action=='secure_food':world.households[p.household].food+=.08+.2*strength
   elif action=='prepare':world.households[p.household].preparedness=min(1.,world.households[p.household].preparedness+.002*strength)
-  elif action=='work':p.wealth+=.03*strength
+  elif action=='work':p.wealth+=ORDINARY_WORK_INCOME*strength
   world.agency.actions.append(ActionRecord(world.year,p.id,action,motive,strength,None if event is None else event.id))
  if len(world.agency.actions)>50000:world.agency.actions=world.agency.actions[-50000:]
  rank_ecology_step(world,rng)
