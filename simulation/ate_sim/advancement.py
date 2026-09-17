@@ -8,17 +8,31 @@ from .semantic_dictionary import ESSENCES,AWAKENING_STONES,stone as stone_semant
 RANKS=('unranked','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
 @dataclass
 class Understanding:
- # At most six successful applications and two held-out transfer proofs per tier.
  evidence:dict[str,int]=field(default_factory=dict)
  applications:dict[str,dict]=field(default_factory=dict)
  transfers:list[dict]=field(default_factory=list)
  integration:float=0.
  def ready(self,rank):
-  # Reflection cannot fabricate application or generalization evidence.
   return len(self.transfers)>=(1 if rank==3 else 2) and all(t['difficulty']>=rank for t in self.transfers) and self.integration>=rank
  def reflect(self,application,reflection):
-  if application>0 and reflection>0:
-   self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*.08)
+  if application>0 and reflection>0:self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*.08)
+@dataclass
+class PathIntegration:
+ """Whole-path inner development, distinct from ability power.
+
+ Silver abilities can be technically ready for Gold while the person remains
+ Silver. Gold requires the person to have deliberately integrated every one of
+ the twenty abilities into an understanding of the complete essence path.
+ Catalysts can deepen reflection, but cannot substitute for an ability that has
+ never demonstrated its own understanding.
+ """
+ reflected:dict[str,float]=field(default_factory=dict)
+ essence_groups:set[str]=field(default_factory=set)
+ contemplation:float=0.
+ catalysts:list[int]=field(default_factory=list)
+ def ready_for_gold(self,abilities):
+  keys={a.semantic_key for a in abilities}
+  return len(abilities)==MAX_SKILLS and keys.issubset(self.reflected) and len(self.essence_groups)>=4 and self.contemplation>=12.
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
@@ -31,7 +45,7 @@ class AbilityProgress:
    self.response_model=ResponseModel()
 @dataclass
 class EssencePath:
- base_essences:list[str]=field(default_factory=list);confluence:str|None=None;confluence_name:str|None=None;confluence_concepts:tuple[str,...]=();abilities:list[AbilityProgress]=field(default_factory=list);core_fraction:float=0.
+ base_essences:list[str]=field(default_factory=list);confluence:str|None=None;confluence_name:str|None=None;confluence_concepts:tuple[str,...]=();abilities:list[AbilityProgress]=field(default_factory=list);core_fraction:float=0.;integration:PathIntegration=field(default_factory=PathIntegration)
  @property
  def essences(self):return tuple(self.base_essences)+(() if self.confluence is None else (self.confluence,))
  @property
@@ -66,8 +80,7 @@ class AdvancementState:
  def _ensure_aura(self,p,context):
   for a in p.abilities:a.aura=False
   if len(p.abilities)!=MAX_SKILLS:return
-  raw='aura|'+'|'.join(p.essences)+'|'+'|'.join(map(str,context));key=hashlib.blake2b(raw.encode(),digest_size=8).hexdigest();preferred=[i for i,a in enumerate(p.abilities) if a.function in ('support','control','influence','detection','enhancement')]
-  choices=preferred or list(range(len(p.abilities)));p.abilities[choices[int(key[:8],16)%len(choices)]].aura=True
+  raw='aura|'+'|'.join(p.essences)+'|'+'|'.join(map(str,context));key=hashlib.blake2b(raw.encode(),digest_size=8).hexdigest();preferred=[i for i,a in enumerate(p.abilities) if a.function in ('support','control','influence','detection','enhancement')];choices=preferred or list(range(len(p.abilities)));p.abilities[choices[int(key[:8],16)%len(choices)]].aura=True
  def absorb_essence(self,pid,essence,year,semantic_context=(),origin_event=None):
   essence=essence.lower()
   if essence not in ESSENCES:raise ValueError(f'unknown essence: {essence}')
@@ -81,13 +94,11 @@ class AdvancementState:
   sem=[ESSENCES[e] for e in essences];cores=[x for s in sem for x in s.get('semantic_core',[])];adj=[x for s in sem for x in s.get('semantic_adjacent',[])];functions=[x for s in sem for x in s.get('suggested_functions',[])];tokens=self._tokens(context);raw='|'.join(sorted(essences))+'|'+'|'.join(map(str,context));key=hashlib.blake2b(raw.encode(),digest_size=16).hexdigest();concepts=[]
   for i,s in enumerate(sem):concepts.append(self._pick(s.get('semantic_core',[]),key,(i*8)%24))
   if tokens:concepts.append(self._pick(tokens,key,8))
-  concepts.append(self._pick(functions,key,16));concepts=tuple(dict.fromkeys(concepts))
-  role=(self._pick(tokens,key,0).title() if tokens else 'Path');higher=self._pick(cores+adj,key,24).title();name=f'{higher} {role}';return 'confluence-'+key[:12],name,concepts
+  concepts.append(self._pick(functions,key,16));concepts=tuple(dict.fromkeys(concepts));role=(self._pick(tokens,key,0).title() if tokens else 'Path');higher=self._pick(cores+adj,key,24).title();return 'confluence-'+key[:12],f'{higher} {role}',concepts
  def awaken_skill(self,pid,stone,year,semantic_context=(),origin_event=None,target_essence=None):
   p=self.paths.get(pid)
   if p is None:return None
-  sd=self._stone(stone);stone_name=next(name for name,data in AWAKENING_STONES.items() if data is sd)
-  available=[e for e in p.essences if len(p.abilities_for(e))<SKILLS_PER_ESSENCE]
+  sd=self._stone(stone);stone_name=next(name for name,data in AWAKENING_STONES.items() if data is sd);available=[e for e in p.essences if len(p.abilities_for(e))<SKILLS_PER_ESSENCE]
   if target_essence is not None:
    if target_essence not in available:return None
    essence=target_essence
@@ -96,32 +107,44 @@ class AdvancementState:
   return None if essence is None else self._semantic_ability(p,essence,'stone:'+stone_name,year,semantic_context,origin_event)
  def rank(self,pid):
   p=self.paths.get(pid)
-  if p is None or len(p.base_essences)!=3 or p.confluence is None:return 0
-  if len(p.abilities)!=MAX_SKILLS:return 0
+  if p is None or len(p.base_essences)!=3 or p.confluence is None or len(p.abilities)!=MAX_SKILLS:return 0
   counts={e:0 for e in p.essences}
   for a in p.abilities:
    if a.essence not in counts:return 0
    counts[a.essence]+=1
   if len(counts)!=4 or any(n!=SKILLS_PER_ESSENCE for n in counts.values()):return 0
   return min(a.rank for a in p.abilities)
+ def integrate_path(self,pid,ability,reflection,catalyst_event=None,catalyst_strength=0.):
+  p=self.paths.get(pid)
+  if p is None or len(p.abilities)!=MAX_SKILLS or ability not in p.abilities or ability.rank!=3:return False
+  if not ability.understanding.ready(3):return False
+  depth=max(0.,reflection)+max(0.,catalyst_strength)
+  if depth<=0:return False
+  old=p.integration.reflected.get(ability.semantic_key,0.);new=min(1.,old+.12*depth)
+  p.integration.reflected[ability.semantic_key]=new
+  if new>=1.:p.integration.essence_groups.add(ability.essence)
+  p.integration.contemplation=min(20.,p.integration.contemplation+.06*depth)
+  if catalyst_event is not None and catalyst_event not in p.integration.catalysts:p.integration.catalysts.append(catalyst_event)
+  return True
  def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.):
   p=self.paths.get(pid)
   if p is None or not p.abilities:return None
-  a=p.abilities[ability%len(p.abilities)];r=a.rank
-  # Partial essence users can develop a Bronze ability without gaining bodily
-  # Iron benefits. An ability waits at the next tier's entry until the body
-  # catches up; practice cannot bank progress beyond that ceiling.
-  ceiling=min(5,max(1,self.rank(pid))+1)
+  a=p.abilities[ability%len(p.abilities)];r=a.rank;ceiling=min(5,max(1,self.rank(pid))+1)
   if r>=ceiling:return a
   gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
+  # Cores accelerate raw ability development. They do not fabricate application,
+  # introspection or whole-path integration, and leave persistent taint.
   if core>0:gain+=core*(.8,.65,.5,.3,.0,.0)[min(r,5)];p.core_fraction=min(1.,p.core_fraction+core*.01)
   if r>=3:a.understanding.reflect(meaningful_use,reflection)
+  if r==3 and a.understanding.ready(3):self.integrate_path(pid,a,reflection)
   a.progress+=gain
   while a.progress>=1 and a.rank<5:
    a.progress-=1;a.level+=1
    if a.level>=10:
-    if a.rank>=3 and (not a.understanding.ready(a.rank) or (a.rank==4 and p.core_fraction>0)):
-     a.level=9;a.progress=.999;break
+    blocked=a.rank>=3 and not a.understanding.ready(a.rank)
+    if a.rank==3 and not p.integration.ready_for_gold(p.abilities):blocked=True
+    if a.rank==4 and p.core_fraction>0:blocked=True
+    if blocked:a.level=9;a.progress=.999;break
     a.rank+=1;a.level=0;a.understanding=Understanding()
     from .mastery_training import ResponseModel
     a.response_model=ResponseModel()
@@ -136,5 +159,6 @@ class AdvancementState:
   if rank==5:return ()
   out=['ability_readiness'] if any(a.rank<=rank for a in p.abilities) else []
   if rank>=3 and any(a.rank==rank and not a.understanding.ready(rank) for a in p.abilities):out.append('understanding')
+  if rank==3 and not p.integration.ready_for_gold(p.abilities):out.append('path_integration')
   if rank==4 and p.core_fraction>0:out.append('core_taint')
   return tuple(out)
