@@ -27,15 +27,16 @@ def test_material_production_is_not_fixed_one_lot_per_settlement_year():
     assert len(produced)!=40*len(w.settlements)
 
 
-def test_magic_interest_is_not_universal_but_serious_aspirants_skew_to_completion():
+def test_magic_interest_is_broad_while_full_path_commitment_remains_a_choice():
     w=generate_world(843001);Simulation(w).run(40)
     aspirations=list(w.magic_resources.aspirations.values())
     assert aspirations
     assert any(a.desired_base_essences==0 for a in aspirations)
     interested=[a for a in aspirations if a.desired_base_essences>0]
     assert interested
-    assert sum(a.completion_goal for a in interested)>len(interested)/2
-    assert all(a.desired_base_essences==3 and a.desired_abilities==20 for a in interested if a.completion_goal)
+    committed=[a for a in interested if a.completion_goal]
+    assert committed and len(committed)<len(interested)
+    assert all(a.desired_base_essences==3 and a.desired_abilities==20 for a in committed)
     assert all(a.completion_goal for a in interested if a.adventurer_aspiration)
 
 
