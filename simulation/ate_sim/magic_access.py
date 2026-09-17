@@ -64,7 +64,7 @@ def _field_recovery(world,rng,adults):
 
 def _broker_stock(world):
  from .magic_resources import _wants
- by_kind={'essence':[],'awakening_stone':[]};by_local={};private={};state=world.magic_resources
+ by_kind={'essence':[],'awakening_stone':[]};by_local={};private={};active=set();state=world.magic_resources
  for (owner_kind,owner_id),ids in sorted(state.owner_index.items(),key=lambda x:(x[0][0],x[0][1])):
   if owner_kind=='settlement':offer_ids=ids
   elif owner_kind=='person':
@@ -78,10 +78,10 @@ def _broker_stock(world):
    if owner_kind=='person':
     if _wants(world,owner,r):continue
     private[r.id]=r.owner_id
-   by_kind[r.kind].append(r);by_local.setdefault((r.location,r.kind),[]).append(r)
+   by_kind[r.kind].append(r);by_local.setdefault((r.location,r.kind),[]).append(r);active.add(r.id)
  for values in by_kind.values():values.sort(key=lambda r:(_price(r),r.id))
  for values in by_local.values():values.sort(key=lambda r:(_price(r),r.id))
- return by_kind,by_local,private
+ return by_kind,by_local,private,active
 
 
 def _can_afford(world,p,price):return p.wealth>=price or can_pay_tier(world,p.id,'iron',ceil(price))
@@ -102,12 +102,12 @@ def _offer_valid(world,p,r,kind,private,owned,a,pressure):
  price=_price(r);sponsored=r.owner_kind=='settlement' and _sponsor(world,p,a,pressure) is not None and r.rarity.lower() in ('common','uncommon')
  return sponsored or _can_afford(world,p,price)
 
-def _candidate(world,p,kind,stock,local_stock,private,a,pressure):
+def _candidate(world,p,kind,stock,local_stock,private,active,a,pressure):
  path=world.advancement.path(p.id);owned=set(() if path is None else path.base_essences)
  for r in local_stock.get((p.settlement,kind),()):
-  if _offer_valid(world,p,r,kind,private,owned,a,pressure):return r
+  if r.id in active and _offer_valid(world,p,r,kind,private,owned,a,pressure):return r
  for r in stock[kind]:
-  if r.location!=p.settlement and _offer_valid(world,p,r,kind,private,owned,a,pressure):return r
+  if r.id in active and r.location!=p.settlement and _offer_valid(world,p,r,kind,private,owned,a,pressure):return r
  return None
 
 def _pay(world,p,price,institution,seller=None):
@@ -120,7 +120,7 @@ def _pay(world,p,price,institution,seller=None):
   return coins,'ranked_coin'
  return None,None
 
-def _acquire(world,p,r,a,pressure=0.):
+def _acquire(world,p,r,a,active,pressure=0.):
  Layer,Ref=layer_ref();magic=world.institutions.institution_by_kind('magic_society')
  if magic is None:return False
  price=_price(r);seller=world.people.get(r.owner_id) if r.owner_kind=='person' else None
@@ -134,7 +134,7 @@ def _acquire(world,p,r,a,pressure=0.):
  remote=r.location!=p.settlement;actors=[Ref('person',p.id)]
  if seller is not None:actors.append(Ref('person',seller.id))
  e=world.emit('magic_resource_ordered' if remote else 'magic_resource_purchased',Layer.SOCIETY,tuple(actors),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,rarity=r.rarity,price=0 if sponsored else price,price_domain=domain,institution=(sponsor.id if sponsored else magic.id),sponsored=sponsored,brokered_private_stock=seller is not None,source_settlement=r.location,ordered=remote,threat_pressure=round(pressure,3))
- world.magic_resources.transfer(r.id,'person',p.id,e.id,p.settlement);a.preparation=min(1.,a.preparation+.12);return True
+ world.magic_resources.transfer(r.id,'person',p.id,e.id,p.settlement);active.discard(r.id);a.preparation=min(1.,a.preparation+.12);return True
 
 def _use_owned_essence(world,p,a):
  from .magic_resources import absorb_essence_resource
@@ -153,11 +153,9 @@ def institutional_magic_access_step(world,rng):
  adults=[p for p in world.current_people() if p.alive and p.age>=16]
  if not adults:return
  prevalence=sum(1 for p in adults if world.advancement.essence_user(p.id))/len(adults);pressure_by_settlement=_threat_pressure(world)
- # Aspirations exist before the Society evaluates unmet demand. Recovery is a
- # response to actual need, not a hidden population target.
  for p in adults:_aspiration(world,p)
  _field_recovery(world,rng,adults)
- stock,local_stock,private=_broker_stock(world)
+ stock,local_stock,private,active=_broker_stock(world)
  for p in sorted(adults,key=lambda x:x.id):
   rr=rng.stream('institutional_magic_access',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);pressure=pressure_by_settlement.get(p.settlement,0.)
   if pressure>0:
@@ -170,8 +168,8 @@ def institutional_magic_access_step(world,rng):
    a.desired_base_essences=3;a.desired_abilities=20;a.compromise_tolerance=max(a.compromise_tolerance,.72+.25*pressure);a.stone_selectiveness=min(a.stone_selectiveness,.35-.20*min(1.,pressure))
   path,base=_use_owned_essence(world,p,a)
   while base<a.desired_base_essences:
-   choice=_candidate(world,p,'essence',stock,local_stock,private,a,pressure)
-   if choice is None or not _acquire(world,p,choice,a,pressure):break
+   choice=_candidate(world,p,'essence',stock,local_stock,private,active,a,pressure)
+   if choice is None or not _acquire(world,p,choice,a,active,pressure):break
    path,newbase=_use_owned_essence(world,p,a)
    if newbase<=base:break
    base=newbase
@@ -179,6 +177,6 @@ def institutional_magic_access_step(world,rng):
   if path is not None and len(path.abilities)<min(a.desired_abilities,path.capacity):
    stones=world.magic_resources.inventory('person',p.id,'awakening_stone')
    if not stones:
-    choice=_candidate(world,p,'awakening_stone',stock,local_stock,private,a,pressure)
-    if choice is not None and _acquire(world,p,choice,a,pressure):stones=world.magic_resources.inventory('person',p.id,'awakening_stone')
+    choice=_candidate(world,p,'awakening_stone',stock,local_stock,private,active,a,pressure)
+    if choice is not None and _acquire(world,p,choice,a,active,pressure):stones=world.magic_resources.inventory('person',p.id,'awakening_stone')
    if stones:stones.sort(key=lambda r:(_price(r),r.id));use_awakening_stone(world,p.id,stones[0].id)
