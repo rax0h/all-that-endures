@@ -4,6 +4,7 @@ from ate_sim.divinity import GOD_DEFINITIONS,divine_step,grant_world_phoenix_res
 from ate_sim.metaphysics import register_outworlder,attempt_transcendence
 from ate_sim.engine import Simulation
 from ate_sim.institutions import ensure_core_societies,society_eligible,apply_for_society
+from ate_sim.semantic_dictionary import AWAKENING_STONES
 
 
 def _adult(w):return next(p for p in w.people.values() if p.alive and p.age>=18)
@@ -41,14 +42,20 @@ def test_transcendence_requires_causes_not_random_rank_roll():
  assert transformed is not None and transformed.ontology=='astral_king' and 'transcendent' in transformed.marks
 
 
-def test_society_membership_barrier_is_four_essences_not_partial_magic():
+def test_society_membership_requires_canonical_20_20_ranked_path():
  w=generate_world(910005);ensure_core_societies(w);p=_adult(w)
  w.advancement.absorb_essence(p.id,'fire',w.year,('test',))
  assert not society_eligible(w,p.id,'adventure_society')
  rejected=apply_for_society(w,p.id,'adventure_society')
  assert rejected.stage=='rejected_ineligible' and rejected.passed is False
  for essence in ('water','wind'):w.advancement.absorb_essence(p.id,essence,w.year,('test',))
- assert len(w.advancement.path(p.id).essences)==4
+ path=w.advancement.path(p.id)
+ assert len(path.essences)==4 and len(path.abilities)==4
+ assert not society_eligible(w,p.id,'adventure_society')
+ stone=next(iter(AWAKENING_STONES))
+ while len(path.abilities)<20:
+  assert w.advancement.awaken_skill(p.id,stone,w.year,('test',)) is not None
+ assert w.advancement.rank(p.id)==1
  assert society_eligible(w,p.id,'adventure_society') and society_eligible(w,p.id,'magic_society')
 
 
