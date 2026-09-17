@@ -32,7 +32,7 @@ class PathIntegration:
  catalysts:list[int]=field(default_factory=list)
  def ready_for_gold(self,abilities):
   keys={a.semantic_key for a in abilities}
-  return len(abilities)==MAX_SKILLS and keys.issubset(self.reflected) and len(self.essence_groups)>=4 and self.contemplation>=12.
+  return len(abilities)==MAX_SKILLS and all(self.reflected.get(k,0.)>=1. for k in keys) and len(self.essence_groups)>=4 and self.contemplation>=12.
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
@@ -132,8 +132,6 @@ class AdvancementState:
   a=p.abilities[ability%len(p.abilities)];r=a.rank;ceiling=min(5,max(1,self.rank(pid))+1)
   if r>=ceiling:return a
   gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
-  # Cores accelerate raw ability development. They do not fabricate application,
-  # introspection or whole-path integration, and leave persistent taint.
   if core>0:gain+=core*(.8,.65,.5,.3,.0,.0)[min(r,5)];p.core_fraction=min(1.,p.core_fraction+core*.01)
   if r>=3:a.understanding.reflect(meaningful_use,reflection)
   if r==3 and a.understanding.ready(3):self.integrate_path(pid,a,reflection)
