@@ -93,14 +93,27 @@ def _kinship_circulation(world, sid, people):
     This is not a prevalence controller: it creates no resources and changes no
     aspirations. It only lets a willing holder give an existing resource to a
     local household member or direct parent/child who already wants it.
+
+    Kin candidates are indexed once per settlement pass. This preserves the old
+    ascending-person ordering without rescanning every adult for every holder.
     """
-    Layer, Ref = layer_ref(); by_id = {p.id: p for p in people}
+    Layer, Ref = layer_ref(); by_id = {p.id: p for p in people}; by_household = {}; children = {}
+    for q in people:
+        by_household.setdefault(q.household, []).append(q)
+        for parent in q.parents:
+            if parent in by_id: children.setdefault(parent, []).append(q)
     for holder in people:
         held = world.magic_resources.inventory('person', holder.id)
         if not held: continue
         surplus = _wanted_resources(world, holder, held, wanted=False)
         if not surplus: continue
-        kin = [q for q in people if q.id != holder.id and (q.household == holder.household or q.id in holder.parents or holder.id in q.parents)]
+        kin_by_id = {q.id: q for q in by_household.get(holder.household, ()) if q.id != holder.id}
+        for parent in holder.parents:
+            q = by_id.get(parent)
+            if q is not None and q.id != holder.id: kin_by_id[q.id] = q
+        for q in children.get(holder.id, ()):
+            if q.id != holder.id: kin_by_id[q.id] = q
+        kin = [kin_by_id[pid] for pid in sorted(kin_by_id)]
         if not kin: continue
         for resource in surplus:
             seekers = [q for q in kin if _wants(world, q, resource)]
@@ -116,7 +129,9 @@ def _resource_circulation(world, rng, sid, people, users, magic):
     if not people: return
     rr = rng.stream('magical_circulation', world.year, sid); people_by_id = {p.id:p for p in people}; rounds = 3 + (3 if magic is not None else 0)
     for _ in range(rounds):
-        holder_ids = sorted(oid for (kind,oid),ids in world.magic_resources.owner_index.items() if kind=='person' and ids and oid in people_by_id)
+        # People are already id-sorted. Probe the owner index directly instead of
+        # rescanning every owner bucket once per round and settlement.
+        holder_ids = [p.id for p in people if world.magic_resources.owner_index.get(('person', p.id))]
         for holder_id in holder_ids:
             holder = people_by_id[holder_id]; path = world.advancement.path(holder.id); a = _aspiration(world, holder); base = 0 if path is None else len(path.base_essences)
             ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if base < a.desired_base_essences else []
@@ -162,8 +177,14 @@ def _magical_workshops(world, rng, sid, people, users, magic):
 
 def magical_civilization_step(world, rng):
     """Civilizational feedback loop: magic is normal; exceptional power remains exceptional."""
+    # Build the adult settlement index once. _living previously rescanned the
+    # entire living population separately for every settlement.
+    by_settlement = {sid: [] for sid in world.settlements}
+    for p in world.current_people():
+        if p.alive and p.age >= 16: by_settlement[p.settlement].append(p)
+    for people in by_settlement.values(): people.sort(key=lambda p: p.id)
     for sid in sorted(world.settlements):
-        people = _living(world, sid)
+        people = by_settlement[sid]
         if not people: continue
         users = _practitioners(world, people); adventure, magic = _institutional_capacity(world, sid)
         _review_magic_demand(world, people, adventure, magic)
