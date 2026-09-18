@@ -22,7 +22,20 @@ class AgencyState:
   if dependents is None:dependents=sum(1 for x in world.genealogy.children.get(p.id,[]) if world.people.get(x) and world.people[x].alive and world.people[x].age<18)
   m=MotiveState(max(0.,min(1.,q.scarcity+max(0.,(5-h.food)/10))),max(0.,min(1.,world.cells[(world.settlements[p.settlement].x,world.settlements[p.settlement].y)].hazard*(1-h.preparedness)+p.fear)),max(0.,1-attachment),max(0.,min(1.,1-p.wealth/120.)),p.curiosity,max(0.,min(1.,p.age/80))*p.attachment,min(1.,dependents*.18+p.grief*.2),max(0.,min(1.,.65-p.wealth/250.))*(.5+.5*(1-p.inhibition)));self.motives[p.id]=m;return m
  def choose(self,world,p,rng,attachment=None,dependents=None):
-  m=self.assess(world,p,attachment,dependents);choices={'secure_food':m.hunger*1.35,'prepare':m.safety,'work':m.wealth+.35*m.obligation,'socialize':m.belonging*.8,'learn':m.curiosity*(1-.55*m.hunger),'teach':m.legacy,'build':(.55*m.safety+.35*m.status)*(1-.5*m.hunger)};best=max(choices.values());near=[(a,v) for a,v in choices.items() if v>=best-.08];action,strength=near[int(rng.random()*len(near))%len(near)];return action,max(m.__dict__,key=m.__dict__.get),strength
+  m=self.assess(world,p,attachment,dependents)
+  # Preserve the original insertion/tie order without allocating two dicts for
+  # every adult every year.
+  choices=(('secure_food',m.hunger*1.35),('prepare',m.safety),
+           ('work',m.wealth+.35*m.obligation),('socialize',m.belonging*.8),
+           ('learn',m.curiosity*(1-.55*m.hunger)),('teach',m.legacy),
+           ('build',(.55*m.safety+.35*m.status)*(1-.5*m.hunger)))
+  best=max(v for _,v in choices);threshold=best-.08
+  near=tuple(x for x in choices if x[1]>=threshold)
+  action,strength=near[int(rng.random()*len(near))%len(near)]
+  motive_names=('hunger','safety','belonging','wealth','curiosity','legacy','obligation','status')
+  motive_values=(m.hunger,m.safety,m.belonging,m.wealth,m.curiosity,m.legacy,m.obligation,m.status)
+  motive=motive_names[max(range(8),key=lambda i:motive_values[i])]
+  return action,motive,strength
 
 def _practice_path(world,p,rr,action,strength):
  # An incomplete rank-0 path's awakened abilities already begin at Iron.
