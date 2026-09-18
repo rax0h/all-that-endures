@@ -182,15 +182,18 @@ def _aspiration(world,p):
  a=world.magic_resources.aspirations.get(p.id)
  if a:return a
  family=sum(1 for x in p.parents if world.advancement.essence_user(x));contacts=sum(1 for x in world.social.neighbors(p.id) if world.advancement.essence_user(x));m=world.agency.motives.get(p.id);status=0 if m is None else m.status
+ # Social/family exposure may make someone more likely to START magic. Full-path
+ # commitment is intentionally based on intrinsic mastery intent instead, so a
+ # magical society does not recursively turn everyone into a completionist.
+ intrinsic=max(0.,min(1.,.60*p.curiosity+.25*(1-p.inhibition)+.15*status))
  drive=max(0.,min(1.,.46*p.curiosity+.18*(1-p.inhibition)+.12*status+.10*min(2,family)+.05*min(3,contacts)))
- adventurer=(p.occupation in ('adventurer','guard','hunter','soldier')) or (drive>.68 and (p.curiosity>.58 or status>.42))
+ adventurer=(p.occupation in ('adventurer','guard','hunter','soldier')) or (intrinsic>.80 and p.curiosity>.72 and status>.45)
  # Magic is normal, so family/peer exposure lowers the threshold to begin a
  # path, but exposure alone does not make every descendant or neighbor a user.
- interested=adventurer or drive>=.31 or (family>0 and drive>=.24) or (contacts>=2 and drive>=.28)
+ interested=adventurer or drive>=.31 or (family>0 and p.curiosity>=.34) or (contacts>=3 and p.curiosity>=.44)
  # Completing all three bases + twenty abilities is a much stronger commitment
- # than simply opening the door with an essence. Family and peer exposure can
- # normalize starting magic, but cannot by themselves make someone a completionist.
- serious=interested and (adventurer or drive>=.72 or (family>0 and drive>=.64 and p.curiosity>=.60))
+ # than simply opening the door with an essence.
+ serious=interested and (adventurer or p.occupation=='magical craftsperson' or intrinsic>=.84)
  completion=serious
  if not interested:desired=0
  elif completion:desired=3
