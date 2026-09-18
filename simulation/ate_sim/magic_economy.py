@@ -145,12 +145,13 @@ def magical_services_step(world,rng,living=None):
 
 
 def apprenticeship_step(world,living=None):
-    """Maintain a broad Society cadet pipeline plus a smaller paid work cohort.
+    """Run annual Adventure Society cadet classes and funded field apprenticeships.
 
-    Cadet seats represent institutional training capacity and commit suitable
-    recruits to a complete path; they grant no essence, stone, ability or rank.
-    Paid apprenticeships remain finite treasury-backed public work. Completed
-    paths release both kinds of seats for later cohorts.
+    Every branch may admit a new class each year from real local candidates.
+    Cadets pursue a complete 20/20 path; nobody is granted an essence, stone,
+    ability or rank. Reaching Iron is graduation, after which normal advancement
+    remains unconstrained. Paid public-work apprenticeships are a smaller funded
+    subset of the wider training program.
     """
     from .magic_resources import _aspiration
     Layer,Ref=layer_ref();inst=world.institutions.institution_by_kind('adventure_society')
@@ -162,28 +163,40 @@ def apprenticeship_step(world,living=None):
         if asset.condition>=1.:continue
         for sid in asset.settlements:
             if sid in assets_by_sid:assets_by_sid[sid].append(asset)
-    for assets in assets_by_sid.values():
-        assets.sort(key=lambda a:(a.condition,a.id))
+    for assets in assets_by_sid.values():assets.sort(key=lambda a:(a.condition,a.id))
+
     for sid,people in sorted(living.items()):
         branch=world.institutions.branch_for('adventure_society',sid)
         if branch is None:continue
         open_notices=world.institutions.active_notice_count(branch.id)
-        # A mature branch trains a standing reserve of field-capable cadets.
-        # Capacity scales from the local adult population, branch authority and
-        # actual operational demand; it never reads a desired rank population.
-        cadet_capacity=min(len(people),max(6,min(64,
-            4+len(people)//4+int(10*branch.authority)+min(8,open_notices))))
-        work_capacity=max(4,min(18,4+int(8*branch.authority)+min(5,open_notices)))
-        cadets=[];recruitable=[]
+
+        # Graduation is a consequence of actually completing the path. It is
+        # not a timer and does not hold anyone at Iron after graduation.
+        for p in people:
+            a=world.magic_resources.aspirations.get(p.id)
+            if a is None or a.cadet_branch!=branch.id or a.cadet_class_year is None or a.cadet_graduated_year is not None:continue
+            if p.rank<1:continue
+            a.cadet_graduated_year=world.year
+            a.reason='Adventure Society graduate'
+            inst.members.add(p.id)
+            if p.occupation=='labor':p.occupation='adventurer'
+            path=world.advancement.path(p.id)
+            world.emit('society_cadet_graduated',Layer.SOCIETY,
+                (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
+                branch=branch.id,class_year=a.cadet_class_year,graduation_year=world.year,
+                body_rank=p.rank,abilities=0 if path is None else len(path.abilities),
+                basis='completed full magical path')
+
+        active=[];recruitable=[]
         for p in people:
             if not p.alive or p.age<16:continue
             path=world.advancement.path(p.id)
-            if path and len(path.abilities)==20:continue
             a=_aspiration(world,p)
-            institutional_cadet=(a.completion_goal and a.adventurer_aspiration
-                and a.reason in ('Adventure Society cadet','Adventure Society apprenticeship'))
-            if institutional_cadet:
-                cadets.append(p);continue
+            if a.cadet_branch==branch.id and a.cadet_class_year is not None and a.cadet_graduated_year is None:
+                if p.rank<1:active.append(p)
+                continue
+            if a.cadet_class_year is not None:continue
+            if path and len(path.abilities)==20:continue
             motive=world.agency.motives.get(p.id);status=0. if motive is None else motive.status
             defense=world.skills.get(p.id,'defense').level
             field_fit=(p.occupation in ('adventurer','guard','hunter','soldier')
@@ -195,33 +208,45 @@ def apprenticeship_step(world,living=None):
                    +.14*(1-p.inhibition)+.12*min(1.,defense/2.)+.12*status)
             threshold=.58-.16*min(1.,.42+.30*branch.authority+.035*min(6,open_notices))
             if score>=threshold:recruitable.append((score,p))
-        cadets.sort(key=lambda p:(
-            -(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),
-            -_aspiration(world,p).preparation,p.id))
+
+        # This is institutional throughput, not a rank-population target.
+        # A branch runs a modest new class every year, sized by its real local
+        # population, authority and operational demand. Several overlapping
+        # classes may be in training at once.
+        class_size=max(1,min(5,1+len(people)//120+int(2*branch.authority)+min(1,open_notices)))
+        program_capacity=max(class_size*6,class_size)
+        intake=min(class_size,max(0,program_capacity-len(active)))
         recruitable.sort(key=lambda x:(-x[0],x[1].id))
-        admitted=list(cadets[:cadet_capacity]);admitted_ids={p.id for p in admitted}
-        for score,p in recruitable:
-            if len(admitted)>=cadet_capacity:break
-            if p.id in admitted_ids:continue
+        new_class=[]
+        for score,p in recruitable[:intake]:
             a=_aspiration(world,p)
             a.adventurer_aspiration=True;a.completion_goal=True
             a.desired_base_essences=3;a.desired_abilities=20
             a.reason='Adventure Society cadet'
-            a.drive=max(a.drive,.46);a.urgency=max(a.urgency,.48)
-            a.preparation=min(1.,a.preparation+.02)
-            admitted.append(p);admitted_ids.add(p.id)
+            a.cadet_class_year=world.year;a.cadet_branch=branch.id
+            a.drive=max(a.drive,.46);a.urgency=max(a.urgency,.55)
+            a.preparation=min(1.,a.preparation+.04)
+            active.append(p);new_class.append(p)
             world.emit('society_cadet_admitted',Layer.SOCIETY,
                 (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
-                branch=branch.id,capacity=cadet_capacity,selection_score=round(score,3),
-                basis='local field-service training capacity')
-        # Finite paid work remains a subset of the cadet program and still
-        # requires both treasury funding and a real infrastructure improvement.
+                branch=branch.id,class_year=world.year,class_size=class_size,
+                selection_score=round(score,3),basis='annual local field-service class')
+        if new_class:
+            world.emit('society_cadet_class_formed',Layer.SOCIETY,
+                tuple(Ref('person',p.id) for p in new_class),Ref('settlement',sid),
+                branch=branch.id,class_year=world.year,admitted=len(new_class),
+                capacity=class_size,active_cadets=len(active))
+
+        # Paid work remains a finite subset. Older and nearer-complete classes
+        # receive first opportunity for practical work; this improves training
+        # continuity without fabricating any magical resource or advancement.
         assets=assets_by_sid.get(sid,[])
         if not assets:continue
-        admitted.sort(key=lambda p:(
+        work_capacity=max(4,min(18,4+int(8*branch.authority)+min(5,open_notices)))
+        active.sort(key=lambda p:(
             -(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),
-            -_aspiration(world,p).preparation,p.id))
-        for p in admitted[:work_capacity]:
+            _aspiration(world,p).cadet_class_year or world.year,p.id))
+        for p in active[:work_capacity]:
             if treasury.get('iron',0)<4:break
             asset=next((a for a in assets if a.condition<1.),None)
             if asset is None:break
@@ -230,19 +255,15 @@ def apprenticeship_step(world,living=None):
             effect=asset.condition-before
             if effect<=0:continue
             a=_aspiration(world,p)
-            if a.reason=='Adventure Society cadet':
-                a.reason='Adventure Society apprenticeship'
-                world.emit('society_apprentice_recruited',Layer.SOCIETY,
-                    (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
-                    branch=branch.id,capacity=work_capacity,basis='funded public-work apprenticeship')
             world.skills.practice(p.id,'construction',.2)
             world.skills.practice(p.id,'defense',.08)
-            a.preparation=min(1.,a.preparation+.025);a.urgency=max(a.urgency,.48)
+            a.preparation=min(1.,a.preparation+.025);a.urgency=max(a.urgency,.55)
             coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':4})
             world.emit('society_apprentice_work',Layer.SOCIETY,
                 (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
-                branch=branch.id,work='public infrastructure maintenance',
+                branch=branch.id,class_year=a.cadet_class_year,
+                work='public infrastructure maintenance',
                 infrastructure=asset.id,improvement=effect,coin_reward=coins,
-                treasury=inst.id,eligibility='funded Society apprenticeship',
+                treasury=inst.id,eligibility='funded Society cadet fieldwork',
                 training_contract=True)
 
