@@ -14,47 +14,144 @@ ACTION_FUNCTIONS={
  'build':{'creation','enhancement','control','transformation'},
 }
 
-def _career_training(world,p,path,asp,member,strength):
+def _martial_school_context(world,rng,living,adventure_members):
+ """Maintain a sparse network of lineage-rooted specialist training schools.
+
+ Schools are historical communities, not rank factories. Silver+ Society veterans
+ can found them, family members inherit them through the normal community system,
+ and a bounded number of complete-path students can be accepted. Their only direct
+ progression effect is access to better deliberate practice from living mentors.
+ """
+ schools=[c for c in world.communities.communities.values() if c.active and c.kind=='martial_school']
+ by_sid={}
+ for p in living:by_sid.setdefault(p.settlement,[]).append(p)
+
+ if world.year%5==0:
+  existing_by_sid={}
+  for school in schools:existing_by_sid.setdefault(school.origin_settlement,[]).append(school)
+  Layer,Ref=layer_ref()
+  for sid,people in sorted(by_sid.items()):
+   local=list(existing_by_sid.get(sid,()))
+   max_schools=max(1,min(3,1+len(people)//220))
+   if len(local)>=max_schools:continue
+   founders=[p for p in people if p.id in adventure_members and world.advancement.rank(p.id)>=3 and p.age>=24]
+   founders.sort(key=lambda p:(world.advancement.rank(p.id),world.skills.get(p.id,'defense').level,p.curiosity,-p.id),reverse=True)
+   for founder in founders:
+    if len(local)>=max_schools:break
+    if any(world.communities.memberships.get((founder.id,s.id),0.)>=.2 for s in local):continue
+    family=[x for x in people if x.id!=founder.id and x.household==founder.household]
+    family_practitioners=sum(world.advancement.essence_user(x.id) for x in family)
+    cid=world.communities.next_community
+    e=world.emit('martial_school_founded',Layer.SOCIETY,(Ref('person',founder.id),),Ref('settlement',sid),
+                 school=cid,founder_rank=world.advancement.rank(founder.id),
+                 household=founder.household,family_practitioners=family_practitioners,
+                 basis='accomplished adventuring tradition and specialist instruction')
+    school=world.communities.create('martial_school',world.year,sid,e.id)
+    world.lineage.register('community',school.id,(('person',founder.id),),e.id,world.year)
+    world.communities.join(founder.id,school.id,1.)
+    for kin in family:world.communities.join(kin.id,school.id,.78 if world.advancement.essence_user(kin.id) else .58)
+    local.append(school);schools.append(school)
+
+ if not schools:return {}
+ school_ids={s.id for s in schools}
+ people_by_id={p.id:p for p in living}
+ members_by_school={sid:[] for sid in school_ids}
+ already_school=set()
+ for (pid,cid),strength in world.communities.memberships.items():
+  if cid not in school_ids or strength<.18:continue
+  person=people_by_id.get(pid)
+  school=world.communities.communities.get(cid)
+  if person is None or school is None or person.settlement!=school.origin_settlement:continue
+  members_by_school[cid].append((person,strength));already_school.add(pid)
+
+ # Schools occasionally accept outsiders, but instruction remains scarce and
+ # teacher-limited. This creates a real route through Bronze/Silver without a
+ # population target or a global advancement multiplier.
+ if world.year%3==0:
+  Layer,Ref=layer_ref()
+  for school in sorted(schools,key=lambda s:s.id):
+   members=members_by_school.get(school.id,[])
+   teachers=[p for p,_ in members if world.advancement.rank(p.id)>=3]
+   if not teachers:continue
+   teacher=max(teachers,key=lambda p:(world.advancement.rank(p.id),world.skills.get(p.id,'defense').level,-p.id))
+   mentor_rank=world.advancement.rank(teacher.id)
+   active_students=sum(1 for p,_ in members if 1<=world.advancement.rank(p.id)<=3)
+   seats=max(0,min(10,2+2*mentor_rank)-active_students)
+   if seats<=0:continue
+   candidates=[]
+   for p in by_sid.get(school.origin_settlement,()):
+    if p.id in already_school or p.age<16:continue
+    path=world.advancement.path(p.id);rank=world.advancement.rank(p.id)
+    if path is None or len(path.abilities)!=20 or rank not in (1,2,3):continue
+    a=_aspiration(world,p)
+    defense=world.skills.get(p.id,'defense').level
+    if not (a.adventurer_aspiration or defense>=.65 or p.curiosity>=.62):continue
+    score=.35*min(1.,defense/2.)+.25*p.curiosity+.20*a.drive+.20*a.preparation
+    candidates.append((score,p))
+   candidates.sort(key=lambda x:(x[0],-x[1].id),reverse=True)
+   for _,student in candidates[:seats]:
+    world.communities.join(student.id,school.id,.62);already_school.add(student.id)
+    e=world.emit('martial_school_student_accepted',Layer.SOCIETY,
+                 (Ref('person',teacher.id),Ref('person',student.id)),Ref('settlement',school.origin_settlement),
+                 ((school.origin_event,) if school.origin_event else ()),school=school.id,
+                 teacher_rank=mentor_rank,student_rank=world.advancement.rank(student.id))
+    world.social.record(teacher.id,student.id,e.id,trust=.025,obligation=.02)
+    members_by_school[school.id].append((student,.62))
+
+ mentor_for_person={}
+ for school in schools:
+  members=members_by_school.get(school.id,[])
+  mentor=max((world.advancement.rank(p.id) for p,_ in members),default=0)
+  if mentor<3:continue
+  for p,strength in members:
+   if strength>=.18:mentor_for_person[p.id]=max(mentor_for_person.get(p.id,0),mentor)
+ return mentor_for_person
+
+def _career_training(world,p,path,asp,member,strength,school_rank=0):
  """Return (candidates_mode, exposure, uses, purposeful_reflection).
 
- Full-time adventurers do not stop training after Bronze. Their annual tick represents a
- year of contracts, drills, sparring, expeditions and deliberate work on weak abilities.
- The curve intentionally steepens by rank: Iron->Bronze is commonly a few good years;
- Bronze->Silver is a longer professional career step; Silver->Gold takes sustained elite
- effort; Gold->Diamond is an exceptional multi-decade/century pursuit whose revelation
- gate must also be satisfied. This creates opportunity for Diamond without guaranteeing it.
+ Iron is the broad professional base. Bronze and Silver take sustained careers;
+ specialist schools improve the lower/middle climb when accomplished mentors
+ actually exist. Gold requires elite continuity, and Diamond remains an
+ exceptional lifetime culmination rather than the default fate of a survivor.
  """
  rank=world.advancement.rank(p.id);complete=len(path.abilities)==20
- dedicated=complete and (member or asp.adventurer_aspiration)
+ dedicated=complete and (member or asp.adventurer_aspiration or school_rank>=3)
  if not dedicated:return None
  ambition=max(0.,min(1.,.45*asp.drive+.30*asp.urgency+.25*p.curiosity))
- if rank==1:return ('all',5.4+1.8*strength+.8*asp.urgency,20,.18+.22*p.curiosity)
- if rank==2:return ('all',2.15+.75*strength+.55*ambition,20,.22+.28*p.curiosity)
+ if rank==1:
+  school_boost=.45 if school_rank>=3 else 0.
+  return ('all',1.20+.40*strength+.20*asp.urgency+school_boost,20,.18+.22*p.curiosity)
+ if rank==2:
+  school_boost=.32 if school_rank>=3 else 0.
+  return ('all',.82+.28*strength+.24*ambition+school_boost,20,.24+.28*p.curiosity)
  if rank==3:
-  if not member and ambition<.52:return None
-  return ('all',1.15+.45*strength+.45*ambition,20,.38+.35*p.curiosity)
+  elite_school=school_rank>=4
+  if not elite_school and not member and ambition<.68:return None
+  return ('all',.48+.18*strength+.20*ambition+(.18 if elite_school else 0.),20,.42+.35*p.curiosity)
  if rank==4:
-  # Gold adventurers need both institutional/field continuity and exceptional personal
-  # commitment. The Diamond gate is still enforced in AdvancementState.practice.
-  if not member or ambition<.56:return None
-  # Diamond remains attainable, but Gold training is intentionally much slower than the
-  # earlier ranks so a living population does not accumulate dozens of near-routine Diamonds.
-  return ('all',.72+.25*strength+.30*ambition,20,.72+.28*p.curiosity)
+  # Gold-to-Diamond must remain possible without a Diamond teacher, but only for
+  # unusually committed practitioners; a Diamond mentor is a genuine advantage.
+  diamond_school=school_rank>=5
+  if not member or (not diamond_school and ambition<.82):return None
+  return ('all',.38+.12*strength+.15*ambition+(.10 if diamond_school else 0.),20,.78+.22*p.curiosity)
  return None
 
 def rank_ecology_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society')
  members=set() if adv is None else adv.members
+ living=sorted(world.current_people(),key=lambda x:x.id)
+ school_rank=_martial_school_context(world,rng,living,members)
  latest={}
  for rec in reversed(world.agency.actions):
   if rec.year!=world.year:break
   latest.setdefault(rec.person,rec)
- for p in sorted((x for x in world.current_people() if x.alive),key=lambda x:x.id):
+ for p in living:
   path=world.advancement.path(p.id)
   if path is None or not path.abilities:continue
   rec=latest.get(p.id);action='work' if rec is None else rec.action;strength=.35 if rec is None else rec.strength;relevant=ACTION_FUNCTIONS.get(action,set())
   indexed=list(enumerate(path.abilities));weakest=min((a.rank,a.level,a.progress) for _,a in indexed);asp=_aspiration(world,p);member=p.id in members
-  career=_career_training(world,p,path,asp,member,strength)
+  career=_career_training(world,p,path,asp,member,strength,school_rank.get(p.id,0))
   purposeful_reflection=None
   if career is not None:
    _,exposure,uses,purposeful_reflection=career
