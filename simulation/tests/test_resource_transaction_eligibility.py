@@ -101,3 +101,20 @@ def test_transfer_is_deterministic_with_affordable_candidates():
     magic._transfer_to_seeker(w,r,h,[h,poor,buyer],RNG(17))
     magic._transfer_to_seeker(other,other.magic_resources.resources[r.id],other.people[h.id],[other.people[p.id] for p in (h,poor,buyer)],RNG(17))
     assert w.digest()==other.digest()
+
+
+def test_urgent_long_waiting_shopper_arrives_before_low_urgency_shopper():
+    w,h,poor,buyer,_,_=setup_market()
+    w.people={p.id:p for p in (h,buyer)}
+    h.wealth=buyer.wealth=10
+    ah=magic._aspiration(w,h);ab=magic._aspiration(w,buyer)
+    ah.desired_base_essences=ab.desired_base_essences=1
+    ah.urgency=.10;ah.drive=.10;ah.preparation=0.;ah.search_years=0
+    ab.urgency=.95;ab.drive=.60;ab.preparation=.40;ab.search_years=20
+    w.magic_resources.resources.clear();w.magic_resources.owner_index.clear()
+    r=w.magic_resources.create('essence',ESSENCE_IDS[0],'common',0,h.settlement,'settlement',h.settlement)
+    class SameArrival:
+        def stream(self,*args):return self
+        def random(self):return .5
+    magic_trade._retail_browse(w,{h.settlement:[h,buyer]},SameArrival())
+    assert r.owner_kind=='person' and r.owner_id==buyer.id
