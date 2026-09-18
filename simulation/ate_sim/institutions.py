@@ -21,12 +21,17 @@ class SocietyApplication:
 class InstitutionState:
  institutions:dict[int,Institution]=field(default_factory=dict);branches:dict[int,Branch]=field(default_factory=dict);magic_records:dict[int,MagicUserRecord]=field(default_factory=dict);notices:dict[int,AdventureNotice]=field(default_factory=dict);applications:dict[int,SocietyApplication]=field(default_factory=dict);next_institution:int=1;next_branch:int=1;next_record:int=1;next_notice:int=1;next_application:int=1
  def create_institution(self,kind,name,year,origin_event=None):
-  iid=self.next_institution;self.next_institution+=1;i=Institution(iid,kind,name,year,origin_event);self.institutions[iid]=i;return i
+  iid=self.next_institution;self.next_institution+=1;i=Institution(iid,kind,name,year,origin_event);self.institutions[iid]=i
+  if hasattr(self,'_kind_index'):self._kind_index[kind]=i;self._kind_index_count=len(self.institutions)
+  return i
  def create_branch(self,institution,settlement,year,origin_event=None,authority=.5):
   old=next((b for b in self.branches.values() if b.institution==institution and b.settlement==settlement),None)
   if old:return old
   bid=self.next_branch;self.next_branch+=1;b=Branch(bid,institution,settlement,year,origin_event,authority);self.branches[bid]=b;self.institutions[institution].branches.append(bid);return b
- def institution_by_kind(self,kind):return next((i for i in self.institutions.values() if i.kind==kind),None)
+ def institution_by_kind(self,kind):
+  if not hasattr(self,'_kind_index') or getattr(self,'_kind_index_count',-1)!=len(self.institutions):
+   self._kind_index={i.kind:i for i in self.institutions.values()};self._kind_index_count=len(self.institutions)
+  return self._kind_index.get(kind)
  def branch_for(self,kind,settlement):
   i=self.institution_by_kind(kind)
   return None if i is None else next((self.branches[bid] for bid in i.branches if self.branches[bid].settlement==settlement),None)
@@ -49,7 +54,16 @@ class InstitutionState:
   if hasattr(self,'_application_pairs'):self._application_pairs.add((person,society));self._application_count=len(self.applications)
   if hasattr(self,'_latest_applications'):self._latest_applications[(society,person)]=a;self._latest_application_count=len(self.applications)
   if hasattr(self,'_pending_application_ids'):self._pending_application_ids.add(aid);self._pending_application_count=len(self.applications)
+  if hasattr(self,'_application_attempts'):
+   key=(society,person);self._application_attempts[key]=self._application_attempts.get(key,0)+1;self._application_attempt_count=len(self.applications)
   return a
+ def application_attempt_count(self,person,society):
+  if not hasattr(self,'_application_attempts') or getattr(self,'_application_attempt_count',-1)!=len(self.applications):
+   self._application_attempts={}
+   for a in self.applications.values():
+    key=(a.society,a.person);self._application_attempts[key]=self._application_attempts.get(key,0)+1
+   self._application_attempt_count=len(self.applications)
+  return self._application_attempts.get((society,person),0)
  def application_pairs(self):
   if not hasattr(self,'_application_pairs') or getattr(self,'_application_count',-1)!=len(self.applications):
    self._application_pairs={(a.person,a.society) for a in self.applications.values()};self._application_count=len(self.applications)
