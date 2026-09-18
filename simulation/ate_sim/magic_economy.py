@@ -230,7 +230,11 @@ def apprenticeship_step(world,living=None):
             effect=asset.condition-before
             if effect<=0:continue
             a=_aspiration(world,p)
-            if a.reason=='Adventure Society cadet':a.reason='Adventure Society apprenticeship'
+            if a.reason=='Adventure Society cadet':
+                a.reason='Adventure Society apprenticeship'
+                world.emit('society_apprentice_recruited',Layer.SOCIETY,
+                    (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
+                    branch=branch.id,capacity=work_capacity,basis='funded public-work apprenticeship')
             world.skills.practice(p.id,'construction',.2)
             world.skills.practice(p.id,'defense',.08)
             a.preparation=min(1.,a.preparation+.025);a.urgency=max(a.urgency,.48)
