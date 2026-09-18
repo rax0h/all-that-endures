@@ -22,6 +22,24 @@ def _institutional_capacity(world, sid):
     return adventure, magic
 
 
+def _essence_supply_signal(world, people, sid):
+    """Return actual local first/path-essence demand, shelf stock and pressure.
+
+    This is a market signal, not a prevalence target. Demand exists only when a
+    person's current path has fewer base essences than that person's own desired
+    configuration. Existing settlement-owned essences are literal shelf stock.
+    """
+    seekers=0
+    for p in people:
+        a=_aspiration(world,p);path=world.advancement.path(p.id)
+        base=0 if path is None else len(path.base_essences)
+        if base<a.desired_base_essences:seekers+=1
+    stock=len(world.magic_resources.inventory('settlement',sid,'essence'))
+    gap=max(0,seekers-stock)
+    pressure=0. if seekers<=0 else min(1.,gap/max(1,seekers))
+    return seekers,stock,pressure
+
+
 def _review_magic_demand(world, people, adventure, magic):
     """Let existing aspirations respond to a changing magical civilization."""
     user_ids = {p.id for p in people if world.advancement.essence_user(p.id)}
@@ -58,13 +76,18 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
     settlement = world.settlements[sid]; cell = world.cells[(settlement.x, settlement.y)]
     aspirants = [p for p in people if _aspiration(world, p).desired_base_essences > 0]
     adventurer_aspirants = [p for p in aspirants if _aspiration(world, p).adventurer_aspiration]
+    essence_seekers, essence_stock, supply_pressure = _essence_supply_signal(world, people, sid)
     member_count = 0 if adventure is None else sum(1 for p in people if p.id in world.institutions.institution_by_kind('adventure_society').members)
     institutional = (0. if adventure is None else 2.0 * adventure.authority) + (0. if magic is None else 1.5 * magic.authority)
     field_capacity = len(users) + len(adventurer_aspirants) * .45 + len(aspirants) * .08 + member_count * 1.5 + institutional
     if field_capacity <= 0: return
     rr = rng.stream('magical_field_economy', world.year, sid)
     pressure = max(0., ambient - .30) + .35 * cell.hazard + .08 * min(10, field_capacity)
-    attempts = min(8, int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0)))
+    base_attempts = int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0))
+    # Established institutions respond to persistent shortage by organizing more
+    # supply expeditions. The ecology still decides whether anything is found.
+    supply_attempts = int(round(4 * supply_pressure)) if (adventure is not None or magic is not None) else 0
+    attempts = min(12, base_attempts + supply_attempts)
     if attempts <= 0: return
     candidates = sorted(users + [p for p in adventurer_aspirants if p not in users], key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
     if not candidates: candidates = sorted(aspirants, key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
@@ -80,10 +103,24 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         if erng.random() > min(.86, readiness + .16 * ambient):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,)); continue
         incomplete = sum(1 for p in users if len(world.advancement.path(p.id).abilities) < world.advancement.path(p.id).capacity)
-        stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
+        base_stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
+        # Expeditions can target what civilization is short of. This changes
+        # search effort, not the metaphysics of what resources exist.
+        stone_share = max(.12, base_stone_share - .45 * supply_pressure)
         kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
         found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition')
-        world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key)
+        recovered = world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key, supply_pressure=round(supply_pressure,3))
+        # Common/uncommon essence recovered by an organized shortage-response
+        # expedition can enter local dealer stock instead of becoming private
+        # loot. Rare finds remain personal and special.
+        rarity=str(found.rarity).lower()
+        if found.kind=='essence' and rarity in ('common','uncommon') and supply_pressure>0 and (adventure is not None or magic is not None):
+            contract_share=min(.90,.40+.45*supply_pressure)
+            if erng.random()<contract_share:
+                wholesale=.55 if rarity=='common' else .85
+                leader.wealth+=wholesale
+                supplied=world.emit('magic_resource_supplied_to_market',Layer.SOCIETY,(Ref('person',leader.id),),Ref('settlement',sid),(recovered.id,),resource=found.id,key=found.key,rarity=found.rarity,channel='organized essence supply expedition',wholesale_price=wholesale,price_domain='ordinary_wealth',seekers=essence_seekers,shelf_stock=essence_stock)
+                world.magic_resources.transfer(found.id,'settlement',sid,supplied.id,sid)
         aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
