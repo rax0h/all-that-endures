@@ -87,9 +87,9 @@ def _review_magic_demand(world, people, adventure, magic):
     for p in people:
         a = _aspiration(world, p)
         path = world.advancement.path(p.id)
-        if path is not None:
-            a.desired_base_essences = max(a.desired_base_essences, min(3, len(path.base_essences) + 1))
-            a.desired_abilities = max(a.desired_abilities, min(20, max(5, len(path.abilities) + 2)))
+        if path is not None and a.completion_goal:
+            a.desired_base_essences = 3
+            a.desired_abilities = 20
         family = sum(1 for x in p.parents if x in user_ids)
         contacts = sum(1 for x in world.social.neighbors(p.id) if x in user_ids)
         named_profession = p.occupation in ('adventurer', 'guard', 'hunter', 'soldier', 'farmer', 'crafter', 'smith', 'healer', 'merchant', 'scholar', 'builder', 'architect', 'craft apprentice', 'magical craftsperson')
@@ -115,7 +115,7 @@ def _review_magic_demand(world, people, adventure, magic):
         household = world.households[p.household]
         household_crisis = local.scarcity >= .24 and household.food < 4
         institutional_access = adventure is not None or magic is not None
-        social_exposure = (family >= 1 and (p.curiosity >= .30 or p.attachment >= .50)) or (contacts >= 3 and p.curiosity >= .45)
+        social_exposure = (family >= 1 and p.curiosity >= .42) or (contacts >= 4 and p.curiosity >= .52)
         reason = None
         if social_exposure: reason = 'social magical exposure'
         elif work_need and institutional_access: reason = f'{work_domain} capability'
@@ -128,7 +128,7 @@ def _review_magic_demand(world, people, adventure, magic):
         a.desired_base_essences = max(a.desired_base_essences, 1)
         a.desired_abilities = max(a.desired_abilities, 5)
         if a.reason == 'capability' or a.desired_base_essences == 1: a.reason = reason
-        if a.adventurer_aspiration or (work_need and social_exposure and a.drive >= .44):
+        if a.adventurer_aspiration or (work_need and social_exposure and a.drive >= .52):
             a.completion_goal = True; a.desired_base_essences = 3; a.desired_abilities = 20
 
 
@@ -165,6 +165,7 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,)); continue
         incomplete = sum(1 for p in users if len(world.advancement.path(p.id).abilities) < world.advancement.path(p.id).capacity)
         stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
+        if supply_pressure < .15: stone_share = max(stone_share, .82)
         kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
         found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition')
         world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key)
