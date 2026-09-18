@@ -132,33 +132,6 @@ def _review_magic_demand(world, people, adventure, magic):
             a.completion_goal = True; a.desired_base_essences = 3; a.desired_abilities = 20
 
 
-def _expedition_candidates(world, people, users, adventurer_aspirants, supply_pressure):
-    """Return field candidates with urgent first-access seekers represented.
-
-    Existing practitioners still provide expedition competence, but under real
-    shortage a civilian who has spent years urgently seeking a first essence can
-    choose to go after one instead of remaining permanently behind users in the
-    candidate order.
-    """
-    first_seekers=[]
-    for p in people:
-        path=world.advancement.path(p.id);a=_aspiration(world,p)
-        base=0 if path is None else len(path.base_essences)
-        if base==0 and a.desired_base_essences>0 and a.urgency>=.48 and a.risk_tolerance>=.28:
-            first_seekers.append(p)
-    first_seekers.sort(key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).search_years,_aspiration(world,p).risk_tolerance,_aspiration(world,p).preparation,p.health,-p.id),reverse=True)
-    experienced=sorted(users+[p for p in adventurer_aspirants if p not in users],key=lambda p:(_aspiration(world,p).risk_tolerance,_aspiration(world,p).preparation,p.health,-p.id),reverse=True)
-    if supply_pressure<=.10 or not first_seekers:return first_seekers,experienced
-    # Interleave rather than replace experienced field hands. This is a behavior
-    # choice under shortage, not a prevalence quota.
-    mixed=[];i=j=0
-    while i<len(experienced) or j<len(first_seekers):
-        if i<len(experienced):mixed.append(experienced[i]);i+=1
-        if j<len(first_seekers):mixed.append(first_seekers[j]);j+=1
-        if i<len(experienced):mixed.append(experienced[i]);i+=1
-    return first_seekers,mixed
-
-
 def _expedition_step(world, rng, sid, people, users, adventure, magic):
     if not people: return
     ambient = world.ambient_magic.field(sid).level
@@ -177,10 +150,9 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
     # activity rate and let demand redirect recovery toward essences below.
     attempts = min(8, int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0)))
     if attempts <= 0: return
-    first_seekers, candidates = _expedition_candidates(world, people, users, adventurer_aspirants, supply_pressure)
-    if not candidates: candidates = sorted(aspirants, key=lambda p: (_aspiration(world, p).urgency, _aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
+    candidates = sorted(users + [p for p in adventurer_aspirants if p not in users], key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
+    if not candidates: candidates = sorted(adventurer_aspirants, key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
     if not candidates: return
-    first_seeker_ids={p.id for p in first_seekers}
     Layer, Ref = layer_ref()
     for n in range(attempts):
         erng = rng.stream('magical_expedition', world.year, sid * 100 + n); leader = candidates[n % len(candidates)]; aspiration = _aspiration(world, leader)
@@ -188,32 +160,14 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         if adventure is not None: readiness += .14
         if magic is not None: readiness += .08
         danger = .08 + .22 * cell.hazard + .10 * max(0., ambient - .8)
-        first_access = leader.id in first_seeker_ids and world.advancement.path(leader.id) is None
-        event = world.emit('magical_expedition', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), society_branch=None if adventure is None else adventure.id, ambient_magic=round(ambient, 3), readiness=round(readiness, 3), danger=round(danger, 3), first_access_seek=first_access, urgency=round(aspiration.urgency,3))
+        event = world.emit('magical_expedition', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), society_branch=None if adventure is None else adventure.id, ambient_magic=round(ambient, 3), readiness=round(readiness, 3), danger=round(danger, 3))
         if erng.random() > min(.86, readiness + .16 * ambient):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,)); continue
         incomplete = sum(1 for p in users if len(world.advancement.path(p.id).abilities) < world.advancement.path(p.id).capacity)
         stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
-        # A first-access seeker is deliberately hunting an essence-bearing site,
-        # not rolling on the same target mix as an experienced practitioner.
-        if first_access:stone_share*=.20
         kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
         found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition')
-        recovered = world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key, supply_pressure=round(supply_pressure,3))
-        # Common essence sources are harvestable deposits rather than one-shot
-        # lottery prizes. Under real local shortage, an organized expedition can
-        # work the same discovered source for a small bounded batch. The original
-        # find remains the finder's property; additional physical units enter
-        # persistent local dealer stock. Rare finds remain singular.
-        rarity=str(found.rarity).lower()
-        if found.kind=='essence' and rarity in ('common','uncommon') and supply_pressure>0 and (adventure is not None or magic is not None):
-            capacity=5 if rarity=='common' else 3
-            harvest_count=min(capacity,max(1,int(capacity*supply_pressure+.999)))
-            wholesale=.55 if rarity=='common' else .85
-            harvest=world.emit('essence_source_harvested',Layer.REALITY,(Ref('person',leader.id),),Ref('settlement',sid),(recovered.id,),source_resource=found.id,key=found.key,rarity=found.rarity,quantity=harvest_count,mechanism='organized harvest of discovered essence source',seekers=essence_seekers,shelf_stock=essence_stock)
-            for _ in range(harvest_count):
-                world.magic_resources.create('essence',found.key,found.rarity,world.year,sid,'settlement',sid,harvest.id)
-            leader.wealth+=wholesale*harvest_count
+        world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key)
         aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
