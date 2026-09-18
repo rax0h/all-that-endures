@@ -77,8 +77,25 @@ class Simulation:
    sp=child_species(a,b,rr);p=Person(pid,self.w.year,sid,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=pair);self.w.people[pid]=p;self.w.metaphysics.soul(pid);h.members.append(pid);self.w.genealogy.birth(pid,pair);alive_by_settlement[sid].append(p);dependent_count[key]=child_count+1;e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(formed,),household=hid,species=sp,reproductive_opportunity=bio_opportunity);self.w.lineage.register("person",pid,tuple(("person",x) for x in pair),e.id,self.w.year);inherited=self.w.communities.inherit(pid,pair)
    for cid,strength in inherited.items():self.w.transmission.record(self.w.year,"parenting","community_membership",cid,"parents",min(pair),"person",pid,e.id,reliability=strength)
    for parent in pair:self.w.social.record(parent,pid,e.id,trust=.15,attachment=.3,obligation=.25)
-  for h in self.w.households.values():
-   if h.alive and not any(self.w.people[i].alive for i in h.members):h.alive=False
+  # Household records are permanent history. Maintain a derived live-id set
+  # so this cleanup scales with the current population, not every household
+  # created across a millennium. New household ids are monotonic.
+  active=self.w.__dict__.get('_active_household_ids')
+  seen_next=self.w.__dict__.get('_active_household_seen_next')
+  if active is None or seen_next is None or seen_next>self.w.next_household:
+   active={hid for hid,h in self.w.households.items() if h.alive}
+  elif seen_next<self.w.next_household:
+   for hid in range(seen_next,self.w.next_household):
+    h=self.w.households.get(hid)
+    if h is not None and h.alive:active.add(hid)
+  self.w._active_household_seen_next=self.w.next_household
+  for hid in tuple(active):
+   h=self.w.households.get(hid)
+   if h is None or not h.alive:
+    active.discard(hid);continue
+   if not any(self.w.people[i].alive for i in h.members):
+    h.alive=False;active.discard(hid)
+  self.w._active_household_ids=active
  def _pressure(self):
   by_settlement={sid:[] for sid in self.w.settlements}
   for p in self.w.current_people():
