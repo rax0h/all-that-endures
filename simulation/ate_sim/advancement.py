@@ -104,14 +104,15 @@ class AdvancementState:
    counts[a.essence]+=1
   if len(counts)!=4 or any(n!=SKILLS_PER_ESSENCE for n in counts.values()):return 0
   return min(a.rank for a in p.abilities)
- def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.):
+ def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.,body_rank=None):
   p=self.paths.get(pid)
   if p is None or not p.abilities:return None
   a=p.abilities[ability%len(p.abilities)];r=a.rank
-  # Partial essence users can develop a Bronze ability without gaining bodily
-  # Iron benefits. An ability waits at the next tier's entry until the body
-  # catches up; practice cannot bank progress beyond that ceiling.
-  ceiling=min(5,max(1,self.rank(pid))+1)
+  # Hot-path callers already know the body's rank for this annual training
+  # block. Reuse it instead of rescanning all twenty abilities per practice.
+  # Callers that do not provide it retain the authoritative full check.
+  current=self.rank(pid) if body_rank is None else int(body_rank)
+  ceiling=min(5,max(1,current)+1)
   if r>=ceiling:return a
   gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
   if core>0:gain+=core*(.8,.65,.5,.3,.0,.0)[min(r,5)];p.core_fraction=min(1.,p.core_fraction+core*.01)
