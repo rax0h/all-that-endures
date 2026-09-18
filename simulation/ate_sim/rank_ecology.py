@@ -27,6 +27,8 @@ def _martial_school_context(world,rng,living,adventure_members):
  # context. Unranked relatives remain members in canonical community state and
  # become visible here automatically if they later reach Iron.
  ranked_living=[p for p in living if p.rank>=1]
+ population_by_sid={}
+ for p in living:population_by_sid[p.settlement]=population_by_sid.get(p.settlement,0)+1
  by_sid={}
  for p in ranked_living:by_sid.setdefault(p.settlement,[]).append(p)
 
@@ -36,7 +38,7 @@ def _martial_school_context(world,rng,living,adventure_members):
   Layer,Ref=layer_ref()
   for sid,people in sorted(by_sid.items()):
    local=list(existing_by_sid.get(sid,()))
-   max_schools=max(1,min(3,1+len(people)//220))
+   max_schools=max(1,min(3,1+population_by_sid.get(sid,0)//220))
    if len(local)>=max_schools:continue
    founders=[p for p in people if p.id in adventure_members and p.rank>=3 and p.age>=24]
    founders.sort(key=lambda p:(p.rank,world.skills.get(p.id,'defense').level,p.curiosity,-p.id),reverse=True)
