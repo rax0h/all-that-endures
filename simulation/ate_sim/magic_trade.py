@@ -65,30 +65,53 @@ def _retail_price(resource):
 
 
 def _retail_browse(world,adults,rng=None):
- """Let people buy ordinary magical goods from literal local shelf stock.
+ """Buy from one live magical-goods market backed by real listed inventory.
 
-Essences are the beginning of a magical path, not a multi-year acquisition
-quest. A shopper who wants base essences may buy every useful affordable base
-essence needed for their current goal in the same annual shopping pass. Each
-purchased essence is absorbed immediately. Adventurers/full-path aspirants can
-therefore leave an adequately stocked shop with all three bases in one visit.
-
-Scarce stock is still first-come rather than allocated by a controller. Urgency,
-drive and preparation affect deterministic arrival order only when buyers really
-are competing for too few goods.
+ Local shelves and Magic Society remote listings are simultaneous choices, not
+ fallback stages. A remote order transfers an actually existing resource from
+ its source settlement and records a within-year delivery delay. No annual
+ quantity cap exists: stock, affordability and the person's path capacity are
+ the only limits.
  """
  Layer,Ref=layer_ref()
- institution=world.institutions.institution_by_kind('adventure_society')
- for sid,people in sorted(adults.items()):
-  stock=world.magic_resources.inventory('settlement',sid)
-  if not stock:continue
+ adventure=world.institutions.institution_by_kind('adventure_society')
+ magic_society=world.institutions.institution_by_kind('magic_society')
+
+ # Build the live catalog once for the whole annual market pass. This makes all
+ # listed settlement stock visible without a person x world-resource scan.
+ markets={}
+ global_stones=[]
+ stone_source={}
+ available_stones=set()
+ for market_sid in sorted(world.settlements):
+  stock=world.magic_resources.inventory('settlement',market_sid)
   essence_by_key={};stone_heap=[]
   for resource in stock:
-   if resource.kind=='essence':essence_by_key.setdefault(resource.key,[]).append(resource.id)
-   else:stone_heap.append(resource.id)
+   if resource.kind=='essence':
+    essence_by_key.setdefault(resource.key,[]).append(resource.id)
+   else:
+    stone_heap.append(resource.id)
+    global_stones.append((resource.id,market_sid))
+    stone_source[resource.id]=market_sid
+    available_stones.add(resource.id)
   for heap in essence_by_key.values():heapify(heap)
   heapify(stone_heap)
-  essence_front={key:heap[0] for key,heap in essence_by_key.items() if heap}
+  markets[market_sid]=(essence_by_key,
+                       {key:heap[0] for key,heap in essence_by_key.items() if heap},
+                       stone_heap)
+ heapify(global_stones)
+
+ def next_global_stone():
+  while global_stones and global_stones[0][0] not in available_stones:heappop(global_stones)
+  return None if not global_stones else global_stones[0]
+
+ def next_local_stone(market_sid):
+  heap=markets[market_sid][2]
+  while heap and heap[0] not in available_stones:heappop(heap)
+  return None if not heap else (heap[0],market_sid)
+
+ for sid,people in sorted(adults.items()):
+  essence_by_key,essence_front,_local_stones=markets[sid]
   eligible=[]
   for p in people:
    a=_aspiration(world,p);path=world.advancement.path(p.id)
@@ -107,24 +130,29 @@ are competing for too few goods.
     arrivals.append((rr.random()-effort,p.id,p))
    shoppers=[p for _,_,p in sorted(arrivals,key=lambda x:(x[0],x[1]))]
 
-  def purchase(p,r,price):
+  def purchase(p,r,price,source_sid):
    coins={}
    if p.wealth>=price:p.wealth-=price
-   elif institution is not None and can_pay_tier(world,p.id,'iron',ceil(price)):
-    coins=world.currency.treasury_transfer(institution.id,p.id,{'iron':ceil(price)},deposit=True)
+   elif adventure is not None and can_pay_tier(world,p.id,'iron',ceil(price)):
+    coins=world.currency.treasury_transfer(adventure.id,p.id,{'iron':ceil(price)},deposit=True)
    else:return False
+   remote=source_sid!=sid
+   broker=None if magic_society is None else magic_society.id
    e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',sid),
                 ((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,
                 price=price,coin_deposit=coins,
-                institution=None if institution is None else institution.id,
+                institution=None if adventure is None else adventure.id,
+                market_operator=broker,source_settlement=source_sid,destination_settlement=sid,
+                delivery_days=14 if remote else 0,
                 price_domain='ranked_coin' if coins else 'ordinary_wealth',
-                channel='local essence dealer',mechanism='browsed shelf stock')
+                channel='Magic Society order network' if remote else 'local essence dealer',
+                mechanism='remote catalog order and courier delivery' if remote else 'browsed shelf stock')
    world.magic_resources.transfer(r.id,'person',p.id,e.id,sid)
    return True
 
   for p in shoppers:
-   # Base essences come first. Keep buying while this person's own path goal is
-   # unmet and distinct affordable essences are physically on the shelf.
+   # Base essences remain ordinary local shopping for now; the global Society
+   # catalog below is specifically the established awakening-stone market.
    while essence_front:
     a=_aspiration(world,p);path=world.advancement.path(p.id)
     base=0 if path is None else len(path.base_essences)
@@ -138,28 +166,27 @@ are competing for too few goods.
       candidates.append((price,rid,key))
     if not candidates:break
     price,rid,key=min(candidates);resource=world.magic_resources.resources[rid]
-    if not purchase(p,resource,price):break
+    if not purchase(p,resource,price,sid):break
     heap=essence_by_key[key];removed=heappop(heap);assert removed==rid
     if heap:essence_front[key]=heap[0]
     else:essence_front.pop(key,None)
     absorb_essence_resource(world,p.id,rid)
 
-   # Awakening stones have no artificial annual throttle. A committed
-   # adventurer who can afford the physically available stock may buy as many
-   # stones as needed in this visit, up to the path's actual ability capacity.
-   a=_aspiration(world,p)
-   while stone_heap:
-    path=world.advancement.path(p.id);abilities=0 if path is None else len(path.abilities)
+   # Adventurers/full-path trainees shop the Society-wide catalog directly.
+   # Local stock and remote stock are both in the candidate set from the start.
+   # Ordinary users may still buy from the local shelf.
+   while True:
+    a=_aspiration(world,p);path=world.advancement.path(p.id)
+    abilities=0 if path is None else len(path.abilities)
     wants_stone=path is not None and abilities<a.desired_abilities and abilities<path.capacity
     if not wants_stone or not (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):break
-    rid=stone_heap[0];resource=world.magic_resources.resources[rid]
-    if not purchase(p,resource,3):break
-    heappop(stone_heap)
-    # A shop visit is not an annual awakening timer. The purchased stone is
-    # physically in hand and may be used immediately; repeat while stock,
-    # funds and the person's own path goal permit it.
+    society_access=a.adventurer_aspiration or a.completion_goal
+    choice=next_global_stone() if society_access else next_local_stone(sid)
+    if choice is None:break
+    rid,source_sid=choice;resource=world.magic_resources.resources[rid]
+    if not purchase(p,resource,3,source_sid):break
+    available_stones.discard(rid)
     if use_awakening_stone(world,p.id,rid) is None:break
-
 
 def _route_neighbors(world,sid):
  neighbors=[]
