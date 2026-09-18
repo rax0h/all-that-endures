@@ -64,7 +64,7 @@ def _retail_price(resource):
  return 2.
 
 
-def _retail_browse(world,adults):
+def _retail_browse(world,adults,rng=None):
  """Let people shop persistent local inventory instead of being market-matched.
 
 A settlement's inventory is literal shelf stock. An adult with unmet magical
@@ -76,6 +76,11 @@ money and actual shelf availability determine whether a purchase occurs.
 Shelf lookup is indexed by kind/key so runtime depends on shoppers and distinct
 goods, not centuries of accumulated copies. Shoppers compare the current front
 of each usable essence identity by actual shelf price, then resource age/id.
+
+When stock is scarce, iteration order is not birth-ID order. Each shopper gets a
+deterministic yearly arrival draw shifted earlier by urgency, active search time,
+drive and preparation. That models people competing to obtain scarce goods
+without a market authority choosing winners.
  """
  Layer,Ref=layer_ref()
  institution=world.institutions.institution_by_kind('adventure_society')
@@ -92,7 +97,17 @@ of each usable essence identity by actual shelf price, then resource age/id.
   # these distinct fronts, never accumulated copies. This also avoids mutating a
   # shared heap merely to skip identities the current buyer already absorbed.
   essence_front={key:heap[0] for key,heap in essence_by_key.items() if heap}
-  for p in people:
+  if rng is None:
+   shoppers=list(people)
+  else:
+   arrivals=[]
+   for p in people:
+    a=_aspiration(world,p)
+    effort=.45*a.urgency+.15*a.drive+.10*a.preparation+.008*min(40,a.search_years)
+    rr=rng.stream('magic_shopping_arrival',world.year,p.id)
+    arrivals.append((rr.random()-effort,p.id,p))
+   shoppers=[p for _,_,p in sorted(arrivals,key=lambda x:(x[0],x[1]))]
+  for p in shoppers:
    held=world.magic_resources.inventory('person',p.id)
    if any(_wants(world,p,r) for r in held):continue
    a=_aspiration(world,p);path=world.advancement.path(p.id)
@@ -194,5 +209,5 @@ def magic_trade_step(world,rng):
  """Annual civilization-level circulation pass; creates no magical resources."""
  adults=_adults_by_settlement(world)
  _dealer_intake(world,adults)
- _retail_browse(world,adults)
+ _retail_browse(world,adults,rng)
  _travelling_merchants(world,adults)
