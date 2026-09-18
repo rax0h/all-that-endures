@@ -289,6 +289,39 @@ def test_established_region_starts_with_society_capacity_and_elevated_magic():
     assert len(observed)==1 and observed[0].data['preexisting'] is True
 
 
+def test_adventurer_can_buy_and_use_all_available_stones_in_one_shop_visit():
+    from ate_sim.magic_trade import _retail_browse
+    from ate_sim.semantic_dictionary import STONE_IDS,AWAKENING_STONES
+    w=generate_world(843020);sid=min(w.settlements)
+    p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
+    p.wealth=200
+    # Ensure a real three-base path exists before buying awakening stones.
+    path=w.advancement.path(p.id)
+    owned=set() if path is None else set(path.base_essences)
+    for key in [k for k in ESSENCES if k not in owned][:max(0,3-len(owned))]:
+        e=w.emit('test_shop_essence',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),essence=key)
+        r=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,sid,'person',p.id,e.id)
+        absorb_essence_resource(w,p.id,r.id)
+        owned.add(key)
+    path=w.advancement.path(p.id)
+    assert len(path.base_essences)==3 and len(path.abilities)==4
+    a=MagicAspiration(.9,3,20,'adventure',w.year,completion_goal=True,
+                      adventurer_aspiration=True,urgency=.9)
+    w.magic_resources.aspirations[p.id]=a
+    stone=STONE_IDS[0]
+    e=w.emit('test_shop_stones',Layer.REALITY,location=Ref('settlement',sid))
+    for _ in range(16):
+        w.magic_resources.create('awakening_stone',stone,AWAKENING_STONES[stone]['rarity'],
+                                 w.year,sid,'settlement',sid,e.id)
+    _retail_browse(w,{sid:[p]})
+    path=w.advancement.path(p.id)
+    assert len(path.abilities)==20
+    purchases=[e for e in w.events if e.kind=='magic_resource_purchased' and e.actors[0].id==p.id]
+    uses=[e for e in w.events if e.kind=='awakening_stone_used' and e.actors[0].id==p.id]
+    assert len(purchases)>=16 and len(uses)==16
+    assert not w.magic_resources.inventory('person',p.id,'awakening_stone')
+
+
 def test_adventure_society_can_recruit_willing_candidate_into_full_path_goal():
     from ate_sim.magic_economy import apprenticeship_step
     w=generate_world(843019);sid=min(w.settlements)
