@@ -83,11 +83,10 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
     if field_capacity <= 0: return
     rr = rng.stream('magical_field_economy', world.year, sid)
     pressure = max(0., ambient - .30) + .35 * cell.hazard + .08 * min(10, field_capacity)
-    base_attempts = int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0))
-    # Established institutions respond to persistent shortage by organizing more
-    # supply expeditions. The ecology still decides whether anything is found.
-    supply_attempts = int(round(4 * supply_pressure)) if (adventure is not None or magic is not None) else 0
-    attempts = min(12, base_attempts + supply_attempts)
+    # Shortage changes what organized expeditions target, not how many physical
+    # opportunities the ecology produces. Keep the existing bounded expedition
+    # activity rate and let demand redirect recovery toward essences below.
+    attempts = min(8, int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0)))
     if attempts <= 0: return
     candidates = sorted(users + [p for p in adventurer_aspirants if p not in users], key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
     if not candidates: candidates = sorted(aspirants, key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
