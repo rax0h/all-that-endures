@@ -223,9 +223,16 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic, supply_pl
                 weighted_stone=stone_gap*stone_share
                 weighted_essence=essence_gap*(1-stone_share)
                 kind='awakening_stone' if erng.random() < weighted_stone/max(.001,weighted_stone+weighted_essence) else 'essence'
-            found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition cache')
+            if adventure is None:
+                found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition cache')
+            else:
+                # Society-funded field crews secure the recovered cache for the
+                # branch training/operations reserve rather than privatizing it
+                # to the expedition leader.
+                found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition cache',
+                                       owner_kind='institution',owner_id=adventure.id)
             supply_plan[kind]=max(0,supply_plan[kind]-1);recovered+=1
-            world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key, cache_size=cache_size)
+            world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key, cache_size=cache_size,custody=found.owner_kind)
         if recovered:aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
