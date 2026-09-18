@@ -118,9 +118,12 @@ def _review_magic_demand(world, people, adventure, magic):
         already_interested = a.desired_base_essences > 0
         social_start = (family >= 1 and p.curiosity >= .50) or (contacts >= 5 and p.curiosity >= .60)
         social_exposure = already_interested and ((family >= 1 and p.curiosity >= .38) or (contacts >= 4 and p.curiosity >= .50))
+        motive = world.agency.motives.get(p.id)
+        status_need = 0.0 if motive is None else motive.status
+        work_start = work_need and (already_interested or p.curiosity >= .48 or status_need >= .38)
         reason = None
         if social_start or social_exposure: reason = 'social magical exposure'
-        elif work_need and institutional_access: reason = f'{work_domain} capability'
+        elif work_start and institutional_access: reason = f'{work_domain} capability'
         elif scarcity_need and institutional_access: reason = 'food-production pressure'
         elif household_crisis and institutional_access and p.attachment >= .45: reason = 'household scarcity'
         elif acute_environment and institutional_access: reason = 'local magical pressure'
@@ -130,13 +133,21 @@ def _review_magic_demand(world, people, adventure, magic):
         # This prevents a mature magical society from recursively making nearly
         # every ordinary user chase all 20 abilities.
         started = path is not None and len(path.base_essences) > 0
-        motive = world.agency.motives.get(p.id)
-        status_need = 0.0 if motive is None else motive.status
         mastery_intent = min(1.0, .62*p.curiosity + .28*(1-p.inhibition) + .10*status_need)
-        personal_mastery = started and mastery_intent >= .86
-        professional_mastery = started and named_profession and work_level >= 2.40 and mastery_intent >= .74
-        magical_profession = started and p.occupation == 'magical craftsperson' and mastery_intent >= .64
-        if a.adventurer_aspiration or personal_mastery or professional_mastery or magical_profession:
+        # Adventuring can become a vocation after childhood aspiration state was
+        # formed. Defense experience + high risk tolerance, especially under
+        # real magical danger, can therefore create a durable adventurer intent.
+        adventure_intent = (
+            a.adventurer_aspiration
+            or (a.risk_tolerance >= .72 and p.curiosity >= .60
+                and (work_levels['defense'] >= .85 or pressure >= .28))
+        )
+        if adventure_intent:
+            a.adventurer_aspiration = True
+        personal_mastery = started and mastery_intent >= .74
+        professional_mastery = started and work_level >= 2.40 and mastery_intent >= .66
+        magical_profession = started and p.occupation == 'magical craftsperson' and mastery_intent >= .60
+        if adventure_intent or personal_mastery or professional_mastery or magical_profession:
             a.completion_goal = True; a.desired_base_essences = 3; a.desired_abilities = 20
 
         if reason is None: continue
