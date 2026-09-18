@@ -169,8 +169,7 @@ def apprenticeship_step(world,living=None):
         branch=world.institutions.branch_for('adventure_society',sid)
         assets=assets_by_sid.get(sid,[])
         if branch is None or not assets:continue
-        open_notices=sum(world.institutions.notices[nid].status!='resolved'
-                         for nid in branch.notices if nid in world.institutions.notices)
+        open_notices=world.institutions.active_notice_count(branch.id)
         capacity=max(4,min(18,4+int(8*branch.authority)+min(5,open_notices)))
         contracted=[];recruitable=[]
         for p in people:
