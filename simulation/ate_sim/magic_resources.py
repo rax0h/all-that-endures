@@ -261,7 +261,7 @@ class _SettlementMarket:
    self.groups={kind:[group for priority,group in sorted(values.items(),reverse=True)] for kind,values in groups.items()}
   kind='essence' if resource.kind=='essence' else 'awakening_stone'
   for group in self.groups[kind]:
-   candidates=[p for p,owned in group if (p.wealth>=min_wealth or can_pay_tier(self.world,p.id,'iron',ceil(min_wealth))) and (kind!='essence' or resource.key not in owned)]
+   candidates=[p for p,owned in group if (p.wealth>=min_wealth or can_pay_tier(self.world,p.id,'iron',ceil(min_wealth))) and (kind!='essence' or resource.key not in owned) and _wants(self.world,p,resource)]
    if candidates:return candidates
   return []
 
@@ -305,14 +305,27 @@ class _SettlementDemand:
   for entry in excluded:heappush(heap,entry)
   return result
 
-def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
+def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None,market=None):
  Layer,Ref=layer_ref();price=(8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity))
- # Rank only feasible transactions. Eligibility checks must not create social edges.
- candidates=[]
- for q in local:
-  if q.id==holder.id or not _wants(world,q,r):continue
-  relationship=world.social.edges.get(world.social.key(holder.id,q.id))
-  if q.wealth>=price or can_pay_tier(world,q.id,'iron',ceil(price)) or (relationship is not None and relationship.attachment>.7):candidates.append(q)
+ # Rank only feasible transactions. A settlement market avoids rescanning every
+ # resident for every offer; strongly attached contacts remain an independent
+ # gift route even when they cannot pay.
+ if market is None:
+  candidates=[]
+  for q in local:
+   if q.id==holder.id or not _wants(world,q,r):continue
+   relationship=world.social.edges.get(world.social.key(holder.id,q.id))
+   if q.wealth>=price or can_pay_tier(world,q.id,'iron',ceil(price)) or (relationship is not None and relationship.attachment>.7):candidates.append(q)
+ else:
+  candidates=[q for q in market.contenders(r,price) if q.id!=holder.id]
+  local_by_id={q.id:q for q in local}
+  seen={q.id for q in candidates}
+  for qid in world.social.neighbors(holder.id):
+   q=local_by_id.get(qid)
+   if q is None or q.id in seen:continue
+   relationship=world.social.edges.get(world.social.key(holder.id,q.id))
+   if relationship is not None and relationship.attachment>.7 and _wants(world,q,r):
+    candidates.append(q);seen.add(q.id)
  if not candidates:return False
  q=max(candidates,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id));a=_aspiration(world,q);gift=world.social.get(holder.id,q.id).attachment>.7
  coins={}
