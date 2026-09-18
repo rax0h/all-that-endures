@@ -111,6 +111,7 @@ def test_real_civilian_work_can_create_magic_demand_without_named_profession():
     magical_civ._review_magic_demand(w,[p],adventure,magic)
     assert a.desired_base_essences>=1 and a.desired_abilities>=5
     assert a.reason=='craft capability'
+    assert not a.completion_goal
 
 
 def test_ordinary_manifestation_collection_is_shelf_bounded():
@@ -175,3 +176,41 @@ def test_generic_aspirant_does_not_accumulate_search_years_for_shop_access():
     w.magic_resources.aspirations[p.id]=a
     Simulation(w).run(1)
     assert a.search_years==0
+
+
+def test_social_exposure_and_ordinary_work_do_not_make_civilian_a_completionist():
+    w=generate_world(843013);Simulation(w).run(1);sid=min(w.settlements)
+    people=[p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid][:5]
+    assert len(people)>=2
+    p=people[0];p.occupation='labor';p.curiosity=.55
+    w.advancement.paths.pop(p.id,None)
+    w.skills.get(p.id,'craft').level=1.5
+    a=MagicAspiration(.55,1,5,'craft capability',w.year,completion_goal=False)
+    w.magic_resources.aspirations[p.id]=a
+    # Give several local contacts magic so social exposure is definitely present.
+    for q in people[1:]:
+        if w.advancement.path(q.id) is None:
+            key=next(iter(ESSENCES));e=w.emit('test_social_user',Layer.REALITY,(Ref('person',q.id),),Ref('settlement',sid))
+            rr=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,sid,'person',q.id,e.id);absorb_essence_resource(w,q.id,rr.id)
+        w.social.get(p.id,q.id).attachment=.8
+    adventure,magic=magical_civ._institutional_capacity(w,sid)
+    magical_civ._review_magic_demand(w,people,adventure,magic)
+    assert not a.completion_goal
+    assert a.desired_base_essences==1
+    assert a.desired_abilities==5
+
+
+def test_high_commitment_civilian_can_choose_to_complete_after_starting_magic():
+    w=generate_world(843014);Simulation(w).run(1);sid=min(w.settlements)
+    p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
+    p.occupation='labor';p.curiosity=.9
+    w.advancement.paths.pop(p.id,None)
+    a=MagicAspiration(.82,1,5,'curiosity',w.year,completion_goal=False)
+    w.magic_resources.aspirations[p.id]=a
+    key=next(iter(ESSENCES));e=w.emit('test_started_path',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid))
+    rr=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,sid,'person',p.id,e.id);absorb_essence_resource(w,p.id,rr.id)
+    adventure,magic=magical_civ._institutional_capacity(w,sid)
+    magical_civ._review_magic_demand(w,[p],adventure,magic)
+    assert a.completion_goal
+    assert a.desired_base_essences==3
+    assert a.desired_abilities==20
