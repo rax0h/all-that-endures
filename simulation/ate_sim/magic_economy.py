@@ -9,12 +9,12 @@ from .threat_ecology import supported_rank
 from .magic_progression import record_application
 
 
-def spirit_economy_step(world,rng):
+def spirit_economy_step(world,rng,living=None):
     Layer,Ref=layer_ref()
     society=world.institutions.institution_by_kind('adventure_society')
     if society is None:return
     farms={a.settlements[0]:a for a in world.infrastructure.assets.values() if a.kind=='spirit_coin_farm'}
-    living=world.living_by_settlement()
+    living=world.living_by_settlement() if living is None else living
     for sid,people in sorted(living.items()):
         eligible=[p for p in people if p.age>=16 and p.rank>=1 and world.skills.get(p.id,'craft').level>=.7]
         if not eligible:continue
@@ -96,8 +96,9 @@ def magical_service(world,provider,client,ability,*,kind,difficulty,constraint):
     return True
 
 
-def magical_services_step(world,rng):
-    for sid,people in sorted(world.living_by_settlement().items()):
+def magical_services_step(world,rng,living=None):
+    living=world.living_by_settlement() if living is None else living
+    for sid,people in sorted(living.items()):
         clients=[p for p in people if p.alive and world.currency.wallets.get(p.id)]
         if not clients:continue
         providers=[p for p in people if p.alive and p.rank>=1]
@@ -116,38 +117,51 @@ def magical_services_step(world,rng):
                 if magical_service(world,p,client,ability,kind=kind,difficulty=difficulty,constraint=constraint):break
 
 
-def apprenticeship_step(world):
-    """Paid public work supports committed trainees; no essence is handed out.
+def apprenticeship_step(world,living=None):
+    """Fund the Society's broad replacement pipeline with real work and real money.
 
-    Three places per existing Society branch, funded from its actual treasury.
-    Incomplete trainees have continuity; completion releases the place. Wages
-    buy real market stock at normal prices and support repeated generations.
+    The Adventure Society wants as many viable Iron-rank responders as its local
+    civilization can sustain. Committed incomplete-path recruits therefore do
+    patrol, drills, logistics and public works for an actual stipend from the
+    conserved Society treasury. Nothing here grants an essence, stone, ability
+    or rank: trainees still buy physical stock and satisfy every progression
+    prerequisite in the normal systems.
     """
     from .magic_resources import _aspiration
     Layer,Ref=layer_ref();inst=world.institutions.institution_by_kind('adventure_society')
     if inst is None:return
-    for sid,people in sorted(world.living_by_settlement().items()):
+    living=world.living_by_settlement() if living is None else living
+    treasury=world.currency.treasuries.get(inst.id,{})
+    for sid,people in sorted(living.items()):
         branch=world.institutions.branch_for('adventure_society',sid)
         if branch is None:continue
+        open_notices=sum(world.institutions.notices[nid].status!='resolved'
+                         for nid in branch.notices if nid in world.institutions.notices)
+        # Capacity follows branch authority and real workload, not a target rank count.
+        capacity=max(4,min(18,4+int(8*branch.authority)+min(5,open_notices)))
         candidates=[]
         for p in people:
             if not p.alive or p.age<16:continue
             path=world.advancement.path(p.id)
             if path and len(path.abilities)==20:continue
             aspiration=_aspiration(world,p)
-            if not aspiration.completion_goal or aspiration.drive<.4:continue
+            if not aspiration.completion_goal or aspiration.drive<.30:continue
             candidates.append(p)
-        candidates.sort(key=lambda p:(-(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),-_aspiration(world,p).preparation,-p.curiosity,p.id))
-        for p in candidates[:3]:
-            if world.currency.treasuries.get(inst.id,{}).get('iron',0)<4:break
-            # Existing infrastructure continuously needs maintenance; saturating
-            # a permanent defense scalar must not erase work for later centuries.
-            assets=[a for a in world.infrastructure.assets.values() if sid in a.settlements and a.condition<1.]
-            if not assets:continue
-            asset=min(assets,key=lambda a:(a.condition,a.id));before=asset.condition
-            world.infrastructure.maintain(asset.id,.2*(.5+p.health));effect=asset.condition-before
-            if effect<=0:continue
-            world.skills.practice(p.id,'construction',.2)
-            coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':4})
-            world.emit('society_apprentice_work',Layer.SOCIETY,(Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
-                branch=branch.id,work='public infrastructure maintenance',infrastructure=asset.id,improvement=effect,coin_reward=coins,treasury=inst.id,eligibility='committed incomplete path')
+        candidates.sort(key=lambda p:(
+            -(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),
+            -_aspiration(world,p).preparation,-_aspiration(world,p).urgency,
+            -p.curiosity,p.id))
+        for p in candidates[:capacity]:
+            if treasury.get('iron',0)<3:break
+            aspiration=_aspiration(world,p)
+            rr=world.year+p.id
+            work='public defense patrol' if rr%2 else 'Society field drills and logistics'
+            world.skills.practice(p.id,'defense',.24 if rr%2 else .18)
+            world.skills.practice(p.id,'construction',.08 if rr%2 else .12)
+            aspiration.preparation=min(1.,aspiration.preparation+.025)
+            aspiration.urgency=max(aspiration.urgency,.48)
+            coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':3})
+            world.emit('society_apprentice_work',Layer.SOCIETY,
+                (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
+                branch=branch.id,work=work,coin_reward=coins,treasury=inst.id,
+                eligibility='committed incomplete path',training_contract=True)
