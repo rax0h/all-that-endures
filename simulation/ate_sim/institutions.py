@@ -24,17 +24,23 @@ class InstitutionState:
   iid=self.next_institution;self.next_institution+=1;i=Institution(iid,kind,name,year,origin_event);self.institutions[iid]=i
   if hasattr(self,'_kind_index'):self._kind_index[kind]=i;self._kind_index_count=len(self.institutions)
   return i
+ def _ensure_branch_index(self):
+  if not hasattr(self,'_branch_index') or getattr(self,'_branch_index_count',-1)!=len(self.branches):
+   self._branch_index={(b.institution,b.settlement):b for b in self.branches.values()};self._branch_index_count=len(self.branches)
  def create_branch(self,institution,settlement,year,origin_event=None,authority=.5):
-  old=next((b for b in self.branches.values() if b.institution==institution and b.settlement==settlement),None)
+  self._ensure_branch_index();old=self._branch_index.get((institution,settlement))
   if old:return old
-  bid=self.next_branch;self.next_branch+=1;b=Branch(bid,institution,settlement,year,origin_event,authority);self.branches[bid]=b;self.institutions[institution].branches.append(bid);return b
+  bid=self.next_branch;self.next_branch+=1;b=Branch(bid,institution,settlement,year,origin_event,authority);self.branches[bid]=b;self.institutions[institution].branches.append(bid)
+  self._branch_index[(institution,settlement)]=b;self._branch_index_count=len(self.branches)
+  return b
  def institution_by_kind(self,kind):
   if not hasattr(self,'_kind_index') or getattr(self,'_kind_index_count',-1)!=len(self.institutions):
    self._kind_index={i.kind:i for i in self.institutions.values()};self._kind_index_count=len(self.institutions)
   return self._kind_index.get(kind)
  def branch_for(self,kind,settlement):
   i=self.institution_by_kind(kind)
-  return None if i is None else next((self.branches[bid] for bid in i.branches if self.branches[bid].settlement==settlement),None)
+  if i is None:return None
+  self._ensure_branch_index();return self._branch_index.get((i.id,settlement))
  def register_magic_user(self,branch,person,path,year,source_event=None,disclosure='full'):
   if disclosure not in ('identity','essences','full'):raise ValueError('invalid disclosure level')
   ess=tuple(path.essences) if disclosure!='identity' else ();cid=path.confluence if disclosure!='identity' else None;cname=path.confluence_name if disclosure!='identity' else None;abilities=tuple(a.semantic_key for a in path.abilities) if disclosure=='full' else ();names=tuple(a.name for a in path.abilities) if disclosure=='full' else ();rid=self.next_record;self.next_record+=1;r=MagicUserRecord(rid,person,branch,year,ess,cid,cname,abilities,names,disclosure,source_event);self.magic_records[rid]=r;self.branches[branch].records.add(rid)
