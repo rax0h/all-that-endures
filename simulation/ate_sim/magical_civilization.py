@@ -277,7 +277,12 @@ def magical_civilization_step(world, rng):
         people = by_settlement[sid]
         if not people: continue
         users = _practitioners(world, people); adventure, magic = _institutional_capacity(world, sid)
-        _review_magic_demand(world, people, adventure, magic)
+        # Long-lived vocational/social goals do not need a full annual
+        # reevaluation. Stagger people across a two-year review cycle; newly
+        # adult people are still reviewed immediately. Acute magical pressure
+        # remains annual below.
+        review_people=[p for p in people if p.age<=17 or ((world.year+p.id)&1)==0]
+        if review_people:_review_magic_demand(world, review_people, adventure, magic)
         _apply_external_magic_pressure(world, sid, people, users)
         _expedition_step(world, rng, sid, people, users, adventure, magic)
         users = _practitioners(world, people)
