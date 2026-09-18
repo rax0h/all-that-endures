@@ -2,6 +2,8 @@ from ate_sim.advancement import AdvancementState
 from ate_sim.worldgen import generate_world
 from ate_sim.core import Layer,Ref
 from ate_sim.magic_progression import practice_ability,record_application
+from ate_sim.rank_ecology import _martial_school_context
+from ate_sim.engine import Simulation
 
 
 def configured_world():
@@ -72,3 +74,18 @@ def test_uncredited_ability_and_failed_output_cannot_supply_evidence():
     record_application(w,p,a,e,constraint='failed',difficulty=2,outcome=0)
     assert not b.understanding.evidence
     assert 'failed' not in a.understanding.evidence
+
+
+def test_accomplished_society_veteran_can_found_lineage_training_school():
+    w,p,path=configured_world();p.age=40;w.year=5
+    adv=w.institutions.institution_by_kind('adventure_society')
+    assert adv is not None
+    adv.members.add(p.id)
+    context=_martial_school_context(w,Simulation(w).rng,sorted(w.current_people(),key=lambda x:x.id),adv.members)
+    schools=[x for x in w.communities.communities.values() if x.kind=='martial_school']
+    assert len(schools)==1
+    school=schools[0]
+    assert w.communities.memberships[(p.id,school.id)]==1.
+    assert context[p.id]>=4
+    event=next(e for e in w.events if e.kind=='martial_school_founded')
+    assert event.actors[0].id==p.id and event.data['founder_rank']==4
