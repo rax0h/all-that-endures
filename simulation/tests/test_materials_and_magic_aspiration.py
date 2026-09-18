@@ -331,21 +331,39 @@ def test_adventurer_can_order_remote_stones_without_exhausting_local_stock_and_u
     assert not w.magic_resources.inventory('person',p.id,'awakening_stone')
 
 
-def test_adventure_society_can_recruit_willing_candidate_into_full_path_goal():
+def test_observation_boundary_contains_established_ranked_magic_users():
+    w=generate_world(843019)
+    adults=[p for p in w.people.values() if p.alive and p.age>=18]
+    users=[p for p in adults if w.advancement.essence_user(p.id)]
+    ranked=[p for p in users if p.rank>=1]
+    assert users
+    assert ranked
+    assert len(ranked)>=max(1,int(len(users)*.30))
+    for p in ranked:
+        path=w.advancement.path(p.id)
+        assert len(path.base_essences)==3
+        assert path.confluence is not None
+        assert len(path.abilities)==20
+
+
+def test_adventure_society_admits_willing_candidate_into_annual_cadet_class():
     from ate_sim.magic_economy import apprenticeship_step
-    w=generate_world(843019);sid=min(w.settlements)
-    p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
+    w=generate_world(843021);sid=min(w.settlements)
+    p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid and p.rank==0)
     w.advancement.paths.pop(p.id,None)
     p.curiosity=.50;p.inhibition=.40;p.health=1.
     w.skills.get(p.id,'defense').level=1.0
     a=MagicAspiration(.45,1,5,'capability',w.year,completion_goal=False,
                       risk_tolerance=.65,urgency=.2)
     w.magic_resources.aspirations[p.id]=a
-    asset=next(x for x in w.infrastructure.assets.values() if sid in x.settlements)
-    asset.condition=.5
     apprenticeship_step(w,{sid:[p]})
+    branch=w.institutions.branch_for('adventure_society',sid)
     assert a.adventurer_aspiration
     assert a.completion_goal
-    assert a.reason=='Adventure Society apprenticeship'
+    assert a.reason=='Adventure Society cadet'
+    assert a.cadet_class_year==w.year
+    assert a.cadet_branch==branch.id
+    assert a.cadet_graduated_year is None
     assert a.desired_base_essences==3 and a.desired_abilities==20
-    assert any(e.kind=='society_apprentice_recruited' and e.actors[0].id==p.id for e in w.events)
+    assert any(e.kind=='society_cadet_admitted' and e.actors[0].id==p.id for e in w.events)
+    assert any(e.kind=='society_cadet_class_formed' and e.data['class_year']==w.year for e in w.events)
