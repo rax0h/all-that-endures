@@ -9,7 +9,7 @@ from heapq import heapify, heappop
 from math import ceil
 from .core_types import layer_ref
 from .currency import can_pay_tier
-from .magic_resources import _wants, _aspiration, _demand_key
+from .magic_resources import _wants, _aspiration, _demand_key, absorb_essence_resource
 
 
 def _adults_by_settlement(world):
@@ -65,22 +65,17 @@ def _retail_price(resource):
 
 
 def _retail_browse(world,adults,rng=None):
- """Let people shop persistent local inventory instead of being market-matched.
+ """Let people buy ordinary magical goods from literal local shelf stock.
 
-A settlement's inventory is literal shelf stock. An adult with unmet magical
-needs can inspect the goods actually present and buy one affordable, usable item
-per year. Priority, aspiration score and preparation never reserve stock or
-decide who is allowed to shop. Those states determine what the person wants;
-money and actual shelf availability determine whether a purchase occurs.
+Essences are the beginning of a magical path, not a multi-year acquisition
+quest. A shopper who wants base essences may buy every useful affordable base
+essence needed for their current goal in the same annual shopping pass. Each
+purchased essence is absorbed immediately. Adventurers/full-path aspirants can
+therefore leave an adequately stocked shop with all three bases in one visit.
 
-Shelf lookup is indexed by kind/key so runtime depends on shoppers and distinct
-goods, not centuries of accumulated copies. Shoppers compare the current front
-of each usable essence identity by actual shelf price, then resource age/id.
-
-When stock is scarce, iteration order is not birth-ID order. Each shopper gets a
-deterministic yearly arrival draw shifted earlier by urgency, active search time,
-drive and preparation. That models people competing to obtain scarce goods
-without a market authority choosing winners.
+Scarce stock is still first-come rather than allocated by a controller. Urgency,
+drive and preparation affect deterministic arrival order only when buyers really
+are competing for too few goods.
  """
  Layer,Ref=layer_ref()
  institution=world.institutions.institution_by_kind('adventure_society')
@@ -88,14 +83,11 @@ without a market authority choosing winners.
   stock=world.magic_resources.inventory('settlement',sid)
   if not stock:continue
   essence_by_key={};stone_heap=[]
-  for r in stock:
-   if r.kind=='essence':essence_by_key.setdefault(r.key,[]).append(r.id)
-   else:stone_heap.append(r.id)
+  for resource in stock:
+   if resource.kind=='essence':essence_by_key.setdefault(resource.key,[]).append(resource.id)
+   else:stone_heap.append(resource.id)
   for heap in essence_by_key.values():heapify(heap)
   heapify(stone_heap)
-  # One current shelf-front id per distinct essence identity. A buyer scans only
-  # these distinct fronts, never accumulated copies. This also avoids mutating a
-  # shared heap merely to skip identities the current buyer already absorbed.
   essence_front={key:heap[0] for key,heap in essence_by_key.items() if heap}
   if rng is None:
    shoppers=list(people)
@@ -103,37 +95,17 @@ without a market authority choosing winners.
    arrivals=[]
    for p in people:
     a=_aspiration(world,p)
-    effort=.45*a.urgency+.15*a.drive+.10*a.preparation+.008*min(40,a.search_years)
+    effort=.45*a.urgency+.15*a.drive+.10*a.preparation
     rr=rng.stream('magic_shopping_arrival',world.year,p.id)
     arrivals.append((rr.random()-effort,p.id,p))
    shoppers=[p for _,_,p in sorted(arrivals,key=lambda x:(x[0],x[1]))]
-  for p in shoppers:
-   held=world.magic_resources.inventory('person',p.id)
-   if any(_wants(world,p,r) for r in held):continue
-   a=_aspiration(world,p);path=world.advancement.path(p.id)
-   base=0 if path is None else len(path.base_essences)
-   abilities=0 if path is None else len(path.abilities)
-   wants_essence=base<a.desired_base_essences
-   wants_stone=path is not None and abilities<a.desired_abilities and abilities<path.capacity
-   choice=None
-   if wants_stone and stone_heap and (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):
-    rid=stone_heap[0];choice=(3,rid,'stone',None)
-   if choice is None and wants_essence and essence_front:
-    owned=set() if path is None else set(path.base_essences)
-    candidates=[]
-    for key,rid in essence_front.items():
-     if key in owned:continue
-     r=world.magic_resources.resources[rid];price=_retail_price(r)
-     if p.wealth>=price or can_pay_tier(world,p.id,'iron',ceil(price)):
-      candidates.append((price,rid,key))
-    if candidates:
-     price,rid,key=min(candidates);choice=(price,rid,'essence',key)
-   if choice is None:continue
-   price,rid,kind,key=choice;r=world.magic_resources.resources[rid];coins={}
+
+  def purchase(p,r,price):
+   coins={}
    if p.wealth>=price:p.wealth-=price
    elif institution is not None and can_pay_tier(world,p.id,'iron',ceil(price)):
     coins=world.currency.treasury_transfer(institution.id,p.id,{'iron':ceil(price)},deposit=True)
-   else:continue
+   else:return False
    e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',sid),
                 ((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,
                 price=price,coin_deposit=coins,
@@ -141,11 +113,38 @@ without a market authority choosing winners.
                 price_domain='ranked_coin' if coins else 'ordinary_wealth',
                 channel='local essence dealer',mechanism='browsed shelf stock')
    world.magic_resources.transfer(r.id,'person',p.id,e.id,sid)
-   if kind=='stone':heappop(stone_heap)
-   else:
+   return True
+
+  for p in shoppers:
+   # Base essences come first. Keep buying while this person's own path goal is
+   # unmet and distinct affordable essences are physically on the shelf.
+   while essence_front:
+    a=_aspiration(world,p);path=world.advancement.path(p.id)
+    base=0 if path is None else len(path.base_essences)
+    if base>=a.desired_base_essences:break
+    owned=set() if path is None else set(path.base_essences)
+    candidates=[]
+    for key,rid in essence_front.items():
+     if key in owned:continue
+     resource=world.magic_resources.resources[rid];price=_retail_price(resource)
+     if p.wealth>=price or can_pay_tier(world,p.id,'iron',ceil(price)):
+      candidates.append((price,rid,key))
+    if not candidates:break
+    price,rid,key=min(candidates);resource=world.magic_resources.resources[rid]
+    if not purchase(p,resource,price):break
     heap=essence_by_key[key];removed=heappop(heap);assert removed==rid
     if heap:essence_front[key]=heap[0]
     else:essence_front.pop(key,None)
+    absorb_essence_resource(world,p.id,rid)
+
+   # Awakening stones remain a later progression good; one stone purchase per
+   # annual pass is enough and cannot delay acquiring the foundational essences.
+   a=_aspiration(world,p);path=world.advancement.path(p.id)
+   abilities=0 if path is None else len(path.abilities)
+   wants_stone=path is not None and abilities<a.desired_abilities and abilities<path.capacity
+   if wants_stone and stone_heap and (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):
+    rid=stone_heap[0];resource=world.magic_resources.resources[rid]
+    if purchase(p,resource,3):heappop(stone_heap)
 
 
 def _route_neighbors(world,sid):
