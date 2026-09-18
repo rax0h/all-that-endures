@@ -24,7 +24,7 @@ def partnership_step(world,rng):
                 if b.id not in ancestry:ancestry[b.id]=world.genealogy.ancestors(b.id,2)
                 bb=ancestry[b.id]
                 if a.id in bb or b.id in aa or aa.intersection(bb):continue
-                rel=world.social.get(a.id,b.id);compatibility=1-abs(a.temperament-b.temperament);score=.35*compatibility+.25*(a.attachment+b.attachment)/2+.20*rel.trust+.20*rel.familiarity;candidates.append((score,b))
+                rel=world.social.edges.get(world.social.key(a.id,b.id));compatibility=1-abs(a.temperament-b.temperament);trust=.5 if rel is None else rel.trust;familiarity=0. if rel is None else rel.familiarity;score=.35*compatibility+.25*(a.attachment+b.attachment)/2+.20*trust+.20*familiarity;candidates.append((score,b))
             if not candidates:continue
             score,b=max(candidates,key=lambda x:x[0])
             if score<.43:continue
@@ -38,8 +38,12 @@ def partnership_step(world,rng):
                 he=world.emit("household_formed",Layer.SOCIETY,(Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(e.id,),household=nhid);world.lineage.register("household",nhid,tuple(("household",x) for x in parent_households),he.id,world.year);prop=world.economy.create("dwelling",sid,"household",nhid,max(5.,share*.5),world.year,he.id);world.lineage.register("property",prop.id,(("household",nhid),),he.id,world.year)
 
 def household_split_step(world,rng):
-    for hid,h in list(world.households.items()):
-        if len(h.members)<8:continue
+    # A historical household archive grows for the whole millennium; only
+    # households containing living people can split today.
+    active_hids=sorted({p.household for p in world.current_people() if p.alive})
+    for hid in active_hids:
+        h=world.households[hid]
+        if not h.alive or len(h.members)<8:continue
         living=[world.people[p] for p in h.members if world.people[p].alive];adults=[p for p in living if p.age>=18]
         if len(living)<8 or len(adults)<3:continue
         rr=rng.stream("household_split",world.year,hid)
