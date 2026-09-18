@@ -101,11 +101,15 @@ def test_ordinary_manifestations_stock_local_shops_even_without_seekers():
 def test_real_civilian_work_can_create_magic_demand_without_named_profession():
     w=generate_world(843007);Simulation(w).run(1);sid=min(w.settlements)
     p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
-    p.occupation='labor';p.curiosity=.8;w.skills.get(p.id,'craft').level=2.0
+    p.occupation='labor';p.curiosity=.8;p.inhibition=.8
+    w.advancement.paths.pop(p.id,None)
+    for skill in ('agriculture','construction','craft','knowledge','defense'):
+        w.skills.get(p.id,skill).level=0.
+    w.skills.get(p.id,'craft').level=2.0
     p.parents=()
     for other in list(w.social.neighbors(p.id)):
         w.social.edges[w.social.key(p.id,other)].attachment=0.
-    a=MagicAspiration(.05,0,0,'capability',w.year,urgency=0.)
+    a=MagicAspiration(.05,0,0,'capability',w.year,urgency=0.,risk_tolerance=.1)
     w.magic_resources.aspirations[p.id]=a
     adventure,magic=magical_civ._institutional_capacity(w,sid)
     magical_civ._review_magic_demand(w,[p],adventure,magic)
