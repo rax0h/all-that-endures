@@ -2,13 +2,22 @@ from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
 from .magic_progression import practice_ability,record_body_transition
-from .rank_ecology import rank_ecology_step, ACTION_FUNCTIONS
+from .rank_ecology import rank_ecology_step
 
 # Ordinary wealth is the civilian market scale. The old .03 work payout made a
 # seven-unit common essence cost centuries of labor for descendants born at zero.
 # Half a unit per full-strength work year keeps ordinary goods and wages on the
 # same scale without granting magic, resources, or rank directly.
 ORDINARY_WORK_INCOME = .50
+AGENCY_ACTION_FUNCTIONS={
+ 'secure_food':{'creation','control','support','detection','recovery'},
+ 'prepare':{'enhancement','control','movement','detection','recovery'},
+ 'work':{'creation','enhancement','control','support','exchange'},
+ 'socialize':{'influence','support','detection','exchange'},
+ 'learn':{'detection','control','transformation','support'},
+ 'teach':{'influence','support','control','exchange'},
+ 'build':{'creation','enhancement','control','transformation'},
+}
 ACTION_DOMAIN={'secure_food':'agriculture','prepare':'defense','work':'craft',
                'learn':'knowledge','teach':'knowledge','build':'construction'}
 @dataclass
@@ -40,7 +49,7 @@ def _practice_path(world,p,rr,action,strength):
  # progression for hundreds of mature partial users whose abilities are capped.
  trainable=[(i,a) for i,a in enumerate(path.abilities) if a.rank<ceiling]
  if not trainable:return
- relevant=ACTION_FUNCTIONS.get(action,set())
+ relevant=AGENCY_ACTION_FUNCTIONS.get(action,set())
  candidates=[(i,a) for i,a in trainable if a.function in relevant] or trainable;rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));before=body_rank
  for i,a in candidates[:uses]:
   meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,body_rank=body_rank)
