@@ -27,7 +27,7 @@ class AgencyState:
 def _practice_path(world,p,rr,action,strength):
  path=world.advancement.path(p.id)
  if path is None or not path.abilities:return
- body_rank=world.advancement.rank(p.id);ceiling=min(5,max(1,body_rank)+1)
+ body_rank=p.rank;ceiling=min(5,max(1,body_rank)+1)
  # Advancement.practice cannot move an ability at or above this body's current
  # training ceiling. Do not rebuild/shuffle candidate lists or call into
  # progression for hundreds of mature partial users whose abilities are capped.
@@ -36,7 +36,7 @@ def _practice_path(world,p,rr,action,strength):
  relevant={'secure_food':{'creation','control','support','detection','recovery'},'prepare':{'enhancement','control','movement','detection','recovery'},'work':{'creation','enhancement','control','support','exchange'},'socialize':{'influence','support','detection','exchange'},'learn':{'detection','control','transformation','support'},'teach':{'influence','support','control','exchange'},'build':{'creation','enhancement','control','transformation'}}.get(action,set())
  candidates=[(i,a) for i,a in trainable if a.function in relevant] or trainable;rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));before=body_rank
  for i,a in candidates[:uses]:
-  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action)
+  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,body_rank=body_rank)
  after=world.advancement.rank(p.id)
  record_body_transition(world,p,before,context=action)
 
