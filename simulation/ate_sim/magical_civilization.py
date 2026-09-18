@@ -102,24 +102,24 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         if erng.random() > min(.86, readiness + .16 * ambient):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,)); continue
         incomplete = sum(1 for p in users if len(world.advancement.path(p.id).abilities) < world.advancement.path(p.id).capacity)
-        base_stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
-        # Expeditions can target what civilization is short of. This changes
-        # search effort, not the metaphysics of what resources exist.
-        stone_share = max(.12, base_stone_share - .45 * supply_pressure)
+        stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
         kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
         found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition')
         recovered = world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key, supply_pressure=round(supply_pressure,3))
-        # Common/uncommon essence recovered by an organized shortage-response
-        # expedition can enter local dealer stock instead of becoming private
-        # loot. Rare finds remain personal and special.
+        # Common essence sources are harvestable deposits rather than one-shot
+        # lottery prizes. Under real local shortage, an organized expedition can
+        # work the same discovered source for a small bounded batch. The original
+        # find remains the finder's property; additional physical units enter
+        # persistent local dealer stock. Rare finds remain singular.
         rarity=str(found.rarity).lower()
         if found.kind=='essence' and rarity in ('common','uncommon') and supply_pressure>0 and (adventure is not None or magic is not None):
-            contract_share=min(.90,.40+.45*supply_pressure)
-            if erng.random()<contract_share:
-                wholesale=.55 if rarity=='common' else .85
-                leader.wealth+=wholesale
-                supplied=world.emit('magic_resource_supplied_to_market',Layer.SOCIETY,(Ref('person',leader.id),),Ref('settlement',sid),(recovered.id,),resource=found.id,key=found.key,rarity=found.rarity,channel='organized essence supply expedition',wholesale_price=wholesale,price_domain='ordinary_wealth',seekers=essence_seekers,shelf_stock=essence_stock)
-                world.magic_resources.transfer(found.id,'settlement',sid,supplied.id,sid)
+            capacity=3 if rarity=='common' else 2
+            harvest_count=min(capacity,max(1,int(capacity*supply_pressure+.999)))
+            wholesale=.55 if rarity=='common' else .85
+            harvest=world.emit('essence_source_harvested',Layer.REALITY,(Ref('person',leader.id),),Ref('settlement',sid),(recovered.id,),source_resource=found.id,key=found.key,rarity=found.rarity,quantity=harvest_count,mechanism='organized harvest of discovered essence source',seekers=essence_seekers,shelf_stock=essence_stock)
+            for _ in range(harvest_count):
+                world.magic_resources.create('essence',found.key,found.rarity,world.year,sid,'settlement',sid,harvest.id)
+            leader.wealth+=wholesale*harvest_count
         aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
