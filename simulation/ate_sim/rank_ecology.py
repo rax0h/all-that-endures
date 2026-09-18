@@ -138,7 +138,7 @@ def _career_training(world,p,path,asp,member,strength,school_rank=0):
   school_boost=.32 if school_rank>=3 else 0.
   # Bronze remains normal professional development, but sustained breadth across
   # all twenty abilities takes decades rather than immediately following Iron.
-  return ('all',.82+.28*strength+.24*ambition+school_boost,4,.24+.28*p.curiosity)
+  return ('all',2*(.82+.28*strength+.24*ambition+school_boost),4,.24+.28*p.curiosity)
  if rank==3:
   elite_school=school_rank>=4
   if not elite_school and not member and ambition<.68:return None
