@@ -47,6 +47,40 @@ def _essence_supply_signal(world, people, sid):
     return seekers,stock,pressure
 
 
+def _apply_external_magic_pressure(world, sid, people, users):
+    """Make existing magical goals urgent when the world gives people a reason.
+
+    This never creates interest. It only changes how hard an already-interested
+    seeker pushes when monsters, magical peers, or competition for scarce local
+    stock make delay costly.
+    """
+    if not people:return
+    active=world.threat_ecology.active(sid)
+    surge=world.settlements[sid].memory.get('monster_surge',0.)
+    threat_rank=max((t.rank for t in active),default=0)
+    local_user_share=len(users)/max(1,len(people))
+    seekers,stock,supply_pressure=_essence_supply_signal(world,people,sid)
+    peer_competition=min(1.,local_user_share*2.5)*(0.55+.45*supply_pressure)
+    for p in people:
+        a=_aspiration(world,p);path=world.advancement.path(p.id)
+        base=0 if path is None else len(path.base_essences)
+        if a.desired_base_essences<=base:continue
+        # An uninterested person is not turned into a seeker by pressure here.
+        if a.desired_base_essences<=0:continue
+        motive=world.agency.motives.get(p.id)
+        status_need=0. if motive is None else motive.status
+        threat=max(surge,p.fear,min(1.,threat_rank/3.))
+        competition=min(1.,peer_competition*(.65+.35*status_need))
+        external=max(threat,competition)
+        if external<.12:continue
+        target=min(1.,.34+.46*threat+.34*competition+.10*a.drive)
+        a.urgency=max(a.urgency,target)
+        # Under real pressure, people become less precious about the exact first
+        # essence they imagined and more willing to take a useful available path.
+        a.compromise_tolerance=max(a.compromise_tolerance,min(.95,.42+.45*external))
+        a.risk_tolerance=max(a.risk_tolerance,min(.92,.28+.38*external+.18*a.drive))
+
+
 def _review_magic_demand(world, people, adventure, magic):
     """Let existing aspirations respond to a changing magical civilization."""
     user_ids = {p.id for p in people if world.advancement.essence_user(p.id)}
@@ -214,6 +248,7 @@ def magical_civilization_step(world, rng):
         if not people: continue
         users = _practitioners(world, people); adventure, magic = _institutional_capacity(world, sid)
         _review_magic_demand(world, people, adventure, magic)
+        _apply_external_magic_pressure(world, sid, people, users)
         _expedition_step(world, rng, sid, people, users, adventure, magic)
         users = _practitioners(world, people)
         _resource_circulation(world, rng, sid, people, users, magic)
