@@ -220,11 +220,15 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
 def _resource_circulation(world, rng, sid, people, users, magic):
     if not people: return
     rr = rng.stream('magical_circulation', world.year, sid); rounds = 3 + (3 if magic is not None else 0)
+    people_by_id={p.id:p for p in people}
     for _ in range(rounds):
-        # People are already id-sorted. Probe each person's owner bucket directly;
-        # avoid rebuilding holder lists/maps every circulation round.
-        for holder in people:
-            if not world.magic_resources.owner_index.get(('person', holder.id)): continue
+        # Available person-held magical resources are sparse in mature runs.
+        # Iterate the owner index rather than every adult six times per year.
+        holder_ids=sorted(oid for (kind,oid),ids in world.magic_resources.owner_index.items()
+                          if kind=='person' and ids and oid in people_by_id)
+        if not holder_ids:break
+        for holder_id in holder_ids:
+            holder=people_by_id[holder_id]
             path = world.advancement.path(holder.id); a = _aspiration(world, holder); base = 0 if path is None else len(path.base_essences)
             ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if base < a.desired_base_essences else []
             if ess and base < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
@@ -237,7 +241,11 @@ def _resource_circulation(world, rng, sid, people, users, magic):
 
 
 def _society_pipeline(world, rng, sid, people, adventure, magic):
-    existing = {(a.person, a.society) for a in world.institutions.applications.values() if a.passed is None or a.passed}
+    # Initial intent may create one application here. Failed applicants are not
+    # recreated every year: society_career_step owns deliberate reapplication
+    # after its cooldown. Use the indexed pair set rather than rescanning the
+    # centuries-long application archive once per settlement.
+    existing = set(world.institutions.application_pairs())
     for p in people:
         if not full_essence_user(world, p.id): continue
         aspiration = _aspiration(world, p); targets = []
