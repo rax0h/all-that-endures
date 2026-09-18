@@ -152,12 +152,16 @@ def _review_magic_demand(world, people, adventure, magic):
             + .14 * (1-p.inhibition) + .12 * min(1., work_levels['defense']/2.)
             + .12 * status_need
         )
+        field_fit = (
+            p.occupation in ('adventurer', 'guard', 'hunter', 'soldier')
+            or work_levels['defense'] >= .55
+            or (a.risk_tolerance >= .58 and p.curiosity >= .48)
+            or (a.risk_tolerance >= .54 and status_need >= .40)
+        )
         society_candidate = (
-            adventure is not None and p.age >= 16 and p.health >= .50
-            and a.risk_tolerance >= .34
-            and (already_interested or p.curiosity >= .42 or status_need >= .34
-                 or work_levels['defense'] >= .55)
-            and recruit_score >= (.58 - .18 * recruitment_pressure)
+            adventure is not None and p.age >= 16 and p.health >= .58
+            and field_fit
+            and recruit_score >= (.58 - .16 * recruitment_pressure)
         )
         adventure_intent = (
             a.adventurer_aspiration or society_candidate

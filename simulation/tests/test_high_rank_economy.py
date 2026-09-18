@@ -158,6 +158,9 @@ def test_apprentice_pay_requires_funded_useful_work_and_releases_complete_paths(
     from ate_sim.magic_economy import apprenticeship_step
     from ate_sim.magic_resources import MagicAspiration
     w,p,path,adv=economy_world()
+    # This fixture is specifically testing whether apprenticeship can spend
+    # unfunded money, so remove the mature world's observed opening reserve.
+    w.currency.treasuries[adv.id].clear()
     for q in w.people.values():
         w.magic_resources.aspirations[q.id]=MagicAspiration(0,0,0,'test',0)
     path.abilities=path.abilities[:1]

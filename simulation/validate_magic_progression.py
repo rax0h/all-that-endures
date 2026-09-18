@@ -21,6 +21,8 @@ def validate(archive):
     treasuries=defaultdict(Counter)
     for row in archive.db.execute('SELECT payload FROM events ORDER BY year,id'):
         e=json.loads(row[0]);data=e['data'];kind=e['kind']
+        if kind=='society_treasury_observed':
+            for denomination,count in data.get('opening_balance',{}).items():treasuries[data['institution']][denomination]+=count
         actors=[a['id'] for a in e['actors'] if a['kind']=='person']
         if not actors:continue
         pid=actors[0]

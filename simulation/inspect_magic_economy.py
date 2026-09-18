@@ -13,6 +13,8 @@ def inspect(archive):
     high={pid:p for pid,p in people.items() if p['alive'] and p['rank']>=4}
     for row in archive.db.execute('SELECT payload FROM events ORDER BY year,id'):
         e=json.loads(row[0]);d=e['data'];k=e['kind']
+        if k=='society_treasury_observed':
+            for denom,n in d.get('opening_balance',{}).items():counts['opening_supply'][denom]+=n
         actors=[a['id'] for a in e['actors'] if a['kind']=='person'];pid=actors[0] if actors else None
         if k=='ranked_magic_manifested':
             counts['manifestations_by_rank'][str(d['rank'])]+=1
@@ -46,7 +48,7 @@ def inspect(archive):
         if people[pid]['alive']:balances[RANKS[people[pid]['rank']]].update(wallet)
     treasuries=Counter()
     for row in archive.db.execute("SELECT payload FROM records WHERE kind='treasury'"):treasuries.update(json.loads(row[0]))
-    conservation={d:counts['created'][d]-counts['consumed'][d]-all_wallets[d]-treasuries[d] for d in COIN_VALUE}
+    conservation={d:counts['opening_supply'][d]+counts['created'][d]-counts['consumed'][d]-all_wallets[d]-treasuries[d] for d in COIN_VALUE}
     threats=[json.loads(row[0]) for row in archive.db.execute("SELECT payload FROM records WHERE kind='threat'")]
     for t in threats:counts['final_threat_status'][f"rank {t['rank']}: {t['status']}"]+=1
     notices=[json.loads(row[0]) for row in archive.db.execute("SELECT payload FROM records WHERE kind='notice'")]

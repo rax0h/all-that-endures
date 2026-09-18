@@ -58,5 +58,5 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
  adv=w.institutions.institution_by_kind('adventure_society')
  if adv is not None:
   reserve=max(120,60*len(adv.branches));w.currency.treasuries.setdefault(adv.id,{})['iron']=reserve
-  anchor=min(w.settlements);w.emit('society_treasury_observed',Layer.SOCIETY,(Ref('institution',adv.id),),Ref('settlement',anchor),institution=adv.id,denomination='iron',count=reserve,preexisting=True,observation_boundary=True)
+  anchor=min(w.settlements);w.emit('society_treasury_observed',Layer.SOCIETY,(Ref('institution',adv.id),),Ref('settlement',anchor),institution=adv.id,denomination='iron',count=reserve,opening_balance={'iron':reserve},preexisting=True,observation_boundary=True)
  return w
