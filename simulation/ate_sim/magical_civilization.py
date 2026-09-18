@@ -122,22 +122,24 @@ def _review_magic_demand(world, people, adventure, magic):
         elif scarcity_need and institutional_access: reason = 'food-production pressure'
         elif household_crisis and institutional_access and p.attachment >= .45: reason = 'household scarcity'
         elif acute_environment and institutional_access: reason = 'local magical pressure'
-        if reason is None: continue
-        a.drive = min(1., max(a.drive, .34 + .05 * min(3, family + contacts) + (.06 if work_need else 0.) + .04 * min(1., work_level)))
-        a.urgency = min(1., max(a.urgency, .30 + .28 * pressure + (.10 if work_need else 0.) + (.08 if scarcity_need or household_crisis else 0.)))
-        a.desired_base_essences = max(a.desired_base_essences, 1)
-        a.desired_abilities = max(a.desired_abilities, 5)
-        if a.reason == 'capability' or a.desired_base_essences == 1: a.reason = reason
+
         # Going from "I use magic" to "I am completing the whole path" is a
         # personal/professional commitment, not a consequence of knowing magical
-        # people. Adventurers commit by role. Civilians may deepen only after
-        # actually starting a path and showing unusually strong mastery intent.
+        # people. This decision can arise from the person's own mastery intent;
+        # it does not require a fresh external pressure reason in the same year.
         started = path is not None and len(path.base_essences) > 0
         personal_mastery = started and a.drive >= .76 and p.curiosity >= .68
         professional_mastery = started and work_level >= 2.0 and a.drive >= .66 and p.curiosity >= .58
         magical_profession = started and p.occupation == 'magical craftsperson' and a.drive >= .60
         if a.adventurer_aspiration or personal_mastery or professional_mastery or magical_profession:
             a.completion_goal = True; a.desired_base_essences = 3; a.desired_abilities = 20
+
+        if reason is None: continue
+        a.drive = min(1., max(a.drive, .34 + .05 * min(3, family + contacts) + (.06 if work_need else 0.) + .04 * min(1., work_level)))
+        a.urgency = min(1., max(a.urgency, .30 + .28 * pressure + (.10 if work_need else 0.) + (.08 if scarcity_need or household_crisis else 0.)))
+        a.desired_base_essences = max(a.desired_base_essences, 1)
+        a.desired_abilities = max(a.desired_abilities, 5)
+        if a.reason == 'capability' or a.desired_base_essences == 1: a.reason = reason
 
 
 def _expedition_step(world, rng, sid, people, users, adventure, magic):
