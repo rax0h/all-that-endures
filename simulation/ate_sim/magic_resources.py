@@ -57,9 +57,9 @@ def absorb_essence_resource(world,pid,rid):
  if r.kind!='essence':raise ValueError('resource is not an essence')
  _validate_absorption_owner(r,pid)
  if r.key not in ESSENCES:raise ValueError('unknown essence')
- p=world.people[pid];path=world.advancement.path(pid);before=world.advancement.rank(pid)
+ p=world.people[pid];path=world.advancement.path(pid);before=world.advancement.rank(pid);base_before=0 if path is None else len(path.base_essences)
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
- Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
+ Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key,base_before=base_before,first_essence=(base_before==0));world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
  a=world.magic_resources.aspirations.get(pid)
  if a is not None and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
  if any(a.source=='confluence' for a in created):
