@@ -25,6 +25,10 @@ class AgencyState:
   m=self.assess(world,p,attachment,dependents);choices={'secure_food':m.hunger*1.35,'prepare':m.safety,'work':m.wealth+.35*m.obligation,'socialize':m.belonging*.8,'learn':m.curiosity*(1-.55*m.hunger),'teach':m.legacy,'build':(.55*m.safety+.35*m.status)*(1-.5*m.hunger)};best=max(choices.values());near=[(a,v) for a,v in choices.items() if v>=best-.08];action,strength=near[int(rng.random()*len(near))%len(near)];return action,max(m.__dict__,key=m.__dict__.get),strength
 
 def _practice_path(world,p,rr,action,strength):
+ # An incomplete rank-0 path's awakened abilities already begin at Iron.
+ # Advancement's body ceiling makes every practice call a no-op until 20/20
+ # completes the body, so avoid rebuilding candidate lists for those users.
+ if p.rank<=0:return
  path=world.advancement.path(p.id)
  if path is None or not path.abilities:return
  body_rank=p.rank;ceiling=min(5,max(1,body_rank)+1)
@@ -44,7 +48,7 @@ def agency_step(world,rng):
  for p in world.current_people():
   if p.alive and p.age<18:
    for parent in p.parents:dependents[parent]=dependents.get(parent,0)+1
- for p in sorted((x for x in world.current_people() if x.alive and x.age>=16),key=lambda x:x.id):
+ for p in (x for x in world.current_people() if x.alive and x.age>=16):
   attachment=max((r.attachment for r in world.social.relationships_for(p.id)),default=0.)
   rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachment,dependents.get(p.id,0));domain={'secure_food':'agriculture','prepare':'defense','work':'craft','learn':'knowledge','teach':'knowledge','build':'construction'}.get(action);event=None
   if domain:world.skills.practice(p.id,domain,.12+.38*strength)
@@ -56,5 +60,5 @@ def agency_step(world,rng):
  # Actions are a bounded recent decision cache; durable history lives in
  # events and the post-run archive. A few recent years are ample for consumers
  # such as rank ecology and avoid copying a 50k-entry list every mature year.
- if len(world.agency.actions)>5000:world.agency.actions=world.agency.actions[-5000:]
+ if len(world.agency.actions)>6000:world.agency.actions=world.agency.actions[-3000:]
  rank_ecology_step(world,rng)
