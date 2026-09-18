@@ -54,15 +54,17 @@ def _martial_school_context(world,rng,living,adventure_members):
 
  if not schools:return {}
  school_ids={s.id for s in schools}
- people_by_id={p.id:p for p in living}
  members_by_school={sid:[] for sid in school_ids}
  already_school=set()
- for (pid,cid),strength in world.communities.memberships.items():
-  if cid not in school_ids or strength<.18:continue
-  person=people_by_id.get(pid)
-  school=world.communities.communities.get(cid)
-  if person is None or school is None or person.settlement!=school.origin_settlement:continue
-  members_by_school[cid].append((person,strength));already_school.add(pid)
+ # Never scan the historical membership archive here. It contains every dead
+ # ancestor and grows for the entire millennium. Query the existing per-person
+ # membership index for the bounded living population instead.
+ for person in living:
+  for cid,strength in world.communities.memberships_for(person.id,.18).items():
+   if cid not in school_ids:continue
+   school=world.communities.communities[cid]
+   if person.settlement!=school.origin_settlement:continue
+   members_by_school[cid].append((person,strength));already_school.add(person.id)
 
  # Schools occasionally accept outsiders, but instruction remains scarce and
  # teacher-limited. This creates a real route through Bronze/Silver without a
