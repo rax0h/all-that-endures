@@ -52,9 +52,9 @@ def _review_magic_demand(world, people, adventure, magic):
         family = sum(1 for x in p.parents if x in user_ids)
         contacts = sum(1 for x in world.social.neighbors(p.id) if x in user_ids)
         named_profession = p.occupation in ('adventurer', 'guard', 'hunter', 'soldier', 'farmer', 'crafter', 'smith', 'healer', 'merchant', 'scholar', 'builder', 'architect', 'craft apprentice', 'magical craftsperson')
-        # Most civilians are still labelled "labor" at Stage 0.5. Use the work
-        # they actually know how to do instead of treating that placeholder as
-        # evidence that magic has no occupational value to them.
+        # "Labor" is only a placeholder, but ordinary work must still become
+        # specific before it creates magical demand. A person needs either a
+        # named profession or substantial demonstrated skill, not merely a job.
         work_levels = {
             'agriculture': world.skills.get(p.id, 'agriculture').level,
             'construction': world.skills.get(p.id, 'construction').level,
@@ -63,21 +63,26 @@ def _review_magic_demand(world, people, adventure, magic):
             'defense': world.skills.get(p.id, 'defense').level,
         }
         work_domain, work_level = max(work_levels.items(), key=lambda x: x[1])
-        work_need = named_profession or work_level >= .45
+        skilled_specialist = work_level >= 1.20 and (p.curiosity >= .42 or p.occupation != 'labor')
+        work_need = named_profession or skilled_specialist
         settlement = world.settlements[p.settlement]
         cell = world.cells[(settlement.x, settlement.y)]
-        pressure = max(cell.hazard, settlement.memory.get('monster_surge', 0.0), p.fear)
+        local = world.local[p.settlement]
+        pressure = max(settlement.memory.get('monster_surge', 0.0), p.fear)
+        acute_environment = cell.hazard >= .72 or pressure >= .48
+        scarcity_need = local.scarcity >= .18 and work_levels['agriculture'] >= .45
         household = world.households[p.household]
-        household_need = household.food < 6 or household.preparedness < .30
+        household_crisis = local.scarcity >= .24 and household.food < 4
         institutional_access = adventure is not None or magic is not None
         reason = None
         if family or contacts >= 2: reason = 'social magical exposure'
         elif work_need and institutional_access: reason = f'{work_domain} capability'
-        elif household_need and institutional_access: reason = 'household capability'
-        elif pressure >= .45 and institutional_access: reason = 'local magical pressure'
+        elif scarcity_need and institutional_access: reason = 'food-production pressure'
+        elif household_crisis and institutional_access and p.attachment >= .45: reason = 'household scarcity'
+        elif acute_environment and institutional_access: reason = 'local magical pressure'
         if reason is None: continue
         a.drive = min(1., max(a.drive, .34 + .05 * min(3, family + contacts) + (.06 if work_need else 0.) + .04 * min(1., work_level)))
-        a.urgency = min(1., max(a.urgency, .30 + .28 * pressure + (.10 if work_need else 0.) + (.06 if household_need else 0.)))
+        a.urgency = min(1., max(a.urgency, .30 + .28 * pressure + (.10 if work_need else 0.) + (.08 if scarcity_need or household_crisis else 0.)))
         a.desired_base_essences = max(a.desired_base_essences, 1)
         a.desired_abilities = max(a.desired_abilities, 5)
         if a.reason == 'capability' or a.desired_base_essences == 1: a.reason = reason
