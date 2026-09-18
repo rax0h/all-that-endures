@@ -45,10 +45,27 @@ class InstitutionState:
    self._recorded_people={r.person for r in self.magic_records.values()};self._record_count=len(self.magic_records)
   return self._recorded_people
  def records_for_person(self,pid):return sorted((r for r in self.magic_records.values() if r.person==pid),key=lambda r:(r.year,r.id))
+ def _ensure_notice_indexes(self):
+  if not hasattr(self,'_notice_by_cause') or getattr(self,'_notice_index_count',-1)!=len(self.notices):
+   self._notice_by_cause={n.cause_event:n for n in self.notices.values()}
+   self._active_notice_ids={n.id for n in self.notices.values() if n.status not in ('resolved','expired')}
+   self._notice_index_count=len(self.notices)
  def post_notice(self,branch,year,kind,location,cause_event):
-  old=next((n for n in self.notices.values() if n.cause_event==cause_event),None)
+  self._ensure_notice_indexes();old=self._notice_by_cause.get(cause_event)
   if old:return old
-  nid=self.next_notice;self.next_notice+=1;n=AdventureNotice(nid,branch,year,kind,location,cause_event);self.notices[nid]=n;self.branches[branch].notices.add(nid);return n
+  nid=self.next_notice;self.next_notice+=1;n=AdventureNotice(nid,branch,year,kind,location,cause_event);self.notices[nid]=n;self.branches[branch].notices.add(nid)
+  self._notice_by_cause[cause_event]=n;self._active_notice_ids.add(nid);self._notice_index_count=len(self.notices)
+  return n
+ def active_notices(self,branch=None):
+  self._ensure_notice_indexes()
+  # Status mutates in career resolution code. Keep only the live operational
+  # queue; the full notice dictionary remains the immutable historical archive.
+  self._active_notice_ids={nid for nid in self._active_notice_ids if self.notices[nid].status not in ('resolved','expired')}
+  ids=sorted(self._active_notice_ids)
+  if branch is not None:ids=[nid for nid in ids if self.notices[nid].branch==branch]
+  return [self.notices[nid] for nid in ids]
+ def active_notice_count(self,branch=None):
+  return len(self.active_notices(branch))
  def create_application(self,society,person,branch,year,eligible,origin_event=None):
   aid=self.next_application;self.next_application+=1;a=SocietyApplication(aid,society,person,branch,year,eligible,origin_event=origin_event);self.applications[aid]=a
   if hasattr(self,'_application_pairs'):self._application_pairs.add((person,society));self._application_count=len(self.applications)
