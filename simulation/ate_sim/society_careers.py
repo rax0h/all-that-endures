@@ -7,8 +7,9 @@ from .magic_economy import spirit_economy_step,magical_services_step,apprentices
 
 def society_career_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');mag=world.institutions.institution_by_kind('magic_society')
+ living=world.living_by_settlement();alive=sorted((p for people in living.values() for p in people),key=lambda x:x.id)
  recorded=set(world.institutions.recorded_people())
- for p in sorted((x for x in world.current_people() if x.alive and full_essence_user(world,x.id)),key=lambda x:x.id):
+ for p in (x for x in alive if full_essence_user(world,x.id)):
   if p.id in recorded:continue
   b=world.institutions.branch_for('magic_society',p.settlement)
   if b is None:continue
@@ -18,7 +19,7 @@ def society_career_step(world,rng):
  for society,inst in (('adventure_society',adv),('magic_society',mag)):
   if inst is None:continue
   latest=world.institutions.latest_applications(society)
-  for p in sorted((x for x in world.current_people() if x.alive and full_essence_user(world,x.id) and x.id not in inst.members),key=lambda x:x.id):
+  for p in (x for x in alive if full_essence_user(world,x.id) and x.id not in inst.members):
    a=latest.get(p.id)
    if a is None or a.passed is None or a.passed or world.year-a.applied_year<3:continue
    aspiration=_aspiration(world,p);intent=aspiration.adventurer_aspiration if society=='adventure_society' else (p.curiosity>.55 or world.skills.get(p.id,'knowledge').level>1 or world.skills.get(p.id,'craft').level>1)
@@ -27,9 +28,10 @@ def society_career_step(world,rng):
    if rr.random()<.18+.35*persistence:
     apply_for_society(world,p.id,society);world.emit('society_reapplication',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),society=society,previous_application=a.id)
  if adv is None:return
- spirit_economy_step(world,rng)
- apprenticeship_step(world)
- magical_services_step(world,rng)
+ # Reuse one living-population index across the three Society economy passes.
+ spirit_economy_step(world,rng,living)
+ apprenticeship_step(world,living)
+ magical_services_step(world,rng,living)
  for n in sorted(world.institutions.notices.values(),key=lambda x:x.id):
   if n.status=='resolved':continue
   resolution=world.threat_ecology.resolutions.get(n.cause_event)
