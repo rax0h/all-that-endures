@@ -34,8 +34,8 @@ def _martial_school_context(world,rng,living,adventure_members):
    local=list(existing_by_sid.get(sid,()))
    max_schools=max(1,min(3,1+len(people)//220))
    if len(local)>=max_schools:continue
-   founders=[p for p in people if p.id in adventure_members and world.advancement.rank(p.id)>=3 and p.age>=24]
-   founders.sort(key=lambda p:(world.advancement.rank(p.id),world.skills.get(p.id,'defense').level,p.curiosity,-p.id),reverse=True)
+   founders=[p for p in people if p.id in adventure_members and p.rank>=3 and p.age>=24]
+   founders.sort(key=lambda p:(p.rank,world.skills.get(p.id,'defense').level,p.curiosity,-p.id),reverse=True)
    for founder in founders:
     if len(local)>=max_schools:break
     if any(world.communities.memberships.get((founder.id,s.id),0.)>=.2 for s in local):continue
@@ -43,7 +43,7 @@ def _martial_school_context(world,rng,living,adventure_members):
     family_practitioners=sum(world.advancement.essence_user(x.id) for x in family)
     cid=world.communities.next_community
     e=world.emit('martial_school_founded',Layer.SOCIETY,(Ref('person',founder.id),),Ref('settlement',sid),
-                 school=cid,founder_rank=world.advancement.rank(founder.id),
+                 school=cid,founder_rank=founder.rank,
                  household=founder.household,family_practitioners=family_practitioners,
                  basis='accomplished adventuring tradition and specialist instruction')
     school=world.communities.create('martial_school',world.year,sid,e.id)
@@ -73,17 +73,17 @@ def _martial_school_context(world,rng,living,adventure_members):
   Layer,Ref=layer_ref()
   for school in sorted(schools,key=lambda s:s.id):
    members=members_by_school.get(school.id,[])
-   teachers=[p for p,_ in members if world.advancement.rank(p.id)>=3]
+   teachers=[p for p,_ in members if p.rank>=3]
    if not teachers:continue
-   teacher=max(teachers,key=lambda p:(world.advancement.rank(p.id),world.skills.get(p.id,'defense').level,-p.id))
-   mentor_rank=world.advancement.rank(teacher.id)
-   active_students=sum(1 for p,_ in members if 1<=world.advancement.rank(p.id)<=3)
+   teacher=max(teachers,key=lambda p:(p.rank,world.skills.get(p.id,'defense').level,-p.id))
+   mentor_rank=teacher.rank
+   active_students=sum(1 for p,_ in members if 1<=p.rank<=3)
    seats=max(0,min(10,2+2*mentor_rank)-active_students)
    if seats<=0:continue
    candidates=[]
    for p in by_sid.get(school.origin_settlement,()):
     if p.id in already_school or p.age<16:continue
-    path=world.advancement.path(p.id);rank=world.advancement.rank(p.id)
+    path=world.advancement.path(p.id);rank=p.rank
     if path is None or len(path.abilities)!=20 or rank not in (1,2,3):continue
     a=_aspiration(world,p)
     defense=world.skills.get(p.id,'defense').level
@@ -96,14 +96,14 @@ def _martial_school_context(world,rng,living,adventure_members):
     e=world.emit('martial_school_student_accepted',Layer.SOCIETY,
                  (Ref('person',teacher.id),Ref('person',student.id)),Ref('settlement',school.origin_settlement),
                  ((school.origin_event,) if school.origin_event else ()),school=school.id,
-                 teacher_rank=mentor_rank,student_rank=world.advancement.rank(student.id))
+                 teacher_rank=mentor_rank,student_rank=student.rank)
     world.social.record(teacher.id,student.id,e.id,trust=.025,obligation=.02)
     members_by_school[school.id].append((student,.62))
 
  mentor_for_person={}
  for school in schools:
   members=members_by_school.get(school.id,[])
-  mentor=max((world.advancement.rank(p.id) for p,_ in members),default=0)
+  mentor=max((p.rank for p,_ in members),default=0)
   if mentor<3:continue
   for p,strength in members:
    if strength>=.18:mentor_for_person[p.id]=max(mentor_for_person.get(p.id,0),mentor)
@@ -117,7 +117,7 @@ def _career_training(world,p,path,asp,member,strength,school_rank=0):
  actually exist. Gold requires elite continuity, and Diamond remains an
  exceptional lifetime culmination rather than the default fate of a survivor.
  """
- rank=world.advancement.rank(p.id);complete=len(path.abilities)==20
+ rank=p.rank;complete=len(path.abilities)==20
  dedicated=complete and (member or asp.adventurer_aspiration or school_rank>=3)
  if not dedicated:return None
  ambition=max(0.,min(1.,.45*asp.drive+.30*asp.urgency+.25*p.curiosity))
@@ -173,11 +173,10 @@ def rank_ecology_step(world,rng):
   # this is the same annual training budget, but avoids 20 hot-path calls for
   # every ranked professional every simulated year.
   if career is None:rr.shuffle(candidates)
-  before=world.advancement.rank(p.id)
+  before=p.rank
   for i,a in candidates[:uses]:
    reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity)
-   practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action)
+   practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action,body_rank=before)
   if len(path.abilities)==20 and (member or action in ('work','learn','teach','build','prepare')):
    mastery_training_step(world,p,path,rng.stream('mastery_training',world.year,p.id))
-  after=world.advancement.rank(p.id);p.rank=after
   record_body_transition(world,p,before,context=action)
