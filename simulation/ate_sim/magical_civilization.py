@@ -29,14 +29,21 @@ def _essence_supply_signal(world, people, sid):
     person's current path has fewer base essences than that person's own desired
     configuration. Existing settlement-owned essences are literal shelf stock.
     """
-    seekers=0
+    first_seekers=0;partial_seekers=0
     for p in people:
         a=_aspiration(world,p);path=world.advancement.path(p.id)
         base=0 if path is None else len(path.base_essences)
-        if base<a.desired_base_essences:seekers+=1
+        if base<a.desired_base_essences:
+            if base==0:first_seekers+=1
+            else:partial_seekers+=1
+    seekers=first_seekers+partial_seekers
     stock=len(world.magic_resources.inventory('settlement',sid,'essence'))
-    gap=max(0,seekers-stock)
-    pressure=0. if seekers<=0 else min(1.,gap/max(1,seekers))
+    # First access carries the full civilian supply signal. Later path-building
+    # still creates demand, but with lower weight so scarce common stock is not
+    # expanded mainly to feed already-magical specialists.
+    effective_demand=first_seekers+.35*partial_seekers
+    gap=max(0.,effective_demand-stock)
+    pressure=0. if effective_demand<=0 else min(1.,gap/max(1.,effective_demand))
     return seekers,stock,pressure
 
 
@@ -74,8 +81,9 @@ def _review_magic_demand(world, people, adventure, magic):
         household = world.households[p.household]
         household_crisis = local.scarcity >= .24 and household.food < 4
         institutional_access = adventure is not None or magic is not None
+        social_exposure = (family >= 1 and (p.curiosity >= .30 or p.attachment >= .50)) or (contacts >= 3 and p.curiosity >= .45)
         reason = None
-        if family or contacts >= 2: reason = 'social magical exposure'
+        if social_exposure: reason = 'social magical exposure'
         elif work_need and institutional_access: reason = f'{work_domain} capability'
         elif scarcity_need and institutional_access: reason = 'food-production pressure'
         elif household_crisis and institutional_access and p.attachment >= .45: reason = 'household scarcity'
@@ -86,7 +94,7 @@ def _review_magic_demand(world, people, adventure, magic):
         a.desired_base_essences = max(a.desired_base_essences, 1)
         a.desired_abilities = max(a.desired_abilities, 5)
         if a.reason == 'capability' or a.desired_base_essences == 1: a.reason = reason
-        if a.adventurer_aspiration or (work_need and (family + contacts) >= 2 and a.drive >= .44):
+        if a.adventurer_aspiration or (work_need and social_exposure and a.drive >= .44):
             a.completion_goal = True; a.desired_base_essences = 3; a.desired_abilities = 20
 
 
