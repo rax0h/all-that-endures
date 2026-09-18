@@ -107,4 +107,5 @@ def test_shortage_response_expedition_can_replenish_shop_with_existing_resource(
         magical_civ._expedition_step(w,ZeroRNG(),sid,people,magical_civ._practitioners(w,people),adventure,magic)
     after=w.magic_resources.inventory('settlement',sid,'essence')
     assert len(after)>before
-    assert any(e.kind=='magic_resource_supplied_to_market' for e in w.events)
+    assert any(e.kind=='essence_source_harvested' for e in w.events)
+    assert all(r.origin_event in w.event_ids for r in after)
