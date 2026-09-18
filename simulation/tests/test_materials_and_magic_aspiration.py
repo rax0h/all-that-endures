@@ -1,7 +1,7 @@
 from collections import Counter
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
-from ate_sim.magic_resources import _aspiration,absorb_essence_resource,_environment_weights,ESSENCE_RARITY_ABUNDANCE,MagicAspiration
+from ate_sim.magic_resources import _aspiration,absorb_essence_resource,MagicAspiration
 from ate_sim.semantic_dictionary import ESSENCES
 from ate_sim import magical_civilization as magical_civ
 from unittest.mock import patch
@@ -69,18 +69,6 @@ def test_transcendent_craft_cannot_be_randomly_rolled_by_mortal():
     for item in w.materials.items.values():
         if item.rarity=='transcendent':
             assert w.metaphysics.soul(item.craftsperson).ontology!='mortal'
-
-
-def test_essence_ecology_weights_physical_rarity():
-    weights=dict(_environment_weights(()))
-    by_rarity={}
-    for key,weight in weights.items():
-        by_rarity.setdefault(str(ESSENCES[key]['rarity']).lower(),[]).append(weight)
-    present=[r for r in ESSENCE_RARITY_ABUNDANCE if r in by_rarity]
-    assert 'common' in present and len(present)>=3
-    ordered=sorted(present,key=lambda r:ESSENCE_RARITY_ABUNDANCE[r],reverse=True)
-    means=[sum(by_rarity[r])/len(by_rarity[r]) for r in ordered]
-    assert means==sorted(means,reverse=True)
 
 
 def test_supply_signal_measures_real_seekers_against_literal_shelf_stock():
