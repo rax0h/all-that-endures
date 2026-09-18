@@ -293,11 +293,11 @@ def magic_ecology_step(world,rng):
   if path is not None and not a.completion_goal and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
   if a.desired_base_essences>base:
    a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive+.5*a.urgency));sought=None
-   if rr.random()<.02*(.35+a.drive+.75*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
-   # Urgent people actively search rather than passively waiting decades. This
-   # still requires a real ecological discovery roll; pressure changes effort,
-   # not whether magical resources physically exist.
-   search_chance=RESOURCE_DISCOVERY_RATE*min(.035,.0006+.0022*a.drive+.0030*a.preparation+.0120*a.urgency+.00018*min(40,a.search_years))
+   if rr.random()<.015*(.4+a.drive+.4*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
+   # External pressure increases real search effort, but the main competition
+   # effect is now who reaches scarce shop stock first rather than spawning a
+   # large parallel discovery economy.
+   search_chance=RESOURCE_DISCOVERY_RATE*min(.018,.00035+.0018*a.drive+.0020*a.preparation+.0045*a.urgency+.00012*min(30,a.search_years))
    if rr.random()<search_chance:_make_resource(world,rr,p.settlement,p,'essence',None if sought is None else sought.id,'aspirant search')
   essences=world.magic_resources.inventory('person',p.id,'essence') if base<a.desired_base_essences else []
   if essences and base<a.desired_base_essences and rr.random()<.15+.34*a.drive+.18*a.urgency:
