@@ -43,7 +43,9 @@ def test_absorption_readiness_milestones_survive_checkpoint_and_archive(tmp_path
     assert transition.kind == 'rank_advanced'
     assert transition.data['body_rank_after'] == 'bronze'
     assert len(transition.causes) == 20
-    milestones = {e.id: e for e in world.events if e.kind == 'ability_rank_advanced'}
+    milestones = {e.id: e for e in world.events
+                  if e.kind == 'ability_rank_advanced'
+                  and any(a.kind == 'person' and a.id == p.id for a in e.actors)}
     assert set(transition.causes) == set(milestones)
     assert all(e.data['ability_rank_after'] == 'bronze' for e in milestones.values())
     restored = loads(dumps(world))
