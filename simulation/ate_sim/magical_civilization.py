@@ -84,13 +84,6 @@ def _apply_external_magic_pressure(world, sid, people, users):
 def _review_magic_demand(world, people, adventure, magic):
     """Let existing aspirations respond to a changing magical civilization."""
     user_ids = {p.id for p in people if world.advancement.essence_user(p.id)}
-    open_notices = 0 if adventure is None else sum(
-        world.institutions.notices[nid].status != 'resolved'
-        for nid in adventure.notices if nid in world.institutions.notices)
-    # A real Adventure Society wants a deep replacement pool. This pressure is
-    # institutional recruiting capacity, never a rank/prevalence target.
-    recruitment_pressure = 0.0 if adventure is None else min(
-        1.0, .42 + .30 * adventure.authority + .035 * min(6, open_notices))
     for p in people:
         a = _aspiration(world, p)
         path = world.advancement.path(p.id)
@@ -145,33 +138,16 @@ def _review_magic_demand(world, people, adventure, magic):
         started = path is not None and len(path.base_essences) > 0
         mastery_intent = min(1.0, .62*p.curiosity + .28*(1-p.inhibition) + .10*status_need)
         # Adventuring can become a vocation after childhood aspiration state was
-        # formed. Defense experience + high risk tolerance, especially under
-        # real magical danger, can therefore create a durable adventurer intent.
-        recruit_score = (
-            .24 * p.health + .20 * a.risk_tolerance + .18 * p.curiosity
-            + .14 * (1-p.inhibition) + .12 * min(1., work_levels['defense']/2.)
-            + .12 * status_need
-        )
-        field_fit = (
-            p.occupation in ('adventurer', 'guard', 'hunter', 'soldier')
-            or work_levels['defense'] >= .55
-            or (a.risk_tolerance >= .58 and p.curiosity >= .48)
-            or (a.risk_tolerance >= .54 and status_need >= .40)
-        )
-        society_candidate = (
-            adventure is not None and p.age >= 16 and p.health >= .58
-            and field_fit
-            and recruit_score >= (.58 - .16 * recruitment_pressure)
-        )
+        # formed, but institutional recruitment is owned by the bounded Society
+        # apprenticeship allocator. This pass may discover self-directed intent;
+        # it must not convert every plausible recruit into a completionist.
         adventure_intent = (
-            a.adventurer_aspiration or society_candidate
+            a.adventurer_aspiration
             or (a.risk_tolerance >= .72 and p.curiosity >= .60
                 and (work_levels['defense'] >= .85 or pressure >= .28))
         )
         if adventure_intent:
             a.adventurer_aspiration = True
-            if society_candidate and a.reason == 'capability':
-                a.reason = 'Adventure Society recruitment'
         personal_mastery = started and mastery_intent >= .74
         professional_mastery = started and work_level >= 2.40 and mastery_intent >= .66
         magical_profession = started and p.occupation == 'magical craftsperson' and mastery_intent >= .60
