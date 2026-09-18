@@ -184,7 +184,13 @@ def material_economy_step(world,rng):
   pressure=world.local[sid].scarcity*.8+s.prosperity*.35
   labor_batches=len(adults)//12
   pressure_batches=int(pressure*2)
-  lot_count=min(8,max(1,1+labor_batches+pressure_batches))
+  desired_batches=min(8,max(1,1+labor_batches+pressure_batches))
+  # Production responds to literal unsold stock instead of depositing material
+  # forever. The buffer scales with the local workforce and scarcity, while
+  # crafting consumes the same real lots and reopens production capacity.
+  active_lots=len(world.materials.active_lot_index.get(sid,()))
+  stock_buffer=max(24,min(180,24+len(adults)//2+int(24*pressure)))
+  lot_count=min(desired_batches,max(0,stock_buffer-active_lots))
   for n in range(lot_count):
    prng=rng.stream('material_producer',world.year,sid*100+n);producer=producers[int(prng.random()*len(producers))%len(producers)];_produce_lot(world,sid,producer,prng,Layer,Ref)
   crafters=sorted(adults,key=lambda p:(world.skills.get(p.id,'craft').level,p.curiosity,-p.id),reverse=True);qualified=[p for p in crafters if world.skills.get(p.id,'craft').level>=.7]
