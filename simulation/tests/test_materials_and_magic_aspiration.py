@@ -252,3 +252,28 @@ def test_adventurer_intent_can_emerge_after_initial_aspiration_and_commits_full_
     assert a.completion_goal
     assert a.desired_base_essences==3
     assert a.desired_abilities==20
+
+
+def test_magical_parent_history_can_create_interest_after_parent_is_absent():
+    w=generate_world(843017);Simulation(w).run(1);sid=min(w.settlements)
+    people=[p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid]
+    assert len(people)>=2
+    parent,p=people[:2]
+    if w.advancement.path(parent.id) is None:
+        key=next(iter(ESSENCES));e=w.emit('test_magical_parent',Layer.REALITY,(Ref('person',parent.id),),Ref('settlement',sid))
+        rr=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,sid,'person',parent.id,e.id)
+        absorb_essence_resource(w,parent.id,rr.id)
+    p.parents=(parent.id,);p.occupation='labor';p.curiosity=.45;p.inhibition=.60
+    w.advancement.paths.pop(p.id,None)
+    for skill in ('agriculture','construction','craft','knowledge','defense'):
+        w.skills.get(p.id,skill).level=0.
+    for other in list(w.social.neighbors(p.id)):
+        w.social.edges[w.social.key(p.id,other)].attachment=0.
+    w.magic_resources.aspirations[p.id]=MagicAspiration(.20,0,0,'capability',w.year,urgency=0.)
+    parent.alive=False
+    adventure,magic=magical_civ._institutional_capacity(w,sid)
+    magical_civ._review_magic_demand(w,[p],adventure,magic)
+    a=w.magic_resources.aspirations[p.id]
+    assert a.desired_base_essences==1 and a.desired_abilities==5
+    assert a.reason=='social magical exposure'
+    assert not a.completion_goal
