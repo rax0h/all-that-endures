@@ -1,8 +1,10 @@
 from collections import Counter
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
-from ate_sim.magic_resources import _aspiration,absorb_essence_resource
+from ate_sim.magic_resources import _aspiration,absorb_essence_resource,_environment_weights,ESSENCE_RARITY_ABUNDANCE,MagicAspiration
 from ate_sim.semantic_dictionary import ESSENCES
+from ate_sim import magical_civilization as magical_civ
+from unittest.mock import patch
 from ate_sim.core import Layer,Ref
 
 
@@ -67,3 +69,52 @@ def test_transcendent_craft_cannot_be_randomly_rolled_by_mortal():
     for item in w.materials.items.values():
         if item.rarity=='transcendent':
             assert w.metaphysics.soul(item.craftsperson).ontology!='mortal'
+
+
+def test_essence_ecology_weights_physical_rarity():
+    weights=dict(_environment_weights(()))
+    by_rarity={}
+    for key,weight in weights.items():
+        by_rarity.setdefault(str(ESSENCES[key]['rarity']).lower(),[]).append(weight)
+    present=[r for r in ESSENCE_RARITY_ABUNDANCE if r in by_rarity]
+    assert 'common' in present and len(present)>=3
+    ordered=sorted(present,key=lambda r:ESSENCE_RARITY_ABUNDANCE[r],reverse=True)
+    means=[sum(by_rarity[r])/len(by_rarity[r]) for r in ordered]
+    assert means==sorted(means,reverse=True)
+
+
+def test_supply_signal_measures_real_seekers_against_literal_shelf_stock():
+    w=generate_world(843005);sid=min(w.settlements)
+    people=[p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid][:3]
+    assert len(people)==3
+    for p in people:
+        w.advancement.paths.pop(p.id,None)
+        w.magic_resources.aspirations[p.id]=MagicAspiration(.6,1,5,'test',0)
+    common=next(k for k,v in ESSENCES.items() if str(v['rarity']).lower()=='common')
+    w.magic_resources.create('essence',common,ESSENCES[common]['rarity'],0,sid,'settlement',sid)
+    seekers,stock,pressure=magical_civ._essence_supply_signal(w,people,sid)
+    assert (seekers,stock)==(3,1)
+    assert pressure==2/3
+
+
+def test_shortage_response_expedition_can_replenish_shop_with_existing_resource():
+    w=generate_world(843006);Simulation(w).run(1);sid=min(w.settlements)
+    people=magical_civ._living(w,sid)
+    assert people
+    for p in people:
+        a=_aspiration(w,p);a.desired_base_essences=max(a.desired_base_essences,3)
+    adventure,magic=magical_civ._institutional_capacity(w,sid)
+    assert adventure is not None or magic is not None
+    common=next(k for k,v in ESSENCES.items() if str(v['rarity']).lower()=='common')
+    class ZeroRNG:
+        def stream(self,*args):return self
+        def random(self):return 0.
+    def make_resource(world,rng,place,finder,kind=None,cause=None,method='test'):
+        e=world.emit('test_supply_find',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',place),(() if cause is None else (cause,)))
+        return world.magic_resources.create('essence',common,ESSENCES[common]['rarity'],world.year,place,'person',finder.id,e.id)
+    before=len(w.magic_resources.inventory('settlement',sid,'essence'))
+    with patch.object(magical_civ,'_make_resource',side_effect=make_resource):
+        magical_civ._expedition_step(w,ZeroRNG(),sid,people,magical_civ._practitioners(w,people),adventure,magic)
+    after=w.magic_resources.inventory('settlement',sid,'essence')
+    assert len(after)>before
+    assert any(e.kind=='magic_resource_supplied_to_market' for e in w.events)
