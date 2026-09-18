@@ -232,3 +232,19 @@ def test_magic_ecology_does_not_turn_started_ordinary_user_into_completionist():
     assert not a.completion_goal
     assert a.desired_base_essences==1
     assert a.desired_abilities==5
+
+
+def test_adventurer_intent_can_emerge_after_initial_aspiration_and_commits_full_path():
+    w=generate_world(843016);Simulation(w).run(1);sid=min(w.settlements)
+    p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
+    p.curiosity=.85;p.inhibition=.15
+    w.advancement.paths.pop(p.id,None)
+    a=MagicAspiration(.68,1,5,'ordinary access',w.year,completion_goal=False,risk_tolerance=.9,adventurer_aspiration=False)
+    w.magic_resources.aspirations[p.id]=a
+    w.skills.get(p.id,'defense').level=1.2
+    adventure,magic=magical_civ._institutional_capacity(w,sid)
+    magical_civ._review_magic_demand(w,[p],adventure,magic)
+    assert a.adventurer_aspiration
+    assert a.completion_goal
+    assert a.desired_base_essences==3
+    assert a.desired_abilities==20
