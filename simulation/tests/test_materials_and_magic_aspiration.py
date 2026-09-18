@@ -158,3 +158,32 @@ def test_social_exposure_does_not_make_low_openness_civilian_automatically_seek_
     adventure,magic=magical_civ._institutional_capacity(w,sid)
     magical_civ._review_magic_demand(w,[p],adventure,magic)
     assert a.desired_base_essences==0
+
+
+def test_external_pressure_raises_urgency_only_for_existing_seeker():
+    w=generate_world(843010);Simulation(w).run(1);sid=min(w.settlements)
+    people=[p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid][:2]
+    assert len(people)==2
+    seeker,uninterested=people
+    w.advancement.paths.pop(seeker.id,None);w.advancement.paths.pop(uninterested.id,None)
+    w.magic_resources.aspirations[seeker.id]=MagicAspiration(.40,1,5,'test',w.year,urgency=.20,compromise_tolerance=.20)
+    w.magic_resources.aspirations[uninterested.id]=MagicAspiration(.20,0,0,'test',w.year,urgency=0.)
+    w.settlements[sid].memory['monster_surge']=.8
+    magical_civ._apply_external_magic_pressure(w,sid,people,[])
+    assert w.magic_resources.aspirations[seeker.id].urgency>.20
+    assert w.magic_resources.aspirations[seeker.id].compromise_tolerance>.20
+    assert w.magic_resources.aspirations[uninterested.id].desired_base_essences==0
+    assert w.magic_resources.aspirations[uninterested.id].urgency==0.
+
+
+def test_first_essence_event_records_active_search_delay_and_age():
+    w=generate_world(843011);p=next(p for p in w.people.values() if p.alive and p.age>=18)
+    a=_aspiration(w,p);a.desired_base_essences=1;a.search_years=9;a.urgency=.77
+    found=w.emit('test_first_essence',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),essence='fire')
+    resource=w.magic_resources.create('essence','fire',ESSENCES['fire']['rarity'],w.year,p.settlement,'person',p.id,found.id)
+    absorb_essence_resource(w,p.id,resource.id)
+    event=next(e for e in reversed(w.events) if e.kind=='essence_absorbed')
+    assert event.data['first_essence'] is True
+    assert event.data['search_years']==9
+    assert event.data['age']==p.age
+    assert event.data['urgency']==.77
