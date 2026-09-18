@@ -144,3 +144,16 @@ def test_common_source_harvest_is_bounded_even_under_full_shortage():
         magical_civ._expedition_step(w,ZeroRNG(),sid,people,magical_civ._practitioners(w,people),adventure,magic)
     harvests=[e for e in w.events if e.kind=='essence_source_harvested']
     assert harvests and all(1<=e.data['quantity']<=5 for e in harvests)
+
+
+def test_social_exposure_does_not_make_low_openness_civilian_automatically_seek_magic():
+    w=generate_world(843009);Simulation(w).run(1);sid=min(w.settlements)
+    people=[p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid]
+    p=people[0];p.occupation='labor';p.curiosity=.05;p.attachment=.20;p.parents=()
+    for skill in ('agriculture','construction','craft','knowledge','defense'):
+        w.skills.get(p.id,skill).level=0.
+    a=MagicAspiration(.05,0,0,'capability',w.year,urgency=0.)
+    w.magic_resources.aspirations[p.id]=a
+    adventure,magic=magical_civ._institutional_capacity(w,sid)
+    magical_civ._review_magic_demand(w,[p],adventure,magic)
+    assert a.desired_base_essences==0
