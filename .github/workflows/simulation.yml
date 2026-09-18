@@ -1,7 +1,7 @@
 name: simulation
 on:
   push:
-    branches: [main, sim/current-standard]
+    branches: [main, sim/current-standard, diagnostic/stage-0.5-profile]
   pull_request:
     branches: [main]
 
