@@ -203,10 +203,11 @@ def _resource_circulation(world, rng, sid, people, users, magic):
     rr = rng.stream('magical_circulation', world.year, sid); rounds = 3 + (3 if magic is not None else 0)
     people_by_id={p.id:p for p in people}
     for _ in range(rounds):
-        # Available person-held magical resources are sparse in mature runs.
-        # Iterate the owner index rather than every adult six times per year.
-        holder_ids=sorted(oid for (kind,oid),ids in world.magic_resources.owner_index.items()
-                          if kind=='person' and ids and oid in people_by_id)
+        # Person-held magical resources are sparse, but the global owner index
+        # grows with historical owners. Query the already-bounded local residents
+        # instead of rescanning that global index once per settlement/round.
+        holder_ids=[pid for pid in people_by_id
+                    if world.magic_resources.owner_index.get(('person',pid))]
         if not holder_ids:break
         for holder_id in holder_ids:
             holder=people_by_id[holder_id]
