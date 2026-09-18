@@ -9,7 +9,7 @@ from heapq import heapify, heappop
 from math import ceil
 from .core_types import layer_ref
 from .currency import can_pay_tier
-from .magic_resources import _wants, _aspiration, _demand_key, absorb_essence_resource
+from .magic_resources import _wants, _aspiration, _demand_key, absorb_essence_resource, use_awakening_stone
 
 
 def _adults_by_settlement(world):
@@ -153,8 +153,12 @@ are competing for too few goods.
     wants_stone=path is not None and abilities<a.desired_abilities and abilities<path.capacity
     if not wants_stone or not (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):break
     rid=stone_heap[0];resource=world.magic_resources.resources[rid]
-    if purchase(p,resource,3):heappop(stone_heap)
-    else:break
+    if not purchase(p,resource,3):break
+    heappop(stone_heap)
+    # A shop visit is not an annual awakening timer. The purchased stone is
+    # physically in hand and may be used immediately; repeat while stock,
+    # funds and the person's own path goal permit it.
+    if use_awakening_stone(world,p.id,rid) is None:break
 
 
 def _route_neighbors(world,sid):
