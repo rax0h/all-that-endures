@@ -51,22 +51,37 @@ def _review_magic_demand(world, people, adventure, magic):
             a.desired_abilities = max(a.desired_abilities, min(20, max(5, len(path.abilities) + 2)))
         family = sum(1 for x in p.parents if x in user_ids)
         contacts = sum(1 for x in world.social.neighbors(p.id) if x in user_ids)
-        occupation_need = p.occupation in ('adventurer', 'guard', 'hunter', 'soldier', 'farmer', 'crafter', 'smith', 'healer', 'merchant', 'scholar', 'builder', 'architect')
+        named_profession = p.occupation in ('adventurer', 'guard', 'hunter', 'soldier', 'farmer', 'crafter', 'smith', 'healer', 'merchant', 'scholar', 'builder', 'architect', 'craft apprentice', 'magical craftsperson')
+        # Most civilians are still labelled "labor" at Stage 0.5. Use the work
+        # they actually know how to do instead of treating that placeholder as
+        # evidence that magic has no occupational value to them.
+        work_levels = {
+            'agriculture': world.skills.get(p.id, 'agriculture').level,
+            'construction': world.skills.get(p.id, 'construction').level,
+            'craft': world.skills.get(p.id, 'craft').level,
+            'knowledge': world.skills.get(p.id, 'knowledge').level,
+            'defense': world.skills.get(p.id, 'defense').level,
+        }
+        work_domain, work_level = max(work_levels.items(), key=lambda x: x[1])
+        work_need = named_profession or work_level >= .45
         settlement = world.settlements[p.settlement]
         cell = world.cells[(settlement.x, settlement.y)]
-        pressure = max(cell.hazard, settlement.memory.get('monster_surge', 0.0))
+        pressure = max(cell.hazard, settlement.memory.get('monster_surge', 0.0), p.fear)
+        household = world.households[p.household]
+        household_need = household.food < 6 or household.preparedness < .30
         institutional_access = adventure is not None or magic is not None
         reason = None
         if family or contacts >= 2: reason = 'social magical exposure'
-        elif occupation_need and institutional_access: reason = 'occupational capability'
+        elif work_need and institutional_access: reason = f'{work_domain} capability'
+        elif household_need and institutional_access: reason = 'household capability'
         elif pressure >= .45 and institutional_access: reason = 'local magical pressure'
         if reason is None: continue
-        a.drive = min(1., max(a.drive, .34 + .05 * min(3, family + contacts) + (.06 if occupation_need else 0.)))
-        a.urgency = min(1., max(a.urgency, .30 + .28 * pressure + (.10 if occupation_need else 0.)))
+        a.drive = min(1., max(a.drive, .34 + .05 * min(3, family + contacts) + (.06 if work_need else 0.) + .04 * min(1., work_level)))
+        a.urgency = min(1., max(a.urgency, .30 + .28 * pressure + (.10 if work_need else 0.) + (.06 if household_need else 0.)))
         a.desired_base_essences = max(a.desired_base_essences, 1)
         a.desired_abilities = max(a.desired_abilities, 5)
         if a.reason == 'capability' or a.desired_base_essences == 1: a.reason = reason
-        if a.adventurer_aspiration or (occupation_need and (family + contacts) >= 2 and a.drive >= .44):
+        if a.adventurer_aspiration or (work_need and (family + contacts) >= 2 and a.drive >= .44):
             a.completion_goal = True; a.desired_base_essences = 3; a.desired_abilities = 20
 
 
@@ -113,7 +128,7 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         # persistent local dealer stock. Rare finds remain singular.
         rarity=str(found.rarity).lower()
         if found.kind=='essence' and rarity in ('common','uncommon') and supply_pressure>0 and (adventure is not None or magic is not None):
-            capacity=3 if rarity=='common' else 2
+            capacity=5 if rarity=='common' else 3
             harvest_count=min(capacity,max(1,int(capacity*supply_pressure+.999)))
             wholesale=.55 if rarity=='common' else .85
             harvest=world.emit('essence_source_harvested',Layer.REALITY,(Ref('person',leader.id),),Ref('settlement',sid),(recovered.id,),source_resource=found.id,key=found.key,rarity=found.rarity,quantity=harvest_count,mechanism='organized harvest of discovered essence source',seekers=essence_seekers,shelf_stock=essence_stock)
