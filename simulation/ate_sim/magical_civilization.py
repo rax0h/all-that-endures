@@ -175,10 +175,19 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
     if field_capacity <= 0: return
     rr = rng.stream('magical_field_economy', world.year, sid)
     pressure = max(0., ambient - .30) + .35 * cell.hazard + .08 * min(10, field_capacity)
-    # Shortage changes what organized expeditions target, not how many physical
-    # opportunities the ecology produces. Keep the existing bounded expedition
-    # activity rate and let demand redirect recovery toward essences below.
-    attempts = min(8, int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0)))
+    completion_trainees=sum(
+        1 for p in people
+        if _aspiration(world,p).completion_goal
+        and world.advancement.path(p.id) is not None
+        and len(world.advancement.path(p.id).abilities)<20)
+    # An established branch fields multiple crews. The old one-item expedition
+    # model artificially starved a civilization with hundreds of practitioners.
+    # Crew count is caused by actual field capacity and training demand; it never
+    # reads or targets a desired Iron population.
+    base_attempts=int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0))
+    field_crews=max(1,int(field_capacity//30))
+    training_crews=min(8,completion_trainees//10)
+    attempts=min(24,max(base_attempts,field_crews+training_crews))
     if attempts <= 0: return
     user_ids={p.id for p in users}
     candidates = sorted(users + [p for p in adventurer_aspirants if p.id not in user_ids], key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
@@ -197,9 +206,17 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,)); continue
         stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
         if supply_pressure < .15: stone_share = max(stone_share, .82)
-        kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
-        found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition')
-        world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key)
+        # Successful professional expeditions can recover a cache rather than
+        # exactly one object. Larger field organizations can carry and secure
+        # larger finds, while each resource remains a distinct physical object
+        # with its own provenance.
+        cache_size=1+min(6,int(field_capacity//35))
+        recovered=[]
+        for _ in range(cache_size):
+            kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
+            found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition cache')
+            recovered.append(found.id)
+            world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key, cache_size=cache_size)
         aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
