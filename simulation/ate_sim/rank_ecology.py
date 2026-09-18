@@ -142,13 +142,17 @@ def _career_training(world,p,path,asp,member,strength,school_rank=0):
 def rank_ecology_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society')
  members=set() if adv is None else adv.members
- living=sorted(world.current_people(),key=lambda x:x.id)
+ living=list(world.current_people())
  school_rank=_martial_school_context(world,rng,living,members)
  latest={}
  for rec in reversed(world.agency.actions):
   if rec.year!=world.year:break
   latest.setdefault(rec.person,rec)
  for p in living:
+  # Rank-0 means the path is incomplete; every awakened ability is already
+  # Iron and the body ceiling forbids further ability advancement. General
+  # agency still runs, but rank ecology has no possible state transition here.
+  if p.rank<=0:continue
   path=world.advancement.path(p.id)
   if path is None or not path.abilities:continue
   rec=latest.get(p.id);action='work' if rec is None else rec.action;strength=.35 if rec is None else rec.strength;relevant=ACTION_FUNCTIONS.get(action,set())
