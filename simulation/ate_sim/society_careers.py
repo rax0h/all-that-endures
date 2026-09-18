@@ -21,12 +21,23 @@ def society_career_step(world,rng):
   latest=world.institutions.latest_applications(society)
   for p in (x for x in alive if full_essence_user(world,x.id) and x.id not in inst.members):
    a=latest.get(p.id)
-   if a is None or a.passed is None or a.passed or world.year-a.applied_year<3:continue
+   if a is None or a.passed is None or a.passed:continue
+   attempts=world.institutions.application_attempt_count(p.id,society)
+   cooldown=min(96,3*(2**min(5,max(0,attempts-1))))
+   if world.year-a.applied_year<cooldown:continue
    aspiration=_aspiration(world,p);intent=aspiration.adventurer_aspiration if society=='adventure_society' else (p.curiosity>.55 or world.skills.get(p.id,'knowledge').level>1 or world.skills.get(p.id,'craft').level>1)
    if not intent:continue
+   path=world.advancement.path(p.id);rank=world.advancement.rank(p.id);defense=world.skills.get(p.id,'defense').level;knowledge=world.skills.get(p.id,'knowledge').level
+   threshold=.52 if society=='magic_society' else .60
+   # Do not let failed applicants repeatedly buy lottery tickets when their
+   # present capabilities cannot possibly clear one of the three assessments.
+   physical_cap=min(1.,.25+.08*p.rank+.25*p.health+.20)
+   magical_cap=min(1.,.25+.025*len(path.abilities)+.08*rank+.20)
+   judgment_cap=min(1.,.30+.22*p.inhibition+.18*p.curiosity+.04*defense+.04*knowledge+.15)
+   if min(physical_cap,magical_cap,judgment_cap)<threshold:continue
    rr=rng.stream('society_reapply',world.year,p.id+(0 if society=='adventure_society' else 1000000));persistence=min(1.,.45*aspiration.drive+.35*aspiration.preparation+.20*aspiration.urgency)
    if rr.random()<.18+.35*persistence:
-    apply_for_society(world,p.id,society);world.emit('society_reapplication',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),society=society,previous_application=a.id)
+    apply_for_society(world,p.id,society);world.emit('society_reapplication',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),society=society,previous_application=a.id,attempt=attempts+1,cooldown=cooldown)
  if adv is None:return
  # Reuse one living-population index across the three Society economy passes.
  spirit_economy_step(world,rng,living)
