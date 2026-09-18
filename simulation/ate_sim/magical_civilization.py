@@ -204,20 +204,29 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic, supply_pl
         if erng.random() > min(.86, readiness + .16 * ambient):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,)); continue
         stone_share = min(.82, .48 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
-        stone_gap=supply_plan['awakening_stone'];essence_gap=supply_plan['essence']
-        if stone_gap<=0 and essence_gap<=0:break
-        if stone_gap<=0:kind='essence'
-        elif essence_gap<=0:kind='awakening_stone'
-        else:
-            # Training demand biases recovery toward stones, while actual
-            # essence shortage remains a competing physical collection target.
-            weighted_stone=stone_gap*stone_share
-            weighted_essence=essence_gap*(1-stone_share)
-            kind='awakening_stone' if erng.random() < weighted_stone/max(.001,weighted_stone+weighted_essence) else 'essence'
-        found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition')
-        supply_plan[kind]=max(0,supply_plan[kind]-1)
-        world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key)
-        aspiration.preparation = min(1., aspiration.preparation + .025)
+        total_gap=supply_plan['awakening_stone']+supply_plan['essence']
+        if total_gap<=0:break
+        # A successful organized expedition can secure a small cache when both
+        # actual unmet demand and enough field capacity exist. The civilization-
+        # wide supply plan is decremented object by object, so this can increase
+        # throughput but can never recreate demand-free warehouse growth.
+        cache_size=min(total_gap,1+min(2,int(field_capacity//60)))
+        recovered=0
+        for _ in range(cache_size):
+            stone_gap=supply_plan['awakening_stone'];essence_gap=supply_plan['essence']
+            if stone_gap<=0 and essence_gap<=0:break
+            if stone_gap<=0:kind='essence'
+            elif essence_gap<=0:kind='awakening_stone'
+            else:
+                # Training demand biases recovery toward stones, while actual
+                # essence shortage remains a competing physical collection target.
+                weighted_stone=stone_gap*stone_share
+                weighted_essence=essence_gap*(1-stone_share)
+                kind='awakening_stone' if erng.random() < weighted_stone/max(.001,weighted_stone+weighted_essence) else 'essence'
+            found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition cache')
+            supply_plan[kind]=max(0,supply_plan[kind]-1);recovered+=1
+            world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key, cache_size=cache_size)
+        if recovered:aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
 def _resource_circulation(world, rng, sid, people, users, magic):
