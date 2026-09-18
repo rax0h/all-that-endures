@@ -61,16 +61,18 @@ def test_affordability_does_not_bypass_essence_compatibility():
     assert r.owner_id==h.id
 
 
-def test_browsable_shop_sells_at_most_one_useful_item_per_shopper():
+def test_full_path_aspirant_buys_and_absorbs_all_three_affordable_bases_in_one_visit():
     w,h,poor,buyer,_,_=setup_market()
-    w.people={p.id:p for p in (h,poor,buyer)}
-    h.wealth=7;buyer.wealth=14
+    w.people={buyer.id:buyer};buyer.wealth=10
+    a=magic._aspiration(w,buyer);a.desired_base_essences=3;a.desired_abilities=20;a.completion_goal=True
     w.magic_resources.resources.clear();w.magic_resources.owner_index.clear()
-    stock=[w.magic_resources.create('essence',ESSENCE_IDS[0],'common',0,h.settlement,'settlement',h.settlement) for _ in range(4)]
-    magic_trade._retail_browse(w,{h.settlement:[h,poor,buyer]})
-    assert [r.owner_id if r.owner_kind=='person' else None for r in stock]==[h.id,buyer.id,None,None]
-    assert h.wealth==pytest.approx(6) and buyer.wealth==pytest.approx(13) and poor.wealth==0
-    assert sum(e.kind=='magic_resource_purchased' for e in w.events)==2
+    stock=[w.magic_resources.create('essence',ESSENCE_IDS[i],'common',0,buyer.settlement,'settlement',buyer.settlement) for i in range(3)]
+    magic_trade._retail_browse(w,{buyer.settlement:[buyer]})
+    path=w.advancement.path(buyer.id)
+    assert path is not None and len(path.base_essences)==3
+    assert all(resource.consumed_by==buyer.id for resource in stock)
+    assert buyer.wealth==pytest.approx(7)
+    assert sum(e.kind=='magic_resource_purchased' for e in w.events)==3
 
 
 def test_failed_shop_purchase_leaves_stock_for_later_buyer():
