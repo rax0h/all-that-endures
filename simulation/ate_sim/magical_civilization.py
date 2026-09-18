@@ -128,7 +128,15 @@ def _review_magic_demand(world, people, adventure, magic):
         a.desired_base_essences = max(a.desired_base_essences, 1)
         a.desired_abilities = max(a.desired_abilities, 5)
         if a.reason == 'capability' or a.desired_base_essences == 1: a.reason = reason
-        if a.adventurer_aspiration or (work_need and social_exposure and a.drive >= .52):
+        # Going from "I use magic" to "I am completing the whole path" is a
+        # personal/professional commitment, not a consequence of knowing magical
+        # people. Adventurers commit by role. Civilians may deepen only after
+        # actually starting a path and showing unusually strong mastery intent.
+        started = path is not None and len(path.base_essences) > 0
+        personal_mastery = started and a.drive >= .76 and p.curiosity >= .68
+        professional_mastery = started and work_level >= 2.0 and a.drive >= .66 and p.curiosity >= .58
+        magical_profession = started and p.occupation == 'magical craftsperson' and a.drive >= .60
+        if a.adventurer_aspiration or personal_mastery or professional_mastery or magical_profession:
             a.completion_goal = True; a.desired_base_essences = 3; a.desired_abilities = 20
 
 
