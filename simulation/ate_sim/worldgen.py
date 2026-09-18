@@ -3,6 +3,7 @@ from .culture import seed_practices
 from .species import habitat_suitability
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
 from .divinity import seed_gods
+from .institutions import ensure_core_societies
 import math
 PEOPLES=('human','elf','celestine','leonid','smoulder','draconian','merfolk','runic');ESSENCES_AVAILABLE=ESSENCE_IDS
 FOUNDING_ADULT_MAGIC_PREVALENCE=.78
@@ -35,7 +36,7 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
   if c.elevation>=.2 and all((c.x-o.x)**2+(c.y-o.y)**2>18 for o in chosen):chosen.append(c)
   if len(chosen)>=settlements:break
  for c in chosen:
-  sid=w.next_settlement;w.next_settlement+=1;s=Settlement(sid,c.x,c.y,food_stock=130+80*c.fertility,defense=.08+.12*c.hazard,irrigation=.08+.2*c.fertility,prosperity=.2+.3*c.fertility);w.settlements[sid]=s;w.local[sid]=LocalState();rr=r.stream('founders',0,sid);local=_local_peoples(rr,c);founded=w.emit('settlement_founded',Layer.REALITY,location=Ref('settlement',sid),fertility=c.fertility,species=tuple(sorted(local)),observation_boundary=True,magical_civilization_preexists=True);w.lineage.register('settlement',sid,origin_event=founded.id,origin_year=0);community=w.communities.create('founder_network',0,sid,founded.id);w.lineage.register('community',community.id,origin_event=founded.id,origin_year=0);irrigation=w.infrastructure.create('irrigation',(sid,),max(.15,s.irrigation),40+120*s.irrigation,0,founded.id);w.lineage.register('infrastructure',irrigation.id,(('settlement',sid),),founded.id,0)
+  sid=w.next_settlement;w.next_settlement+=1;s=Settlement(sid,c.x,c.y,food_stock=130+80*c.fertility,defense=.08+.12*c.hazard,irrigation=.08+.2*c.fertility,prosperity=.2+.3*c.fertility);w.settlements[sid]=s;w.local[sid]=LocalState();field=w.ambient_magic.field(sid);field.level=min(.58,.28+.16*c.hazard+.10*c.fertility+.05*s.prosperity);field.peak=field.level;rr=r.stream('founders',0,sid);local=_local_peoples(rr,c);founded=w.emit('settlement_founded',Layer.REALITY,location=Ref('settlement',sid),fertility=c.fertility,species=tuple(sorted(local)),observation_boundary=True,magical_civilization_preexists=True);w.lineage.register('settlement',sid,origin_event=founded.id,origin_year=0);community=w.communities.create('founder_network',0,sid,founded.id);w.lineage.register('community',community.id,origin_event=founded.id,origin_year=0);irrigation=w.infrastructure.create('irrigation',(sid,),max(.15,s.irrigation),40+120*s.irrigation,0,founded.id);w.lineage.register('infrastructure',irrigation.id,(('settlement',sid),),founded.id,0)
   for _ in range(rr.randint(5,9)):
    hid=w.next_household;w.next_household+=1;h=Household(hid,sid,wealth=rr.uniform(15,90),food=rr.uniform(8,20),preparedness=rr.uniform(.05,.3),lineage=f'Line-{sid}-{hid}');w.households[hid]=h;s.households.append(hid);w.lineage.register('household',hid,(('community',community.id),),founded.id,0);sp0=rr.choice(local);prop=w.economy.create('homestead',sid,'household',hid,h.wealth*.7,0,founded.id);w.lineage.register('property',prop.id,(('household',hid),),founded.id,0)
    for _ in range(rr.randint(2,6)):
@@ -50,4 +51,12 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
    for a,b in zip(hm,hm[1:]):w.social.record(a,b,founded.id,trust=.15,attachment=.15)
  seed_practices(w,w.culture)
  for pid,practice in w.culture.practices.items():w.lineage.register('practice',pid,origin_year=practice.origin_year)
+ # The observation window opens inside an established connected magical civilization.
+ # Core Societies and a modest inherited operating reserve therefore already exist at
+ # year zero; this is initial state, not currency minted during the observed history.
+ ensure_core_societies(w)
+ adv=w.institutions.institution_by_kind('adventure_society')
+ if adv is not None:
+  reserve=max(120,60*len(adv.branches));w.currency.treasuries.setdefault(adv.id,{})['iron']=reserve
+  anchor=min(w.settlements);w.emit('society_treasury_observed',Layer.SOCIETY,(Ref('institution',adv.id),),Ref('settlement',anchor),institution=adv.id,denomination='iron',count=reserve,preexisting=True,observation_boundary=True)
  return w
