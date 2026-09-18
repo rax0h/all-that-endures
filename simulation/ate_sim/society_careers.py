@@ -25,7 +25,9 @@ def society_career_step(world,rng):
    attempts=world.institutions.application_attempt_count(p.id,society)
    cooldown=min(96,3*(2**min(5,max(0,attempts-1))))
    if world.year-a.applied_year<cooldown:continue
-   aspiration=_aspiration(world,p);intent=aspiration.adventurer_aspiration if society=='adventure_society' else (p.curiosity>.55 or world.skills.get(p.id,'knowledge').level>1 or world.skills.get(p.id,'craft').level>1)
+   aspiration=_aspiration(world,p)
+   if society=='adventure_society' and world.advancement.rank(p.id)<1:continue
+   intent=aspiration.adventurer_aspiration if society=='adventure_society' else (p.curiosity>.55 or world.skills.get(p.id,'knowledge').level>1 or world.skills.get(p.id,'craft').level>1)
    if not intent:continue
    path=world.advancement.path(p.id);rank=world.advancement.rank(p.id);defense=world.skills.get(p.id,'defense').level;knowledge=world.skills.get(p.id,'knowledge').level
    threshold=.52 if society=='magic_society' else .60
