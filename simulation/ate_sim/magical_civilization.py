@@ -252,7 +252,10 @@ def _magical_workshops(world, rng, sid, people, users, magic):
     if not people: return
     settlement = world.settlements[sid]
     producers = sorted(people, key=lambda p: (world.skills.get(p.id, 'agriculture').level + world.skills.get(p.id, 'craft').level, p.health, -p.id), reverse=True)
-    extra_batches = min(24, max(0, len(people) // 18 + int(settlement.prosperity * 3) - 1)); Layer, Ref = layer_ref()
+    desired_batches = min(24, max(0, len(people) // 18 + int(settlement.prosperity * 3) - 1))
+    active_lots=len(world.materials.active_lot_index.get(sid,()))
+    workshop_buffer=max(36,min(240,36+len(people)))
+    extra_batches=min(desired_batches,max(0,workshop_buffer-active_lots)); Layer, Ref = layer_ref()
     for n in range(extra_batches): _produce_lot(world, sid, producers[n % len(producers)], rng.stream('civilization_material_batch', world.year, sid * 100 + n), Layer, Ref)
     magical_crafters = [p for p in users if world.skills.get(p.id, 'craft').level >= .7]
     if not magical_crafters: return
