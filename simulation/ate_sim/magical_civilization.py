@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .core_types import layer_ref
-from .magic_resources import _aspiration, _make_resource, _wanted_resources, _transfer_to_seeker, absorb_essence_resource, use_awakening_stone
+from .magic_resources import _aspiration, _make_resource, _wanted_resources, _transfer_to_seeker, _SettlementMarket, absorb_essence_resource, use_awakening_stone
 from .materials import _produce_lot, _craft_once
 from .institutions import apply_for_society, full_essence_user
 
@@ -206,13 +206,15 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
 def _resource_circulation(world, rng, sid, people, users, magic):
     if not people: return
     rr = rng.stream('magical_circulation', world.year, sid); rounds = 3 + (3 if magic is not None else 0)
-    people_by_id={p.id:p for p in people}
+    people_by_id={p.id:p for p in people};market=_SettlementMarket(world,people)
+    # Build the sparse holder queue once. Recipients are appended when a transfer
+    # gives them their first held resource, preserving within-year circulation
+    # without rescanning every resident before every round.
+    holder_ids=[pid for pid in people_by_id if world.magic_resources.owner_index.get(('person',pid))]
+    holder_set=set(holder_ids)
+    def note_transfer(q):
+        if q.id not in holder_set:holder_set.add(q.id);holder_ids.append(q.id)
     for _ in range(rounds):
-        # Person-held magical resources are sparse, but the global owner index
-        # grows with historical owners. Query the already-bounded local residents
-        # instead of rescanning that global index once per settlement/round.
-        holder_ids=[pid for pid in people_by_id
-                    if world.magic_resources.owner_index.get(('person',pid))]
         if not holder_ids:break
         for holder_id in holder_ids:
             holder=people_by_id[holder_id]
@@ -224,7 +226,7 @@ def _resource_circulation(world, rng, sid, people, users, magic):
             stones = [] if path is None else (_wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'awakening_stone')) if len(path.abilities) < min(a.desired_abilities, path.capacity) else [])
             if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity) and rr.random()<max(.22,.82-.55*a.stone_selectiveness): use_awakening_stone(world,holder.id,stones[int(rr.random()*len(stones))%len(stones)].id)
             held=world.magic_resources.inventory('person',holder.id); surplus=_wanted_resources(world,holder,held,wanted=False) if held else []
-            if surplus and rr.random()<(.58 if magic is not None else .28): _transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],holder,people,rr)
+            if surplus and rr.random()<(.58 if magic is not None else .28): _transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],holder,people,rr,on_transfer=note_transfer,market=market)
 
 
 def _society_pipeline(world, rng, sid, people, adventure, magic, existing=None):
