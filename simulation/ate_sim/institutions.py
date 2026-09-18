@@ -48,6 +48,7 @@ class InstitutionState:
   aid=self.next_application;self.next_application+=1;a=SocietyApplication(aid,society,person,branch,year,eligible,origin_event=origin_event);self.applications[aid]=a
   if hasattr(self,'_application_pairs'):self._application_pairs.add((person,society));self._application_count=len(self.applications)
   if hasattr(self,'_latest_applications'):self._latest_applications[(society,person)]=a;self._latest_application_count=len(self.applications)
+  if hasattr(self,'_pending_application_ids'):self._pending_application_ids.add(aid);self._pending_application_count=len(self.applications)
   return a
  def application_pairs(self):
   if not hasattr(self,'_application_pairs') or getattr(self,'_application_count',-1)!=len(self.applications):
@@ -59,6 +60,16 @@ class InstitutionState:
    for a in self.applications.values():self._latest_applications[(a.society,a.person)]=a
    self._latest_application_count=len(self.applications)
   return {person:a for (kind,person),a in self._latest_applications.items() if kind==society}
+ def pending_applications(self):
+  # Pending applications are a tiny hot subset of the historical archive.
+  # Rebuild only for old/directly-mutated state; normal creation/resolution
+  # keeps this derived index current.
+  if not hasattr(self,'_pending_application_ids') or getattr(self,'_pending_application_count',-1)!=len(self.applications):
+   self._pending_application_ids={aid for aid,a in self.applications.items() if a.passed is None}
+   self._pending_application_count=len(self.applications)
+  else:
+   self._pending_application_ids={aid for aid in self._pending_application_ids if self.applications[aid].passed is None}
+  return [self.applications[aid] for aid in sorted(self._pending_application_ids)]
 
 def full_essence_user(world,pid):
  p=world.advancement.path(pid);return p is not None and p.confluence is not None and len(p.essences)==4
@@ -100,11 +111,15 @@ def apply_for_society(world,pid,society):
 def _advance_application(world,a,rng):
  if a.passed is not None:return
  p=world.people.get(a.person)
- if p is None or not p.alive:a.stage='closed';a.passed=False;return
+ if p is None or not p.alive:
+  a.stage='closed';a.passed=False
+  if hasattr(world.institutions,'_pending_application_ids'):world.institutions._pending_application_ids.discard(a.id)
+  return
  path=world.advancement.path(p.id);rr=rng.stream('society_assessment',world.year,a.id);a.days_completed+=1
  if a.days_completed==1:a.stage='physical';a.physical_score=min(1.,.25+.08*p.rank+.25*p.health+.2*rr.random());return
  if a.days_completed==2:a.stage='magical';a.magical_score=min(1.,.25+.025*len(path.abilities)+.08*world.advancement.rank(p.id)+.2*rr.random());return
  defense=world.skills.get(p.id,'defense').level;knowledge=world.skills.get(p.id,'knowledge').level;a.stage='field';a.judgment_score=min(1.,.30+.22*p.inhibition+.18*p.curiosity+.04*defense+.04*knowledge+.15*rr.random());threshold=.52 if a.society=='magic_society' else .60;a.passed=min(a.physical_score,a.magical_score,a.judgment_score)>=threshold;a.stage='passed' if a.passed else 'failed';Layer,Ref=layer_ref();causes=(a.origin_event,) if a.origin_event else ();e=world.emit('society_assessment_completed',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),causes,society=a.society,application=a.id,passed=a.passed,days=a.days_completed,physical=round(a.physical_score,3),magical=round(a.magical_score,3),judgment=round(a.judgment_score,3));a.resolved_event=e.id
+ if hasattr(world.institutions,'_pending_application_ids'):world.institutions._pending_application_ids.discard(a.id)
  if a.passed:world.institutions.institution_by_kind(a.society).members.add(p.id)
 
 def institution_step(world,rng):
@@ -126,5 +141,5 @@ def institution_step(world,rng):
    if i is None or p.id in i.members or (p.id,society) in applied:continue
    rr=rng.stream('society_apply',world.year,p.id+(1 if society=='adventure_society' else 1000000))
    if rr.random()<.035:apply_for_society(world,p.id,society)
- for a in sorted(world.institutions.applications.values(),key=lambda x:x.id):
-  if a.passed is None:_advance_application(world,a,rng)
+ for a in world.institutions.pending_applications():
+  _advance_application(world,a,rng)
