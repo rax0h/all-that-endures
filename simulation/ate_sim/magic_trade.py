@@ -144,15 +144,14 @@ are competing for too few goods.
     else:essence_front.pop(key,None)
     absorb_essence_resource(world,p.id,rid)
 
-   # Awakening stones remain later progression goods. A committed full-path
-   # cadet may buy two real stones in a year when stock and money both exist;
-   # ordinary users retain the one-stone pace.
-   a=_aspiration(world,p);path=world.advancement.path(p.id)
-   stone_budget=2 if a.completion_goal and a.adventurer_aspiration else 1
-   for _ in range(stone_budget):
+   # Awakening stones have no artificial annual throttle. A committed
+   # adventurer who can afford the physically available stock may buy as many
+   # stones as needed in this visit, up to the path's actual ability capacity.
+   a=_aspiration(world,p)
+   while stone_heap:
     path=world.advancement.path(p.id);abilities=0 if path is None else len(path.abilities)
     wants_stone=path is not None and abilities<a.desired_abilities and abilities<path.capacity
-    if not wants_stone or not stone_heap or not (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):break
+    if not wants_stone or not (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):break
     rid=stone_heap[0];resource=world.magic_resources.resources[rid]
     if purchase(p,resource,3):heappop(stone_heap)
     else:break
