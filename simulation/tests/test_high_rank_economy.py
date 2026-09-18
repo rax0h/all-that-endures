@@ -163,20 +163,22 @@ def test_apprentice_pay_requires_funded_useful_work_and_releases_complete_paths(
     w.currency.treasuries[adv.id].clear()
     for q in w.people.values():
         w.magic_resources.aspirations[q.id]=MagicAspiration(0,0,0,'test',0)
+    full_path=list(path.abilities)
     path.abilities=path.abilities[:1]
     w.magic_resources.aspirations[p.id]=MagicAspiration(1,3,20,'Adventure Society apprenticeship',0,completion_goal=True,adventurer_aspiration=True)
     asset=next(iter(w.infrastructure.assets.values()));asset.condition=.5
-    apprenticeship_step(w)
+    apprenticeship_step(w,{p.settlement:[p]})
     assert asset.condition==.5
     assert not [e for e in w.events if e.kind=='society_apprentice_work']
     w.currency.credit(p.id,{'iron':8});w.currency.treasury_transfer(adv.id,p.id,{'iron':8},deposit=True)
-    apprenticeship_step(w)
+    apprenticeship_step(w,{p.settlement:[p]})
     assert asset.condition>.5
     assert w.currency.wallets[p.id]['iron']==4
     assert w.currency.treasuries[adv.id]['iron']==4
     assert w.currency.minted=={'iron':8}
     event=next(e for e in w.events if e.kind=='society_apprentice_work')
     assert event.data['infrastructure']==asset.id and event.data['improvement']>0
-    path.abilities=path.abilities*20
-    apprenticeship_step(w)
+    path.abilities=full_path
+    p.rank=w.advancement.rank(p.id)
+    apprenticeship_step(w,{p.settlement:[p]})
     assert w.currency.treasuries[adv.id]['iron']==4
