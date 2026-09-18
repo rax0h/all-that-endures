@@ -29,4 +29,4 @@ def test_indexed_population_matches_archive_scan_simulation():
     # The research branch intentionally changes world history. Keep this
     # fixture branch-local while still proving the living-population index is
     # semantically identical to a full archive scan.
-    assert indexed.digest()==reference.digest()=='3d2ca3168a0a238aec2d7288b21c8d429fe75796a5daa7b1a02be4174db2e0af'
+    assert indexed.digest()==reference.digest()=='ce3dd86787fd28ed802517220fcc9f019540294d67294288258ddbe57ba4244f'
