@@ -289,10 +289,10 @@ def test_established_region_starts_with_society_capacity_and_elevated_magic():
     assert len(observed)==1 and observed[0].data['preexisting'] is True
 
 
-def test_adventurer_can_buy_and_use_all_available_stones_in_one_shop_visit():
+def test_adventurer_can_order_remote_stones_without_exhausting_local_stock_and_use_all_same_visit():
     from ate_sim.magic_trade import _retail_browse
     from ate_sim.semantic_dictionary import STONE_IDS,AWAKENING_STONES
-    w=generate_world(843020);sid=min(w.settlements)
+    w=generate_world(843020);sid=min(w.settlements);remote=next(x for x in sorted(w.settlements) if x!=sid)
     p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
     p.wealth=200
     # Ensure a real three-base path exists before buying awakening stones.
@@ -301,24 +301,33 @@ def test_adventurer_can_buy_and_use_all_available_stones_in_one_shop_visit():
     for key in [k for k in ESSENCES if k not in owned][:max(0,3-len(owned))]:
         e=w.emit('test_shop_essence',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),essence=key)
         r=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,sid,'person',p.id,e.id)
-        absorb_essence_resource(w,p.id,r.id)
-        owned.add(key)
+        absorb_essence_resource(w,p.id,r.id);owned.add(key)
     path=w.advancement.path(p.id)
     assert len(path.base_essences)==3 and len(path.abilities)==4
     a=MagicAspiration(.9,3,20,'adventure',w.year,completion_goal=True,
                       adventurer_aspiration=True,urgency=.9)
     w.magic_resources.aspirations[p.id]=a
     stone=STONE_IDS[0]
-    e=w.emit('test_shop_stones',Layer.REALITY,location=Ref('settlement',sid))
-    for _ in range(16):
+    # Remote listings are created first so the live catalog can select one even
+    # while a local shelf is simultaneously stocked.
+    remote_event=w.emit('test_remote_shop_stones',Layer.REALITY,location=Ref('settlement',remote))
+    local_event=w.emit('test_local_shop_stones',Layer.REALITY,location=Ref('settlement',sid))
+    for _ in range(8):
         w.magic_resources.create('awakening_stone',stone,AWAKENING_STONES[stone]['rarity'],
-                                 w.year,sid,'settlement',sid,e.id)
-    _retail_browse(w,{sid:[p]})
+                                 w.year,remote,'settlement',remote,remote_event.id)
+    for _ in range(8):
+        w.magic_resources.create('awakening_stone',stone,AWAKENING_STONES[stone]['rarity'],
+                                 w.year,sid,'settlement',sid,local_event.id)
+    _retail_browse(w,{sid:[p],remote:[]})
     path=w.advancement.path(p.id)
     assert len(path.abilities)==20
     purchases=[e for e in w.events if e.kind=='magic_resource_purchased' and e.actors[0].id==p.id]
     uses=[e for e in w.events if e.kind=='awakening_stone_used' and e.actors[0].id==p.id]
-    assert len(purchases)>=16 and len(uses)==16
+    stone_purchases=[e for e in purchases if e.data.get('source_settlement') in (sid,remote)]
+    assert len(stone_purchases)>=16 and len(uses)==16
+    assert stone_purchases[0].data['source_settlement']==remote
+    assert stone_purchases[0].data['delivery_days']==14
+    assert any(e.data['source_settlement']==sid and e.data['delivery_days']==0 for e in stone_purchases)
     assert not w.magic_resources.inventory('person',p.id,'awakening_stone')
 
 
