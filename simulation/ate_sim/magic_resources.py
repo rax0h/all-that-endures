@@ -13,6 +13,7 @@ RESOURCE_DISCOVERY_RATE=.45
 @dataclass
 class MagicAspiration:
  drive:float;desired_base_essences:int;desired_abilities:int;reason:str;formed_year:int;preparation:float=0.;search_years:int=0;completion_goal:bool=False;urgency:float=.0;compromise_tolerance:float=.5;stone_selectiveness:float=.5;risk_tolerance:float=.5;adventurer_aspiration:bool=False
+ cadet_class_year:int|None=None;cadet_branch:int|None=None;cadet_graduated_year:int|None=None
 @dataclass
 class MagicResource:
  id:int;kind:str;key:str;rarity:str;location:int|None;owner_kind:str|None=None;owner_id:int|None=None;created_year:int=0;origin_event:int|None=None;consumed_year:int|None=None;consumed_by:int|None=None;consumed_event:int|None=None;transfers:list[int]=field(default_factory=list)
