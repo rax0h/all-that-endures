@@ -1,4 +1,5 @@
 name: simulation
+# diagnostic branch exists only to expose the Stage 0.5 profiler independently
 on:
   push:
     branches: [main, sim/current-standard, diagnostic/stage-0.5-profile]
