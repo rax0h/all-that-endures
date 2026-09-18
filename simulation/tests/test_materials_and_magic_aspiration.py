@@ -189,7 +189,7 @@ def test_social_exposure_and_ordinary_work_do_not_make_civilian_a_completionist(
     p=people[0];p.occupation='labor';p.curiosity=.55
     w.advancement.paths.pop(p.id,None)
     w.skills.get(p.id,'craft').level=1.5
-    a=MagicAspiration(.55,1,5,'craft capability',w.year,completion_goal=False)
+    a=MagicAspiration(.55,1,5,'craft capability',w.year,completion_goal=False,risk_tolerance=.1)
     w.magic_resources.aspirations[p.id]=a
     # Give several local contacts magic so social exposure is definitely present.
     for q in people[1:]:
@@ -277,3 +277,29 @@ def test_magical_parent_history_can_create_interest_after_parent_is_absent():
     assert a.desired_base_essences==1 and a.desired_abilities==5
     assert a.reason=='social magical exposure'
     assert not a.completion_goal
+
+
+def test_established_region_starts_with_society_capacity_and_elevated_magic():
+    w=generate_world(843018)
+    adv=w.institutions.institution_by_kind('adventure_society')
+    assert adv is not None and len(adv.branches)==len(w.settlements)
+    assert w.currency.treasuries[adv.id]['iron']>=60*len(adv.branches)
+    assert all(w.ambient_magic.field(sid).level>=.28 for sid in w.settlements)
+    observed=[e for e in w.events if e.kind=='society_treasury_observed']
+    assert len(observed)==1 and observed[0].data['preexisting'] is True
+
+
+def test_adventure_society_can_recruit_willing_candidate_into_full_path_goal():
+    w=generate_world(843019);sid=min(w.settlements)
+    p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
+    w.advancement.paths.pop(p.id,None)
+    p.curiosity=.50;p.inhibition=.40;p.health=1.
+    w.skills.get(p.id,'defense').level=1.0
+    a=MagicAspiration(.45,1,5,'capability',w.year,completion_goal=False,
+                      risk_tolerance=.65,urgency=.2)
+    w.magic_resources.aspirations[p.id]=a
+    adventure,magic=magical_civ._institutional_capacity(w,sid)
+    magical_civ._review_magic_demand(w,[p],adventure,magic)
+    assert a.adventurer_aspiration
+    assert a.completion_goal
+    assert a.desired_base_essences==3 and a.desired_abilities==20
