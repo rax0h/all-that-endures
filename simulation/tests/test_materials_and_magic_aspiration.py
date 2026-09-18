@@ -109,3 +109,39 @@ def test_shortage_response_expedition_can_replenish_shop_with_existing_resource(
     assert len(after)>before
     assert any(e.kind=='essence_source_harvested' for e in w.events)
     assert all(r.origin_event in w.event_ids for r in after)
+
+
+def test_real_civilian_work_can_create_magic_demand_without_named_profession():
+    w=generate_world(843007);Simulation(w).run(1);sid=min(w.settlements)
+    p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
+    p.occupation='labor';w.skills.get(p.id,'craft').level=1.0
+    p.parents=()
+    for other in list(w.social.neighbors(p.id)):
+        w.social.edges[w.social.key(p.id,other)].attachment=0.
+    a=MagicAspiration(.05,0,0,'capability',w.year,urgency=0.)
+    w.magic_resources.aspirations[p.id]=a
+    adventure,magic=magical_civ._institutional_capacity(w,sid)
+    magical_civ._review_magic_demand(w,[p],adventure,magic)
+    assert a.desired_base_essences>=1 and a.desired_abilities>=5
+    assert a.reason=='craft capability'
+
+
+def test_common_source_harvest_is_bounded_even_under_full_shortage():
+    w=generate_world(843008);Simulation(w).run(1);sid=min(w.settlements)
+    people=magical_civ._living(w,sid)
+    for p in people:
+        a=_aspiration(w,p);a.desired_base_essences=max(a.desired_base_essences,3)
+    adventure,magic=magical_civ._institutional_capacity(w,sid)
+    w.ambient_magic.field(sid).level=1.2
+    settlement=w.settlements[sid];w.cells[(settlement.x,settlement.y)].hazard=1.
+    common=next(k for k,v in ESSENCES.items() if str(v['rarity']).lower()=='common')
+    class ZeroRNG:
+        def stream(self,*args):return self
+        def random(self):return 0.
+    def make_resource(world,rng,place,finder,kind=None,cause=None,method='test'):
+        e=world.emit('test_supply_find',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',place),(() if cause is None else (cause,)))
+        return world.magic_resources.create('essence',common,ESSENCES[common]['rarity'],world.year,place,'person',finder.id,e.id)
+    with patch.object(magical_civ,'_make_resource',side_effect=make_resource):
+        magical_civ._expedition_step(w,ZeroRNG(),sid,people,magical_civ._practitioners(w,people),adventure,magic)
+    harvests=[e for e in w.events if e.kind=='essence_source_harvested']
+    assert harvests and all(1<=e.data['quantity']<=5 for e in harvests)
