@@ -178,6 +178,7 @@ def test_external_pressure_raises_urgency_only_for_existing_seeker():
 
 def test_first_essence_event_records_active_search_delay_and_age():
     w=generate_world(843011);p=next(p for p in w.people.values() if p.alive and p.age>=18)
+    w.advancement.paths.pop(p.id,None)
     a=_aspiration(w,p);a.desired_base_essences=1;a.search_years=9;a.urgency=.77
     found=w.emit('test_first_essence',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),essence='fire')
     resource=w.magic_resources.create('essence','fire',ESSENCES['fire']['rarity'],w.year,p.settlement,'person',p.id,found.id)
