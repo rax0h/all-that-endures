@@ -32,7 +32,9 @@ def test_wanted_inventory_queries_once_per_semantic_demand_and_preserves_order()
 
 def test_market_contenders_preserve_wealth_ties_and_ineligible_top_buyer():
     world = generate_world(17)
-    people = [p for p in world.people.values() if p.age >= 18][:3]
+    people = [p for p in world.people.values()
+              if p.age >= 18 and world.advancement.path(p.id) is None][:3]
+    assert len(people)==3
     resource = world.magic_resources.create("essence", ESSENCE_IDS[0], "common", 0)
     for p in people:
         world.magic_resources.aspirations[p.id] = magic.MagicAspiration(.7, 3, 20, "test", 0, urgency=.8, preparation=.5)
