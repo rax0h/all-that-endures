@@ -185,16 +185,16 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
     if not candidates: candidates = sorted(adventurer_aspirants, key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
     if not candidates: return
     Layer, Ref = layer_ref()
+    incomplete = sum(1 for p in users if len(world.advancement.path(p.id).abilities) < world.advancement.path(p.id).capacity)
     for n in range(attempts):
         erng = rng.stream('magical_expedition', world.year, sid * 100 + n); leader = candidates[n % len(candidates)]; aspiration = _aspiration(world, leader)
-        readiness = .20 + .22 * aspiration.preparation + .18 * aspiration.risk_tolerance + .08 * world.advancement.rank(leader.id)
+        readiness = .20 + .22 * aspiration.preparation + .18 * aspiration.risk_tolerance + .08 * leader.rank
         if adventure is not None: readiness += .14
         if magic is not None: readiness += .08
         danger = .08 + .22 * cell.hazard + .10 * max(0., ambient - .8)
         event = world.emit('magical_expedition', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), society_branch=None if adventure is None else adventure.id, ambient_magic=round(ambient, 3), readiness=round(readiness, 3), danger=round(danger, 3))
         if erng.random() > min(.86, readiness + .16 * ambient):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,)); continue
-        incomplete = sum(1 for p in users if len(world.advancement.path(p.id).abilities) < world.advancement.path(p.id).capacity)
         stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
         if supply_pressure < .15: stone_share = max(stone_share, .82)
         kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
@@ -227,12 +227,12 @@ def _resource_circulation(world, rng, sid, people, users, magic):
             if surplus and rr.random()<(.58 if magic is not None else .28): _transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],holder,people,rr)
 
 
-def _society_pipeline(world, rng, sid, people, adventure, magic):
+def _society_pipeline(world, rng, sid, people, adventure, magic, existing=None):
     # Initial intent may create one application here. Failed applicants are not
     # recreated every year: society_career_step owns deliberate reapplication
     # after its cooldown. Use the indexed pair set rather than rescanning the
     # centuries-long application archive once per settlement.
-    existing = set(world.institutions.application_pairs())
+    existing = set(world.institutions.application_pairs()) if existing is None else existing
     for p in people:
         if not full_essence_user(world, p.id): continue
         aspiration = _aspiration(world, p); targets = []
@@ -270,6 +270,7 @@ def magical_civilization_step(world, rng):
     for p in world.current_people():
         if p.alive and p.age >= 16: by_settlement[p.settlement].append(p)
     for people in by_settlement.values(): people.sort(key=lambda p: p.id)
+    application_pairs=set(world.institutions.application_pairs())
     for sid in sorted(world.settlements):
         people = by_settlement[sid]
         if not people: continue
@@ -279,5 +280,5 @@ def magical_civilization_step(world, rng):
         _expedition_step(world, rng, sid, people, users, adventure, magic)
         users = _practitioners(world, people)
         _resource_circulation(world, rng, sid, people, users, magic)
-        _society_pipeline(world, rng, sid, people, adventure, magic)
+        _society_pipeline(world, rng, sid, people, adventure, magic, application_pairs)
         _magical_workshops(world, rng, sid, people, users, magic)
