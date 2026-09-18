@@ -150,6 +150,7 @@ def test_social_exposure_does_not_make_low_openness_civilian_automatically_seek_
     w=generate_world(843009);Simulation(w).run(1);sid=min(w.settlements)
     people=[p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid]
     p=people[0];p.occupation='labor';p.curiosity=.05;p.attachment=.20;p.parents=()
+    w.advancement.paths.pop(p.id,None)
     for skill in ('agriculture','construction','craft','knowledge','defense'):
         w.skills.get(p.id,skill).level=0.
     a=MagicAspiration(.05,0,0,'capability',w.year,urgency=0.)
