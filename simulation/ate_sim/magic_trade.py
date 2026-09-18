@@ -89,11 +89,18 @@ are competing for too few goods.
   for heap in essence_by_key.values():heapify(heap)
   heapify(stone_heap)
   essence_front={key:heap[0] for key,heap in essence_by_key.items() if heap}
+  eligible=[]
+  for p in people:
+   a=_aspiration(world,p);path=world.advancement.path(p.id)
+   base=0 if path is None else len(path.base_essences)
+   abilities=0 if path is None else len(path.abilities)
+   if base<a.desired_base_essences or (path is not None and abilities<min(a.desired_abilities,path.capacity)):
+    eligible.append(p)
   if rng is None:
-   shoppers=list(people)
+   shoppers=eligible
   else:
    arrivals=[]
-   for p in people:
+   for p in eligible:
     a=_aspiration(world,p)
     effort=.45*a.urgency+.15*a.drive+.10*a.preparation
     rr=rng.stream('magic_shopping_arrival',world.year,p.id)
