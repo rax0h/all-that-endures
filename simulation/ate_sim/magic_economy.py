@@ -192,6 +192,11 @@ def apprenticeship_step(world,living=None):
             if not p.alive or p.age<16:continue
             path=world.advancement.path(p.id)
             a=_aspiration(world,p)
+            # Older checkpoints/tests may carry the previous apprenticeship
+            # marker without explicit cohort fields. Adopt it into the current
+            # branch once, preserving the person's original formation year.
+            if a.cadet_class_year is None and a.reason=='Adventure Society apprenticeship' and a.completion_goal:
+                a.cadet_class_year=a.formed_year;a.cadet_branch=branch.id
             if a.cadet_branch==branch.id and a.cadet_class_year is not None and a.cadet_graduated_year is None:
                 if p.rank<1:active.append(p)
                 continue
