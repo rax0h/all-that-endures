@@ -101,7 +101,7 @@ def test_ordinary_manifestations_stock_local_shops_even_without_seekers():
 def test_real_civilian_work_can_create_magic_demand_without_named_profession():
     w=generate_world(843007);Simulation(w).run(1);sid=min(w.settlements)
     p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
-    p.occupation='labor';w.skills.get(p.id,'craft').level=1.5
+    p.occupation='labor';p.curiosity=.8;w.skills.get(p.id,'craft').level=2.0
     p.parents=()
     for other in list(w.social.neighbors(p.id)):
         w.social.edges[w.social.key(p.id,other)].attachment=0.
@@ -203,7 +203,7 @@ def test_social_exposure_and_ordinary_work_do_not_make_civilian_a_completionist(
 def test_high_commitment_civilian_can_choose_to_complete_after_starting_magic():
     w=generate_world(843014);Simulation(w).run(1);sid=min(w.settlements)
     p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
-    p.occupation='labor';p.curiosity=.9
+    p.occupation='labor';p.curiosity=1.;p.inhibition=0.
     w.advancement.paths.pop(p.id,None)
     a=MagicAspiration(.82,1,5,'curiosity',w.year,completion_goal=False)
     w.magic_resources.aspirations[p.id]=a
