@@ -84,30 +84,18 @@ def test_supply_signal_measures_real_seekers_against_literal_shelf_stock():
     assert pressure==2/3
 
 
-def test_shortage_response_expedition_can_replenish_shop_with_existing_resource():
-    w=generate_world(843006);Simulation(w).run(1);sid=min(w.settlements)
-    people=magical_civ._living(w,sid)
+def test_ordinary_manifestations_stock_local_shops_even_without_seekers():
+    w=generate_world(843006);sid=min(w.settlements)
+    people=[p for p in w.people.values() if p.alive and p.age>=16 and p.settlement==sid]
     assert people
     for p in people:
-        a=_aspiration(w,p);a.desired_base_essences=max(a.desired_base_essences,3)
-    adventure,magic=magical_civ._institutional_capacity(w,sid)
-    assert adventure is not None or magic is not None
-    w.ambient_magic.field(sid).level=1.2
-    settlement=w.settlements[sid];w.cells[(settlement.x,settlement.y)].hazard=1.
-    common=next(k for k,v in ESSENCES.items() if str(v['rarity']).lower()=='common')
-    class ZeroRNG:
-        def stream(self,*args):return self
-        def random(self):return 0.
-    def make_resource(world,rng,place,finder,kind=None,cause=None,method='test'):
-        e=world.emit('test_supply_find',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',place),(() if cause is None else (cause,)))
-        return world.magic_resources.create('essence',common,ESSENCES[common]['rarity'],world.year,place,'person',finder.id,e.id)
+        w.magic_resources.aspirations[p.id]=MagicAspiration(.05,0,0,'test',w.year)
     before=len(w.magic_resources.inventory('settlement',sid,'essence'))
-    with patch.object(magical_civ,'_make_resource',side_effect=make_resource):
-        magical_civ._expedition_step(w,ZeroRNG(),sid,people,magical_civ._practitioners(w,people),adventure,magic)
-    after=w.magic_resources.inventory('settlement',sid,'essence')
-    assert len(after)>before
-    assert any(e.kind=='essence_source_harvested' for e in w.events)
-    assert all(r.origin_event in w.event_ids for r in after)
+    added=__import__('ate_sim.magic_resources',fromlist=['_collect_ordinary_manifestations'])._collect_ordinary_manifestations(w,Simulation(w).rng,sid,people)
+    stock=w.magic_resources.inventory('settlement',sid,'essence')
+    assert added>0 and len(stock)==before+added
+    assert all(str(r.rarity).lower() in ('common','uncommon') for r in stock[-added:])
+    assert any(e.kind=='ordinary_essence_manifestations_collected' for e in w.events)
 
 
 def test_real_civilian_work_can_create_magic_demand_without_named_profession():
@@ -125,25 +113,15 @@ def test_real_civilian_work_can_create_magic_demand_without_named_profession():
     assert a.reason=='craft capability'
 
 
-def test_common_source_harvest_is_bounded_even_under_full_shortage():
-    w=generate_world(843008);Simulation(w).run(1);sid=min(w.settlements)
-    people=magical_civ._living(w,sid)
-    for p in people:
-        a=_aspiration(w,p);a.desired_base_essences=max(a.desired_base_essences,3)
-    adventure,magic=magical_civ._institutional_capacity(w,sid)
-    w.ambient_magic.field(sid).level=1.2
-    settlement=w.settlements[sid];w.cells[(settlement.x,settlement.y)].hazard=1.
-    common=next(k for k,v in ESSENCES.items() if str(v['rarity']).lower()=='common')
-    class ZeroRNG:
-        def stream(self,*args):return self
-        def random(self):return 0.
-    def make_resource(world,rng,place,finder,kind=None,cause=None,method='test'):
-        e=world.emit('test_supply_find',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',place),(() if cause is None else (cause,)))
-        return world.magic_resources.create('essence',common,ESSENCES[common]['rarity'],world.year,place,'person',finder.id,e.id)
-    with patch.object(magical_civ,'_make_resource',side_effect=make_resource):
-        magical_civ._expedition_step(w,ZeroRNG(),sid,people,magical_civ._practitioners(w,people),adventure,magic)
-    harvests=[e for e in w.events if e.kind=='essence_source_harvested']
-    assert harvests and all(1<=e.data['quantity']<=5 for e in harvests)
+def test_ordinary_manifestation_collection_is_shelf_bounded():
+    w=generate_world(843008);sid=min(w.settlements)
+    people=[p for p in w.people.values() if p.alive and p.age>=16 and p.settlement==sid]
+    mod=__import__('ate_sim.magic_resources',fromlist=['_collect_ordinary_manifestations'])
+    rng=Simulation(w).rng
+    first=mod._collect_ordinary_manifestations(w,rng,sid,people)
+    second=mod._collect_ordinary_manifestations(w,rng,sid,people)
+    assert first>0
+    assert second==0
 
 
 def test_social_exposure_does_not_make_low_openness_civilian_automatically_seek_magic():
@@ -190,18 +168,10 @@ def test_first_essence_event_records_active_search_delay_and_age():
     assert event.data['urgency']==.77
 
 
-def test_urgent_first_access_seeker_is_not_excluded_from_expeditions_by_existing_users():
-    w=generate_world(843012);Simulation(w).run(1);sid=min(w.settlements)
-    people=[p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid][:3]
-    assert len(people)==3
-    seeker=people[0]
-    w.advancement.paths.pop(seeker.id,None)
-    a=_aspiration(w,seeker);a.desired_base_essences=1;a.urgency=.9;a.risk_tolerance=.8;a.search_years=12
-    users=[p for p in people[1:] if w.advancement.path(p.id) is not None]
-    if not users:
-        # Give one comparison resident an existing path through a real owned essence.
-        u=people[1];key=next(iter(ESSENCES));e=w.emit('test_existing_user',Layer.REALITY,(Ref('person',u.id),),Ref('settlement',sid))
-        rr=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,sid,'person',u.id,e.id);absorb_essence_resource(w,u.id,rr.id);users=[u]
-    first,candidates=magical_civ._expedition_candidates(w,people,users,[],1.0)
-    assert seeker in first and seeker in candidates
-    assert any(p.id in {u.id for u in users} for p in candidates)
+def test_generic_aspirant_does_not_accumulate_search_years_for_shop_access():
+    w=generate_world(843012);p=next(p for p in w.people.values() if p.alive and p.age>=18)
+    w.advancement.paths.pop(p.id,None)
+    a=MagicAspiration(.6,3,20,'ordinary access',w.year,urgency=.8)
+    w.magic_resources.aspirations[p.id]=a
+    Simulation(w).run(1)
+    assert a.search_years==0
