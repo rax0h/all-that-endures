@@ -145,11 +145,13 @@ def magical_services_step(world,rng,living=None):
 
 
 def apprenticeship_step(world,living=None):
-    """Fund committed trainees through real, bounded Society public work.
+    """Allocate real Society apprenticeship slots to suitable recruits.
 
-    Apprentices are paid only when they improve real infrastructure. Assets are
-    indexed once by settlement for the whole pass, so a broad trainee population
-    does not create person-by-infrastructure scans.
+    A person becomes Society-committed only when a branch has capacity, funded
+    work and infrastructure that genuinely needs maintenance. Existing contracted
+    trainees keep priority until they complete their path; completion releases the
+    slot for another cohort. This creates a continuous Iron pipeline without a
+    prevalence/rank quota or an unbounded pool of nominal completionists.
     """
     from .magic_resources import _aspiration
     Layer,Ref=layer_ref();inst=world.institutions.institution_by_kind('adventure_society')
@@ -170,19 +172,37 @@ def apprenticeship_step(world,living=None):
         open_notices=sum(world.institutions.notices[nid].status!='resolved'
                          for nid in branch.notices if nid in world.institutions.notices)
         capacity=max(4,min(18,4+int(8*branch.authority)+min(5,open_notices)))
-        candidates=[]
+        contracted=[];recruitable=[]
         for p in people:
             if not p.alive or p.age<16:continue
             path=world.advancement.path(p.id)
             if path and len(path.abilities)==20:continue
-            aspiration=_aspiration(world,p)
-            if not aspiration.completion_goal or aspiration.drive<.30:continue
-            candidates.append(p)
-        candidates.sort(key=lambda p:(
+            a=_aspiration(world,p)
+            if a.reason=='Adventure Society apprenticeship' and a.completion_goal:
+                contracted.append(p);continue
+            motive=world.agency.motives.get(p.id);status=0. if motive is None else motive.status
+            defense=world.skills.get(p.id,'defense').level
+            field_fit=(p.occupation in ('adventurer','guard','hunter','soldier')
+                       or defense>=.55
+                       or (a.risk_tolerance>=.58 and p.curiosity>=.48)
+                       or (a.risk_tolerance>=.54 and status>=.40))
+            if p.health<.58 or not field_fit:continue
+            score=(.24*p.health+.20*a.risk_tolerance+.18*p.curiosity
+                   +.14*(1-p.inhibition)+.12*min(1.,defense/2.)+.12*status)
+            threshold=.58-.16*min(1.,.42+.30*branch.authority+.035*min(6,open_notices))
+            if score<threshold:continue
+            recruitable.append((score,p))
+        contracted.sort(key=lambda p:(
             -(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),
-            -_aspiration(world,p).preparation,-_aspiration(world,p).urgency,
-            -p.curiosity,p.id))
-        for p in candidates[:capacity]:
+            -_aspiration(world,p).preparation,p.id))
+        recruitable.sort(key=lambda x:(-x[0],x[1].id))
+        selected=list(contracted[:capacity])
+        selected_ids={p.id for p in selected}
+        for _,p in recruitable:
+            if len(selected)>=capacity:break
+            if p.id in selected_ids:continue
+            selected.append(p);selected_ids.add(p.id)
+        for p in selected:
             if treasury.get('iron',0)<4:break
             asset=next((a for a in assets if a.condition<1.),None)
             if asset is None:break
@@ -190,15 +210,23 @@ def apprenticeship_step(world,living=None):
             world.infrastructure.maintain(asset.id,.2*(.5+p.health))
             effect=asset.condition-before
             if effect<=0:continue
-            aspiration=_aspiration(world,p)
+            a=_aspiration(world,p)
+            newly_recruited=not (a.reason=='Adventure Society apprenticeship' and a.completion_goal)
+            if newly_recruited:
+                a.adventurer_aspiration=True;a.completion_goal=True
+                a.desired_base_essences=3;a.desired_abilities=20
+                a.reason='Adventure Society apprenticeship'
+                a.drive=max(a.drive,.46);a.urgency=max(a.urgency,.48)
+                world.emit('society_apprentice_recruited',Layer.SOCIETY,
+                    (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
+                    branch=branch.id,capacity=capacity,basis='funded field apprenticeship')
             world.skills.practice(p.id,'construction',.2)
             world.skills.practice(p.id,'defense',.08)
-            aspiration.preparation=min(1.,aspiration.preparation+.025)
-            aspiration.urgency=max(aspiration.urgency,.48)
+            a.preparation=min(1.,a.preparation+.025);a.urgency=max(a.urgency,.48)
             coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':4})
             world.emit('society_apprentice_work',Layer.SOCIETY,
                 (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
                 branch=branch.id,work='public infrastructure maintenance',
                 infrastructure=asset.id,improvement=effect,coin_reward=coins,
-                treasury=inst.id,eligibility='committed incomplete path',
+                treasury=inst.id,eligibility='funded Society apprenticeship',
                 training_contract=True)
