@@ -158,11 +158,13 @@ def _collect_ordinary_manifestations(world,rng,sid,people):
  return missing
 
 
-def _make_resource(world,rng,sid,finder,kind=None,cause=None,method='chance discovery'):
+def _make_resource(world,rng,sid,finder,kind=None,cause=None,method='chance discovery',owner_kind=None,owner_id=None):
  Layer,Ref=layer_ref();kind=kind or ('essence' if rng.random()<.6 else 'awakening_stone');tags=()
  if kind=='essence':key,tags=_environmental_essence(world,rng,sid);rarity=ESSENCES[key]['rarity']
  else:key=STONE_IDS[int(rng.random()*len(STONE_IDS))%len(STONE_IDS)];rarity=AWAKENING_STONES[key]['rarity']
- causes=() if cause is None else (cause,);e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),causes,resource_kind=kind,key=key,rarity=rarity,method=method,environment_tags=tags,manifestation_basis='local magical ecology' if kind=='essence' else 'awakening resonance');return world.magic_resources.create(kind,key,rarity,world.year,sid,'person',finder.id,e.id)
+ causes=() if cause is None else (cause,);e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),causes,resource_kind=kind,key=key,rarity=rarity,method=method,environment_tags=tags,manifestation_basis='local magical ecology' if kind=='essence' else 'awakening resonance')
+ owner_kind='person' if owner_kind is None else owner_kind;owner_id=finder.id if owner_id is None else owner_id
+ return world.magic_resources.create(kind,key,rarity,world.year,sid,owner_kind,owner_id,e.id)
 def _discover(world,rng,sid,people):
  if not people:return None
  finder=people[int(rng.random()*len(people))%len(people)];return _make_resource(world,rng,sid,finder)
