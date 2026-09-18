@@ -250,7 +250,7 @@ def _eligible_kind(state,kind):
 class _SettlementMarket:
  """Fixed-priority groups, built once when the first resource is offered."""
  def __init__(self,world,people):
-  self.world=world;self.people=people;self.groups=None
+  self.world=world;self.people=people;self.people_by_id={p.id:p for p in people};self.groups=None
  def contenders(self,resource,min_wealth=0.):
   if self.groups is None:
    groups={'essence':{},'awakening_stone':{}}
@@ -318,10 +318,9 @@ def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None,market=None):
    if q.wealth>=price or can_pay_tier(world,q.id,'iron',ceil(price)) or (relationship is not None and relationship.attachment>.7):candidates.append(q)
  else:
   candidates=[q for q in market.contenders(r,price) if q.id!=holder.id]
-  local_by_id={q.id:q for q in local}
   seen={q.id for q in candidates}
   for qid in world.social.neighbors(holder.id):
-   q=local_by_id.get(qid)
+   q=market.people_by_id.get(qid)
    if q is None or q.id in seen:continue
    relationship=world.social.edges.get(world.social.key(holder.id,q.id))
    if relationship is not None and relationship.attachment>.7 and _wants(world,q,r):
