@@ -31,9 +31,54 @@ class AgencyState:
   q=world.local[p.settlement];h=world.households[p.household]
   if attachment is None:attachment=max((r.attachment for r in world.social.relationships_for(p.id)),default=0.)
   if dependents is None:dependents=sum(1 for x in world.genealogy.children.get(p.id,[]) if world.people.get(x) and world.people[x].alive and world.people[x].age<18)
-  m=MotiveState(max(0.,min(1.,q.scarcity+max(0.,(5-h.food)/10))),max(0.,min(1.,world.cells[(world.settlements[p.settlement].x,world.settlements[p.settlement].y)].hazard*(1-h.preparedness)+p.fear)),max(0.,1-attachment),max(0.,min(1.,1-p.wealth/120.)),p.curiosity,max(0.,min(1.,p.age/80))*p.attachment,min(1.,dependents*.18+p.grief*.2),max(0.,min(1.,.65-p.wealth/250.))*(.5+.5*(1-p.inhibition)));self.motives[p.id]=m;return m
+  m=self.motives.get(p.id)
+  if m is None:m=MotiveState();self.motives[p.id]=m
+  m.hunger=max(0.,min(1.,q.scarcity+max(0.,(5-h.food)/10)))
+  m.safety=max(0.,min(1.,world.cells[(world.settlements[p.settlement].x,world.settlements[p.settlement].y)].hazard*(1-h.preparedness)+p.fear))
+  m.belonging=max(0.,1-attachment)
+  m.wealth=max(0.,min(1.,1-p.wealth/120.))
+  m.curiosity=p.curiosity
+  m.legacy=max(0.,min(1.,p.age/80))*p.attachment
+  m.obligation=min(1.,dependents*.18+p.grief*.2)
+  m.status=max(0.,min(1.,.65-p.wealth/250.))*(.5+.5*(1-p.inhibition))
+  return m
  def choose(self,world,p,rng,attachment=None,dependents=None):
-  m=self.assess(world,p,attachment,dependents);choices={'secure_food':m.hunger*1.35,'prepare':m.safety,'work':m.wealth+.35*m.obligation,'socialize':m.belonging*.8,'learn':m.curiosity*(1-.55*m.hunger),'teach':m.legacy,'build':(.55*m.safety+.35*m.status)*(1-.5*m.hunger)};best=max(choices.values());near=[(a,v) for a,v in choices.items() if v>=best-.08];action,strength=near[int(rng.random()*len(near))%len(near)];return action,max(m.__dict__,key=m.__dict__.get),strength
+  m=self.assess(world,p,attachment,dependents)
+  secure=m.hunger*1.35;prepare=m.safety;work=m.wealth+.35*m.obligation
+  socialize=m.belonging*.8;learn=m.curiosity*(1-.55*m.hunger);teach=m.legacy
+  build=(.55*m.safety+.35*m.status)*(1-.5*m.hunger)
+  best=max(secure,prepare,work,socialize,learn,teach,build);threshold=best-.08
+  count=(secure>=threshold)+(prepare>=threshold)+(work>=threshold)+(socialize>=threshold)+(learn>=threshold)+(teach>=threshold)+(build>=threshold)
+  pick=int(rng.random()*count)%count
+  if secure>=threshold:
+   if pick==0:action,strength='secure_food',secure
+   else:pick-=1;action=None
+  else:action=None
+  if action is None and prepare>=threshold:
+   if pick==0:action,strength='prepare',prepare
+   else:pick-=1
+  if action is None and work>=threshold:
+   if pick==0:action,strength='work',work
+   else:pick-=1
+  if action is None and socialize>=threshold:
+   if pick==0:action,strength='socialize',socialize
+   else:pick-=1
+  if action is None and learn>=threshold:
+   if pick==0:action,strength='learn',learn
+   else:pick-=1
+  if action is None and teach>=threshold:
+   if pick==0:action,strength='teach',teach
+   else:pick-=1
+  if action is None:action,strength='build',build
+  motive='hunger';mv=m.hunger
+  if m.safety>mv:motive='safety';mv=m.safety
+  if m.belonging>mv:motive='belonging';mv=m.belonging
+  if m.wealth>mv:motive='wealth';mv=m.wealth
+  if m.curiosity>mv:motive='curiosity';mv=m.curiosity
+  if m.legacy>mv:motive='legacy';mv=m.legacy
+  if m.obligation>mv:motive='obligation';mv=m.obligation
+  if m.status>mv:motive='status'
+  return action,motive,strength
 
 
 def _practice_path(world,p,rr,action,strength):
