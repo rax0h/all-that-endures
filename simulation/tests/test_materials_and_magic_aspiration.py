@@ -290,6 +290,7 @@ def test_established_region_starts_with_society_capacity_and_elevated_magic():
 
 
 def test_adventure_society_can_recruit_willing_candidate_into_full_path_goal():
+    from ate_sim.magic_economy import apprenticeship_step
     w=generate_world(843019);sid=min(w.settlements)
     p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
     w.advancement.paths.pop(p.id,None)
@@ -298,8 +299,11 @@ def test_adventure_society_can_recruit_willing_candidate_into_full_path_goal():
     a=MagicAspiration(.45,1,5,'capability',w.year,completion_goal=False,
                       risk_tolerance=.65,urgency=.2)
     w.magic_resources.aspirations[p.id]=a
-    adventure,magic=magical_civ._institutional_capacity(w,sid)
-    magical_civ._review_magic_demand(w,[p],adventure,magic)
+    asset=next(x for x in w.infrastructure.assets.values() if sid in x.settlements)
+    asset.condition=.5
+    apprenticeship_step(w,{sid:[p]})
     assert a.adventurer_aspiration
     assert a.completion_goal
+    assert a.reason=='Adventure Society apprenticeship'
     assert a.desired_base_essences==3 and a.desired_abilities==20
+    assert any(e.kind=='society_apprentice_recruited' and e.actors[0].id==p.id for e in w.events)
