@@ -28,6 +28,13 @@ def _observe_preexisting_essence(w,rr,p,sid,founded,essence=None):
                  resource=resource.id,essence=essence,observation_boundary=True,preexisting=True)
  w.magic_resources.consume(resource.id,p.id,0,absorbed.id)
  path,created=w.advancement.absorb_essence(p.id,essence,0,_context(p,sid),absorbed.id)
+ if any(a.source=='confluence' for a in created):
+  formation=w.emit('confluence_formed',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(absorbed.id,),
+                   base_essences=tuple(path.base_essences),confluence=path.confluence,
+                   observation_boundary=True,preexisting=True)
+  w.emit('confluence_absorbed',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(formation.id,),
+         confluence=path.confluence,mechanism='touch',automatic_acceptance=True,
+         observation_boundary=True,preexisting=True)
  for a in created:
   w.emit('ability_awakened',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(absorbed.id,),
          essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura,
