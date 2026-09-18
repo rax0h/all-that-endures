@@ -59,8 +59,8 @@ def absorb_essence_resource(world,pid,rid):
  if r.key not in ESSENCES:raise ValueError('unknown essence')
  p=world.people[pid];path=world.advancement.path(pid);before=world.advancement.rank(pid);base_before=0 if path is None else len(path.base_essences)
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
- Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key,base_before=base_before,first_essence=(base_before==0));world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
  a=world.magic_resources.aspirations.get(pid)
+ Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key,base_before=base_before,first_essence=(base_before==0),age=p.age,search_years=0 if a is None else a.search_years,urgency=0. if a is None else round(a.urgency,3),reason=None if a is None else a.reason);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
  if a is not None and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
  if any(a.source=='confluence' for a in created):
   formation=world.emit('confluence_formed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),base_essences=tuple(path.base_essences),confluence=path.confluence)
@@ -293,8 +293,11 @@ def magic_ecology_step(world,rng):
   if path is not None and not a.completion_goal and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
   if a.desired_base_essences>base:
    a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive+.5*a.urgency));sought=None
-   if rr.random()<.015*(.4+a.drive+.4*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
-   search_chance=RESOURCE_DISCOVERY_RATE*min(.012,.00035+.0018*a.drive+.0020*a.preparation+.0018*a.urgency+.00008*min(30,a.search_years))
+   if rr.random()<.02*(.35+a.drive+.75*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
+   # Urgent people actively search rather than passively waiting decades. This
+   # still requires a real ecological discovery roll; pressure changes effort,
+   # not whether magical resources physically exist.
+   search_chance=RESOURCE_DISCOVERY_RATE*min(.035,.0006+.0022*a.drive+.0030*a.preparation+.0120*a.urgency+.00018*min(40,a.search_years))
    if rr.random()<search_chance:_make_resource(world,rr,p.settlement,p,'essence',None if sought is None else sought.id,'aspirant search')
   essences=world.magic_resources.inventory('person',p.id,'essence') if base<a.desired_base_essences else []
   if essences and base<a.desired_base_essences and rr.random()<.15+.34*a.drive+.18*a.urgency:
