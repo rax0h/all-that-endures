@@ -53,5 +53,8 @@ def agency_step(world,rng):
   elif action=='prepare':world.households[p.household].preparedness=min(1.,world.households[p.household].preparedness+.002*strength)
   elif action=='work':p.wealth+=ORDINARY_WORK_INCOME*strength
   world.agency.actions.append(ActionRecord(world.year,p.id,action,motive,strength,None if event is None else event.id))
- if len(world.agency.actions)>50000:world.agency.actions=world.agency.actions[-50000:]
+ # Actions are a bounded recent decision cache; durable history lives in
+ # events and the post-run archive. A few recent years are ample for consumers
+ # such as rank ecology and avoid copying a 50k-entry list every mature year.
+ if len(world.agency.actions)>5000:world.agency.actions=world.agency.actions[-5000:]
  rank_ecology_step(world,rng)
