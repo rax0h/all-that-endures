@@ -186,11 +186,16 @@ def _aspiration(world,p):
  # commitment is intentionally based on intrinsic mastery intent instead, so a
  # magical society does not recursively turn everyone into a completionist.
  intrinsic=max(0.,min(1.,.60*p.curiosity+.25*(1-p.inhibition)+.15*status))
+ # Entry intent deliberately excludes the social feedback terms below. Family
+ # and peers can make starting magic easier, but a magical society should not
+ # recursively make literally everyone interested just because everyone knows a
+ # magic user.
+ entry_intent=max(0.,min(1.,.55*p.curiosity+.25*(1-p.inhibition)+.10*status))
  drive=max(0.,min(1.,.46*p.curiosity+.18*(1-p.inhibition)+.12*status+.10*min(2,family)+.05*min(3,contacts)))
  adventurer=(p.occupation in ('adventurer','guard','hunter','soldier')) or (intrinsic>.80 and p.curiosity>.72 and status>.45)
- # Magic is normal, so family/peer exposure lowers the threshold to begin a
- # path, but exposure alone does not make every descendant or neighbor a user.
- interested=adventurer or drive>=.31 or (family>0 and p.curiosity>=.34) or (contacts>=3 and p.curiosity>=.44)
+ interested=(adventurer or entry_intent>=.35
+             or (family>0 and entry_intent>=.27 and p.curiosity>=.30)
+             or (contacts>=3 and entry_intent>=.30 and p.curiosity>=.40))
  # Completing all three bases + twenty abilities is a much stronger commitment
  # than simply opening the door with an essence.
  serious=interested and (adventurer or p.occupation=='magical craftsperson' or intrinsic>=.84)
