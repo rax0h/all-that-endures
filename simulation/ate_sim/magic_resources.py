@@ -119,6 +119,42 @@ def _environmental_essence(world,rng,sid):
   if x<=0:return key,tags
  return weighted[-1][0],tags
 
+def _ordinary_manifestation_key(world,rng,sid):
+ # Common and uncommon essences are ordinary magical ecology: they manifest
+ # throughout inhabited landscapes and are routinely collected into commerce.
+ ordinary=[key for key in ESSENCE_IDS if str(ESSENCES[key]['rarity']).lower() in ('common','uncommon')]
+ tags=_environment_tags(world,sid);weighted=_environment_weights(tags)
+ candidates=[(key,w) for key,w in weighted if key in ordinary]
+ if not candidates:candidates=[(key,1.) for key in ordinary]
+ total=sum(w for _,w in candidates);x=rng.random()*total
+ for key,w in candidates:
+  x-=w
+  if x<=0:return key,tags
+ return candidates[-1][0],tags
+
+
+def _collect_ordinary_manifestations(world,rng,sid,people):
+ """Keep ordinary essence shelves stocked from ubiquitous local manifestations.
+
+ This is physical supply, not a prevalence controller. Retailers collect common
+ and uncommon manifestations until their ordinary shelf capacity is filled.
+ Rare/specific essences still come through discovery, trade and expeditions.
+ """
+ if not people:return 0
+ stock=[r for r in world.magic_resources.inventory('settlement',sid,'essence')
+        if str(r.rarity).lower() in ('common','uncommon')]
+ capacity=max(18,min(36,10+len(people)//10))
+ missing=max(0,capacity-len(stock))
+ if not missing:return 0
+ Layer,Ref=layer_ref();rr=rng.stream('ordinary_essence_manifestations',world.year,sid)
+ event=world.emit('ordinary_essence_manifestations_collected',Layer.REALITY,location=Ref('settlement',sid),
+                  quantity=missing,mechanism='ubiquitous local manifestation and civilian collection')
+ for _ in range(missing):
+  key,_tags=_ordinary_manifestation_key(world,rr,sid)
+  world.magic_resources.create('essence',key,ESSENCES[key]['rarity'],world.year,sid,'settlement',sid,event.id)
+ return missing
+
+
 def _make_resource(world,rng,sid,finder,kind=None,cause=None,method='chance discovery'):
  Layer,Ref=layer_ref();kind=kind or ('essence' if rng.random()<.6 else 'awakening_stone');tags=()
  if kind=='essence':key,tags=_environmental_essence(world,rng,sid);rarity=ESSENCES[key]['rarity']
@@ -280,6 +316,9 @@ def magic_ecology_step(world,rng):
  for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
  for sid,people in sorted(adults_by_settlement.items()):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
+  _collect_ordinary_manifestations(world,rng,sid,people)
+  # Chance discovery is for unusual finds. Basic essence access comes from the
+  # ubiquitous common/uncommon manifestations already entering local commerce.
   chance=RESOURCE_DISCOVERY_RATE*min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
   if rr.random()<chance:_discover(world,rr,sid,people)
   # Settlement-owned stock is retailed by magic_trade_step, where people
@@ -292,12 +331,10 @@ def magic_ecology_step(world,rng):
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
   if path is not None and not a.completion_goal and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
   if a.desired_base_essences>base:
-   a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive+.5*a.urgency));sought=None
-   if rr.random()<.015*(.4+a.drive+.4*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
-   # Personal chance-discovery stays bounded. Urgency is expressed mainly through
-   # civilization channels: shelf competition, trade, and joining expeditions.
-   search_chance=RESOURCE_DISCOVERY_RATE*min(.012,.00035+.0018*a.drive+.0020*a.preparation+.0018*a.urgency+.00008*min(30,a.search_years))
-   if rr.random()<search_chance:_make_resource(world,rr,p.settlement,p,'essence',None if sought is None else sought.id,'aspirant search')
+   # Ordinary essence acquisition is shopping, not a multi-year wilderness
+   # search. search_years is reserved for a future explicit scarce/specific
+   # essence goal; general aspirants should normally remain at zero.
+   a.preparation=min(1.,a.preparation+.001*(.5+a.drive+.5*a.urgency))
   essences=world.magic_resources.inventory('person',p.id,'essence') if base<a.desired_base_essences else []
   if essences and base<a.desired_base_essences and rr.random()<.15+.34*a.drive+.18*a.urgency:
    candidates=[r for r in essences if path is None or r.key not in path.base_essences]
