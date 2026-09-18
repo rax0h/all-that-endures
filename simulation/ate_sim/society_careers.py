@@ -31,11 +31,19 @@ def society_career_step(world,rng):
  apprenticeship_step(world)
  magical_services_step(world,rng)
  for n in sorted(world.institutions.notices.values(),key=lambda x:x.id):
+  if n.status=='resolved':continue
   resolution=world.threat_ecology.resolutions.get(n.cause_event)
-  if n.status!='resolved' and n.kind=='ranked_magic_manifested' and resolution is not None:
-   actual=next((ref.id for ref in world.events[resolution-1].actors if ref.kind=='person'),None)
-   if actual in adv.members and world.people[actual].alive:
+  if n.kind=='ranked_magic_manifested' and resolution is not None:
+   event=world.events[resolution-1]
+   actual=next((ref.id for ref in event.actors if ref.kind=='person'),None)
+   # Once the underlying threat is gone, the notice cannot remain assigned
+   # forever. Society members can still receive the normal verified reward;
+   # an outside/dead resolver closes the obsolete notice without payment.
+   if actual in adv.members and world.people.get(actual) is not None and world.people[actual].alive:
     n.assigned_to=actual;n.status='assigned'
+   else:
+    n.status='resolved';n.assigned_to=actual;n.resolved_event=resolution
+    continue
   if n.status=='open':
    candidates=[world.people[pid] for pid in adv.members if pid in world.people and world.people[pid].alive and world.people[pid].settlement==n.location and world.advancement.rank(pid)>=n.required_rank]
    if not candidates and n.required_rank>=3:
