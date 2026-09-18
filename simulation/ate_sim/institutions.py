@@ -176,6 +176,10 @@ def institution_step(world,rng):
   for society in ('adventure_society','magic_society'):
    i=world.institutions.institution_by_kind(society)
    if i is None or p.id in i.members or (p.id,society) in applied:continue
+   # Adventure Society membership is a ranked profession. Incomplete cadets
+   # train through annual classes and graduate into membership instead of
+   # repeatedly applying before they have an Iron body.
+   if society=='adventure_society' and world.advancement.rank(p.id)<1:continue
    rr=rng.stream('society_apply',world.year,p.id+(1 if society=='adventure_society' else 1000000))
    if rr.random()<.035:apply_for_society(world,p.id,society)
  for a in world.institutions.pending_applications():
