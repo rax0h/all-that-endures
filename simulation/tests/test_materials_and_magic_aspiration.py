@@ -29,13 +29,13 @@ def test_material_production_is_not_fixed_one_lot_per_settlement_year():
     assert len(produced)!=40*len(w.settlements)
 
 
-def test_civilian_magic_interest_can_be_broad_while_serious_aspirants_skew_to_completion():
+def test_civilian_magic_interest_can_be_broad_without_forcing_every_user_to_full_path():
     w=generate_world(843001);Simulation(w).run(40)
     aspirations=list(w.magic_resources.aspirations.values())
     assert aspirations
     interested=[a for a in aspirations if a.desired_base_essences>0]
     assert interested
-    assert sum(a.completion_goal for a in interested)>len(interested)/2
+    assert any(not a.completion_goal for a in interested)
     assert all(a.desired_base_essences==3 and a.desired_abilities==20 for a in interested if a.completion_goal)
     assert all(a.completion_goal for a in interested if a.adventurer_aspiration)
 
@@ -52,15 +52,15 @@ def test_adventurer_aspirant_treats_full_configuration_as_the_goal():
     assert a.urgency>=.55
 
 
-def test_absorbing_first_essence_turns_committed_interest_into_full_completion_goal():
+def test_absorbing_first_essence_does_not_force_ordinary_civilian_into_full_path():
     w=generate_world(843002);p=next(p for p in w.people.values() if p.alive and p.age>=18)
-    a=_aspiration(w,p);a.drive=.35;a.completion_goal=False;a.desired_base_essences=1;a.desired_abilities=5
+    a=_aspiration(w,p);a.adventurer_aspiration=False;a.drive=.35;a.completion_goal=False;a.desired_base_essences=1;a.desired_abilities=5
     found=w.emit('test_essence_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),essence='fire')
     r=w.magic_resources.create('essence','fire',ESSENCES['fire']['rarity'],w.year,p.settlement,'person',p.id,found.id)
     absorb_essence_resource(w,p.id,r.id)
-    assert a.completion_goal
-    assert a.desired_base_essences==3
-    assert a.desired_abilities==20
+    assert not a.completion_goal
+    assert a.desired_base_essences==1
+    assert a.desired_abilities==5
 
 
 def test_transcendent_craft_cannot_be_randomly_rolled_by_mortal():
