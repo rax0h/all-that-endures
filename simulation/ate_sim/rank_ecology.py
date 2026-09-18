@@ -131,20 +131,26 @@ def _career_training(world,p,path,asp,member,strength,school_rank=0):
  ambition=max(0.,min(1.,.45*asp.drive+.30*asp.urgency+.25*p.curiosity))
  if rank==1:
   school_boost=.45 if school_rank>=3 else 0.
-  return ('all',4*(1.20+.40*strength+.20*asp.urgency+school_boost),5,.18+.22*p.curiosity)
+  # Iron is the broad professional base. One annual deliberate block trains the
+  # weakest quarter of the path; do not compress four years of training into one.
+  return ('all',1.20+.40*strength+.20*asp.urgency+school_boost,4,.18+.22*p.curiosity)
  if rank==2:
   school_boost=.32 if school_rank>=3 else 0.
-  return ('all',4*(.82+.28*strength+.24*ambition+school_boost),5,.24+.28*p.curiosity)
+  # Bronze remains normal professional development, but sustained breadth across
+  # all twenty abilities takes decades rather than immediately following Iron.
+  return ('all',.82+.28*strength+.24*ambition+school_boost,4,.24+.28*p.curiosity)
  if rank==3:
   elite_school=school_rank>=4
   if not elite_school and not member and ambition<.68:return None
-  return ('all',4*(.48+.18*strength+.20*ambition+(.18 if elite_school else 0.)),5,.42+.35*p.curiosity)
+  # Silver specialists train intensely enough that long careers can reach Gold,
+  # while understanding and held-out evidence remain mandatory.
+  return ('all',6*(.48+.18*strength+.20*ambition+(.18 if elite_school else 0.)),5,.42+.35*p.curiosity)
  if rank==4:
-  # Gold-to-Diamond must remain possible without a Diamond teacher, but only for
-  # unusually committed practitioners; a Diamond mentor is a genuine advantage.
+  # Gold-to-Diamond remains a centuries-scale culmination. More deliberate
+  # training does not bypass the two-transfer understanding requirement.
   diamond_school=school_rank>=5
   if not member or (not diamond_school and ambition<.82):return None
-  return ('all',4*(.38+.12*strength+.15*ambition+(.10 if diamond_school else 0.)),5,.78+.22*p.curiosity)
+  return ('all',8*(.38+.12*strength+.15*ambition+(.10 if diamond_school else 0.)),5,.78+.22*p.curiosity)
  return None
 
 def rank_ecology_step(world,rng):
@@ -180,10 +186,10 @@ def rank_ecology_step(world,rng):
    candidates=[x for x in indexed if x[1].function in relevant] or indexed
    exposure=.16+.20*strength;uses=min(len(candidates),4)
   rr=rng.stream('rank_ecology',world.year,p.id)
-  # Full-time training is represented as a rotating weakest-quarter block:
-  # five abilities receive four years' worth of exposure at once. Over a cycle
-  # this is the same annual training budget, but avoids 20 hot-path calls for
-  # every ranked professional every simulated year.
+  # Deliberate training targets a bounded weakest-ability block each year.
+  # Lower ranks use real annual cadence; elite ranks can sustain more intensive
+  # practice, but every ability still advances through the normal progression,
+  # understanding and evidence machinery.
   if career is None:rr.shuffle(candidates)
   before=p.rank
   for i,a in candidates[:uses]:
