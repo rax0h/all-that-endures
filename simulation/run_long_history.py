@@ -97,7 +97,13 @@ def main(seed=843000, years=1000, max_seconds=None, archive=None):
     profiler=cProfile.Profile() if profile_tail else None
     profiled_years=0
     from scaling_telemetry import ScalingTelemetry, BUCKET_ENDS
-    world=generate_world(seed);sim=Simulation(world)
+    world=generate_world(seed)
+    # Stage 0.5 treats year zero as an observation boundary inside an already
+    # established civilization. Report the actual seeded cross-section before
+    # the simulation gets one chance to change it.
+    initial=snapshot(world,include_digest=False);initial['record']='initial_snapshot'
+    print(json.dumps(initial,sort_keys=True),flush=True)
+    sim=Simulation(world)
     marks=sorted(set([m for m in BUCKET_ENDS if m<=years]+[years]))
     last=0;simulation_seconds=0.;diagnostic_seconds=0.
     with ScalingTelemetry(world) as telemetry:
