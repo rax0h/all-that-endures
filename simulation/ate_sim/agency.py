@@ -37,7 +37,6 @@ def _practice_path(world,p,rr,action,strength):
  candidates=[(i,a) for i,a in trainable if a.function in relevant] or trainable;rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));before=body_rank
  for i,a in candidates[:uses]:
   meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,body_rank=body_rank)
- after=world.advancement.rank(p.id)
  record_body_transition(world,p,before,context=action)
 
 def agency_step(world,rng):
