@@ -113,7 +113,12 @@ def full_essence_user(world,pid):
 
 def society_eligible(world,pid,society):
  if society not in ('adventure_society','magic_society'):raise ValueError('unknown society')
- p=world.people.get(pid);return bool(p and p.alive and full_essence_user(world,pid))
+ p=world.people.get(pid)
+ if not (p and p.alive and full_essence_user(world,pid)):return False
+ # The Magic Society can recognize a complete essence configuration before the
+ # body is ranked. Adventure Society membership is a field profession: cadets
+ # graduate into it only once the full 20/20 path makes them Iron.
+ return True if society=='magic_society' else world.advancement.rank(pid)>=1
 
 def ensure_core_societies(world):
  if not world.settlements:return
