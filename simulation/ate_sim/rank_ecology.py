@@ -23,8 +23,12 @@ def _martial_school_context(world,rng,living,adventure_members):
  progression effect is access to better deliberate practice from living mentors.
  """
  schools=[c for c in world.communities.communities.values() if c.active and c.kind=='martial_school']
+ # Only ranked practitioners can teach, occupy student seats or consume mentor
+ # context. Unranked relatives remain members in canonical community state and
+ # become visible here automatically if they later reach Iron.
+ ranked_living=[p for p in living if p.rank>=1]
  by_sid={}
- for p in living:by_sid.setdefault(p.settlement,[]).append(p)
+ for p in ranked_living:by_sid.setdefault(p.settlement,[]).append(p)
 
  if world.year%5==0:
   existing_by_sid={}
@@ -39,7 +43,9 @@ def _martial_school_context(world,rng,living,adventure_members):
    for founder in founders:
     if len(local)>=max_schools:break
     if any(world.communities.memberships.get((founder.id,s.id),0.)>=.2 for s in local):continue
-    family=[x for x in people if x.id!=founder.id and x.household==founder.household]
+    family=sorted((world.people[pid] for pid in world.households[founder.household].members
+                   if pid!=founder.id and world.people[pid].alive
+                   and world.people[pid].settlement==sid),key=lambda p:p.id)
     family_practitioners=sum(world.advancement.essence_user(x.id) for x in family)
     cid=world.communities.next_community
     e=world.emit('martial_school_founded',Layer.SOCIETY,(Ref('person',founder.id),),Ref('settlement',sid),
@@ -59,7 +65,7 @@ def _martial_school_context(world,rng,living,adventure_members):
  # Never scan the historical membership archive here. It contains every dead
  # ancestor and grows for the entire millennium. Query the existing per-person
  # membership index for the bounded living population instead.
- for person in living:
+ for person in ranked_living:
   for cid,strength in world.communities.memberships_for(person.id,.18).items():
    if cid not in school_ids:continue
    school=world.communities.communities[cid]
