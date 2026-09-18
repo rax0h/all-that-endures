@@ -61,7 +61,9 @@ def absorb_essence_resource(world,pid,rid):
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
  a=world.magic_resources.aspirations.get(pid)
  Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key,base_before=base_before,first_essence=(base_before==0),age=p.age,search_years=0 if a is None else a.search_years,urgency=0. if a is None else round(a.urgency,3),reason=None if a is None else a.reason);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
- if a is not None and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
+ # Absorbing an essence starts a path; it does not automatically turn every
+ # civilian into a full-path aspirant. Adventurers remain explicitly committed.
+ if a is not None and a.adventurer_aspiration:_commit_to_full_path(a)
  if any(a.source=='confluence' for a in created):
   formation=world.emit('confluence_formed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),base_essences=tuple(path.base_essences),confluence=path.confluence)
   world.emit('confluence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(formation.id,),confluence=path.confluence,mechanism='touch',automatic_acceptance=True)
@@ -143,7 +145,7 @@ def _collect_ordinary_manifestations(world,rng,sid,people):
  if not people:return 0
  stock=[r for r in world.magic_resources.inventory('settlement',sid,'essence')
         if str(r.rarity).lower() in ('common','uncommon')]
- capacity=max(18,min(36,10+len(people)//10))
+ capacity=max(12,min(24,8+len(people)//15))
  missing=max(0,capacity-len(stock))
  if not missing:return 0
  Layer,Ref=layer_ref();rr=rng.stream('ordinary_essence_manifestations',world.year,sid)
@@ -182,8 +184,12 @@ def _aspiration(world,p):
  family=sum(1 for x in p.parents if world.advancement.essence_user(x));contacts=sum(1 for x in world.social.neighbors(p.id) if world.advancement.essence_user(x));m=world.agency.motives.get(p.id);status=0 if m is None else m.status
  drive=max(0.,min(1.,.46*p.curiosity+.18*(1-p.inhibition)+.12*status+.10*min(2,family)+.05*min(3,contacts)))
  adventurer=(p.occupation in ('adventurer','guard','hunter','soldier')) or (drive>.68 and (p.curiosity>.58 or status>.42))
- interested=drive>=.34 or family>0 or contacts>=2
- serious=interested and (adventurer or drive>=.40 or family>0 or contacts>=2)
+ # Magic is normal, so family/peer exposure lowers the threshold to begin a
+ # path, but exposure alone does not make every descendant or neighbor a user.
+ interested=adventurer or drive>=.31 or (family>0 and drive>=.24) or (contacts>=2 and drive>=.28)
+ # Completing all three bases + twenty abilities is a stronger commitment than
+ # simply opening the door with an essence.
+ serious=interested and (adventurer or drive>=.50 or (family>0 and drive>=.43) or (contacts>=3 and drive>=.46))
  completion=serious
  if not interested:desired=0
  elif completion:desired=3
