@@ -187,9 +187,10 @@ def _aspiration(world,p):
  # Magic is normal, so family/peer exposure lowers the threshold to begin a
  # path, but exposure alone does not make every descendant or neighbor a user.
  interested=adventurer or drive>=.31 or (family>0 and drive>=.24) or (contacts>=2 and drive>=.28)
- # Completing all three bases + twenty abilities is a stronger commitment than
- # simply opening the door with an essence.
- serious=interested and (adventurer or drive>=.50 or (family>0 and drive>=.43) or (contacts>=3 and drive>=.46))
+ # Completing all three bases + twenty abilities is a much stronger commitment
+ # than simply opening the door with an essence. Family and peer exposure can
+ # normalize starting magic, but cannot by themselves make someone a completionist.
+ serious=interested and (adventurer or drive>=.72 or (family>0 and drive>=.64 and p.curiosity>=.60))
  completion=serious
  if not interested:desired=0
  elif completion:desired=3
