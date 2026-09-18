@@ -164,7 +164,7 @@ def test_apprentice_pay_requires_funded_useful_work_and_releases_complete_paths(
     for q in w.people.values():
         w.magic_resources.aspirations[q.id]=MagicAspiration(0,0,0,'test',0)
     path.abilities=path.abilities[:1]
-    w.magic_resources.aspirations[p.id]=MagicAspiration(1,3,20,'committed',0,completion_goal=True)
+    w.magic_resources.aspirations[p.id]=MagicAspiration(1,3,20,'Adventure Society apprenticeship',0,completion_goal=True,adventurer_aspiration=True)
     asset=next(iter(w.infrastructure.assets.values()));asset.condition=.5
     apprenticeship_step(w)
     assert asset.condition==.5
