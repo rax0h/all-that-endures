@@ -144,14 +144,18 @@ are competing for too few goods.
     else:essence_front.pop(key,None)
     absorb_essence_resource(world,p.id,rid)
 
-   # Awakening stones remain a later progression good; one stone purchase per
-   # annual pass is enough and cannot delay acquiring the foundational essences.
+   # Awakening stones remain later progression goods. A committed full-path
+   # cadet may buy two real stones in a year when stock and money both exist;
+   # ordinary users retain the one-stone pace.
    a=_aspiration(world,p);path=world.advancement.path(p.id)
-   abilities=0 if path is None else len(path.abilities)
-   wants_stone=path is not None and abilities<a.desired_abilities and abilities<path.capacity
-   if wants_stone and stone_heap and (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):
+   stone_budget=2 if a.completion_goal and a.adventurer_aspiration else 1
+   for _ in range(stone_budget):
+    path=world.advancement.path(p.id);abilities=0 if path is None else len(path.abilities)
+    wants_stone=path is not None and abilities<a.desired_abilities and abilities<path.capacity
+    if not wants_stone or not stone_heap or not (p.wealth>=3 or can_pay_tier(world,p.id,'iron',3)):break
     rid=stone_heap[0];resource=world.magic_resources.resources[rid]
     if purchase(p,resource,3):heappop(stone_heap)
+    else:break
 
 
 def _route_neighbors(world,sid):
