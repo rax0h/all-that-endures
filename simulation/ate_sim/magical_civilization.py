@@ -104,7 +104,7 @@ def _review_magic_demand(world, people, adventure, magic):
             'defense': world.skills.get(p.id, 'defense').level,
         }
         work_domain, work_level = max(work_levels.items(), key=lambda x: x[1])
-        skilled_specialist = work_level >= 1.20 and (p.curiosity >= .42 or p.occupation != 'labor')
+        skilled_specialist = work_level >= 1.60 and p.curiosity >= .55
         work_need = named_profession or skilled_specialist
         settlement = world.settlements[p.settlement]
         cell = world.cells[(settlement.x, settlement.y)]
@@ -115,22 +115,27 @@ def _review_magic_demand(world, people, adventure, magic):
         household = world.households[p.household]
         household_crisis = local.scarcity >= .24 and household.food < 4
         institutional_access = adventure is not None or magic is not None
-        social_exposure = (family >= 1 and p.curiosity >= .42) or (contacts >= 4 and p.curiosity >= .52)
+        already_interested = a.desired_base_essences > 0
+        social_start = (family >= 1 and p.curiosity >= .50) or (contacts >= 5 and p.curiosity >= .60)
+        social_exposure = already_interested and ((family >= 1 and p.curiosity >= .38) or (contacts >= 4 and p.curiosity >= .50))
         reason = None
-        if social_exposure: reason = 'social magical exposure'
+        if social_start or social_exposure: reason = 'social magical exposure'
         elif work_need and institutional_access: reason = f'{work_domain} capability'
         elif scarcity_need and institutional_access: reason = 'food-production pressure'
         elif household_crisis and institutional_access and p.attachment >= .45: reason = 'household scarcity'
         elif acute_environment and institutional_access: reason = 'local magical pressure'
 
-        # Going from "I use magic" to "I am completing the whole path" is a
-        # personal/professional commitment, not a consequence of knowing magical
-        # people. This decision can arise from the person's own mastery intent;
-        # it does not require a fresh external pressure reason in the same year.
+        # Completion is driven by intrinsic mastery intent and exceptional
+        # professional commitment, not by socially-inflated aspiration drive.
+        # This prevents a mature magical society from recursively making nearly
+        # every ordinary user chase all 20 abilities.
         started = path is not None and len(path.base_essences) > 0
-        personal_mastery = started and a.drive >= .76 and p.curiosity >= .68
-        professional_mastery = started and work_level >= 2.0 and a.drive >= .66 and p.curiosity >= .58
-        magical_profession = started and p.occupation == 'magical craftsperson' and a.drive >= .60
+        motive = world.agency.motives.get(p.id)
+        status_need = 0.0 if motive is None else motive.status
+        mastery_intent = min(1.0, .62*p.curiosity + .28*(1-p.inhibition) + .10*status_need)
+        personal_mastery = started and mastery_intent >= .86
+        professional_mastery = started and named_profession and work_level >= 2.40 and mastery_intent >= .74
+        magical_profession = started and p.occupation == 'magical craftsperson' and mastery_intent >= .64
         if a.adventurer_aspiration or personal_mastery or professional_mastery or magical_profession:
             a.completion_goal = True; a.desired_base_essences = 3; a.desired_abilities = 20
 
