@@ -2,13 +2,15 @@ from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
 from .magic_progression import practice_ability,record_body_transition
-from .rank_ecology import rank_ecology_step
+from .rank_ecology import rank_ecology_step, ACTION_FUNCTIONS
 
 # Ordinary wealth is the civilian market scale. The old .03 work payout made a
 # seven-unit common essence cost centuries of labor for descendants born at zero.
 # Half a unit per full-strength work year keeps ordinary goods and wages on the
 # same scale without granting magic, resources, or rank directly.
 ORDINARY_WORK_INCOME = .50
+ACTION_DOMAIN={'secure_food':'agriculture','prepare':'defense','work':'craft',
+               'learn':'knowledge','teach':'knowledge','build':'construction'}
 @dataclass
 class MotiveState:hunger:float=0.;safety:float=0.;belonging:float=0.;wealth:float=0.;curiosity:float=0.;legacy:float=0.;obligation:float=0.;status:float=0.
 @dataclass
@@ -22,20 +24,8 @@ class AgencyState:
   if dependents is None:dependents=sum(1 for x in world.genealogy.children.get(p.id,[]) if world.people.get(x) and world.people[x].alive and world.people[x].age<18)
   m=MotiveState(max(0.,min(1.,q.scarcity+max(0.,(5-h.food)/10))),max(0.,min(1.,world.cells[(world.settlements[p.settlement].x,world.settlements[p.settlement].y)].hazard*(1-h.preparedness)+p.fear)),max(0.,1-attachment),max(0.,min(1.,1-p.wealth/120.)),p.curiosity,max(0.,min(1.,p.age/80))*p.attachment,min(1.,dependents*.18+p.grief*.2),max(0.,min(1.,.65-p.wealth/250.))*(.5+.5*(1-p.inhibition)));self.motives[p.id]=m;return m
  def choose(self,world,p,rng,attachment=None,dependents=None):
-  m=self.assess(world,p,attachment,dependents)
-  # Preserve the original insertion/tie order without allocating two dicts for
-  # every adult every year.
-  choices=(('secure_food',m.hunger*1.35),('prepare',m.safety),
-           ('work',m.wealth+.35*m.obligation),('socialize',m.belonging*.8),
-           ('learn',m.curiosity*(1-.55*m.hunger)),('teach',m.legacy),
-           ('build',(.55*m.safety+.35*m.status)*(1-.5*m.hunger)))
-  best=max(v for _,v in choices);threshold=best-.08
-  near=tuple(x for x in choices if x[1]>=threshold)
-  action,strength=near[int(rng.random()*len(near))%len(near)]
-  motive_names=('hunger','safety','belonging','wealth','curiosity','legacy','obligation','status')
-  motive_values=(m.hunger,m.safety,m.belonging,m.wealth,m.curiosity,m.legacy,m.obligation,m.status)
-  motive=motive_names[max(range(8),key=lambda i:motive_values[i])]
-  return action,motive,strength
+  m=self.assess(world,p,attachment,dependents);choices={'secure_food':m.hunger*1.35,'prepare':m.safety,'work':m.wealth+.35*m.obligation,'socialize':m.belonging*.8,'learn':m.curiosity*(1-.55*m.hunger),'teach':m.legacy,'build':(.55*m.safety+.35*m.status)*(1-.5*m.hunger)};best=max(choices.values());near=[(a,v) for a,v in choices.items() if v>=best-.08];action,strength=near[int(rng.random()*len(near))%len(near)];return action,max(m.__dict__,key=m.__dict__.get),strength
+
 
 def _practice_path(world,p,rr,action,strength):
  # An incomplete rank-0 path's awakened abilities already begin at Iron.
@@ -50,7 +40,7 @@ def _practice_path(world,p,rr,action,strength):
  # progression for hundreds of mature partial users whose abilities are capped.
  trainable=[(i,a) for i,a in enumerate(path.abilities) if a.rank<ceiling]
  if not trainable:return
- relevant={'secure_food':{'creation','control','support','detection','recovery'},'prepare':{'enhancement','control','movement','detection','recovery'},'work':{'creation','enhancement','control','support','exchange'},'socialize':{'influence','support','detection','exchange'},'learn':{'detection','control','transformation','support'},'teach':{'influence','support','control','exchange'},'build':{'creation','enhancement','control','transformation'}}.get(action,set())
+ relevant=ACTION_FUNCTIONS.get(action,set())
  candidates=[(i,a) for i,a in trainable if a.function in relevant] or trainable;rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));before=body_rank
  for i,a in candidates[:uses]:
   meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,body_rank=body_rank)
@@ -63,7 +53,7 @@ def agency_step(world,rng):
    for parent in p.parents:dependents[parent]=dependents.get(parent,0)+1
  for p in (x for x in world.current_people() if x.alive and x.age>=16):
   attachment=max((r.attachment for r in world.social.relationships_for(p.id)),default=0.)
-  rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachment,dependents.get(p.id,0));domain={'secure_food':'agriculture','prepare':'defense','work':'craft','learn':'knowledge','teach':'knowledge','build':'construction'}.get(action);event=None
+  rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachment,dependents.get(p.id,0));domain=ACTION_DOMAIN.get(action);event=None
   if domain:world.skills.practice(p.id,domain,.12+.38*strength)
   _practice_path(world,p,rr,action,strength)
   if action=='secure_food':world.households[p.household].food+=.08+.2*strength
