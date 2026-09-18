@@ -26,7 +26,7 @@ def test_indexed_population_matches_archive_scan_simulation():
     indexed=Simulation(generate_world(843000)).run(100)
     with patch.object(World,'current_people',lambda w:tuple(p for p in w.people.values() if p.alive)):
         reference=Simulation(generate_world(843000)).run(100)
-    # The research branch intentionally changes world history. Keep this
-    # fixture branch-local while still proving the living-population index is
-    # semantically identical to a full archive scan.
-    assert indexed.digest()==reference.digest()=='9c49c7afccd6a303de18d66f178d26036f8c066ebc5c18556cbe73930e8bc93e'
+    # This test protects the index's semantics, not a research-branch history
+    # fixture. Stage 0.5 deliberately changes world history as causal hypotheses
+    # are tested; determinism itself is covered separately.
+    assert indexed.digest()==reference.digest()
