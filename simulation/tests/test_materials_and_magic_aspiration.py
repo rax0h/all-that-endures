@@ -188,3 +188,20 @@ def test_first_essence_event_records_active_search_delay_and_age():
     assert event.data['search_years']==9
     assert event.data['age']==p.age
     assert event.data['urgency']==.77
+
+
+def test_urgent_first_access_seeker_is_not_excluded_from_expeditions_by_existing_users():
+    w=generate_world(843012);Simulation(w).run(1);sid=min(w.settlements)
+    people=[p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid][:3]
+    assert len(people)==3
+    seeker=people[0]
+    w.advancement.paths.pop(seeker.id,None)
+    a=_aspiration(w,seeker);a.desired_base_essences=1;a.urgency=.9;a.risk_tolerance=.8;a.search_years=12
+    users=[p for p in people[1:] if w.advancement.path(p.id) is not None]
+    if not users:
+        # Give one comparison resident an existing path through a real owned essence.
+        u=people[1];key=next(iter(ESSENCES));e=w.emit('test_existing_user',Layer.REALITY,(Ref('person',u.id),),Ref('settlement',sid))
+        rr=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,sid,'person',u.id,e.id);absorb_essence_resource(w,u.id,rr.id);users=[u]
+    first,candidates=magical_civ._expedition_candidates(w,people,users,[],1.0)
+    assert seeker in first and seeker in candidates
+    assert any(p.id in {u.id for u in users} for p in candidates)
