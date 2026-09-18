@@ -97,47 +97,78 @@ def magical_service(world,provider,client,ability,*,kind,difficulty,constraint):
 
 
 def magical_services_step(world,rng,living=None):
+    """Run a demand-bounded magical service market.
+
+    Ranked practitioners can be numerous in a mature civilization; client need,
+    liquidity and local market throughput are the limiting factors. Never run one
+    synthetic service attempt per ranked provider per year.
+    """
     living=world.living_by_settlement() if living is None else living
     for sid,people in sorted(living.items()):
         clients=[p for p in people if p.alive and world.currency.wallets.get(p.id)]
-        if not clients:continue
         providers=[p for p in people if p.alive and p.rank>=1]
-        for p in providers:
-            path=world.advancement.path(p.id)
-            if path is None:continue
-            # One actual service per provider/year; no all-pairs marketplace.
-            rr=rng.stream('magical_service',world.year,p.id)
-            client=clients[int(rr.random()*len(clients))%len(clients)]
-            if client.id==p.id:continue
-            kind='instruction' if world.skills.get(client.id,'knowledge').level<.7 and world.year%2==0 else 'healing' if client.health<.9 else ('provision' if world.households[client.household].food<3 else 'protection')
+        if not clients or not providers:continue
+        requests=[]
+        for client in clients:
+            household=world.households[client.household]
+            if client.health<.9:
+                kind='healing';need=1-client.health
+            elif household.food<3:
+                kind='provision';need=3-household.food
+            elif world.year%2==0 and world.skills.get(client.id,'knowledge').level<.7:
+                kind='instruction';need=.7-world.skills.get(client.id,'knowledge').level
+            elif household.preparedness<.8:
+                kind='protection';need=.8-household.preparedness
+            else:continue
+            requests.append((need,client.id,client,kind))
+        if not requests:continue
+        requests.sort(key=lambda x:(-x[0],x[1]))
+        # Local demand and transaction capacity, not provider count, bound work.
+        slots=min(12,max(2,len(people)//40),len(requests))
+        ordered_providers=sorted(providers,key=lambda p:(-p.rank,-world.skills.get(p.id,'knowledge').level,p.id))
+        for _,_,client,kind in requests[:slots]:
             difficulty=max(1,client.rank if kind=='healing' else supported_rank(world.ambient_magic.field(sid).level))
-            for ability in sorted(path.abilities,key=lambda a:(a.rank,a.level,a.semantic_key)):
-                # Disease/embodiment, ecology and household conditions define cases.
+            start=int(rng.stream('magical_service_market',world.year,client.id).random()*len(ordered_providers))%len(ordered_providers)
+            # Try only a bounded provider window; an unmet request can remain unmet.
+            for offset in range(min(8,len(ordered_providers))):
+                provider=ordered_providers[(start+offset)%len(ordered_providers)]
+                if provider.id==client.id:continue
+                path=world.advancement.path(provider.id)
+                if path is None:continue
                 constraint=f'{kind}:{client.species}:{sid}:{int(world.local[sid].scarcity*4)}'
-                if magical_service(world,p,client,ability,kind=kind,difficulty=difficulty,constraint=constraint):break
+                for ability in sorted(path.abilities,key=lambda a:(a.rank,a.level,a.semantic_key)):
+                    if magical_service(world,provider,client,ability,kind=kind,difficulty=difficulty,constraint=constraint):
+                        break
+                else:
+                    continue
+                break
 
 
 def apprenticeship_step(world,living=None):
-    """Fund the Society's broad replacement pipeline with real work and real money.
+    """Fund committed trainees through real, bounded Society public work.
 
-    The Adventure Society wants as many viable Iron-rank responders as its local
-    civilization can sustain. Committed incomplete-path recruits therefore do
-    patrol, drills, logistics and public works for an actual stipend from the
-    conserved Society treasury. Nothing here grants an essence, stone, ability
-    or rank: trainees still buy physical stock and satisfy every progression
-    prerequisite in the normal systems.
+    Apprentices are paid only when they improve real infrastructure. Assets are
+    indexed once by settlement for the whole pass, so a broad trainee population
+    does not create person-by-infrastructure scans.
     """
     from .magic_resources import _aspiration
     Layer,Ref=layer_ref();inst=world.institutions.institution_by_kind('adventure_society')
     if inst is None:return
     living=world.living_by_settlement() if living is None else living
     treasury=world.currency.treasuries.get(inst.id,{})
+    assets_by_sid={sid:[] for sid in living}
+    for asset in world.infrastructure.assets.values():
+        if asset.condition>=1.:continue
+        for sid in asset.settlements:
+            if sid in assets_by_sid:assets_by_sid[sid].append(asset)
+    for assets in assets_by_sid.values():
+        assets.sort(key=lambda a:(a.condition,a.id))
     for sid,people in sorted(living.items()):
         branch=world.institutions.branch_for('adventure_society',sid)
-        if branch is None:continue
+        assets=assets_by_sid.get(sid,[])
+        if branch is None or not assets:continue
         open_notices=sum(world.institutions.notices[nid].status!='resolved'
                          for nid in branch.notices if nid in world.institutions.notices)
-        # Capacity follows branch authority and real workload, not a target rank count.
         capacity=max(4,min(18,4+int(8*branch.authority)+min(5,open_notices)))
         candidates=[]
         for p in people:
@@ -152,16 +183,22 @@ def apprenticeship_step(world,living=None):
             -_aspiration(world,p).preparation,-_aspiration(world,p).urgency,
             -p.curiosity,p.id))
         for p in candidates[:capacity]:
-            if treasury.get('iron',0)<3:break
+            if treasury.get('iron',0)<4:break
+            asset=next((a for a in assets if a.condition<1.),None)
+            if asset is None:break
+            before=asset.condition
+            world.infrastructure.maintain(asset.id,.2*(.5+p.health))
+            effect=asset.condition-before
+            if effect<=0:continue
             aspiration=_aspiration(world,p)
-            rr=world.year+p.id
-            work='public defense patrol' if rr%2 else 'Society field drills and logistics'
-            world.skills.practice(p.id,'defense',.24 if rr%2 else .18)
-            world.skills.practice(p.id,'construction',.08 if rr%2 else .12)
+            world.skills.practice(p.id,'construction',.2)
+            world.skills.practice(p.id,'defense',.08)
             aspiration.preparation=min(1.,aspiration.preparation+.025)
             aspiration.urgency=max(aspiration.urgency,.48)
-            coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':3})
+            coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':4})
             world.emit('society_apprentice_work',Layer.SOCIETY,
                 (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
-                branch=branch.id,work=work,coin_reward=coins,treasury=inst.id,
-                eligibility='committed incomplete path',training_contract=True)
+                branch=branch.id,work='public infrastructure maintenance',
+                infrastructure=asset.id,improvement=effect,coin_reward=coins,
+                treasury=inst.id,eligibility='committed incomplete path',
+                training_contract=True)
