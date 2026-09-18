@@ -113,7 +113,7 @@ def test_shortage_response_expedition_can_replenish_shop_with_existing_resource(
 def test_real_civilian_work_can_create_magic_demand_without_named_profession():
     w=generate_world(843007);Simulation(w).run(1);sid=min(w.settlements)
     p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid)
-    p.occupation='labor';w.skills.get(p.id,'craft').level=1.0
+    p.occupation='labor';w.skills.get(p.id,'craft').level=1.5
     p.parents=()
     for other in list(w.social.neighbors(p.id)):
         w.social.edges[w.social.key(p.id,other)].attachment=0.
