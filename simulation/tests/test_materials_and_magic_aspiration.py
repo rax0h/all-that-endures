@@ -214,3 +214,21 @@ def test_high_commitment_civilian_can_choose_to_complete_after_starting_magic():
     assert a.completion_goal
     assert a.desired_base_essences==3
     assert a.desired_abilities==20
+
+
+def test_magic_ecology_does_not_turn_started_ordinary_user_into_completionist():
+    w=generate_world(843015);p=next(p for p in w.people.values() if p.alive and p.age>=18)
+    p.occupation='labor';w.advancement.paths.pop(p.id,None)
+    a=MagicAspiration(.55,1,5,'ordinary access',w.year,completion_goal=False,adventurer_aspiration=False)
+    w.magic_resources.aspirations[p.id]=a
+    key=next(iter(ESSENCES));e=w.emit('test_started_ordinary_path',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement))
+    rr=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,p.settlement,'person',p.id,e.id)
+    absorb_essence_resource(w,p.id,rr.id)
+    from ate_sim.magic_resources import magic_ecology_step
+    class FixedRNG:
+        def stream(self,*args):return self
+        def random(self):return .99
+    magic_ecology_step(w,FixedRNG())
+    assert not a.completion_goal
+    assert a.desired_base_essences==1
+    assert a.desired_abilities==5
