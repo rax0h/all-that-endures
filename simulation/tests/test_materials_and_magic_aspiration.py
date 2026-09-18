@@ -93,6 +93,8 @@ def test_shortage_response_expedition_can_replenish_shop_with_existing_resource(
         a=_aspiration(w,p);a.desired_base_essences=max(a.desired_base_essences,3)
     adventure,magic=magical_civ._institutional_capacity(w,sid)
     assert adventure is not None or magic is not None
+    w.ambient_magic.field(sid).level=1.2
+    settlement=w.settlements[sid];w.cells[(settlement.x,settlement.y)].hazard=1.
     common=next(k for k,v in ESSENCES.items() if str(v['rarity']).lower()=='common')
     class ZeroRNG:
         def stream(self,*args):return self
