@@ -9,6 +9,7 @@ from math import ceil
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
 
 RESOURCE_DISCOVERY_RATE=.45
+ESSENCE_RARITY_ABUNDANCE={'common':8.0,'uncommon':4.0,'rare':1.5,'epic':.55,'legendary':.18,'mythic':.06,'transcendent':.015}
 
 @dataclass
 class MagicAspiration:
@@ -103,10 +104,16 @@ def _environment_weights(tags):
  # The semantic dictionary is immutable simulation-version data. Cache complete
  # weights by the exact composed context, never by settlement or ambient rank.
  # Explicit dictionary hot reloads must call _environment_weights.cache_clear().
+ #
+ # Rarity is physical ecology, not merely a price label: common essences should
+ # actually be encountered more often than legendary/transcendent ones.
  weighted=[]
  for key in ESSENCE_IDS:
-  text=(key+' '+str(ESSENCES[key])).lower();hits=sum(1 for tag in tags if tag in text)
-  if hits:weighted.append((key,float(hits*hits)))
+  data=ESSENCES[key];text=(key+' '+str(data)).lower();hits=sum(1 for tag in tags if tag in text)
+  abundance=ESSENCE_RARITY_ABUNDANCE.get(str(data.get('rarity','common')).lower(),1.)
+  if hits:weighted.append((key,float(hits*hits)*abundance))
+ if not weighted:
+  weighted=[(key,ESSENCE_RARITY_ABUNDANCE.get(str(ESSENCES[key].get('rarity','common')).lower(),1.)) for key in ESSENCE_IDS]
  return tuple(weighted)
 
 def _environmental_essence(world,rng,sid):
