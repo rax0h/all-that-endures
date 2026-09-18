@@ -90,7 +90,10 @@ def _review_magic_demand(world, people, adventure, magic):
         if path is not None and a.completion_goal:
             a.desired_base_essences = 3
             a.desired_abilities = 20
-        family = sum(1 for x in p.parents if x in user_ids)
+        # Family transmission is historical, not merely local/present-tense:
+        # a dead or migrated magical parent can still have raised a child inside
+        # an established magical culture.
+        family = sum(1 for x in p.parents if world.advancement.essence_user(x))
         contacts = sum(1 for x in world.social.neighbors(p.id) if x in user_ids)
         named_profession = p.occupation in ('adventurer', 'guard', 'hunter', 'soldier', 'farmer', 'crafter', 'smith', 'healer', 'merchant', 'scholar', 'builder', 'architect', 'craft apprentice', 'magical craftsperson')
         # "Labor" is only a placeholder, but ordinary work must still become
@@ -116,7 +119,7 @@ def _review_magic_demand(world, people, adventure, magic):
         household_crisis = local.scarcity >= .24 and household.food < 4
         institutional_access = adventure is not None or magic is not None
         already_interested = a.desired_base_essences > 0
-        social_start = (family >= 1 and p.curiosity >= .50) or (contacts >= 5 and p.curiosity >= .60)
+        social_start = (family >= 1 and p.curiosity >= .42) or (contacts >= 5 and p.curiosity >= .60)
         social_exposure = already_interested and ((family >= 1 and p.curiosity >= .38) or (contacts >= 4 and p.curiosity >= .50))
         motive = world.agency.motives.get(p.id)
         status_need = 0.0 if motive is None else motive.status
