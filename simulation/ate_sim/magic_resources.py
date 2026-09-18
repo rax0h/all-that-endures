@@ -339,7 +339,9 @@ def magic_ecology_step(world,rng):
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
-  if path is not None and not a.completion_goal and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
+  # Merely having started magic does not escalate an ordinary civilian into a
+  # full-path completionist. Adventurers are the explicit exception here.
+  if path is not None and not a.completion_goal and a.adventurer_aspiration:_commit_to_full_path(a)
   if a.desired_base_essences>base:
    # Ordinary essence acquisition is shopping, not a multi-year wilderness
    # search. search_years is reserved for a future explicit scarce/specific
