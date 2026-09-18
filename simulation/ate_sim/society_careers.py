@@ -43,8 +43,15 @@ def society_career_step(world,rng):
  spirit_economy_step(world,rng,living)
  apprenticeship_step(world,living)
  magical_services_step(world,rng,living)
- for n in sorted(world.institutions.notices.values(),key=lambda x:x.id):
-  if n.status=='resolved':continue
+ for n in world.institutions.active_notices():
+  # Event-backed notices without a persistent world object are operational
+  # opportunities, not immortal obligations. If nobody solved them while the
+  # event was current, they age out of the live queue but remain in history.
+  if n.kind!='ranked_magic_manifested' and world.year-n.year>=5:
+   n.status='expired';n.assigned_to=None
+   world.emit('adventure_notice_expired',Layer.SOCIETY,location=Ref('settlement',n.location),
+              causes=(n.cause_event,),notice=n.id,notice_kind=n.kind,age=world.year-n.year)
+   continue
   resolution=world.threat_ecology.resolutions.get(n.cause_event)
   if n.kind=='ranked_magic_manifested' and resolution is not None:
    event=world.events[resolution-1]
@@ -58,11 +65,11 @@ def society_career_step(world,rng):
     n.status='resolved';n.assigned_to=actual;n.resolved_event=resolution
     continue
   if n.status=='open':
-   candidates=[world.people[pid] for pid in adv.members if pid in world.people and world.people[pid].alive and world.people[pid].settlement==n.location and world.advancement.rank(pid)>=n.required_rank]
+   candidates=[world.people[pid] for pid in adv.members if pid in world.people and world.people[pid].alive and world.people[pid].settlement==n.location and world.people[pid].rank>=n.required_rank]
    if not candidates and n.required_rank>=3:
     candidates=[world.people[pid] for pid in adv.members if pid in world.people and world.people[pid].alive and world.advancement.rank(pid)>=n.required_rank and world.infrastructure.route_condition(world.people[pid].settlement,n.location)>0]
    if candidates:
-    candidates.sort(key=lambda p:(world.advancement.rank(p.id),world.skills.get(p.id,'defense').level,p.health,-p.id),reverse=True);leader=candidates[0];rr=rng.stream('notice_accept',world.year,n.id)
+    candidates.sort(key=lambda p:(p.rank,world.skills.get(p.id,'defense').level,p.health,-p.id),reverse=True);leader=candidates[0];rr=rng.stream('notice_accept',world.year,n.id)
     if rr.random()<.45:
      n.status='assigned';n.assigned_to=leader.id;world.emit('adventure_notice_accepted',Layer.SOCIETY,(Ref('person',leader.id),),Ref('settlement',n.location),causes=(n.cause_event,),notice=n.id)
   if n.status=='assigned' and n.assigned_to in world.people:
@@ -73,7 +80,7 @@ def society_career_step(world,rng):
     if resolution is None:continue
     event=world.events[resolution-1]
     if not any(ref.kind=='person' and ref.id==p.id for ref in event.actors):continue
-   rr=rng.stream('notice_resolve',world.year,n.id);rank=world.advancement.rank(p.id);cap=.22+.10*rank+.08*world.skills.get(p.id,'defense').level+.18*p.health
+   rr=rng.stream('notice_resolve',world.year,n.id);rank=p.rank;cap=.22+.10*rank+.08*world.skills.get(p.id,'defense').level+.18*p.health
    if rr.random()<min(.85,cap):
     # Job difficulty sets the denomination. A known ranked threat must really
     # have been resolved by this claimant before the Society can pay.
