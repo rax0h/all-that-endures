@@ -238,7 +238,11 @@ def _society_pipeline(world, rng, sid, people, adventure, magic, existing=None):
     for p in people:
         if not full_essence_user(world, p.id): continue
         aspiration = _aspiration(world, p); targets = []
-        if aspiration.adventurer_aspiration: targets.append(('adventure_society', adventure, .72))
+        # Cadet training is the route into the Adventure Society. Formal
+        # application is only relevant once a non-cadet has a complete Iron path;
+        # incomplete trainees must not churn through membership assessments.
+        if aspiration.adventurer_aspiration and len(world.advancement.path(p.id).abilities)==20:
+            targets.append(('adventure_society', adventure, .72))
         craft = world.skills.get(p.id, 'craft').level; knowledge = world.skills.get(p.id, 'knowledge').level
         if p.curiosity > .52 or craft >= 1.2 or knowledge >= 1.2: targets.append(('magic_society', magic, .48 + .22 * p.curiosity))
         for society, branch, intent in targets:
