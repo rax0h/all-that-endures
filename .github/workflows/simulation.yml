@@ -25,6 +25,20 @@ jobs:
           ATE_PROFILE_TAIL: '40'
         run: python simulation/run_long_history.py 843000 300
 
+  millennium:
+    needs: profile
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: unprofiled 1000-year performance and calibration gate
+        run: python simulation/run_long_history.py 843000 1000 --max-seconds 120
+
   test:
     needs: profile
     runs-on: ubuntu-latest
