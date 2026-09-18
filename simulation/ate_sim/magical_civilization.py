@@ -162,7 +162,7 @@ def _review_magic_demand(world, people, adventure, magic):
         if a.reason == 'capability' or a.desired_base_essences == 1: a.reason = reason
 
 
-def _expedition_step(world, rng, sid, people, users, adventure, magic):
+def _expedition_step(world, rng, sid, people, users, adventure, magic, supply_plan):
     if not people: return
     ambient = world.ambient_magic.field(sid).level
     settlement = world.settlements[sid]; cell = world.cells[(settlement.x, settlement.y)]
@@ -180,15 +180,14 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         if _aspiration(world,p).completion_goal
         and world.advancement.path(p.id) is not None
         and len(world.advancement.path(p.id).abilities)<20)
-    # An established branch fields multiple crews. The old one-item expedition
-    # model artificially starved a civilization with hundreds of practitioners.
-    # Crew count is caused by actual field capacity and training demand; it never
-    # reads or targets a desired Iron population.
-    base_attempts=int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0))
-    field_crews=max(1,int(field_capacity//30))
-    training_crews=min(8,completion_trainees//10)
-    attempts=min(24,max(base_attempts,field_crews+training_crews))
-    if attempts <= 0: return
+    # Resource expeditions respond to unmet physical market/training demand.
+    # They do not keep extracting merely because the Society has more crews.
+    # A large professional organization improves the chance that demand is met;
+    # it must not create century-scale warehouses of unused stones.
+    if supply_plan['awakening_stone']<=0 and supply_plan['essence']<=0:return
+    base_attempts=max(1,int(EXPEDITION_ACTIVITY_RATE * pressure * (1.2 + len(people) / 90.0)))
+    training_attempts=min(3,completion_trainees//20)
+    attempts=min(8,base_attempts+training_attempts)
     user_ids={p.id for p in users}
     candidates = sorted(users + [p for p in adventurer_aspirants if p.id not in user_ids], key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
     if not candidates: candidates = sorted(adventurer_aspirants, key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
@@ -204,19 +203,20 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         event = world.emit('magical_expedition', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), society_branch=None if adventure is None else adventure.id, ambient_magic=round(ambient, 3), readiness=round(readiness, 3), danger=round(danger, 3))
         if erng.random() > min(.86, readiness + .16 * ambient):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,)); continue
-        stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
-        if supply_pressure < .15: stone_share = max(stone_share, .82)
-        # Successful professional expeditions can recover a cache rather than
-        # exactly one object. Larger field organizations can carry and secure
-        # larger finds, while each resource remains a distinct physical object
-        # with its own provenance.
-        cache_size=1+min(6,int(field_capacity//35))
-        recovered=[]
-        for _ in range(cache_size):
-            kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
-            found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition cache')
-            recovered.append(found.id)
-            world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key, cache_size=cache_size)
+        stone_share = min(.82, .48 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
+        stone_gap=supply_plan['awakening_stone'];essence_gap=supply_plan['essence']
+        if stone_gap<=0 and essence_gap<=0:break
+        if stone_gap<=0:kind='essence'
+        elif essence_gap<=0:kind='awakening_stone'
+        else:
+            # Training demand biases recovery toward stones, while actual
+            # essence shortage remains a competing physical collection target.
+            weighted_stone=stone_gap*stone_share
+            weighted_essence=essence_gap*(1-stone_share)
+            kind='awakening_stone' if erng.random() < weighted_stone/max(.001,weighted_stone+weighted_essence) else 'essence'
+        found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition')
+        supply_plan[kind]=max(0,supply_plan[kind]-1)
+        world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key)
         aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
@@ -297,6 +297,29 @@ def magical_civilization_step(world, rng):
         if p.alive and p.age >= 16: by_settlement[p.settlement].append(p)
     for people in by_settlement.values(): people.sort(key=lambda p: p.id)
     application_pairs=set(world.institutions.application_pairs())
+
+    # Build one civilization-wide supply plan because the Magic Society market
+    # can order across settlements. Existing physical stock anywhere in the
+    # owner index counts before another expedition collects anything.
+    stone_need=0;essence_need=0
+    for people in by_settlement.values():
+        for p in people:
+            a=_aspiration(world,p);path=world.advancement.path(p.id)
+            base=0 if path is None else len(path.base_essences)
+            essence_need+=max(0,a.desired_base_essences-base)
+            if path is not None:
+                stone_need+=max(0,min(a.desired_abilities,path.capacity)-len(path.abilities))
+    available={'awakening_stone':0,'essence':0}
+    for ids in world.magic_resources.owner_index.values():
+        for rid in ids:
+            resource=world.magic_resources.resources[rid]
+            if resource.kind in available:available[resource.kind]+=1
+    # Keep a modest logistics reserve so orders do not require a discovery on
+    # the same day, but never scale reserve with a desired rank population.
+    supply_plan={
+        'awakening_stone':max(0,stone_need+24-available['awakening_stone']),
+        'essence':max(0,essence_need+40-available['essence']),
+    }
     for sid in sorted(world.settlements):
         people = by_settlement[sid]
         if not people: continue
@@ -308,7 +331,7 @@ def magical_civilization_step(world, rng):
         review_people=[p for p in people if p.age<=17 or ((world.year+p.id)&1)==0]
         if review_people:_review_magic_demand(world, review_people, adventure, magic)
         _apply_external_magic_pressure(world, sid, people, users)
-        _expedition_step(world, rng, sid, people, users, adventure, magic)
+        _expedition_step(world, rng, sid, people, users, adventure, magic, supply_plan)
         users = _practitioners(world, people)
         _resource_circulation(world, rng, sid, people, users, magic)
         _society_pipeline(world, rng, sid, people, adventure, magic, application_pairs)
