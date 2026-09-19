@@ -24,7 +24,23 @@ def snapshot(world, include_digest=False):
     aspirations=[a for pid,a in world.magic_resources.aspirations.items() if pid in world.people and world.people[pid].alive]
     interested=[a for a in aspirations if a.desired_base_essences>0];completion=[a for a in interested if a.completion_goal];adventurers=[a for a in interested if a.adventurer_aspiration]
 
-    resources=list(world.magic_resources.resources.values());available=[r for r in resources if r.consumed_year is None];resource_kinds=Counter(r.kind for r in resources);available_kinds=Counter(r.kind for r in available);inst_kinds=Counter(i.kind for i in world.institutions.institutions.values());notice_status=Counter(n.status for n in world.institutions.notices.values());disclosures=Counter(r.disclosure for r in world.institutions.magic_records.values())
+    resources=list(world.magic_resources.resources.values());available=[r for r in resources if r.consumed_year is None];resource_kinds=Counter(r.kind for r in resources);available_kinds=Counter(r.kind for r in available);available_owner=Counter((r.owner_kind or 'unowned') for r in available);inst_kinds=Counter(i.kind for i in world.institutions.institutions.values());notice_status=Counter(n.status for n in world.institutions.notices.values());disclosures=Counter(r.disclosure for r in world.institutions.magic_records.values())
+    eligible=[p for p in alive if p.age>=16];eligible_users=[p for p in eligible if p.id in paths]
+    base_stage=Counter(len(paths[p.id].base_essences) for p in eligible_users)
+    complete_users=[p for p in living_users if world.advancement.completed_path(p.id)]
+    incomplete_users=[p for p in living_users if not world.advancement.completed_path(p.id)]
+    silver=[p for p in complete_users if world.advancement.rank(p.id)==3];gold=[p for p in complete_users if world.advancement.rank(p.id)==4]
+    silver_gold=[sum(a.rank>=4 for a in paths[p.id].abilities) for p in silver];gold_diamond=[sum(a.rank>=5 for a in paths[p.id].abilities) for p in gold]
+    cadets=[(pid,a) for pid,a in world.magic_resources.aspirations.items() if pid in world.people and world.people[pid].alive and a.cadet_class_year is not None and a.cadet_graduated_year is None]
+    graduates=[(pid,a) for pid,a in world.magic_resources.aspirations.items() if pid in world.people and world.people[pid].alive and a.cadet_graduated_year is not None]
+    adventure=world.institutions.institution_by_kind('adventure_society');magic_society=world.institutions.institution_by_kind('magic_society')
+    adv_reserve=[] if adventure is None else world.magic_resources.inventory('institution',adventure.id)
+    recent=Counter(e.kind for e in world.events_between(max(0,world.year-99),world.year))
+    recent_orders=[e for e in world.events_between(max(0,world.year-99),world.year) if e.kind=='magic_resource_ordered']
+    active_threats=[t for t in world.threat_ecology.threats.values() if t.status=='active']
+    living_members={}
+    for kind,inst in (('adventure_society',adventure),('magic_society',magic_society)):
+        living_members[kind]=0 if inst is None else sum(pid in world.people and world.people[pid].alive for pid in inst.members)
 
     lots=list(world.materials.lots.values());items=list(world.materials.items.values());year=max(1,world.year);pop=max(1,len(alive));households=max(1,living_households)
     production_by_year=Counter(l.created_year for l in lots);production_by_settlement=Counter(l.settlement for l in lots);active_crafters={i.craftsperson for i in items if world.people.get(i.craftsperson) and world.people[i.craftsperson].alive}
@@ -37,9 +53,49 @@ def snapshot(world, include_digest=False):
         'magic_resources_total':len(resources),'magic_resources_by_kind':dict(sorted(resource_kinds.items())),'magic_resources_available':len(available),'magic_resources_available_by_kind':dict(sorted(available_kinds.items())),'magic_resource_purchases':events['magic_resource_purchased'],'magic_resource_transfers':events['magic_resource_transferred'],'essence_absorptions':events['essence_absorbed'],'awakening_stones_used':events['awakening_stone_used'],'abilities_awakened':events['ability_awakened'],
         'material_lots_total':len(lots),'material_lots_per_year':round(len(lots)/year,3),'material_lots_per_100_living_people_year':round((len(lots)/year)/pop*100,3),'material_lots_by_settlement':dict(sorted(production_by_settlement.items())),'material_peak_lots_in_year':max(production_by_year.values(),default=0),'material_purchases':events['material_purchased'],'crafted_items_total':len(items),'crafted_items_per_100_living_households_year':round((len(items)/year)/households*100,3),'living_active_craftspeople':len(active_crafters),'supplier_relationships_observed':len(supplier_pairs),'magical_material_lots':sum(bool(l.magical_properties) for l in lots),'magical_items':sum(bool(i.magical) for i in items),
         'core_institutions':dict(sorted(inst_kinds.items())),'institution_branches':len(world.institutions.branches),'magic_registry_records':len(world.institutions.magic_records),'magic_registry_disclosure':dict(sorted(disclosures.items())),'adventure_notices':len(world.institutions.notices),'adventure_notice_status':dict(sorted(notice_status.items())),
+        'stage_0_5':{
+            'magic_eligible_adults_living':len(eligible),
+            'eligible_adults_with_essence':len(eligible_users),
+            'eligible_adult_essence_share':round(len(eligible_users)/len(eligible),4) if eligible else 0.0,
+            'eligible_user_base_essences':dict(sorted(base_stage.items())),
+            'eligible_users_with_confluence':sum(paths[p.id].confluence is not None for p in eligible_users),
+            'complete_paths_living':len(complete_users),
+            'complete_rank_counts':dict(sorted(Counter(world.advancement.rank(p.id) for p in complete_users).items())),
+            'incomplete_paths_living':len(incomplete_users),
+            'silver_progress':{
+                'living':len(silver),'with_any_gold_ability':sum(n>0 for n in silver_gold),
+                'with_10plus_gold_abilities':sum(n>=10 for n in silver_gold),
+                'with_15plus_gold_abilities':sum(n>=15 for n in silver_gold),
+                'with_19plus_gold_abilities':sum(n>=19 for n in silver_gold),
+                'gold_abilities_median':0 if not silver_gold else sorted(silver_gold)[len(silver_gold)//2],
+                'gold_abilities_p90':0 if not silver_gold else sorted(silver_gold)[min(len(silver_gold)-1,int((len(silver_gold)-1)*.9))],
+            },
+            'gold_progress':{
+                'living':len(gold),'with_any_diamond_ability':sum(n>0 for n in gold_diamond),
+                'diamond_abilities_median':0 if not gold_diamond else sorted(gold_diamond)[len(gold_diamond)//2],
+                'diamond_abilities_p90':0 if not gold_diamond else sorted(gold_diamond)[min(len(gold_diamond)-1,int((len(gold_diamond)-1)*.9))],
+            },
+            'cadets_current':len(cadets),'cadet_graduates_living':len(graduates),
+            'cadet_admissions_total':events['society_cadet_admitted'],'cadet_graduations_total':events['society_cadet_graduated'],
+            'adventure_society_reserve':dict(sorted(Counter(r.kind for r in adv_reserve).items())),
+            'resources_available_by_owner_kind':dict(sorted(available_owner.items())),
+            'magic_society_orders_total':events['magic_resource_ordered'],
+            'magic_society_remote_orders_total':sum(e.data.get('remote_order',False) for e in world.events if e.kind=='magic_resource_ordered'),
+            'orders_last_100y':len(recent_orders),'remote_orders_last_100y':sum(e.data.get('remote_order',False) for e in recent_orders),
+            'living_society_members':living_members,
+            'ranked_coin_wallet_supply':{d:sum(w.get(d,0) for w in world.currency.wallets.values()) for d in ('iron','bronze','silver','gold','diamond')},
+            'ranked_coin_treasury_supply':{d:sum(w.get(d,0) for w in world.currency.treasuries.values()) for d in ('iron','bronze','silver','gold','diamond')},
+            'ranked_coin_minted':dict(sorted(world.currency.minted.items())),'ranked_coin_consumed':dict(sorted(world.currency.consumed.items())),
+            'threats_total':len(world.threat_ecology.threats),'threats_active':len(active_threats),
+            'threat_resolutions_total':len(world.threat_ecology.resolutions),
+            'recent_100y_activity':{k:recent[k] for k in ('birth','death','essence_absorbed','ability_awakened','rank_advanced','society_cadet_admitted','society_cadet_graduated','magic_resource_discovered','magic_resource_ordered','magical_expedition','ranked_magic_manifested','ranked_threat_resolved','material_produced','item_crafted') if recent[k]},
+            'state_size':{
+                'events':len(world.events),'people':len(world.people),'households':len(world.households),
+                'relationships':len(world.social.edges),'resources':len(resources),'materials':len(world.materials.lots),
+                'items':len(world.materials.items),'applications':len(world.institutions.applications),'notices':len(world.institutions.notices),
+            },
+        },
     }
-    complete_users=[p for p in living_users if len(paths[p.id].abilities)==20]
-    incomplete_users=[p for p in living_users if len(paths[p.id].abilities)!=20]
     result['completed_path_ranks']=dict(sorted(Counter(world.advancement.rank(p.id) for p in complete_users).items()))
     result['incomplete_path_ranks']=dict(sorted(Counter(world.advancement.rank(p.id) for p in incomplete_users).items()))
     if include_digest:result['digest']=world.digest()
@@ -57,6 +113,8 @@ def main(seed=843000, years=1000, max_seconds=None, archive=None):
     profiled_years=0
     from scaling_telemetry import ScalingTelemetry, BUCKET_ENDS
     world=generate_world(seed);sim=Simulation(world)
+    initial=snapshot(world,include_digest=False);initial['record']='initial_snapshot'
+    print(json.dumps(initial,sort_keys=True),flush=True)
     marks=sorted(set([m for m in BUCKET_ENDS if m<=years]+[years]))
     last=0;simulation_seconds=0.;diagnostic_seconds=0.
     with ScalingTelemetry(world) as telemetry:
@@ -73,7 +131,7 @@ def main(seed=843000, years=1000, max_seconds=None, archive=None):
             elapsed=perf_counter()-start;simulation_seconds+=elapsed
             print(json.dumps(telemetry.report(last+1,elapsed),sort_keys=True),flush=True)
             start=perf_counter()
-            report=snapshot(world,include_digest=False)
+            report=snapshot(world,include_digest=False);report['record']='snapshot'
             diagnostic_seconds+=perf_counter()-start
             print(json.dumps(report,sort_keys=True),flush=True)
             last=mark
