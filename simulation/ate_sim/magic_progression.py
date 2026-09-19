@@ -62,74 +62,56 @@ def observe_experience(world,event):
     return
 
 
-def application_would_record(ability,constraint,difficulty,outcome,metric):
-    """Whether a successful application would change bounded understanding."""
-    if ability.rank not in (3,4) or outcome<=0:return False
-    u=ability.understanding
-    if constraint in u.applications:return False
-    priors=list(u.applications.values())
-    challenging=[x for x in priors if x['difficulty']<difficulty and x['metric']==metric]
-    output_floor=min((x['outcome'] for x in challenging[-2:]),default=float('inf'))
-    transfer=len(challenging)>=2 and outcome>=output_floor and u.integration>=2+len(u.transfers) and difficulty>=ability.rank and len(u.transfers)<(1 if ability.rank==3 else 2)
-    if len(priors)<6 or transfer:return True
-    same=sum(x['metric']==metric for x in priors)
-    if same>=2:return False
-    counts={x['metric']:sum(y['metric']==x['metric'] for y in priors) for x in priors}
-    return any(counts[x['metric']]>2 for x in priors)
-
-
 def record_application(world,person,ability,source,*,constraint,difficulty,outcome):
     """A successful use in a real task. A later held-out task tests a compact rule.
 
-    Ordinary control-model evidence reuses its real control-trial event instead
-    of duplicating that history into a second event. Only genuine held-out
-    generalization receives an ability_applied milestone.
+    A rule summarizes two earlier successful applications of this same ability,
+    including different constraints. Transfer must succeed under a new constraint
+    at a strictly harder problem tier; Gold requires two independent held-outs.
+    This is structural generalization evidence, not simulated consciousness.
     """
-    if ability.rank not in (3,4) or outcome<=0:return False
+    if ability.rank not in (3,4) or outcome<=0:return
     path=world.advancement.path(person.id)
-    if path is None or not path.contains_ability(ability):return False
+    if path is None or not path.contains_ability(ability):return
     keys=source.data.get('used_abilities',(source.data.get('ability'),))
     recorded_rank=source.data.get('challenge_complexity',source.data.get('task_rank',source.data.get('item_rank',source.data.get('threat_rank'))))
-    if ability.semantic_key not in keys or recorded_rank!=difficulty:return False
+    if ability.semantic_key not in keys or recorded_rank!=difficulty:return
     actor_found=False
     for actor in source.actors:
         if actor.kind=='person' and actor.id==person.id:
             actor_found=True;break
-    if not actor_found:return False
+    if not actor_found:return
     u=ability.understanding
-    if constraint in u.applications:return False
+    if constraint in u.applications:return
     Layer,Ref=layer_ref()
     priors=list(u.applications.values())
     metric=source.data.get('service',source.kind)
     challenging=[x for x in priors if x['difficulty']<difficulty and x['metric']==metric]
     output_floor=min((x['outcome'] for x in challenging[-2:]),default=float('inf'))
     transfer=len(challenging)>=2 and outcome>=output_floor and u.integration>=2+len(u.transfers) and difficulty>=ability.rank and len(u.transfers)<(1 if ability.rank==3 else 2)
+    # Once the bounded sample is full, retain only a harder held-out application.
     if len(priors)>=6 and not transfer:
+        # Reserve a pair for a new application metric; unrelated early samples
+        # must not permanently prevent a later mastery route from being learned.
         same=sum(x['metric']==metric for x in priors)
-        if same>=2:return False
+        if same>=2:return
         counts={x['metric']:sum(y['metric']==x['metric'] for y in priors) for x in priors}
         redundant=[k for k,x in u.applications.items() if counts[x['metric']]>2]
-        if not redundant:return False
+        if not redundant:return
         oldest=min(redundant,key=lambda k:u.applications[k]['event'])
         del u.applications[oldest];u.evidence.pop(oldest,None)
-    if source.kind=='ability_control_trial' and not transfer:
-        evidence_event=source.id
-    else:
-        causes=(source.id,)
-        if transfer:causes+=tuple(x['event'] for x in challenging[-2:])
-        e=world.emit('ability_applied',Layer.REALITY,(Ref('person',person.id),),source.location,causes,
-            ability=ability.semantic_key,essence=ability.essence,function=ability.function,domain=ability.domain,
-            ability_rank=RANKS[ability.rank],ability_level=ability.level,task_event=source.id,
-            constraint=constraint,difficulty=difficulty,outcome=outcome,
-            generalization=transfer,principle=ability.function if transfer else None,
-            metric=metric,output_floor=output_floor if transfer else None,
-            basis='same ability, distinct constraints, harder held-out application')
-        evidence_event=e.id
+    causes=(source.id,)
+    if transfer:causes+=tuple(x['event'] for x in challenging[-2:])
+    e=world.emit('ability_applied',Layer.REALITY,(Ref('person',person.id),),source.location,causes,
+        ability=ability.semantic_key,essence=ability.essence,function=ability.function,domain=ability.domain,
+        ability_rank=RANKS[ability.rank],ability_level=ability.level,task_event=source.id,
+        constraint=constraint,difficulty=difficulty,outcome=outcome,
+        generalization=transfer,principle=ability.function if transfer else None,
+        metric=metric,output_floor=output_floor if transfer else None,
+        basis='same ability, distinct constraints, harder held-out application')
     if len(u.applications)>=6:
         oldest=min(u.applications,key=lambda k:(u.applications[k]['difficulty'],u.applications[k]['event']))
         del u.applications[oldest];u.evidence.pop(oldest,None)
-    u.applications[constraint]={'event':evidence_event,'difficulty':difficulty,'outcome':outcome,'metric':metric}
-    u.evidence[constraint]=evidence_event
-    if transfer:u.transfers.append({'event':evidence_event,'difficulty':difficulty,'premises':[x['event'] for x in challenging[-2:]]})
-    return True
-
+    u.applications[constraint]={'event':e.id,'difficulty':difficulty,'outcome':outcome,'metric':metric}
+    u.evidence[constraint]=e.id
+    if transfer:u.transfers.append({'event':e.id,'difficulty':difficulty,'premises':list(causes[1:])})
