@@ -44,7 +44,8 @@ class InstitutionState:
  def register_magic_user(self,branch,person,path,year,source_event=None,disclosure='full'):
   if disclosure not in ('identity','essences','full'):raise ValueError('invalid disclosure level')
   ess=tuple(path.essences) if disclosure!='identity' else ();cid=path.confluence if disclosure!='identity' else None;cname=path.confluence_name if disclosure!='identity' else None;abilities=tuple(a.semantic_key for a in path.abilities) if disclosure=='full' else ();names=tuple(a.name for a in path.abilities) if disclosure=='full' else ();rid=self.next_record;self.next_record+=1;r=MagicUserRecord(rid,person,branch,year,ess,cid,cname,abilities,names,disclosure,source_event);self.magic_records[rid]=r;self.branches[branch].records.add(rid)
-  if hasattr(self,'_recorded_people'):self._recorded_people.add(person)
+  if hasattr(self,'_recorded_people'):
+   self._recorded_people.add(person);self._record_count=len(self.magic_records)
   return r
  def recorded_people(self):
   if not hasattr(self,'_recorded_people') or getattr(self,'_record_count',-1)!=len(self.magic_records):
@@ -76,6 +77,8 @@ class InstitutionState:
   aid=self.next_application;self.next_application+=1;a=SocietyApplication(aid,society,person,branch,year,eligible,origin_event=origin_event);self.applications[aid]=a
   if hasattr(self,'_application_pairs'):self._application_pairs.add((person,society));self._application_count=len(self.applications)
   if hasattr(self,'_latest_applications'):self._latest_applications[(society,person)]=a;self._latest_application_count=len(self.applications)
+  if hasattr(self,'_latest_by_society'):
+   self._latest_by_society.setdefault(society,{})[person]=a;self._latest_by_society_count=len(self.applications)
   if hasattr(self,'_pending_application_ids'):self._pending_application_ids.add(aid);self._pending_application_count=len(self.applications)
   if hasattr(self,'_application_attempts'):
    key=(society,person);self._application_attempts[key]=self._application_attempts.get(key,0)+1;self._application_attempt_count=len(self.applications)
@@ -92,11 +95,13 @@ class InstitutionState:
    self._application_pairs={(a.person,a.society) for a in self.applications.values()};self._application_count=len(self.applications)
   return self._application_pairs
  def latest_applications(self,society):
-  if not hasattr(self,'_latest_applications') or getattr(self,'_latest_application_count',-1)!=len(self.applications):
-   self._latest_applications={}
-   for a in self.applications.values():self._latest_applications[(a.society,a.person)]=a
-   self._latest_application_count=len(self.applications)
-  return {person:a for (kind,person),a in self._latest_applications.items() if kind==society}
+  # Keep a society-partitioned latest index. The historical application archive
+  # grows for the full millennium; callers need only one current record/person.
+  if not hasattr(self,'_latest_by_society') or getattr(self,'_latest_by_society_count',-1)!=len(self.applications):
+   self._latest_by_society={}
+   for a in self.applications.values():self._latest_by_society.setdefault(a.society,{})[a.person]=a
+   self._latest_by_society_count=len(self.applications)
+  return self._latest_by_society.get(society,{})
  def pending_applications(self):
   # Pending applications are a tiny hot subset of the historical archive.
   # Rebuild only for old/directly-mutated state; normal creation/resolution
@@ -109,7 +114,7 @@ class InstitutionState:
   return [self.applications[aid] for aid in sorted(self._pending_application_ids)]
 
 def full_essence_user(world,pid):
- p=world.advancement.path(pid);return p is not None and p.confluence is not None and len(p.essences)==4
+ p=world.advancement.path(pid);return p is not None and p.confluence is not None and len(p.base_essences)==3
 
 def society_eligible(world,pid,society):
  if society not in ('adventure_society','magic_society'):raise ValueError('unknown society')
