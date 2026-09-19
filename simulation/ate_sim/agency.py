@@ -1,6 +1,5 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
-from operator import attrgetter
 from .core_types import layer_ref
 from .magic_progression import practice_ability,record_body_transition
 from .rank_ecology import rank_ecology_step
@@ -21,7 +20,6 @@ AGENCY_ACTION_FUNCTIONS={
 }
 ACTION_DOMAIN={'secure_food':'agriculture','prepare':'defense','work':'craft',
                'learn':'knowledge','teach':'knowledge','build':'construction'}
-_ATTACHMENT=attrgetter('attachment')
 @dataclass
 class MotiveState:hunger:float=0.;safety:float=0.;belonging:float=0.;wealth:float=0.;curiosity:float=0.;legacy:float=0.;obligation:float=0.;status:float=0.
 @dataclass
@@ -113,14 +111,14 @@ def agency_step(world,rng):
   if p.age<18:
    for parent in p.parents:dependents[parent]=dependents.get(parent,0)+1
  current_actions={};year=world.year
- relationships_for=world.social.relationships_for;stream=rng.stream;choose=world.agency.choose
+ max_attachment=world.social.max_attachment;stream=rng.stream;choose=world.agency.choose
  skills_practice=world.skills.practice;households=world.households;append_action=world.agency.actions.append
  hazards={sid:world.cells[(s.x,s.y)].hazard for sid,s in world.settlements.items()}
  for p in people:
   if p.age<16:continue
   # The per-person reference index includes historical/deceased relationships
   # and tracks direct relationship mutations. Do not scan the global archive.
-  attachment=max(map(_ATTACHMENT,relationships_for(p.id)),default=0.)
+  attachment=max_attachment(p.id)
   rr=stream('agency',year,p.id);action,motive,strength=choose(world,p,rr,attachment,dependents.get(p.id,0),hazards[p.settlement]);domain=ACTION_DOMAIN.get(action)
   if domain:skills_practice(p.id,domain,.12+.38*strength)
   if p.rank>0:_practice_path(world,p,rr,action,strength)
