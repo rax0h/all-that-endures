@@ -8,7 +8,7 @@ from collections import Counter,defaultdict
 import json
 from ate_sim.history_archive import HistoryArchive
 from ate_sim.advancement import RANKS
-from ate_sim.currency import DENOMINATIONS
+from ate_sim.currency import DENOMINATIONS,value_of
 
 
 def validate(archive):
@@ -19,9 +19,32 @@ def validate(archive):
     examples=defaultdict(list)
     wallets=defaultdict(Counter)
     treasuries=defaultdict(Counter)
+    opening_treasury=Counter()
     for row in archive.db.execute('SELECT payload FROM events ORDER BY year,id'):
         e=json.loads(row[0]);data=e['data'];kind=e['kind']
         actors=[a['id'] for a in e['actors'] if a['kind']=='person']
+
+        if kind=='society_treasury_observed':
+            institution=data['institution']
+            for denomination,count in data.get('opening_balance',{}).items():
+                treasuries[institution][denomination]+=count;opening_treasury[denomination]+=count
+
+        if kind=='society_currency_exchange':
+            if not actors:
+                violations.append({'event':e['id'],'issue':'treasury exchange lacks person counterparty'})
+            else:
+                pid0=actors[0];institution=data['institution'];tg=data.get('treasury_gives',{});pg=data.get('person_gives',{})
+                if value_of(tg)!=value_of(pg):
+                    violations.append({'event':e['id'],'issue':'unequal treasury exchange'})
+                if any(treasuries[institution][d]<n for d,n in tg.items()):
+                    violations.append({'event':e['id'],'institution':institution,'issue':'unfunded treasury exchange'})
+                if any(wallets[pid0][d]<n for d,n in pg.items()):
+                    violations.append({'event':e['id'],'person':pid0,'issue':'unfunded wallet side of treasury exchange'})
+                for denomination,count in tg.items():
+                    treasuries[institution][denomination]-=count;wallets[pid0][denomination]+=count
+                for denomination,count in pg.items():
+                    wallets[pid0][denomination]-=count;treasuries[institution][denomination]+=count
+
         if not actors:continue
         pid=actors[0]
         for denomination,count in data.get('coin_created',{}).items():wallets[pid][denomination]+=count
@@ -40,6 +63,9 @@ def validate(archive):
             for denomination,count in coins.items():
                 wallets[payer][denomination]-=count;wallets[payee][denomination]+=count
                 if wallets[payer][denomination]<0:violations.append({'person':payer,'event':e['id'],'issue':'unfunded coin transfer'})
+        if kind=='society_cadet_graduated':
+            if data.get('abilities')!=20 or data.get('body_rank',0)<1 or bodies[pid]<1:
+                violations.append({'person':pid,'event':e['id'],'issue':'cadet graduated without legal 20/20 Iron body'})
         if kind=='ability_control_trial':
             from types import SimpleNamespace
             from ate_sim.mastery_training import response
@@ -88,7 +114,7 @@ def validate(archive):
             target=data['to_rank'];current=abilities[pid]
             counts=Counter(v[0] for v in current.values())
             valid=(data['from_rank']==bodies[pid] and target==bodies[pid]+1 and len(essences[pid])==4)
-            if target>=2:
+            if target>=1:
                 valid=valid and len(current)==20 and len(counts)==4 and set(counts.values())=={5} and all(v[1]>=target for v in current.values())
             if target==5:valid=valid and data.get('core_taint')==0
             if not valid:violations.append({'person':pid,'event':e['id'],'issue':'body prerequisites'})
@@ -119,6 +145,16 @@ def validate(archive):
     for row in archive.db.execute("SELECT id,payload FROM records WHERE kind='treasury'"):
         actual=json.loads(row[1]);expected=treasuries[int(row[0])]
         if {d:n for d,n in actual.items() if n}!={d:n for d,n in expected.items() if n}:violations.append({'institution':row[0],'issue':'treasury disagrees with recorded transfers'})
+    actual_wallet=Counter();actual_treasury=Counter()
+    for balances in wallets.values():actual_wallet.update(balances)
+    for balances in treasuries.values():actual_treasury.update(balances)
+    for denomination in DENOMINATIONS:
+        minted=archive.record('coin_supply',denomination) or 0
+        consumed=archive.record('coin_consumption',denomination) or 0
+        expected=minted+opening_treasury[denomination]-consumed
+        actual=actual_wallet[denomination]+actual_treasury[denomination]
+        if actual!=expected:
+            violations.append({'denomination':denomination,'issue':'ranked currency conservation','expected':expected,'actual':actual})
     return {'world_digest':archive.metadata()['world_digest'],'valid':not violations,
             'violations':violations,'living_ranks':dict(sorted(living.items())),
             'living_gold_and_diamond':high,'lower_rank_examples':dict(lower),
