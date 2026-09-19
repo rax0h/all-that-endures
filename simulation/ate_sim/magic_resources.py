@@ -78,7 +78,10 @@ def use_awakening_stone(world,pid,rid,target_essence=None):
  world.advancement._stone(r.key)
  p=world.people[pid];path=world.advancement.path(pid)
  if path is None:return None
- available=[e for e in path.essences if len(path.abilities_for(e))<5]
+ counts={e:0 for e in path.essences}
+ for ability in path.abilities:
+  if ability.essence in counts:counts[ability.essence]+=1
+ available=[e for e in path.essences if counts[e]<5]
  if not available or (target_essence is not None and target_essence not in available):return None
  before=world.advancement.rank(pid)
  Layer,Ref=layer_ref();e=world.emit('awakening_stone_used',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,stone=r.key,target_essence=target_essence);a=world.advancement.awaken_skill(pid,r.key,world.year,person_context(p,p.settlement),e.id,target_essence)
