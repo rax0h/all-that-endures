@@ -48,7 +48,7 @@ def society_eligible(world,pid,society):
  if society not in ('adventure_society','magic_society'):raise ValueError('unknown society')
  p=world.people.get(pid);return bool(p and p.alive and full_essence_user(world,pid))
 
-def ensure_core_societies(world):
+def ensure_core_societies(world,*,preexisting=False):
  if not world.settlements:return
  populations={sid:0 for sid in world.settlements}
  for p in world.current_people():
@@ -58,11 +58,11 @@ def ensure_core_societies(world):
  for kind,name in (('adventure_society','Adventure Society'),('magic_society','Magic Society')):
   inst=world.institutions.institution_by_kind(kind)
   if inst is None:
-   e=world.emit('institution_founded',Layer.SOCIETY,location=Ref('settlement',anchor),institution_kind=kind,name=name);inst=world.institutions.create_institution(kind,name,world.year,e.id);world.lineage.register('institution',inst.id,origin_event=e.id,origin_year=world.year)
+   e=world.emit('institution_founded',Layer.SOCIETY,location=Ref('settlement',anchor),institution_kind=kind,name=name,preexisting=preexisting,observation_boundary=preexisting);inst=world.institutions.create_institution(kind,name,world.year,e.id);world.lineage.register('institution',inst.id,origin_event=e.id,origin_year=world.year)
   for sid in sorted(world.settlements):
    residents=populations[sid]
    if residents>=8 and world.institutions.branch_for(kind,sid) is None:
-    causes=(inst.origin_event,) if inst.origin_event else ();e=world.emit('institution_branch_founded',Layer.SOCIETY,location=Ref('settlement',sid),causes=causes,institution=inst.id,institution_kind=kind);b=world.institutions.create_branch(inst.id,sid,world.year,e.id,min(.95,.35+residents/200));world.lineage.register('institution_branch',b.id,(('institution',inst.id),),e.id,world.year)
+    causes=(inst.origin_event,) if inst.origin_event else ();e=world.emit('institution_branch_founded',Layer.SOCIETY,location=Ref('settlement',sid),causes=causes,institution=inst.id,institution_kind=kind,preexisting=preexisting,observation_boundary=preexisting);b=world.institutions.create_branch(inst.id,sid,world.year,e.id,min(.95,.35+residents/200));world.lineage.register('institution_branch',b.id,(('institution',inst.id),),e.id,world.year)
 
 def register_magic_user(world,pid,disclosure='full'):
  p=world.people[pid];path=world.advancement.path(pid)
