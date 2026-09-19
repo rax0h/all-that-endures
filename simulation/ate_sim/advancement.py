@@ -37,6 +37,16 @@ class EssencePath:
  @property
  def capacity(self):return len(self.essences)*SKILLS_PER_ESSENCE
  def abilities_for(self,e):return [a for a in self.abilities if a.essence==e]
+ def contains_ability(self,ability):
+  index=getattr(self,'_ability_identity_index',None)
+  if index is not None:
+   i=index.get(id(ability))
+   if i is not None and i<len(self.abilities) and self.abilities[i] is ability:return True
+  self._ability_identity_index={id(a):i for i,a in enumerate(self.abilities)}
+  i=self._ability_identity_index.get(id(ability))
+  if i is not None and self.abilities[i] is ability:return True
+  # Preserve equality-based compatibility for external equivalent objects.
+  return ability in self.abilities
 @dataclass
 class AdvancementState:
  paths:dict[int,EssencePath]=field(default_factory=dict)
