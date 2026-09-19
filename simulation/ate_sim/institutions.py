@@ -30,16 +30,40 @@ class InstitutionState:
  def branch_for(self,kind,settlement):
   i=self.institution_by_kind(kind)
   return None if i is None else next((self.branches[bid] for bid in i.branches if self.branches[bid].settlement==settlement),None)
+ def recorded_people(self):
+  index=self.__dict__.get('_recorded_people')
+  if index is None:index={r.person for r in self.magic_records.values()};self._recorded_people=index
+  return index
+ def application_pairs(self):
+  index=self.__dict__.get('_application_pairs')
+  if index is None:index={(a.person,a.society) for a in self.applications.values()};self._application_pairs=index
+  return index
+ def latest_application(self,person,society):
+  index=self.__dict__.get('_latest_applications')
+  if index is None:
+   index={}
+   for a in self.applications.values():
+    key=(a.person,a.society)
+    if key not in index or a.id>index[key].id:index[key]=a
+   self._latest_applications=index
+  return index.get((person,society))
  def register_magic_user(self,branch,person,path,year,source_event=None,disclosure='full'):
   if disclosure not in ('identity','essences','full'):raise ValueError('invalid disclosure level')
-  ess=tuple(path.essences) if disclosure!='identity' else ();cid=path.confluence if disclosure!='identity' else None;cname=path.confluence_name if disclosure!='identity' else None;abilities=tuple(a.semantic_key for a in path.abilities) if disclosure=='full' else ();names=tuple(a.name for a in path.abilities) if disclosure=='full' else ();rid=self.next_record;self.next_record+=1;r=MagicUserRecord(rid,person,branch,year,ess,cid,cname,abilities,names,disclosure,source_event);self.magic_records[rid]=r;self.branches[branch].records.add(rid);return r
+  ess=tuple(path.essences) if disclosure!='identity' else ();cid=path.confluence if disclosure!='identity' else None;cname=path.confluence_name if disclosure!='identity' else None;abilities=tuple(a.semantic_key for a in path.abilities) if disclosure=='full' else ();names=tuple(a.name for a in path.abilities) if disclosure=='full' else ();rid=self.next_record;self.next_record+=1;r=MagicUserRecord(rid,person,branch,year,ess,cid,cname,abilities,names,disclosure,source_event);self.magic_records[rid]=r;self.branches[branch].records.add(rid)
+  if '_recorded_people' in self.__dict__:self._recorded_people.add(person)
+  return r
  def records_for_person(self,pid):return sorted((r for r in self.magic_records.values() if r.person==pid),key=lambda r:(r.year,r.id))
  def post_notice(self,branch,year,kind,location,cause_event):
-  old=next((n for n in self.notices.values() if n.cause_event==cause_event),None)
+  index=self.__dict__.get('_notice_by_cause')
+  if index is None:index={n.cause_event:n for n in self.notices.values()};self._notice_by_cause=index
+  old=index.get(cause_event)
   if old:return old
-  nid=self.next_notice;self.next_notice+=1;n=AdventureNotice(nid,branch,year,kind,location,cause_event);self.notices[nid]=n;self.branches[branch].notices.add(nid);return n
+  nid=self.next_notice;self.next_notice+=1;n=AdventureNotice(nid,branch,year,kind,location,cause_event);self.notices[nid]=n;self.branches[branch].notices.add(nid);index[cause_event]=n;return n
  def create_application(self,society,person,branch,year,eligible,origin_event=None):
-  aid=self.next_application;self.next_application+=1;a=SocietyApplication(aid,society,person,branch,year,eligible,origin_event=origin_event);self.applications[aid]=a;return a
+  aid=self.next_application;self.next_application+=1;a=SocietyApplication(aid,society,person,branch,year,eligible,origin_event=origin_event);self.applications[aid]=a
+  if '_application_pairs' in self.__dict__:self._application_pairs.add((person,society))
+  if '_latest_applications' in self.__dict__:self._latest_applications[(person,society)]=a
+  return a
 
 def full_essence_user(world,pid):
  return world.advancement.completed_path(pid)
@@ -99,7 +123,7 @@ def institution_step(world,rng):
   n=world.institutions.post_notice(b.id,world.year,e.kind,e.location.id,e.id)
   n.required_rank=max(1,min(5,int(e.data.get('rank',1+int(4*e.data.get('severity',0.))))))
   if n.year==world.year:world.emit('adventure_notice_posted',Layer.KNOWLEDGE,location=Ref('settlement',e.location.id),causes=(e.id,),notice=n.id,threat=e.kind)
- applied={(a.person,a.society) for a in world.institutions.applications.values()}
+ applied=world.institutions.application_pairs()
  for p in sorted(world.current_people(),key=lambda x:x.id):
   if not p.alive or not full_essence_user(world,p.id):continue
   for society in ('adventure_society','magic_society'):
