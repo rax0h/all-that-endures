@@ -1,4 +1,5 @@
 from ate_sim import generate_world
+from ate_sim.core import RNG
 from ate_sim.magic_resources import society_resource_step
 
 
@@ -11,7 +12,7 @@ def test_society_resource_step_creates_only_physical_demand_bounded_reserve():
     a.adventurer_aspiration=True;a.completion_goal=True;a.desired_base_essences=3;a.desired_abilities=20
     for r in list(world.magic_resources.inventory('institution',adventure.id)):
         world.magic_resources._index_remove(r);r.owner_kind='settlement';r.owner_id=r.location;world.magic_resources._index_add(r)
-    world.year=1;society_resource_step(world,world.__class__.__module__ and __import__('ate_sim.core',fromlist=['RNG']).RNG(world.seed))
+    world.year=1;society_resource_step(world,RNG(world.seed))
     reserve=world.magic_resources.inventory('institution',adventure.id)
     assert reserve
     assert all(r.origin_event in world.event_ids for r in reserve)
