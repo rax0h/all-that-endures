@@ -45,6 +45,8 @@ class Simulation:
    p.age+=1;q=self.w.local[p.settlement];r=self.rng.stream("life",self.w.year,pid);risk=mortality_risk(p,q.scarcity,max(0.,1-p.health))
    if r.random()<risk:kill(self.w,p,"natural")
    else:p.grief*=.94;p.fear*=.9
+  # Age is part of adult/cohort eligibility in RuntimeView.
+  self.w.invalidate_runtime()
  def _capacity(self,sid):
   s=self.w.settlements[sid];c=self.w.cells[(s.x,s.y)];return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
  def _demography(self):
