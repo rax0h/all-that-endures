@@ -10,7 +10,7 @@ import hashlib
 from .core_types import layer_ref
 from .magic_progression import record_application
 
-@dataclass
+@dataclass(slots=True)
 class ResponseModel:
     samples:list=field(default_factory=list)
     coefficients:list=field(default_factory=list)
