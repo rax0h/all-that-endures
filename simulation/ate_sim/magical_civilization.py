@@ -83,28 +83,33 @@ def _apply_external_magic_pressure(world, sid, people, users):
 
 def _review_magic_demand(world, people, adventure, magic):
     """Let existing aspirations respond to a changing magical civilization."""
-    user_ids = {p.id for p in people if world.advancement.essence_user(p.id)}
+    paths=world.advancement.paths
+    aspirations=world.magic_resources.aspirations
+    skills_get=world.skills.get
+    neighbors=world.social.neighbors
+    user_ids = {p.id for p in people if p.id in paths}
     for p in people:
-        a = _aspiration(world, p)
-        path = world.advancement.path(p.id)
+        a=aspirations.get(p.id)
+        if a is None:a=_aspiration(world,p)
+        path=paths.get(p.id)
         if path is not None and a.completion_goal:
             a.desired_base_essences = 3
             a.desired_abilities = 20
         # Family transmission is historical, not merely local/present-tense:
         # a dead or migrated magical parent can still have raised a child inside
         # an established magical culture.
-        family = sum(1 for x in p.parents if world.advancement.essence_user(x))
-        contacts = sum(1 for x in world.social.neighbors(p.id) if x in user_ids)
+        family = sum(1 for x in p.parents if x in paths)
+        contacts = sum(1 for x in neighbors(p.id) if x in user_ids)
         named_profession = p.occupation in ('adventurer', 'guard', 'hunter', 'soldier', 'farmer', 'crafter', 'smith', 'healer', 'merchant', 'scholar', 'builder', 'architect', 'craft apprentice', 'magical craftsperson')
         # "Labor" is only a placeholder, but ordinary work must still become
         # specific before it creates magical demand. A person needs either a
         # named profession or substantial demonstrated skill, not merely a job.
         work_levels = {
-            'agriculture': world.skills.get(p.id, 'agriculture').level,
-            'construction': world.skills.get(p.id, 'construction').level,
-            'craft': world.skills.get(p.id, 'craft').level,
-            'knowledge': world.skills.get(p.id, 'knowledge').level,
-            'defense': world.skills.get(p.id, 'defense').level,
+            'agriculture': skills_get(p.id, 'agriculture').level,
+            'construction': skills_get(p.id, 'construction').level,
+            'craft': skills_get(p.id, 'craft').level,
+            'knowledge': skills_get(p.id, 'knowledge').level,
+            'defense': skills_get(p.id, 'defense').level,
         }
         work_domain, work_level = max(work_levels.items(), key=lambda x: x[1])
         skilled_specialist = work_level >= 1.60 and p.curiosity >= .55
@@ -166,8 +171,15 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic, supply_pl
     if not people: return
     ambient = world.ambient_magic.field(sid).level
     settlement = world.settlements[sid]; cell = world.cells[(settlement.x, settlement.y)]
-    aspirants = [p for p in people if _aspiration(world, p).desired_base_essences > 0]
-    adventurer_aspirants = [p for p in aspirants if _aspiration(world, p).adventurer_aspiration]
+    aspiration_state=world.magic_resources.aspirations
+    paths=world.advancement.paths
+    aspiration_by_id={};aspirants=[]
+    for p in people:
+        a=aspiration_state.get(p.id)
+        if a is None:a=_aspiration(world,p)
+        aspiration_by_id[p.id]=a
+        if a.desired_base_essences>0:aspirants.append(p)
+    adventurer_aspirants = [p for p in aspirants if aspiration_by_id[p.id].adventurer_aspiration]
     essence_seekers, essence_stock, supply_pressure = _essence_supply_signal(world, people, sid)
     member_count = 0 if adventure is None else sum(1 for p in people if p.id in world.institutions.institution_by_kind('adventure_society').members)
     institutional = (0. if adventure is None else 2.0 * adventure.authority) + (0. if magic is None else 1.5 * magic.authority)
@@ -177,9 +189,9 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic, supply_pl
     pressure = max(0., ambient - .30) + .35 * cell.hazard + .08 * min(10, field_capacity)
     completion_trainees=sum(
         1 for p in people
-        if _aspiration(world,p).completion_goal
-        and world.advancement.path(p.id) is not None
-        and len(world.advancement.path(p.id).abilities)<20)
+        if aspiration_by_id[p.id].completion_goal
+        and p.id in paths
+        and len(paths[p.id].abilities)<20)
     # Resource expeditions respond to unmet physical market/training demand.
     # They do not keep extracting merely because the Society has more crews.
     # A large professional organization improves the chance that demand is met;
@@ -189,13 +201,13 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic, supply_pl
     training_attempts=min(3,completion_trainees//20)
     attempts=min(8,base_attempts+training_attempts)
     user_ids={p.id for p in users}
-    candidates = sorted(users + [p for p in adventurer_aspirants if p.id not in user_ids], key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
-    if not candidates: candidates = sorted(adventurer_aspirants, key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
+    candidates = sorted(users + [p for p in adventurer_aspirants if p.id not in user_ids], key=lambda p: (aspiration_by_id[p.id].risk_tolerance, aspiration_by_id[p.id].preparation, p.health, -p.id), reverse=True)
+    if not candidates: candidates = sorted(adventurer_aspirants, key=lambda p: (aspiration_by_id[p.id].risk_tolerance, aspiration_by_id[p.id].preparation, p.health, -p.id), reverse=True)
     if not candidates: return
     Layer, Ref = layer_ref()
-    incomplete = sum(1 for p in users if len(world.advancement.path(p.id).abilities) < world.advancement.path(p.id).capacity)
+    incomplete = sum(1 for p in users if len(paths[p.id].abilities) < paths[p.id].capacity)
     for n in range(attempts):
-        erng = rng.stream('magical_expedition', world.year, sid * 100 + n); leader = candidates[n % len(candidates)]; aspiration = _aspiration(world, leader)
+        erng = rng.stream('magical_expedition', world.year, sid * 100 + n); leader = candidates[n % len(candidates)]; aspiration = aspiration_by_id[leader.id]
         readiness = .20 + .22 * aspiration.preparation + .18 * aspiration.risk_tolerance + .08 * leader.rank
         if adventure is not None: readiness += .14
         if magic is not None: readiness += .08
