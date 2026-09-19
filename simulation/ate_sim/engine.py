@@ -78,7 +78,8 @@ class Simulation:
   for hid in tuple(active):
    h=self.w.households.get(hid)
    if h is None or not h.alive:active.discard(hid);continue
-   if hid not in live_households:h.alive=False;active.discard(hid)
+   if hid not in live_households:
+    h.alive=False;active.discard(hid);self.w.__dict__.setdefault('_dead_household_property_queue',set()).add(hid)
   self.w._active_household_ids=active
  def _pressure(self):
   by_settlement=self.w.living_by_settlement()
