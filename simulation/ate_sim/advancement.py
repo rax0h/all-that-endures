@@ -6,6 +6,7 @@ if TYPE_CHECKING:
  from .mastery_training import ResponseModel
 from .semantic_dictionary import ESSENCES,AWAKENING_STONES,stone as stone_semantics
 RANKS=('unranked','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
+SILVER_TO_GOLD_INTEGRATION=.16;GOLD_TO_DIAMOND_INTEGRATION=.08
 @dataclass
 class Understanding:
  # At most six successful applications and two held-out transfer proofs per tier.
@@ -16,9 +17,10 @@ class Understanding:
  def ready(self,rank):
   # Reflection cannot fabricate application or generalization evidence.
   return len(self.transfers)>=(1 if rank==3 else 2) and all(t['difficulty']>=rank for t in self.transfers) and self.integration>=rank
- def reflect(self,application,reflection):
+ def reflect(self,application,reflection,rank):
   if application>0 and reflection>0:
-   self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*.08)
+   rate=SILVER_TO_GOLD_INTEGRATION if rank==3 else GOLD_TO_DIAMOND_INTEGRATION
+   self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*rate)
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
@@ -116,7 +118,7 @@ class AdvancementState:
   if r>=ceiling:return a
   gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
   if core>0:gain+=core*(.8,.65,.5,.3,.0,.0)[min(r,5)];p.core_fraction=min(1.,p.core_fraction+core*.01)
-  if r>=3:a.understanding.reflect(meaningful_use,reflection)
+  if r>=3:a.understanding.reflect(meaningful_use,reflection,r)
   a.progress+=gain
   while a.progress>=1 and a.rank<5:
    a.progress-=1;a.level+=1
