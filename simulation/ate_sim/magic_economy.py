@@ -13,7 +13,7 @@ def spirit_economy_step(world,rng):
     Layer,Ref=layer_ref()
     society=world.institutions.institution_by_kind('adventure_society')
     if society is None:return
-    farms={a.settlements[0]:a for a in world.infrastructure.assets.values() if a.kind=='spirit_coin_farm'}
+    farms={a.settlements[0]:a for a in world.infrastructure.assets_of_kind('spirit_coin_farm')}
     living=world.living_by_settlement()
     for sid,people in sorted(living.items()):
         eligible=[p for p in people if p.age>=16 and p.rank>=1 and world.skills.get(p.id,'craft').level>=.7]
