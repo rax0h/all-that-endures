@@ -64,7 +64,8 @@ class World:
  def emit(self,kind,layer,actors=(),location=None,causes=(),**data):
   if layer is None:raise ValueError('events require an explicit layer')
   if any(c not in self.event_ids for c in causes):raise ValueError('event cause does not exist')
-  if kind in ('birth','death','resurrection'):self.__dict__.pop('_living_cache',None)
+  if kind in ('birth','death','resurrection','household_migrated'):
+   self.__dict__.pop('_living_cache',None);self.__dict__.pop('_living_by_settlement_cache',None);self.__dict__.pop('_adult_by_settlement_cache',None)
   e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id)
   from .magic_progression import observe_experience
   observe_experience(self,e)
@@ -84,6 +85,8 @@ class World:
   finally:
    self.__dict__.pop('_index_current_people',None)
    self.__dict__.pop('_living_cache',None)
+   self.__dict__.pop('_living_by_settlement_cache',None)
+   self.__dict__.pop('_adult_by_settlement_cache',None)
  def current_people(self):
   cached=self.__dict__.get('_living_cache')
   if cached is None:
@@ -92,9 +95,21 @@ class World:
   return cached
  def living(self):return list(self.current_people())
  def living_by_settlement(self):
+  cached=self.__dict__.get('_living_by_settlement_cache')
+  if cached is not None:return cached
+  out={sid:[] for sid in self.settlements}
+  for p in self.current_people():out[p.settlement].append(p)
+  if self.__dict__.get('_index_current_people'):self._living_by_settlement_cache=out
+  return out
+ def adults_by_settlement(self,min_age=16):
+  caches=self.__dict__.get('_adult_by_settlement_cache')
+  if caches is not None and min_age in caches:return caches[min_age]
   out={sid:[] for sid in self.settlements}
   for p in self.current_people():
-   if p.alive:out[p.settlement].append(p)
+   if p.age>=min_age:out[p.settlement].append(p)
+  if self.__dict__.get('_index_current_people'):
+   if caches is None:caches={};self._adult_by_settlement_cache=caches
+   caches[min_age]=out
   return out
  def digest(self):return hashlib.sha256(json.dumps(_canonical(self),sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()
 
