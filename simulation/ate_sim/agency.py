@@ -29,14 +29,16 @@ class ActionRecord:year:int;person:int;action:str;motive:str;strength:float;even
 @dataclass
 class AgencyState:
  motives:dict[int,MotiveState]=field(default_factory=dict);actions:list[ActionRecord]=field(default_factory=list)
- def assess(self,world,p,attachment=None,dependents=None):
+ def assess(self,world,p,attachment=None,dependents=None,hazard=None):
   q=world.local[p.settlement];h=world.households[p.household]
   if attachment is None:attachment=max((r.attachment for r in world.social.relationships_for(p.id)),default=0.)
   if dependents is None:dependents=sum(1 for x in world.genealogy.children.get(p.id,[]) if world.people.get(x) and world.people[x].alive and world.people[x].age<18)
   m=self.motives.get(p.id)
   if m is None:m=MotiveState();self.motives[p.id]=m
   m.hunger=max(0.,min(1.,q.scarcity+max(0.,(5-h.food)/10)))
-  m.safety=max(0.,min(1.,world.cells[(world.settlements[p.settlement].x,world.settlements[p.settlement].y)].hazard*(1-h.preparedness)+p.fear))
+  if hazard is None:
+   settlement=world.settlements[p.settlement];hazard=world.cells[(settlement.x,settlement.y)].hazard
+  m.safety=max(0.,min(1.,hazard*(1-h.preparedness)+p.fear))
   m.belonging=max(0.,1-attachment)
   m.wealth=max(0.,min(1.,1-p.wealth/120.))
   m.curiosity=p.curiosity
@@ -44,8 +46,8 @@ class AgencyState:
   m.obligation=min(1.,dependents*.18+p.grief*.2)
   m.status=max(0.,min(1.,.65-p.wealth/250.))*(.5+.5*(1-p.inhibition))
   return m
- def choose(self,world,p,rng,attachment=None,dependents=None):
-  m=self.assess(world,p,attachment,dependents)
+ def choose(self,world,p,rng,attachment=None,dependents=None,hazard=None):
+  m=self.assess(world,p,attachment,dependents,hazard)
   secure=m.hunger*1.35;prepare=m.safety;work=m.wealth+.35*m.obligation
   socialize=m.belonging*.8;learn=m.curiosity*(1-.55*m.hunger);teach=m.legacy
   build=(.55*m.safety+.35*m.status)*(1-.5*m.hunger)
@@ -110,20 +112,23 @@ def agency_step(world,rng):
  for p in people:
   if p.age<18:
    for parent in p.parents:dependents[parent]=dependents.get(parent,0)+1
- current_actions={}
+ current_actions={};year=world.year
+ relationships_for=world.social.relationships_for;stream=rng.stream;choose=world.agency.choose
+ skills_practice=world.skills.practice;households=world.households;append_action=world.agency.actions.append
+ hazards={sid:world.cells[(s.x,s.y)].hazard for sid,s in world.settlements.items()}
  for p in people:
   if p.age<16:continue
   # The per-person reference index includes historical/deceased relationships
   # and tracks direct relationship mutations. Do not scan the global archive.
-  attachment=max(map(_ATTACHMENT,world.social.relationships_for(p.id)),default=0.)
-  rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachment,dependents.get(p.id,0));domain=ACTION_DOMAIN.get(action);event=None
-  if domain:world.skills.practice(p.id,domain,.12+.38*strength)
+  attachment=max(map(_ATTACHMENT,relationships_for(p.id)),default=0.)
+  rr=stream('agency',year,p.id);action,motive,strength=choose(world,p,rr,attachment,dependents.get(p.id,0),hazards[p.settlement]);domain=ACTION_DOMAIN.get(action)
+  if domain:skills_practice(p.id,domain,.12+.38*strength)
   if p.rank>0:_practice_path(world,p,rr,action,strength)
-  if action=='secure_food':world.households[p.household].food+=.08+.2*strength
-  elif action=='prepare':world.households[p.household].preparedness=min(1.,world.households[p.household].preparedness+.002*strength)
+  if action=='secure_food':households[p.household].food+=.08+.2*strength
+  elif action=='prepare':households[p.household].preparedness=min(1.,households[p.household].preparedness+.002*strength)
   elif action=='work':p.wealth+=ORDINARY_WORK_INCOME*strength
-  rec=ActionRecord(world.year,p.id,action,motive,strength,None if event is None else event.id)
-  world.agency.actions.append(rec);current_actions[p.id]=rec
+  rec=ActionRecord(year,p.id,action,motive,strength,None);append_action(rec)
+  if p.rank>0:current_actions[p.id]=rec
  # Actions are a bounded recent decision cache; durable history lives in
  # events and the post-run archive. A few recent years are ample for consumers
  # such as rank ecology and avoid copying a 50k-entry list every mature year.
