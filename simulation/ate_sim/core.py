@@ -113,6 +113,8 @@ class World:
   Canonical runs retain the complete list. Longevity observations may prune an
   old prefix after aggregating it; absolute IDs and event_ids remain permanent.
   """
+  sparse=self.__dict__.get('_retained_event_payloads')
+  if sparse is not None and event_id in sparse:return sparse[event_id]
   base=self.__dict__.get('_event_base_id',1)
   idx=event_id-base
   if 0<=idx<len(self.events):
@@ -125,15 +127,25 @@ class World:
   if last_year<first_year:return []
   key=attrgetter('year');start=bisect_left(self.events,first_year,key=key);stop=bisect_right(self.events,last_year,key=key)
   return self.events[start:stop]
- def prune_event_payloads_before_year(self,first_year_to_keep):
+ def prune_event_payloads_before_year(self,first_year_to_keep,protected_ids=()):
   """Drop an old event-payload prefix while preserving permanent causal IDs.
 
-  This is for non-canonical longevity observation only. Provenance references
-  remain valid through event_ids/next_event; archive/digest runs must not call it.
+  A tiny sparse set of operationally referenced old payloads may be protected.
+  This is for non-canonical longevity observation only; archive/digest runs must
+  retain the complete event list and must not call it.
   """
   if not self.events:return 0
   key=attrgetter('year');cut=bisect_left(self.events,first_year_to_keep,key=key)
   if cut<=0:return 0
+  protected=set(protected_ids)
+  if protected:
+   sparse=self.__dict__.setdefault('_retained_event_payloads',{})
+   for event in self.events[:cut]:
+    if event.id in protected:sparse[event.id]=event
+   for eid in tuple(sparse):
+    if eid not in protected:sparse.pop(eid,None)
+  elif '_retained_event_payloads' in self.__dict__:
+   self._retained_event_payloads.clear()
   removed=cut
   del self.events[:cut]
   self._event_base_id=self.events[0].id if self.events else self.next_event
