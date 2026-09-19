@@ -1,4 +1,5 @@
 from __future__ import annotations
+from heapq import nsmallest
 from .core_types import layer_ref
 from .magic_progression import practice_ability,record_body_transition
 from .magic_resources import _aspiration
@@ -153,15 +154,16 @@ def _career_training(world,p,path,asp,member,strength,school_rank=0):
   return ('all',8*(.38+.12*strength+.15*ambition+(.10 if diamond_school else 0.)),5,.78+.22*p.curiosity)
  return None
 
-def rank_ecology_step(world,rng):
+def rank_ecology_step(world,rng,latest=None):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society')
  members=set() if adv is None else adv.members
  living=list(world.current_people())
  school_rank=_martial_school_context(world,rng,living,members)
- latest={}
- for rec in reversed(world.agency.actions):
-  if rec.year!=world.year:break
-  latest.setdefault(rec.person,rec)
+ if latest is None:
+  latest={}
+  for rec in reversed(world.agency.actions):
+   if rec.year!=world.year:break
+   latest.setdefault(rec.person,rec)
  for p in living:
   # Rank-0 means the path is incomplete; every awakened ability is already
   # Iron and the body ceiling forbids further ability advancement. General
@@ -170,17 +172,18 @@ def rank_ecology_step(world,rng):
   path=world.advancement.path(p.id)
   if path is None or not path.abilities:continue
   rec=latest.get(p.id);action='work' if rec is None else rec.action;strength=.35 if rec is None else rec.strength;relevant=ACTION_FUNCTIONS.get(action,set())
-  indexed=list(enumerate(path.abilities));weakest=min((a.rank,a.level,a.progress) for _,a in indexed);asp=_aspiration(world,p);member=p.id in members
+  indexed=list(enumerate(path.abilities));asp=_aspiration(world,p);member=p.id in members
   career=_career_training(world,p,path,asp,member,strength,school_rank.get(p.id,0))
   purposeful_reflection=None
   if career is not None:
    _,exposure,uses,purposeful_reflection=career
-   # Deliberate rank training targets the weakest links first, but a full professional
-   # year is broad enough to exercise the entire configuration.
-   candidates=sorted(indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))
+   # We consume only the weakest bounded block. nsmallest preserves the same
+   # key/order result without sorting the other fifteen or sixteen abilities.
+   candidates=nsmallest(uses,indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))
   elif member:
+   weakest=min((a.rank,a.level,a.progress) for _,a in indexed)
    candidates=[x for x in indexed if (x[1].rank,x[1].level,x[1].progress)<=weakest]
-   if len(candidates)<4:candidates=sorted(indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))[:8]
+   if len(candidates)<4:candidates=nsmallest(8,indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))
    exposure=.32+.22*strength;uses=min(len(candidates),6)
   else:
    candidates=[x for x in indexed if x[1].function in relevant] or indexed
@@ -191,10 +194,14 @@ def rank_ecology_step(world,rng):
   # practice, but every ability still advances through the normal progression,
   # understanding and evidence machinery.
   if career is None:rr.shuffle(candidates)
-  before=p.rank
+  before=p.rank;changed=False
   for i,a in candidates[:uses]:
+   ability_rank=a.rank
    reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity)
    practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action,body_rank=before)
-  if len(path.abilities)==20 and (member or action in ('work','learn','teach','build','prepare')):
+   if a.rank!=ability_rank:changed=True
+  # Iron bodies cannot yet contain rank-3 abilities, so mastery has no candidate
+  # until Bronze. Preserve the exact Bronze+ training path and RNG stream.
+  if before>=2 and len(path.abilities)==20 and (member or action in ('work','learn','teach','build','prepare')):
    mastery_training_step(world,p,path,rng.stream('mastery_training',world.year,p.id))
-  record_body_transition(world,p,before,context=action)
+  if changed:record_body_transition(world,p,before,context=action)
