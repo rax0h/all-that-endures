@@ -9,9 +9,8 @@ class Relationship:
             old=getattr(self,'attachment',None)
             object.__setattr__(self,name,value)
             if old is not None and old!=value:
-                graph=getattr(self,'_graph',None)
-                if graph is not None:
-                    graph.__dict__.setdefault('_attachment_dirty',set()).update((self.a,self.b))
+                dirty=getattr(self,'_attachment_dirty',None)
+                if dirty is not None:dirty.update((self.a,self.b))
             return
         object.__setattr__(self,name,value)
 
@@ -32,12 +31,13 @@ class SocialGraph:
             self.adjacency=rebuilt;self._adjacency_edge_count=len(self.edges)
             self.__dict__.pop('_relationships',None)
             self.__dict__.pop('_attachment_max',None)
-            self._attachment_dirty=set(rebuilt)
+            dirty=set(rebuilt);self._attachment_dirty=dirty
+            for relationship in self.edges.values():object.__setattr__(relationship,'_attachment_dirty',dirty)
     def __setstate__(self,state):
         self.__dict__.update(state)
         self.__dict__.pop('_attachment_max',None)
-        self._attachment_dirty=set(self.adjacency)
-        for relationship in self.edges.values():object.__setattr__(relationship,'_graph',self)
+        dirty=set(self.adjacency);self._attachment_dirty=dirty
+        for relationship in self.edges.values():object.__setattr__(relationship,'_attachment_dirty',dirty)
     def get(self,a,b):
         k=self.key(a,b)
         if k not in self.edges:
@@ -50,7 +50,9 @@ class SocialGraph:
             for pid,other in ((k[0],k[1]),(k[1],k[0])):
                 if pid in cached:cached[pid][other]=self.edges[k]
         relationship=self.edges[k]
-        if getattr(relationship,'_graph',None) is not self:object.__setattr__(relationship,'_graph',self)
+        dirty=self.__dict__.setdefault('_attachment_dirty',set())
+        if getattr(relationship,'_attachment_dirty',None) is not dirty:
+            object.__setattr__(relationship,'_attachment_dirty',dirty)
         return relationship
     def record(self,a,b,event_id,trust=0.,attachment=0.,obligation=0.,resentment=0.):
         r=self.get(a,b); r.familiarity=min(1.,r.familiarity+.03); r.trust=max(0.,min(1.,r.trust+trust)); r.attachment=max(0.,min(1.,r.attachment+attachment)); r.obligation=max(0.,min(1.,r.obligation+obligation)); r.resentment=max(0.,min(1.,r.resentment+resentment)); r.shared_history.append(event_id); return r
@@ -74,7 +76,8 @@ class SocialGraph:
             best=0.
             for other in self.adjacency.get(pid,()):
                 relationship=self.edges[self.key(pid,other)]
-                if getattr(relationship,'_graph',None) is not self:object.__setattr__(relationship,'_graph',self)
+                if getattr(relationship,'_attachment_dirty',None) is not dirty:
+                    object.__setattr__(relationship,'_attachment_dirty',dirty)
                 if relationship.attachment>best:best=relationship.attachment
             cache[pid]=best;dirty.discard(pid)
         return cache.get(pid,0.)
