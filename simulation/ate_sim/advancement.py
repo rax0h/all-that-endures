@@ -52,7 +52,7 @@ class AdvancementState:
   if data is None:raise ValueError(f'unknown awakening stone: {key}')
   return data
  def _semantic_ability(self,p,essence,source,year,context,origin_event=None):
-  slot=len(p.abilities_for(essence))+1
+  slot=1+sum(a.essence==essence for a in p.abilities)
   if slot>SKILLS_PER_ESSENCE:return None
   raw='|'.join(p.essences)+'|'+essence+'|'+source+'|'+str(year)+'|'+'|'.join(map(str,context))+'|'+str(slot);key=hashlib.blake2b(raw.encode(),digest_size=16).hexdigest();special=slot==5
   if essence in ESSENCES:
@@ -87,7 +87,10 @@ class AdvancementState:
   p=self.paths.get(pid)
   if p is None:return None
   sd=self._stone(stone);stone_name=next(name for name,data in AWAKENING_STONES.items() if data is sd)
-  available=[e for e in p.essences if len(p.abilities_for(e))<SKILLS_PER_ESSENCE]
+  counts={e:0 for e in p.essences}
+  for ability in p.abilities:
+   if ability.essence in counts:counts[ability.essence]+=1
+  available=[e for e in p.essences if counts[e]<SKILLS_PER_ESSENCE]
   if target_essence is not None:
    if target_essence not in available:return None
    essence=target_essence
@@ -96,14 +99,19 @@ class AdvancementState:
   return None if essence is None else self._semantic_ability(p,essence,'stone:'+stone_name,year,semantic_context,origin_event)
  def rank(self,pid):
   p=self.paths.get(pid)
-  if p is None or len(p.base_essences)!=3 or p.confluence is None:return 0
-  if len(p.abilities)!=MAX_SKILLS:return 0
-  counts={e:0 for e in p.essences}
+  if p is None or len(p.base_essences)!=3 or p.confluence is None or len(p.abilities)!=MAX_SKILLS:return 0
+  e0,e1,e2=p.base_essences;ec=p.confluence
+  c0=c1=c2=c3=0;minimum=5
   for a in p.abilities:
-   if a.essence not in counts:return 0
-   counts[a.essence]+=1
-  if len(counts)!=4 or any(n!=SKILLS_PER_ESSENCE for n in counts.values()):return 0
-  return min(a.rank for a in p.abilities)
+   essence=a.essence
+   if essence==e0:c0+=1
+   elif essence==e1:c1+=1
+   elif essence==e2:c2+=1
+   elif essence==ec:c3+=1
+   else:return 0
+   if a.rank<minimum:minimum=a.rank
+  if c0!=SKILLS_PER_ESSENCE or c1!=SKILLS_PER_ESSENCE or c2!=SKILLS_PER_ESSENCE or c3!=SKILLS_PER_ESSENCE:return 0
+  return minimum
  def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.,body_rank=None):
   p=self.paths.get(pid)
   if p is None or not p.abilities:return None
