@@ -72,11 +72,7 @@ def record_application(world,person,ability,source,*,constraint,difficulty,outco
     """
     if ability.rank not in (3,4) or outcome<=0:return
     path=world.advancement.path(person.id)
-    if path is None:return
-    if not any(candidate is ability for candidate in path.abilities):
-        # Preserve the old equality-based edge case for external/test-created
-        # equivalent ability objects; production uses the path's exact object.
-        if ability not in path.abilities:return
+    if path is None or not path.contains_ability(ability):return
     keys=source.data.get('used_abilities',(source.data.get('ability'),))
     recorded_rank=source.data.get('challenge_complexity',source.data.get('task_rank',source.data.get('item_rank',source.data.get('threat_rank'))))
     if ability.semantic_key not in keys or recorded_rank!=difficulty:return
