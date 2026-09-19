@@ -195,7 +195,7 @@ def rank_ecology_step(world,rng,latest=None):
   for i,a in candidates[:uses]:
    ability_rank=a.rank
    reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity)
-   practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action,body_rank=before)
+   practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action,body_rank=before,path=path)
    if a.rank!=ability_rank:changed=True
   # Iron bodies cannot yet contain rank-3 abilities, so mastery has no candidate
   # until Bronze. Preserve the exact Bronze+ training path and RNG stream.
