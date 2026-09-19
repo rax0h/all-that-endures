@@ -3,6 +3,9 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from heapq import heappush, heappop, heapify
 from .core_types import layer_ref
+from .magic_progression import record_body_transition
+from .currency import can_pay_tier
+from math import ceil
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
 
 RESOURCE_DISCOVERY_RATE=.45
@@ -46,26 +49,40 @@ def person_context(p,sid):return (p.species,p.occupation,round(p.curiosity,2),ro
 def _commit_to_full_path(a):
  if a is None or a.completion_goal:return
  a.completion_goal=True;a.desired_base_essences=3;a.desired_abilities=20;a.urgency=max(a.urgency,.55)
+def _validate_absorption_owner(resource,pid):
+ if resource.consumed_year is not None:raise ValueError('magical resource already consumed')
+ if resource.owner_kind!='person' or resource.owner_id!=pid:raise ValueError('person must own resource before absorption')
 def absorb_essence_resource(world,pid,rid):
  r=world.magic_resources.resources[rid]
  if r.kind!='essence':raise ValueError('resource is not an essence')
- p=world.people[pid];path=world.advancement.path(pid)
+ _validate_absorption_owner(r,pid)
+ if r.key not in ESSENCES:raise ValueError('unknown essence')
+ p=world.people[pid];path=world.advancement.path(pid);before=world.advancement.rank(pid)
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
- Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=max(1,world.advancement.rank(pid))
+ Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
  a=world.magic_resources.aspirations.get(pid)
  if a is not None and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
+ if any(a.source=='confluence' for a in created):
+  formation=world.emit('confluence_formed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),base_essences=tuple(path.base_essences),confluence=path.confluence)
+  world.emit('confluence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(formation.id,),confluence=path.confluence,mechanism='touch',automatic_acceptance=True)
  for ability in created:world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=ability.essence,source=ability.source,ability=ability.semantic_key,name=ability.name,special=ability.special,aura=ability.aura)
+ record_body_transition(world,p,before,context="essence_absorption",causes=(e.id,))
  return path,created
 def use_awakening_stone(world,pid,rid,target_essence=None):
  r=world.magic_resources.resources[rid]
  if r.kind!='awakening_stone':raise ValueError('resource is not an awakening stone')
+ _validate_absorption_owner(r,pid)
+ world.advancement._stone(r.key)
  p=world.people[pid];path=world.advancement.path(pid)
  if path is None:return None
  available=[e for e in path.essences if len(path.abilities_for(e))<5]
  if not available or (target_essence is not None and target_essence not in available):return None
+ before=world.advancement.rank(pid)
  Layer,Ref=layer_ref();e=world.emit('awakening_stone_used',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,stone=r.key,target_essence=target_essence);a=world.advancement.awaken_skill(pid,r.key,world.year,person_context(p,p.settlement),e.id,target_essence)
  if a is None:return None
- world.magic_resources.consume(rid,pid,world.year,e.id);world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura);return a
+ world.magic_resources.consume(rid,pid,world.year,e.id);awakened=world.emit('ability_awakened',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura)
+ record_body_transition(world,p,before,context='awakening_stone',causes=(awakened.id,))
+ return a
 
 def _environment_tags(world,sid):
  s=world.settlements[sid];c=world.cells[(s.x,s.y)];q=world.local[sid];tags=[]
@@ -193,7 +210,7 @@ class _SettlementMarket:
    self.groups={kind:[group for priority,group in sorted(values.items(),reverse=True)] for kind,values in groups.items()}
   kind='essence' if resource.kind=='essence' else 'awakening_stone'
   for group in self.groups[kind]:
-   candidates=[p for p,owned in group if p.wealth>=min_wealth and (kind!='essence' or resource.key not in owned)]
+   candidates=[p for p,owned in group if (p.wealth>=min_wealth or can_pay_tier(self.world,p.id,'iron',ceil(min_wealth))) and (kind!='essence' or resource.key not in owned)]
    if candidates:return candidates
   return []
 
@@ -237,20 +254,63 @@ class _SettlementDemand:
   for entry in excluded:heappush(heap,entry)
   return result
 
-def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
+class TransferMarket:
+ """Ephemeral paid-demand heaps plus real relationship gifts, shared by a market session."""
+ def __init__(self,world,people):
+  self.world=world;self.people={p.id:p for p in people};self.heaps={};self.versions={};self.states={};self.gifts={}
+ def _entry(self,p):
+  a=_aspiration(self.world,p)
+  return (-a.urgency,-a.drive,-a.preparation,-p.wealth,p.id,self.versions.get(p.id,0))
+ def _eligible(self,p,kind,price):
+  return _eligible_kind(_demand_state(self.world,p),kind) and (p.wealth>=price or can_pay_tier(self.world,p.id,'iron',ceil(price)))
+ def refresh(self,p):
+  state=(_demand_state(self.world,p),p.wealth,self.world.currency.wallets.get(p.id,{}).get('iron',0))
+  if self.states.get(p.id)==state:return
+  self.states[p.id]=state;self.versions[p.id]=self.versions.get(p.id,0)+1
+  for (kind,price),heap in self.heaps.items():
+   if self._eligible(p,kind,price):heappush(heap,self._entry(p))
+ def buyer(self,r,holder,price):
+  key=(r.kind,price)
+  if key not in self.heaps:
+   heap=[self._entry(p) for p in self.people.values() if self._eligible(p,*key)]
+   heapify(heap);self.heaps[key]=heap
+  heap=self.heaps[key];excluded=[];best=None
+  while heap:
+   item=heap[0];pid=item[4];p=self.people[pid]
+   if item[5]!=self.versions.get(pid,0):heappop(heap);continue
+   if pid==holder.id or not _wants(self.world,p,r):excluded.append(heappop(heap));continue
+   best=p;break
+  for item in excluded:heappush(heap,item)
+  # A personal gift can make an otherwise unaffordable transaction feasible.
+  if holder.id not in self.gifts:
+   self.gifts[holder.id]=[self.people[pid] for pid in self.world.social.neighbors(holder.id) if pid in self.people and pid!=holder.id and self.world.social.edges[self.world.social.key(holder.id,pid)].attachment>.7]
+  for p in self.gifts[holder.id]:
+   if _wants(self.world,p,r):
+    if best is None or self._entry(p)[:5]<self._entry(best)[:5]:best=p
+  return best
+
+def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None,market=None):
  Layer,Ref=layer_ref();price=(8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity))
  # Rank only feasible transactions. Eligibility checks must not create social edges.
- candidates=[]
- for q in local:
-  if q.id==holder.id or not _wants(world,q,r):continue
-  relationship=world.social.edges.get(world.social.key(holder.id,q.id))
-  if q.wealth>=price or (relationship is not None and relationship.attachment>.7):candidates.append(q)
- if not candidates:return False
- q=max(candidates,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id));a=_aspiration(world,q);gift=world.social.get(holder.id,q.id).attachment>.7
- if not gift and q.wealth<price:return False
- if not gift:q.wealth-=price;holder.wealth+=price
- e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',holder.id),Ref('person',q.id)),Ref('settlement',holder.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,reason='relationship gift' if gift else 'aspirant purchase',price=0 if gift else price);world.magic_resources.transfer(r.id,'person',q.id,e.id,holder.settlement);a.preparation=min(1.,a.preparation+.08)
+ q=None
+ if market is not None:q=market.buyer(r,holder,price)
+ else:
+  candidates=[]
+  for q in local:
+   if q.id==holder.id or not _wants(world,q,r):continue
+   relationship=world.social.edges.get(world.social.key(holder.id,q.id))
+   if q.wealth>=price or can_pay_tier(world,q.id,'iron',ceil(price)) or (relationship is not None and relationship.attachment>.7):candidates.append(q)
+  q=max(candidates,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id)) if candidates else None
+ if q is None:return False
+ a=_aspiration(world,q);gift=world.social.get(holder.id,q.id).attachment>.7
+ coins={}
+ if not gift:
+  if q.wealth>=price:q.wealth-=price;holder.wealth+=price
+  elif can_pay_tier(world,q.id,'iron',ceil(price)):coins=world.currency.transfer(q.id,holder.id,{'iron':ceil(price)})
+  else:return False
+ e=world.emit('magic_resource_transferred',Layer.SOCIETY,(Ref('person',holder.id),Ref('person',q.id)),Ref('settlement',holder.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,resource_kind=r.kind,key=r.key,reason='relationship gift' if gift else 'aspirant purchase',price=0 if gift else price,coin_transfer=coins,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,holder.settlement);a.preparation=min(1.,a.preparation+.08)
  if on_transfer is not None:on_transfer(q)
+ if market is not None:market.refresh(q);market.refresh(holder)
  return True
 
 def magic_ecology_step(world,rng):
@@ -266,14 +326,19 @@ def magic_ecology_step(world,rng):
   for r in world.magic_resources.inventory('settlement',sid):
    key=_demand_key(r);price=(7 if r.kind=='essence' else 3)
    if key not in market:market[key]=matching.contenders(r,price)
-   seekers=[p for p in market[key] if p.wealth>=price]
+   seekers=[p for p in market[key] if p.wealth>=price or can_pay_tier(world,p.id,'iron',price)]
    # Wealth only decreases in this phase. Retry lower priority groups after the
    # cached group is exhausted; an empty result remains valid for the phase.
    if not seekers and market[key]:market[key]=seekers=matching.contenders(r,price)
    if seekers:
     q=max(seekers,key=lambda p:(p.wealth,-p.id))
-    if q.wealth>=price:
-     q.wealth-=price;e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price);world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
+    institution=world.institutions.institution_by_kind('adventure_society')
+    coins={}
+    if q.wealth>=price:q.wealth-=price
+    elif institution is not None:
+     coins=world.currency.treasury_transfer(institution.id,q.id,{'iron':price},deposit=True)
+    else:continue
+    e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price,coin_deposit=coins,institution=None if institution is None else institution.id,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
  demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:

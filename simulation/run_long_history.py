@@ -31,7 +31,7 @@ def snapshot(world, include_digest=False):
     supplier_pairs={(l.producer,i.craftsperson) for i in items for lid in i.materials for l in [world.materials.lots.get(lid)] if l is not None and l.producer!=i.craftsperson}
 
     result={
-        'year':world.year,'alive':len(alive),'people_total':len(world.people),'living_households':living_households,'households_total':len(world.households),'settlement_population':dict(sorted(by_settlement.items())),'species_population':dict(sorted(by_species.items())),'events_total':len(world.events),'event_kinds':dict(events.most_common(25)),'practices':len(world.culture.practices),'practice_domains':dict(sorted(practice_domains.items())),'practice_origins':dict(sorted(practices_by_origin.items())),'culture_institutions':len(world.culture.institutions),'laws':len(world.culture.laws),'properties':len(world.economy.property),'relationships':len(world.social.edges),'genealogical_births':len(world.genealogy.parents),'max_lineage_depth':max_depth,'knowledge_claims':len(world.knowledge.claims),'cultural_signatures':cultural_signatures,
+        'eligible_adults':sum(p.age>=16 for p in alive),'adult_essence_users':sum(p.age>=16 for p in living_users),'year':world.year,'alive':len(alive),'people_total':len(world.people),'living_households':living_households,'households_total':len(world.households),'settlement_population':dict(sorted(by_settlement.items())),'species_population':dict(sorted(by_species.items())),'events_total':len(world.events),'event_kinds':dict(events.most_common(25)),'practices':len(world.culture.practices),'practice_domains':dict(sorted(practice_domains.items())),'practice_origins':dict(sorted(practices_by_origin.items())),'culture_institutions':len(world.culture.institutions),'laws':len(world.culture.laws),'properties':len(world.economy.property),'relationships':len(world.social.edges),'genealogical_births':len(world.genealogy.parents),'max_lineage_depth':max_depth,'knowledge_claims':len(world.knowledge.claims),'cultural_signatures':cultural_signatures,
         'essence_users_living':len(living_users),'essence_user_base_essences':dict(sorted(base_counts.items())),'essence_user_abilities':dict(sorted(ability_counts.items())),'essence_user_ranks':dict(sorted(rank_counts.items())),'living_confluences':confluences,'completed_loadouts':completed,'living_auras':auras,
         'magic_aspirants_living':len(aspirations),'magic_interested_living':len(interested),'magic_completion_goal_living':len(completion),'magic_adventurer_aspirants_living':len(adventurers),'magic_completion_goal_share':round(len(completion)/len(interested),4) if interested else 0.0,'magic_adventurer_completion_share':round(sum(a.completion_goal for a in adventurers)/len(adventurers),4) if adventurers else 0.0,
         'magic_resources_total':len(resources),'magic_resources_by_kind':dict(sorted(resource_kinds.items())),'magic_resources_available':len(available),'magic_resources_available_by_kind':dict(sorted(available_kinds.items())),'magic_resource_purchases':events['magic_resource_purchased'],'magic_resource_transfers':events['magic_resource_transferred'],'essence_absorptions':events['essence_absorbed'],'awakening_stones_used':events['awakening_stone_used'],'abilities_awakened':events['ability_awakened'],
@@ -42,11 +42,26 @@ def snapshot(world, include_digest=False):
     incomplete_users=[p for p in living_users if len(paths[p.id].abilities)!=20]
     result['completed_path_ranks']=dict(sorted(Counter(world.advancement.rank(p.id) for p in complete_users).items()))
     result['incomplete_path_ranks']=dict(sorted(Counter(world.advancement.rank(p.id) for p in incomplete_users).items()))
+    adults=[p for p in alive if p.age>=16]
+    adult_paths=[paths[p.id] for p in adults if p.id in paths]
+    result['magic_access']={
+        'adult_participation':len(adult_paths)/max(1,len(adults)),
+        'second_essence':sum(len(p.base_essences)>=2 for p in adult_paths),
+        'third_essence':sum(len(p.base_essences)==3 for p in adult_paths),
+        'completed_last_50_years':sum(len(p.abilities)==20 and max(a.awakened_year for a in p.abilities)>world.year-50 for p in adult_paths),
+        'dead_incomplete_paths':sum(not world.people[pid].alive and len(path.abilities)<20 for pid,path in paths.items()),
+        'users_by_occupation':dict(Counter(p.occupation for p in adults if p.id in paths)),
+        'available_stock_owner_kinds':dict(Counter(r.owner_kind for r in available)),
+        'coin_supply':dict(world.currency.minted),'coin_consumption':dict(world.currency.consumed),
+        'treasuries':world.currency.treasuries,
+        'change_exchanges':events['society_change_exchanged'],
+        'paid_apprentice_jobs':events['society_apprentice_work'],
+    }
     if include_digest:result['digest']=world.digest()
     return result
 
 
-def main(seed=843000, years=1000, max_seconds=None, archive=None):
+def main(seed=843000, years=1000, max_seconds=None, archive=None, initialization="mature"):
     from time import perf_counter
     import os, cProfile, pstats, io, platform
     profile_tail=int(os.environ.get('ATE_PROFILE_TAIL','0'))
@@ -56,7 +71,8 @@ def main(seed=843000, years=1000, max_seconds=None, archive=None):
     profiler=cProfile.Profile() if profile_tail else None
     profiled_years=0
     from scaling_telemetry import ScalingTelemetry, BUCKET_ENDS
-    world=generate_world(seed);sim=Simulation(world)
+    world=generate_world(seed,mature=initialization=="mature");sim=Simulation(world)
+    print(json.dumps(snapshot(world),sort_keys=True),flush=True)
     marks=sorted(set([m for m in BUCKET_ENDS if m<=years]+[years]))
     last=0;simulation_seconds=0.;diagnostic_seconds=0.
     with ScalingTelemetry(world) as telemetry:
@@ -86,7 +102,7 @@ def main(seed=843000, years=1000, max_seconds=None, archive=None):
     if world.year!=years:raise SystemExit(f'expected year {years}, got {world.year}')
     if not all(c<e.id for e in world.events for c in e.causes):raise SystemExit('causal integrity failure')
     validation_seconds=perf_counter()-start
-    print(json.dumps({'record':'benchmark','python_version':platform.python_version(),'platform':platform.platform(),'seed':seed,'years':years,'simulation_seconds':simulation_seconds,'profile_tail_requested':profile_tail,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest,'max_seconds':max_seconds,'performance_passed':None if max_seconds is None else simulation_seconds<=max_seconds},sort_keys=True),flush=True)
+    print(json.dumps({'record':'benchmark','initialization':initialization,'python_version':platform.python_version(),'platform':platform.platform(),'seed':seed,'years':years,'simulation_seconds':simulation_seconds,'profile_tail_requested':profile_tail,'diagnostic_seconds':diagnostic_seconds,'digest_seconds':digest_seconds,'validation_seconds':validation_seconds,'digest':digest,'max_seconds':max_seconds,'performance_passed':None if max_seconds is None else simulation_seconds<=max_seconds},sort_keys=True),flush=True)
     if archive is not None:
         from ate_sim.history_archive import export_archive
         print(json.dumps(export_archive(world, archive, digest=digest), sort_keys=True), flush=True)
@@ -101,6 +117,7 @@ if __name__ == '__main__':
     parser.add_argument('seed',nargs='?',type=int,default=843000)
     parser.add_argument('years',nargs='?',type=int,default=1000)
     parser.add_argument('--max-seconds',type=float,help='Fail if actual simulation wall time exceeds this limit; incompatible with ATE_PROFILE_TAIL.')
+    parser.add_argument('--initialization',choices=('mature','founders'),default='mature')
     parser.add_argument('--archive', help='Create a new indexed SQLite history archive after simulation; timed separately.')
     args=parser.parse_args()
-    main(args.seed,args.years,args.max_seconds,args.archive)
+    main(args.seed,args.years,args.max_seconds,args.archive,args.initialization)
