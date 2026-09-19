@@ -42,11 +42,22 @@ def test_deliberate_reflection_integrates_evidenced_experience_without_replacing
         'b':{'event':2,'difficulty':2,'outcome':1.,'metric':'control'},
         'c':{'event':3,'difficulty':2,'outcome':1.,'metric':'control'},
     }
-    for _ in range(20):u.reflect(4.,.6)
+    for _ in range(32):u.reflect(4.,.6,3)
     assert u.integration==3.
     assert not u.ready(3)
     u.transfers.append({'event':4,'difficulty':3,'premises':[1,2]})
     assert u.ready(3)
+
+
+def test_gold_integration_remains_slower_than_silver_integration():
+    silver=Understanding(applications={str(i):{'event':i,'difficulty':3,'outcome':1.,'metric':'control'} for i in range(4)})
+    gold=Understanding(applications={str(i):{'event':i,'difficulty':4,'outcome':1.,'metric':'control'} for i in range(4)})
+    for _ in range(20):
+        silver.reflect(4.,.8,3)
+        gold.reflect(4.,.8,4)
+    assert silver.integration>gold.integration
+    assert silver.integration>=2.5
+    assert gold.integration<2.
 
 
 def test_easy_variety_and_reflection_do_not_substitute_for_harder_transfer():
