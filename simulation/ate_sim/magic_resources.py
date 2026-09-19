@@ -33,7 +33,13 @@ class MagicResourceState:
  def available(self,rid):
   r=self.resources.get(rid);return r is not None and r.consumed_year is None
  def inventory(self,owner_kind,owner_id,kind=None):
-  ids=sorted(self.owner_index.get((owner_kind,owner_id),()));return [self.resources[rid] for rid in ids if self.resources[rid].consumed_year is None and (kind is None or self.resources[rid].kind==kind)]
+  bucket=self.owner_index.get((owner_kind,owner_id))
+  if not bucket:return []
+  if len(bucket)==1:
+   rid=next(iter(bucket));resource=self.resources[rid]
+   return [resource] if resource.consumed_year is None and (kind is None or resource.kind==kind) else []
+  ids=sorted(bucket)
+  return [self.resources[rid] for rid in ids if self.resources[rid].consumed_year is None and (kind is None or self.resources[rid].kind==kind)]
  def transfer(self,rid,owner_kind,owner_id,event_id,location=None):
   r=self.resources[rid]
   if r.consumed_year is not None:raise ValueError('consumed magical resource cannot be transferred')
