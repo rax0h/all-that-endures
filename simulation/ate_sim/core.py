@@ -43,7 +43,7 @@ class Ref:
   if cached is None:
    cached=super().__new__(cls);_REF_CACHE[key]=cached
   return cached
-@dataclass
+@dataclass(slots=True)
 class Event: id:int; year:int; kind:str; layer:Layer; actors:tuple[Ref,...]=(); location:Ref|None=None; causes:tuple[int,...]=(); data:dict[str,Any]=field(default_factory=dict)
 @dataclass
 class Person:
