@@ -160,7 +160,7 @@ def _admit_cadets(world,adventure,branch,people):
     class_event=world.emit('society_cadet_class_formed',Layer.SOCIETY,
         tuple(Ref('person',p.id) for _,p,_ in admitted)+(Ref('institution',adventure.id),),
         Ref('settlement',branch.settlement),institution=adventure.id,branch=branch.id,
-        class_year=world.year,class_size=len(admitted),training_capacity=training_capacity if False else seats)
+        class_year=world.year,class_size=len(admitted),admission_capacity=seats)
     for score,p,aspiration in admitted:
         aspiration.cadet_class_year=world.year;aspiration.cadet_branch=branch.id
         aspiration.adventurer_aspiration=True;aspiration.completion_goal=True
