@@ -30,8 +30,19 @@ from .society_accountability import SocietyAccountabilityState
 from .currency import RankedCurrencyState
 from .threat_ecology import ThreatEcologyState
 class Layer(str,Enum): REALITY='reality'; SOCIETY='society'; KNOWLEDGE='knowledge'; NARRATIVE='narrative'
+_REF_CACHE={}
 @dataclass(frozen=True)
-class Ref: kind:str; id:int
+class Ref:
+ kind:str; id:int
+ def __new__(cls,kind=None,id=None):
+  # Refs are immutable value objects and recur millions of times in event
+  # history. Reuse one object per (kind,id) during normal construction. The
+  # no-arg path preserves pickle/deepcopy reconstruction compatibility.
+  if kind is None:return super().__new__(cls)
+  key=(kind,id);cached=_REF_CACHE.get(key)
+  if cached is None:
+   cached=super().__new__(cls);_REF_CACHE[key]=cached
+  return cached
 @dataclass
 class Event: id:int; year:int; kind:str; layer:Layer; actors:tuple[Ref,...]=(); location:Ref|None=None; causes:tuple[int,...]=(); data:dict[str,Any]=field(default_factory=dict)
 @dataclass
