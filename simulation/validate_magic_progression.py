@@ -19,8 +19,11 @@ def validate(archive):
     examples=defaultdict(list)
     wallets=defaultdict(Counter)
     treasuries=defaultdict(Counter)
+    cadet_admissions=[];cadet_graduations=[];last_year=0
     for row in archive.db.execute('SELECT payload FROM events ORDER BY year,id'):
-        e=json.loads(row[0]);data=e['data'];kind=e['kind']
+        e=json.loads(row[0]);data=e['data'];kind=e['kind'];last_year=max(last_year,e['year'])
+        if kind=='society_cadet_admitted':cadet_admissions.append(e['year'])
+        elif kind=='society_cadet_graduated':cadet_graduations.append(e['year'])
         if kind=='society_treasury_observed':
             for denomination,count in data.get('opening_balance',{}).items():treasuries[data['institution']][denomination]+=count
         actors=[a['id'] for a in e['actors'] if a['kind']=='person']
@@ -118,6 +121,14 @@ def validate(archive):
             high.append({'person':p['id'],'species':p['species'],'age':p['age'],'body_rank':RANKS[p['rank']],
                 'wealth':p['wealth'],'wallet':archive.record('wallet',p['id']),
                 'progression':examples[p['id']]})
+    recent_admissions=sum(year>last_year-100 for year in cadet_admissions)
+    recent_graduations=sum(year>last_year-100 for year in cadet_graduations)
+    # This is a pipeline-liveness invariant, not a rank quota. If an established
+    # Society continues admitting cohorts for a century but graduates nobody,
+    # the training/resource handoff is broken even if chronology is internally valid.
+    if recent_admissions and not recent_graduations:
+        violations.append({'issue':'Adventure Society admitted cadets for the recent century but graduated none',
+                           'recent_admissions':recent_admissions})
     for row in archive.db.execute("SELECT id,payload FROM records WHERE kind='treasury'"):
         actual=json.loads(row[1]);expected=treasuries[int(row[0])]
         if {d:n for d,n in actual.items() if n}!={d:n for d,n in expected.items() if n}:violations.append({'institution':row[0],'issue':'treasury disagrees with recorded transfers'})
