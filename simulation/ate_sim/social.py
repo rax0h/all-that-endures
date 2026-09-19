@@ -4,6 +4,14 @@ from dataclasses import dataclass, field
 @dataclass
 class Relationship:
     a:int; b:int; familiarity:float=0.; trust:float=.5; attachment:float=0.; obligation:float=0.; resentment:float=0.; attraction:float=0.; shared_history:list[int]=field(default_factory=list)
+    def __setattr__(self,name,value):
+        if name=='attachment':
+            old=getattr(self,'attachment',None);object.__setattr__(self,name,value)
+            if old is not None and old!=value:
+                graph=getattr(self,'_graph',None)
+                if graph is not None:graph.__dict__.setdefault('_attachment_dirty',set()).update((self.a,self.b))
+            return
+        object.__setattr__(self,name,value)
 
 @dataclass
 class SocialGraph:
@@ -27,10 +35,13 @@ class SocialGraph:
             self.adjacency.setdefault(k[0],set()).add(k[1])
             self.adjacency.setdefault(k[1],set()).add(k[0])
             self._adjacency_edge_count=len(self.edges)
+            self.__dict__.setdefault('_attachment_dirty',set()).update(k)
             cached=self.__dict__.get('_relationships',{})
             for pid,other in ((k[0],k[1]),(k[1],k[0])):
                 if pid in cached:cached[pid][other]=self.edges[k]
-        return self.edges[k]
+        relationship=self.edges[k]
+        if getattr(relationship,'_graph',None) is not self:object.__setattr__(relationship,'_graph',self)
+        return relationship
     def record(self,a,b,event_id,trust=0.,attachment=0.,obligation=0.,resentment=0.):
         r=self.get(a,b); r.familiarity=min(1.,r.familiarity+.03); r.trust=max(0.,min(1.,r.trust+trust)); r.attachment=max(0.,min(1.,r.attachment+attachment)); r.obligation=max(0.,min(1.,r.obligation+obligation)); r.resentment=max(0.,min(1.,r.resentment+resentment)); r.shared_history.append(event_id); return r
     def neighbors(self,pid):
@@ -43,6 +54,17 @@ class SocialGraph:
         if pid not in self._relationships:
             self._relationships[pid]={other:self.edges[self.key(pid,other)] for other in self.neighbors(pid)}
         return self._relationships[pid].values()
+    def max_attachment(self,pid):
+        self._ensure_adjacency_index()
+        cache=self.__dict__.setdefault('_attachment_max',{});dirty=self.__dict__.setdefault('_attachment_dirty',set())
+        if pid not in cache or pid in dirty:
+            best=0.
+            for other in self.adjacency.get(pid,()):
+                relationship=self.edges[self.key(pid,other)]
+                if getattr(relationship,'_graph',None) is not self:object.__setattr__(relationship,'_graph',self)
+                if relationship.attachment>best:best=relationship.attachment
+            cache[pid]=best;dirty.discard(pid)
+        return cache.get(pid,0.)
     def partner(self,a,b,event_id):
         key=self.key(a,b);self.partnerships[key]=event_id
         if hasattr(self,'_partnership_index'):
