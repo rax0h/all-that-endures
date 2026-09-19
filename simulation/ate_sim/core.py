@@ -107,12 +107,37 @@ class World:
   if kind in ('birth','death','resurrection'):self.__dict__.pop('_living_cache',None)
   e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id)
   return e
+ def event(self,event_id):
+  """Return a retained event payload by absolute id.
+
+  Canonical runs retain the complete list. Longevity observations may prune an
+  old prefix after aggregating it; absolute IDs and event_ids remain permanent.
+  """
+  base=self.__dict__.get('_event_base_id',1)
+  idx=event_id-base
+  if 0<=idx<len(self.events):
+   event=self.events[idx]
+   if event.id==event_id:return event
+  return None
  def events_between(self,first_year,last_year=None):
   # Events append in simulation-year order; binary search touches no old payloads.
   last_year=self.year if last_year is None else last_year
   if last_year<first_year:return []
   key=attrgetter('year');start=bisect_left(self.events,first_year,key=key);stop=bisect_right(self.events,last_year,key=key)
   return self.events[start:stop]
+ def prune_event_payloads_before_year(self,first_year_to_keep):
+  """Drop an old event-payload prefix while preserving permanent causal IDs.
+
+  This is for non-canonical longevity observation only. Provenance references
+  remain valid through event_ids/next_event; archive/digest runs must not call it.
+  """
+  if not self.events:return 0
+  key=attrgetter('year');cut=bisect_left(self.events,first_year_to_keep,key=key)
+  if cut<=0:return 0
+  removed=cut
+  del self.events[:cut]
+  self._event_base_id=self.events[0].id if self.events else self.next_event
+  return removed
  @contextmanager
  def current_people_scope(self):
   # A step-local index: direct edits between steps and loaded checkpoints need
