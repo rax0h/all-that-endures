@@ -65,16 +65,16 @@ jobs:
 
 
   longevity:
-    needs: profile
     if: github.head_ref == 'research/stage-0.5-causal-rebuild'
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 4
     env:
       PYTHONPATH: .:simulation
+      PYTHONHASHSEED: '0'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: 'pypy3.10'
       - name: fresh-seed 10000-year broad longevity observation
-        run: python simulation/run_longevity_observation.py --seed 917263 --years 10000 --checkpoints 1000 5000 7500 10000
+        run: python simulation/run_longevity_observation.py --seed 917263 --years 10000 --checkpoints 1000 5000 7500 10000 --chunk-years 250 --event-years-retained 100 --max-wall-seconds 180
