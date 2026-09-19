@@ -122,8 +122,8 @@ class AdvancementState:
    if a.rank<minimum:minimum=a.rank
   if c0!=SKILLS_PER_ESSENCE or c1!=SKILLS_PER_ESSENCE or c2!=SKILLS_PER_ESSENCE or c3!=SKILLS_PER_ESSENCE:return 0
   return minimum
- def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.,body_rank=None):
-  p=self.paths.get(pid)
+ def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.,body_rank=None,path=None):
+  p=self.paths.get(pid) if path is None else path
   if p is None or not p.abilities:return None
   a=p.abilities[ability%len(p.abilities)];r=a.rank
   # Hot-path callers already know the body's rank for this annual training
