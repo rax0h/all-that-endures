@@ -6,7 +6,7 @@ if TYPE_CHECKING:
  from .mastery_training import ResponseModel
 from .semantic_dictionary import ESSENCES,AWAKENING_STONES,stone as stone_semantics
 RANKS=('unranked','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
-@dataclass
+@dataclass(slots=True)
 class Understanding:
  # At most six successful applications and two held-out transfer proofs per tier.
  evidence:dict[str,int]=field(default_factory=dict)
@@ -24,7 +24,7 @@ class Understanding:
    # the hard cap and held-out transfer proofs remain mandatory at both tiers.
    rate=.16 if rank==3 else .08
    self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*rate)
-@dataclass
+@dataclass(slots=True)
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
  response_model:ResponseModel|None=None
