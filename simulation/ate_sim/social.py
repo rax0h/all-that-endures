@@ -11,22 +11,34 @@ class SocialGraph:
     partnerships:dict[tuple[int,int],int]=field(default_factory=dict)
     adjacency:dict[int,set[int]]=field(default_factory=dict)
     def key(self,a,b): return (min(a,b),max(a,b))
+    def _ensure_adjacency_index(self):
+        # adjacency is derived from authoritative edges.  Old checkpoints and
+        # direct test fixtures may bypass get(), so validate by edge count.
+        if getattr(self,'_adjacency_edge_count',-1)!=len(self.edges):
+            rebuilt={}
+            for a,b in self.edges:
+                rebuilt.setdefault(a,set()).add(b);rebuilt.setdefault(b,set()).add(a)
+            self.adjacency=rebuilt;self._adjacency_edge_count=len(self.edges)
+            self.__dict__.pop('_relationships',None)
     def get(self,a,b):
         k=self.key(a,b)
         if k not in self.edges:
             self.edges[k]=Relationship(*k)
             self.adjacency.setdefault(k[0],set()).add(k[1])
             self.adjacency.setdefault(k[1],set()).add(k[0])
+            self._adjacency_edge_count=len(self.edges)
             cached=self.__dict__.get('_relationships',{})
             for pid,other in ((k[0],k[1]),(k[1],k[0])):
                 if pid in cached:cached[pid][other]=self.edges[k]
         return self.edges[k]
     def record(self,a,b,event_id,trust=0.,attachment=0.,obligation=0.,resentment=0.):
         r=self.get(a,b); r.familiarity=min(1.,r.familiarity+.03); r.trust=max(0.,min(1.,r.trust+trust)); r.attachment=max(0.,min(1.,r.attachment+attachment)); r.obligation=max(0.,min(1.,r.obligation+obligation)); r.resentment=max(0.,min(1.,r.resentment+resentment)); r.shared_history.append(event_id); return r
-    def neighbors(self,pid): return self.adjacency.get(pid,())
+    def neighbors(self,pid):
+        self._ensure_adjacency_index();return self.adjacency.get(pid,())
     def relationships_for(self,pid):
         # Retain references, not copies of mutable weights. Direct relationship
         # edits remain visible; new edges extend already materialized adjacency.
+        self._ensure_adjacency_index()
         if not hasattr(self,'_relationships'):self._relationships={}
         if pid not in self._relationships:
             self._relationships[pid]={other:self.edges[self.key(pid,other)] for other in self.neighbors(pid)}
