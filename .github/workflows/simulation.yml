@@ -37,7 +37,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: unprofiled 1000-year performance and calibration gate
-        run: python simulation/run_long_history.py 843000 1000 --max-seconds 120
+        run: python simulation/run_long_history.py 843000 1000 --max-cpu-seconds 120
 
   test:
     needs: profile
