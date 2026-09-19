@@ -83,7 +83,8 @@ def trial(world,person,ability,rng):
         ability_rank=rank,ability_level=ability.level,inputs=inputs,measured_response=measured,
         prediction=predicted,prediction_error=error,model_parameters=list(model.coefficients),
         held_out=held_out,success=success,challenge_complexity=rank if held_out else rank-1,
-        output_metric='normalized control accuracy',effort='one supervised or deliberate practical session',
+        constraint=constraint,output_metric='normalized control accuracy',
+        effort='one supervised or deliberate practical session',
         model='ATE response-law learning approximation')
     if not held_out:
         model.samples.append({'event':e.id,'inputs':inputs,'response':measured})
