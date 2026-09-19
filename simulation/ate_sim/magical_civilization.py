@@ -323,7 +323,7 @@ def magical_civilization_step(world, rng):
         for p in people:
             a=world.magic_resources.aspirations.get(p.id)
             if a is None or a.cadet_class_year is None or a.cadet_graduated_year is not None:continue
-            if world.advancement.rank(p.id)>=1:continue
+            if p.rank>=1:continue
             path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
             essence_need+=max(0,3-base)
             # Do not stockpile later-stage stones while a cadet is still missing
