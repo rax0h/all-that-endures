@@ -1,7 +1,7 @@
 name: simulation
 on:
   push:
-    branches: [main, sim/current-standard]
+    branches: [main, sim/current-standard, game-ready/stage-0.5-rearchitecture]
   pull_request:
     branches: [main]
 
