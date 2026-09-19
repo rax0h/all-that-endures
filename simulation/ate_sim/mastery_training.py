@@ -8,7 +8,7 @@ from dataclasses import dataclass,field
 from functools import lru_cache
 import hashlib
 from .core_types import layer_ref
-from .magic_progression import record_application
+from .magic_progression import record_application,application_would_record
 
 @dataclass
 class ResponseModel:
@@ -67,6 +67,13 @@ def trial(world,person,ability,rng):
     held_out=predicted is not None
     success=not held_out or error<1e-7
     model.trials+=1
+    constraint=f'control:{model.trials}'
+    if held_out and success:model.validated=min(2,model.validated+1)
+    # Failed held-out attempts and successful repetitions that cannot change the
+    # bounded understanding model are transient practice, not permanent history.
+    if held_out and (not success or not application_would_record(
+            ability,constraint,rank,1.,'ability_control_trial')):
+        return success
     Layer,Ref=layer_ref()
     causes=tuple(s['event'] for s in model.samples) if held_out else ()
     origin=ability.milestone_event or ability.origin_event
@@ -84,8 +91,7 @@ def trial(world,person,ability,rng):
             model.samples=model.samples[-n:]
             model.coefficients=solve([s['inputs'] for s in model.samples],[s['response'] for s in model.samples])
     if success:
-        if held_out:model.validated=min(2,model.validated+1)
-        record_application(world,person,ability,e,constraint=f'control:{model.trials}',difficulty=rank if held_out else rank-1,outcome=1.)
+        record_application(world,person,ability,e,constraint=constraint,difficulty=rank if held_out else rank-1,outcome=1.)
     return success
 
 
