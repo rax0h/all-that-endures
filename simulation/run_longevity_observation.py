@@ -11,7 +11,7 @@ from time import perf_counter, process_time
 import argparse
 import json
 
-from ate_sim.worldgen import generate_world
+from ate_sim.worldgen import generate_world, PEOPLES
 from ate_sim.engine import Simulation
 
 CHECKPOINTS=(1000,5000,7500,10000)
@@ -63,7 +63,7 @@ def snapshot(world,start_event,founding_species,interval_wall,interval_cpu):
     for p in completed:rank_by_species[p.species][RANK_NAMES.get(p.rank,str(p.rank))]+=1
 
     species_detail={}
-    for name in sorted(set(founding_species)|set(species)):
+    for name in sorted(set(PEOPLES)|set(founding_species)|set(species)):
         people=[p for p in alive if p.species==name]
         vals=ages.get(name,[])
         users=sum(p.id in paths for p in people)
