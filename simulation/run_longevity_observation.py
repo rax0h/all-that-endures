@@ -310,7 +310,12 @@ def main(seed=917263,years=10000,checkpoints=CHECKPOINTS,chunk_years=25,event_ye
             step=min(chunk_years,mark-world.year);first_new_id=world.next_event
             sim.run(step)
             _accumulate_activity(activity,(e for e in world.events if e.id>=first_new_id))
-            world.prune_event_payloads_before_year(max(0,world.year-event_years_retained))
+            protected=set()
+            for notice in world.institutions.notices.values():
+                if notice.status in ('resolved','expired'):continue
+                resolution=world.threat_ecology.resolutions.get(notice.cause_event)
+                if resolution is not None:protected.add(resolution)
+            world.prune_event_payloads_before_year(max(0,world.year-event_years_retained),protected)
         wall_elapsed=perf_counter()-wall;cpu_elapsed=process_time()-cpu
         if world.year!=mark:raise RuntimeError(f'expected year {mark}, got {world.year}')
         report=snapshot(world,activity,founding_species,wall_elapsed,cpu_elapsed)
