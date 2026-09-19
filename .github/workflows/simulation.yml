@@ -67,7 +67,7 @@ jobs:
   longevity:
     if: github.head_ref == 'research/stage-0.5-causal-rebuild'
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 90
     env:
       PYTHONPATH: .:simulation
       PYTHONHASHSEED: '0'
@@ -76,5 +76,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 'pypy3.10'
-      - name: fresh-seed 10000-year broad longevity observation
-        run: python simulation/run_longevity_observation.py --seed 917263 --years 10000 --checkpoints 1000 5000 7500 10000 --chunk-years 250 --event-years-retained 100 --max-wall-seconds 180
+      - name: fresh-seed 10000-year pure simulation
+        run: |
+          set -o pipefail
+          python simulation/run_longevity_observation.py --seed 917263 --years 10000 --checkpoints 1000 5000 7500 10000 | tee /tmp/longevity-report.jsonl
+      - name: upload longevity report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: longevity-report
+          path: /tmp/longevity-report.jsonl
+          if-no-files-found: warn
