@@ -119,11 +119,11 @@ def _environmental_essence(world,rng,sid):
   if x<=0:return key,tags
  return weighted[-1][0],tags
 
-def _make_resource(world,rng,sid,finder,kind=None,cause=None,method='chance discovery'):
+def _make_resource(world,rng,sid,finder,kind=None,cause=None,method='chance discovery',owner_kind='person',owner_id=None):
  Layer,Ref=layer_ref();kind=kind or ('essence' if rng.random()<.6 else 'awakening_stone');tags=()
  if kind=='essence':key,tags=_environmental_essence(world,rng,sid);rarity=ESSENCES[key]['rarity']
  else:key=STONE_IDS[int(rng.random()*len(STONE_IDS))%len(STONE_IDS)];rarity=AWAKENING_STONES[key]['rarity']
- causes=() if cause is None else (cause,);e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),causes,resource_kind=kind,key=key,rarity=rarity,method=method,environment_tags=tags,manifestation_basis='local magical ecology' if kind=='essence' else 'awakening resonance');return world.magic_resources.create(kind,key,rarity,world.year,sid,'person',finder.id,e.id)
+ causes=() if cause is None else (cause,);e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),causes,resource_kind=kind,key=key,rarity=rarity,method=method,environment_tags=tags,manifestation_basis='local magical ecology' if kind=='essence' else 'awakening resonance',custody=owner_kind);return world.magic_resources.create(kind,key,rarity,world.year,sid,owner_kind,finder.id if owner_id is None else owner_id,e.id)
 def _discover(world,rng,sid,people):
  if not people:return None
  finder=people[int(rng.random()*len(people))%len(people)];return _make_resource(world,rng,sid,finder)
@@ -273,10 +273,72 @@ def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
  if on_transfer is not None:on_transfer(q)
  return True
 
+def _society_training_demand(world,adventure):
+ living={p.id for p in world.current_people()}
+ essence_need=0;stone_need=0
+ for pid,a in world.magic_resources.aspirations.items():
+  if pid not in living or a.cadet_class_year is None or a.cadet_graduated_year is not None:continue
+  path=world.advancement.path(pid);base=0 if path is None else len(path.base_essences)
+  if base<3:essence_need+=3-base
+  elif path is not None:stone_need+=max(0,20-len(path.abilities))
+ reserve=world.magic_resources.inventory('institution',adventure.id)
+ available_essences=sum(r.kind=='essence' for r in reserve);available_stones=sum(r.kind=='awakening_stone' for r in reserve)
+ return {'essence':max(0,essence_need-available_essences),'awakening_stone':max(0,stone_need-available_stones)}
+
+
+def society_resource_step(world,rng):
+ """Resource authority fulfills real Adventure Society training demand.
+
+ Recovered objects are random physical resources with normal environmental
+ provenance. Institutional demand chooses expedition purpose/kind, never an
+ exact essence or stone identity, and no resource is created once the reserve
+ covers current cadet demand.
+ """
+ adventure=world.institutions.institution_by_kind('adventure_society')
+ if adventure is None:return
+ gaps=_society_training_demand(world,adventure)
+ if not any(gaps.values()):return
+ Layer,Ref=layer_ref();living=world.adults_by_settlement(16)
+ for bid in adventure.branches:
+  branch=world.institutions.branches[bid];sid=branch.settlement
+  members=[p for p in living.get(sid,()) if p.id in adventure.members and p.rank>=1]
+  if not members:continue
+  members.sort(key=lambda p:(p.rank,world.skills.get(p.id,'defense').level,p.health,-p.id),reverse=True)
+  settlement=world.settlements[sid];cell=world.cells[(settlement.x,settlement.y)];ambient=world.ambient_magic.field(sid).level
+  field_capacity=sum(max(1,p.rank) for p in members)+branch.authority*4
+  attempts=min(12,max(1,int(1+field_capacity/3+min(6,(gaps['essence']+gaps['awakening_stone'])/18))))
+  for n in range(attempts):
+   if not any(gaps.values()):return
+   leader=members[n%len(members)];rr=rng.stream('society_resource_expedition',world.year,bid*100+n)
+   readiness=.28+.09*leader.rank+.16*branch.authority+.08*leader.health
+   danger=.08+.22*cell.hazard+.10*max(0.,ambient-.8)
+   expedition=world.emit('magical_expedition',Layer.SOCIETY,(Ref('person',leader.id),Ref('institution',adventure.id)),
+                         Ref('settlement',sid),institution=adventure.id,branch=bid,
+                         purpose='cadet resource provisioning',readiness=round(readiness,3),danger=round(danger,3))
+   if rr.random()>min(.92,readiness+.15*ambient):
+    world.emit('magical_expedition_returned_empty',Layer.SOCIETY,(Ref('person',leader.id),Ref('institution',adventure.id)),
+               Ref('settlement',sid),(expedition.id,),institution=adventure.id,branch=bid,purpose='cadet resource provisioning')
+    continue
+   total=gaps['essence']+gaps['awakening_stone']
+   stone_weight=gaps['awakening_stone']/max(1,total)
+   cache=min(total,1+min(3,int(field_capacity//6)))
+   recovered=0
+   for _ in range(cache):
+    if gaps['essence']<=0:kind='awakening_stone'
+    elif gaps['awakening_stone']<=0:kind='essence'
+    else:kind='awakening_stone' if rr.random()<stone_weight else 'essence'
+    found=_make_resource(world,rr,sid,leader,kind,expedition.id,'Adventure Society provisioning expedition','institution',adventure.id)
+    gaps[kind]-=1;recovered+=1
+    world.emit('magical_expedition_resource_recovered',Layer.SOCIETY,(Ref('person',leader.id),Ref('institution',adventure.id)),
+               Ref('settlement',sid),(expedition.id,found.origin_event),institution=adventure.id,branch=bid,
+               resource=found.id,resource_kind=found.kind,key=found.key,custody='institution')
+   if recovered:
+    aspiration=world.magic_resources.aspirations.get(leader.id)
+    if aspiration is not None:aspiration.preparation=min(1.,aspiration.preparation+.015)
+
+
 def magic_ecology_step(world,rng):
- Layer,Ref=layer_ref();_recover_dead_owner_resources(world);adults_by_settlement={sid:[] for sid in world.settlements}
- for p in world.current_people():
-  if p.alive and p.age>=16:adults_by_settlement[p.settlement].append(p)
+ Layer,Ref=layer_ref();_recover_dead_owner_resources(world);society_resource_step(world,rng);adults_by_settlement=world.adults_by_settlement(16)
  for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
  for sid,people in sorted(adults_by_settlement.items()):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
