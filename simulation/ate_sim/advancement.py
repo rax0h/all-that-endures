@@ -16,14 +16,14 @@ class Understanding:
  def ready(self,rank):
   # Reflection cannot fabricate application or generalization evidence.
   return len(self.transfers)>=(1 if rank==3 else 2) and all(t['difficulty']>=rank for t in self.transfers) and self.integration>=rank
- def reflect(self,application,reflection):
+ def reflect(self,application,reflection,rank):
   if application>0 and reflection>0:
-   # Integration represents deliberate synthesis of *already evidenced* use.
-   # The previous .08 scale made ordinary purposeful reflection take centuries
-   # per ability, so full-body Gold was effectively unreachable. Keep evidence
-   # as the hard cap and transfer proofs as mandatory; only let real reflection
-   # integrate those experiences on a professional-career timescale.
-   self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*.30)
+   # Integration represents deliberate synthesis of already evidenced use.
+   # Silver-to-Gold should be achievable across a serious professional career;
+   # Gold-to-Diamond should remain a much longer culmination. Evidence remains
+   # the hard cap and held-out transfer proofs remain mandatory at both tiers.
+   rate=.16 if rank==3 else .08
+   self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*rate)
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
@@ -139,7 +139,7 @@ class AdvancementState:
   if r>=ceiling:return a
   gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
   if core>0:gain+=core*(.8,.65,.5,.3,.0,.0)[min(r,5)];p.core_fraction=min(1.,p.core_fraction+core*.01)
-  if r>=3:a.understanding.reflect(meaningful_use,reflection)
+  if r>=3:a.understanding.reflect(meaningful_use,reflection,r)
   a.progress+=gain
   while a.progress>=1 and a.rank<5:
    a.progress-=1;a.level+=1
