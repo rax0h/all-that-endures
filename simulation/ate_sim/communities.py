@@ -21,6 +21,9 @@ class CommunityState:
         cid=self.next_community; self.next_community+=1
         c=Community(cid,kind,year,origin_settlement,origin_event,parent)
         self.communities[cid]=c
+        if hasattr(self,'_kind_index'):self._kind_index.setdefault(kind,[]).append(cid);self._community_index_count=len(self.communities)
+        if kind=='founder_network' and hasattr(self,'_root_index'):self._root_index.setdefault(origin_settlement,cid)
+        if kind=='diaspora' and parent is not None and hasattr(self,'_diaspora_index'):self._diaspora_index.setdefault((parent,origin_settlement),cid)
         return c
 
     def join(self,person_id,community_id,strength=1.0):
@@ -45,13 +48,24 @@ class CommunityState:
         for cid,v in inherited.items():self.join(child_id,cid,v)
         return inherited
 
+    def _ensure_community_indexes(self):
+        if not hasattr(self,'_kind_index') or getattr(self,'_community_index_count',-1)!=len(self.communities):
+            kinds={};roots={};diaspora={}
+            for cid,c in self.communities.items():
+                kinds.setdefault(c.kind,[]).append(cid)
+                if c.kind=='founder_network':roots.setdefault(c.origin_settlement,cid)
+                if c.kind=='diaspora' and c.parent is not None:diaspora.setdefault((c.parent,c.origin_settlement),cid)
+            self._kind_index=kinds;self._root_index=roots;self._diaspora_index=diaspora;self._community_index_count=len(self.communities)
+    def communities_of_kind(self,kind,active_only=False):
+        self._ensure_community_indexes()
+        values=[self.communities[cid] for cid in self._kind_index.get(kind,())]
+        return [c for c in values if c.active] if active_only else values
     def local_root(self,settlement):
-        roots=[c.id for c in self.communities.values() if c.kind=="founder_network" and c.origin_settlement==settlement]
-        return min(roots) if roots else None
+        self._ensure_community_indexes();return self._root_index.get(settlement)
 
     def diaspora(self,parent_id,destination,year,event_id):
-        existing=[c for c in self.communities.values() if c.kind=="diaspora" and c.parent==parent_id and c.origin_settlement==destination]
-        if existing:return min(existing,key=lambda c:c.id)
+        self._ensure_community_indexes();existing=self._diaspora_index.get((parent_id,destination))
+        if existing is not None:return self.communities[existing]
         return self.create("diaspora",year,destination,event_id,parent_id)
 
 def community_step(world):
