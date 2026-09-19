@@ -51,3 +51,18 @@ def test_relationship_reference_index_empty_endpoints_and_legacy_rebuild():
     del graph._relationships  # Checkpoints created before this derived cache.
     assert list(graph.relationships_for(2))==[edge]
     assert list(graph.relationships_for(1))==[edge]
+
+def test_max_attachment_cache_tracks_direct_mutation_without_graph_cycle():
+    import pickle
+    from simulation.ate_sim.social import SocialGraph
+    graph=SocialGraph()
+    a=graph.get(1,2);b=graph.get(1,3)
+    a.attachment=.8;b.attachment=.4
+    assert graph.max_attachment(1)==.8
+    a.attachment=.1
+    assert graph.max_attachment(1)==.4
+    assert getattr(a,'_attachment_dirty',None) is graph._attachment_dirty
+    assert not hasattr(a,'_graph')
+    restored=pickle.loads(pickle.dumps(graph))
+    restored.edges[(1,3)].attachment=.2
+    assert restored.max_attachment(1)==.2
