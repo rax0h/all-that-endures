@@ -24,12 +24,12 @@ def record_body_transition(world, person, before, *, context, causes=()):
                essences=path.essences, bodily_purge=True,core_taint=path.core_fraction)
 
 
-def practice_ability(world, person, index, meaningful_use, reflection=0., *, context):
-    path = world.advancement.path(person.id)
+def practice_ability(world, person, index, meaningful_use, reflection=0., *, context, body_rank=None, path=None):
+    path = world.advancement.path(person.id) if path is None else path
     ability = path.abilities[index]
     before = ability.rank
     understanding=ability.understanding
-    world.advancement.practice(person.id, index, meaningful_use, reflection)
+    world.advancement.practice(person.id,index,meaningful_use,reflection,body_rank=body_rank,path=path)
     if ability.rank == before:
         return
     Layer, Ref = layer_ref()
@@ -71,7 +71,8 @@ def record_application(world,person,ability,source,*,constraint,difficulty,outco
     This is structural generalization evidence, not simulated consciousness.
     """
     if ability.rank not in (3,4) or outcome<=0:return
-    if ability not in world.advancement.path(person.id).abilities:return
+    path=world.advancement.path(person.id)
+    if path is None or not path.contains_ability(ability):return
     keys=source.data.get('used_abilities',(source.data.get('ability'),))
     recorded_rank=source.data.get('challenge_complexity',source.data.get('task_rank',source.data.get('item_rank',source.data.get('threat_rank'))))
     if ability.semantic_key not in keys or recorded_rank!=difficulty:return
