@@ -40,6 +40,28 @@ def test_scope_clears_on_exception():
     assert '_index_current_people' not in world.__dict__
 
 
+
+
+def test_step_local_settlement_indexes_reuse_and_invalidate():
+    world=generate_world(17)
+    sim=Simulation(world)
+    with world.current_people_scope():
+        living=world.living_by_settlement()
+        adults=world.adults_by_settlement(18)
+        assert world.living_by_settlement() is living
+        assert world.adults_by_settlement(18) is adults
+        person=next(p for p in world.current_people() if p.age>=18)
+        old=person.settlement
+        new=next(sid for sid in world.settlements if sid!=old)
+        person.settlement=new
+        world.emit('household_migrated',Layer.SOCIETY,(Ref('person',person.id),),Ref('settlement',new),origin=old,destination=new)
+        refreshed=world.living_by_settlement()
+        assert refreshed is not living
+        assert person in refreshed[new] and person not in refreshed[old]
+        assert person in world.adults_by_settlement(18)[new]
+    assert '_living_by_settlement_cache' not in world.__dict__
+    assert '_adult_by_settlement_cache' not in world.__dict__
+
 def test_indexed_population_matches_archive_scan_simulation():
     indexed=Simulation(generate_world(843000)).run(100)
     with patch.object(World,'current_people',lambda w:tuple(p for p in w.people.values() if p.alive)):
