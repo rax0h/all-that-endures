@@ -59,6 +59,20 @@ class RankedCurrencyState:
    if any(d not in COIN_VALUE or type(n) is not int or n<0 for d,n in coins.items()):raise ValueError('invalid exchange')
    if any(self.wallets.get(owner,{}).get(d,0)<n for d,n in coins.items()):raise ValueError('unfunded exchange')
   self.transfer(payer,counterparty,give);self.transfer(counterparty,payer,receive)
+ def treasury_exchange(self,institution,counterparty,give,receive):
+  """Exact-value denomination exchange with a real wallet counterparty."""
+  if value_of(give)!=value_of(receive):raise ValueError('unequal exchange value')
+  treasury=self.treasuries.setdefault(institution,{})
+  wallet=self.wallets.get(counterparty,{})
+  for coins in (give,receive):
+   if any(d not in COIN_VALUE or type(n) is not int or n<0 for d,n in coins.items()):raise ValueError('invalid exchange')
+  if any(treasury.get(d,0)<n for d,n in give.items()) or any(wallet.get(d,0)<n for d,n in receive.items()):raise ValueError('unfunded exchange')
+  destination=self.wallet(counterparty)
+  for d,n in give.items():
+   if n:treasury[d]-=n;destination[d]=destination.get(d,0)+n
+  for d,n in receive.items():
+   if n:destination[d]-=n;treasury[d]=treasury.get(d,0)+n
+  return dict(give),dict(receive)
 
 def denomination_for_rank(rank):return RANK_DENOMINATION[max(0,min(5,int(rank)))]
 def value_of(coins):return sum(COIN_VALUE[d]*int(n) for d,n in coins.items())
