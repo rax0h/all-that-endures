@@ -72,6 +72,43 @@ def validate(archive):
                 source=archive.event(proof['event'])
                 valid=valid and source is not None and source['id']<e['id'] and source['kind']=='ability_applied' and source['data']['ability']==data['ability'] and source['data']['generalization'] and source['data']['difficulty']>=rank and source['id'] in e['causes']
             if not valid:violations.append({'person':pid,'event':e['id'],'issue':'understanding evidence'})
+        elif kind=='preexisting_rank_observed':
+            # Year zero is an observation boundary into an already mature world,
+            # not a fabricated live transition from Unranked. Validate the
+            # observed body/path as a self-consistent initial condition, then use
+            # it as the chronological starting state for later live events.
+            target=int(data.get('body_rank',0))
+            listed=tuple(data.get('abilities',()))
+            ranks=tuple(data.get('ability_ranks',()))
+            current=abilities[pid]
+            counts=Counter(v[0] for v in current.values())
+            valid=(
+                data.get('preexisting') is True
+                and data.get('observation_boundary') is True
+                and e['year']==0
+                and target in (1,2,3)
+                and len(essences[pid])==4
+                and len(current)==20
+                and len(counts)==4
+                and set(counts.values())=={5}
+                and set(listed)==set(current)
+                and len(ranks)==20
+                and all(int(r)==target for r in ranks)
+            )
+            if not valid:
+                violations.append({'person':pid,'event':e['id'],'issue':'invalid preexisting rank observation'})
+            else:
+                for key,(essence,_) in tuple(current.items()):
+                    current[key]=(essence,target)
+                bodies[pid]=target
+                p=archive.record('person',pid)
+                examples[pid].append({
+                    'year':e['year'],'age':None if p is None else e['year']-p['born'],
+                    'event':e['id'],'essences':sorted(essences[pid]),
+                    'abilities':dict(Counter(RANKS[v[1]] for v in current.values())),
+                    'body_rank':RANKS[target],'preexisting_observation':True,
+                    'economic_tier':next((d for d in reversed(DENOMINATIONS) if wallets[pid].get(d,0)>0),'no recorded coins'),
+                    'coin_balance':dict(wallets[pid])})
         elif kind=='ability_rank_advanced':
             key=data['ability'];before=RANKS.index(data['ability_rank_before']);after=RANKS.index(data['ability_rank_after'])
             previous=abilities[pid].get(key)
@@ -88,7 +125,7 @@ def validate(archive):
             target=data['to_rank'];current=abilities[pid]
             counts=Counter(v[0] for v in current.values())
             valid=(data['from_rank']==bodies[pid] and target==bodies[pid]+1 and len(essences[pid])==4)
-            if target>=2:
+            if target>=1:
                 valid=valid and len(current)==20 and len(counts)==4 and set(counts.values())=={5} and all(v[1]>=target for v in current.values())
             if target==5:valid=valid and data.get('core_taint')==0
             if not valid:violations.append({'person':pid,'event':e['id'],'issue':'body prerequisites'})
