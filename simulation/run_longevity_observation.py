@@ -204,7 +204,6 @@ def snapshot(world,start_event,founding_species,interval_wall,interval_cpu):
         'record':'longevity_snapshot','seed':world.seed,'year':world.year,
         'interval':{
             'wall_seconds':round(interval_wall,3),'cpu_seconds':round(interval_cpu,3),
-            'seconds_per_year':round(interval_cpu/max(1,world.year-(0 if start_event==0 else (interval['first_event_year'] or world.year)),6),
             **interval,
         },
         'health':{'integrity_ok':not integrity,'integrity_issues':integrity,'warnings':warnings,'extinct_founding_species':extinct},
