@@ -8,8 +8,9 @@ from .magic_economy import spirit_economy_step,magical_services_step,apprentices
 def society_career_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');mag=world.institutions.institution_by_kind('magic_society')
  living=world.living_by_settlement();alive=list(world.current_people())
+ full_users=[p for p in alive if full_essence_user(world,p.id)]
  recorded=world.institutions.recorded_people()
- for p in (x for x in alive if full_essence_user(world,x.id)):
+ for p in full_users:
   if p.id in recorded:continue
   b=world.institutions.branch_for('magic_society',p.settlement)
   if b is None:continue
@@ -19,7 +20,7 @@ def society_career_step(world,rng):
  for society,inst in (('adventure_society',adv),('magic_society',mag)):
   if inst is None:continue
   latest=world.institutions.latest_applications(society)
-  for p in (x for x in alive if full_essence_user(world,x.id) and x.id not in inst.members):
+  for p in (x for x in full_users if x.id not in inst.members):
    a=latest.get(p.id)
    if a is None or a.passed is None or a.passed:continue
    attempts=world.institutions.application_attempt_count(p.id,society)
