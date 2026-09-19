@@ -230,7 +230,7 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic, supply_pl
                 # branch training/operations reserve rather than privatizing it
                 # to the expedition leader.
                 found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition cache',
-                                       owner_kind='institution',owner_id=adventure.id)
+                                       owner_kind='institution',owner_id=supply_plan['institution_id'])
             supply_plan[kind]=max(0,supply_plan[kind]-1);recovered+=1
             world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key, cache_size=cache_size,custody=found.owner_kind)
         if recovered:aspiration.preparation = min(1., aspiration.preparation + .025)
@@ -314,27 +314,31 @@ def magical_civilization_step(world, rng):
     for people in by_settlement.values(): people.sort(key=lambda p: p.id)
     application_pairs=set(world.institutions.application_pairs())
 
-    # Build one civilization-wide supply plan because the Magic Society market
-    # can order across settlements. Existing physical stock anywhere in the
-    # owner index counts before another expedition collects anything.
+    # Society expeditions provision the Society's actual cadet program, not
+    # every civilian magical desire in the region. Ordinary users are supplied
+    # by manifestations, shops and the open Magic Society market.
+    adventure_society=world.institutions.institution_by_kind('adventure_society')
     stone_need=0;essence_need=0
     for people in by_settlement.values():
         for p in people:
-            a=_aspiration(world,p);path=world.advancement.path(p.id)
-            base=0 if path is None else len(path.base_essences)
-            essence_need+=max(0,a.desired_base_essences-base)
-            if path is not None:
-                stone_need+=max(0,min(a.desired_abilities,path.capacity)-len(path.abilities))
+            a=world.magic_resources.aspirations.get(p.id)
+            if a is None or a.cadet_class_year is None or a.cadet_graduated_year is not None:continue
+            if world.advancement.rank(p.id)>=1:continue
+            path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
+            essence_need+=max(0,3-base)
+            # Do not stockpile later-stage stones while a cadet is still missing
+            # foundational essences. Once all three bases exist, provision the
+            # remaining real awakening-stone requirement.
+            if base>=3 and path is not None:
+                stone_need+=max(0,20-len(path.abilities))
     available={'awakening_stone':0,'essence':0}
-    for ids in world.magic_resources.owner_index.values():
-        for rid in ids:
-            resource=world.magic_resources.resources[rid]
+    if adventure_society is not None:
+        for resource in world.magic_resources.inventory('institution',adventure_society.id):
             if resource.kind in available:available[resource.kind]+=1
-    # Keep a modest logistics reserve so orders do not require a discovery on
-    # the same day, but never scale reserve with a desired rank population.
     supply_plan={
-        'awakening_stone':max(0,stone_need+24-available['awakening_stone']),
-        'essence':max(0,essence_need+40-available['essence']),
+        'awakening_stone':max(0,stone_need-available['awakening_stone']),
+        'essence':max(0,essence_need-available['essence']),
+        'institution_id':None if adventure_society is None else adventure_society.id,
     }
     for sid in sorted(world.settlements):
         people = by_settlement[sid]
