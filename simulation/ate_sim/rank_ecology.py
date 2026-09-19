@@ -1,5 +1,4 @@
 from __future__ import annotations
-from heapq import nsmallest
 from .core_types import layer_ref
 from .magic_progression import practice_ability,record_body_transition
 from .magic_resources import _aspiration
@@ -177,13 +176,11 @@ def rank_ecology_step(world,rng,latest=None):
   purposeful_reflection=None
   if career is not None:
    _,exposure,uses,purposeful_reflection=career
-   # We consume only the weakest bounded block. nsmallest preserves the same
-   # key/order result without sorting the other fifteen or sixteen abilities.
-   candidates=nsmallest(uses,indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))
+   candidates=sorted(indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))
   elif member:
    weakest=min((a.rank,a.level,a.progress) for _,a in indexed)
    candidates=[x for x in indexed if (x[1].rank,x[1].level,x[1].progress)<=weakest]
-   if len(candidates)<4:candidates=nsmallest(8,indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))
+   if len(candidates)<4:candidates=sorted(indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))[:8]
    exposure=.32+.22*strength;uses=min(len(candidates),6)
   else:
    candidates=[x for x in indexed if x[1].function in relevant] or indexed
