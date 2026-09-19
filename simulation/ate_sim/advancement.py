@@ -18,7 +18,12 @@ class Understanding:
   return len(self.transfers)>=(1 if rank==3 else 2) and all(t['difficulty']>=rank for t in self.transfers) and self.integration>=rank
  def reflect(self,application,reflection):
   if application>0 and reflection>0:
-   self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*.08)
+   # Integration represents deliberate synthesis of *already evidenced* use.
+   # The previous .08 scale made ordinary purposeful reflection take centuries
+   # per ability, so full-body Gold was effectively unreachable. Keep evidence
+   # as the hard cap and transfer proofs as mandatory; only let real reflection
+   # integrate those experiences on a professional-career timescale.
+   self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*.30)
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
