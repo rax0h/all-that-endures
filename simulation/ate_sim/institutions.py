@@ -84,11 +84,20 @@ class InstitutionState:
  def create_application(self,society,person,branch,year,eligible,origin_event=None):
   aid=self.next_application;self.next_application+=1;a=SocietyApplication(aid,society,person,branch,year,eligible,origin_event=origin_event);self.applications[aid]=a
   if hasattr(self,'_application_pairs'):self._application_pairs.add((person,society));self._application_count=len(self.applications)
+  if hasattr(self,'_latest_application'):self._latest_application[(person,society)]=a
   self.__dict__.setdefault('_pending_application_ids',set()).add(aid);return a
  def application_pairs(self):
   if not hasattr(self,'_application_pairs') or getattr(self,'_application_count',-1)!=len(self.applications):
    self._application_pairs={(a.person,a.society) for a in self.applications.values()};self._application_count=len(self.applications)
   return self._application_pairs
+ def latest_application(self,person,society):
+  if not hasattr(self,'_latest_application') or getattr(self,'_latest_application_count',-1)!=len(self.applications):
+   latest={}
+   for a in self.applications.values():
+    key=(a.person,a.society)
+    if key not in latest or a.id>latest[key].id:latest[key]=a
+   self._latest_application=latest;self._latest_application_count=len(self.applications)
+  return self._latest_application.get((person,society))
  def pending_applications(self):
   pending=self.__dict__.get('_pending_application_ids')
   if pending is None or any(aid not in self.applications for aid in pending):
