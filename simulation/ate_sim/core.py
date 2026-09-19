@@ -45,6 +45,27 @@ class Ref:
   return cached
 @dataclass(slots=True)
 class Event: id:int; year:int; kind:str; layer:Layer; actors:tuple[Ref,...]=(); location:Ref|None=None; causes:tuple[int,...]=(); data:dict[str,Any]=field(default_factory=dict)
+@dataclass(slots=True)
+class EventIdIndex:
+ max_id:int=0
+ missing:set[int]=field(default_factory=set)
+ def add(self,value):
+  if value==self.max_id+1:self.max_id=value;return
+  if 0<value<=self.max_id:self.missing.discard(value);return
+  # Out-of-order future IDs are not a normal simulation state; represent the
+  # gap explicitly so membership remains correct for fixtures/checkpoints.
+  if value>self.max_id+1:
+   self.missing.update(range(self.max_id+1,value));self.max_id=value
+ def discard(self,value):
+  if 0<value<=self.max_id:self.missing.add(value)
+ def remove(self,value):
+  if value not in self:raise KeyError(value)
+  self.discard(value)
+ def __contains__(self,value):return 0<value<=self.max_id and value not in self.missing
+ def __len__(self):return self.max_id-len(self.missing)
+ def __iter__(self):
+  return (i for i in range(1,self.max_id+1) if i not in self.missing)
+
 @dataclass
 class Person:
  id:int; born:int; settlement:int; household:int; alive:bool=True; age:int=0; wealth:float=0.; health:float=1.; temperament:float=.5; attachment:float=.5; curiosity:float=.5; inhibition:float=.5; grief:float=0.; fear:float=0.; rank:int=0; species:str='human'; occupation:str='labor'; parents:tuple[int,...]=()
@@ -71,7 +92,7 @@ def _canonical(value):
  return value
 @dataclass
 class World:
- seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); trade_routes:dict[tuple[int,int],TradeRoute]=field(default_factory=dict); events:list[Event]=field(default_factory=list); event_ids:set[int]=field(default_factory=set); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); lineage:LineageState=field(default_factory=LineageState); communities:CommunityState=field(default_factory=CommunityState); transmission:TransmissionState=field(default_factory=TransmissionState); skills:SkillState=field(default_factory=SkillState); infrastructure:InfrastructureState=field(default_factory=InfrastructureState); agency:AgencyState=field(default_factory=AgencyState); advancement:AdvancementState=field(default_factory=AdvancementState); magic_resources:MagicResourceState=field(default_factory=MagicResourceState); institutions:InstitutionState=field(default_factory=InstitutionState); metaphysics:MetaphysicalState=field(default_factory=MetaphysicalState); divinity:DivineState=field(default_factory=DivineState); materials:MaterialEconomy=field(default_factory=MaterialEconomy); ambient_magic:AmbientMagicState=field(default_factory=AmbientMagicState); warfare:WarfareState=field(default_factory=WarfareState); society_accountability:SocietyAccountabilityState=field(default_factory=SocietyAccountabilityState); currency:RankedCurrencyState=field(default_factory=RankedCurrencyState); threat_ecology:ThreatEcologyState=field(default_factory=ThreatEcologyState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
+ seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); trade_routes:dict[tuple[int,int],TradeRoute]=field(default_factory=dict); events:list[Event]=field(default_factory=list); event_ids:EventIdIndex|set[int]=field(default_factory=EventIdIndex); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); lineage:LineageState=field(default_factory=LineageState); communities:CommunityState=field(default_factory=CommunityState); transmission:TransmissionState=field(default_factory=TransmissionState); skills:SkillState=field(default_factory=SkillState); infrastructure:InfrastructureState=field(default_factory=InfrastructureState); agency:AgencyState=field(default_factory=AgencyState); advancement:AdvancementState=field(default_factory=AdvancementState); magic_resources:MagicResourceState=field(default_factory=MagicResourceState); institutions:InstitutionState=field(default_factory=InstitutionState); metaphysics:MetaphysicalState=field(default_factory=MetaphysicalState); divinity:DivineState=field(default_factory=DivineState); materials:MaterialEconomy=field(default_factory=MaterialEconomy); ambient_magic:AmbientMagicState=field(default_factory=AmbientMagicState); warfare:WarfareState=field(default_factory=WarfareState); society_accountability:SocietyAccountabilityState=field(default_factory=SocietyAccountabilityState); currency:RankedCurrencyState=field(default_factory=RankedCurrencyState); threat_ecology:ThreatEcologyState=field(default_factory=ThreatEcologyState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
  def emit(self,kind,layer,actors=(),location=None,causes=(),**data):
   if layer is None:raise ValueError('events require an explicit layer')
   # Event IDs are contiguous and append-only from 1..next_event-1. Validate
