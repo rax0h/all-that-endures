@@ -346,6 +346,39 @@ def test_observation_boundary_contains_established_ranked_magic_users():
         assert len(path.abilities)==20
 
 
+def test_society_wide_training_reserve_can_finish_one_cadet_without_issue_throttle():
+    from ate_sim.magic_economy import apprenticeship_step
+    from ate_sim.semantic_dictionary import STONE_IDS,AWAKENING_STONES
+    w=generate_world(843022);sid=min(w.settlements);remote=next(x for x in sorted(w.settlements) if x!=sid)
+    adv=w.institutions.institution_by_kind('adventure_society')
+    branch=w.institutions.branch_for('adventure_society',sid)
+    p=next(p for p in w.people.values() if p.alive and p.age>=18 and p.settlement==sid and p.rank==0)
+    w.advancement.paths.pop(p.id,None)
+    a=MagicAspiration(.9,3,20,'Adventure Society cadet',w.year,
+                      completion_goal=True,adventurer_aspiration=True,urgency=.9,
+                      cadet_class_year=w.year,cadet_branch=branch.id)
+    w.magic_resources.aspirations[p.id]=a
+    keys=list(ESSENCES)[:3]
+    for key in keys:
+        e=w.emit('test_society_essence',Layer.REALITY,location=Ref('settlement',remote))
+        w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],w.year,remote,
+                                 'institution',adv.id,e.id)
+    stone=STONE_IDS[0]
+    for _ in range(16):
+        e=w.emit('test_society_stone',Layer.REALITY,location=Ref('settlement',remote))
+        w.magic_resources.create('awakening_stone',stone,AWAKENING_STONES[stone]['rarity'],
+                                 w.year,remote,'institution',adv.id,e.id)
+    apprenticeship_step(w,{sid:[p]})
+    path=w.advancement.path(p.id)
+    assert len(path.base_essences)==3
+    assert len(path.abilities)==20
+    assert w.advancement.rank(p.id)==1
+    issued=[e for e in w.events if e.kind=='society_cadet_resource_issued' and e.actors[0].id==p.id]
+    assert len(issued)==19
+    assert all(e.data['source_settlement']==remote and e.data['delivery_days']==14 for e in issued)
+    assert not w.magic_resources.inventory('institution',adv.id)
+
+
 def test_adventure_society_admits_willing_candidate_into_annual_cadet_class():
     from ate_sim.magic_economy import apprenticeship_step
     w=generate_world(843021);sid=min(w.settlements)
