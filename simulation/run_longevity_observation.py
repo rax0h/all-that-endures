@@ -28,27 +28,35 @@ def _counter(d):
     return dict(sorted(d.items(),key=lambda kv:str(kv[0])))
 
 
-def _interval_activity(world,start_event):
-    kinds=Counter();birth_species=Counter();death_species=Counter();rank_advances=Counter()
-    first_year=None;last_year=None
-    for i in range(start_event,len(world.events)):
-        e=world.events[i];kinds[e.kind]+=1
-        if first_year is None:first_year=e.year
-        last_year=e.year
-        if e.kind=='birth':birth_species[e.data.get('species','unknown')]+=1
-        elif e.kind=='death':death_species[e.data.get('species','unknown')]+=1
-        elif e.kind=='rank_advanced':rank_advances[RANK_NAMES.get(e.data.get('to_rank',0),str(e.data.get('to_rank',0)))]+=1
+def _new_activity():
+    return {'events':0,'first_event_year':None,'last_event_year':None,
+            'event_kinds':Counter(),'births_by_species':Counter(),
+            'deaths_by_species':Counter(),'rank_advances':Counter()}
+
+
+def _accumulate_activity(activity,events):
+    for e in events:
+        activity['events']+=1;activity['event_kinds'][e.kind]+=1
+        if activity['first_event_year'] is None:activity['first_event_year']=e.year
+        activity['last_event_year']=e.year
+        if e.kind=='birth':activity['births_by_species'][e.data.get('species','unknown')]+=1
+        elif e.kind=='death':activity['deaths_by_species'][e.data.get('species','unknown')]+=1
+        elif e.kind=='rank_advanced':
+            activity['rank_advances'][RANK_NAMES.get(e.data.get('to_rank',0),str(e.data.get('to_rank',0)))]+=1
+
+
+def _activity_report(activity):
     return {
-        'events':len(world.events)-start_event,
-        'first_event_year':first_year,'last_event_year':last_year,
-        'event_kinds':_counter(kinds),
-        'births_by_species':_counter(birth_species),
-        'deaths_by_species':_counter(death_species),
-        'rank_advances':_counter(rank_advances),
+        'events':activity['events'],
+        'first_event_year':activity['first_event_year'],'last_event_year':activity['last_event_year'],
+        'event_kinds':_counter(activity['event_kinds']),
+        'births_by_species':_counter(activity['births_by_species']),
+        'deaths_by_species':_counter(activity['deaths_by_species']),
+        'rank_advances':_counter(activity['rank_advances']),
     }
 
 
-def snapshot(world,start_event,founding_species,interval_wall,interval_cpu):
+def snapshot(world,activity,founding_species,interval_wall,interval_cpu):
     alive=list(world.current_people());alive_ids={p.id for p in alive}
     species=Counter(p.species for p in alive);settlement_pop=Counter(p.settlement for p in alive)
     ages=defaultdict(list);occupations=Counter();species_settlement=defaultdict(Counter)
@@ -167,7 +175,7 @@ def snapshot(world,start_event,founding_species,interval_wall,interval_cpu):
             'active_threats':sum(t.location==sid for t in active_threats),
         }
 
-    interval=_interval_activity(world,start_event)
+    interval=_activity_report(activity)
     expected={
         'birth':interval['event_kinds'].get('birth',0),
         'death':interval['event_kinds'].get('death',0),
@@ -278,7 +286,7 @@ def snapshot(world,start_event,founding_species,interval_wall,interval_cpu):
             'churches':len(churches),'god_manifestations':god_manifestations,'great_astral_interventions':astral_interventions,
         },
         'state_size':{
-            'events_total':len(world.events),'relationships_total':len(world.social.edges),
+            'events_total':world.next_event-1,'event_payloads_retained':len(world.events),'relationships_total':len(world.social.edges),
             'people_total':len(world.people),'households_total':len(world.households),
             'magic_resources_total':len(resources),'materials_total':len(lots),'items_total':len(items),
             'applications_total':len(world.institutions.applications),'notices_total':len(world.institutions.notices),
@@ -287,23 +295,31 @@ def snapshot(world,start_event,founding_species,interval_wall,interval_cpu):
     }
 
 
-def main(seed=917263,years=10000,checkpoints=CHECKPOINTS):
+def main(seed=917263,years=10000,checkpoints=CHECKPOINTS,chunk_years=25,event_years_retained=10):
     checkpoints=tuple(sorted(set(int(x) for x in checkpoints if 0<int(x)<=years)))
     if not checkpoints or checkpoints[-1]!=years:checkpoints=(*checkpoints,years)
     world=generate_world(seed);sim=Simulation(world)
     founding_species=sorted({p.species for p in world.current_people()})
-    print(json.dumps({'record':'longevity_start','seed':seed,'years':years,'checkpoints':checkpoints,'founding_species':founding_species},sort_keys=True),flush=True)
-    last_year=0;event_start=0
+    print(json.dumps({'record':'longevity_start','seed':seed,'years':years,'checkpoints':checkpoints,
+                      'founding_species':founding_species,'chunk_years':chunk_years,
+                      'event_years_retained':event_years_retained},sort_keys=True),flush=True)
+    last_checkpoint=0
     for mark in checkpoints:
-        wall=perf_counter();cpu=process_time();sim.run(mark-last_year)
+        activity=_new_activity();wall=perf_counter();cpu=process_time()
+        while world.year<mark:
+            step=min(chunk_years,mark-world.year);first_new_id=world.next_event
+            sim.run(step)
+            _accumulate_activity(activity,(e for e in world.events if e.id>=first_new_id))
+            world.prune_event_payloads_before_year(max(0,world.year-event_years_retained))
         wall_elapsed=perf_counter()-wall;cpu_elapsed=process_time()-cpu
         if world.year!=mark:raise RuntimeError(f'expected year {mark}, got {world.year}')
-        report=snapshot(world,event_start,founding_species,wall_elapsed,cpu_elapsed)
-        report['interval']['years']=mark-last_year
-        report['interval']['seconds_per_year']=round(cpu_elapsed/max(1,mark-last_year),6)
+        report=snapshot(world,activity,founding_species,wall_elapsed,cpu_elapsed)
+        report['interval']['years']=mark-last_checkpoint
+        report['interval']['seconds_per_year']=round(cpu_elapsed/max(1,mark-last_checkpoint),6)
         print(json.dumps(report,sort_keys=True),flush=True)
-        event_start=len(world.events);last_year=mark
-    print(json.dumps({'record':'longevity_complete','seed':seed,'year':world.year,'snapshots':list(checkpoints),'events_total':len(world.events)},sort_keys=True),flush=True)
+        last_checkpoint=mark
+    print(json.dumps({'record':'longevity_complete','seed':seed,'year':world.year,'snapshots':list(checkpoints),
+                      'events_total':world.next_event-1,'event_payloads_retained':len(world.events)},sort_keys=True),flush=True)
     return world
 
 
@@ -312,5 +328,7 @@ if __name__=='__main__':
     parser.add_argument('--seed',type=int,default=917263)
     parser.add_argument('--years',type=int,default=10000)
     parser.add_argument('--checkpoints',type=int,nargs='*',default=list(CHECKPOINTS))
+    parser.add_argument('--chunk-years',type=int,default=25)
+    parser.add_argument('--event-years-retained',type=int,default=10)
     args=parser.parse_args()
-    main(args.seed,args.years,args.checkpoints)
+    main(args.seed,args.years,args.checkpoints,args.chunk_years,args.event_years_retained)
