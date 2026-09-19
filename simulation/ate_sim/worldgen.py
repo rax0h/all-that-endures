@@ -113,6 +113,20 @@ def _seed_mature_magical_civilization(w,r,founding_events):
     w.emit('society_membership_observed',Layer.SOCIETY,(Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
            institution=inst.id,institution_kind=inst.kind,branch=branch.id,preexisting=True,observation_boundary=True)
 
+def _seed_preexisting_society_reserve(w,r,founding_events):
+ adv=w.institutions.institution_by_kind('adventure_society')
+ if adv is None:return
+ for bid in adv.branches:
+  branch=w.institutions.branches[bid];sid=branch.settlement;rr=r.stream('founding_society_reserve',0,bid)
+  for kind,count in (('essence',4+int(branch.authority*4)),('awakening_stone',18+int(branch.authority*10))):
+   for _ in range(count):
+    if kind=='essence':key=rr.choice(ESSENCE_IDS);rarity=ESSENCES[key]['rarity']
+    else:key=rr.choice(STONE_IDS);rarity=AWAKENING_STONES[key]['rarity']
+    e=w.emit('society_resource_reserve_observed',Layer.SOCIETY,(Ref('institution',adv.id),),Ref('settlement',sid),
+             ((founding_events[sid].id,) if sid in founding_events else ()),institution=adv.id,branch=bid,
+             resource_kind=kind,key=key,rarity=rarity,preexisting=True,observation_boundary=True)
+    w.magic_resources.create(kind,key,rarity,0,sid,'institution',adv.id,e.id)
+
 def _seed_essence_for_person(w,rr,p,sid,founded):
  _observe_preexisting_essence(w,rr,p,sid,founded)
  if rr.random()<.12:
@@ -142,4 +156,5 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
  seed_practices(w,w.culture)
  for pid,practice in w.culture.practices.items():w.lineage.register('practice',pid,origin_year=practice.origin_year)
  _seed_mature_magical_civilization(w,r,founding_events)
+ _seed_preexisting_society_reserve(w,r,founding_events)
  return w
