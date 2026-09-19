@@ -273,6 +273,54 @@ def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
  if on_transfer is not None:on_transfer(q)
  return True
 
+def _magic_society_network_stock(world,magic):
+ stock={}
+ if magic is None:return stock
+ for bid in magic.branches:
+  sid=world.institutions.branches[bid].settlement
+  for resource in world.magic_resources.inventory('settlement',sid):stock[resource.id]=resource
+ return stock
+
+
+def _network_order_resources(world,person,aspiration,stock,magic,rng):
+ """Buy existing network stock without requiring local inventory exhaustion."""
+ if magic is None or world.institutions.branch_for('magic_society',person.settlement) is None:return 0
+ path=world.advancement.path(person.id);base=0 if path is None else len(path.base_essences)
+ held_essences={r.key for r in world.magic_resources.inventory('person',person.id,'essence')}
+ if path is not None:held_essences.update(path.base_essences)
+ essence_need=max(0,aspiration.desired_base_essences-base-len([k for k in held_essences if path is None or k not in path.base_essences]))
+ abilities=0 if path is None else len(path.abilities)
+ held_stones=len(world.magic_resources.inventory('person',person.id,'awakening_stone'))
+ stone_need=max(0,min(aspiration.desired_abilities,0 if path is None else path.capacity)-abilities-held_stones)
+ ordered=0;Layer,Ref=layer_ref()
+ while essence_need>0 or stone_need>0:
+  kind='essence' if essence_need>0 else 'awakening_stone'
+  candidates=[r for r in stock.values() if r.kind==kind and (kind!='essence' or r.key not in held_essences)
+              and world.institutions.branch_for('magic_society',r.location) is not None]
+  if not candidates:
+   if kind=='essence':essence_need=0;continue
+   break
+  resource=candidates[int(rng.random()*len(candidates))%len(candidates)]
+  rare=resource.rarity in ('Rare','Epic');legendary=resource.rarity=='Legendary'
+  price=(8 if kind=='essence' else 4)*(1+.35*rare+.8*legendary);count=ceil(price)
+  coins={};price_domain='ordinary_wealth'
+  if person.wealth>=price:person.wealth-=price
+  elif can_pay_tier(world,person.id,'iron',count):
+   coins=world.currency.treasury_transfer(magic.id,person.id,{'iron':count},deposit=True);price_domain='ranked_coin'
+  else:break
+  source=resource.location;delivery=0 if source==person.settlement else 14
+  e=world.emit('magic_resource_ordered',Layer.SOCIETY,(Ref('person',person.id),Ref('institution',magic.id)),
+               Ref('settlement',person.settlement),((resource.origin_event,) if resource.origin_event else ()),
+               institution=magic.id,resource=resource.id,resource_kind=resource.kind,key=resource.key,
+               source_settlement=source,destination_settlement=person.settlement,delivery_days=delivery,
+               remote_order=bool(delivery),price=round(price,3),coin_deposit=coins,price_domain=price_domain)
+  world.magic_resources.transfer(resource.id,'person',person.id,e.id,person.settlement);stock.pop(resource.id,None)
+  aspiration.preparation=min(1.,aspiration.preparation+.03);ordered+=1
+  if kind=='essence':held_essences.add(resource.key);essence_need-=1
+  else:stone_need-=1
+ return ordered
+
+
 def _society_training_demand(world,adventure):
  living={p.id for p in world.current_people()}
  essence_need=0;stone_need=0
@@ -339,6 +387,7 @@ def society_resource_step(world,rng):
 
 def magic_ecology_step(world,rng):
  Layer,Ref=layer_ref();_recover_dead_owner_resources(world);society_resource_step(world,rng);adults_by_settlement=world.adults_by_settlement(16)
+ magic_society=world.institutions.institution_by_kind('magic_society')
  for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
  for sid,people in sorted(adults_by_settlement.items()):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
@@ -354,18 +403,21 @@ def magic_ecology_step(world,rng):
    if not seekers and market[key]:market[key]=seekers=matching.contenders(r,price)
    if seekers:
     q=max(seekers,key=lambda p:(p.wealth,-p.id))
-    institution=world.institutions.institution_by_kind('adventure_society')
+    institution=magic_society
     coins={}
     if q.wealth>=price:q.wealth-=price
     elif institution is not None:
      coins=world.currency.treasury_transfer(institution.id,q.id,{'iron':price},deposit=True)
     else:continue
     e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price,coin_deposit=coins,institution=None if institution is None else institution.id,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
+ network_stock=_magic_society_network_stock(world,magic_society)
  demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
   if path is not None and not a.completion_goal and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
+  if a.desired_base_essences>base or (path is not None and len(path.abilities)<min(a.desired_abilities,path.capacity)):
+   _network_order_resources(world,p,a,network_stock,magic_society,rr)
   if a.desired_base_essences>base:
    a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive+.5*a.urgency));sought=None
    if rr.random()<.015*(.4+a.drive+.4*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
