@@ -50,7 +50,7 @@ def test_unknown_essence_and_stone_are_rejected():
 def test_rank_requires_every_actually_awakened_skill():
  a=path_with_one_skill();a.awaken_skill(1,'eyes',1,('farmer',));first=a.path(1).abilities[0]
  for _ in range(200):a.practice(1,0,1.)
- assert first.rank==2 and a.rank(1)==0
+ assert first.rank==2 and a.rank(1)==0 and not a.completed_path(1)
 
 def test_gold_to_diamond_requires_revelation_and_integration():
  a=full_path();p=a.path(1)
@@ -92,7 +92,7 @@ def test_iron_requires_four_essences_and_all_twenty_abilities():
  assert len(a.path(1).abilities)==4 and a.rank(1)==0
  for essence in a.path(1).essences:
   for _ in range(4):a.awaken_skill(1,'eyes',1,target_essence=essence)
- assert len(a.path(1).abilities)==20 and a.rank(1)==1
+ assert len(a.path(1).abilities)==20 and a.completed_path(1) and a.rank(1)==1
 
 
 def test_single_ability_cannot_carry_incomplete_body_to_diamond():
