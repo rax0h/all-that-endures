@@ -1,4 +1,4 @@
-from ate_sim.advancement import AdvancementState
+from ate_sim.advancement import AdvancementState,Understanding
 from ate_sim.worldgen import generate_world
 from ate_sim.core import Layer,Ref
 from ate_sim.magic_progression import practice_ability,record_application
@@ -33,6 +33,20 @@ def test_migration_teaching_and_participation_do_not_credit_any_ability():
     for _ in range(100):practice_ability(w,p,0,100,100,context='teach')
     assert path.abilities[0].rank==4
     assert all(not a.understanding.evidence for a in path.abilities)
+
+
+def test_deliberate_reflection_integrates_evidenced_experience_without_replacing_transfer():
+    u=Understanding()
+    u.applications={
+        'a':{'event':1,'difficulty':2,'outcome':1.,'metric':'control'},
+        'b':{'event':2,'difficulty':2,'outcome':1.,'metric':'control'},
+        'c':{'event':3,'difficulty':2,'outcome':1.,'metric':'control'},
+    }
+    for _ in range(20):u.reflect(4.,.6)
+    assert u.integration==3.
+    assert not u.ready(3)
+    u.transfers.append({'event':4,'difficulty':3,'premises':[1,2]})
+    assert u.ready(3)
 
 
 def test_easy_variety_and_reflection_do_not_substitute_for_harder_transfer():
