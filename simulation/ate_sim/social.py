@@ -28,6 +28,8 @@ class SocialGraph:
                 rebuilt.setdefault(a,set()).add(b);rebuilt.setdefault(b,set()).add(a)
             self.adjacency=rebuilt;self._adjacency_edge_count=len(self.edges)
             self.__dict__.pop('_relationships',None)
+            self.__dict__.pop('_attachment_max',None)
+            self._attachment_dirty=set(rebuilt)
     def get(self,a,b):
         k=self.key(a,b)
         if k not in self.edges:
