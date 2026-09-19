@@ -7,7 +7,7 @@ from .magic_economy import spirit_economy_step,magical_services_step,apprentices
 
 def society_career_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');mag=world.institutions.institution_by_kind('magic_society')
- recorded={r.person for r in world.institutions.magic_records.values()}
+ recorded=world.institutions.recorded_people()
  for p in sorted((x for x in world.current_people() if x.alive and full_essence_user(world,x.id)),key=lambda x:x.id):
   if p.id in recorded:continue
   b=world.institutions.branch_for('magic_society',p.settlement)
@@ -17,11 +17,8 @@ def society_career_step(world,rng):
    register_magic_user(world,p.id,'full' if member else ('essences' if rr.random()<.55 else 'identity'));recorded.add(p.id)
  for society,inst in (('adventure_society',adv),('magic_society',mag)):
   if inst is None:continue
-  latest={}
-  for a in world.institutions.applications.values():
-   if a.society==society and (a.person not in latest or a.id>latest[a.person].id):latest[a.person]=a
   for p in sorted((x for x in world.current_people() if x.alive and full_essence_user(world,x.id) and x.id not in inst.members),key=lambda x:x.id):
-   a=latest.get(p.id)
+   a=world.institutions.latest_application(p.id,society)
    if a is None or a.passed is None or a.passed or world.year-a.applied_year<3:continue
    aspiration=_aspiration(world,p);intent=aspiration.adventurer_aspiration if society=='adventure_society' else (p.curiosity>.55 or world.skills.get(p.id,'knowledge').level>1 or world.skills.get(p.id,'craft').level>1)
    if not intent:continue
