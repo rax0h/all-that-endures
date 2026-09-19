@@ -57,7 +57,8 @@ def society_career_step(world,rng):
    continue
   resolution=world.threat_ecology.resolutions.get(n.cause_event)
   if n.kind=='ranked_magic_manifested' and resolution is not None:
-   event=world.events[resolution-1]
+   event=world.event(resolution)
+   if event is None:continue
    actual=next((ref.id for ref in event.actors if ref.kind=='person'),None)
    # Once the underlying threat is gone, the notice cannot remain assigned
    # forever. Society members can still receive the normal verified reward;
@@ -81,8 +82,8 @@ def society_career_step(world,rng):
    resolution=world.threat_ecology.resolutions.get(n.cause_event)
    if n.kind=='ranked_magic_manifested':
     if resolution is None:continue
-    event=world.events[resolution-1]
-    if not any(ref.kind=='person' and ref.id==p.id for ref in event.actors):continue
+    event=world.event(resolution)
+    if event is None or not any(ref.kind=='person' and ref.id==p.id for ref in event.actors):continue
    rr=rng.stream('notice_resolve',world.year,n.id);rank=p.rank;cap=.22+.10*rank+.08*world.skills.get(p.id,'defense').level+.18*p.health
    if rr.random()<min(.85,cap):
     # Job difficulty sets the denomination. A known ranked threat must really
