@@ -4,7 +4,7 @@ Farm yields, tax shares and service prices are explicit ATE approximations.
 Harvesting monsters does not call any currency production function.
 """
 from .core_types import layer_ref
-from .currency import denomination_for_rank
+from .currency import denomination_for_rank,COIN_VALUE,DENOMINATIONS,ranked_reward
 from .threat_ecology import supported_rank
 from .magic_progression import record_application
 
@@ -116,38 +116,150 @@ def magical_services_step(world,rng):
                 if magical_service(world,p,client,ability,kind=kind,difficulty=difficulty,constraint=constraint):break
 
 
-def apprenticeship_step(world):
-    """Paid public work supports committed trainees; no essence is handed out.
+def treasury_liquidity_step(world,institution_id,people=None):
+    """Recover needed low denominations through exact-value voluntary exchange.
 
-    Three places per existing Society branch, funded from its actual treasury.
-    Incomplete trainees have continuity; completion releases the place. Wages
-    buy real market stock at normal prices and support repeated generations.
+    This creates no monetary value.  The institution gives an existing higher
+    coin and receives the exact lower-denomination value from a real wallet.
     """
-    from .magic_resources import _aspiration
+    Layer,Ref=layer_ref()
+    people=list(world.current_people()) if people is None else list(people)
+    treasury=world.currency.treasuries.setdefault(institution_id,{})
+    institution=world.institutions.institutions.get(institution_id)
+    if institution is None:return 0
+
+    active=world.institutions.active_notices()
+    target={d:0 for d in DENOMINATIONS}
+    for n in active:
+        for d,count in ranked_reward(n.required_rank,1.,include_change=False).items():
+            target[d]+=count
+    # Keep a small operating buffer for low-tier purchases/contracts without
+    # inventing an output quota.
+    target['iron']=max(target['iron'],12)
+    exchanges=0
+    for lower_index in range(1,len(DENOMINATIONS)-1):
+        lower=DENOMINATIONS[lower_index]
+        short=max(0,target.get(lower,0)-treasury.get(lower,0))
+        if short<=0:continue
+        for higher_index in range(lower_index+1,len(DENOMINATIONS)):
+            higher=DENOMINATIONS[higher_index]
+            ratio=COIN_VALUE[higher]//COIN_VALUE[lower]
+            if ratio<=0:continue
+            while treasury.get(higher,0)>0 and treasury.get(lower,0)<target.get(lower,0):
+                holder=next((p for p in people if p.alive and world.currency.wallets.get(p.id,{}).get(lower,0)>=ratio),None)
+                if holder is None:break
+                result=world.currency.treasury_exchange(institution_id,holder.id,{higher:1},{lower:ratio})
+                world.emit('society_currency_exchange',Layer.SOCIETY,
+                    (Ref('person',holder.id),Ref('institution',institution_id)),
+                    Ref('settlement',holder.settlement),
+                    institution=institution_id,treasury_gives=result['treasury_gives'],
+                    person_gives=result['person_gives'],exchange_value=COIN_VALUE[higher],
+                    mechanism='exact-value public change')
+                exchanges+=1
+            if treasury.get(lower,0)>=target.get(lower,0):break
+    return exchanges
+
+
+def apprenticeship_step(world):
+    """Run annual Adventure Society cadet cohorts using physical Society reserves.
+
+    Recruitment, resource ownership and advancement remain separate authorities:
+    the institution owns the cohort; the resource system owns real essences/stones;
+    advancement alone decides whether a completed path becomes Iron.
+    """
+    from .magic_resources import _aspiration,_commit_to_full_path,absorb_essence_resource,use_awakening_stone
     Layer,Ref=layer_ref();inst=world.institutions.institution_by_kind('adventure_society')
     if inst is None:return
-    for sid,people in sorted(world.living_by_settlement().items()):
-        branch=world.institutions.branch_for('adventure_society',sid)
-        if branch is None:continue
+    living=world.living_by_settlement()
+
+    active_cadet_ids=set()
+    for cohort in world.institutions.cadet_cohorts.values():
+        if cohort.closed_year is None:
+            active_cadet_ids.update(pid for pid in cohort.cadets if pid not in cohort.graduates)
+
+    # One real class per branch/year. Capacity comes from branch authority and
+    # local population, not a global target.
+    for branch_id in sorted(inst.branches):
+        branch=world.institutions.branches[branch_id];people=list(living.get(branch.settlement,()))
+        if not people:continue
+        capacity=max(2,min(14,2+int(branch.authority*6)+len(people)//90))
         candidates=[]
         for p in people:
-            if not p.alive or p.age<16:continue
+            if p.age<16 or p.id in inst.members or p.id in active_cadet_ids:continue
             path=world.advancement.path(p.id)
-            if path and len(path.abilities)==20:continue
-            aspiration=_aspiration(world,p)
-            if not aspiration.completion_goal or aspiration.drive<.4:continue
-            candidates.append(p)
-        candidates.sort(key=lambda p:(-(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),-_aspiration(world,p).preparation,-p.curiosity,p.id))
-        for p in candidates[:3]:
-            if world.currency.treasuries.get(inst.id,{}).get('iron',0)<4:break
-            # Existing infrastructure continuously needs maintenance; saturating
-            # a permanent defense scalar must not erase work for later centuries.
-            assets=[a for a in world.infrastructure.assets.values() if sid in a.settlements and a.condition<1.]
-            if not assets:continue
-            asset=min(assets,key=lambda a:(a.condition,a.id));before=asset.condition
-            world.infrastructure.maintain(asset.id,.2*(.5+p.health));effect=asset.condition-before
-            if effect<=0:continue
-            world.skills.practice(p.id,'construction',.2)
-            coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':4})
-            world.emit('society_apprentice_work',Layer.SOCIETY,(Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
-                branch=branch.id,work='public infrastructure maintenance',infrastructure=asset.id,improvement=effect,coin_reward=coins,treasury=inst.id,eligibility='committed incomplete path')
+            if path is not None and len(path.abilities)==20 and world.advancement.rank(p.id)>=1:continue
+            a=_aspiration(world,p)
+            defense=world.skills.get(p.id,'defense').level
+            intent=a.adventurer_aspiration or (a.risk_tolerance>=.58 and p.curiosity>=.48 and (defense>=.35 or a.drive>=.52))
+            if not intent:continue
+            score=.34*a.drive+.24*a.preparation+.18*a.risk_tolerance+.14*p.curiosity+.10*min(1.,defense)
+            candidates.append((score,p))
+        candidates.sort(key=lambda x:(x[0],-x[1].id),reverse=True)
+        selected=[p for _,p in candidates[:capacity]]
+        if selected:
+            formed=world.emit('society_cadet_class_formed',Layer.SOCIETY,
+                tuple(Ref('person',p.id) for p in selected),Ref('settlement',branch.settlement),
+                branch=branch.id,class_year=world.year,capacity=capacity,admitted=len(selected))
+            cohort=world.institutions.create_cadet_cohort(branch.id,world.year,capacity,formed.id)
+            for p in selected:
+                a=_aspiration(world,p);a.adventurer_aspiration=True;_commit_to_full_path(a)
+                cohort.cadets.add(p.id);active_cadet_ids.add(p.id)
+                world.emit('society_cadet_admitted',Layer.SOCIETY,(Ref('person',p.id),),
+                    Ref('settlement',branch.settlement),(formed.id,),branch=branch.id,
+                    cohort=cohort.id,class_year=cohort.class_year)
+
+    # Oldest cohorts and most-complete cadets receive reserves first.
+    reserve=lambda kind:world.magic_resources.inventory('institution',inst.id,kind)
+    cadets=[]
+    for cohort in sorted(world.institutions.cadet_cohorts.values(),key=lambda x:(x.class_year,x.id)):
+        if cohort.closed_year is not None:continue
+        for pid in cohort.cadets:
+            if pid in cohort.graduates:continue
+            p=world.people.get(pid)
+            if p is None or not p.alive:continue
+            path=world.advancement.path(pid);base=0 if path is None else len(path.base_essences);abilities=0 if path is None else len(path.abilities)
+            cadets.append((cohort.class_year,-abilities,-base,p.id,cohort))
+    cadets.sort(key=lambda x:(x[0],x[1],x[2],x[3]))
+
+    for _,_,_,pid,cohort in cadets:
+        p=world.people[pid];path=world.advancement.path(pid);base=0 if path is None else len(path.base_essences)
+        while base<3:
+            stock=reserve('essence')
+            viable=[r for r in stock if path is None or r.key not in path.base_essences]
+            if not viable:break
+            resource=min(viable,key=lambda r:(r.created_year,r.id));source=resource.location
+            issue=world.emit('society_cadet_resource_issued',Layer.SOCIETY,
+                (Ref('person',pid),Ref('institution',inst.id)),Ref('settlement',p.settlement),
+                ((resource.origin_event,) if resource.origin_event else ()),resource=resource.id,
+                resource_kind=resource.kind,branch=cohort.branch,cohort=cohort.id,
+                class_year=cohort.class_year,source_location=source,destination=p.settlement,
+                delivery_days=0 if source in (None,p.settlement) else 14)
+            world.magic_resources.transfer(resource.id,'person',pid,issue.id,p.settlement)
+            absorb_essence_resource(world,pid,resource.id);path=world.advancement.path(pid);base=len(path.base_essences)
+        if path is not None and base>=3:
+            while len(path.abilities)<20:
+                stock=reserve('awakening_stone')
+                if not stock:break
+                resource=min(stock,key=lambda r:(r.created_year,r.id));source=resource.location
+                issue=world.emit('society_cadet_resource_issued',Layer.SOCIETY,
+                    (Ref('person',pid),Ref('institution',inst.id)),Ref('settlement',p.settlement),
+                    ((resource.origin_event,) if resource.origin_event else ()),resource=resource.id,
+                    resource_kind=resource.kind,branch=cohort.branch,cohort=cohort.id,
+                    class_year=cohort.class_year,source_location=source,destination=p.settlement,
+                    delivery_days=0 if source in (None,p.settlement) else 14)
+                world.magic_resources.transfer(resource.id,'person',pid,issue.id,p.settlement)
+                if use_awakening_stone(world,pid,resource.id) is None:break
+                path=world.advancement.path(pid)
+        path=world.advancement.path(pid)
+        if path is not None and len(path.abilities)==20 and world.advancement.rank(pid)>=1:
+            cohort.graduates.add(pid);inst.members.add(pid)
+            world.emit('society_cadet_graduated',Layer.SOCIETY,
+                (Ref('person',pid),Ref('institution',inst.id)),Ref('settlement',p.settlement),
+                ((cohort.origin_event,) if cohort.origin_event else ()),branch=cohort.branch,
+                cohort=cohort.id,class_year=cohort.class_year,graduation_year=world.year,
+                body_rank=world.advancement.rank(pid),abilities=len(path.abilities))
+
+    for cohort in world.institutions.cadet_cohorts.values():
+        if cohort.closed_year is not None:continue
+        unresolved=[pid for pid in cohort.cadets if pid not in cohort.graduates and world.people.get(pid) is not None and world.people[pid].alive]
+        if not unresolved:cohort.closed_year=world.year
