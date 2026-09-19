@@ -29,11 +29,37 @@ from .warfare import WarfareState
 from .society_accountability import SocietyAccountabilityState
 from .currency import RankedCurrencyState
 from .threat_ecology import ThreatEcologyState
+from .runtime import RuntimeView
 class Layer(str,Enum): REALITY='reality'; SOCIETY='society'; KNOWLEDGE='knowledge'; NARRATIVE='narrative'
+_REF_CACHE={}
 @dataclass(frozen=True)
-class Ref: kind:str; id:int
-@dataclass
+class Ref:
+ kind:str; id:int
+ def __new__(cls,kind=None,id=None):
+  if kind is None:return super().__new__(cls)
+  key=(kind,id);cached=_REF_CACHE.get(key)
+  if cached is None:
+   cached=super().__new__(cls);_REF_CACHE[key]=cached
+  return cached
+@dataclass(slots=True)
 class Event: id:int; year:int; kind:str; layer:Layer; actors:tuple[Ref,...]=(); location:Ref|None=None; causes:tuple[int,...]=(); data:dict[str,Any]=field(default_factory=dict)
+@dataclass(slots=True)
+class EventIdIndex:
+ max_id:int=0
+ missing:set[int]=field(default_factory=set)
+ def add(self,value):
+  if value==self.max_id+1:self.max_id=value;return
+  if 0<value<=self.max_id:self.missing.discard(value);return
+  if value>self.max_id+1:
+   self.missing.update(range(self.max_id+1,value));self.max_id=value
+ def discard(self,value):
+  if 0<value<=self.max_id:self.missing.add(value)
+ def remove(self,value):
+  if value not in self:raise KeyError(value)
+  self.discard(value)
+ def __contains__(self,value):return 0<value<=self.max_id and value not in self.missing
+ def __len__(self):return self.max_id-len(self.missing)
+ def __iter__(self):return (i for i in range(1,self.max_id+1) if i not in self.missing)
 @dataclass
 class Person:
  id:int; born:int; settlement:int; household:int; alive:bool=True; age:int=0; wealth:float=0.; health:float=1.; temperament:float=.5; attachment:float=.5; curiosity:float=.5; inhibition:float=.5; grief:float=0.; fear:float=0.; rank:int=0; species:str='human'; occupation:str='labor'; parents:tuple[int,...]=()
@@ -53,6 +79,7 @@ def _canonical_fields(cls):
 def _canonical(value):
  if value is None or type(value) in (str,int,float,bool):return value
  if isinstance(value,Enum):return value.value
+ if isinstance(value,EventIdIndex):return list(value)
  if is_dataclass(value):return {key:_canonical(getattr(value,name)) for key,name in _canonical_fields(type(value))}
  if isinstance(value,dict):return {repr(k):_canonical(v) for k,v in sorted(value.items(),key=lambda kv:repr(kv[0]))}
  if isinstance(value,(list,tuple)):return [_canonical(v) for v in value]
@@ -60,15 +87,34 @@ def _canonical(value):
  return value
 @dataclass
 class World:
- seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); trade_routes:dict[tuple[int,int],TradeRoute]=field(default_factory=dict); events:list[Event]=field(default_factory=list); event_ids:set[int]=field(default_factory=set); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); lineage:LineageState=field(default_factory=LineageState); communities:CommunityState=field(default_factory=CommunityState); transmission:TransmissionState=field(default_factory=TransmissionState); skills:SkillState=field(default_factory=SkillState); infrastructure:InfrastructureState=field(default_factory=InfrastructureState); agency:AgencyState=field(default_factory=AgencyState); advancement:AdvancementState=field(default_factory=AdvancementState); magic_resources:MagicResourceState=field(default_factory=MagicResourceState); institutions:InstitutionState=field(default_factory=InstitutionState); metaphysics:MetaphysicalState=field(default_factory=MetaphysicalState); divinity:DivineState=field(default_factory=DivineState); materials:MaterialEconomy=field(default_factory=MaterialEconomy); ambient_magic:AmbientMagicState=field(default_factory=AmbientMagicState); warfare:WarfareState=field(default_factory=WarfareState); society_accountability:SocietyAccountabilityState=field(default_factory=SocietyAccountabilityState); currency:RankedCurrencyState=field(default_factory=RankedCurrencyState); threat_ecology:ThreatEcologyState=field(default_factory=ThreatEcologyState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
+ seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); trade_routes:dict[tuple[int,int],TradeRoute]=field(default_factory=dict); events:list[Event]=field(default_factory=list); event_ids:EventIdIndex|set[int]=field(default_factory=EventIdIndex); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); lineage:LineageState=field(default_factory=LineageState); communities:CommunityState=field(default_factory=CommunityState); transmission:TransmissionState=field(default_factory=TransmissionState); skills:SkillState=field(default_factory=SkillState); infrastructure:InfrastructureState=field(default_factory=InfrastructureState); agency:AgencyState=field(default_factory=AgencyState); advancement:AdvancementState=field(default_factory=AdvancementState); magic_resources:MagicResourceState=field(default_factory=MagicResourceState); institutions:InstitutionState=field(default_factory=InstitutionState); metaphysics:MetaphysicalState=field(default_factory=MetaphysicalState); divinity:DivineState=field(default_factory=DivineState); materials:MaterialEconomy=field(default_factory=MaterialEconomy); ambient_magic:AmbientMagicState=field(default_factory=AmbientMagicState); warfare:WarfareState=field(default_factory=WarfareState); society_accountability:SocietyAccountabilityState=field(default_factory=SocietyAccountabilityState); currency:RankedCurrencyState=field(default_factory=RankedCurrencyState); threat_ecology:ThreatEcologyState=field(default_factory=ThreatEcologyState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
+ def invalidate_runtime(self):
+  self.__dict__['_runtime_epoch']=self.__dict__.get('_runtime_epoch',0)+1
+  self.__dict__.pop('_runtime_view',None);self.__dict__.pop('_living_cache',None)
+ def runtime_view(self):
+  epoch=self.__dict__.get('_runtime_epoch',0);view=self.__dict__.get('_runtime_view')
+  if view is None or view.epoch!=epoch:
+   view=RuntimeView(self,epoch)
+   if self.__dict__.get('_index_current_people'):self._runtime_view=view
+  return view
  def emit(self,kind,layer,actors=(),location=None,causes=(),**data):
   if layer is None:raise ValueError('events require an explicit layer')
-  if any(c not in self.event_ids for c in causes):raise ValueError('event cause does not exist')
-  if kind in ('birth','death','resurrection'):self.__dict__.pop('_living_cache',None)
+  if causes:
+   limit=self.next_event
+   if isinstance(self.event_ids,EventIdIndex) and len(self.event_ids)==limit-1:
+    if any(c<=0 or c>=limit for c in causes):raise ValueError('event cause does not exist')
+   elif any(c not in self.event_ids for c in causes):raise ValueError('event cause does not exist')
+  if kind in ('birth','death','resurrection','household_migrated'):self.invalidate_runtime()
   e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id)
   from .magic_progression import observe_experience
   observe_experience(self,e)
   return e
+ def event(self,event_id):
+  idx=event_id-1
+  if 0<=idx<len(self.events):
+   event=self.events[idx]
+   if event.id==event_id:return event
+  return None
  def events_between(self,first_year,last_year=None):
   # Events append in simulation-year order; binary search touches no old payloads.
   last_year=self.year if last_year is None else last_year
@@ -77,24 +123,29 @@ class World:
   return self.events[start:stop]
  @contextmanager
  def current_people_scope(self):
-  # A step-local index: direct edits between steps and loaded checkpoints need
-  # no invalidation. Birth/death/resurrection events invalidate during a step.
+  # Runtime indexes are derived and live only for one simulation step.
   self._index_current_people=True
   try:yield
   finally:
    self.__dict__.pop('_index_current_people',None)
+   self.__dict__.pop('_runtime_view',None)
    self.__dict__.pop('_living_cache',None)
  def current_people(self):
-  cached=self.__dict__.get('_living_cache')
-  if cached is None:
-   cached=tuple(p for p in self.people.values() if p.alive)
-   if self.__dict__.get('_index_current_people'):self._living_cache=cached
-  return cached
+  if self.__dict__.get('_index_current_people'):return self.runtime_view().living
+  return tuple(p for p in self.people.values() if p.alive)
  def living(self):return list(self.current_people())
  def living_by_settlement(self):
+  if self.__dict__.get('_index_current_people'):return self.runtime_view().by_settlement
+  out={sid:[] for sid in self.settlements}
+  for p in self.current_people():out[p.settlement].append(p)
+  return out
+ def adults_by_settlement(self,min_age=16):
+  if self.__dict__.get('_index_current_people'):
+   view=self.runtime_view()
+   return view.adults18_by_settlement if min_age>=18 else view.adults16_by_settlement
   out={sid:[] for sid in self.settlements}
   for p in self.current_people():
-   if p.alive:out[p.settlement].append(p)
+   if p.age>=min_age:out[p.settlement].append(p)
   return out
  def digest(self):return hashlib.sha256(json.dumps(_canonical(self),sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()
 
