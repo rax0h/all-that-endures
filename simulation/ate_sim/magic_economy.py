@@ -160,12 +160,13 @@ def apprenticeship_step(world,living=None):
     living=world.living_by_settlement() if living is None else living
     treasury=world.currency.treasuries.get(inst.id,{})
     assets_by_sid={sid:[] for sid in living}
-    training_stock={sid:{'essence':[],'awakening_stone':[]} for sid in living}
+    # The Adventure Society is a network. A branch can request a physical item
+    # held by another branch; remote delivery is recorded below rather than
+    # pretending each settlement is an isolated warehouse.
+    training_stock={'essence':[],'awakening_stone':[]}
     for resource in world.magic_resources.inventory('institution',inst.id):
-        if resource.location in training_stock and resource.kind in training_stock[resource.location]:
-            training_stock[resource.location][resource.kind].append(resource)
-    for stock in training_stock.values():
-        for resources in stock.values():resources.sort(key=lambda r:r.id)
+        if resource.kind in training_stock:training_stock[resource.kind].append(resource)
+    for resources in training_stock.values():resources.sort(key=lambda r:r.id)
     for asset in world.infrastructure.assets.values():
         if asset.condition>=1.:continue
         for sid in asset.settlements:
@@ -252,38 +253,39 @@ def apprenticeship_step(world,living=None):
                 capacity=class_size,active_cadets=len(active))
 
         # Organized Society expeditions create a physical training reserve.
-        # Enrolled cadets can be issued those actual objects without first
-        # converting a training contract into personal retail wealth. Nothing is
-        # fabricated: every essence/stone must already exist in institutional
-        # custody, is transferred once, and is consumed through normal magic APIs.
-        stock=training_stock.get(sid,{'essence':[],'awakening_stone':[]})
-        training_capacity=max(8,min(32,8+int(16*branch.authority)+2*min(6,open_notices)))
+        # There is no artificial annual issue limit: an enrolled cadet may use
+        # every required physical essence/stone that the Society actually has,
+        # just as a private adventurer may buy and use all available stock.
+        # Oldest cohorts are served first and near-complete cadets first within
+        # a cohort, so the institution finishes classes instead of spreading
+        # resources across an ever-growing pool of partial paths.
         active.sort(key=lambda p:(
             _aspiration(world,p).cadet_class_year or world.year,
             -(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),
             p.id))
-        issued=0
         for p in active:
-            while issued<training_capacity:
+            while True:
                 path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
                 resource=None
                 if base<3:
                     owned=set() if path is None else set(path.base_essences)
-                    resource=next((r for r in stock['essence'] if r.key not in owned),None)
-                elif len(path.abilities)<20:
-                    resource=stock['awakening_stone'][0] if stock['awakening_stone'] else None
+                    resource=next((r for r in training_stock['essence'] if r.key not in owned),None)
+                elif path is not None and len(path.abilities)<20:
+                    resource=training_stock['awakening_stone'][0] if training_stock['awakening_stone'] else None
                 if resource is None:break
-                source=stock[resource.kind];source.remove(resource)
+                source=training_stock[resource.kind];source.remove(resource)
+                source_sid=resource.location
                 event=world.emit('society_cadet_resource_issued',Layer.SOCIETY,
                     (Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
                     ((resource.origin_event,) if resource.origin_event else ()),
                     branch=branch.id,class_year=_aspiration(world,p).cadet_class_year,
                     resource=resource.id,resource_kind=resource.kind,key=resource.key,
+                    source_settlement=source_sid,destination_settlement=sid,
+                    delivery_days=0 if source_sid==sid else 14,
                     basis='physical Society expedition training reserve')
                 world.magic_resources.transfer(resource.id,'person',p.id,event.id,sid)
                 if resource.kind=='essence':absorb_essence_resource(world,p.id,resource.id)
                 else:use_awakening_stone(world,p.id,resource.id)
-                issued+=1
 
         # Paid work remains a finite subset. Older and nearer-complete classes
         # receive first opportunity for practical work; this improves training
