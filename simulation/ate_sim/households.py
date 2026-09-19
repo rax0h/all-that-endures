@@ -2,10 +2,9 @@ from __future__ import annotations
 from .core import Household, Layer, Ref
 
 def partnership_step(world,rng):
-    adults=[p for p in world.current_people() if p.alive and p.age>=18];by_settlement={}
-    for p in adults:by_settlement.setdefault(p.settlement,[]).append(p)
+    living=world.current_people();by_settlement=world.adults_by_settlement(18)
     paired=set()
-    for a,b in world.social.living_partnerships(world.current_people()):
+    for a,b in world.social.living_partnerships(living):
         pa,pb=world.people.get(a),world.people.get(b)
         if pa and pb and pa.alive and pb.alive:paired.update((a,b))
     ancestry={}
@@ -38,7 +37,8 @@ def partnership_step(world,rng):
                 he=world.emit("household_formed",Layer.SOCIETY,(Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(e.id,),household=nhid);world.lineage.register("household",nhid,tuple(("household",x) for x in parent_households),he.id,world.year);prop=world.economy.create("dwelling",sid,"household",nhid,max(5.,share*.5),world.year,he.id);world.lineage.register("property",prop.id,(("household",nhid),),he.id,world.year)
 
 def household_split_step(world,rng):
-    for hid,h in list(world.households.items()):
+    for hid in tuple(world.runtime_view().living_household_ids):
+        h=world.households[hid]
         if len(h.members)<8:continue
         living=[world.people[p] for p in h.members if world.people[p].alive];adults=[p for p in living if p.age>=18]
         if len(living)<8 or len(adults)<3:continue
@@ -51,15 +51,29 @@ def household_split_step(world,rng):
         e=world.emit("household_split",Layer.SOCIETY,tuple(Ref("person",p.id) for p in movers),Ref("settlement",h.settlement),origin_household=hid,new_household=nhid);world.lineage.register("household",nhid,(("household",hid),),e.id,world.year);prop=world.economy.create("dwelling",h.settlement,"household",nhid,max(5.,share*.5),world.year,e.id);world.lineage.register("property",prop.id,(("household",nhid),),e.id,world.year)
 
 def inheritance_property_step(world):
-    for prop in world.economy.property.values():
-        if prop.owner_kind!="household":continue
-        h=world.households.get(prop.owner_id)
-        if h and h.alive:continue
+    # Only properties still owned by dead households can transition here.
+    # Track those household IDs incrementally instead of scanning all property history.
+    pending=world.__dict__.get('_dead_household_property_queue')
+    if pending is None:
+        pending={p.owner_id for p in world.economy.property.values()
+                 if p.owner_kind=='household' and (p.owner_id not in world.households or not world.households[p.owner_id].alive)}
+        world._dead_household_property_queue=pending
+    for hid in tuple(pending):
+        h=world.households.get(hid)
+        if h is not None and h.alive:
+            pending.discard(hid);continue
+        props=world.economy.properties_for_owner('household',hid)
+        if not props:
+            pending.discard(hid);continue
         heirs=[]
         if h:
-            for pid in h.members:heirs.extend(world.genealogy.children.get(pid,[]))
+            for pid in h.members:heirs.extend(world.genealogy.children.get(pid,()))
         heirs=[pid for pid in heirs if pid in world.people and world.people[pid].alive]
-        if heirs:
-            heir=min(heirs);e=world.emit("property_inherited",Layer.SOCIETY,(Ref("person",heir),),Ref("settlement",prop.settlement),property=prop.id);world.economy.transfer(prop.id,"person",heir,e.id,world.year)
+        if not heirs:continue
+        heir=min(heirs)
+        for prop in props:
+            e=world.emit("property_inherited",Layer.SOCIETY,(Ref("person",heir),),Ref("settlement",prop.settlement),property=prop.id)
+            world.economy.transfer(prop.id,"person",heir,e.id,world.year)
+        pending.discard(hid)
 
 def household_step(world,rng):partnership_step(world,rng);household_split_step(world,rng);inheritance_property_step(world)
