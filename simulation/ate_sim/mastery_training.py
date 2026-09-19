@@ -5,6 +5,8 @@ philosophical prose. Bounded response models compress observations and predict
 held-out results; successful models also improve practical control precision.
 """
 from dataclasses import dataclass,field
+from functools import lru_cache
+from heapq import nsmallest
 import hashlib
 from .core_types import layer_ref
 from .magic_progression import record_application
@@ -37,11 +39,18 @@ def solve(rows,values):
     return [row[-1] for row in a]
 
 
+@lru_cache(maxsize=None)
+def _response_coefficients(semantic_key,function,domain):
+    # Ability identity/function/domain never change after awakening. Cache this
+    # immutable response law instead of hashing it for every mastery trial.
+    key=hashlib.blake2b((semantic_key+'|'+function+'|'+domain).encode(),digest_size=16).digest()
+    return tuple(.15+key[i]/255 for i in range(5))
+
 def response(ability,inputs):
     # The response law belongs to this ability/essence/function/domain. It is
     # independent of the learner's estimated model and cannot read that model.
-    key=hashlib.blake2b((ability.semantic_key+'|'+ability.function+'|'+ability.domain).encode(),digest_size=16).digest()
-    return sum((.15+key[i]/255)*x for i,x in enumerate(inputs))
+    coeffs=_response_coefficients(ability.semantic_key,ability.function,ability.domain)
+    return sum(coeffs[i]*x for i,x in enumerate(inputs))
 
 
 def trial(world,person,ability,rng):
@@ -85,5 +94,5 @@ def mastery_training_step(world,person,path,rng):
     candidates=[a for a in path.abilities if a.rank in (3,4) and not a.understanding.ready(a.rank)]
     # Rotate across every function, including rare semantic functions; no
     # arbitrary occupation/function whitelist can make an ability impossible.
-    candidates.sort(key=lambda a:(a.response_model.trials,a.semantic_key))
-    for ability in candidates[:2]:trial(world,person,ability,rng)
+    candidates=nsmallest(2,candidates,key=lambda a:(a.response_model.trials,a.semantic_key))
+    for ability in candidates:trial(world,person,ability,rng)
