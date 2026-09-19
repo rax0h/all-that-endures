@@ -59,6 +59,22 @@ class RankedCurrencyState:
    if any(d not in COIN_VALUE or type(n) is not int or n<0 for d,n in coins.items()):raise ValueError('invalid exchange')
    if any(self.wallets.get(owner,{}).get(d,0)<n for d,n in coins.items()):raise ValueError('unfunded exchange')
   self.transfer(payer,counterparty,give);self.transfer(counterparty,payer,receive)
+ def treasury_exchange(self,institution,pid,treasury_gives,person_gives):
+  """Exact-value exchange between a real institutional treasury and a real wallet."""
+  treasury_gives=dict(treasury_gives);person_gives=dict(person_gives)
+  if value_of(treasury_gives)!=value_of(person_gives):raise ValueError('unequal exchange value')
+  for coins in (treasury_gives,person_gives):
+   if any(d not in COIN_VALUE or type(n) is not int or n<0 for d,n in coins.items()):raise ValueError('invalid exchange')
+  treasury=self.treasuries.setdefault(institution,{})
+  wallet=self.wallets.get(pid,{})
+  if any(treasury.get(d,0)<n for d,n in treasury_gives.items()):raise ValueError('unfunded treasury exchange')
+  if any(wallet.get(d,0)<n for d,n in person_gives.items()):raise ValueError('unfunded wallet exchange')
+  destination=self.wallet(pid)
+  for d,n in treasury_gives.items():
+   if n:treasury[d]-=n;destination[d]=destination.get(d,0)+n
+  for d,n in person_gives.items():
+   if n:destination[d]-=n;treasury[d]=treasury.get(d,0)+n
+  return {'treasury_gives':treasury_gives,'person_gives':person_gives}
 
 def denomination_for_rank(rank):return RANK_DENOMINATION[max(0,min(5,int(rank)))]
 def value_of(coins):return sum(COIN_VALUE[d]*int(n) for d,n in coins.items())
