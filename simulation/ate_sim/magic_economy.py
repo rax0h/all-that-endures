@@ -184,6 +184,9 @@ def apprenticeship_step(world,living=None):
             a=world.magic_resources.aspirations.get(p.id)
             if a is None or a.cadet_branch!=branch.id or a.cadet_class_year is None or a.cadet_graduated_year is not None:continue
             body_rank=p.rank
+            path=world.advancement.path(p.id)
+            if body_rank>0 and (path is None or len(path.abilities)!=20):
+                body_rank=world.advancement.rank(p.id)
             if body_rank<1:continue
             a.cadet_graduated_year=world.year
             a.reason='Adventure Society graduate'
@@ -207,7 +210,10 @@ def apprenticeship_step(world,living=None):
             if a.cadet_class_year is None and a.reason=='Adventure Society apprenticeship' and a.completion_goal:
                 a.cadet_class_year=a.formed_year;a.cadet_branch=branch.id
             if a.cadet_branch==branch.id and a.cadet_class_year is not None and a.cadet_graduated_year is None:
-                if p.rank<1:active.append(p)
+                body_rank=p.rank
+                if body_rank>0 and (path is None or len(path.abilities)!=20):
+                    body_rank=world.advancement.rank(p.id)
+                if body_rank<1:active.append(p)
                 continue
             if a.cadet_class_year is not None:continue
             if path and len(path.abilities)==20:continue
