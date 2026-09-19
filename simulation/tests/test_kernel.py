@@ -1,4 +1,5 @@
 from simulation.ate_sim import *
+from simulation.ate_sim.core import World, Layer
 
 def test_determinism():
     a=Simulation(generate_world(42)).run(100); b=Simulation(generate_world(42)).run(100); assert a.digest()==b.digest()
