@@ -116,38 +116,116 @@ def magical_services_step(world,rng):
                 if magical_service(world,p,client,ability,kind=kind,difficulty=difficulty,constraint=constraint):break
 
 
-def apprenticeship_step(world):
-    """Paid public work supports committed trainees; no essence is handed out.
+def _active_cadet(aspiration):
+    return aspiration.cadet_class_year is not None and aspiration.cadet_graduated_year is None
 
-    Three places per existing Society branch, funded from its actual treasury.
-    Incomplete trainees have continuity; completion releases the place. Wages
-    buy real market stock at normal prices and support repeated generations.
+
+def _graduate_cadet(world,person,aspiration,adventure):
+    if not _active_cadet(aspiration) or not world.advancement.completed_path(person.id):return False
+    aspiration.cadet_graduated_year=world.year
+    before=person.id in adventure.members
+    adventure.members.add(person.id);person.occupation='adventurer'
+    Layer,Ref=layer_ref()
+    world.emit('society_cadet_graduated',Layer.SOCIETY,(Ref('person',person.id),Ref('institution',adventure.id)),
+               Ref('settlement',person.settlement),institution=adventure.id,branch=aspiration.cadet_branch,
+               class_year=aspiration.cadet_class_year,graduated_year=world.year,body_rank=world.advancement.rank(person.id),
+               membership_added=not before,requirement='three bases + confluence + 20 abilities')
+    return True
+
+
+def _cadet_class_size(world,adventure,branch,people):
+    local_members=[p for p in people if p.id in adventure.members and p.rank>=1]
+    training_capacity=sum(max(1,p.rank) for p in local_members)
+    if training_capacity<=0:return 0
+    return max(1,min(6,1+training_capacity//8+int(branch.authority*2)))
+
+
+def _admit_cadets(world,adventure,branch,people):
+    from .magic_resources import _aspiration
+    seats=_cadet_class_size(world,adventure,branch,people)
+    if seats<=0:return []
+    candidates=[]
+    for p in people:
+        if p.age<16 or p.age>40 or world.advancement.completed_path(p.id) or p.id in adventure.members:continue
+        aspiration=_aspiration(world,p)
+        if aspiration.cadet_class_year is not None:continue
+        defense=world.skills.get(p.id,'defense').level
+        if not (aspiration.adventurer_aspiration or aspiration.drive>=.42 or defense>=.55):continue
+        score=.34*aspiration.drive+.20*aspiration.risk_tolerance+.16*aspiration.preparation+.15*p.curiosity+.10*p.health+.05*min(1.,defense)
+        candidates.append((score,p,aspiration))
+    candidates.sort(key=lambda x:(x[0],-x[1].id),reverse=True)
+    admitted=candidates[:seats]
+    if not admitted:return []
+    Layer,Ref=layer_ref()
+    class_event=world.emit('society_cadet_class_formed',Layer.SOCIETY,
+        tuple(Ref('person',p.id) for _,p,_ in admitted)+(Ref('institution',adventure.id),),
+        Ref('settlement',branch.settlement),institution=adventure.id,branch=branch.id,
+        class_year=world.year,class_size=len(admitted),training_capacity=training_capacity if False else seats)
+    for score,p,aspiration in admitted:
+        aspiration.cadet_class_year=world.year;aspiration.cadet_branch=branch.id
+        aspiration.adventurer_aspiration=True;aspiration.completion_goal=True
+        aspiration.desired_base_essences=3;aspiration.desired_abilities=20
+        aspiration.urgency=max(aspiration.urgency,.65);aspiration.preparation=min(1.,aspiration.preparation+.08)
+        world.emit('society_cadet_admitted',Layer.SOCIETY,(Ref('person',p.id),Ref('institution',adventure.id)),
+                   Ref('settlement',branch.settlement),(class_event.id,),institution=adventure.id,branch=branch.id,
+                   class_year=world.year,selection_score=round(score,3))
+    return [p for _,p,_ in admitted]
+
+
+def _issue_cadet_resources(world,adventure,cadets):
+    from .magic_resources import absorb_essence_resource,use_awakening_stone
+    if not cadets:return
+    reserve=world.magic_resources.inventory('institution',adventure.id)
+    if not reserve:return
+    available={r.id:r for r in reserve}
+    Layer,Ref=layer_ref()
+    for p in sorted(cadets,key=lambda x:(world.magic_resources.aspirations[x.id].cadet_class_year,x.id)):
+        aspiration=world.magic_resources.aspirations[p.id]
+        if not _active_cadet(aspiration):continue
+        while not world.advancement.completed_path(p.id):
+            path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
+            resource=None;target=None
+            if base<3:
+                owned=() if path is None else path.base_essences
+                resource=next((r for r in available.values() if r.kind=='essence' and r.key not in owned),None)
+            else:
+                resource=next((r for r in available.values() if r.kind=='awakening_stone'),None)
+                if path is not None:target=min(path.essences,key=lambda e:(len(path.abilities_for(e)),path.essences.index(e)))
+            if resource is None:break
+            source=resource.location;delivery=0 if source==p.settlement else 14
+            e=world.emit('society_cadet_resource_issued',Layer.SOCIETY,
+                (Ref('person',p.id),Ref('institution',adventure.id)),Ref('settlement',p.settlement),
+                ((resource.origin_event,) if resource.origin_event else ()),institution=adventure.id,
+                branch=aspiration.cadet_branch,class_year=aspiration.cadet_class_year,resource=resource.id,
+                resource_kind=resource.kind,key=resource.key,source_settlement=source,destination_settlement=p.settlement,
+                delivery_days=delivery,remote_order=bool(delivery))
+            world.magic_resources.transfer(resource.id,'person',p.id,e.id,p.settlement);available.pop(resource.id,None)
+            if resource.kind=='essence':absorb_essence_resource(world,p.id,resource.id)
+            else:use_awakening_stone(world,p.id,resource.id,target)
+        _graduate_cadet(world,p,aspiration,adventure)
+
+
+def apprenticeship_step(world):
+    """Annual Adventure Society cadet classes backed by real resources.
+
+    Institutions decide whom to train and issue only resources they actually own.
+    Advancement remains the sole authority on completion/rank. Resource supply is
+    replenished elsewhere by physical/resource systems, not manufactured here.
     """
     from .magic_resources import _aspiration
-    Layer,Ref=layer_ref();inst=world.institutions.institution_by_kind('adventure_society')
-    if inst is None:return
-    for sid,people in sorted(world.living_by_settlement().items()):
+    Layer,Ref=layer_ref();adventure=world.institutions.institution_by_kind('adventure_society')
+    if adventure is None:return
+    living=world.living_by_settlement();active=[]
+    for sid,people in sorted(living.items()):
         branch=world.institutions.branch_for('adventure_society',sid)
         if branch is None:continue
-        candidates=[]
         for p in people:
-            if not p.alive or p.age<16:continue
-            path=world.advancement.path(p.id)
-            if path and len(path.abilities)==20:continue
-            aspiration=_aspiration(world,p)
-            if not aspiration.completion_goal or aspiration.drive<.4:continue
-            candidates.append(p)
-        candidates.sort(key=lambda p:(-(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),-_aspiration(world,p).preparation,-p.curiosity,p.id))
-        for p in candidates[:3]:
-            if world.currency.treasuries.get(inst.id,{}).get('iron',0)<4:break
-            # Existing infrastructure continuously needs maintenance; saturating
-            # a permanent defense scalar must not erase work for later centuries.
-            assets=[a for a in world.infrastructure.assets.values() if sid in a.settlements and a.condition<1.]
-            if not assets:continue
-            asset=min(assets,key=lambda a:(a.condition,a.id));before=asset.condition
-            world.infrastructure.maintain(asset.id,.2*(.5+p.health));effect=asset.condition-before
-            if effect<=0:continue
-            world.skills.practice(p.id,'construction',.2)
-            coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':4})
-            world.emit('society_apprentice_work',Layer.SOCIETY,(Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
-                branch=branch.id,work='public infrastructure maintenance',infrastructure=asset.id,improvement=effect,coin_reward=coins,treasury=inst.id,eligibility='committed incomplete path')
+            aspiration=world.magic_resources.aspirations.get(p.id)
+            if aspiration is not None and _active_cadet(aspiration):
+                if not _graduate_cadet(world,p,aspiration,adventure):active.append(p)
+        active.extend(_admit_cadets(world,adventure,branch,people))
+    # Oldest cohorts get first access to the network reserve; there is no
+    # per-cadet annual stone cap and remote reserve stock is immediately eligible.
+    active={p.id:p for p in active}
+    _issue_cadet_resources(world,adventure,list(active.values()))
+
