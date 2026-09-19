@@ -66,18 +66,9 @@ def validate(archive):
                 violations.append({'person':pid,'event':e['id'],'issue':'unsubstantiated ability application'})
             if data['generalization']:
                 premises=[archive.event(c) for c in e['causes'][1:]]
-                def premise_fields(x):
-                    if x is None:return None
-                    d=x['data']
-                    if x['kind']=='ability_applied':
-                        return (d.get('ability'),d.get('difficulty'),d.get('constraint'),d.get('metric'),d.get('outcome',0))
-                    if x['kind']=='ability_control_trial' and d.get('success'):
-                        return (d.get('ability'),d.get('challenge_complexity'),d.get('constraint'),'ability_control_trial',1.)
-                    return None
-                parsed=[premise_fields(x) for x in premises]
-                if len(parsed)!=2 or any(x is None or x[0]!=data['ability'] or x[1]>=data['difficulty'] or x[2]==data['constraint'] or x[3]!=data['metric'] for x in parsed):
+                if len(premises)!=2 or not all(x and x['kind']=='ability_applied' and x['data']['ability']==data['ability'] and x['data']['difficulty']<data['difficulty'] and x['data']['constraint']!=data['constraint'] and x['data']['metric']==data['metric'] for x in premises):
                     violations.append({'person':pid,'event':e['id'],'issue':'invalid held-out generalization'})
-                elif data['outcome']<min(x[4] for x in parsed):
+                elif data['outcome']<min(x['data']['outcome'] for x in premises):
                     violations.append({'person':pid,'event':e['id'],'issue':'transfer lost prior performance'})
         elif kind=='essence_revelation_integrated':
             rank=RANKS.index(data['ability_rank']);proofs=data.get('transfer_proofs',[])
