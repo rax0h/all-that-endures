@@ -267,7 +267,7 @@ class _SettlementDemand:
   for entry in excluded:heappush(heap,entry)
   return result
 
-def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
+def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None,market=None):
  Layer,Ref=layer_ref();price=(8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity))
  # Rank only feasible transactions. Eligibility checks must not create social edges.
  candidates=[]
