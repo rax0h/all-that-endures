@@ -103,7 +103,7 @@ def _practice_path(world,p,rr,action,strength):
  changed=False
  for i,a in candidates[:uses]:
   ability_rank=a.rank
-  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,body_rank=body_rank)
+  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,body_rank=body_rank,path=path)
   if a.rank!=ability_rank:changed=True
  if changed:record_body_transition(world,p,before,context=action)
 
