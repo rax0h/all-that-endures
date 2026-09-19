@@ -11,6 +11,7 @@ from .materials import material_economy_step
 from .ambient_magic import ambient_magic_step
 from .divinity import divine_step
 from .mortality import kill
+from .health import health_step
 from .magical_civilization import magical_civilization_step
 from .warfare import warfare_step
 from .society_careers import society_career_step
@@ -24,7 +25,7 @@ class Simulation:
   return self.w
  def step(self):
   with self.w.current_people_scope():
-   self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
+   self.w.year+=1; self._weather(); self._production(); health_step(self.w,self.rng); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("weather",self.w.year,sid);q=self.w.local[sid];q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38)));q.drought=max(0,.35-q.rain);q.flood=max(0,q.rain-.82)
@@ -41,7 +42,7 @@ class Simulation:
   for p in self.w.current_people():
    pid=p.id
    if not p.alive:continue
-   p.age+=1;q=self.w.local[p.settlement];r=self.rng.stream("life",self.w.year,pid);risk=mortality_risk(p,q.scarcity)
+   p.age+=1;q=self.w.local[p.settlement];r=self.rng.stream("life",self.w.year,pid);risk=mortality_risk(p,q.scarcity,max(0.,1-p.health))
    if r.random()<risk:kill(self.w,p,"natural")
    else:p.grief*=.94;p.fear*=.9
  def _capacity(self,sid):
