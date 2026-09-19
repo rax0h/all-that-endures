@@ -17,6 +17,18 @@ def _local_peoples(rr,cell):
 
 def _context(p,sid):return (p.species,'founder',p.occupation,round(p.curiosity,2),round(p.temperament,2),round(p.attachment,2),round(p.inhibition,2),sid)
 
+def _seed_founder_profession(w,rr,p,founded):
+ levels={
+  'agriculture':rr.uniform(.45,3.1),
+  'construction':rr.uniform(.25,2.2),
+  'craft':rr.uniform(.15,2.7)*( .75+.5*p.curiosity),
+  'knowledge':rr.uniform(.10,2.4)*( .65+.7*p.curiosity),
+  'defense':rr.uniform(.10,2.2)*( .75+.45*(1-p.inhibition)),
+ }
+ for domain,value in levels.items():w.skills.practice(p.id,domain,value,founded.id)
+ primary=max(levels,key=levels.get)
+ p.occupation={'agriculture':'farmer','construction':'builder','craft':'crafter','knowledge':'scholar','defense':'guard'}[primary]
+
 def _observe_preexisting_essence(w,rr,p,sid,founded,essence=None):
  essence=essence or rr.choice([e for e in ESSENCES_AVAILABLE if w.advancement.path(p.id) is None or e not in w.advancement.path(p.id).base_essences])
  found=w.emit('essence_resource_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(founded.id,),essence=essence,provenance='pre-simulation magical civilization',preexisting=True,observation_boundary=True)
@@ -148,7 +160,7 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
    for _ in range(rr.randint(2,6)):
     pid=w.next_person;w.next_person+=1;age=rr.randint(0,45);sp=sp0 if rr.random()<.88 else rr.choice(local);p=Person(pid,-age,sid,hid,age=age,wealth=h.wealth/max(1,len(h.members)+1),temperament=rr.random(),attachment=rr.random(),curiosity=rr.random(),inhibition=rr.random(),species=sp);w.people[pid]=p;w.metaphysics.soul(pid);h.members.append(pid);w.communities.join(pid,community.id,1.0);w.lineage.register('person',pid,(('household',hid),),founded.id,-age)
     if age>=18:
-     w.skills.practice(pid,'agriculture',rr.uniform(.8,3.2),founded.id);w.skills.practice(pid,'construction',rr.uniform(.2,1.4),founded.id)
+     _seed_founder_profession(w,rr,p,founded)
      if rr.random()<FOUNDING_ADULT_MAGIC_PREVALENCE:_seed_essence_for_person(w,rr,p,sid,founded)
   for h in s.households:
    hm=w.households[h].members
