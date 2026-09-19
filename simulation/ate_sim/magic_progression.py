@@ -76,7 +76,11 @@ def record_application(world,person,ability,source,*,constraint,difficulty,outco
     keys=source.data.get('used_abilities',(source.data.get('ability'),))
     recorded_rank=source.data.get('challenge_complexity',source.data.get('task_rank',source.data.get('item_rank',source.data.get('threat_rank'))))
     if ability.semantic_key not in keys or recorded_rank!=difficulty:return
-    if not any(a.kind=='person' and a.id==person.id for a in source.actors):return
+    actor_found=False
+    for actor in source.actors:
+        if actor.kind=='person' and actor.id==person.id:
+            actor_found=True;break
+    if not actor_found:return
     u=ability.understanding
     if constraint in u.applications:return
     Layer,Ref=layer_ref()
