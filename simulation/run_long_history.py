@@ -88,8 +88,33 @@ def snapshot(world, include_digest=False):
     }
     complete_users=[p for p in living_users if len(paths[p.id].abilities)==20]
     incomplete_users=[p for p in living_users if len(paths[p.id].abilities)!=20]
-    result['completed_path_ranks']=dict(sorted(Counter(world.advancement.rank(p.id) for p in complete_users).items()))
+    complete_ranks={p.id:world.advancement.rank(p.id) for p in complete_users}
+    result['completed_path_ranks']=dict(sorted(Counter(complete_ranks[p.id] for p in complete_users).items()))
     result['incomplete_path_ranks']=dict(sorted(Counter(world.advancement.rank(p.id) for p in incomplete_users).items()))
+
+    # Read-only upper-rank diagnostics. Silver is expected to accumulate; these
+    # metrics distinguish a healthy shelf with individuals progressing internally
+    # from a mechanically frozen Silver population.
+    silver_users=[p for p in complete_users if complete_ranks[p.id]==3]
+    silver_ages=sorted(p.age for p in silver_users)
+    silver_gold_abilities=sorted(sum(a.rank>=4 for a in paths[p.id].abilities) for p in silver_users)
+    silver_ready_abilities=sorted(sum(a.rank==3 and a.understanding.ready(3) for a in paths[p.id].abilities) for p in silver_users)
+    gold_users=[p for p in complete_users if complete_ranks[p.id]==4]
+    gold_ages=sorted(p.age for p in gold_users)
+    gold_diamond_abilities=sorted(sum(a.rank>=5 for a in paths[p.id].abilities) for p in gold_users)
+    result['upper_rank_progression']={
+        'silver_living':len(silver_users),
+        'silver_age_median':pct(silver_ages,.5),'silver_age_p90':pct(silver_ages,.9),
+        'silver_gold_abilities_median':pct(silver_gold_abilities,.5),'silver_gold_abilities_p90':pct(silver_gold_abilities,.9),
+        'silver_with_any_gold_ability':sum(n>0 for n in silver_gold_abilities),
+        'silver_with_10plus_gold_abilities':sum(n>=10 for n in silver_gold_abilities),
+        'silver_with_15plus_gold_abilities':sum(n>=15 for n in silver_gold_abilities),
+        'silver_with_19plus_gold_abilities':sum(n>=19 for n in silver_gold_abilities),
+        'silver_ready_abilities_median':pct(silver_ready_abilities,.5),'silver_ready_abilities_p90':pct(silver_ready_abilities,.9),
+        'gold_living':len(gold_users),'gold_age_median':pct(gold_ages,.5),'gold_age_p90':pct(gold_ages,.9),
+        'gold_diamond_abilities_median':pct(gold_diamond_abilities,.5),'gold_diamond_abilities_p90':pct(gold_diamond_abilities,.9),
+        'gold_with_any_diamond_ability':sum(n>0 for n in gold_diamond_abilities),
+    }
     if include_digest:result['digest']=world.digest()
     return result
 
