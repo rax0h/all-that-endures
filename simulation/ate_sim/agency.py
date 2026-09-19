@@ -96,26 +96,39 @@ def _practice_path(world,p,rr,action,strength):
  if not trainable:return
  relevant=AGENCY_ACTION_FUNCTIONS.get(action,set())
  candidates=[(i,a) for i,a in trainable if a.function in relevant] or trainable;rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));before=body_rank
+ changed=False
  for i,a in candidates[:uses]:
+  ability_rank=a.rank
   meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,body_rank=body_rank)
- record_body_transition(world,p,before,context=action)
+  if a.rank!=ability_rank:changed=True
+ if changed:record_body_transition(world,p,before,context=action)
 
 def agency_step(world,rng):
- dependents={}
- for p in world.current_people():
-  if p.alive and p.age<18:
+ people=world.current_people();dependents={}
+ for p in people:
+  if p.age<18:
    for parent in p.parents:dependents[parent]=dependents.get(parent,0)+1
- for p in (x for x in world.current_people() if x.alive and x.age>=16):
-  attachment=max((r.attachment for r in world.social.relationships_for(p.id)),default=0.)
+ # Compute the same maximum attachment once by traversing each relationship
+ # edge once, instead of materializing every person's relationship view.
+ attachment_max={}
+ for rel in world.social.edges.values():
+  value=rel.attachment
+  if value>attachment_max.get(rel.a,0.):attachment_max[rel.a]=value
+  if value>attachment_max.get(rel.b,0.):attachment_max[rel.b]=value
+ current_actions={}
+ for p in people:
+  if p.age<16:continue
+  attachment=attachment_max.get(p.id,0.)
   rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachment,dependents.get(p.id,0));domain=ACTION_DOMAIN.get(action);event=None
   if domain:world.skills.practice(p.id,domain,.12+.38*strength)
-  _practice_path(world,p,rr,action,strength)
+  if p.rank>0:_practice_path(world,p,rr,action,strength)
   if action=='secure_food':world.households[p.household].food+=.08+.2*strength
   elif action=='prepare':world.households[p.household].preparedness=min(1.,world.households[p.household].preparedness+.002*strength)
   elif action=='work':p.wealth+=ORDINARY_WORK_INCOME*strength
-  world.agency.actions.append(ActionRecord(world.year,p.id,action,motive,strength,None if event is None else event.id))
+  rec=ActionRecord(world.year,p.id,action,motive,strength,None if event is None else event.id)
+  world.agency.actions.append(rec);current_actions[p.id]=rec
  # Actions are a bounded recent decision cache; durable history lives in
  # events and the post-run archive. A few recent years are ample for consumers
  # such as rank ecology and avoid copying a 50k-entry list every mature year.
  if len(world.agency.actions)>6000:world.agency.actions=world.agency.actions[-3000:]
- rank_ecology_step(world,rng)
+ rank_ecology_step(world,rng,current_actions)
