@@ -6,7 +6,6 @@ held-out results; successful models also improve practical control precision.
 """
 from dataclasses import dataclass,field
 from functools import lru_cache
-from heapq import nsmallest
 import hashlib
 from .core_types import layer_ref
 from .magic_progression import record_application
@@ -94,5 +93,5 @@ def mastery_training_step(world,person,path,rng):
     candidates=[a for a in path.abilities if a.rank in (3,4) and not a.understanding.ready(a.rank)]
     # Rotate across every function, including rare semantic functions; no
     # arbitrary occupation/function whitelist can make an ability impossible.
-    candidates=nsmallest(2,candidates,key=lambda a:(a.response_model.trials,a.semantic_key))
-    for ability in candidates:trial(world,person,ability,rng)
+    candidates.sort(key=lambda a:(a.response_model.trials,a.semantic_key))
+    for ability in candidates[:2]:trial(world,person,ability,rng)
