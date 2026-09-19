@@ -10,5 +10,5 @@ def kill(world,p,cause,causes=()):
  for oid in survivors:
   q=world.people[oid];rel=world.social.get(p.id,oid);q.grief=min(1,q.grief+.12+.55*rel.attachment);world.social.record(p.id,oid,e.id,attachment=.01);world.emit('bereavement',Layer.SOCIETY,(Ref('person',oid),Ref('person',p.id)),Ref('settlement',p.settlement),(e.id,),grief=q.grief)
  if survivors:
-  children=[x for x in world.genealogy.children.get(p.id,[]) if world.people.get(x) and world.people[x].alive];heir=min(children) if children else min(survivors);inherited=p.wealth;world.people[heir].wealth+=inherited;p.wealth=0.;world.emit('inheritance',Layer.SOCIETY,(Ref('person',heir),Ref('person',p.id)),Ref('settlement',p.settlement),(e.id,),wealth=inherited)
+  children=[x for x in world.genealogy.children.get(p.id,[]) if world.people.get(x) and world.people[x].alive];heir=min(children) if children else min(survivors);inherited=p.wealth;world.people[heir].wealth+=inherited;p.wealth=0.;coins=dict(world.currency.wallets.get(p.id,{}));world.currency.transfer(p.id,heir,coins);world.emit('inheritance',Layer.SOCIETY,(Ref('person',heir),Ref('person',p.id)),Ref('settlement',p.settlement),(e.id,),wealth=inherited,coin_transfer=coins)
  return e
