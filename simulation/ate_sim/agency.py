@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
+from operator import attrgetter
 from .core_types import layer_ref
 from .magic_progression import practice_ability,record_body_transition
 from .rank_ecology import rank_ecology_step
@@ -20,6 +21,7 @@ AGENCY_ACTION_FUNCTIONS={
 }
 ACTION_DOMAIN={'secure_food':'agriculture','prepare':'defense','work':'craft',
                'learn':'knowledge','teach':'knowledge','build':'construction'}
+_ATTACHMENT=attrgetter('attachment')
 @dataclass
 class MotiveState:hunger:float=0.;safety:float=0.;belonging:float=0.;wealth:float=0.;curiosity:float=0.;legacy:float=0.;obligation:float=0.;status:float=0.
 @dataclass
@@ -108,17 +110,12 @@ def agency_step(world,rng):
  for p in people:
   if p.age<18:
    for parent in p.parents:dependents[parent]=dependents.get(parent,0)+1
- # Compute the same maximum attachment once by traversing each relationship
- # edge once, instead of materializing every person's relationship view.
- attachment_max={}
- for rel in world.social.edges.values():
-  value=rel.attachment
-  if value>attachment_max.get(rel.a,0.):attachment_max[rel.a]=value
-  if value>attachment_max.get(rel.b,0.):attachment_max[rel.b]=value
  current_actions={}
  for p in people:
   if p.age<16:continue
-  attachment=attachment_max.get(p.id,0.)
+  # The per-person reference index includes historical/deceased relationships
+  # and tracks direct relationship mutations. Do not scan the global archive.
+  attachment=max(map(_ATTACHMENT,world.social.relationships_for(p.id)),default=0.)
   rr=rng.stream('agency',world.year,p.id);action,motive,strength=world.agency.choose(world,p,rr,attachment,dependents.get(p.id,0));domain=ACTION_DOMAIN.get(action);event=None
   if domain:world.skills.practice(p.id,domain,.12+.38*strength)
   if p.rank>0:_practice_path(world,p,rr,action,strength)
