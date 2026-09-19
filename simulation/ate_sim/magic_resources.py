@@ -9,11 +9,12 @@ from math import ceil
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
 
 RESOURCE_DISCOVERY_RATE=.45
+ORDINARY_ESSENCE_IDS=tuple(k for k,v in ESSENCES.items() if v.get('rarity') in ('Common','Uncommon'))
 
-@dataclass
+@dataclass(slots=True)
 class MagicAspiration:
  drive:float;desired_base_essences:int;desired_abilities:int;reason:str;formed_year:int;preparation:float=0.;search_years:int=0;completion_goal:bool=False;urgency:float=.0;compromise_tolerance:float=.5;stone_selectiveness:float=.5;risk_tolerance:float=.5;adventurer_aspiration:bool=False
-@dataclass
+@dataclass(slots=True)
 class MagicResource:
  id:int;kind:str;key:str;rarity:str;location:int|None;owner_kind:str|None=None;owner_id:int|None=None;created_year:int=0;origin_event:int|None=None;consumed_year:int|None=None;consumed_by:int|None=None;consumed_event:int|None=None;transfers:list[int]=field(default_factory=list)
 @dataclass
@@ -61,7 +62,7 @@ def absorb_essence_resource(world,pid,rid):
  if path is not None and (r.key in path.base_essences or len(path.base_essences)>=3):return path,[]
  Layer,Ref=layer_ref();e=world.emit('essence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),((r.origin_event,) if r.origin_event else ()),resource=rid,essence=r.key);world.magic_resources.consume(rid,pid,world.year,e.id);path,created=world.advancement.absorb_essence(pid,r.key,world.year,person_context(p,p.settlement),e.id);p.rank=world.advancement.rank(pid)
  a=world.magic_resources.aspirations.get(pid)
- if a is not None and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
+ if a is not None and a.adventurer_aspiration:_commit_to_full_path(a)
  if any(a.source=='confluence' for a in created):
   formation=world.emit('confluence_formed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(e.id,),base_essences=tuple(path.base_essences),confluence=path.confluence)
   world.emit('confluence_absorbed',Layer.REALITY,(Ref('person',pid),),Ref('settlement',p.settlement),(formation.id,),confluence=path.confluence,mechanism='touch',automatic_acceptance=True)
@@ -119,11 +120,18 @@ def _environmental_essence(world,rng,sid):
   if x<=0:return key,tags
  return weighted[-1][0],tags
 
-def _make_resource(world,rng,sid,finder,kind=None,cause=None,method='chance discovery'):
+def _make_resource(world,rng,sid,finder,kind=None,cause=None,method='chance discovery',owner_kind=None,owner_id=None):
  Layer,Ref=layer_ref();kind=kind or ('essence' if rng.random()<.6 else 'awakening_stone');tags=()
  if kind=='essence':key,tags=_environmental_essence(world,rng,sid);rarity=ESSENCES[key]['rarity']
  else:key=STONE_IDS[int(rng.random()*len(STONE_IDS))%len(STONE_IDS)];rarity=AWAKENING_STONES[key]['rarity']
- causes=() if cause is None else (cause,);e=world.emit('magic_resource_discovered',Layer.REALITY,(Ref('person',finder.id),),Ref('settlement',sid),causes,resource_kind=kind,key=key,rarity=rarity,method=method,environment_tags=tags,manifestation_basis='local magical ecology' if kind=='essence' else 'awakening resonance');return world.magic_resources.create(kind,key,rarity,world.year,sid,'person',finder.id,e.id)
+ causes=() if cause is None else (cause,)
+ actors=() if finder is None else (Ref('person',finder.id),)
+ e=world.emit('magic_resource_discovered',Layer.REALITY,actors,Ref('settlement',sid),causes,resource_kind=kind,key=key,rarity=rarity,method=method,environment_tags=tags,manifestation_basis='local magical ecology' if kind=='essence' else 'awakening resonance')
+ if owner_kind is None:
+  owner_kind='settlement' if finder is None else 'person'
+ if owner_id is None:
+  owner_id=sid if owner_kind=='settlement' else (None if finder is None else finder.id)
+ return world.magic_resources.create(kind,key,rarity,world.year,sid,owner_kind,owner_id,e.id)
 def _discover(world,rng,sid,people):
  if not people:return None
  finder=people[int(rng.random()*len(people))%len(people)];return _make_resource(world,rng,sid,finder)
@@ -143,21 +151,26 @@ def _recover_dead_owner_resources(world):
 def _aspiration(world,p):
  a=world.magic_resources.aspirations.get(p.id)
  if a:return a
- family=sum(1 for x in p.parents if world.advancement.essence_user(x));contacts=sum(1 for x in world.social.neighbors(p.id) if world.advancement.essence_user(x));m=world.agency.motives.get(p.id);status=0 if m is None else m.status
+ paths=world.advancement.paths
+ family=sum(1 for x in p.parents if x in paths)
+ contacts=sum(1 for x in world.social.neighbors(p.id) if x in paths)
+ motive=world.agency.motives.get(p.id);status=0. if motive is None else motive.status
+ intrinsic=max(0.,min(1.,.60*p.curiosity+.25*(1-p.inhibition)+.15*status))
+ entry=max(0.,min(1.,.55*p.curiosity+.25*(1-p.inhibition)+.10*status))
  drive=max(0.,min(1.,.46*p.curiosity+.18*(1-p.inhibition)+.12*status+.10*min(2,family)+.05*min(3,contacts)))
- adventurer=(p.occupation in ('adventurer','guard','hunter','soldier')) or (drive>.68 and (p.curiosity>.58 or status>.42))
- interested=drive>=.34 or family>0 or contacts>=2
- serious=interested and (adventurer or drive>=.40 or family>0 or contacts>=2)
- completion=serious
- if not interested:desired=0
- elif completion:desired=3
- else:desired=1
+ defense=world.skills.get(p.id,'defense').level
+ adventurer=(p.occupation in ('adventurer','guard','hunter','soldier')) or (intrinsic>=.82 and defense>=.55)
+ interested=(adventurer or entry>=.35 or (family>0 and entry>=.27 and p.curiosity>=.30) or (contacts>=3 and entry>=.30 and p.curiosity>=.40))
+ completion=interested and (adventurer or p.occupation=='magical craftsperson' or intrinsic>=.86)
+ desired=0 if not interested else (3 if completion else 1)
  urgency=max(0.,min(1.,.18+.55*drive+(.22 if adventurer else 0.)+.08*min(2,family))) if interested else 0.
  compromise=max(.05,min(.95,.70-.38*p.inhibition+.18*drive+(.12 if adventurer else 0.)))
  selectivity=max(.05,min(.95,.66+.22*p.inhibition-.25*urgency))
  risk=max(.05,min(.95,.25+.42*drive+.20*(1-p.inhibition)+(.15 if adventurer else 0.)))
  reason='adventure' if adventurer else ('family tradition' if family else ('curiosity' if p.curiosity>.7 else ('ambition' if status>.45 else 'capability')))
- a=MagicAspiration(drive,desired,0 if desired==0 else (20 if completion else 5),reason,world.year,completion_goal=completion,urgency=urgency,compromise_tolerance=compromise,stone_selectiveness=selectivity,risk_tolerance=risk,adventurer_aspiration=adventurer);world.magic_resources.aspirations[p.id]=a;return a
+ a=MagicAspiration(drive,desired,0 if desired==0 else (20 if completion else 5),reason,world.year,completion_goal=completion,urgency=urgency,compromise_tolerance=compromise,stone_selectiveness=selectivity,risk_tolerance=risk,adventurer_aspiration=adventurer)
+ world.magic_resources.aspirations[p.id]=a;return a
+
 def _wants(world,p,r):
  a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences);abilities=0 if path is None else len(path.abilities)
  if r.kind=='essence':return base<a.desired_base_essences and (path is None or r.key not in path.base_essences)
@@ -273,18 +286,51 @@ def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None):
  if on_transfer is not None:on_transfer(q)
  return True
 
+def _ordinary_manifestations(world,rng,sid,people):
+ """Produce bounded common/uncommon settlement stock from ordinary local magic.
+
+ This is a physical ecology process, not an aspirant fulfillment function.
+ Identity is selected from environmental context and rarity only.
+ """
+ if not people:return 0
+ first_seekers=0
+ for p in people:
+  a=_aspiration(world,p);path=world.advancement.path(p.id)
+  base=0 if path is None else len(path.base_essences)
+  if a.desired_base_essences>base and base==0:first_seekers+=1
+ stock=world.magic_resources.inventory('settlement',sid,'essence')
+ ordinary_stock=sum(r.key in ORDINARY_ESSENCE_IDS for r in stock)
+ buffer=min(12,2+len(people)//30+min(6,first_seekers//3))
+ count=max(0,min(4,buffer-ordinary_stock))
+ if count<=0:return 0
+ tags=_environment_tags(world,sid);weighted=[(k,w) for k,w in _environment_weights(tags) if k in ORDINARY_ESSENCE_IDS]
+ Layer,Ref=layer_ref()
+ for n in range(count):
+  rr=rng.stream('ordinary_essence_manifestation',world.year,sid*16+n)
+  if weighted:
+   total=sum(w for _,w in weighted);x=rr.random()*total;key=weighted[-1][0]
+   for candidate,w in weighted:
+    x-=w
+    if x<=0:key=candidate;break
+  else:key=ORDINARY_ESSENCE_IDS[int(rr.random()*len(ORDINARY_ESSENCE_IDS))%len(ORDINARY_ESSENCE_IDS)]
+  rarity=ESSENCES[key]['rarity']
+  e=world.emit('ordinary_essence_manifested',Layer.REALITY,location=Ref('settlement',sid),
+      resource_kind='essence',key=key,rarity=rarity,environment_tags=tags,
+      manifestation_basis='ordinary ambient magical ecology')
+  world.magic_resources.create('essence',key,rarity,world.year,sid,'settlement',sid,e.id)
+ return count
+
+
 def magic_ecology_step(world,rng):
- Layer,Ref=layer_ref();_recover_dead_owner_resources(world);adults_by_settlement={sid:[] for sid in world.settlements}
- for p in world.current_people():
-  if p.alive and p.age>=16:adults_by_settlement[p.settlement].append(p)
- for sid in adults_by_settlement:adults_by_settlement[sid].sort(key=lambda p:p.id)
+ Layer,Ref=layer_ref();_recover_dead_owner_resources(world);adults_by_settlement=world.adults_by_settlement(16)
  for sid,people in sorted(adults_by_settlement.items()):
   c=world.cells[(world.settlements[sid].x,world.settlements[sid].y)];rr=rng.stream('magic_discovery',world.year,sid);ambient=world.ambient_magic.field(sid).level
+  _ordinary_manifestations(world,rng,sid,people)
   chance=RESOURCE_DISCOVERY_RATE*min(.16,.010+.00004*len(people)+.025*c.hazard+.008*c.forest+.04*max(0.,ambient-.5))
   if rr.random()<chance:_discover(world,rr,sid,people)
   market={};matching=_SettlementMarket(world,people)
   for r in world.magic_resources.inventory('settlement',sid):
-   key=_demand_key(r);price=(7 if r.kind=='essence' else 3)
+   key=_demand_key(r);price=(1.0 if r.kind=='essence' and r.key in ORDINARY_ESSENCE_IDS else (7 if r.kind=='essence' else 3))
    if key not in market:market[key]=matching.contenders(r,price)
    seekers=[p for p in market[key] if p.wealth>=price or can_pay_tier(world,p.id,'iron',price)]
    # Wealth only decreases in this phase. Retry lower priority groups after the
@@ -295,15 +341,15 @@ def magic_ecology_step(world,rng):
     institution=world.institutions.institution_by_kind('adventure_society')
     coins={}
     if q.wealth>=price:q.wealth-=price
-    elif institution is not None:
-     coins=world.currency.treasury_transfer(institution.id,q.id,{'iron':price},deposit=True)
+    elif institution is not None and float(price).is_integer():
+     coins=world.currency.treasury_transfer(institution.id,q.id,{'iron':int(price)},deposit=True)
     else:continue
     e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price,coin_deposit=coins,institution=None if institution is None else institution.id,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
  demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
-  if path is not None and not a.completion_goal and (a.adventurer_aspiration or a.drive>=.34):_commit_to_full_path(a)
+  if path is not None and not a.completion_goal and a.adventurer_aspiration:_commit_to_full_path(a)
   if a.desired_base_essences>base:
    a.search_years+=1;a.preparation=min(1.,a.preparation+.0025*(.5+a.drive+.5*a.urgency));sought=None
    if rr.random()<.015*(.4+a.drive+.4*a.urgency):sought=world.emit('magic_resource_sought',Layer.SOCIETY,(Ref('person',p.id),),Ref('settlement',p.settlement),reason=a.reason,drive=round(a.drive,3),urgency=round(a.urgency,3),preparation=round(a.preparation,3),search_years=a.search_years,completion_goal=a.completion_goal)
