@@ -67,8 +67,11 @@ class World:
   # against that range instead of hashing every cause into a million-entry set.
   if causes:
    limit=self.next_event
-   for cause in causes:
-    if cause<=0 or cause>=limit:raise ValueError('event cause does not exist')
+   if len(self.event_ids)==limit-1:
+    for cause in causes:
+     if cause<=0 or cause>=limit:raise ValueError('event cause does not exist')
+   elif any(cause not in self.event_ids for cause in causes):
+    raise ValueError('event cause does not exist')
   if kind in ('birth','death','resurrection'):self.__dict__.pop('_living_cache',None)
   e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id)
   return e
