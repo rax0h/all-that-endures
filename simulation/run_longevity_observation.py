@@ -165,8 +165,9 @@ def snapshot(world,founding_species,interval_wall,interval_cpu):
             'active_threats':sum(t.location==sid for t in active_threats),
         }
 
-    interval=_activity_report(world.events)
-    interval['activity_window_years']=0 if interval['first_event_year'] is None else world.year-interval['first_event_year']+1
+    recent_start=max(0,world.year-99)
+    interval=_activity_report(world.events_between(recent_start,world.year))
+    interval['activity_window_years']=world.year-recent_start+1
     expected={
         'birth':interval['event_kinds'].get('birth',0),
         'death':interval['event_kinds'].get('death',0),
@@ -286,31 +287,17 @@ def snapshot(world,founding_species,interval_wall,interval_cpu):
     }
 
 
-def main(seed=917263,years=10000,checkpoints=CHECKPOINTS,chunk_years=250,event_years_retained=100,max_wall_seconds=180):
+def main(seed=917263,years=10000,checkpoints=CHECKPOINTS):
     checkpoints=tuple(sorted(set(int(x) for x in checkpoints if 0<int(x)<=years)))
     if not checkpoints or checkpoints[-1]!=years:checkpoints=(*checkpoints,years)
     world=generate_world(seed);sim=Simulation(world)
     founding_species=sorted({p.species for p in world.current_people()})
     print(json.dumps({'record':'longevity_start','seed':seed,'years':years,'checkpoints':checkpoints,
-                      'founding_species':founding_species,'chunk_years':chunk_years,
-                      'event_years_retained':event_years_retained},sort_keys=True),flush=True)
-    last_checkpoint=0;overall_start=perf_counter()
+                      'founding_species':founding_species,'mode':'pure_exact_simulation'},sort_keys=True),flush=True)
+    last_checkpoint=0
     for mark in checkpoints:
         wall=perf_counter();cpu=process_time()
-        while world.year<mark:
-            step=min(chunk_years,mark-world.year)
-            sim.run(step)
-            protected=set()
-            for notice in world.institutions.notices.values():
-                if notice.status in ('resolved','expired'):continue
-                resolution=world.threat_ecology.resolutions.get(notice.cause_event)
-                if resolution is not None:protected.add(resolution)
-            world.prune_event_payloads_before_year(max(0,world.year-event_years_retained),protected)
-            elapsed_total=perf_counter()-overall_start
-            if max_wall_seconds is not None and elapsed_total>max_wall_seconds:
-                print(json.dumps({'record':'longevity_budget_exceeded','seed':seed,'year':world.year,
-                                  'elapsed_seconds':round(elapsed_total,3),'budget_seconds':max_wall_seconds},sort_keys=True),flush=True)
-                raise SystemExit(f'longevity observation exceeded {max_wall_seconds:.0f}s wall budget at year {world.year}')
+        sim.run(mark-last_checkpoint)
         wall_elapsed=perf_counter()-wall;cpu_elapsed=process_time()-cpu
         if world.year!=mark:raise RuntimeError(f'expected year {mark}, got {world.year}')
         report=snapshot(world,founding_species,wall_elapsed,cpu_elapsed)
@@ -324,12 +311,9 @@ def main(seed=917263,years=10000,checkpoints=CHECKPOINTS,chunk_years=250,event_y
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description='Sparse, broad deep-time health observation without archive export or canonical digest.')
+    parser=argparse.ArgumentParser(description='Pure exact deep-time simulation with sparse checkpoint reports.')
     parser.add_argument('--seed',type=int,default=917263)
     parser.add_argument('--years',type=int,default=10000)
     parser.add_argument('--checkpoints',type=int,nargs='*',default=list(CHECKPOINTS))
-    parser.add_argument('--chunk-years',type=int,default=250)
-    parser.add_argument('--event-years-retained',type=int,default=100)
-    parser.add_argument('--max-wall-seconds',type=float,default=180)
     args=parser.parse_args()
-    main(args.seed,args.years,args.checkpoints,args.chunk_years,args.event_years_retained,args.max_wall_seconds)
+    main(args.seed,args.years,args.checkpoints)
