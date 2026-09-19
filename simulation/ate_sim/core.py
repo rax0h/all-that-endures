@@ -105,7 +105,7 @@ class World:
    if isinstance(self.event_ids,EventIdIndex) and len(self.event_ids)==limit-1:
     if any(c<=0 or c>=limit for c in causes):raise ValueError('event cause does not exist')
    elif any(c not in self.event_ids for c in causes):raise ValueError('event cause does not exist')
-  if kind in ('birth','death','resurrection','household_migrated'):self.invalidate_runtime()
+  if kind in ('birth','death','resurrection','household_formed','household_split','household_migrated'):self.invalidate_runtime()
   e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id)
   from .magic_progression import observe_experience
   observe_experience(self,e)
