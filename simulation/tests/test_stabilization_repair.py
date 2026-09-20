@@ -93,7 +93,7 @@ def test_gold_workload_does_not_bypass_understanding():
     for a in path.abilities:a.rank=4
     p.rank=4;a=_aspiration(w,p);a.urgency=a.drive=1.;p.curiosity=1.
     _,_,uses,_=_career_training(w,p,path,a,True,1.)
-    assert 12<=uses<=18
+    assert 6<=uses<=10
     assert all(not ability.understanding.ready(4) for ability in path.abilities)
 
 

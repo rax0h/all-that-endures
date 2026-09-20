@@ -38,9 +38,9 @@ def _career_training(world,p,path,asp,member,strength,body_rank=None):
   # commitment. The Diamond gate is still enforced in AdvancementState.practice.
   if not member or ambition<.56:return None
   # Independent Gold problems consume a finite professional year. Commitment
-  # permits twelve to eighteen focused sessions, not twenty full annual allocations.
+  # permits six to ten focused sessions, not twenty full annual allocations.
   # Each ability still needs its own mastery proofs; no body-rank shortcut.
-  return ('focused',.72+.25*strength+.30*ambition,12+int(6*ambition),.72+.28*p.curiosity)
+  return ('focused',.72+.25*strength+.30*ambition,6+int(4*ambition),.72+.28*p.curiosity)
  return None
 
 def rank_ecology_step(world,rng):

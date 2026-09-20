@@ -1,4 +1,16 @@
-# Stage 0.5 validation: not ready (2026-09-20)
+# Diamond workload restoration (2026-09-20)
+
+The current candidate restores only the Gold professional session allowance
+from `12 + int(6 * ambition)` to `6 + int(4 * ambition)`. Corrected weakest-first
+selection and missing-evidence scheduling remain intact. Ability rates,
+mastery requirements, economy and performance implementation are unchanged.
+Targeted tests precede one canonical validation; results are pending.
+
+The earlier zero-Diamond result did not isolate workload from the scheduling
+bug, so it did not justify increasing the allowance. The 65-Diamond experiment
+and its measured failures below are historical, not this candidate's results.
+
+# Prior Stage 0.5 validation: not ready
 
 Tested implementation: `820241efe748f29f2d0c827a70487fb8391bb2dc`.
 [Actions run](https://github.com/rax0h/all-that-endures/actions/runs/35512882584).

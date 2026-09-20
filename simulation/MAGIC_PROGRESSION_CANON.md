@@ -394,14 +394,16 @@ apprentice payrolls request lower-denomination output; spare capacity produces
 the native denomination. Already minted coins still require a funded
 counterparty for exchange. Coin ratios and resource prices do not change.
 
-Gold professional practice is bounded to twelve to eighteen focused ability sessions
+Gold professional practice is bounded to six to ten focused ability sessions
 per year, depending on existing commitment, instead of twenty full annual
 allocations. This approximates increasingly demanding practical research. It
 does not substitute for per-ability understanding or the all-twenty body gate.
 No target rank counts, age deadlines, or population feedback control it.
 
-This session budget is an unaccepted calibration experiment: validation at
-`820241e` produced 65 living Diamonds and failed the performance gate. Focused
-selection now genuinely chooses unfinished abilities; the earlier shuffle had
-erased that priority. Do not interpret the budget as canon or finalized pacing.
+The temporary 12–18-session increase is reverted: validation at `820241e`
+produced 65 living Diamonds. Its earlier justification conflated pacing with
+a scheduling defect. Focused selection now genuinely chooses unfinished
+abilities; the earlier shuffle had erased that priority. The restored 6–10
+budget is an ATE workload approximation, not canon or a population target.
+Validation of this isolated restoration is pending.
 See STAGE_0_5_STABILIZATION.md for measurements and current limitations.
