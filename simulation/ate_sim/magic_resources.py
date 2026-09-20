@@ -19,9 +19,16 @@ class MagicResource:
 @dataclass
 class MagicResourceState:
  resources:dict[int,MagicResource]=field(default_factory=dict);owner_index:dict[tuple[str,int],set[int]]=field(default_factory=dict);aspirations:dict[int,MagicAspiration]=field(default_factory=dict);next_id:int=1
+ def __getstate__(self):
+  return {k:v for k,v in self.__dict__.items() if not k.startswith("_query_")}
+ def _invalidate_inventory(self,r):
+  getattr(self,"_query_inventory",{}).pop((r.owner_kind,r.owner_id),None)
+  if r.owner_kind=="person":getattr(self,"_query_selection",{}).pop(r.owner_id,None)
  def _index_add(self,r):
+  self._invalidate_inventory(r)
   if r.owner_kind is not None and r.owner_id is not None:self.owner_index.setdefault((r.owner_kind,r.owner_id),set()).add(r.id)
  def _index_remove(self,r):
+  self._invalidate_inventory(r)
   if r.owner_kind is None or r.owner_id is None:return
   key=(r.owner_kind,r.owner_id);bucket=self.owner_index.get(key)
   if bucket is not None:
@@ -32,7 +39,16 @@ class MagicResourceState:
  def available(self,rid):
   r=self.resources.get(rid);return r is not None and r.consumed_year is None
  def inventory(self,owner_kind,owner_id,kind=None):
-  ids=sorted(self.owner_index.get((owner_kind,owner_id),()));return [self.resources[rid] for rid in ids if self.resources[rid].consumed_year is None and (kind is None or self.resources[rid].kind==kind)]
+  cache=getattr(self,'_query_inventory',None)
+  if cache is None:cache=self._query_inventory={}
+  key=(owner_kind,owner_id)
+  if key not in cache:
+   values=tuple(self.resources[rid] for rid in sorted(self.owner_index.get(key,())) if self.resources[rid].consumed_year is None)
+   if not values:return []
+   cache[key]={None:values}
+  kinds=cache[key]
+  if kind not in kinds:kinds[kind]=tuple(r for r in kinds[None] if r.kind==kind)
+  return list(kinds[kind])
  def transfer(self,rid,owner_kind,owner_id,event_id,location=None):
   r=self.resources[rid]
   if r.consumed_year is not None:raise ValueError('consumed magical resource cannot be transferred')
@@ -186,6 +202,23 @@ def _wanted_resources(world,person,resources,wanted=True):
   if decisions[key]==wanted:result.append(resource)
  return result
 
+def _circulation_stock(world,person):
+ """Exact ordered selections, invalidated by ownership or demand changes."""
+ resources=world.magic_resources;path=world.advancement.path(person.id);a=_aspiration(world,person)
+ signature=(a.desired_base_essences,a.desired_abilities,None if path is None else (tuple(path.base_essences),len(path.abilities),path.capacity))
+ cache=getattr(resources,'_query_selection',None)
+ if cache is None:cache=resources._query_selection={}
+ previous=cache.get(person.id)
+ if previous is not None and previous[0]==signature:return previous[1]
+ held=resources.inventory('person',person.id);ess=[];stones=[];surplus=[]
+ for resource in held:
+  if _wants(world,person,resource):(ess if resource.kind=='essence' else stones).append(resource)
+  else:surplus.append(resource)
+ result=(ess,stones,surplus)
+ if held:cache[person.id]=(signature,result)
+ return result
+
+
 def _demand_state(world,p):
  a=_aspiration(world,p);path=world.advancement.path(p.id)
  return (a.drive,a.urgency,a.preparation,a.desired_base_essences,a.desired_abilities,
@@ -197,22 +230,27 @@ def _eligible_kind(state,kind):
  return path is not None and path[1]<state[4] and path[1]<path[2]
 
 class _SettlementMarket:
- """Fixed-priority groups, built once when the first resource is offered."""
+ """Lazy paid-demand queues; priorities fixed while wealth only decreases."""
  def __init__(self,world,people):
-  self.world=world;self.people=people;self.groups=None
+  self.world=world;self.people={p.id:p for p in people};self.heaps={};self.owned={}
  def contenders(self,resource,min_wealth=0.):
-  if self.groups is None:
-   groups={'essence':{},'awakening_stone':{}}
-   for p in self.people:
-    state=_demand_state(self.world,p);priority=(state[1],state[0],state[2]);path=state[5]
-    for kind in groups:
-     if _eligible_kind(state,kind):groups[kind].setdefault(priority,[]).append((p,() if path is None else path[0]))
-   self.groups={kind:[group for priority,group in sorted(values.items(),reverse=True)] for kind,values in groups.items()}
-  kind='essence' if resource.kind=='essence' else 'awakening_stone'
-  for group in self.groups[kind]:
-   candidates=[p for p,owned in group if (p.wealth>=min_wealth or can_pay_tier(self.world,p.id,'iron',ceil(min_wealth))) and (kind!='essence' or resource.key not in owned)]
-   if candidates:return candidates
-  return []
+  key=(resource.kind,min_wealth)
+  if key not in self.heaps:
+   heap=[]
+   for p in self.people.values():
+    state=_demand_state(self.world,p);self.owned[p.id]=() if state[5] is None else state[5][0]
+    if _eligible_kind(state,resource.kind) and (p.wealth>=min_wealth or can_pay_tier(self.world,p.id,'iron',ceil(min_wealth))):heap.append((-state[1],-state[0],-state[2],p.id))
+   heapify(heap);self.heaps[key]=heap
+  heap=self.heaps[key];removed=[];result=[];priority=None
+  while heap:
+   entry=heap[0];p=self.people[entry[3]]
+   if not (p.wealth>=min_wealth or can_pay_tier(self.world,p.id,'iron',ceil(min_wealth))):heappop(heap);continue
+   if priority is not None and entry[:3]!=priority:break
+   removed.append(heappop(heap))
+   if resource.kind=='essence' and resource.key in self.owned[p.id]:continue
+   priority=entry[:3];result.append(p)
+  for entry in removed:heappush(heap,entry)
+  return result
 
 class _SettlementDemand:
  """Two current eligibility heaps; essence identity is an exclusion at lookup.
@@ -262,7 +300,8 @@ class TransferMarket:
   a=_aspiration(self.world,p)
   return (-a.urgency,-a.drive,-a.preparation,-p.wealth,p.id,self.versions.get(p.id,0))
  def _eligible(self,p,kind,price):
-  return _eligible_kind(_demand_state(self.world,p),kind) and (p.wealth>=price or can_pay_tier(self.world,p.id,'iron',ceil(price)))
+  if p.id not in self.states:self.states[p.id]=(_demand_state(self.world,p),p.wealth,self.world.currency.wallets.get(p.id,{}).get('iron',0))
+  return _eligible_kind(self.states[p.id][0],kind) and (p.wealth>=price or can_pay_tier(self.world,p.id,'iron',ceil(price)))
  def refresh(self,p):
   state=(_demand_state(self.world,p),p.wealth,self.world.currency.wallets.get(p.id,{}).get('iron',0))
   if self.states.get(p.id)==state:return
@@ -340,6 +379,7 @@ def magic_ecology_step(world,rng):
     else:continue
     e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price,coin_deposit=coins,institution=None if institution is None else institution.id,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
  demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}
+ transfers={sid:TransferMarket(world,people) for sid,people in adults_by_settlement.items()}
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
@@ -358,7 +398,7 @@ def magic_ecology_step(world,rng):
   stones=world.magic_resources.inventory('person',p.id,'awakening_stone') if path is not None and len(path.abilities)<min(a.desired_abilities,path.capacity) else []
   if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity) and rr.random()<.15+.34*a.drive+.18*a.urgency:
    if rr.random()<max(.12,1-a.stone_selectiveness):use_awakening_stone(world,p.id,stones[int(rr.random()*len(stones))%len(stones)].id)
-  demand=demands[p.settlement];demand.refresh(p)
+  demand=demands[p.settlement];demand.refresh(p);transfers[p.settlement].refresh(p)
   held=world.magic_resources.inventory('person',p.id)
   if held:
    surplus=_wanted_resources(world,p,held,wanted=False)
@@ -369,4 +409,4 @@ def magic_ecology_step(world,rng):
     for r in demand_types.values():
      pressure=max(pressure,demand.pressure(r,p.id))
     conditional=(.04+.16*min(1.,pressure))/.20
-    if rr.random()<conditional:_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,local,rr,on_transfer=demand.refresh)
+    if rr.random()<conditional:_transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],p,local,rr,on_transfer=demand.refresh,market=transfers[p.settlement])

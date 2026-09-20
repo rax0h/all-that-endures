@@ -37,9 +37,10 @@ def _career_training(world,p,path,asp,member,strength):
   # Gold adventurers need both institutional/field continuity and exceptional personal
   # commitment. The Diamond gate is still enforced in AdvancementState.practice.
   if not member or ambition<.56:return None
-  # Diamond remains attainable, but Gold training is intentionally much slower than the
-  # earlier ranks so a living population does not accumulate dozens of near-routine Diamonds.
-  return ('all',.72+.25*strength+.30*ambition,20,.72+.28*p.curiosity)
+  # Independent Gold problems consume a finite professional year. Commitment
+  # permits six to ten focused sessions, not twenty full annual allocations.
+  # Each ability still needs its own mastery proofs; no body-rank shortcut.
+  return ('focused',.72+.25*strength+.30*ambition,6+int(4*ambition),.72+.28*p.curiosity)
  return None
 
 def rank_ecology_step(world,rng):
@@ -68,10 +69,10 @@ def rank_ecology_step(world,rng):
   else:
    candidates=[x for x in indexed if x[1].function in relevant] or indexed
    exposure=.16+.20*strength;uses=min(len(candidates),4)
-  rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates);before=world.advancement.rank(p.id)
+  rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates);before=world.advancement.rank(p.id);session=world.advancement.practice_batch(p.id)
   for i,a in candidates[:uses]:
    reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity)
-   practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action)
+   practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action,session=session)
   if len(path.abilities)==20 and (member or action in ('work','learn','teach','build','prepare')):
    mastery_training_step(world,p,path,rng.stream('mastery_training',world.year,p.id))
   after=world.advancement.rank(p.id);p.rank=after

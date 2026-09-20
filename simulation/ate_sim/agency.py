@@ -22,9 +22,9 @@ def _practice_path(world,p,rr,action,strength):
  path=world.advancement.path(p.id)
  if path is None or not path.abilities:return
  relevant={'secure_food':{'creation','control','support','detection','recovery'},'prepare':{'enhancement','control','movement','detection','recovery'},'work':{'creation','enhancement','control','support','exchange'},'socialize':{'influence','support','detection','exchange'},'learn':{'detection','control','transformation','support'},'teach':{'influence','support','control','exchange'},'build':{'creation','enhancement','control','transformation'}}.get(action,set())
- candidates=[(i,a) for i,a in enumerate(path.abilities) if a.function in relevant] or list(enumerate(path.abilities));rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));before=world.advancement.rank(p.id)
+ candidates=[(i,a) for i,a in enumerate(path.abilities) if a.function in relevant] or list(enumerate(path.abilities));rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));before=world.advancement.rank(p.id);session=world.advancement.practice_batch(p.id)
  for i,a in candidates[:uses]:
-  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action)
+  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,session=session)
  after=world.advancement.rank(p.id)
  record_body_transition(world,p,before,context=action)
 

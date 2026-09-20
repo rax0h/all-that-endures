@@ -4,9 +4,44 @@ Farm yields, tax shares and service prices are explicit ATE approximations.
 Harvesting monsters does not call any currency production function.
 """
 from .core_types import layer_ref
-from .currency import denomination_for_rank
+from .currency import denomination_for_rank, COIN_VALUE, ranked_reward
 from .threat_ecology import supported_rank
 from .magic_progression import record_application
+
+
+def _coin_demand(world, society, living):
+    """Actual contracts plus two payrolls for available apprentice places."""
+    demand={}
+    for notice in world.institutions.notices.values():
+        if notice.status=='resolved':continue
+        for denomination,n in ranked_reward(notice.required_rank,1.,include_change=False).items():
+            demand[denomination]=demand.get(denomination,0)+n
+    for sid,people in living.items():
+        if world.institutions.branch_for('adventure_society',sid) is None:continue
+        candidates=0
+        for p in people:
+            a=world.magic_resources.aspirations.get(p.id);path=world.advancement.path(p.id)
+            if p.alive and p.age>=16 and a and a.completion_goal and a.drive>=.4 and (path is None or len(path.abilities)<20):candidates+=1
+        demand['iron']=demand.get('iron',0)+8*min(3,candidates)
+    return demand
+
+
+def _farm_output(tier, quantity, demand, treasury):
+    """Finite worked cultivation, not conversion of already-existing coins.
+
+    Lower-tier output is requested by real pending payments. Remaining capacity
+    grows the native tier. Half the harvest funds the protection agreement.
+    Value-equivalent cultivation capacity is an explicit ATE yield approximation.
+    """
+    native=denomination_for_rank(tier);budget=quantity*COIN_VALUE[native];out={}
+    for denomination,value in COIN_VALUE.items():
+        if value>=COIN_VALUE[native]:break
+        shortage=max(0,demand.get(denomination,0)-treasury.get(denomination,0))
+        count=min(2*shortage,budget//value)
+        if count:out[denomination]=count;budget-=count*value
+    count=budget//COIN_VALUE[native]
+    if count:out[native]=count
+    return out
 
 
 def spirit_economy_step(world,rng):
@@ -15,6 +50,7 @@ def spirit_economy_step(world,rng):
     if society is None:return
     farms={a.settlements[0]:a for a in world.infrastructure.assets.values() if a.kind=='spirit_coin_farm'}
     living=world.living_by_settlement()
+    demand=_coin_demand(world,society,living)
     for sid,people in sorted(living.items()):
         eligible=[p for p in people if p.age>=16 and p.rank>=1 and world.skills.get(p.id,'craft').level>=.7]
         if not eligible:continue
@@ -42,11 +78,13 @@ def spirit_economy_step(world,rng):
         tier=min(farmer.rank,operator.rank,supported_rank(ambient),5)
         if farm.condition<.5:continue
         # One working operator, one annual harvest, limited by site AND operator.
-        denomination=denomination_for_rank(tier);coins={denomination:max(1,int(24*farm.condition))}
+        denomination=denomination_for_rank(tier)
+        coins=_farm_output(tier,max(1,int(24*farm.condition)),demand,world.currency.treasuries.get(society.id,{}))
+        produced_tier=max(rank for rank in range(1,tier+1) if coins.get(denomination_for_rank(rank),0))
         world.currency.credit(farmer.id,coins)
-        e=world.emit('spirit_coins_cultivated',Layer.REALITY,(Ref('person',farmer.id),),Ref('settlement',sid),(farm.origin_event,),farm=farm.id,ambient=ambient,production_rank=tier,challenge_complexity=tier,used_abilities=(operator.semantic_key,),coin_created=coins,mechanism='worked ambient coin cultivation')
-        record_application(world,farmer,operator,e,constraint=f'cultivation:{sid}:{int(world.local[sid].rain*4)}',difficulty=tier,outcome=float(coins[denomination]))
-        levy={denomination:coins[denomination]//2}
+        e=world.emit('spirit_coins_cultivated',Layer.REALITY,(Ref('person',farmer.id),),Ref('settlement',sid),(farm.origin_event,),farm=farm.id,ambient=ambient,production_rank=produced_tier,capacity_rank=tier,challenge_complexity=produced_tier,used_abilities=(operator.semantic_key,),coin_created=coins,mechanism='worked ambient coin cultivation')
+        record_application(world,farmer,operator,e,constraint=f'cultivation:{sid}:{int(world.local[sid].rain*4)}',difficulty=produced_tier,outcome=float(coins[denomination_for_rank(produced_tier)]))
+        levy={d:n//2 for d,n in coins.items() if n//2}
         world.currency.treasury_transfer(society.id,farmer.id,levy,deposit=True)
         world.emit('society_treasury_funded',Layer.SOCIETY,(Ref('person',farmer.id),Ref('institution',society.id)),Ref('settlement',sid),(e.id,),coin_deposit=levy,institution=society.id,mechanism='farm protection agreement')
         world.infrastructure.maintain(farm.id,.03)

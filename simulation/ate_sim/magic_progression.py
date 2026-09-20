@@ -24,12 +24,13 @@ def record_body_transition(world, person, before, *, context, causes=()):
                essences=path.essences, bodily_purge=True,core_taint=path.core_fraction)
 
 
-def practice_ability(world, person, index, meaningful_use, reflection=0., *, context):
+def practice_ability(world, person, index, meaningful_use, reflection=0., *, context, session=None):
     path = world.advancement.path(person.id)
     ability = path.abilities[index]
     before = ability.rank
     understanding=ability.understanding
-    world.advancement.practice(person.id, index, meaningful_use, reflection)
+    if session is None:world.advancement.practice(person.id, index, meaningful_use, reflection)
+    else:session.practice(index, meaningful_use, reflection)
     if ability.rank == before:
         return
     Layer, Ref = layer_ref()

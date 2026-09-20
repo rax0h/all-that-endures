@@ -1,4 +1,32 @@
-# Stage 0.5 continuation from preserved PR #5
+# Stage 0.5 stabilization repair (2026-09-20)
+
+This follow-up addresses the failed candidate recorded below. Final validation
+is pending; earlier numbers are not results for this repair.
+
+- Coin farms allocate their existing value-limited annual cultivation capacity
+  to actual outstanding Society contracts and two payrolls for eligible
+  apprentice places before using remaining capacity for native-tier coins.
+  Output is physical cultivated supply, not conversion of existing coins or a
+  rank wealth grant. Its denomination mix, production ceiling and half-harvest
+  protection levy are recorded. Rank-tier value equivalence for cultivation
+  yield is an explicit ATE economic approximation, not asserted source canon.
+- Gold training has six to ten focused sessions per annual career allocation,
+  varying with existing commitment. The earlier twenty full allocations let a
+  single professional develop twenty advanced abilities in parallel without a
+  finite workload. Ability rates, readiness, all-twenty body gates and genuine
+  mastery proofs remain intact. This is a pacing approximation, not a rank quota.
+- Exact derived inventory/selection caches invalidate on ownership, consumption
+  and demand changes. They are excluded from checkpoints. Paid-demand heaps
+  replace repeated buyer scans; ties and transaction semantics are unchanged.
+- Disposable training sessions validate configuration once and incrementally
+  track ability ranks, including body advancement mid-session. Direct practice
+  remains independently authoritative; differential histories compare both.
+
+The previous candidate also ran in GitHub Actions: **135.194282791 seconds**,
+with 154 unit/integration tests passing. Its local 248.881-second measurement
+below came from a slower execution environment. Both failed the unchanged gate.
+
+## Earlier continuation from preserved PR #5
 
 Authority: `docs/IMPLEMENTATION_ROADMAP.md` and `docs/ASTRA_STAGE_0_5_UPDATE.md`.
 Production code starts at `fbfbe58ef1e18fa35eb4d63af98cd66e00f64c4f`.

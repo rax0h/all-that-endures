@@ -96,6 +96,7 @@ def _resource_circulation(world, rng, sid, people, users, magic):
     # Magic Society presence improves information/market matching, not resource creation.
     # Mature communities get more matching opportunities, but every absorption/use and transfer
     # still follows the normal aspiration, compatibility, wealth and selectiveness gates.
+    from .magic_resources import _circulation_stock
     market=TransferMarket(world,people)
     rounds = 3 + (3 if magic is not None else 0)
     for _ in range(rounds):
@@ -106,19 +107,18 @@ def _resource_circulation(world, rng, sid, people, users, magic):
             path = world.advancement.path(holder.id)
             a = _aspiration(world, holder)
             base = 0 if path is None else len(path.base_essences)
-            ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if base < a.desired_base_essences else []
+            ess = _circulation_stock(world,holder)[0]
             if ess and base < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
                 viable = [r for r in ess if path is None or r.key not in path.base_essences]
                 if viable and rr.random() < max(.25, a.compromise_tolerance):
                     absorb_essence_resource(world, holder.id, viable[int(rr.random() * len(viable)) % len(viable)].id)
                     path = world.advancement.path(holder.id)
-            stones = [] if path is None else (_wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'awakening_stone')) if len(path.abilities) < min(a.desired_abilities, path.capacity) else [])
+            stones = _circulation_stock(world,holder)[1]
             if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity):
                 if rr.random()<max(.22,.82-.55*a.stone_selectiveness):
                     use_awakening_stone(world,holder.id,stones[int(rr.random()*len(stones))%len(stones)].id)
             market.refresh(holder)
-            held=world.magic_resources.inventory('person',holder.id)
-            surplus=_wanted_resources(world,holder,held,wanted=False) if held else []
+            surplus=_circulation_stock(world,holder)[2]
             if surplus and rr.random()<(.58 if magic is not None else .28):
                 _transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],holder,people,rr,market=market)
 

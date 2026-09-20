@@ -385,3 +385,19 @@ export separately, inspect every living Gold/Diamond and representative lower
 ranks and unranked humans. Validate histories, not only final rank counts.
 Explain the expected semantic digest change; never refresh a golden merely to
 hide an unexplained difference. No Diamond population quota is an acceptance test.
+
+## Stage 0.5 renewal repair (ATE approximations)
+
+Cultivation has a finite annual value capacity set by the working operator,
+farm condition and ambient ceiling. Actual contracted payments and prospective
+apprentice payrolls request lower-denomination output; spare capacity produces
+the native denomination. Already minted coins still require a funded
+counterparty for exchange. Coin ratios and resource prices do not change.
+
+Gold professional practice is bounded to six to ten focused ability sessions
+per year, depending on existing commitment, instead of twenty full annual
+allocations. This approximates increasingly demanding practical research. It
+does not substitute for per-ability understanding or the all-twenty body gate.
+No target rank counts, age deadlines, or population feedback control it.
+
+See STAGE_0_5_STABILIZATION.md for measurements and current limitations.

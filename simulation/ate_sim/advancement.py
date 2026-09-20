@@ -105,13 +105,16 @@ class AdvancementState:
   if len(counts)!=4 or any(n!=SKILLS_PER_ESSENCE for n in counts.values()):return 0
   return min(a.rank for a in p.abilities)
  def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.):
+  return self._practice(pid,ability,meaningful_use,reflection,core,self.rank(pid))
+ def practice_batch(self,pid):return PracticeBatch(self,pid)
+ def _practice(self,pid,ability,meaningful_use,reflection,core,body_rank):
   p=self.paths.get(pid)
   if p is None or not p.abilities:return None
   a=p.abilities[ability%len(p.abilities)];r=a.rank
   # Partial essence users can develop a Bronze ability without gaining bodily
   # Iron benefits. An ability waits at the next tier's entry until the body
   # catches up; practice cannot bank progress beyond that ceiling.
-  ceiling=min(5,max(1,self.rank(pid))+1)
+  ceiling=min(5,max(1,body_rank)+1)
   if r>=ceiling:return a
   gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
   if core>0:gain+=core*(.8,.65,.5,.3,.0,.0)[min(r,5)];p.core_fraction=min(1.,p.core_fraction+core*.01)
@@ -138,3 +141,20 @@ class AdvancementState:
   if rank>=3 and any(a.rank==rank and not a.understanding.ready(rank) for a in p.abilities):out.append('understanding')
   if rank==4 and p.core_fraction>0:out.append('core_taint')
   return tuple(out)
+
+class PracticeBatch:
+ """Disposable session: validate once, track mid-session body transitions.
+
+ No absorption or awakening occurs within a session; never persistent state.
+ """
+ def __init__(self,state,pid):
+  self.state=state;self.pid=pid;self.path=state.path(pid);self.rank=state.rank(pid);self.counts=[0]*6
+  if self.rank:
+   for a in self.path.abilities:self.counts[a.rank]+=1
+ def practice(self,index,meaningful_use,reflection=0.):
+  before=self.path.abilities[index%len(self.path.abilities)].rank
+  result=self.state._practice(self.pid,index,meaningful_use,reflection,0.,self.rank)
+  if self.rank and result.rank!=before:
+   self.counts[before]-=1;self.counts[result.rank]+=1
+   while not self.counts[self.rank]:self.rank+=1
+  return result
