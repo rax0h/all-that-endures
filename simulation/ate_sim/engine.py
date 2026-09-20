@@ -39,7 +39,7 @@ class Simulation:
   return self.w
 
  def step(self):
-  with self.w.current_people_scope():
+  with self.w.current_people_scope(),self.w.advancement.rank_scope():
    self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():

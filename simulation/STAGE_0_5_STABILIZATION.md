@@ -1,4 +1,38 @@
-# Diamond workload restoration (2026-09-20)
+# Measured workload correction and exact computation reuse (2026-09-20)
+
+The isolated restoration at `955173af257d6c488edd1b6f77d85b044f9092e6`
+passed 164 tests and both smoke checks. Its canonical run took 208.6005498
+seconds, with 35 Iron, 2 Bronze, 41 Silver, 91 Gold and zero Diamond.
+The chronological archive audit was valid with zero progression/currency
+violations. Digest: `c687072d08c2a1056610976192cc49e49ba0740dc7ed9fb28add70cbd161be76`.
+This disproves the claim that corrected selection alone makes 6–10 sufficient.
+
+Year-500 inspection found old Gold users with all twenty mastery gates ready
+but only roughly six of ten levels accumulated after about 300 Gold years.
+A constant-effort diagnostic across 36 established Gold users projected a
+median Diamond age of 645.5 with the lower allocation, versus 503.5 at the
+intermediate `9 + int(5 * ambition)` allocation. Existing Gold senescence starts
+around age 406.25; no mortality change is made. The intermediate 9–14 allowance
+is a documented workload approximation, not a population controller or canon.
+
+Exact optimizations skip practice only when every ability is already at its
+body-imposed ceiling; these calls previously returned without changing state.
+Annual body-rank queries cache their validated result and invalidate on every
+normal configuration/rank mutation; caches do not enter checkpoints. Society
+application queries are shared across settlements. Service matching rejects
+unpayable requests and irrelevant abilities before repeating identical checks.
+Resource matching reuses current eligibility and stock state.
+
+A replay of years 501–510 from the same saved world retained the full digest
+`b853a78edafc3e5abad0cd72fdc10509f8362cddc99f1a243145c35af4a48ac5` and
+415,422 events, taking 4.57 seconds versus 5.14 in the reference. These short
+measurements include final collection and are not canonical gate results.
+42 focused source tests passed; a compiled-module probe also preserved the
+digest and passed 16 tests, but showed too little additional speed to justify
+a new build dependency. No compiler dependency or generated binary is shipped.
+Final validation of the combined candidate is pending.
+
+## Historical isolated Diamond workload restoration
 
 The current candidate restores only the Gold professional session allowance
 from `12 + int(6 * ambition)` to `6 + int(4 * ambition)`. Corrected weakest-first

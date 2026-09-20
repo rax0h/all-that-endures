@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
+from contextlib import contextmanager
 import hashlib,re
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -40,6 +41,19 @@ class EssencePath:
 @dataclass
 class AdvancementState:
  paths:dict[int,EssencePath]=field(default_factory=dict)
+ def __getstate__(self):return {k:v for k,v in self.__dict__.items() if k!='_rank_cache'}
+ @contextmanager
+ def rank_scope(self):
+  # Annual current-state cache only. All normal configuration/rank mutations
+  # invalidate it; direct fixture edits between steps remain fully visible.
+  previous=self.__dict__.get('_rank_cache');self._rank_cache={}
+  try:yield
+  finally:
+   if previous is None:self.__dict__.pop('_rank_cache',None)
+   else:previous.clear();self._rank_cache=previous
+ def _invalidate_rank(self,pid):
+  cache=self.__dict__.get('_rank_cache')
+  if cache is not None:cache.pop(pid,None)
  def path(self,pid):return self.paths.get(pid)
  def essence_user(self,pid):return pid in self.paths
  def _pick(self,v,k,o=0):return v[(int(k[o:o+8],16) if len(k)>=o+8 else int(k[:8],16))%len(v)] if v else 'manifestation'
@@ -73,6 +87,7 @@ class AdvancementState:
   if essence not in ESSENCES:raise ValueError(f'unknown essence: {essence}')
   p=self.paths.setdefault(pid,EssencePath())
   if essence in p.base_essences or len(p.base_essences)>=MAX_BASE_ESSENCES:return p,[]
+  self._invalidate_rank(pid)
   p.base_essences.append(essence);created=[self._semantic_ability(p,essence,'essence',year,semantic_context,origin_event)]
   if len(p.base_essences)==MAX_BASE_ESSENCES and p.confluence is None:
    p.confluence,p.confluence_name,p.confluence_concepts=self._confluence(p.base_essences,semantic_context);created.append(self._semantic_ability(p,p.confluence,'confluence',year,semantic_context,origin_event))
@@ -86,6 +101,7 @@ class AdvancementState:
  def awaken_skill(self,pid,stone,year,semantic_context=(),origin_event=None,target_essence=None):
   p=self.paths.get(pid)
   if p is None:return None
+  self._invalidate_rank(pid)
   sd=self._stone(stone);stone_name=next(name for name,data in AWAKENING_STONES.items() if data is sd)
   available=[e for e in p.essences if len(p.abilities_for(e))<SKILLS_PER_ESSENCE]
   if target_essence is not None:
@@ -95,6 +111,11 @@ class AdvancementState:
    raw='|'.join(p.essences)+'|'+stone_name+'|'+'|'.join(map(str,semantic_context))+'|'+str(len(p.abilities));key=hashlib.blake2b(raw.encode(),digest_size=8).hexdigest();essence=available[int(key[:8],16)%len(available)] if available else None
   return None if essence is None else self._semantic_ability(p,essence,'stone:'+stone_name,year,semantic_context,origin_event)
  def rank(self,pid):
+  cache=self.__dict__.get('_rank_cache')
+  if cache is None:return self._uncached_rank(pid)
+  if pid not in cache:cache[pid]=self._uncached_rank(pid)
+  return cache[pid]
+ def _uncached_rank(self,pid):
   p=self.paths.get(pid)
   if p is None or len(p.base_essences)!=3 or p.confluence is None:return 0
   if len(p.abilities)!=MAX_SKILLS:return 0
@@ -125,7 +146,7 @@ class AdvancementState:
    if a.level>=10:
     if a.rank>=3 and (not a.understanding.ready(a.rank) or (a.rank==4 and p.core_fraction>0)):
      a.level=9;a.progress=.999;break
-    a.rank+=1;a.level=0;a.understanding=Understanding()
+    a.rank+=1;self._invalidate_rank(pid);a.level=0;a.understanding=Understanding()
     from .mastery_training import ResponseModel
     a.response_model=ResponseModel()
     if a.rank>=ceiling:a.progress=0.;break

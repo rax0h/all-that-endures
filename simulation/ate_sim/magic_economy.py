@@ -100,6 +100,11 @@ def spirit_economy_step(world,rng):
         world.emit('spirit_coin_sustenance',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),coin_consumed=coins,body_rank=p.rank,recovered_health=recovered,mechanism='safe own-tier magical reserve supplement')
 
 
+SERVICE_FUNCTIONS={'healing':{'recovery','healing','restoration'},
+               'protection':{'control','support','enhancement','detection','sense','creation','defense','preservation','storage','environmental control'},
+               'instruction':{'communication','influence','analysis','guidance','coordination','prediction','teamwork'},
+               'provision':{'creation','transformation','control','exchange'}}
+
 def magical_service(world,provider,client,ability,*,kind,difficulty,constraint):
     """A priced service changes a real client/household state; no work, no proof.
 
@@ -108,11 +113,7 @@ def magical_service(world,provider,client,ability,*,kind,difficulty,constraint):
     using a flattened ordinary-wealth scalar.
     """
     Layer,Ref=layer_ref()
-    functions={'healing':{'recovery','healing','restoration'},
-               'protection':{'control','support','enhancement','detection','sense','creation','defense','preservation','storage','environmental control'},
-               'instruction':{'communication','influence','analysis','guidance','coordination','prediction','teamwork'},
-               'provision':{'creation','transformation','control','exchange'}}
-    if ability.function not in functions.get(kind,set()) or ability.rank<difficulty:return False
+    if ability.function not in SERVICE_FUNCTIONS.get(kind,()) or ability.rank<difficulty:return False
     h=world.households[client.household]
     need=(1-world.skills.get(client.id,'knowledge').level) if kind=='instruction' else (1-client.health) if kind=='healing' else ((1-h.preparedness) if kind=='protection' else max(0.,5-h.food))
     if need<=.01:return False
@@ -148,7 +149,11 @@ def magical_services_step(world,rng):
             if client.id==p.id:continue
             kind='instruction' if world.skills.get(client.id,'knowledge').level<.7 and world.year%2==0 else 'healing' if client.health<.9 else ('provision' if world.households[client.household].food<3 else 'protection')
             difficulty=max(1,client.rank if kind=='healing' else supported_rank(world.ambient_magic.field(sid).level))
-            for ability in sorted(path.abilities,key=lambda a:(a.rank,a.level,a.semantic_key)):
+            # Every attempt has the same payer, price and difficulty. A missing
+            # denomination makes all attempts impossible before ability lookup.
+            if world.currency.wallets.get(client.id,{}).get(denomination_for_rank(difficulty),0)<2:continue
+            candidates=(a for a in path.abilities if a.function in SERVICE_FUNCTIONS[kind] and a.rank>=difficulty)
+            for ability in sorted(candidates,key=lambda a:(a.rank,a.level,a.semantic_key)):
                 # Disease/embodiment, ecology and household conditions define cases.
                 constraint=f'{kind}:{client.species}:{sid}:{int(world.local[sid].scarcity*4)}'
                 if magical_service(world,p,client,ability,kind=kind,difficulty=difficulty,constraint=constraint):break

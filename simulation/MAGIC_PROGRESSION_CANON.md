@@ -394,16 +394,21 @@ apprentice payrolls request lower-denomination output; spare capacity produces
 the native denomination. Already minted coins still require a funded
 counterparty for exchange. Coin ratios and resource prices do not change.
 
-Gold professional practice is bounded to six to ten focused ability sessions
+Gold professional practice is bounded to nine to fourteen focused ability sessions
 per year, depending on existing commitment, instead of twenty full annual
 allocations. This approximates increasingly demanding practical research. It
 does not substitute for per-ability understanding or the all-twenty body gate.
 No target rank counts, age deadlines, or population feedback control it.
 
-The temporary 12–18-session increase is reverted: validation at `820241e`
-produced 65 living Diamonds. Its earlier justification conflated pacing with
-a scheduling defect. Focused selection now genuinely chooses unfinished
-abilities; the earlier shuffle had erased that priority. The restored 6–10
-budget is an ATE workload approximation, not canon or a population target.
-Validation of this isolated restoration is pending.
+The 12–18-session experiment at `820241e` produced 65 living Diamonds; the
+isolated 6–10 restoration at `955173a` produced none. Both retained corrected
+weakest-first selection. A year-500 sample contained 36 established Gold users
+with at least 100 years at Gold and mastery evidence for at least 15 abilities.
+At their observed development pace, the lower allocation projected a median
+Diamond age of 645.5, beyond the existing Gold senescence curve. Scaling the
+same observed effort to 9–14 sessions projected 503.5. This constant-effort
+calculation is a pacing diagnostic, not a forecast of population or a deadline.
+The intermediate workload is explicitly an ATE approximation. It changes no
+ability gain rate, mastery gate, mortality rule or target count; full validation
+is required before considering it calibrated.
 See STAGE_0_5_STABILIZATION.md for measurements and current limitations.

@@ -93,7 +93,7 @@ def test_gold_workload_does_not_bypass_understanding():
     for a in path.abilities:a.rank=4
     p.rank=4;a=_aspiration(w,p);a.urgency=a.drive=1.;p.curiosity=1.
     _,_,uses,_=_career_training(w,p,path,a,True,1.)
-    assert 6<=uses<=10
+    assert 9<=uses<=14
     assert all(not ability.understanding.ready(4) for ability in path.abilities)
 
 
@@ -149,3 +149,24 @@ def test_gc_schedule_preserves_history():
     with patch('gc.isenabled',return_value=False):reference.run(40)
     actual=Simulation(generate_world(39,mature=True)).run(40)
     assert actual.digest()==reference.w.digest()
+
+
+def test_scoped_rank_cache_tracks_awakening_and_mid_session_advancement():
+    import pickle
+    from ate_sim.advancement import AdvancementState
+    state=AdvancementState()
+    with state.rank_scope():
+        assert state.rank(1)==0
+        for essence in ('fire','water','wind'):state.absorb_essence(1,essence,0)
+        path=state.path(1)
+        for essence in path.essences:
+            for _ in range(4):state.awaken_skill(1,'eyes',1,target_essence=essence)
+        assert state.rank(1)==1
+        assert '_rank_cache' not in pickle.loads(pickle.dumps(state)).__dict__
+        with state.rank_scope():
+            batch=state.practice_batch(1)
+            for i in range(20):batch.practice(i,100.)
+            assert state.rank(1)==2
+        assert state.rank(1)==2
+    path.abilities[0].rank=1
+    assert state.rank(1)==1  # direct fixture/checkpoint edits outside a step

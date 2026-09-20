@@ -38,9 +38,9 @@ def _career_training(world,p,path,asp,member,strength,body_rank=None):
   # commitment. The Diamond gate is still enforced in AdvancementState.practice.
   if not member or ambition<.56:return None
   # Independent Gold problems consume a finite professional year. Commitment
-  # permits six to ten focused sessions, not twenty full annual allocations.
+  # permits nine to fourteen focused sessions, not twenty full annual allocations.
   # Each ability still needs its own mastery proofs; no body-rank shortcut.
-  return ('focused',.72+.25*strength+.30*ambition,6+int(4*ambition),.72+.28*p.curiosity)
+  return ('focused',.72+.25*strength+.30*ambition,9+int(5*ambition),.72+.28*p.curiosity)
  return None
 
 def rank_ecology_step(world,rng):
@@ -54,8 +54,11 @@ def rank_ecology_step(world,rng):
   path=world.advancement.path(p.id)
   if path is None or not path.abilities:continue
   rec=latest.get(p.id);action='work' if rec is None else rec.action;strength=.35 if rec is None else rec.strength;relevant=ACTION_FUNCTIONS.get(action,set())
-  indexed=list(enumerate(path.abilities));weakest=min((a.rank,a.level,a.progress) for _,a in indexed);asp=_aspiration(world,p);member=p.id in members
+  asp=_aspiration(world,p);member=p.id in members
   session=world.advancement.practice_batch(p.id);before=session.rank
+  ceiling=min(5,max(1,before)+1)
+  if all(a.rank>=ceiling for a in path.abilities):continue
+  indexed=list(enumerate(path.abilities));weakest=min((a.rank,a.level,a.progress) for _,a in indexed)
   career=_career_training(world,p,path,asp,member,strength,before)
   purposeful_reflection=None
   if career is not None:

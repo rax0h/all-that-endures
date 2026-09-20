@@ -301,7 +301,8 @@ class TransferMarket:
   return (-a.urgency,-a.drive,-a.preparation,-p.wealth,p.id,self.versions.get(p.id,0))
  def _eligible(self,p,kind,price):
   if p.id not in self.states:self.states[p.id]=(_demand_state(self.world,p),p.wealth,self.world.currency.wallets.get(p.id,{}).get('iron',0))
-  return _eligible_kind(self.states[p.id][0],kind) and (p.wealth>=price or can_pay_tier(self.world,p.id,'iron',ceil(price)))
+  state,wealth,iron=self.states[p.id]
+  return _eligible_kind(state,kind) and (wealth>=price or iron>=ceil(price))
  def refresh(self,p):
   state=(_demand_state(self.world,p),p.wealth,self.world.currency.wallets.get(p.id,{}).get('iron',0))
   if self.states.get(p.id)==state:return
@@ -317,7 +318,8 @@ class TransferMarket:
   while heap:
    item=heap[0];pid=item[4];p=self.people[pid]
    if item[5]!=self.versions.get(pid,0):heappop(heap);continue
-   if pid==holder.id or not _wants(self.world,p,r):excluded.append(heappop(heap));continue
+   path=self.states[pid][0][5]
+   if pid==holder.id or (r.kind=='essence' and path is not None and r.key in path[0]):excluded.append(heappop(heap));continue
    best=p;break
   for item in excluded:heappush(heap,item)
   # A personal gift can make an otherwise unaffordable transaction feasible.
@@ -401,7 +403,7 @@ def magic_ecology_step(world,rng):
   demand=demands[p.settlement];demand.refresh(p);transfers[p.settlement].refresh(p)
   held=world.magic_resources.inventory('person',p.id)
   if held:
-   surplus=_wanted_resources(world,p,held,wanted=False)
+   surplus=_circulation_stock(world,p)[2]
    if surplus and rr.random()<.20:
     local=adults_by_settlement[p.settlement];pressure=0.
     demand_types={}

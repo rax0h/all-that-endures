@@ -23,8 +23,13 @@ PRACTICE_FUNCTIONS={'secure_food':{'creation','control','support','detection','r
 def _practice_path(world,p,rr,action,strength):
  path=world.advancement.path(p.id)
  if path is None or not path.abilities:return
+ session=world.advancement.practice_batch(p.id);before=session.rank
+ ceiling=min(5,max(1,before)+1)
+ # Every selected practice would be a no-op at the body ceiling. This stream
+ # is private to this person's action and has no later consumer in the step.
+ if all(a.rank>=ceiling for a in path.abilities):return
  relevant=PRACTICE_FUNCTIONS.get(action,())
- candidates=[(i,a) for i,a in enumerate(path.abilities) if a.function in relevant] or list(enumerate(path.abilities));rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));session=world.advancement.practice_batch(p.id);before=session.rank
+ candidates=[(i,a) for i,a in enumerate(path.abilities) if a.function in relevant] or list(enumerate(path.abilities));rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)))
  for i,a in candidates[:uses]:
   meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,session=session)
  record_body_transition(world,p,before,context=action)

@@ -124,9 +124,9 @@ def _resource_circulation(world, rng, sid, people, users, magic):
                 _transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],holder,people,rr,market=market)
 
 
-def _society_pipeline(world, rng, sid, people, adventure, magic):
+def _society_pipeline(world, rng, sid, people, adventure, magic, existing=None):
     """Convert Society ambition into applications once the person has actually qualified."""
-    existing = {(a.person, a.society) for a in world.institutions.applications.values() if a.passed is None or a.passed}
+    if existing is None:existing = {(a.person, a.society) for a in world.institutions.applications.values() if a.passed is None or a.passed}
     for p in people:
         if not full_essence_user(world, p.id):
             continue
@@ -182,6 +182,7 @@ def _magical_workshops(world, rng, sid, people, users, magic):
 
 def magical_civilization_step(world, rng):
     """Civilizational feedback loop: magic is normal; exceptional power remains exceptional."""
+    existing = {(a.person, a.society) for a in world.institutions.applications.values() if a.passed is None or a.passed}
     for sid in sorted(world.settlements):
         people = _living(world, sid)
         if not people:
@@ -192,5 +193,5 @@ def magical_civilization_step(world, rng):
         # Recompute because expeditions can put resources into practitioners' hands.
         users = _practitioners(world, people)
         _resource_circulation(world, rng, sid, people, users, magic)
-        _society_pipeline(world, rng, sid, people, adventure, magic)
+        _society_pipeline(world, rng, sid, people, adventure, magic, existing)
         _magical_workshops(world, rng, sid, people, users, magic)
