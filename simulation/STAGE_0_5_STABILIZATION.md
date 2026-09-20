@@ -1,7 +1,67 @@
-# Stage 0.5 stabilization repair (2026-09-20)
+# Stage 0.5 validation: not ready (2026-09-20)
 
-This follow-up addresses the failed candidate recorded below. Final validation
-is pending; earlier numbers are not results for this repair.
+Tested implementation: `820241efe748f29f2d0c827a70487fb8391bb2dc`.
+[Actions run](https://github.com/rax0h/all-that-endures/actions/runs/35512882584).
+The code is preserved for review on PR #14; PR #5 and main remain unchanged.
+This is a failed candidate, not a completed stabilization or baseline freeze.
+
+- **164 tests passed in 169.72 seconds**, including checkpoint/resume,
+  environmental selection, progression, currency and cache equivalence tests.
+  Both normal smoke checks passed; causal integrity passed.
+- Canonical seed 843000 / 1,000 years: **218.470726270 seconds**;
+  the unchanged 120-second gate failed. Digest:
+  `18faf1646c7f81905d69c2a1ccd8df5688db61ee5d2861945d69870b6f0c025c`.
+- Living population 1,514; essence users 773; complete 20-ability paths 243.
+  Body ranks: **41 Iron, 7 Bronze, 42 Silver, 88 Gold, 65 Diamond**.
+  Incomplete users remain unranked. No assigned rank quotas were used.
+- Resources: **96,556 total / 19,768 unused**. Society: 3,075 resolved,
+  6 assigned, 4 open notices. Paid apprentice jobs: 13,934; final treasury
+  retains 100 Iron coins. Low-denomination renewal now works in this run.
+- Full chronological archive audit: **valid, zero violations**, including
+  every living Gold/Diamond and all wallet/treasury reconciliations.
+- Archive export: **230.494510852 seconds**, **1,569,394,688 bytes**,
+  outside the simulation timer. Logical checksum:
+  `c72adefc954a3843050563f0330bb6d511afec6bdcc77d347f39fa60c872be41`.
+
+| Seed / years | Living | Users | Complete | Iron / Bronze / Silver / Gold / Diamond | Resources / unused | Resolved / assigned / open notices | Simulation seconds |
+|---|---:|---:|---:|---|---|---|---:|
+| 843001 / 300 | 1,462 | 498 | 136 | 56 / 7 / 39 / 34 / 0 | 15,224 / 1,437 | 527 / 0 / 2 | 26.725458720 |
+| 843002 / 300 | 1,369 | 479 | 145 | 63 / 11 / 31 / 40 / 0 | 18,273 / 2,114 | 584 / 4 / 2 | 23.801479974 |
+
+The shorter runs passed causal-integrity checks; they did not export archives
+and therefore do not constitute separate chronological currency audits.
+
+## Remaining measured failures
+
+Focused training fixed an actual scheduling defect: sorting weakest abilities
+and then shuffling the whole list discarded the priority, allowing already
+advanced abilities to consume scarce sessions. Solved response experiments also
+repeated while waiting for reflection. The corrections retain every mastery gate.
+However, increasing the session budget before isolating that defect was not
+justified as final calibration. Under the tested 12–18-session approximation,
+the 65 living Diamonds completed Gold→Diamond in 251–315 years and accumulated
+as ageless survivors. This exceeds the intended rarity. The approximation is
+not accepted as final; no further blind constant tuning was performed.
+
+Measured canonical subsystem totals are approximately 63.0 seconds agency
+(including rank training), 49.6 magical civilization, 27.2 magic ecology and
+20.8 Society careers. A separate 500-year diagnostic profiled its final ten
+years: 10.24 million calls in 5.65 profiler seconds, including 1.21 seconds
+final cyclic collection; leading step costs were agency 1.30, magical
+civilization 1.16, magic ecology 0.68 and Society careers 0.40 seconds.
+Current-state queries and training still cost too much at the larger practitioner
+population. The profile is not a performance-gate result or another millennium.
+
+The audit proves progression legality, not desired rarity, sustained initial
+75–80% participation, differentiated occupations, or sufficient performance.
+The initial participation still falls sharply by year 100 before recovering to
+62.3% of eligible adults at year 1000. Stage 0.5 remains unfinished. Do not merge.
+Machine-readable measurements and real linked progression examples are in
+`stage_0_5_validation.json`; earlier experiments below are historical.
+
+# Earlier stabilization repair
+
+This section records the repair rationale before the completed validation above.
 
 - Coin farms allocate their existing value-limited annual cultivation capacity
   to actual outstanding Society contracts and two payrolls for eligible

@@ -400,4 +400,8 @@ allocations. This approximates increasingly demanding practical research. It
 does not substitute for per-ability understanding or the all-twenty body gate.
 No target rank counts, age deadlines, or population feedback control it.
 
+This session budget is an unaccepted calibration experiment: validation at
+`820241e` produced 65 living Diamonds and failed the performance gate. Focused
+selection now genuinely chooses unfinished abilities; the earlier shuffle had
+erased that priority. Do not interpret the budget as canon or finalized pacing.
 See STAGE_0_5_STABILIZATION.md for measurements and current limitations.
