@@ -107,18 +107,19 @@ def _resource_circulation(world, rng, sid, people, users, magic):
             path = world.advancement.path(holder.id)
             a = _aspiration(world, holder)
             base = 0 if path is None else len(path.base_essences)
-            ess = _circulation_stock(world,holder)[0]
+            ess,stones,surplus = _circulation_stock(world,holder)
+            changed=False
             if ess and base < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
                 viable = [r for r in ess if path is None or r.key not in path.base_essences]
                 if viable and rr.random() < max(.25, a.compromise_tolerance):
                     absorb_essence_resource(world, holder.id, viable[int(rr.random() * len(viable)) % len(viable)].id)
                     path = world.advancement.path(holder.id)
-            stones = _circulation_stock(world,holder)[1]
+                    _,stones,surplus=_circulation_stock(world,holder);changed=True
             if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity):
                 if rr.random()<max(.22,.82-.55*a.stone_selectiveness):
                     use_awakening_stone(world,holder.id,stones[int(rr.random()*len(stones))%len(stones)].id)
-            market.refresh(holder)
-            surplus=_circulation_stock(world,holder)[2]
+                    surplus=_circulation_stock(world,holder)[2];changed=True
+            if changed:market.refresh(holder)
             if surplus and rr.random()<(.58 if magic is not None else .28):
                 _transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],holder,people,rr,market=market)
 

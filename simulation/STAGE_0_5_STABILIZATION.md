@@ -10,7 +10,7 @@ is pending; earlier numbers are not results for this repair.
   rank wealth grant. Its denomination mix, production ceiling and half-harvest
   protection levy are recorded. Rank-tier value equivalence for cultivation
   yield is an explicit ATE economic approximation, not asserted source canon.
-- Gold training has six to ten focused sessions per annual career allocation,
+- Gold training has twelve to eighteen focused sessions per annual career allocation,
   varying with existing commitment. The earlier twenty full allocations let a
   single professional develop twenty advanced abilities in parallel without a
   finite workload. Ability rates, readiness, all-twenty body gates and genuine
@@ -25,6 +25,30 @@ is pending; earlier numbers are not results for this repair.
 The previous candidate also ran in GitHub Actions: **135.194282791 seconds**,
 with 154 unit/integration tests passing. Its local 248.881-second measurement
 below came from a slower execution environment. Both failed the unchanged gate.
+
+## Revision after the first repair validation
+
+Commit `8003e356` passed 160 tests and smoke checks, but measured
+171.321866434 seconds in Actions. Its final ranks were 42 Iron, 5 Bronze,
+44 Silver, 76 Gold and zero Diamond, with 167 complete paths. It did fix
+renewal: 13,934 paid apprentice jobs, 3,068 resolved notices, 108 Iron in
+treasury. The six-to-ten-session Gold limit was too restrictive for actual
+lifespans; it is superseded by twelve to eighteen focused sessions.
+
+Focused sessions now select the weakest unfinished abilities before shuffling.
+Already advanced abilities cannot waste these sessions. Controlled experiments
+stop once their needed evidence exists or a fitted, fully sampled model is
+waiting for integration; this grants no reflection, proof or progression.
+Actual practice/reflection must still make the next experiment meaningful.
+
+Performance corrections remove duplicate rank/configuration checks and repeated
+market queries. Cyclic collection runs on a bounded 25/250-year schedule rather
+than repeatedly traversing the live archive after allocation thresholds; reference
+counting stays active. Final collection is included in simulation timing and the
+caller GC state is restored, including after exceptions. History is preserved.
+
+CI now performs the archive audit even after a performance failure and fails
+if either check fails. The 120-second gate is unchanged.
 
 ## Earlier continuation from preserved PR #5
 

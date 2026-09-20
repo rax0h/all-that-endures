@@ -79,7 +79,7 @@ def test_optimized_training_and_stock_match_uncached_history():
         held=inventory(world.magic_resources,'person',p.id)
         return ([r for r in held if r.kind=='essence' and resources._wants(world,p,r)],[r for r in held if r.kind=='awakening_stone' and resources._wants(world,p,r)],[r for r in held if not resources._wants(world,p,r)])
     class Direct:
-        def __init__(self,state,pid):self.state=state;self.pid=pid
+        def __init__(self,state,pid):self.state=state;self.pid=pid;self.rank=state.rank(pid)
         def practice(self,i,use,reflection=0.):return self.state.practice(self.pid,i,use,reflection)
     with patch.object(resources.MagicResourceState,'inventory',inventory),patch.object(resources,'_circulation_stock',stock),patch.object(AdvancementState,'practice_batch',lambda state,pid:Direct(state,pid)):
         reference=Simulation(generate_world(843001,mature=True)).run(100)
@@ -93,5 +93,59 @@ def test_gold_workload_does_not_bypass_understanding():
     for a in path.abilities:a.rank=4
     p.rank=4;a=_aspiration(w,p);a.urgency=a.drive=1.;p.curiosity=1.
     _,_,uses,_=_career_training(w,p,path,a,True,1.)
-    assert 6<=uses<=10
+    assert 12<=uses<=18
     assert all(not ability.understanding.ready(4) for ability in path.abilities)
+
+
+def test_collection_policy_restores_caller_state_on_failure():
+    import gc
+    import pytest
+    simulation=Simulation(generate_world(17));enabled=gc.isenabled()
+    try:
+        for original in (True,False):
+            (gc.enable if original else gc.disable)()
+            with patch.object(simulation,'step',side_effect=RuntimeError('test failure')):
+                with pytest.raises(RuntimeError):simulation.run(1)
+            assert gc.isenabled()==original
+    finally:(gc.enable if enabled else gc.disable)()
+
+
+def test_focused_gold_work_does_not_waste_sessions_on_diamond_abilities():
+    from ate_sim.rank_ecology import rank_ecology_step
+    from ate_sim.magic_resources import _aspiration
+    from ate_sim import rank_ecology
+    w,p,path,adv=economy_world()
+    for ability in path.abilities:ability.rank=5
+    path.abilities[-1].rank=4;p.rank=4
+    aspiration=_aspiration(w,p);aspiration.drive=aspiration.urgency=1.;p.curiosity=1.
+    used=[]
+    original=rank_ecology.practice_ability
+    def capture(world,person,index,*args,**kwargs):
+        if person.id==p.id:used.append(index)
+        return original(world,person,index,*args,**kwargs)
+    with patch.object(rank_ecology,'practice_ability',capture):rank_ecology_step(w,RNG(92))
+    assert used==[19]
+    assert p.rank==4
+
+
+def test_solved_trials_wait_for_integration_without_creating_more_exposure():
+    from ate_sim.mastery_training import trial,needs_trial
+    w,p,path,_=economy_world();a=path.abilities[0];a.rank=4;p.curiosity=p.health=1.
+    for year in range(30):trial(w,p,a,RNG(83).stream('trial',year,p.id))
+    assert a.response_model.coefficients and len(a.understanding.applications)==6
+    assert not needs_trial(a) and not a.understanding.ready(4)
+    count=len(w.events)
+    for year in range(30,80):trial(w,p,a,RNG(83).stream('trial',year,p.id))
+    assert len(w.events)==count and a.rank==4
+    a.understanding.reflect(100,100)
+    assert needs_trial(a)
+    for year in range(80,100):trial(w,p,a,RNG(83).stream('trial',year,p.id))
+    assert a.understanding.ready(4) and len(a.understanding.transfers)==2
+    assert a.rank==4  # proofs still do not bypass ability development
+
+
+def test_gc_schedule_preserves_history():
+    reference=Simulation(generate_world(39,mature=True))
+    with patch('gc.isenabled',return_value=False):reference.run(40)
+    actual=Simulation(generate_world(39,mature=True)).run(40)
+    assert actual.digest()==reference.w.digest()

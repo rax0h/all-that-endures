@@ -394,7 +394,7 @@ apprentice payrolls request lower-denomination output; spare capacity produces
 the native denomination. Already minted coins still require a funded
 counterparty for exchange. Coin ratios and resource prices do not change.
 
-Gold professional practice is bounded to six to ten focused ability sessions
+Gold professional practice is bounded to twelve to eighteen focused ability sessions
 per year, depending on existing commitment, instead of twenty full annual
 allocations. This approximates increasingly demanding practical research. It
 does not substitute for per-ability understanding or the all-twenty body gate.

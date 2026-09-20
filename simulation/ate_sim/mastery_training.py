@@ -44,8 +44,21 @@ def response(ability,inputs):
     return sum((.15+key[i]/255)*x for i,x in enumerate(inputs))
 
 
+def needs_trial(ability):
+    """Measure a missing case; repetition cannot substitute for integration."""
+    rank=ability.rank
+    if rank not in (3,4):return False
+    u=ability.understanding
+    if len(u.transfers)>=(1 if rank==3 else 2):return False
+    # A fitted law with a full sample is waiting for reflection before a new
+    # held-out test can establish a further transfer. Repeating the same solved
+    # experiment cannot change that state; spend the session on another ability.
+    if ability.response_model.coefficients and len(u.applications)>=6 and u.integration<2+len(u.transfers):return False
+    return True
+
+
 def trial(world,person,ability,rng):
-    if ability.rank not in (3,4) or ability.understanding.ready(ability.rank):return False
+    if not needs_trial(ability):return False
     model=ability.response_model
     # Training is bounded by real annual time; unsuccessful measurements cost
     # that attempt, too. Pressure/health affect whether useful work is possible.
@@ -82,7 +95,7 @@ def trial(world,person,ability,rng):
 
 
 def mastery_training_step(world,person,path,rng):
-    candidates=[a for a in path.abilities if a.rank in (3,4) and not a.understanding.ready(a.rank)]
+    candidates=[a for a in path.abilities if needs_trial(a)]
     # Rotate across every function, including rare semantic functions; no
     # arbitrary occupation/function whitelist can make an ability impossible.
     candidates.sort(key=lambda a:(a.response_model.trials,a.semantic_key))
