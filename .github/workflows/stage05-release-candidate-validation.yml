@@ -1,0 +1,37 @@
+name: stage05-release-candidate-validation
+
+on:
+  push:
+    branches:
+      - validation/stage05-release-candidate-20260920
+
+jobs:
+  deep-audit:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [843000, 843005]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Full millennium in-memory release audit
+        run: python simulation/stage05_release_candidate_validation.py audit --seed ${{ matrix.seed }} --years 1000
+
+  checkpoint-resume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Full millennium checkpoint/resume determinism
+        run: python simulation/stage05_release_candidate_validation.py resume --seed 843006 --split 500 --years 1000
