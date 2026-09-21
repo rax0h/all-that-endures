@@ -5,6 +5,11 @@ progression fixed while supporting recurring new Irons. Runtime should be
 assessed against character-creation time; no new numeric CI limit is specified.
 See SOCIETY_RECRUITMENT.md for the focused cohort implementation and validation.
 The prior results below are historical, not measurements of the new candidate.
+The cohort candidate passed 170 tests and the full progression/currency audit.
+Its millennium took 131.737 seconds with 132 Gold / 2 Diamond and 1,305
+actual Society graduations. Years 901–1000 produced 148 new Irons, with 18
+empty years. The existing 120-second CI guard still fails; it was not raised.
+See the recruitment report for the tested SHA, complete results and limits.
 
 # Prior validation: Stage 0.5 remained unfinished (2026-09-21)
 

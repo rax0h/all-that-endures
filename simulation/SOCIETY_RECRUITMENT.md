@@ -80,5 +80,40 @@ tests with only the expected previous digest assertion failing; indexed and
 archival population-query histories agreed with each other. The 100-year
 founder golden was deliberately updated to
 `b061f5632124348ce953d644c7c0926abfca1f4e9313c1b5f74f8078c7611494`,
-with the reason recorded in the test. Both normal smoke checks passed. CI will
-rerun the full suite and perform one canonical millennium/archive audit.
+with the reason recorded in the test. Both normal smoke checks passed.
+
+## Final canonical validation
+
+Implementation `887ba8b2caf7962e28a36114d16ad952849cb48f`,
+[Actions run](https://github.com/rax0h/all-that-endures/actions/runs/35550906817).
+
+- **170 tests passed in 118.14 seconds**; both smoke checks passed.
+- Seed 843000 / 1,000 years: **131.737358910 seconds simulation**.
+  The unchanged 120-second CI guard failed; all correctness/audit steps passed.
+  The owner has relaxed the original cap in principle, but no new numeric
+  character-creation budget has been specified.
+- Living population **1,525**; essence users **732**; complete paths **208**.
+  Body ranks: **33 Iron / 4 Bronze / 37 Silver / 132 Gold / 2 Diamond**.
+  Gold/Diamond progression rules were not changed.
+- **1,305 actual Society graduations**, from 1,900 enrollments, with 580
+  departures and 15 current trainees. This reconciles active course state.
+- Years **901–1000: 148 new Irons, 18 years with none**. Final fifty years:
+  **68 new Irons, nine years with none**. This is recurring renewal, not yet
+  a graduating class in every calendar year. No guaranteed class was forced.
+- Resources **95,530 total / 17,635 unused**. Society notices **3,064 resolved /
+  9 assigned / 1 open**. Treasury retains 3,963 Iron; 13,934 paid work events.
+- Chronological audit **valid, zero violations**, including all 134 living
+  Gold/Diamond histories and currency/treasury reconciliation.
+- Digest `8dd36dec4d5dfd3b0f1e8d5c2b716b4547f51c4765e7fa0e98e18823145175dd`.
+- Archive export **120.471793382 seconds**, **1,594,798,080 bytes**, outside
+  simulation time; logical checksum
+  `2044fca276331b90ded9f8ecf8a118c41cbc7622bf622bc59ec9303871dc7ba0`.
+
+Runtime is lower than the prior 194.30-second run, but both history and runner
+performance differ; do not attribute the full difference to this feature.
+The complete year-by-year counts and machine-readable results are in
+`society_recruitment_validation.json`. This completes the bounded cohort
+implementation, not all Stage 0.5 calibration: participation is 58.70%, the
+lower-rank population remains thin, and recruitment still has empty years.
+The old report remains historical. No additional millennium or tuning loop
+followed this result. Original PR #5 and main were verified unchanged.
