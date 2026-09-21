@@ -1,0 +1,37 @@
+name: stage05-light-validation
+
+on:
+  push:
+    branches:
+      - validation/stage05-multiseed-longrun-20260920
+
+jobs:
+  multiseed:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [843001, 843002, 843003, 843004]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 1000-year lightweight seed check
+        run: python simulation/light_endurance_validation.py --seed ${{ matrix.seed }} --years 1000 --milestone 1000
+
+  endurance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 3000-year lightweight endurance check
+        run: python simulation/light_endurance_validation.py --seed 843010 --years 3000 --milestone 1000
