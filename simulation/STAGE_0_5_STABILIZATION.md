@@ -1,3 +1,53 @@
+# Current validation: Stage 0.5 remains unfinished (2026-09-21)
+
+Tested implementation: `0147717a773f412fd356cf583ef870c137d8a1e8`.
+[Actions run](https://github.com/rax0h/all-that-endures/actions/runs/35529400618).
+This report supersedes the historical candidates below. No merge is authorized.
+
+- **165 tests passed in 168.68 seconds**; both normal smoke checks passed.
+- Canonical seed 843000 / 1,000 years: **194.300367483 seconds**.
+  The unchanged 120-second performance gate **failed**.
+- Living population **1,488**; essence users **733**; completed four-essence,
+  twenty-ability paths **175**. Body ranks: **37 Iron / 8 Bronze / 26 Silver /
+  102 Gold / 2 Diamond**. The other 558 essence users remain unranked.
+- Chronological archive audit: **valid, zero violations**, including all 104
+  living Gold/Diamond histories and wallet/treasury reconciliation.
+- Resources **95,863 total / 17,045 unused**. Society notices: **3,046 resolved /
+  12 assigned / 5 open**. Treasury retains **302 Iron**; 13,934 paid apprentice
+  jobs occurred. Adult magical participation is **60.63%**, below the mature
+  observational expectation; lower-rank populations also remain thin.
+- Digest: `480d44a9b1eff0bfd6d160cb399e094683a87d408fdc1485054960bdd36f1122`.
+  This intentionally differs because the Gold workload changed; no golden
+  digest was refreshed to conceal a discrepancy.
+- Archive: **1,589,997,568 bytes**, **230.972650663 seconds** separately timed.
+  Logical checksum:
+  `620b116da2d54a87c80c1097b004e92b07abc9f3cb62cc99d18e55e6cb75f51b`.
+
+## What the final measurement establishes
+
+The intermediate workload does **not** meet the requested roughly 20–25 living
+Diamonds. It produces two legitimate Diamonds, not a validated population
+calibration. The observed sensitivity (65 at 12–18 sessions, zero at 6–10, two
+at 9–14) reflects the interaction of whole-path development time, mortality
+and subsequent ageless survival. These different histories are not a controlled
+linear interpolation of rank populations.
+
+Both current Diamonds have all twenty Diamond abilities and complete permanent
+configurations. Person 4337 reached Gold in year 397 (age 136), then Diamond in
+733 (age 472): 336 Gold years. Person 5030 reached Gold in 440 (age 144), then
+Diamond in 762 (age 466): 322 Gold years. Their final wallets respectively
+contain 3,162 and 2,531 Diamond coins; those balances are recorded history,
+not rank-granted bonuses. Full event-linked transitions are in the JSON report.
+
+Exact query reuse reduced runtime from 208.60 to 194.30 seconds between the
+latest candidates, but the workload change also changed the history; only the
+shared-checkpoint comparison below isolates the optimization's equivalence.
+There is no evidence that the existing gate is impossible, and it has not been
+raised. Stage 0.5 is **not ready for freeze/merge**: runtime, Diamond calibration,
+participation and rank distribution remain open. No additional millennium or
+calibration loop was launched after this result. Original PR #5 and main remain
+untouched; implementation and measured failures are retained on draft PR #14.
+
 # Measured workload correction and exact computation reuse (2026-09-20)
 
 The isolated restoration at `955173af257d6c488edd1b6f77d85b044f9092e6`
@@ -30,15 +80,15 @@ measurements include final collection and are not canonical gate results.
 42 focused source tests passed; a compiled-module probe also preserved the
 digest and passed 16 tests, but showed too little additional speed to justify
 a new build dependency. No compiler dependency or generated binary is shipped.
-Final validation of the combined candidate is pending.
+Final validation of the combined candidate is recorded above; it did not pass.
 
 ## Historical isolated Diamond workload restoration
 
-The current candidate restores only the Gold professional session allowance
+The historical isolated candidate restored only the Gold professional session allowance
 from `12 + int(6 * ambition)` to `6 + int(4 * ambition)`. Corrected weakest-first
 selection and missing-evidence scheduling remain intact. Ability rates,
 mastery requirements, economy and performance implementation are unchanged.
-Targeted tests precede one canonical validation; results are pending.
+Targeted tests preceded its canonical validation; the measured result is recorded above.
 
 The earlier zero-Diamond result did not isolate workload from the scheduling
 bug, so it did not justify increasing the allowance. The 65-Diamond experiment

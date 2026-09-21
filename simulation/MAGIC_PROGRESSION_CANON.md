@@ -409,6 +409,9 @@ Diamond age of 645.5, beyond the existing Gold senescence curve. Scaling the
 same observed effort to 9–14 sessions projected 503.5. This constant-effort
 calculation is a pacing diagnostic, not a forecast of population or a deadline.
 The intermediate workload is explicitly an ATE approximation. It changes no
-ability gain rate, mastery gate, mortality rule or target count; full validation
-is required before considering it calibrated.
+ability gain rate, mastery gate, mortality rule or target count. Full validation
+at `0147717a773f412fd356cf583ef870c137d8a1e8` produced 102 Gold and two
+Diamonds with zero progression/currency violations, but took 194.30 seconds.
+This is not accepted final calibration: the Diamond population remains below
+the requested range and the unchanged 120-second performance gate failed.
 See STAGE_0_5_STABILIZATION.md for measurements and current limitations.
