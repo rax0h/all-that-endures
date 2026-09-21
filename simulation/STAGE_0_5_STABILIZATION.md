@@ -1,4 +1,12 @@
-# Current validation: Stage 0.5 remains unfinished (2026-09-21)
+# Current scope: Society recruitment (2026-09-21)
+
+The owner now accepts that two Diamonds may be reasonable and asks to hold
+progression fixed while supporting recurring new Irons. Runtime should be
+assessed against character-creation time; no new numeric CI limit is specified.
+See SOCIETY_RECRUITMENT.md for the focused cohort implementation and validation.
+The prior results below are historical, not measurements of the new candidate.
+
+# Prior validation: Stage 0.5 remained unfinished (2026-09-21)
 
 Tested implementation: `0147717a773f412fd356cf583ef870c137d8a1e8`.
 [Actions run](https://github.com/rax0h/all-that-endures/actions/runs/35529400618).

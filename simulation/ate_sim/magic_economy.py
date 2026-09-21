@@ -159,41 +159,101 @@ def magical_services_step(world,rng):
                 if magical_service(world,p,client,ability,kind=kind,difficulty=difficulty,constraint=constraint):break
 
 
+def _trainee_resources(world, person, people, supply, rng):
+    """Execute a willing trainee's order against owned/local surplus stock.
+
+    One shared local offer list per branch/year, created only if needed. No
+    historical-event queries, invented stock, discount, or annual stone limit.
+    """
+    from math import ceil
+    from .magic_resources import (_aspiration, _wants, _circulation_stock,
+        resource_price, purchase_settlement_resource, _transfer_to_seeker,
+        absorb_essence_resource, use_awakening_stone)
+    aspiration=_aspiration(world,person)
+    for kind in ('essence','awakening_stone'):
+        willingness=aspiration.compromise_tolerance if kind=='essence' else 1-aspiration.stone_selectiveness
+        if rng.random()>=willingness:continue
+        owned=world.magic_resources.inventory('person',person.id,kind)
+        for r in owned:
+            if _wants(world,person,r):
+                (absorb_essence_resource if kind=='essence' else use_awakening_stone)(world,person.id,r.id)
+        path=world.advancement.path(person.id)
+        needed=(3-(len(path.base_essences) if path else 0)) if kind=='essence' else (0 if path is None else min(aspiration.desired_abilities,path.capacity)-len(path.abilities))
+        if needed<=0:continue
+        minimum=7 if kind=='essence' else 3
+        if person.wealth<minimum and world.currency.wallets.get(person.id,{}).get('iron',0)<minimum:continue
+        if not supply:
+            offers=world.magic_resources.inventory('settlement',person.settlement)
+            for holder in people:
+                if holder.alive and holder.age>=16:offers.extend(_circulation_stock(world,holder)[2])
+            for k in ('essence','awakening_stone'):
+                supply[k]=sorted((r for r in offers if r.kind==k),key=lambda r:(resource_price(r),r.id))
+        for r in supply[kind]:
+            if needed<=0:break
+            if r.consumed_year is not None or not _wants(world,person,r):continue
+            price=resource_price(r)
+            if person.wealth<price and world.currency.wallets.get(person.id,{}).get('iron',0)<ceil(price):continue
+            if r.owner_kind=='settlement':bought=purchase_settlement_resource(world,person,r)
+            elif r.owner_kind=='person':
+                holder=world.people[r.owner_id]
+                if holder.id==person.id or not holder.alive or holder.settlement!=person.settlement or _wants(world,holder,r):continue
+                bought=_transfer_to_seeker(world,r,holder,[person],rng)
+            else:continue
+            if bought:
+                (absorb_essence_resource if kind=='essence' else use_awakening_stone)(world,person.id,r.id)
+                needed-=1
+
+
 def apprenticeship_step(world):
     """Paid public work supports committed trainees; no essence is handed out.
 
     Three places per existing Society branch, funded from its actual treasury.
-    Incomplete trainees have continuity; completion releases the place. Wages
-    buy real market stock at normal prices and support repeated generations.
+    Persist the cohort until completion, withdrawal, migration or death. Wages
+    buy real market stock at normal prices; graduation is recorded by the real
+    Unranked -> Iron transition, never by elapsed course time.
     """
     from .magic_resources import _aspiration
+    from .core import RNG
     Layer,Ref=layer_ref();inst=world.institutions.institution_by_kind('adventure_society')
     if inst is None:return
     for sid,people in sorted(world.living_by_settlement().items()):
         branch=world.institutions.branch_for('adventure_society',sid)
         if branch is None:continue
+        for pid,enrollment in list(branch.trainees.items()):
+            p=world.people[pid];a=_aspiration(world,p);path=world.advancement.path(pid)
+            reason='death' if not p.alive else 'migration' if p.settlement!=sid else 'withdrawal' if not a.completion_goal else 'already completed' if path and len(path.abilities)==20 else None
+            if reason:
+                branch.trainees.pop(pid)
+                world.emit('society_trainee_departed',Layer.SOCIETY,(Ref('person',pid),Ref('institution',inst.id)),Ref('settlement',sid),(enrollment,),branch=branch.id,reason=reason)
         candidates=[]
         for p in people:
-            if not p.alive or p.age<16:continue
+            if not p.alive or p.age<16 or p.id in branch.trainees:continue
             path=world.advancement.path(p.id)
             if path and len(path.abilities)==20:continue
             aspiration=_aspiration(world,p)
             if not aspiration.completion_goal or aspiration.drive<.4:continue
             candidates.append(p)
         candidates.sort(key=lambda p:(-(len(world.advancement.path(p.id).abilities) if world.advancement.path(p.id) else 0),-_aspiration(world,p).preparation,-p.curiosity,p.id))
-        for p in candidates[:3]:
-            if world.currency.treasuries.get(inst.id,{}).get('iron',0)<4:break
+        assets=[a for a in world.infrastructure.assets.values() if sid in a.settlements and a.condition<1.]
+        funded=world.currency.treasuries.get(inst.id,{}).get('iron',0)//4
+        places=min(3,max(0,funded)) if assets else 0
+        for p in candidates[:max(0,places-len(branch.trainees))]:
+            e=world.emit('society_trainee_enrolled',Layer.SOCIETY,(Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),(() if branch.origin_event is None else (branch.origin_event,)),branch=branch.id,cohort_year=world.year,goal='complete Iron path',funding='paid public work')
+            branch.trainees[p.id]=e.id
+        supply={}
+        for pid in list(branch.trainees):
+            p=world.people[pid]
             # Existing infrastructure continuously needs maintenance; saturating
             # a permanent defense scalar must not erase work for later centuries.
-            assets=[a for a in world.infrastructure.assets.values() if sid in a.settlements and a.condition<1.]
-            if not assets:continue
-            asset=min(assets,key=lambda a:(a.condition,a.id));before=asset.condition
-            world.infrastructure.maintain(asset.id,.2*(.5+p.health));effect=asset.condition-before
-            if effect<=0:continue
-            world.skills.practice(p.id,'construction',.2)
-            coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':4})
-            world.emit('society_apprentice_work',Layer.SOCIETY,(Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),
-                branch=branch.id,work='public infrastructure maintenance',infrastructure=asset.id,improvement=effect,coin_reward=coins,treasury=inst.id,eligibility='committed incomplete path')
+            if assets and world.currency.treasuries.get(inst.id,{}).get('iron',0)>=4:
+                asset=min(assets,key=lambda a:(a.condition,a.id));before=asset.condition
+                world.infrastructure.maintain(asset.id,.2*(.5+p.health));effect=asset.condition-before
+                if effect>0:
+                    world.skills.practice(p.id,'construction',.2)
+                    coins=world.currency.treasury_transfer(inst.id,p.id,{'iron':4})
+                    world.emit('society_apprentice_work',Layer.SOCIETY,(Ref('person',p.id),Ref('institution',inst.id)),Ref('settlement',sid),(branch.trainees[pid],),
+                        branch=branch.id,work='public infrastructure maintenance',infrastructure=asset.id,improvement=effect,coin_reward=coins,treasury=inst.id,eligibility='committed incomplete path')
+            _trainee_resources(world,p,people,supply,RNG(world.seed).stream('society_trainee_order',world.year,p.id))
 
 
 def society_change_step(world):

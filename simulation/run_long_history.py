@@ -57,6 +57,20 @@ def snapshot(world, include_digest=False):
         'change_exchanges':events['society_change_exchanged'],
         'paid_apprentice_jobs':events['society_apprentice_work'],
     }
+    # Post-run flow diagnostics include graduates who subsequently advanced or
+    # died. A living-Iron snapshot alone cannot measure annual recruitment.
+    new_irons=Counter(e.year for e in world.events if e.kind=='rank_advanced' and e.data.get('from_rank')==0 and e.data.get('to_rank')==1)
+    graduates=Counter(e.year for e in world.events if e.kind=='society_trainee_graduated')
+    recent=range(max(1,world.year-49),world.year+1)
+    result['iron_recruitment']={
+        'new_irons_by_year':dict(sorted(new_irons.items())),
+        'society_graduates_by_year':dict(sorted(graduates.items())),
+        'active_trainees':sum(len(b.trainees) for b in world.institutions.branches.values()),
+        'enrollments':events['society_trainee_enrolled'],
+        'departures':events['society_trainee_departed'],
+        'new_irons_last_50_years':sum(new_irons[y] for y in recent),
+        'years_without_new_irons_last_50':sum(not new_irons[y] for y in recent),
+    }
     if include_digest:result['digest']=world.digest()
     return result
 

@@ -85,7 +85,8 @@ independently recomputes measurements and predictions. Trials are recorded as
 controlled practice, never mislabeled as combat, field feats or authored insight.
 Gold/Diamond still require the existing integration/transfer gates on all twenty
 abilities, their within-rank development, and freedom from core taint where
-required. No single trial advances a body. Checkpoint schema **7** is current;
+required. No single trial advances a body. Checkpoint schema **8** is current
+(persistent Society trainee places and their enrollment causes);
 older schema references below describe earlier revisions.
 
 ## Current economic and understanding implementation (supersedes initial PR #5 model)
@@ -415,3 +416,15 @@ Diamonds with zero progression/currency violations, but took 194.30 seconds.
 This is not accepted final calibration: the Diamond population remains below
 the requested range and the unchanged 120-second performance gate failed.
 See STAGE_0_5_STABILIZATION.md for measurements and current limitations.
+
+### Society recruitment (2026-09-21)
+
+Progression pacing is held fixed. Existing paid public-work places now retain
+their trainees, broker affordable purchases of actual local surplus stock,
+and record graduation only at the canonical Unranked-to-Iron transition.
+Four essences and all twenty abilities remain mandatory. Owned resources may
+be used in one session; no annual awakening-stone cap is introduced. Prices,
+wages, cultivation capacity and the existing three places per branch are
+unchanged. Willingness uses existing compromise/selectiveness dispositions.
+No stock, currency, ability, annual graduating class or target rank is created
+to meet a population goal. See SOCIETY_RECRUITMENT.md for scope and measurements.

@@ -15,13 +15,23 @@ def record_body_transition(world, person, before, *, context, causes=()):
     prerequisites = tuple(dict.fromkeys((*causes, *(
         a.milestone_event or a.origin_event for a in path.abilities
         if a.milestone_event is not None or a.origin_event is not None))))
-    world.emit('rank_advanced', Layer.REALITY, (Ref('person', person.id),),
+    transition = world.emit('rank_advanced', Layer.REALITY, (Ref('person', person.id),),
                Ref('settlement', person.settlement), prerequisites,
                from_rank=before, to_rank=after, body_rank_before=RANKS[before],
                body_rank_after=RANKS[after], practice_context=context,
                prerequisite_abilities=tuple(a.semantic_key for a in path.abilities),
                ability_ranks=tuple(a.rank for a in path.abilities),
                essences=path.essences, bodily_purge=True,core_taint=path.core_fraction)
+    if before == 0:
+        branch = world.institutions.branch_for('adventure_society', person.settlement)
+        if branch is not None and person.id in branch.trainees:
+            enrollment = branch.trainees.pop(person.id)
+            world.emit('society_trainee_graduated', Layer.SOCIETY,
+                       (Ref('person', person.id), Ref('institution', branch.institution)),
+                       Ref('settlement', person.settlement), (enrollment, transition.id),
+                       branch=branch.id, enrollment=enrollment,
+                       cohort_year=world.events[enrollment-1].year,
+                       body_rank=RANKS[after], abilities=len(path.abilities))
 
 
 def practice_ability(world, person, index, meaningful_use, reflection=0., *, context, session=None):

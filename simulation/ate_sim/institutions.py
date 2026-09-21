@@ -8,6 +8,7 @@ class Institution:
 @dataclass
 class Branch:
  id:int;institution:int;settlement:int;founded_year:int;origin_event:int|None;authority:float=.5;records:set[int]=field(default_factory=set);notices:set[int]=field(default_factory=set)
+ trainees:dict[int,int]=field(default_factory=dict)  # active person -> enrollment event; history stays in events
 @dataclass
 class MagicUserRecord:
  id:int;person:int;branch:int;year:int;essence_ids:tuple[str,...];confluence_id:str|None;confluence_name:str|None;abilities:tuple[str,...];ability_names:tuple[str,...];disclosure:str;source_event:int|None

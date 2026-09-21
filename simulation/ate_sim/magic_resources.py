@@ -330,8 +330,21 @@ class TransferMarket:
     if best is None or self._entry(p)[:5]<self._entry(best)[:5]:best=p
   return best
 
+def resource_price(r):
+ return (7 if r.kind=='essence' else 3) if r.owner_kind=='settlement' else (8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity))
+
+def purchase_settlement_resource(world,q,r):
+ """The existing public-stock sale, shared with Society procurement."""
+ if r.consumed_year is not None or r.owner_kind!='settlement' or r.owner_id!=q.settlement:return False
+ Layer,Ref=layer_ref();price=resource_price(r);institution=world.institutions.institution_by_kind('adventure_society');coins={}
+ if q.wealth>=price:q.wealth-=price
+ elif institution is not None and can_pay_tier(world,q.id,'iron',price):coins=world.currency.treasury_transfer(institution.id,q.id,{'iron':price},deposit=True)
+ else:return False
+ e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',q.settlement),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price,coin_deposit=coins,institution=None if institution is None else institution.id,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,q.settlement)
+ return True
+
 def _transfer_to_seeker(world,r,holder,local,rng,on_transfer=None,market=None):
- Layer,Ref=layer_ref();price=(8 if r.kind=='essence' else 4)*(1+.35*('Rare' in r.rarity or 'Epic' in r.rarity)+.8*('Legendary' in r.rarity))
+ Layer,Ref=layer_ref();price=resource_price(r)
  # Rank only feasible transactions. Eligibility checks must not create social edges.
  q=None
  if market is not None:q=market.buyer(r,holder,price)
@@ -373,13 +386,7 @@ def magic_ecology_step(world,rng):
    if not seekers and market[key]:market[key]=seekers=matching.contenders(r,price)
    if seekers:
     q=max(seekers,key=lambda p:(p.wealth,-p.id))
-    institution=world.institutions.institution_by_kind('adventure_society')
-    coins={}
-    if q.wealth>=price:q.wealth-=price
-    elif institution is not None:
-     coins=world.currency.treasury_transfer(institution.id,q.id,{'iron':price},deposit=True)
-    else:continue
-    e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price,coin_deposit=coins,institution=None if institution is None else institution.id,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
+    purchase_settlement_resource(world,q,r)
  demands={sid:_SettlementDemand(world,people) for sid,people in adults_by_settlement.items()}
  transfers={sid:TransferMarket(world,people) for sid,people in adults_by_settlement.items()}
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
