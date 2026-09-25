@@ -1,0 +1,1392 @@
+{
+  "tested_commit": "0147717a773f412fd356cf583ef870c137d8a1e8",
+  "workflow": "https://github.com/rax0h/all-that-endures/actions/runs/35529400618",
+  "status": "NOT READY FOR STAGE 0.5 FREEZE / MERGE",
+  "tests": {
+    "passed": 165,
+    "seconds": 168.68,
+    "probe_smoke": "passed",
+    "deterministic_100_year_smoke": "passed",
+    "local_final_focused": {
+      "passed": 34,
+      "seconds": 26.36
+    }
+  },
+  "benchmark": {
+    "diagnostic_seconds": 0.6992838209999377,
+    "digest": "480d44a9b1eff0bfd6d160cb399e094683a87d408fdc1485054960bdd36f1122",
+    "digest_seconds": 40.23875195599999,
+    "initialization": "mature",
+    "max_seconds": 120,
+    "performance_passed": false,
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "profile_tail_requested": 0,
+    "python_version": "3.12.14",
+    "record": "benchmark",
+    "seed": 843000,
+    "simulation_seconds": 194.30036748300012,
+    "validation_seconds": 0.24839810799994666,
+    "years": 1000
+  },
+  "snapshot": {
+    "abilities_awakened": 83560,
+    "adult_essence_users": 733,
+    "adventure_notice_status": {
+      "assigned": 12,
+      "open": 5,
+      "resolved": 3046
+    },
+    "adventure_notices": 3063,
+    "alive": 1488,
+    "awakening_stones_used": 57001,
+    "completed_loadouts": 175,
+    "completed_path_ranks": {
+      "1": 37,
+      "2": 8,
+      "3": 26,
+      "4": 102,
+      "5": 2
+    },
+    "core_institutions": {
+      "adventure_society": 1,
+      "magic_society": 1
+    },
+    "crafted_items_per_100_living_households_year": 5.328,
+    "crafted_items_total": 33036,
+    "cultural_signatures": {
+      "1": [
+        [
+          5,
+          0.647
+        ],
+        [
+          25,
+          0.348
+        ],
+        [
+          30,
+          0.209
+        ],
+        [
+          2,
+          0.2
+        ],
+        [
+          21,
+          0.2
+        ]
+      ],
+      "2": [
+        [
+          10,
+          0.997
+        ],
+        [
+          7,
+          0.57
+        ],
+        [
+          6,
+          0.566
+        ],
+        [
+          20,
+          0.369
+        ],
+        [
+          28,
+          0.335
+        ],
+        [
+          29,
+          0.321
+        ],
+        [
+          5,
+          0.31
+        ]
+      ],
+      "3": [
+        [
+          15,
+          0.41
+        ],
+        [
+          12,
+          0.237
+        ],
+        [
+          16,
+          0.232
+        ],
+        [
+          17,
+          0.232
+        ],
+        [
+          11,
+          0.23
+        ],
+        [
+          27,
+          0.223
+        ],
+        [
+          6,
+          0.219
+        ],
+        [
+          25,
+          0.207
+        ]
+      ],
+      "4": [
+        [
+          20,
+          0.394
+        ],
+        [
+          27,
+          0.278
+        ],
+        [
+          25,
+          0.255
+        ],
+        [
+          5,
+          0.248
+        ],
+        [
+          16,
+          0.23
+        ],
+        [
+          15,
+          0.229
+        ],
+        [
+          10,
+          0.222
+        ],
+        [
+          17,
+          0.21
+        ]
+      ],
+      "5": [
+        [
+          25,
+          0.436
+        ],
+        [
+          5,
+          0.355
+        ],
+        [
+          21,
+          0.253
+        ],
+        [
+          22,
+          0.247
+        ],
+        [
+          1,
+          0.228
+        ],
+        [
+          2,
+          0.226
+        ],
+        [
+          26,
+          0.208
+        ]
+      ]
+    },
+    "culture_institutions": 16,
+    "eligible_adults": 1209,
+    "essence_absorptions": 21817,
+    "essence_user_abilities": {
+      "1": 65,
+      "2": 79,
+      "3": 71,
+      "4": 77,
+      "5": 101,
+      "6": 37,
+      "7": 35,
+      "8": 29,
+      "9": 19,
+      "10": 23,
+      "11": 3,
+      "12": 5,
+      "13": 5,
+      "14": 2,
+      "15": 2,
+      "16": 1,
+      "18": 3,
+      "19": 1,
+      "20": 175
+    },
+    "essence_user_base_essences": {
+      "1": 271,
+      "2": 173,
+      "3": 289
+    },
+    "essence_user_ranks": {
+      "0": 558,
+      "1": 37,
+      "2": 8,
+      "3": 26,
+      "4": 102,
+      "5": 2
+    },
+    "essence_users_living": 733,
+    "event_kinds": {
+      "ability_applied": 87670,
+      "ability_awakened": 83560,
+      "ability_control_trial": 86139,
+      "ability_rank_advanced": 37733,
+      "awakening_stone_used": 57001,
+      "bereavement": 24407,
+      "birth": 17254,
+      "death": 15893,
+      "essence_absorbed": 21817,
+      "household_formed": 8491,
+      "inheritance": 12506,
+      "item_crafted": 33036,
+      "magic_resource_discovered": 95306,
+      "magic_resource_inherited": 16855,
+      "magic_resource_recovered": 15871,
+      "magic_resource_sought": 9815,
+      "magic_resource_transferred": 22231,
+      "magical_expedition": 18453,
+      "magical_expedition_resource_recovered": 94062,
+      "material_produced": 104640,
+      "material_purchased": 28492,
+      "partnership_formed": 13763,
+      "society_application": 10344,
+      "society_apprentice_work": 13934,
+      "society_assessment_completed": 9794
+    },
+    "events_total": 1006684,
+    "genealogical_births": 17254,
+    "households_total": 8535,
+    "incomplete_path_ranks": {
+      "0": 558
+    },
+    "institution_branches": 10,
+    "knowledge_claims": 10,
+    "laws": 15,
+    "living_active_craftspeople": 67,
+    "living_auras": 175,
+    "living_confluences": 289,
+    "living_households": 620,
+    "magic_access": {
+      "adult_participation": 0.6062861869313482,
+      "available_stock_owner_kinds": {
+        "person": 8659,
+        "settlement": 8386
+      },
+      "change_exchanges": 0,
+      "coin_consumption": {
+        "silver": 2
+      },
+      "coin_supply": {
+        "bronze": 2958,
+        "diamond": 11224,
+        "gold": 76208,
+        "iron": 89034,
+        "silver": 3562
+      },
+      "completed_last_50_years": 47,
+      "dead_incomplete_paths": 7933,
+      "paid_apprentice_jobs": 13934,
+      "second_essence": 462,
+      "third_essence": 289,
+      "treasuries": {
+        "1": {
+          "bronze": 1208,
+          "diamond": 5368,
+          "gold": 36654,
+          "iron": 302,
+          "silver": 1628
+        }
+      },
+      "users_by_occupation": {
+        "labor": 733
+      }
+    },
+    "magic_adventurer_aspirants_living": 73,
+    "magic_adventurer_completion_share": 1,
+    "magic_aspirants_living": 1209,
+    "magic_completion_goal_living": 1055,
+    "magic_completion_goal_share": 0.9915,
+    "magic_interested_living": 1064,
+    "magic_registry_disclosure": {
+      "essences": 709,
+      "full": 1930,
+      "identity": 632
+    },
+    "magic_registry_records": 3271,
+    "magic_resource_purchases": 7485,
+    "magic_resource_transfers": 22231,
+    "magic_resources_available": 17045,
+    "magic_resources_available_by_kind": {
+      "awakening_stone": 7533,
+      "essence": 9512
+    },
+    "magic_resources_by_kind": {
+      "awakening_stone": 64534,
+      "essence": 31329
+    },
+    "magic_resources_total": 95863,
+    "magical_items": 29595,
+    "magical_material_lots": 58920,
+    "material_lots_by_settlement": {
+      "1": 21243,
+      "2": 20064,
+      "3": 20821,
+      "4": 21750,
+      "5": 20930
+    },
+    "material_lots_per_100_living_people_year": 7.044,
+    "material_lots_per_year": 104.808,
+    "material_lots_total": 104808,
+    "material_peak_lots_in_year": 119,
+    "material_purchases": 28492,
+    "max_lineage_depth": 41,
+    "people_total": 17381,
+    "practice_domains": {
+      "agriculture": 10,
+      "construction": 13,
+      "defense": 5,
+      "food": 5
+    },
+    "practice_origins": {
+      "1": 6,
+      "2": 7,
+      "3": 7,
+      "4": 5,
+      "5": 8
+    },
+    "practices": 33,
+    "properties": 8535,
+    "relationships": 125568,
+    "settlement_population": {
+      "1": 330,
+      "2": 262,
+      "3": 299,
+      "4": 298,
+      "5": 299
+    },
+    "species_population": {
+      "celestine": 65,
+      "draconian": 501,
+      "elf": 295,
+      "human": 509,
+      "leonid": 53,
+      "runic": 65
+    },
+    "supplier_relationships_observed": 9275,
+    "year": 1000
+  },
+  "archive": {
+    "archive_bytes": 1589997568,
+    "archive_seconds": 230.97265066299997,
+    "logical_sha256": "620b116da2d54a87c80c1097b004e92b07abc9f3cb62cc99d18e55e6cb75f51b",
+    "path": "/tmp/ate-canonical.sqlite",
+    "record": "archive"
+  },
+  "audit": {
+    "valid": true,
+    "violations": [],
+    "world_digest": "480d44a9b1eff0bfd6d160cb399e094683a87d408fdc1485054960bdd36f1122",
+    "living_ranks": {
+      "bronze": 8,
+      "diamond": 2,
+      "gold": 102,
+      "iron": 37,
+      "silver": 26,
+      "unranked": 1313
+    },
+    "living_gold_and_diamond_audited": 104,
+    "living_gold_and_diamond_examples": [
+      {
+        "age": 739,
+        "body_rank": "diamond",
+        "person": 4337,
+        "progression": [
+          {
+            "abilities": {
+              "bronze": 3,
+              "iron": 17
+            },
+            "age": 57,
+            "body_rank": "iron",
+            "coin_balance": {
+              "iron": 0
+            },
+            "economic_tier": "no recorded coins",
+            "essences": [
+              "confluence-907bf6ec3cf7",
+              "growth",
+              "life",
+              "sand"
+            ],
+            "event": 177533,
+            "year": 318
+          },
+          {
+            "abilities": {
+              "bronze": 20
+            },
+            "age": 60,
+            "body_rank": "bronze",
+            "coin_balance": {
+              "iron": 0
+            },
+            "economic_tier": "no recorded coins",
+            "essences": [
+              "confluence-907bf6ec3cf7",
+              "growth",
+              "life",
+              "sand"
+            ],
+            "event": 180681,
+            "year": 321
+          },
+          {
+            "abilities": {
+              "silver": 20
+            },
+            "age": 72,
+            "body_rank": "silver",
+            "coin_balance": {
+              "iron": 4
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "confluence-907bf6ec3cf7",
+              "growth",
+              "life",
+              "sand"
+            ],
+            "event": 195207,
+            "year": 333
+          },
+          {
+            "abilities": {
+              "gold": 20
+            },
+            "age": 136,
+            "body_rank": "gold",
+            "coin_balance": {
+              "iron": 18
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "confluence-907bf6ec3cf7",
+              "growth",
+              "life",
+              "sand"
+            ],
+            "event": 273697,
+            "year": 397
+          },
+          {
+            "abilities": {
+              "diamond": 20
+            },
+            "age": 472,
+            "body_rank": "diamond",
+            "coin_balance": {
+              "gold": 1349,
+              "iron": 478
+            },
+            "economic_tier": "gold",
+            "essences": [
+              "confluence-907bf6ec3cf7",
+              "growth",
+              "life",
+              "sand"
+            ],
+            "event": 682828,
+            "year": 733
+          }
+        ],
+        "species": "human",
+        "wallet": {
+          "bronze": 12,
+          "diamond": 3162,
+          "gold": 1149,
+          "iron": 1263
+        },
+        "wealth": 33.043371235558034
+      },
+      {
+        "age": 704,
+        "body_rank": "diamond",
+        "person": 5030,
+        "progression": [
+          {
+            "abilities": {
+              "iron": 20
+            },
+            "age": 37,
+            "body_rank": "iron",
+            "coin_balance": {
+              "iron": 0
+            },
+            "economic_tier": "no recorded coins",
+            "essences": [
+              "confluence-48c6d7b4a73a",
+              "crystal",
+              "earth",
+              "renewal"
+            ],
+            "event": 195569,
+            "year": 333
+          },
+          {
+            "abilities": {
+              "bronze": 20
+            },
+            "age": 40,
+            "body_rank": "bronze",
+            "coin_balance": {
+              "iron": 4
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "confluence-48c6d7b4a73a",
+              "crystal",
+              "earth",
+              "renewal"
+            ],
+            "event": 198786,
+            "year": 336
+          },
+          {
+            "abilities": {
+              "silver": 20
+            },
+            "age": 52,
+            "body_rank": "silver",
+            "coin_balance": {
+              "iron": 12
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "confluence-48c6d7b4a73a",
+              "crystal",
+              "earth",
+              "renewal"
+            ],
+            "event": 213364,
+            "year": 348
+          },
+          {
+            "abilities": {
+              "gold": 20
+            },
+            "age": 144,
+            "body_rank": "gold",
+            "coin_balance": {
+              "iron": 80
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "confluence-48c6d7b4a73a",
+              "crystal",
+              "earth",
+              "renewal"
+            ],
+            "event": 326941,
+            "year": 440
+          },
+          {
+            "abilities": {
+              "diamond": 20
+            },
+            "age": 466,
+            "body_rank": "diamond",
+            "coin_balance": {
+              "bronze": 0,
+              "gold": 0,
+              "iron": 576
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "confluence-48c6d7b4a73a",
+              "crystal",
+              "earth",
+              "renewal"
+            ],
+            "event": 718193,
+            "year": 762
+          }
+        ],
+        "species": "human",
+        "wallet": {
+          "bronze": 8,
+          "diamond": 2531,
+          "gold": 4,
+          "iron": 1408,
+          "silver": 4
+        },
+        "wealth": 40.97327950280165
+      },
+      {
+        "age": 415,
+        "body_rank": "gold",
+        "person": 10035,
+        "progression": [
+          {
+            "abilities": {
+              "bronze": 2,
+              "iron": 18
+            },
+            "age": 70,
+            "body_rank": "iron",
+            "coin_balance": {
+              "iron": 0
+            },
+            "economic_tier": "no recorded coins",
+            "essences": [
+              "axe",
+              "confluence-29f92c4180ae",
+              "life",
+              "plant"
+            ],
+            "event": 588975,
+            "year": 655
+          },
+          {
+            "abilities": {
+              "bronze": 20
+            },
+            "age": 100,
+            "body_rank": "bronze",
+            "coin_balance": {
+              "iron": 10
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "axe",
+              "confluence-29f92c4180ae",
+              "life",
+              "plant"
+            ],
+            "event": 623699,
+            "year": 685
+          },
+          {
+            "abilities": {
+              "silver": 20
+            },
+            "age": 112,
+            "body_rank": "silver",
+            "coin_balance": {
+              "iron": 10
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "axe",
+              "confluence-29f92c4180ae",
+              "life",
+              "plant"
+            ],
+            "event": 638308,
+            "year": 697
+          },
+          {
+            "abilities": {
+              "gold": 20
+            },
+            "age": 244,
+            "body_rank": "gold",
+            "coin_balance": {
+              "iron": 38
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "axe",
+              "confluence-29f92c4180ae",
+              "life",
+              "plant"
+            ],
+            "event": 798972,
+            "year": 829
+          }
+        ],
+        "species": "human",
+        "wallet": {
+          "gold": 0,
+          "iron": 174
+        },
+        "wealth": 0.8221091857664946
+      },
+      {
+        "age": 407,
+        "body_rank": "gold",
+        "person": 10173,
+        "progression": [
+          {
+            "abilities": {
+              "bronze": 4,
+              "iron": 16
+            },
+            "age": 64,
+            "body_rank": "iron",
+            "coin_balance": {
+              "iron": 0
+            },
+            "economic_tier": "no recorded coins",
+            "essences": [
+              "confluence-b886141f668f",
+              "life",
+              "magic",
+              "sand"
+            ],
+            "event": 590797,
+            "year": 657
+          },
+          {
+            "abilities": {
+              "bronze": 20
+            },
+            "age": 67,
+            "body_rank": "bronze",
+            "coin_balance": {
+              "iron": 0
+            },
+            "economic_tier": "no recorded coins",
+            "essences": [
+              "confluence-b886141f668f",
+              "life",
+              "magic",
+              "sand"
+            ],
+            "event": 593908,
+            "year": 660
+          },
+          {
+            "abilities": {
+              "silver": 20
+            },
+            "age": 79,
+            "body_rank": "silver",
+            "coin_balance": {
+              "iron": 0
+            },
+            "economic_tier": "no recorded coins",
+            "essences": [
+              "confluence-b886141f668f",
+              "life",
+              "magic",
+              "sand"
+            ],
+            "event": 607621,
+            "year": 672
+          },
+          {
+            "abilities": {
+              "gold": 20
+            },
+            "age": 164,
+            "body_rank": "gold",
+            "coin_balance": {
+              "iron": 16
+            },
+            "economic_tier": "iron",
+            "essences": [
+              "confluence-b886141f668f",
+              "life",
+              "magic",
+              "sand"
+            ],
+            "event": 712485,
+            "year": 757
+          }
+        ],
+        "species": "runic",
+        "wallet": {
+          "gold": 0,
+          "iron": 56
+        },
+        "wealth": 0.5812674082316969
+      },
+      {
+        "age": 406,
+        "body_rank": "gold",
+        "person": 10179,
+        "progression": [
+          {
+            "abilities": {
+              "iron": 20
+            },
+            "age": 62,
+            "body_rank": "iron",
+            "coin_balance": {
+              "gold": 198,
+              "iron": 0
+            },
+            "economic_tier": "gold",
+            "essences": [
+              "bone",
+              "confluence-5b3c52d5bc38",
+              "knowledge",
+              "life"
+            ],
+            "event": 589850,
+            "year": 656
+          },
+          {
+            "abilities": {
+              "bronze": 20
+            },
+            "age": 70,
+            "body_rank": "bronze",
+            "coin_balance": {
+              "gold": 198,
+              "iron": 0
+            },
+            "economic_tier": "gold",
+            "essences": [
+              "bone",
+              "confluence-5b3c52d5bc38",
+              "knowledge",
+              "life"
+            ],
+            "event": 598713,
+            "year": 664
+          },
+          {
+            "abilities": {
+              "silver": 20
+            },
+            "age": 83,
+            "body_rank": "silver",
+            "coin_balance": {
+              "gold": 198,
+              "iron": 0
+            },
+            "economic_tier": "gold",
+            "essences": [
+              "bone",
+              "confluence-5b3c52d5bc38",
+              "knowledge",
+              "life"
+            ],
+            "event": 613891,
+            "year": 677
+          },
+          {
+            "abilities": {
+              "gold": 20
+            },
+            "age": 165,
+            "body_rank": "gold",
+            "coin_balance": {
+              "gold": 198,
+              "iron": 24
+            },
+            "economic_tier": "gold",
+            "essences": [
+              "bone",
+              "confluence-5b3c52d5bc38",
+              "knowledge",
+              "life"
+            ],
+            "event": 714867,
+            "year": 759
+          }
+        ],
+        "species": "human",
+        "wallet": {
+          "gold": 186,
+          "iron": 108
+        },
+        "wealth": 24.54050535477122
+      }
+    ]
+  },
+  "scaling": [
+    {
+      "collections": {
+        "active_material_lots": 4073,
+        "applications": 133,
+        "available_magic_resources": 20,
+        "events": 16710,
+        "households": 340,
+        "items": 229,
+        "living": 902,
+        "magic_resources": 1207,
+        "material_lots": 4089,
+        "partnerships": 498,
+        "paths": 171,
+        "people": 1228,
+        "relationships": 5230,
+        "resource_owner_buckets": 10,
+        "settlement_magic_stock": 0
+      },
+      "first_year": 1,
+      "gc_collections": {
+        "0": 5,
+        "1": 0,
+        "2": 1
+      },
+      "gc_seconds_including_diagnostics": 0.0443914009999844,
+      "last_year": 100,
+      "record": "scaling_bucket",
+      "seconds_per_year": 0.027397158699999976,
+      "simulation_seconds": 2.7397158699999977,
+      "subsystem_calls": {
+        "_demography": 100,
+        "_memory": 100,
+        "_people": 100,
+        "_pressure": 100,
+        "_production": 100,
+        "_weather": 100,
+        "accountability_step": 100,
+        "agency_step": 100,
+        "ambient_magic_step": 100,
+        "civilization_step": 100,
+        "craft_career_step": 100,
+        "cultural_step": 100,
+        "development_step": 100,
+        "divine_step": 100,
+        "household_step": 100,
+        "institution_step": 100,
+        "magic_ecology_step": 100,
+        "magical_civilization_step": 100,
+        "material_economy_step": 100,
+        "society_career_step": 100,
+        "threat_ecology_step": 100,
+        "warfare_step": 100
+      },
+      "subsystem_seconds": {
+        "_demography": 0.16214084199987155,
+        "_memory": 0.00045383500014395395,
+        "_people": 0.26683231800001295,
+        "_pressure": 0.011825259000090682,
+        "_production": 0.134936648000064,
+        "_weather": 0.004317785000580443,
+        "accountability_step": 0.001642389999972238,
+        "agency_step": 0.8447848769997108,
+        "ambient_magic_step": 0.013346105999914926,
+        "civilization_step": 0.07230648299986342,
+        "craft_career_step": 0.023497844999781137,
+        "cultural_step": 0.027212589999862757,
+        "development_step": 0.045777019000297514,
+        "divine_step": 0.050979045000190126,
+        "household_step": 0.08637268500012851,
+        "institution_step": 0.037392920000229424,
+        "magic_ecology_step": 0.2599382149996359,
+        "magical_civilization_step": 0.3199553850002417,
+        "material_economy_step": 0.12430470799995419,
+        "society_career_step": 0.13267348899989884,
+        "threat_ecology_step": 0.0651029369997218,
+        "warfare_step": 0.005856622999885985
+      }
+    },
+    {
+      "collections": {
+        "active_material_lots": 4073,
+        "applications": 133,
+        "available_magic_resources": 20,
+        "events": 16710,
+        "households": 340,
+        "items": 229,
+        "living": 902,
+        "magic_resources": 1207,
+        "material_lots": 4089,
+        "partnerships": 498,
+        "paths": 171,
+        "people": 1228,
+        "relationships": 5230,
+        "resource_owner_buckets": 10,
+        "settlement_magic_stock": 0
+      },
+      "first_year": 1,
+      "gc_collections": {
+        "0": 5,
+        "1": 0,
+        "2": 1
+      },
+      "gc_seconds_including_diagnostics": 0.04197121900000411,
+      "last_year": 100,
+      "record": "scaling_bucket",
+      "seconds_per_year": 0.02732802373000027,
+      "simulation_seconds": 2.732802373000027,
+      "subsystem_calls": {
+        "_demography": 100,
+        "_memory": 100,
+        "_people": 100,
+        "_pressure": 100,
+        "_production": 100,
+        "_weather": 100,
+        "accountability_step": 100,
+        "agency_step": 100,
+        "ambient_magic_step": 100,
+        "civilization_step": 100,
+        "craft_career_step": 100,
+        "cultural_step": 100,
+        "development_step": 100,
+        "divine_step": 100,
+        "household_step": 100,
+        "institution_step": 100,
+        "magic_ecology_step": 100,
+        "magical_civilization_step": 100,
+        "material_economy_step": 100,
+        "society_career_step": 100,
+        "threat_ecology_step": 100,
+        "warfare_step": 100
+      },
+      "subsystem_seconds": {
+        "_demography": 0.16285577400014972,
+        "_memory": 0.00043521800000689836,
+        "_people": 0.2659362130002023,
+        "_pressure": 0.012064445000135038,
+        "_production": 0.1348603349998143,
+        "_weather": 0.004192188000160968,
+        "accountability_step": 0.001544630999887886,
+        "agency_step": 0.8423766230000638,
+        "ambient_magic_step": 0.01361888100024089,
+        "civilization_step": 0.07175570400005427,
+        "craft_career_step": 0.023165071000107673,
+        "cultural_step": 0.02675990699981412,
+        "development_step": 0.04625906799981294,
+        "divine_step": 0.05162372500006995,
+        "household_step": 0.0868207150000444,
+        "institution_step": 0.03731317599988415,
+        "magic_ecology_step": 0.2613801269998248,
+        "magical_civilization_step": 0.31788377299972126,
+        "material_economy_step": 0.12403390199978048,
+        "society_career_step": 0.13192904600020938,
+        "threat_ecology_step": 0.06473083699984272,
+        "warfare_step": 0.00566547499971648
+      }
+    },
+    {
+      "collections": {
+        "active_material_lots": 19377,
+        "applications": 1254,
+        "available_magic_resources": 467,
+        "events": 108992,
+        "households": 1745,
+        "items": 2442,
+        "living": 1377,
+        "magic_resources": 8339,
+        "material_lots": 19639,
+        "partnerships": 2808,
+        "paths": 1139,
+        "people": 4153,
+        "relationships": 26994,
+        "resource_owner_buckets": 107,
+        "settlement_magic_stock": 33
+      },
+      "first_year": 101,
+      "gc_collections": {
+        "0": 6,
+        "1": 0,
+        "2": 1
+      },
+      "gc_seconds_including_diagnostics": 0.40210134099999095,
+      "last_year": 250,
+      "record": "scaling_bucket",
+      "seconds_per_year": 0.10999994149333361,
+      "simulation_seconds": 16.49999122400004,
+      "subsystem_calls": {
+        "_demography": 150,
+        "_memory": 150,
+        "_people": 150,
+        "_pressure": 150,
+        "_production": 150,
+        "_weather": 150,
+        "accountability_step": 150,
+        "agency_step": 150,
+        "ambient_magic_step": 150,
+        "civilization_step": 150,
+        "craft_career_step": 150,
+        "cultural_step": 150,
+        "development_step": 150,
+        "divine_step": 150,
+        "household_step": 150,
+        "institution_step": 150,
+        "magic_ecology_step": 150,
+        "magical_civilization_step": 150,
+        "material_economy_step": 150,
+        "society_career_step": 150,
+        "threat_ecology_step": 150,
+        "warfare_step": 150
+      },
+      "subsystem_seconds": {
+        "_demography": 0.7065880709999419,
+        "_memory": 0.0009104300004310062,
+        "_people": 1.2346811140000682,
+        "_pressure": 0.058484714999622156,
+        "_production": 0.6510840389997838,
+        "_weather": 0.007179861999873083,
+        "accountability_step": 0.005467588999920281,
+        "agency_step": 5.060540784999887,
+        "ambient_magic_step": 0.052267551999477746,
+        "civilization_step": 0.4487434230000531,
+        "craft_career_step": 0.130862110999999,
+        "cultural_step": 0.06676516899977969,
+        "development_step": 0.2464261720000991,
+        "divine_step": 0.1530938979997245,
+        "household_step": 0.5394159620002483,
+        "institution_step": 0.24963474700035704,
+        "magic_ecology_step": 1.7753269070003057,
+        "magical_civilization_step": 3.045151536999583,
+        "material_economy_step": 0.5682855619999714,
+        "society_career_step": 0.7329140510001366,
+        "threat_ecology_step": 0.346383430000742,
+        "warfare_step": 0.009442981000461259
+      }
+    },
+    {
+      "collections": {
+        "active_material_lots": 46021,
+        "applications": 4642,
+        "available_magic_resources": 6384,
+        "events": 402747,
+        "households": 4043,
+        "items": 12615,
+        "living": 1515,
+        "magic_resources": 36334,
+        "material_lots": 47885,
+        "partnerships": 6529,
+        "paths": 3725,
+        "people": 8671,
+        "relationships": 61001,
+        "resource_owner_buckets": 417,
+        "settlement_magic_stock": 912
+      },
+      "first_year": 251,
+      "gc_collections": {
+        "0": 10,
+        "1": 0,
+        "2": 1
+      },
+      "gc_seconds_including_diagnostics": 1.3699938130000078,
+      "last_year": 500,
+      "record": "scaling_bucket",
+      "seconds_per_year": 0.2018068169720002,
+      "simulation_seconds": 50.45170424300005,
+      "subsystem_calls": {
+        "_demography": 250,
+        "_memory": 250,
+        "_people": 250,
+        "_pressure": 250,
+        "_production": 250,
+        "_weather": 250,
+        "accountability_step": 250,
+        "agency_step": 250,
+        "ambient_magic_step": 250,
+        "civilization_step": 250,
+        "craft_career_step": 250,
+        "cultural_step": 250,
+        "development_step": 250,
+        "divine_step": 250,
+        "household_step": 250,
+        "institution_step": 250,
+        "magic_ecology_step": 250,
+        "magical_civilization_step": 250,
+        "material_economy_step": 250,
+        "society_career_step": 250,
+        "threat_ecology_step": 250,
+        "warfare_step": 250
+      },
+      "subsystem_seconds": {
+        "_demography": 1.3405093580001903,
+        "_memory": 0.0016493130004846535,
+        "_people": 2.1727698229998964,
+        "_pressure": 0.17826667899998938,
+        "_production": 1.305847984999673,
+        "_weather": 0.012607426999807103,
+        "accountability_step": 0.01703066899932537,
+        "agency_step": 16.737525649000247,
+        "ambient_magic_step": 0.10401748599946359,
+        "civilization_step": 1.0933626730002288,
+        "craft_career_step": 0.2673446120002154,
+        "cultural_step": 0.11824362500038887,
+        "development_step": 0.48605646800018576,
+        "divine_step": 0.32665547000004835,
+        "household_step": 1.4948321319995443,
+        "institution_step": 1.1351925309999729,
+        "magic_ecology_step": 5.935276880999993,
+        "magical_civilization_step": 11.903071973000294,
+        "material_economy_step": 1.1756798349999826,
+        "society_career_step": 2.1868047509993858,
+        "threat_ecology_step": 1.0570530549995283,
+        "warfare_step": 0.016346225999882336
+      }
+    },
+    {
+      "collections": {
+        "active_material_lots": 72618,
+        "applications": 7523,
+        "available_magic_resources": 12305,
+        "events": 704518,
+        "households": 6260,
+        "items": 23618,
+        "living": 1457,
+        "magic_resources": 65646,
+        "material_lots": 76233,
+        "partnerships": 10065,
+        "paths": 6561,
+        "people": 12868,
+        "relationships": 92340,
+        "resource_owner_buckets": 408,
+        "settlement_magic_stock": 3024
+      },
+      "first_year": 501,
+      "gc_collections": {
+        "0": 10,
+        "1": 0,
+        "2": 1
+      },
+      "gc_seconds_including_diagnostics": 2.054523146000065,
+      "last_year": 750,
+      "record": "scaling_bucket",
+      "seconds_per_year": 0.242977316148,
+      "simulation_seconds": 60.744329037,
+      "subsystem_calls": {
+        "_demography": 250,
+        "_memory": 250,
+        "_people": 250,
+        "_pressure": 250,
+        "_production": 250,
+        "_weather": 250,
+        "accountability_step": 250,
+        "agency_step": 250,
+        "ambient_magic_step": 250,
+        "civilization_step": 250,
+        "craft_career_step": 250,
+        "cultural_step": 250,
+        "development_step": 250,
+        "divine_step": 250,
+        "household_step": 250,
+        "institution_step": 250,
+        "magic_ecology_step": 250,
+        "magical_civilization_step": 250,
+        "material_economy_step": 250,
+        "society_career_step": 250,
+        "threat_ecology_step": 250,
+        "warfare_step": 250
+      },
+      "subsystem_seconds": {
+        "_demography": 1.4793206570003008,
+        "_memory": 0.00172576199975083,
+        "_people": 2.1538083449995042,
+        "_pressure": 0.24016522499982784,
+        "_production": 1.4736380319995988,
+        "_weather": 0.012447553999777483,
+        "accountability_step": 0.018544535999524214,
+        "agency_step": 19.115050787999735,
+        "ambient_magic_step": 0.11077981900047007,
+        "civilization_step": 1.3720512600006032,
+        "craft_career_step": 0.27826377999980423,
+        "cultural_step": 0.1349040589999504,
+        "development_step": 0.5206018879992484,
+        "divine_step": 0.45383341800004473,
+        "household_step": 2.1867106790000435,
+        "institution_step": 1.8368001649992607,
+        "magic_ecology_step": 7.4231364410005085,
+        "magical_civilization_step": 14.410787617999915,
+        "material_economy_step": 1.2337357910005835,
+        "society_career_step": 2.8829067710005347,
+        "threat_ecology_step": 1.3181658169995671,
+        "warfare_step": 0.016728863000082583
+      }
+    },
+    {
+      "collections": {
+        "active_material_lots": 99668,
+        "applications": 10344,
+        "available_magic_resources": 17045,
+        "events": 1006684,
+        "households": 8535,
+        "items": 33036,
+        "living": 1488,
+        "magic_resources": 95863,
+        "material_lots": 104808,
+        "partnerships": 13763,
+        "paths": 9878,
+        "people": 17381,
+        "relationships": 125568,
+        "resource_owner_buckets": 412,
+        "settlement_magic_stock": 8386
+      },
+      "first_year": 751,
+      "gc_collections": {
+        "0": 10,
+        "1": 0,
+        "2": 1
+      },
+      "gc_seconds_including_diagnostics": 2.6589718490000678,
+      "last_year": 1000,
+      "record": "scaling_bucket",
+      "seconds_per_year": 0.25548616242399996,
+      "simulation_seconds": 63.871540605999996,
+      "subsystem_calls": {
+        "_demography": 250,
+        "_memory": 250,
+        "_people": 250,
+        "_pressure": 250,
+        "_production": 250,
+        "_weather": 250,
+        "accountability_step": 250,
+        "agency_step": 250,
+        "ambient_magic_step": 250,
+        "civilization_step": 250,
+        "craft_career_step": 250,
+        "cultural_step": 250,
+        "development_step": 250,
+        "divine_step": 250,
+        "household_step": 250,
+        "institution_step": 250,
+        "magic_ecology_step": 250,
+        "magical_civilization_step": 250,
+        "material_economy_step": 250,
+        "society_career_step": 250,
+        "threat_ecology_step": 250,
+        "warfare_step": 250
+      },
+      "subsystem_seconds": {
+        "_demography": 1.6347313040003542,
+        "_memory": 0.00173895200083507,
+        "_people": 2.209381260999635,
+        "_pressure": 0.2989711439999496,
+        "_production": 1.649445316000424,
+        "_weather": 0.012356798000496383,
+        "accountability_step": 0.017852380999954676,
+        "agency_step": 17.921024952999915,
+        "ambient_magic_step": 0.1064627199995698,
+        "civilization_step": 1.6732626109998705,
+        "craft_career_step": 0.27077461400028824,
+        "cultural_step": 0.14459048199950075,
+        "development_step": 0.5099045920000549,
+        "divine_step": 0.538530631999663,
+        "household_step": 2.8767444170001113,
+        "institution_step": 2.433428910000373,
+        "magic_ecology_step": 8.87625566500003,
+        "magical_civilization_step": 14.387996691999206,
+        "material_economy_step": 1.1944097360000114,
+        "society_career_step": 3.153932323000049,
+        "threat_ecology_step": 1.2676581580002448,
+        "warfare_step": 0.01705536900004745
+      }
+    }
+  ],
+  "limitations": [
+    "2 Diamonds remains below desired roughly 20–25; workload not accepted final calibration.",
+    "194.30 seconds fails unchanged 120-second gate.",
+    "60.63% adult magical participation and thin lower ranks remain open.",
+    "No new 300-year seed runs: earlier shorter-run results belong to 820241e, not this candidate."
+  ]
+}

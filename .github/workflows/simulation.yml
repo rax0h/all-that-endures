@@ -27,3 +27,11 @@ jobs:
         run: python simulation/specific_test.py --seed 843000 --years 10 --section all
       - name: deterministic 100-year smoke history
         run: python simulation/run_long_history.py 843000 100
+      - name: canonical 1000-year progression validation
+        run: |
+          set -o pipefail
+          benchmark_status=0
+          python simulation/run_long_history.py 843000 1000 --max-seconds 120 --archive /tmp/ate-canonical.sqlite | tee /tmp/canonical-millennium.log || benchmark_status=$?
+          audit_status=0
+          python simulation/validate_magic_progression.py /tmp/ate-canonical.sqlite | tee /tmp/canonical-validation.log || audit_status=$?
+          if (( benchmark_status != 0 || audit_status != 0 )); then exit 1; fi

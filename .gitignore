@@ -1,3 +1,6 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+
+# Local validation databases/logs; reports are committed separately.
+.validation/

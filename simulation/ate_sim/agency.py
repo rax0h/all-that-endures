@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
+from .magic_progression import practice_ability,record_body_transition
 from .rank_ecology import rank_ecology_step
 @dataclass
 class MotiveState:hunger:float=0.;safety:float=0.;belonging:float=0.;wealth:float=0.;curiosity:float=0.;legacy:float=0.;obligation:float=0.;status:float=0.
@@ -17,15 +18,21 @@ class AgencyState:
  def choose(self,world,p,rng,attachment=None,dependents=None):
   m=self.assess(world,p,attachment,dependents);choices={'secure_food':m.hunger*1.35,'prepare':m.safety,'work':m.wealth+.35*m.obligation,'socialize':m.belonging*.8,'learn':m.curiosity*(1-.55*m.hunger),'teach':m.legacy,'build':(.55*m.safety+.35*m.status)*(1-.5*m.hunger)};best=max(choices.values());near=[(a,v) for a,v in choices.items() if v>=best-.08];action,strength=near[int(rng.random()*len(near))%len(near)];return action,max(m.__dict__,key=m.__dict__.get),strength
 
+PRACTICE_FUNCTIONS={'secure_food':{'creation','control','support','detection','recovery'},'prepare':{'enhancement','control','movement','detection','recovery'},'work':{'creation','enhancement','control','support','exchange'},'socialize':{'influence','support','detection','exchange'},'learn':{'detection','control','transformation','support'},'teach':{'influence','support','control','exchange'},'build':{'creation','enhancement','control','transformation'}}
+
 def _practice_path(world,p,rr,action,strength):
  path=world.advancement.path(p.id)
  if path is None or not path.abilities:return
- relevant={'secure_food':{'creation','control','support','detection','recovery'},'prepare':{'enhancement','control','movement','detection','recovery'},'work':{'creation','enhancement','control','support','exchange'},'socialize':{'influence','support','detection','exchange'},'learn':{'detection','control','transformation','support'},'teach':{'influence','support','control','exchange'},'build':{'creation','enhancement','control','transformation'}}.get(action,set())
- candidates=[(i,a) for i,a in enumerate(path.abilities) if a.function in relevant] or list(enumerate(path.abilities));rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));before=world.advancement.rank(p.id)
+ session=world.advancement.practice_batch(p.id);before=session.rank
+ ceiling=min(5,max(1,before)+1)
+ # Every selected practice would be a no-op at the body ceiling. This stream
+ # is private to this person's action and has no later consumer in the step.
+ if all(a.rank>=ceiling for a in path.abilities):return
+ relevant=PRACTICE_FUNCTIONS.get(action,())
+ candidates=[(i,a) for i,a in enumerate(path.abilities) if a.function in relevant] or list(enumerate(path.abilities));rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)))
  for i,a in candidates[:uses]:
-  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;world.advancement.practice(p.id,i,meaningful,reflection)
- after=world.advancement.rank(p.id)
- if after>before:p.rank=after;Layer,Ref=layer_ref();world.emit('rank_advanced',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),from_rank=before,to_rank=after,practice_context=action)
+  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action,session=session)
+ record_body_transition(world,p,before,context=action)
 
 def agency_step(world,rng):
  dependents={}

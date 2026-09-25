@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .core_types import layer_ref
-from .magic_resources import _aspiration, _make_resource, _wants, _wanted_resources, _transfer_to_seeker, absorb_essence_resource, use_awakening_stone
+from .magic_resources import _aspiration, _make_resource, _wants, _wanted_resources, _transfer_to_seeker, absorb_essence_resource, use_awakening_stone, TransferMarket
 from .materials import _produce_lot, _craft_once
 from .institutions import apply_for_society, full_essence_user
 
@@ -48,13 +48,20 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
     if attempts <= 0:
         return
 
-    candidates = sorted(users + [p for p in adventurer_aspirants if p not in users], key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
+    candidates = sorted([p for p in aspirants if _aspiration(world,p).risk_tolerance >= .08+.22*cell.hazard], key=lambda p: (_aspiration(world, p).risk_tolerance, _aspiration(world, p).preparation, p.health, -p.id), reverse=True)
     if not candidates:
         return
     Layer, Ref = layer_ref()
+    available = list(candidates)
     for n in range(attempts):
+        if not available:break
         erng = rng.stream('magical_expedition', world.year, sid * 100 + n)
-        leader = candidates[n % len(candidates)]
+        # An annual field party includes a skilled leader and willing workers.
+        # Rotate access to field work; each participant works at most one trip/year.
+        leader = available.pop(0)
+        crew=[leader]
+        for _ in range(min(5,len(available))):
+            crew.append(available.pop((world.year+n)%len(available)))
         aspiration = _aspiration(world, leader)
         readiness = .20 + .22 * aspiration.preparation + .18 * aspiration.risk_tolerance + .08 * world.advancement.rank(leader.id)
         if adventure is not None:
@@ -62,7 +69,7 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         if magic is not None:
             readiness += .08
         danger = .08 + .22 * cell.hazard + .10 * max(0., ambient - .8)
-        event = world.emit('magical_expedition', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), society_branch=None if adventure is None else adventure.id, ambient_magic=round(ambient, 3), readiness=round(readiness, 3), danger=round(danger, 3))
+        event = world.emit('magical_expedition', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), participants=tuple(p.id for p in crew),society_branch=None if adventure is None else adventure.id, ambient_magic=round(ambient, 3), readiness=round(readiness, 3), danger=round(danger, 3))
         if erng.random() > min(.86, readiness + .16 * ambient):
             world.emit('magical_expedition_returned_empty', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id,))
             continue
@@ -71,8 +78,12 @@ def _expedition_step(world, rng, sid, people, users, adventure, magic):
         incomplete = sum(1 for p in users if len(world.advancement.path(p.id).abilities) < world.advancement.path(p.id).capacity)
         stone_share = min(.68, .38 + .025 * min(10, incomplete) + (.08 if magic is not None else 0.))
         kind = 'awakening_stone' if erng.random() < stone_share else 'essence'
-        found = _make_resource(world, erng, sid, leader, kind, event.id, 'organized magical expedition')
-        world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', leader.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key)
+        # Physical collection by actual participants, not a looting ability.
+        for worker in crew:
+            hrng=rng.stream('field_harvest',world.year,worker.id)
+            collected_kind='awakening_stone' if hrng.random()<stone_share else 'essence'
+            found = _make_resource(world, hrng, sid, worker, collected_kind, event.id, 'organized magical field harvest')
+            world.emit('magical_expedition_resource_recovered', Layer.SOCIETY, (Ref('person', worker.id),), Ref('settlement', sid), (event.id, found.origin_event), resource=found.id, resource_kind=found.kind, key=found.key)
         aspiration.preparation = min(1., aspiration.preparation + .025)
 
 
@@ -85,6 +96,8 @@ def _resource_circulation(world, rng, sid, people, users, magic):
     # Magic Society presence improves information/market matching, not resource creation.
     # Mature communities get more matching opportunities, but every absorption/use and transfer
     # still follows the normal aspiration, compatibility, wealth and selectiveness gates.
+    from .magic_resources import _circulation_stock
+    market=TransferMarket(world,people)
     rounds = 3 + (3 if magic is not None else 0)
     for _ in range(rounds):
         holder_ids = sorted(oid for (kind,oid),ids in world.magic_resources.owner_index.items()
@@ -94,25 +107,26 @@ def _resource_circulation(world, rng, sid, people, users, magic):
             path = world.advancement.path(holder.id)
             a = _aspiration(world, holder)
             base = 0 if path is None else len(path.base_essences)
-            ess = _wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'essence')) if base < a.desired_base_essences else []
+            ess,stones,surplus = _circulation_stock(world,holder)
+            changed=False
             if ess and base < a.desired_base_essences and rr.random() < .55 + .30 * a.urgency:
                 viable = [r for r in ess if path is None or r.key not in path.base_essences]
                 if viable and rr.random() < max(.25, a.compromise_tolerance):
                     absorb_essence_resource(world, holder.id, viable[int(rr.random() * len(viable)) % len(viable)].id)
                     path = world.advancement.path(holder.id)
-            stones = [] if path is None else (_wanted_resources(world, holder, world.magic_resources.inventory('person', holder.id, 'awakening_stone')) if len(path.abilities) < min(a.desired_abilities, path.capacity) else [])
+                    _,stones,surplus=_circulation_stock(world,holder);changed=True
             if path is not None and stones and len(path.abilities)<min(a.desired_abilities,path.capacity):
                 if rr.random()<max(.22,.82-.55*a.stone_selectiveness):
                     use_awakening_stone(world,holder.id,stones[int(rr.random()*len(stones))%len(stones)].id)
-            held=world.magic_resources.inventory('person',holder.id)
-            surplus=_wanted_resources(world,holder,held,wanted=False) if held else []
+                    surplus=_circulation_stock(world,holder)[2];changed=True
+            if changed:market.refresh(holder)
             if surplus and rr.random()<(.58 if magic is not None else .28):
-                _transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],holder,people,rr)
+                _transfer_to_seeker(world,surplus[int(rr.random()*len(surplus))%len(surplus)],holder,people,rr,market=market)
 
 
-def _society_pipeline(world, rng, sid, people, adventure, magic):
+def _society_pipeline(world, rng, sid, people, adventure, magic, existing=None):
     """Convert Society ambition into applications once the person has actually qualified."""
-    existing = {(a.person, a.society) for a in world.institutions.applications.values() if a.passed is None or a.passed}
+    if existing is None:existing = {(a.person, a.society) for a in world.institutions.applications.values() if a.passed is None or a.passed}
     for p in people:
         if not full_essence_user(world, p.id):
             continue
@@ -168,6 +182,7 @@ def _magical_workshops(world, rng, sid, people, users, magic):
 
 def magical_civilization_step(world, rng):
     """Civilizational feedback loop: magic is normal; exceptional power remains exceptional."""
+    existing = {(a.person, a.society) for a in world.institutions.applications.values() if a.passed is None or a.passed}
     for sid in sorted(world.settlements):
         people = _living(world, sid)
         if not people:
@@ -178,5 +193,5 @@ def magical_civilization_step(world, rng):
         # Recompute because expeditions can put resources into practitioners' hands.
         users = _practitioners(world, people)
         _resource_circulation(world, rng, sid, people, users, magic)
-        _society_pipeline(world, rng, sid, people, adventure, magic)
+        _society_pipeline(world, rng, sid, people, adventure, magic, existing)
         _magical_workshops(world, rng, sid, people, users, magic)

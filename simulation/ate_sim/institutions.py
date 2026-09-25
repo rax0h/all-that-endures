@@ -8,12 +8,13 @@ class Institution:
 @dataclass
 class Branch:
  id:int;institution:int;settlement:int;founded_year:int;origin_event:int|None;authority:float=.5;records:set[int]=field(default_factory=set);notices:set[int]=field(default_factory=set)
+ trainees:dict[int,int]=field(default_factory=dict)  # active person -> enrollment event; history stays in events
 @dataclass
 class MagicUserRecord:
  id:int;person:int;branch:int;year:int;essence_ids:tuple[str,...];confluence_id:str|None;confluence_name:str|None;abilities:tuple[str,...];ability_names:tuple[str,...];disclosure:str;source_event:int|None
 @dataclass
 class AdventureNotice:
- id:int;branch:int;year:int;kind:str;location:int;cause_event:int;status:str='open';assigned_to:int|None=None;resolved_event:int|None=None
+ id:int;branch:int;year:int;kind:str;location:int;cause_event:int;status:str='open';assigned_to:int|None=None;resolved_event:int|None=None;required_rank:int=1
 @dataclass
 class SocietyApplication:
  id:int;society:str;person:int;branch:int;applied_year:int;eligibility_verified:bool;stage:str='screening';days_completed:int=0;physical_score:float=0.;magical_score:float=0.;judgment_score:float=0.;passed:bool|None=None;origin_event:int|None=None;resolved_event:int|None=None
@@ -97,6 +98,7 @@ def institution_step(world,rng):
   b=world.institutions.branch_for('adventure_society',e.location.id)
   if b is None:continue
   n=world.institutions.post_notice(b.id,world.year,e.kind,e.location.id,e.id)
+  n.required_rank=max(1,min(5,int(e.data.get('rank',1+int(4*e.data.get('severity',0.))))))
   if n.year==world.year:world.emit('adventure_notice_posted',Layer.KNOWLEDGE,location=Ref('settlement',e.location.id),causes=(e.id,),notice=n.id,threat=e.kind)
  applied={(a.person,a.society) for a in world.institutions.applications.values()}
  for p in sorted(world.current_people(),key=lambda x:x.id):

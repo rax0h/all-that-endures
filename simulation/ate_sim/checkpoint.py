@@ -2,7 +2,9 @@ from __future__ import annotations
 import hashlib,pickle
 from dataclasses import dataclass
 
-CHECKPOINT_SCHEMA=4
+# Legacy worlds contain impossible magical histories; do not silently migrate
+# their rank snapshots into the corrected progression model.
+CHECKPOINT_SCHEMA=8  # persistent Society trainee places; legacy checkpoint digests differ
 @dataclass
 class Checkpoint:
     schema:int

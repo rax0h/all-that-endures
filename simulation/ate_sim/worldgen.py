@@ -19,12 +19,12 @@ def _seed_essence_for_person(w,rr,p,sid,founded):
  essence=rr.choice(ESSENCES_AVAILABLE);found=w.emit('essence_resource_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(founded.id,),essence=essence,provenance='founder-era local discovery')
  resource=w.magic_resources.create('essence',essence,ESSENCES[essence]['rarity'],0,sid,'person',p.id,found.id)
  absorbed=w.emit('essence_absorbed',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(found.id,),resource=resource.id,essence=essence)
- w.magic_resources.consume(resource.id,p.id,0,absorbed.id);path,created=w.advancement.absorb_essence(p.id,essence,0,_context(p,sid),absorbed.id);p.rank=1
+ w.magic_resources.consume(resource.id,p.id,0,absorbed.id);path,created=w.advancement.absorb_essence(p.id,essence,0,_context(p,sid),absorbed.id);p.rank=w.advancement.rank(p.id)
  for a in created:w.emit('ability_awakened',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(absorbed.id,),essence=a.essence,source=a.source,ability=a.semantic_key,name=a.name,special=a.special,aura=a.aura)
  if rr.random()<.12:
   skey=rr.choice(STONE_IDS);sf=w.emit('awakening_stone_found',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',sid),(founded.id,),stone=skey,provenance='founder-era local discovery');w.magic_resources.create('awakening_stone',skey,AWAKENING_STONES[skey]['rarity'],0,sid,'person',p.id,sf.id)
 
-def generate_world(seed:int,width=24,height=18,settlements=5):
+def generate_world(seed:int,width=24,height=18,settlements=5,*,mature=False):
  w=World(seed);seed_gods(w);r=RNG(seed)
  for y in range(height):
   for x in range(width):
@@ -41,10 +41,41 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
     pid=w.next_person;w.next_person+=1;age=rr.randint(0,45);sp=sp0 if rr.random()<.88 else rr.choice(local);p=Person(pid,-age,sid,hid,age=age,wealth=h.wealth/max(1,len(h.members)+1),temperament=rr.random(),attachment=rr.random(),curiosity=rr.random(),inhibition=rr.random(),species=sp);w.people[pid]=p;w.metaphysics.soul(pid);h.members.append(pid);w.communities.join(pid,community.id,1.0);w.lineage.register('person',pid,(('household',hid),),founded.id,-age)
     if age>=18:
      w.skills.practice(pid,'agriculture',rr.uniform(.8,3.2),founded.id);w.skills.practice(pid,'construction',rr.uniform(.2,1.4),founded.id)
-     if rr.random()<.18:_seed_essence_for_person(w,rr,p,sid,founded)
+     if rr.random()<.18 and not mature:_seed_essence_for_person(w,rr,p,sid,founded)
   for h in s.households:
    hm=w.households[h].members
    for a,b in zip(hm,hm[1:]):w.social.record(a,b,founded.id,trust=.15,attachment=.15)
  seed_practices(w,w.culture)
  for pid,practice in w.culture.practices.items():w.lineage.register('practice',pid,origin_year=practice.origin_year)
+ if mature:_seed_mature_magic(w,r)
  return w
+
+
+def _seed_mature_magic(w,rng):
+ """Initial inherited civilization, never a yearly participation controller.
+
+ Each resource exists before use. No founder is assigned a body/ability rank;
+ the ordinary absorption and awakening authorities derive Iron eligibility.
+ Higher-rank founders are deferred until their mastery history is representable.
+ """
+ from .magic_resources import _environmental_essence,absorb_essence_resource,use_awakening_stone
+ from .institutions import ensure_core_societies
+ ensure_core_societies(w)
+ for p in w.people.values():
+  if p.age<16:continue
+  rr=rng.stream('mature_founder_magic',0,p.id)
+  if rr.random()>=.78:continue
+  estate=w.emit('founder_magic_estate',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),
+      provenance='inherited pre-observation magical education and property',initial_condition=True)
+  bases=rr.randint(1,3)
+  for _ in range(bases):
+   # Existing environmental selection; duplicates remain unused property.
+   key,tags=_environmental_essence(w,rr,p.settlement)
+   resource=w.magic_resources.create('essence',key,ESSENCES[key]['rarity'],0,p.settlement,'person',p.id,estate.id)
+   absorb_essence_resource(w,p.id,resource.id)
+  path=w.advancement.path(p.id)
+  training_years=max(0,p.age-16)
+  for _ in range(min(path.capacity-len(path.abilities),training_years)):
+   key=rr.choice(STONE_IDS)
+   resource=w.magic_resources.create('awakening_stone',key,AWAKENING_STONES[key]['rarity'],0,p.settlement,'person',p.id,estate.id)
+   use_awakening_stone(w,p.id,resource.id)

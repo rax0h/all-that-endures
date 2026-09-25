@@ -20,10 +20,26 @@ from .threat_ecology import threat_ecology_step
 class Simulation:
  def __init__(self,world): self.w=world; self.rng=RNG(world.seed)
  def run(self,years):
-  for _ in range(years):self.step()
+  # Reference counting remains active. Bound cyclic garbage, but avoid repeated
+  # full scans of the growing live archive at Python's allocation-driven cadence.
+  import gc
+  managed=gc.isenabled()
+  if managed:gc.disable()
+  collected=False
+  try:
+   for i in range(years):
+    collected=False;self.step()
+    if managed and (i+1)%25==0:gc.collect(0)
+    if managed and (i+1)%250==0:gc.collect();collected=True
+  finally:
+   if managed:
+    try:
+     if not collected:gc.collect()
+    finally:gc.enable()
   return self.w
+
  def step(self):
-  with self.w.current_people_scope():
+  with self.w.current_people_scope(),self.w.advancement.rank_scope():
    self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():
@@ -54,7 +70,7 @@ class Simulation:
   for oid in survivors:
    q=self.w.people[oid];rel=self.w.social.get(p.id,oid);q.grief=min(1,q.grief+.12+.55*rel.attachment);self.w.social.record(p.id,oid,e.id,attachment=.01);self.w.emit("bereavement",Layer.SOCIETY,(Ref("person",oid),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),grief=q.grief)
   if survivors:
-   children=[x for x in self.w.genealogy.children.get(p.id,[]) if self.w.people.get(x) and self.w.people[x].alive];heir=min(children) if children else min(survivors);inherited=p.wealth;self.w.people[heir].wealth+=inherited;p.wealth=0.;self.w.emit("inheritance",Layer.SOCIETY,(Ref("person",heir),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),wealth=inherited)
+   children=[x for x in self.w.genealogy.children.get(p.id,[]) if self.w.people.get(x) and self.w.people[x].alive];heir=min(children) if children else min(survivors);inherited=p.wealth;self.w.people[heir].wealth+=inherited;p.wealth=0.;coins=dict(self.w.currency.wallets.get(p.id,{}));self.w.currency.transfer(p.id,heir,coins);self.w.emit("inheritance",Layer.SOCIETY,(Ref("person",heir),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),wealth=inherited,coin_transfer=coins)
  def _capacity(self,sid):
   s=self.w.settlements[sid];c=self.w.cells[(s.x,s.y)];return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
  def _demography(self):
