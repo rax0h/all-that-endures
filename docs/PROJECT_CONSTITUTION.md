@@ -48,6 +48,22 @@ Experiential acceptance test:
 
 > **Walk back into a settlement years later and recognize what happened.**
 
+## Material-life contract
+
+Characters do not live in a frictionless narrative economy. Material circumstances must carry causal weight in ordinary life even when they are not the current plot.
+
+- Money, food, housing, time, transport, tools, repairs, debt, work, dependents, social position and magical access may constrain choices.
+- Scarcity should usually be ambient and specific rather than announced through generic poverty labels or constant crisis.
+- Material limitation never replaces personhood. Constrained characters retain humor, competence, pride, desire, contradiction, relationships and agency.
+- Wealth changes options, buffers, risks and assumptions; it is not a personality type.
+- The same loss, gift, opportunity or expense may mean radically different things to different people because consequences are relative to their resources, obligations and alternatives.
+- Magic participates in the same reality. Talent does not erase the cost of training, travel, equipment, missed labor, family obligations or access to awakening resources.
+- Routine material life may be aggregated for performance, but consequential pressures and transactions must remain capable of affecting Agency, memory, relationships, opportunity and history.
+
+Material-life acceptance test:
+
+> **Would someone who actually has to think about resources recognize this life?**
+
 ## Rank ontology
 
 Rank is not a cosmetic power level. Advancement progressively changes what kind of organism a person is. Rank consequences must be centralized and explicit across biology, metabolism, sustenance, aging, cognition, perception, movement, healing, injury, disease, reproduction, appearance, sleep, temperature, respiration, magical needs, labor, combat, travel, economics, medicine, law, culture and psychology.
