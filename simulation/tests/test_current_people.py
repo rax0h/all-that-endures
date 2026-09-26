@@ -44,7 +44,6 @@ def test_indexed_population_matches_archive_scan_simulation():
     indexed=Simulation(generate_world(843000)).run(100)
     with patch.object(World,'current_people',lambda w:tuple(p for p in w.people.values() if p.alive)):
         reference=Simulation(generate_world(843000)).run(100)
-    # Society cohorts add serialized branch state and intentionally change
-    # funded recruitment/consumption. Indexed and archival population queries
-    # must still reproduce the exact same new history.
-    assert indexed.digest()==reference.digest()=='b061f5632124348ce953d644c7c0926abfca1f4e9313c1b5f74f8078c7611494'
+    # Stable-ID material selection fixes checkpoint-dependent set ordering.
+    # Population indexing must still match a full archival scan exactly.
+    assert indexed.digest()==reference.digest()=='df38fe532db745b33d2e4bc36b45bd509273083f7b64e0311b88eeb9e5fba300'

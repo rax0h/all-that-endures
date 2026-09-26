@@ -12,7 +12,7 @@ from .magic_progression import record_application
 def _coin_demand(world, society, living):
     """Actual contracts plus two payrolls for available apprentice places."""
     demand={}
-    for notice in world.institutions.notices.values():
+    for notice in world.institutions.active_notices():
         if notice.status=='resolved':continue
         for denomination,n in ranked_reward(notice.required_rank,1.,include_change=False).items():
             demand[denomination]=demand.get(denomination,0)+n

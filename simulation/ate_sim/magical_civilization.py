@@ -126,7 +126,6 @@ def _resource_circulation(world, rng, sid, people, users, magic):
 
 def _society_pipeline(world, rng, sid, people, adventure, magic, existing=None):
     """Convert Society ambition into applications once the person has actually qualified."""
-    if existing is None:existing = {(a.person, a.society) for a in world.institutions.applications.values() if a.passed is None or a.passed}
     for p in people:
         if not full_essence_user(world, p.id):
             continue
@@ -141,12 +140,11 @@ def _society_pipeline(world, rng, sid, people, adventure, magic, existing=None):
             targets.append(('magic_society', magic, .48 + .22 * p.curiosity))
         for society, branch, intent in targets:
             inst = world.institutions.institution_by_kind(society)
-            if branch is None or inst is None or p.id in inst.members or (p.id, society) in existing:
+            if branch is None or inst is None or p.id in inst.members or world.institutions.has_application(p.id,society,qualified=True):
                 continue
             srng = rng.stream('society_career_intent', world.year, p.id + (0 if society == 'adventure_society' else 1000000))
             if srng.random() < min(.92, intent + .12 * aspiration.urgency + .10 * aspiration.preparation):
                 apply_for_society(world, p.id, society)
-                existing.add((p.id, society))
 
 
 def _magical_workshops(world, rng, sid, people, users, magic):
@@ -182,7 +180,6 @@ def _magical_workshops(world, rng, sid, people, users, magic):
 
 def magical_civilization_step(world, rng):
     """Civilizational feedback loop: magic is normal; exceptional power remains exceptional."""
-    existing = {(a.person, a.society) for a in world.institutions.applications.values() if a.passed is None or a.passed}
     for sid in sorted(world.settlements):
         people = _living(world, sid)
         if not people:
@@ -193,5 +190,5 @@ def magical_civilization_step(world, rng):
         # Recompute because expeditions can put resources into practitioners' hands.
         users = _practitioners(world, people)
         _resource_circulation(world, rng, sid, people, users, magic)
-        _society_pipeline(world, rng, sid, people, adventure, magic, existing)
+        _society_pipeline(world, rng, sid, people, adventure, magic)
         _magical_workshops(world, rng, sid, people, users, magic)

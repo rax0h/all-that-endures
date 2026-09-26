@@ -31,7 +31,10 @@ jobs:
         run: |
           set -o pipefail
           benchmark_status=0
-          python simulation/run_long_history.py 843000 1000 --max-seconds 120 --archive /tmp/ate-canonical.sqlite | tee /tmp/canonical-millennium.log || benchmark_status=$?
+          # Stage 0.5 owner decision: 120s is an optimization goal, not a hard
+          # acceptance threshold. Keep all correctness/audit failures fatal.
+          python simulation/run_long_history.py 843000 1000 --archive /tmp/ate-canonical.sqlite | tee /tmp/canonical-millennium.log || benchmark_status=$?
+          python -c 'import json; rows=[json.loads(s) for s in open("/tmp/canonical-millennium.log")]; b=next(r for r in rows if r.get("record")=="benchmark"); t=b["simulation_seconds"]; print(f"::warning::Millennium {t:.2f}s exceeds the 120s optimization goal" if t>120 else f"Millennium {t:.2f}s meets the optimization goal")'
           audit_status=0
           python simulation/validate_magic_progression.py /tmp/ate-canonical.sqlite | tee /tmp/canonical-validation.log || audit_status=$?
           if (( benchmark_status != 0 || audit_status != 0 )); then exit 1; fi

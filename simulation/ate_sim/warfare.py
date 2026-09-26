@@ -3,14 +3,15 @@ from dataclasses import dataclass,field
 from .core_types import layer_ref
 from .biology import combat_value,injury_resilience
 from .mortality import kill
+from .record_index import IndexedRecord, indexed
 
 @dataclass
-class Conflict:
+class Conflict(IndexedRecord):
  id:int; attacker:int; defender:int; started_year:int; cause:str; cause_event:int|None=None; status:str='war'; war_score:float=0.; battles:int=0; attacker_losses:int=0; defender_losses:int=0; ended_year:int|None=None; origin_event:int|None=None; peace_event:int|None=None
 @dataclass
 class WarfareState:
  conflicts:dict[int,Conflict]=field(default_factory=dict); tensions:dict[tuple[int,int],float]=field(default_factory=dict); next_conflict:int=1
- def active(self):return [c for c in self.conflicts.values() if c.status=='war']
+ def active(self):return indexed(self,'conflicts').select('status','war')
 
 def _pair(a,b):return (a,b) if a<b else (b,a)
 def _residents(world,sid):return [p for p in world.current_people() if p.alive and p.age>=16 and p.settlement==sid]
@@ -25,7 +26,7 @@ def _tension_step(world,rng):
    key=(a,b);sa,sb=world.settlements[a],world.settlements[b];qa,qb=world.local[a],world.local[b];route=world.trade_routes.get(key) or world.trade_routes.get((b,a));trade=0. if route is None else min(1.,route.strength+.002*route.exchanges)
    scarcity=max(qa.scarcity,qb.scarcity);prosperity_gap=abs(sa.prosperity-sb.prosperity);grievance=.35*(sa.memory.get('war',0)+sb.memory.get('war',0))+.15*(sa.memory.get('monster_surge',0)+sb.memory.get('monster_surge',0));target=.42*scarcity+.25*prosperity_gap+.18*grievance-.35*trade
    old=world.warfare.tensions.get(key,0.);world.warfare.tensions[key]=max(0.,min(1.,old*.965+max(0.,target)*.07))
-   if any(c.status=='war' and {c.attacker,c.defender}=={a,b} for c in world.warfare.conflicts.values()):continue
+   if any({c.attacker,c.defender}=={a,b} for c in world.warfare.active()):continue
    tension=world.warfare.tensions[key];rr=rng.stream('war_origin',world.year,a*100000+b)
    if tension<.58 or rr.random()>.025*tension:continue
    attacker=a if (qa.scarcity+.25*sa.prosperity)>(qb.scarcity+.25*sb.prosperity) else b;defender=b if attacker==a else a;cause='resource_pressure' if max(qa.scarcity,qb.scarcity)>.35 else ('trade_rivalry' if trade>.15 else 'political_rivalry')

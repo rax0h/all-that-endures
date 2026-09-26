@@ -8,6 +8,7 @@ import json
 import os
 import sqlite3
 import tempfile
+from .event_log import EventLog
 
 SCHEMA_VERSION = 1
 # Explicit authoritative collections. Runtime indexes/caches are not exported.
@@ -111,9 +112,10 @@ def export_archive(world, path, *, digest=None):
                     'collections': COLLECTIONS}
         for k, v in sorted(metadata.items()): insert('metadata', (k, encode(v)))
         # Insert all event nodes before foreign-key edges; validate chronology.
-        for e in sorted(world.events, key=lambda e: e.id):
+        ordered=world.events if isinstance(world.events,EventLog) else sorted(world.events,key=lambda e:e.id)
+        for e in ordered:
             insert('events', (e.id, e.year, e.kind, e.layer.value, encode(e)))
-        for e in sorted(world.events, key=lambda e: e.id):
+        for e in ordered:
             for n, c in enumerate(e.causes):
                 if c >= e.id: raise ValueError('non-causal event reference')
                 insert('causes', (e.id, c, n))

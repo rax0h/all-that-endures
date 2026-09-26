@@ -3,11 +3,12 @@ from dataclasses import dataclass,field
 from .core_types import layer_ref
 from .currency import denomination_for_rank
 from .magic_progression import record_application
+from .record_index import IndexedRecord, indexed
 
 RANK_NAMES=('mundane','iron','bronze','silver','gold','diamond','transcendent')
 
 @dataclass
-class MagicalThreat:
+class MagicalThreat(IndexedRecord):
  id:int;kind:str;rank:int;location:int;created_year:int;ambient:float;status:str='active';origin_event:int|None=None;form:str='unshaped manifestation';environment_tags:tuple[str,...]=()
 
 @dataclass
@@ -15,7 +16,8 @@ class ThreatEcologyState:
  threats:dict[int,MagicalThreat]=field(default_factory=dict);next_id:int=1
  resolutions:dict[int,int]=field(default_factory=dict)
  def active(self,sid=None):
-  return [t for t in self.threats.values() if t.status=='active' and (sid is None or t.location==sid)]
+  table=indexed(self,'threats')
+  return table.select('status','active') if sid is None else table.select(('status','location'),'active',sid)
 
 def supported_rank(ambient,hazard=0.):
  """Normal ecological ceiling. Exceptional rolls can still manifest one rank above it."""
@@ -81,7 +83,7 @@ def effective_response_rank(world,p):
 def threat_ecology_step(world,rng):
  Layer,Ref=layer_ref();state=world.threat_ecology;living=world.living_by_settlement()
  dispatched={}
- for notice in world.institutions.notices.values():
+ for notice in world.institutions.table('notices').select('status','assigned'):
   if notice.kind=='ranked_magic_manifested' and notice.status=='assigned' and notice.assigned_to is not None:
    person=world.people.get(notice.assigned_to)
    if person and person.alive and person.settlement!=notice.location and world.infrastructure.route_condition(person.settlement,notice.location)>0:

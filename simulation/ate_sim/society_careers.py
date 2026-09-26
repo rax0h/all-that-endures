@@ -7,21 +7,18 @@ from .magic_economy import spirit_economy_step,magical_services_step,apprentices
 
 def society_career_step(world,rng):
  Layer,Ref=layer_ref();adv=world.institutions.institution_by_kind('adventure_society');mag=world.institutions.institution_by_kind('magic_society')
- recorded={r.person for r in world.institutions.magic_records.values()}
+ records=world.institutions.table('magic_records')
  for p in sorted((x for x in world.current_people() if x.alive and full_essence_user(world,x.id)),key=lambda x:x.id):
-  if p.id in recorded:continue
+  if records.ids('person',p.id):continue
   b=world.institutions.branch_for('magic_society',p.settlement)
   if b is None:continue
   rr=rng.stream('magic_registry',world.year,p.id);member=mag is not None and p.id in mag.members
   if rr.random()<(.70 if member else .025):
-   register_magic_user(world,p.id,'full' if member else ('essences' if rr.random()<.55 else 'identity'));recorded.add(p.id)
+   register_magic_user(world,p.id,'full' if member else ('essences' if rr.random()<.55 else 'identity'))
  for society,inst in (('adventure_society',adv),('magic_society',mag)):
   if inst is None:continue
-  latest={}
-  for a in world.institutions.applications.values():
-   if a.society==society and (a.person not in latest or a.id>latest[a.person].id):latest[a.person]=a
   for p in sorted((x for x in world.current_people() if x.alive and full_essence_user(world,x.id) and x.id not in inst.members),key=lambda x:x.id):
-   a=latest.get(p.id)
+   a=world.institutions.latest_application(p.id,society)
    if a is None or a.passed is None or a.passed or world.year-a.applied_year<3:continue
    aspiration=_aspiration(world,p);intent=aspiration.adventurer_aspiration if society=='adventure_society' else (p.curiosity>.55 or world.skills.get(p.id,'knowledge').level>1 or world.skills.get(p.id,'craft').level>1)
    if not intent:continue
@@ -33,16 +30,17 @@ def society_career_step(world,rng):
  society_change_step(world)
  apprenticeship_step(world)
  magical_services_step(world,rng)
- for n in sorted(world.institutions.notices.values(),key=lambda x:x.id):
+ members=[p for p in world.current_people() if p.alive and p.id in adv.members]
+ for n in sorted(world.institutions.active_notices(),key=lambda x:x.id):
   resolution=world.threat_ecology.resolutions.get(n.cause_event)
   if n.status!='resolved' and n.kind=='ranked_magic_manifested' and resolution is not None:
    actual=next((ref.id for ref in world.events[resolution-1].actors if ref.kind=='person'),None)
    if actual in adv.members and world.people[actual].alive:
     n.assigned_to=actual;n.status='assigned'
   if n.status=='open':
-   candidates=[world.people[pid] for pid in adv.members if pid in world.people and world.people[pid].alive and world.people[pid].settlement==n.location and world.advancement.rank(pid)>=n.required_rank]
+   candidates=[p for p in members if p.settlement==n.location and world.advancement.rank(p.id)>=n.required_rank]
    if not candidates and n.required_rank>=3:
-    candidates=[world.people[pid] for pid in adv.members if pid in world.people and world.people[pid].alive and world.advancement.rank(pid)>=n.required_rank and world.infrastructure.route_condition(world.people[pid].settlement,n.location)>0]
+    candidates=[p for p in members if world.advancement.rank(p.id)>=n.required_rank and world.infrastructure.route_condition(p.settlement,n.location)>0]
    if candidates:
     candidates.sort(key=lambda p:(world.advancement.rank(p.id),world.skills.get(p.id,'defense').level,p.health,-p.id),reverse=True);leader=candidates[0];rr=rng.stream('notice_accept',world.year,n.id)
     if rr.random()<.45:

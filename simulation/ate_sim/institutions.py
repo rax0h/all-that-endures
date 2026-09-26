@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
+from .record_index import IndexedRecord, indexed
 
 @dataclass
 class Institution:
@@ -10,13 +11,13 @@ class Branch:
  id:int;institution:int;settlement:int;founded_year:int;origin_event:int|None;authority:float=.5;records:set[int]=field(default_factory=set);notices:set[int]=field(default_factory=set)
  trainees:dict[int,int]=field(default_factory=dict)  # active person -> enrollment event; history stays in events
 @dataclass
-class MagicUserRecord:
+class MagicUserRecord(IndexedRecord):
  id:int;person:int;branch:int;year:int;essence_ids:tuple[str,...];confluence_id:str|None;confluence_name:str|None;abilities:tuple[str,...];ability_names:tuple[str,...];disclosure:str;source_event:int|None
 @dataclass
-class AdventureNotice:
+class AdventureNotice(IndexedRecord):
  id:int;branch:int;year:int;kind:str;location:int;cause_event:int;status:str='open';assigned_to:int|None=None;resolved_event:int|None=None;required_rank:int=1
 @dataclass
-class SocietyApplication:
+class SocietyApplication(IndexedRecord):
  id:int;society:str;person:int;branch:int;applied_year:int;eligibility_verified:bool;stage:str='screening';days_completed:int=0;physical_score:float=0.;magical_score:float=0.;judgment_score:float=0.;passed:bool|None=None;origin_event:int|None=None;resolved_event:int|None=None
 @dataclass
 class InstitutionState:
@@ -35,8 +36,17 @@ class InstitutionState:
   if disclosure not in ('identity','essences','full'):raise ValueError('invalid disclosure level')
   ess=tuple(path.essences) if disclosure!='identity' else ();cid=path.confluence if disclosure!='identity' else None;cname=path.confluence_name if disclosure!='identity' else None;abilities=tuple(a.semantic_key for a in path.abilities) if disclosure=='full' else ();names=tuple(a.name for a in path.abilities) if disclosure=='full' else ();rid=self.next_record;self.next_record+=1;r=MagicUserRecord(rid,person,branch,year,ess,cid,cname,abilities,names,disclosure,source_event);self.magic_records[rid]=r;self.branches[branch].records.add(rid);return r
  def records_for_person(self,pid):return sorted((r for r in self.magic_records.values() if r.person==pid),key=lambda r:(r.year,r.id))
+ def table(self,name):return indexed(self,name)
+ def active_notices(self):return self.table('notices').select('status','open')+self.table('notices').select('status','assigned')
+ def has_application(self,pid,society,qualified=False):
+  table=self.table('applications')
+  if not qualified:return bool(table.ids(('person','society'),pid,society))
+  return bool(table.ids(('person','society','passed'),pid,society,None) or table.ids(('person','society','passed'),pid,society,True))
+ def latest_application(self,pid,society):
+  table=self.table('applications');ids=table.ids(('person','society'),pid,society)
+  return table[max(ids)] if ids else None
  def post_notice(self,branch,year,kind,location,cause_event):
-  old=next((n for n in self.notices.values() if n.cause_event==cause_event),None)
+  old=next(iter(self.table('notices').select('cause_event',cause_event)),None)
   if old:return old
   nid=self.next_notice;self.next_notice+=1;n=AdventureNotice(nid,branch,year,kind,location,cause_event);self.notices[nid]=n;self.branches[branch].notices.add(nid);return n
  def create_application(self,society,person,branch,year,eligible,origin_event=None):
@@ -100,13 +110,12 @@ def institution_step(world,rng):
   n=world.institutions.post_notice(b.id,world.year,e.kind,e.location.id,e.id)
   n.required_rank=max(1,min(5,int(e.data.get('rank',1+int(4*e.data.get('severity',0.))))))
   if n.year==world.year:world.emit('adventure_notice_posted',Layer.KNOWLEDGE,location=Ref('settlement',e.location.id),causes=(e.id,),notice=n.id,threat=e.kind)
- applied={(a.person,a.society) for a in world.institutions.applications.values()}
  for p in sorted(world.current_people(),key=lambda x:x.id):
   if not p.alive or not full_essence_user(world,p.id):continue
   for society in ('adventure_society','magic_society'):
    i=world.institutions.institution_by_kind(society)
-   if i is None or p.id in i.members or (p.id,society) in applied:continue
+   if i is None or p.id in i.members or world.institutions.has_application(p.id,society):continue
    rr=rng.stream('society_apply',world.year,p.id+(1 if society=='adventure_society' else 1000000))
    if rr.random()<.035:apply_for_society(world,p.id,society)
- for a in sorted(world.institutions.applications.values(),key=lambda x:x.id):
+ for a in world.institutions.table('applications').select('passed',None):
   if a.passed is None:_advance_application(world,a,rng)

@@ -6,6 +6,7 @@ from .magic_progression import record_application
 from .currency import denomination_for_rank,can_pay_tier
 from math import ceil
 from heapq import heappush, heappop, heapify
+from .selection_pool import SelectionPool
 RARITIES=('common','uncommon','rare','epic','legendary','mythic','transcendent')
 @dataclass
 class MaterialLot:
@@ -21,7 +22,7 @@ class MaterialEconomy:
   if hasattr(self,'_selection_index'):
    heaps,counts=self._selection_index;heappush(heaps.setdefault(sid,[]),self._selection_key(l));counts[sid]=counts.get(sid,0)+bool(l.magical_properties)
   if hasattr(self,'_rank_heaps'):heappush(self._rank_heaps.setdefault((sid,material_rank),[]),self._selection_key(l))
-  if hasattr(self,'_selection_ids'):self._selection_ids.pop(sid,None)
+  if isinstance(getattr(self,'_selection_ids',{}).get(sid),SelectionPool):self._selection_ids[sid].add(i)
   if hasattr(self,'_whole_units'):self._whole_units[sid]=self._whole_units.get(sid,0)+int(max(0.,l.quantity-l.consumed))
   return l
  def available(self,sid,kind=None):
@@ -34,7 +35,7 @@ class MaterialEconomy:
    active=self.active_lot_index.get(lot.settlement,set())
    if lot.id in active:
     active.discard(lot.id)
-    if hasattr(self,'_selection_ids'):self._selection_ids.pop(lot.settlement,None)
+    if isinstance(getattr(self,'_selection_ids',{}).get(lot.settlement),SelectionPool):self._selection_ids[lot.settlement].discard(lot.id)
     if hasattr(self,'_selection_index'):
      _,counts=self._selection_index;counts[lot.settlement]=counts.get(lot.settlement,0)-bool(lot.magical_properties)
   if hasattr(self,'_whole_units'):self._whole_units[lot.settlement]=self._whole_units.get(lot.settlement,0)+int(max(0.,lot.quantity-lot.consumed))-old_whole
@@ -78,10 +79,10 @@ class MaterialEconomy:
  def magical_available_count(self,sid):
   return self._ensure_selection_index()[1].get(sid,0)
  def selection_ids(self,sid):
-  # Internal immutable pool preserves the exact active-set iteration order.
-  # Rebuild only when creation or exhaustion changes that set.
+  # Uniform selection uses stable ID order, never Python set layout. The latter
+  # can change on pickle restore and made previously valid checkpoints diverge.
   if not hasattr(self,'_selection_ids'):self._selection_ids={}
-  if sid not in self._selection_ids:self._selection_ids[sid]=tuple(self.active_lot_index.get(sid,()))
+  if not isinstance(self._selection_ids.get(sid),SelectionPool):self._selection_ids[sid]=SelectionPool(self.active_lot_index.get(sid,()))
   return self._selection_ids[sid]
  def crafting_capacity(self,sid,limit):
   # Integer lower bound proves saturation without summing the growing stockpile.
