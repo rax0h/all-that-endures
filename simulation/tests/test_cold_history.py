@@ -168,3 +168,37 @@ def test_active_institution_queries_do_not_scan_completed_history():
     assert state.latest_application(9999,'adventure_society').id==9999
     state.notices[9999].status='open'
     assert [n.id for n in state.active_notices()]==[9999]
+
+
+def test_church_rng_draw_order_survives_checkpoint_with_sparse_member_ids():
+    from simulation.ate_sim.divinity import divine_step
+    ids=[10611,4943,12937,21329,1582,2373,26911,17559,3084,11982,19096,1900]
+    w=generate_world(7)
+    w.people={i:Person(i,0,1,1,age=25) for i in ids}
+    w.year=1
+    e=w.emit('church_founded',Layer.SOCIETY)
+    church=w.divinity.create_church('knowledge',1,1,e.id)
+    for i in ids:
+        church.followers.add(i)
+        w.divinity.gods['knowledge'].relationships[i]=.9
+    restored=loads(dumps(w))
+    class Always:
+        def stream(self,*args):return self
+        def random(self):return 0.
+    divine_step(w,Always());divine_step(restored,Always())
+    assert w.digest()==restored.digest()
+    assert [e.actors[0].id for e in w.events if e.kind=='divine_essence_granted']==sorted(ids)
+
+
+def test_archive_set_membership_links_have_stable_ordinals(tmp_path):
+    w=generate_world(7,mature=True)
+    institution=next(iter(w.institutions.institutions.values()))
+    ids=[10611,4943,12937,21329,1582,2373,26911,17559,3084,11982,19096,1900]
+    for i in ids:
+        w.people[i]=Person(i,0,1,1)
+        institution.members.add(i)
+    restored=loads(dumps(w))
+    a=export_archive(w,tmp_path/'a.sqlite')
+    b=export_archive(restored,tmp_path/'b.sqlite')
+    assert a['logical_sha256']==b['logical_sha256']
+    assert (tmp_path/'a.sqlite').read_bytes()==(tmp_path/'b.sqlite').read_bytes()

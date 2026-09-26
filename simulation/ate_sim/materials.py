@@ -27,7 +27,7 @@ class MaterialEconomy:
   return l
  def available(self,sid,kind=None):
   ids=self.active_lot_index.get(sid,())
-  return [self.lots[i] for i in ids if (kind is None or self.lots[i].kind==kind)]
+  return [self.lots[i] for i in sorted(ids) if (kind is None or self.lots[i].kind==kind)]
  def consume(self,lot,amount):
   old_whole=int(max(0.,lot.quantity-lot.consumed))
   used=min(max(0.,amount),max(0.,lot.quantity-lot.consumed));lot.consumed+=used

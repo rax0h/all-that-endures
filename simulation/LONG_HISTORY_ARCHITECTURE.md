@@ -55,6 +55,15 @@ to claim the former canonical millennium digest still applies. The new
 100-year founder reference is
 `df38fe532db745b33d2e4bc36b45bd509273083f7b64e0311b88eeb9e5fba300`.
 
+A sparse-ID fixture exposed the same pre-existing defect in church followers:
+the church consumed a shared RNG stream in Python set order. The follow-up
+processes the intersection of living IDs and historical membership in sorted
+ID order. It preserves membership and grant probability, and avoids walking
+deceased followers. Material summation order and archive set-membership link
+ordinals are now stable as well. The founder golden above remains unchanged;
+the previously measured millennium is historical evidence for the preceding
+implementation, not a golden for this further correction.
+
 Storage/index changes alone, before this correction, reproduced the exact
 baseline digest after replaying years 1001–1020 from the saved seed-843010
 world: `db0537187e6099c77e8cd39ad4e1cb914e9f01e31fe0d9a629f8e8f6eb9f4dfc`.

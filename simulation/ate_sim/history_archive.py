@@ -140,7 +140,8 @@ def export_archive(world, path, *, digest=None):
                     if kind == 'relationship':
                         link(kind, rid, 'endpoint', 'person', obj.a, 0); link(kind, rid, 'endpoint', 'person', obj.b, 1)
                     if kind == 'household':
-                        for n, pid in enumerate(obj.members): link(kind, rid, 'member_at_export', 'person', pid, n)
+                        members=sorted(obj.members) if isinstance(obj.members,(set,frozenset)) else obj.members
+                        for n, pid in enumerate(members): link(kind, rid, 'member_at_export', 'person', pid, n)
                     if kind == 'lineage':
                         # Link to lineage nodes, not a guessed institution registry.
                         for n, parent in enumerate(obj.parents): link(kind, rid, 'lineage_parent', 'lineage', parent, n)
