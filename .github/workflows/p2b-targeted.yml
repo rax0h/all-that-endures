@@ -1,5 +1,5 @@
 name: p2b-targeted
-# rerun after final two tracker fixes
+# rerun after cache-detach fix
 on:
   push:
     branches: [sol/p2b-mutation-tracking]
@@ -17,5 +17,10 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest
+      - name: continuation stability
+        run: |
+          for i in 1 2 3 4 5; do
+            pytest -q simulation/tests/test_persistence_tracking.py::test_one_real_year_incremental_save_restores_identical_world_and_continues
+          done
       - name: targeted P2A and P2B persistence tests
         run: pytest -q -s simulation/tests/test_persistence_tracking.py simulation/tests/test_persistence_adapters.py simulation/tests/test_incremental_store.py
