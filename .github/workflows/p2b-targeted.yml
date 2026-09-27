@@ -1,5 +1,5 @@
 name: p2b-targeted
-# rerun after tracker fixes
+# rerun after final two tracker fixes
 on:
   push:
     branches: [sol/p2b-mutation-tracking]
