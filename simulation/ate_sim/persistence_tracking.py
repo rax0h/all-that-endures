@@ -21,6 +21,7 @@ from .persistence_adapters import (
     _restore_collection, _identity_groups,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
+from .persistence_identity import IdentityOccurrenceIndex
 
 
 _BINDINGS = {}
@@ -772,6 +773,8 @@ class IncrementalWorldSession:
         self._scalar_fields = {}
         self._baseline_ordinals = {}
         self._identity_dirty = False
+        self._identity_dirty_owners = set()
+        self._identity_index = None
         self._changed_member_work = 0
         self._bootstrap_originals = {}
         self._bound_root_originals = {}
@@ -790,6 +793,7 @@ class IncrementalWorldSession:
                 self._validate_bound_identity()
             self._normalize_bootstrap()
             self._bind_roots()
+            self._bootstrap_identity_index()
         except Exception:
             self._undo_bound_roots()
             self._undo_bootstrap()
@@ -1014,6 +1018,8 @@ class IncrementalWorldSession:
             return
         tracked_owners = None
         if isinstance(value, _NestedMixin):
+            if value._session is not self:
+                raise StoreError("cross-session mutable alias")
             tracked_owners = value._owners
         else:
             bound = _binding(value)
@@ -1087,6 +1093,8 @@ class IncrementalWorldSession:
                 for v in value
             )
         if isinstance(value, _NestedMixin):
+            if value._session is not self:
+                raise StoreError("cross-session mutable alias")
             previous = set(value._owners)
             new = set(owners) - previous
             if new and not (initial or allow_existing):
@@ -1191,6 +1199,58 @@ class IncrementalWorldSession:
             return any(self._contains_identity(child, target, seen) for child in value)
         return False
 
+    @staticmethod
+    def _namespace_path(namespace):
+        parts = namespace.split(".")
+        if not parts or parts[0] != "world":
+            raise StoreFormatError(f"invalid World namespace: {namespace}")
+        return tuple(("field", part) for part in parts[1:])
+
+    def _owner_path(self, owner):
+        namespace, key = owner
+        base = self._namespace_path(namespace)
+        kind = self._base_kind(self._manifest["collections"][namespace][0])
+        if kind in ("dict", "RecordTable"):
+            return base + (("key", key),)
+        if kind in ("list", "EventLog"):
+            return base + (("index", key),)
+        if kind == "set":
+            return base + (("index", key),)
+        return base
+
+    def _iter_identity_owners(self):
+        for root, obj in _roots(self.world):
+            for name, expected in ROOT_FIELDS[root].items():
+                if expected in ("state", "int"):
+                    continue
+                namespace = root + "." + name
+                value = getattr(obj, name)
+                if expected == "dict":
+                    for key, child in value.items():
+                        yield (namespace, key), child, self._owner_path((namespace, key))
+                elif expected in ("list", "events"):
+                    for i, child in enumerate(value):
+                        yield (namespace, i), child, self._owner_path((namespace, i))
+                elif expected == "set":
+                    continue
+
+    def _bootstrap_identity_index(self):
+        self._identity_index = IdentityOccurrenceIndex(self.codec, RECORD_FIELDS)
+        self._identity_index.bootstrap(self._iter_identity_owners())
+
+    def _refresh_identity_index(self):
+        if not self._identity_dirty_owners:
+            return
+        changed = False
+        for owner in tuple(self._identity_dirty_owners):
+            value = None if owner in self._deleted else self._owner_value(owner)
+            if self._identity_index.refresh(owner, value, self._owner_path(owner)):
+                changed = True
+        self._identity_dirty_owners.clear()
+        if changed:
+            self._identity_dirty = True
+            self._manifest_dirty = True
+
     def _owner_value(self, owner):
         namespace, key = owner
         if namespace in self._scalar_fields:
@@ -1232,9 +1292,8 @@ class IncrementalWorldSession:
         if isinstance(value, _NestedMixin) and owner in value._owners:
             value._owners.discard(owner)
             changed = True
-        if changed:
-            self._identity_dirty = True
-            self._manifest_dirty = True
+        # Owner tags are live tracking metadata. Persisted identity is repaired
+        # from this owner's occurrence index at save time.
         if is_dataclass(value):
             for name in RECORD_FIELDS.get(cls, ()):
                 self._remove_owner_recursive(getattr(value, name), owner, seen)
@@ -1315,6 +1374,7 @@ class IncrementalWorldSession:
         self._ensure_active()
         self._deleted.discard(owner)
         self._dirty.add(owner)
+        self._identity_dirty_owners.add(owner)
 
     def _mark_many(self, owners):
         for owner in owners:
@@ -1324,6 +1384,7 @@ class IncrementalWorldSession:
         self._ensure_active()
         self._dirty.discard(owner)
         self._deleted.add(owner)
+        self._identity_dirty_owners.add(owner)
 
     def _event_appended(self, log, event):
         namespace = "world.events"
@@ -1461,6 +1522,7 @@ class IncrementalWorldSession:
         }
 
     def _changes(self):
+        self._refresh_identity_index()
         changes = []
         for namespace, key in sorted(self._deleted, key=lambda x: (x[0], self.codec.encode(x[1]))):
             changes.append(RecordChange(namespace, key, delete=True))
@@ -1472,7 +1534,7 @@ class IncrementalWorldSession:
                 "schema": self._manifest["schema"],
                 "collections": dict(self._manifest["collections"]),
                 "identity_links": (
-                    self._current_identity_links()
+                    self._identity_index.links()
                     if self._identity_dirty
                     else self._manifest["identity_links"]
                 ),
@@ -1527,6 +1589,7 @@ class IncrementalWorldSession:
         self._deleted.clear()
         self._manifest_dirty = False
         self._identity_dirty = False
+        self._identity_dirty_owners.clear()
         return generation
 
     def diagnostics(self):
