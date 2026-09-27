@@ -160,16 +160,16 @@ class TrackedDict(_NestedMixin, dict):
 
     def __setitem__(self, key, value):
         old = self.get(key, _MISSING)
-        if old is not _MISSING and old is not value:
-            self._detach_value(old)
         value = self._bind(value)
         dict.__setitem__(self, key, value)
+        if old is not _MISSING and old is not value:
+            self._detach_value(old)
         self._touch()
 
     def __delitem__(self, key):
         old = self[key]
-        self._detach_value(old)
         dict.__delitem__(self, key)
+        self._detach_value(old)
         self._touch()
 
     def update(self, other=(), **kwargs):
@@ -197,9 +197,10 @@ class TrackedDict(_NestedMixin, dict):
         return key, self.pop(key)
 
     def clear(self):
-        for value in list(self.values()):
-            self._detach_value(value)
+        old = list(self.values())
         dict.clear(self)
+        for value in old:
+            self._detach_value(value)
         self._touch()
 
     def __ior__(self, other):
@@ -213,25 +214,28 @@ class TrackedList(_NestedMixin, list):
     def __setitem__(self, index, value):
         if isinstance(index, slice):
             old = self[index]
+            values = [self._bind(v) for v in value]
+            trial = list(self)
+            list.__setitem__(trial, index, list(values))
+            list.__setitem__(self, index, values)
             for item in old:
                 self._detach_value(item)
-            values = [self._bind(v) for v in value]
-            list.__setitem__(self, index, values)
         else:
             old = self[index]
-            if old is not value:
+            wrapped = self._bind(value)
+            list.__setitem__(self, index, wrapped)
+            if old is not wrapped:
                 self._detach_value(old)
-            list.__setitem__(self, index, self._bind(value))
         self._touch()
 
     def __delitem__(self, index):
         old = self[index]
+        list.__delitem__(self, index)
         if isinstance(index, slice):
             for item in old:
                 self._detach_value(item)
         else:
             self._detach_value(old)
-        list.__delitem__(self, index)
         self._touch()
 
     def append(self, value):
@@ -248,8 +252,8 @@ class TrackedList(_NestedMixin, list):
 
     def pop(self, index=-1):
         value = self[index]
-        self._detach_value(value)
         result = list.pop(self, index)
+        self._detach_value(value)
         self._touch()
         return result
 
@@ -258,9 +262,10 @@ class TrackedList(_NestedMixin, list):
         self.pop(index)
 
     def clear(self):
-        for value in list(self):
-            self._detach_value(value)
+        old = list(self)
         list.clear(self)
+        for value in old:
+            self._detach_value(value)
         self._touch()
 
     def sort(self, *args, **kwargs):
