@@ -16,6 +16,7 @@ class IdentityOccurrenceIndex:
         self.owner_occurrences = {}
         self.occurrences = {}
         self.links_by_ident = {}
+        self.path_to_ident = {}
 
     @staticmethod
     def _mutable(value):
@@ -70,15 +71,29 @@ class IdentityOccurrenceIndex:
             elif entry[0] is not obj:
                 raise RuntimeError("mutable identity address reused while indexed")
             entry[1].add(path)
+            self.path_to_ident[path] = ident
         return {ident for ident, _obj, _path in rows}
 
     def bootstrap(self, owners):
         for owner, value, owner_path in owners:
             self._add_occurrences(owner, value, owner_path)
+        # Explicit persisted links are seeded separately. Bootstrap occurrence
+        # discovery must not invent links that a legacy parent alias already
+        # implies by containment.
+        self.links_by_ident = {}
+
+    def seed_explicit_links(self, links):
+        grouped = {}
+        for link in links:
+            target, owner = link
+            target_ident = self.path_to_ident.get(target)
+            owner_ident = self.path_to_ident.get(owner)
+            if target_ident is None or target_ident != owner_ident:
+                raise RuntimeError("persisted identity link does not match live graph")
+            grouped.setdefault(target_ident, []).append(link)
         self.links_by_ident = {
-            ident: tuple(self._links_for(entry[1]))
-            for ident, entry in self.occurrences.items()
-            if len(entry[1]) > 1
+            ident: tuple(group)
+            for ident, group in grouped.items()
         }
 
     def refresh(self, owner, value, owner_path):
@@ -90,6 +105,7 @@ class IdentityOccurrenceIndex:
             if entry is None:
                 continue
             entry[1].discard(path)
+            self.path_to_ident.pop(path, None)
             if not entry[1]:
                 self.occurrences.pop(ident, None)
         if value is not None:
