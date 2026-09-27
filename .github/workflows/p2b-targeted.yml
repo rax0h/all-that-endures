@@ -1,0 +1,20 @@
+name: p2b-targeted
+on:
+  push:
+    branches: [sol/p2b-mutation-tracking]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: targeted P2A and P2B persistence tests
+        run: pytest -q -s simulation/tests/test_persistence_tracking.py simulation/tests/test_persistence_adapters.py simulation/tests/test_incremental_store.py
