@@ -50,7 +50,7 @@ def _install_assignment_hooks():
             assigned = value
             if bound is not None:
                 token = bound.before_assignment(self, name, value)
-                if token is not None and token[0] in ("owned", "root_collection"):
+                if token is not None and token[0] in ("owned", "root_collection", "root_collection_normalize"):
                     assigned = token[-1]
             _original(self, name, assigned)
             if bound is not None:
@@ -118,7 +118,7 @@ class _ObjectBinding:
             if old != value:
                 self.session._mark((namespace, 0))
             return
-        if token[0] == "root_collection":
+        if token[0] in ("root_collection", "root_collection_normalize"):
             self.session._finish_root_assignment(token)
             return
         _, old, owners, wrapped = token
@@ -987,8 +987,6 @@ class IncrementalWorldSession:
                 for i, event in enumerate(value):
                     self._bind_nested(event, {(namespace, i)}, initial=True)
                 self._root_containers[namespace] = value
-                if stored_kind != "EventLog":
-                    self._manifest_dirty = True
                 return value
             wrapped = _RootList()
             wrapped._setup(self, namespace, "list")
