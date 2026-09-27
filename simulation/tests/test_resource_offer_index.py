@@ -61,6 +61,37 @@ def test_incremental_offers_match_legacy_through_inventory_and_demand_changes():
         legacy_offers(control, p.settlement, control_people)
     )
 
+    # Exercise both ownership directions while the old source is still cached.
+    person_rid = next(
+        r.id for r in indexed.magic_resources.inventory("person", seller.id)
+        if r.kind == "awakening_stone"
+    )
+    settlement_rid = next(
+        r.id for r in indexed.magic_resources.inventory("settlement", p.settlement)
+        if r.kind == "essence"
+    )
+    for world in (control, indexed):
+        q = world.people[seller.id]
+        e = world.emit(
+            "test_resource_transfer",
+            Layer.SOCIETY,
+            location=Ref("settlement", q.settlement),
+        )
+        world.magic_resources.transfer(
+            person_rid, "settlement", q.settlement, e.id, q.settlement
+        )
+        e = world.emit(
+            "test_resource_transfer",
+            Layer.SOCIETY,
+            location=Ref("settlement", q.settlement),
+        )
+        world.magic_resources.transfer(
+            settlement_rid, "person", q.id, e.id, q.settlement
+        )
+    assert ids(ordered_resource_offers(indexed, p.settlement, indexed_people)) == ids(
+        legacy_offers(control, p.settlement, control_people)
+    )
+
     # An unchanged second query must not reconstruct holder circulation.
     expected = ids(ordered_resource_offers(indexed, p.settlement, indexed_people))
     with patch.object(
