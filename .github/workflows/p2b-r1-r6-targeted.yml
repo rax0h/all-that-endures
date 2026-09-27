@@ -1,4 +1,5 @@
 name: p2b-r1-r6-targeted
+# rerun after normalization/sharing fixes
 on:
   push:
     branches: [sol/p2b-r1-r6]
