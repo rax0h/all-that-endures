@@ -128,6 +128,13 @@ class IdentityOccurrenceIndex:
                 self.links_by_ident.pop(ident, None)
         return removed, added
 
+    @staticmethod
+    def _suffix(path, prefix):
+        """Compatibility probe for review instrumentation; save no longer uses it."""
+        if len(prefix) >= len(path) or path[:len(prefix)] != prefix:
+            return None
+        return path[len(prefix):]
+
     def _links_for(self, paths):
         ordered = sorted(paths, key=self.codec.encode)
         if len(ordered) < 2:
