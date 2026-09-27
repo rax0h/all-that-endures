@@ -44,6 +44,39 @@ def main():
         expected[sid] = ids(legacy_offers(world, sid, people))
         actual = ids(ordered_resource_offers(world, sid, people))
         if actual != expected[sid]:
+            detail = {"settlement": sid, "kinds": {}}
+            for kind in KINDS:
+                legacy_ids = expected[sid][kind]
+                indexed_ids = actual[kind]
+                extra = [rid for rid in indexed_ids if rid not in set(legacy_ids)][:12]
+                missing = [rid for rid in legacy_ids if rid not in set(indexed_ids)][:12]
+                detail["kinds"][kind] = {
+                    "legacy_count": len(legacy_ids),
+                    "indexed_count": len(indexed_ids),
+                    "extra": [
+                        {
+                            "id": rid,
+                            "owner_kind": world.magic_resources.resources[rid].owner_kind,
+                            "owner_id": world.magic_resources.resources[rid].owner_id,
+                            "key": world.magic_resources.resources[rid].key,
+                            "rarity": world.magic_resources.resources[rid].rarity,
+                            "consumed_year": world.magic_resources.resources[rid].consumed_year,
+                        }
+                        for rid in extra
+                    ],
+                    "missing": [
+                        {
+                            "id": rid,
+                            "owner_kind": world.magic_resources.resources[rid].owner_kind,
+                            "owner_id": world.magic_resources.resources[rid].owner_id,
+                            "key": world.magic_resources.resources[rid].key,
+                            "rarity": world.magic_resources.resources[rid].rarity,
+                            "consumed_year": world.magic_resources.resources[rid].consumed_year,
+                        }
+                        for rid in missing
+                    ],
+                }
+            print(json.dumps({"offer_mismatch": detail}, sort_keys=True), flush=True)
             raise AssertionError(f"offer mismatch in settlement {sid}")
 
     start = perf_counter()
