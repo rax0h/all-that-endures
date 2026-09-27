@@ -149,7 +149,10 @@ class _NestedMixin:
             self._session._mark_many(self._owners)
 
     def _bind(self, value):
-        return self._session._prepare_nested(value, self._owners)
+        # Nested simulation state may intentionally share an existing mutable
+        # descendant (for example mastery samples and their source event data).
+        # The identity manifest records that legal topology change.
+        return self._session._prepare_nested(value, self._owners, allow_existing=True)
 
     def _detach_value(self, value):
         self._session._detach(value, self._owners)
@@ -767,6 +770,7 @@ class IncrementalWorldSession:
         self._identity_dirty = False
         self._changed_member_work = 0
         self._bootstrap_originals = {}
+        self._bound_root_originals = {}
         try:
             with self.store.read_transaction():
                 self.generation = self.store.generation
@@ -783,6 +787,7 @@ class IncrementalWorldSession:
             self._normalize_bootstrap()
             self._bind_roots()
         except Exception:
+            self._undo_bound_roots()
             self._undo_bootstrap()
             self._clear_bindings()
             self.store.close()
@@ -894,6 +899,11 @@ class IncrementalWorldSession:
             object.__setattr__(self.world, name, value)
         self._bootstrap_originals.clear()
 
+    def _undo_bound_roots(self):
+        for (_ident, name), (obj, value) in reversed(tuple(self._bound_root_originals.items())):
+            object.__setattr__(obj, name, value)
+        self._bound_root_originals.clear()
+
     def _bind_roots(self):
         for root, obj in _roots(self.world):
             field_specs = {}
@@ -908,6 +918,7 @@ class IncrementalWorldSession:
                     continue
                 wrapped = self._bind_root_collection(namespace, value, kind)
                 if wrapped is not value:
+                    self._bound_root_originals[(id(obj), name)] = (obj, value)
                     object.__setattr__(obj, name, wrapped)
             bound = _binding(obj)
             if bound is None:
