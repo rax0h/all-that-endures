@@ -17,7 +17,8 @@ from .incremental_store import (
     StoreIntegrityError, TransactionalStore,
 )
 from .persistence_adapters import (
-    META, RECORD_SCHEMA, SCHEMA, WorldCodec, _audit, _roots,
+    META, RECORD_SCHEMA, SCHEMA, WorldCodec, _audit, _roots, _kind,
+    _restore_collection, _identity_groups,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
 
@@ -46,11 +47,14 @@ def _install_assignment_hooks():
         def hooked(self, name, value, _original=original):
             bound = _binding(self)
             token = None
+            assigned = value
             if bound is not None:
                 token = bound.before_assignment(self, name, value)
-            _original(self, name, value)
+                if token is not None and token[0] in ("owned", "root_collection"):
+                    assigned = token[-1]
+            _original(self, name, assigned)
             if bound is not None:
-                bound.after_assignment(self, name, value, token)
+                bound.after_assignment(self, name, assigned, token)
 
         cls.__setattr__ = hooked
 
@@ -99,10 +103,12 @@ class _ObjectBinding:
             namespace, kind = spec
             if kind == "state":
                 raise StoreError("bound root state objects cannot be replaced in P2B")
-            if kind != "int":
-                raise StoreError("bound root collections cannot be replaced in P2B")
-            return ("root_scalar", namespace, getattr(obj, name))
-        return ("owned", getattr(obj, name), frozenset(self.owners))
+            if kind == "int":
+                return ("root_scalar", namespace, getattr(obj, name))
+            return self.session._prepare_root_assignment(namespace, getattr(obj, name), value, kind)
+        owners = frozenset(self.owners)
+        wrapped = self.session._bind_nested(value, owners, initial=False)
+        return ("owned", getattr(obj, name), owners, wrapped)
 
     def after_assignment(self, obj, name, value, token):
         if token is None or self.session._suspended:
@@ -112,18 +118,12 @@ class _ObjectBinding:
             if old != value:
                 self.session._mark((namespace, 0))
             return
-        _, old, owners = token
-        if old is value:
-            self.session._mark_many(owners)
+        if token[0] == "root_collection":
+            self.session._finish_root_assignment(token)
             return
-        self.session._detach(old, owners)
-        wrapped = self.session._bind_nested(value, owners, initial=False)
-        if wrapped is not value:
-            self.session._suspended += 1
-            try:
-                object.__setattr__(obj, name, wrapped)
-            finally:
-                self.session._suspended -= 1
+        _, old, owners, wrapped = token
+        if old is not wrapped:
+            self.session._detach(old, owners)
         self.session._mark_many(owners)
 
     def event_appended(self, log, event):
