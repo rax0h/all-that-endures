@@ -1120,7 +1120,6 @@ class IncrementalWorldSession:
                 self._propagate_owners(value, owners)
                 if not initial:
                     self._identity_dirty = True
-                    self._manifest_dirty = True
                     self._mark_many(previous | set(owners))
             return value
         existing = _binding(value)
@@ -1147,7 +1146,6 @@ class IncrementalWorldSession:
                 self._propagate_owners(replacement, owners)
                 if not initial:
                     self._identity_dirty = True
-                    self._manifest_dirty = True
                     self._mark_many(previous | set(owners))
             return replacement
         if _mutable_record(value):
@@ -1256,18 +1254,52 @@ class IncrementalWorldSession:
         self._identity_index.bootstrap(self._iter_identity_owners())
         self._identity_index.seed_explicit_links(self._initial_links)
 
+    def _merge_identity_patch(self, removes, adds):
+        pending_removes, pending_adds = {}, {}
+        if self._pending_identity_patch is not None:
+            for link in self._pending_identity_patch[0]:
+                pending_removes[self.codec.encode(link)] = link
+            for link in self._pending_identity_patch[1]:
+                pending_adds[self.codec.encode(link)] = link
+        for link in removes:
+            token = self.codec.encode(link)
+            if token in pending_adds:
+                pending_adds.pop(token)
+            else:
+                pending_removes[token] = link
+        for link in adds:
+            token = self.codec.encode(link)
+            if token in pending_removes:
+                pending_removes.pop(token)
+            else:
+                pending_adds[token] = link
+        if pending_removes or pending_adds:
+            self._pending_identity_patch = (
+                tuple(pending_removes[token] for token in sorted(pending_removes)),
+                tuple(pending_adds[token] for token in sorted(pending_adds)),
+            )
+            self._identity_dirty = True
+        else:
+            self._pending_identity_patch = None
+            self._identity_dirty = False
+
     def _refresh_identity_index(self):
         if not self._identity_dirty_owners:
             return
-        changed = False
-        for owner in tuple(self._identity_dirty_owners):
+        removes, adds = [], []
+        owners = sorted(
+            self._identity_dirty_owners,
+            key=lambda owner: (owner[0], self.codec.encode(owner[1])),
+        )
+        for owner in owners:
             value = None if owner in self._deleted else self._owner_value(owner)
-            if self._identity_index.refresh(owner, value, self._owner_path(owner)):
-                changed = True
+            removed, added = self._identity_index.refresh(
+                owner, value, self._owner_path(owner)
+            )
+            removes.extend(removed)
+            adds.extend(added)
         self._identity_dirty_owners.clear()
-        if changed:
-            self._identity_dirty = True
-            self._manifest_dirty = True
+        self._merge_identity_patch(removes, adds)
 
     def _owner_value(self, owner):
         namespace, key = owner
@@ -1532,6 +1564,9 @@ class IncrementalWorldSession:
         raise StoreFormatError(f"unsupported incremental namespace: {namespace}")
 
     def _metadata(self):
+        namespaces = tuple(self._manifest["collections"]) + (META,)
+        if self._has_identity_deltas or self._pending_identity_patch is not None:
+            namespaces += (IDENTITY_DELTAS,)
         return {
             "simulation_position": self.world.year,
             "seed": self.world.seed,
@@ -1539,7 +1574,7 @@ class IncrementalWorldSession:
                 key: getattr(self.world, key)
                 for key in ("next_person", "next_household", "next_settlement", "next_event")
             },
-            "namespaces": tuple(self._manifest["collections"]) + (META,),
+            "namespaces": namespaces,
         }
 
     def _changes(self):
@@ -1550,15 +1585,23 @@ class IncrementalWorldSession:
         for namespace, key in sorted(self._dirty, key=lambda x: (x[0], self.codec.encode(x[1]))):
             envelope = self._plain(self._record_value(namespace, key))
             changes.append(RecordChange(namespace, key, envelope, record_schema=RECORD_SCHEMA))
+        if self._pending_identity_patch is not None:
+            patch = (
+                "identity-delta/v1",
+                self._pending_identity_patch[0],
+                self._pending_identity_patch[1],
+            )
+            changes.append(RecordChange(
+                IDENTITY_DELTAS,
+                self._identity_delta_next,
+                patch,
+                record_schema=IDENTITY_DELTA_SCHEMA,
+            ))
         if self._manifest_dirty:
             manifest = {
                 "schema": self._manifest["schema"],
                 "collections": dict(self._manifest["collections"]),
-                "identity_links": (
-                    self._identity_index.links()
-                    if self._identity_dirty
-                    else self._manifest["identity_links"]
-                ),
+                "identity_links": self._manifest["identity_links"],
             }
             for namespace in self._root_containers:
                 manifest["collections"][namespace] = self._description(namespace)
@@ -1609,6 +1652,10 @@ class IncrementalWorldSession:
         self._dirty.clear()
         self._deleted.clear()
         self._manifest_dirty = False
+        if self._pending_identity_patch is not None:
+            self._identity_delta_next += 1
+            self._has_identity_deltas = True
+            self._pending_identity_patch = None
         self._identity_dirty = False
         self._identity_dirty_owners.clear()
         return generation
