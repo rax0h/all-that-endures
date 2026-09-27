@@ -1,0 +1,33 @@
+name: resource-offer-index-short
+
+on:
+  push:
+    branches: [sol/resource-offer-index]
+
+concurrency:
+  group: resource-offer-index-short
+  cancel-in-progress: true
+
+jobs:
+  targeted:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: resource offer differential and transaction tests
+        run: |
+          pytest -q \
+            simulation/tests/test_resource_offer_index.py \
+            simulation/tests/test_society_cohorts.py \
+            simulation/tests/test_resource_demand_index.py \
+            simulation/tests/test_resource_transaction_eligibility.py
+      - name: short-history offer query benchmark
+        run: python simulation/resource_offer_index_benchmark.py --seed 843000 --years 200 --repeats 40
+      - name: short deterministic continuation
+        run: python simulation/run_long_history.py 843000 100
