@@ -1199,6 +1199,58 @@ class IncrementalWorldSession:
             return any(self._contains_identity(child, target, seen) for child in value)
         return False
 
+    @staticmethod
+    def _namespace_path(namespace):
+        parts = namespace.split(".")
+        if not parts or parts[0] != "world":
+            raise StoreFormatError(f"invalid World namespace: {namespace}")
+        return tuple(("field", part) for part in parts[1:])
+
+    def _owner_path(self, owner):
+        namespace, key = owner
+        base = self._namespace_path(namespace)
+        kind = self._base_kind(self._manifest["collections"][namespace][0])
+        if kind in ("dict", "RecordTable"):
+            return base + (("key", key),)
+        if kind in ("list", "EventLog"):
+            return base + (("index", key),)
+        if kind == "set":
+            return base + (("index", key),)
+        return base
+
+    def _iter_identity_owners(self):
+        for root, obj in _roots(self.world):
+            for name, expected in ROOT_FIELDS[root].items():
+                if expected in ("state", "int"):
+                    continue
+                namespace = root + "." + name
+                value = getattr(obj, name)
+                if expected == "dict":
+                    for key, child in value.items():
+                        yield (namespace, key), child, self._owner_path((namespace, key))
+                elif expected in ("list", "events"):
+                    for i, child in enumerate(value):
+                        yield (namespace, i), child, self._owner_path((namespace, i))
+                elif expected == "set":
+                    continue
+
+    def _bootstrap_identity_index(self):
+        self._identity_index = IdentityOccurrenceIndex(self.codec, RECORD_FIELDS)
+        self._identity_index.bootstrap(self._iter_identity_owners())
+
+    def _refresh_identity_index(self):
+        if not self._identity_dirty_owners:
+            return
+        changed = False
+        for owner in tuple(self._identity_dirty_owners):
+            value = None if owner in self._deleted else self._owner_value(owner)
+            if self._identity_index.refresh(owner, value, self._owner_path(owner)):
+                changed = True
+        self._identity_dirty_owners.clear()
+        if changed:
+            self._identity_dirty = True
+            self._manifest_dirty = True
+
     def _owner_value(self, owner):
         namespace, key = owner
         if namespace in self._scalar_fields:
@@ -1323,6 +1375,7 @@ class IncrementalWorldSession:
         self._ensure_active()
         self._deleted.discard(owner)
         self._dirty.add(owner)
+        self._identity_dirty_owners.add(owner)
 
     def _mark_many(self, owners):
         for owner in owners:
@@ -1332,6 +1385,7 @@ class IncrementalWorldSession:
         self._ensure_active()
         self._dirty.discard(owner)
         self._deleted.add(owner)
+        self._identity_dirty_owners.add(owner)
 
     def _event_appended(self, log, event):
         namespace = "world.events"
