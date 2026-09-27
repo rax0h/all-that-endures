@@ -1,4 +1,33 @@
-# P1 architecture review — changes required before P2
+# P1 architecture review — repaired and accepted for P2A
+
+## Current disposition — 2026-09-27
+
+**P1 standalone foundation accepted** at
+`0671a9f39d4216a2cd130f177a70e35a5e0af22e`. R1–R4 below are historical findings,
+now resolved, not outstanding instructions. This is not approval of an integrated
+save backend, bounded-memory continuation, Stage 0.5 freeze or merge.
+
+Independent review evidence:
+
+* 27 focused tests passed locally in 0.41 seconds.
+* The original record-initialization, frozen-container, missing-namespace,
+  reassigned-identity and deleted-row reproductions now pass or reject explicitly.
+* 100 deterministic mixed insert/update/delete commits matched an independent
+  in-memory model and reconciled counts after every commit.
+* [CI 36298228538](https://github.com/rax0h/all-that-endures/actions/runs/36298228538)
+  succeeded: 27 focused tests and 211 full-suite tests (200.90 seconds).
+  Its implementation and test files at `2d27d8a681f1586b83fae2a6e4e193ea087bf65e`
+  were compared directly with the product head and are byte-for-byte identical.
+* Persistence format 2 protects record/segment identity and metadata in checksum
+  envelopes and retained namespace counts in the head checksum. Legacy schema-8
+  checkpoints and simulation behavior remain unchanged.
+
+Next: **P2A only**, defined in [PERSISTENCE_P2A.md](PERSISTENCE_P2A.md): complete
+World field coverage and explicit full snapshot round trips through adapters.
+Automatic dirty tracking, lazy loading and default save replacement remain later
+work. No additional millennium is needed to implement or review P2A.
+
+## Historical initial review (superseded by the disposition above)
 
 Reviewed commit: `591b37076c611edcaf6852ca281888bf00cf5846`.
 Actual branch head and its parent `8c8aea4...` verified. No World integration,
