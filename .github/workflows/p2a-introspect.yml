@@ -1,0 +1,52 @@
+name: p2a-introspect
+on:
+  push:
+    branches: [sol/p2a-world-adapters]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: inspect real world graph
+        run: |
+          python - <<'PY'
+          from dataclasses import is_dataclass, fields
+          from enum import Enum
+          from simulation.ate_sim import generate_world, Simulation
+          from simulation.ate_sim.event_log import EventLog
+          w=Simulation(generate_world(843000,mature=True)).run(2)
+          seen=set(); rows=[]
+          def walk(v,path):
+              t=type(v)
+              if is_dataclass(v):
+                  key=(t.__module__,t.__qualname__)
+                  if key not in seen:
+                      seen.add(key)
+                      declared=tuple(f.name for f in fields(t))
+                      extra=tuple(sorted(k for k in getattr(v,'__dict__',{}) if k not in declared))
+                      rows.append(("DATACLASS",t.__module__,t.__qualname__,declared,extra))
+                  for f in fields(v): walk(getattr(v,f.name),path+"."+f.name)
+              elif isinstance(v,dict):
+                  rows.append(("DICT",path,t.__module__,t.__qualname__,len(v), type(next(iter(v),None)).__name__ if v else None, type(next(iter(v.values()),None)).__name__ if v else None))
+                  for i,(k,x) in enumerate(v.items()):
+                      if i<12: walk(k,path+".<key>"); walk(x,path+"[]")
+              elif isinstance(v,(list,tuple,set,frozenset,EventLog)):
+                  rows.append(("COLL",path,t.__module__,t.__qualname__,len(v)))
+                  for i,x in enumerate(v):
+                      if i<12: walk(x,path+"[]")
+              elif isinstance(v,Enum):
+                  rows.append(("ENUM",t.__module__,t.__qualname__))
+          walk(w,"world")
+          for r in rows: print(repr(r))
+          print("WORLD_DIGEST",w.digest())
+          print("WORLD_FIELDS",tuple(f.name for f in fields(type(w))))
+          print("WORLD_EXTRA",tuple(sorted(k for k in w.__dict__ if k not in {f.name for f in fields(type(w))})))
+          PY
