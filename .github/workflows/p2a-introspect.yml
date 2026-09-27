@@ -49,4 +49,14 @@ jobs:
           print("WORLD_DIGEST",w.digest())
           print("WORLD_FIELDS",tuple(f.name for f in fields(type(w))))
           print("WORLD_EXTRA",tuple(sorted(k for k in w.__dict__ if k not in {f.name for f in fields(type(w))})))
+import pkgutil, importlib, inspect, simulation.ate_sim as pkg
+print("ALL_DECLARED_TYPES")
+for info in pkgutil.iter_modules(pkg.__path__):
+    name="simulation.ate_sim."+info.name
+    try: mod=importlib.import_module(name)
+    except Exception: continue
+    for n,obj in sorted(vars(mod).items()):
+        if inspect.isclass(obj) and obj.__module__==name and (is_dataclass(obj) or issubclass(obj,Enum)):
+            print("DECL", name, n, "DATACLASS" if is_dataclass(obj) else "ENUM",
+                  tuple(f.name for f in fields(obj)) if is_dataclass(obj) else tuple(x.name for x in obj))
           PY
