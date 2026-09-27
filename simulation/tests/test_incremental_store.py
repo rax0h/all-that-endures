@@ -1,13 +1,16 @@
 import enum
+from collections import namedtuple
 import os
 import sqlite3
 import struct
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import pytest
+
+from simulation.ate_sim.event_log import FrozenDict, FrozenList
 
 from simulation.ate_sim.incremental_store import (
     CodecError,
@@ -290,3 +293,256 @@ def test_effective_sqlite_durability_settings_are_required(tmp_path):
         assert store.db.execute("PRAGMA synchronous").fetchone()[0] == 2
     with pytest.raises(ValueError):
         create(tmp_path / "wal", simulation_schema="8", rules_id="x", journal_mode="WAL")
+
+
+def test_registered_record_restore_does_not_rerun_init_or_post_init_and_restores_all_fields():
+    calls = []
+
+    @dataclass
+    class Counter:
+        n: int
+        snapshot: int = field(init=False)
+
+        def __post_init__(self):
+            calls.append(("counter", self.n))
+            self.n += 1
+            self.snapshot = self.n * 10
+
+    @dataclass(frozen=True, slots=True)
+    class FrozenSlot:
+        n: int
+        derived: int = field(init=False)
+
+        def __post_init__(self):
+            calls.append(("slot", self.n))
+            object.__setattr__(self, "derived", self.n + 7)
+
+    c = TypedCodec()
+    c.register_record("test.Counter", Counter)
+    c.register_record("test.FrozenSlot", FrozenSlot)
+    counter = Counter(3)
+    slot = FrozenSlot(5)
+    before = list(calls)
+
+    restored_counter = c.decode(c.encode(counter))
+    restored_slot = c.decode(c.encode(slot))
+
+    assert calls == before
+    assert (restored_counter.n, restored_counter.snapshot) == (counter.n, counter.snapshot) == (4, 40)
+    assert (restored_slot.n, restored_slot.derived) == (slot.n, slot.derived) == (5, 12)
+
+
+def test_container_subclasses_are_rejected_instead_of_silently_flattened():
+    Pair = namedtuple("Pair", "a b")
+
+    class CustomList(list):
+        pass
+
+    class CustomDict(dict):
+        pass
+
+    class CustomSet(set):
+        pass
+
+    c = TypedCodec()
+    unsupported = [
+        FrozenList([1]),
+        FrozenDict({"a": 1}),
+        Pair(1, 2),
+        CustomList([1]),
+        CustomDict({"a": 1}),
+        CustomSet({1}),
+    ]
+    for value in unsupported:
+        with pytest.raises(CodecError, match="unsupported typed value"):
+            c.encode(value)
+
+
+def test_namespace_counts_block_dropping_live_records_or_segments_and_allow_empty_removal(tmp_path):
+    path = tmp_path / "save"
+    with make_store(path) as store:
+        assert store.commit(0, [RecordChange("people", 1, "Ada")], [], metadata(1)) == 1
+        with pytest.raises(ValueError, match="retained namespace"):
+            store.commit(1, [], [], metadata(2, namespaces=("events",)))
+        assert store.generation == 1
+        assert store.verify_all() == {"generation": 1, "records": 1, "segments": 0}
+
+        # Deleting the final record makes that namespace empty, so the caller may
+        # deliberately remove it from the published inventory in the same transaction.
+        assert store.commit(
+            1,
+            [RecordChange("people", 1, delete=True)],
+            [],
+            metadata(2, namespaces=("events",)),
+        ) == 2
+        assert store.verify_all() == {"generation": 2, "records": 0, "segments": 0}
+
+        assert store.commit(
+            2,
+            [],
+            [NewSegment("events", 0, ("e",), 1, 1, 1)],
+            metadata(3, namespaces=("events",)),
+        ) == 3
+        with pytest.raises(ValueError, match="retained namespace"):
+            store.commit(3, [], [], metadata(4, namespaces=()))
+        assert store.generation == 3
+        assert store.verify_all() == {"generation": 3, "records": 0, "segments": 1}
+
+
+def test_namespace_counts_survive_rollback_retry_and_stale_writer(tmp_path):
+    path = tmp_path / "save"
+    first = make_store(path)
+    second = open_store(path, codec=codec(), expected_simulation_schema="8", expected_rules_id="stage-0.5")
+    try:
+        assert first.commit(0, [RecordChange("people", 1, "one")], [], metadata(1)) == 1
+        with pytest.raises(StoreConflictError):
+            second.commit(0, [RecordChange("people", 2, "stale")], [], metadata(2))
+
+        first._phase_hook = lambda phase: (_ for _ in ()).throw(OSError("rollback")) if phase == "before_commit" else None
+        with pytest.raises(OSError, match="rollback"):
+            first.commit(
+                1,
+                [RecordChange("people", 2, "two")],
+                [NewSegment("events", 0, [1], 1, 1, 1)],
+                metadata(2),
+            )
+        first._phase_hook = lambda phase: None
+        assert first.generation == 1
+        assert first.verify_all() == {"generation": 1, "records": 1, "segments": 0}
+
+        assert first.commit(
+            1,
+            [RecordChange("people", 2, "two")],
+            [NewSegment("events", 0, [1], 1, 1, 1)],
+            metadata(2),
+        ) == 2
+        assert first.verify_all() == {"generation": 2, "records": 2, "segments": 1}
+    finally:
+        second.close()
+        first.close()
+
+
+def test_record_checksum_envelope_detects_reassigned_identity_and_metadata(tmp_path):
+    cases = ("typed_key", "record_schema", "last_changed_generation")
+    for index, column in enumerate(cases):
+        path = tmp_path / f"record-{index}"
+        with make_store(path) as store:
+            store.commit(0, [RecordChange("people", 1, "Ada")], [], metadata(1))
+            if column == "typed_key":
+                store.db.execute("UPDATE records SET typed_key=? WHERE namespace='people'", (store.codec.encode(2),))
+            else:
+                store.db.execute(f"UPDATE records SET {column}={column}+1 WHERE namespace='people'")
+            store.db.commit()
+            key = 2 if column == "typed_key" else 1
+            with pytest.raises(StoreIntegrityError, match="checksum"):
+                store.read_record("people", key)
+            with pytest.raises(StoreIntegrityError):
+                store.verify_all()
+
+
+def test_segment_checksum_envelope_detects_ordinal_range_count_and_generation_changes(tmp_path):
+    cases = ("ordinal", "first_id", "last_id", "element_count", "created_generation")
+    for index, column in enumerate(cases):
+        path = tmp_path / f"segment-{index}"
+        with make_store(path) as store:
+            store.commit(
+                0,
+                [],
+                [NewSegment("events", 0, [1, 2], 2, 1, 2)],
+                metadata(1),
+            )
+            if column == "ordinal":
+                store.db.execute("UPDATE segments SET ordinal=1 WHERE namespace='events'")
+                ordinal = 1
+            elif column in ("first_id", "last_id"):
+                store.db.execute(
+                    f"UPDATE segments SET {column}=? WHERE namespace='events'",
+                    (store.codec.encode(999),),
+                )
+                ordinal = 0
+            else:
+                store.db.execute(f"UPDATE segments SET {column}={column}+1 WHERE namespace='events'")
+                ordinal = 0
+            store.db.commit()
+            with pytest.raises(StoreIntegrityError, match="checksum"):
+                store.read_segment("events", ordinal)
+            with pytest.raises(StoreIntegrityError):
+                store.verify_all()
+
+
+def test_full_scrub_detects_deleted_committed_rows_and_never_repairs_them(tmp_path):
+    path = tmp_path / "save"
+    with make_store(path) as store:
+        store.commit(
+            0,
+            [RecordChange("people", 1, "Ada")],
+            [NewSegment("events", 0, [1], 1, 1, 1)],
+            metadata(1),
+        )
+        store.db.execute("DELETE FROM records")
+        store.db.execute("DELETE FROM segments")
+        store.db.commit()
+        with pytest.raises(StoreIntegrityError, match="namespace counts"):
+            store.verify_all()
+        assert store.generation == 1
+        assert store.db.execute("SELECT COUNT(*) FROM records").fetchone()[0] == 0
+        assert store.db.execute("SELECT COUNT(*) FROM segments").fetchone()[0] == 0
+
+
+def test_head_checksum_protects_namespace_counts(tmp_path):
+    path = tmp_path / "save"
+    with make_store(path) as store:
+        store.commit(0, [RecordChange("people", 1, "Ada")], [], metadata(1))
+        store.db.execute("UPDATE save_head SET namespace_counts=?", (store.codec.encode({}),))
+        store.db.commit()
+        with pytest.raises(StoreIntegrityError, match="head checksum"):
+            store.verify_all()
+
+
+def test_noop_and_one_record_change_do_not_touch_unrelated_cold_payloads(tmp_path):
+    class TrackingCodec(TypedCodec):
+        def __init__(self):
+            super().__init__()
+            self.encoded = []
+
+        def encode(self, value):
+            self.encoded.append(value)
+            return super().encode(value)
+
+    tracking = TrackingCodec()
+    tracking.register_record("test.Sample", Sample)
+    path = tmp_path / "save"
+    with create(
+        path,
+        simulation_schema="8",
+        rules_id="stage-0.5",
+        codec=tracking,
+        metadata=metadata(),
+    ) as store:
+        cold = Sample("cold", (1,))
+        hot = Sample("hot", (1,))
+        store.commit(
+            0,
+            [RecordChange("people", 1, cold), RecordChange("people", 2, hot)],
+            [],
+            metadata(1),
+        )
+
+        tracking.encoded.clear()
+        store.reset_diagnostics()
+        assert store.commit(1, [], [], metadata(1)) == 1
+        assert store.diagnostics() == store.diagnostics().__class__(0, 0, 0, 0)
+        assert not any(isinstance(value, Sample) for value in tracking.encoded)
+
+        tracking.encoded.clear()
+        store.reset_diagnostics()
+        replacement = Sample("hot-2", (2,))
+        assert store.commit(1, [RecordChange("people", 2, replacement)], [], metadata(2)) == 2
+        diagnostics = store.diagnostics()
+        assert diagnostics.payload_reads == 0
+        assert diagnostics.payload_read_bytes == 0
+        assert diagnostics.payload_writes == 1
+        assert diagnostics.payload_write_bytes > 0
+        encoded_samples = [value for value in tracking.encoded if isinstance(value, Sample)]
+        assert encoded_samples == [replacement]
+        assert cold not in encoded_samples
