@@ -152,6 +152,8 @@ class _NestedMixin:
         # Nested simulation state may intentionally share an existing mutable
         # descendant (for example mastery samples and their source event data).
         # The identity manifest records that legal topology change.
+        if self._session._contains_identity(value, self):
+            raise StoreError("cycles are not supported by P2B")
         return self._session._prepare_nested(value, self._owners, allow_existing=True)
 
     def _detach_value(self, value):
