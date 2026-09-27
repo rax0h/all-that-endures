@@ -1,6 +1,7 @@
 from copy import deepcopy
 from unittest.mock import patch
 
+from ate_sim import Simulation, generate_world
 from ate_sim.checkpoint import dumps, loads
 from ate_sim.core import Layer, Ref
 from ate_sim.magic_economy import _trainee_resources
@@ -157,3 +158,14 @@ def test_indexed_trainee_procurement_matches_legacy_snapshot_and_outcome():
     _trainee_resources(indexed, indexed_p, indexed_people, {}, Willing())
 
     assert legacy.digest() == indexed.digest()
+
+
+def test_warmed_offer_index_checkpoint_resume_preserves_future_world():
+    world = Simulation(generate_world(843000, mature=True)).run(40)
+    for sid, people in sorted(world.living_by_settlement().items()):
+        ordered_resource_offers(world, sid, people)
+    restored = loads(dumps(world))
+    assert not hasattr(restored.magic_resources, "_query_offer_books")
+    Simulation(world).run(5)
+    Simulation(restored).run(5)
+    assert world.digest() == restored.digest()

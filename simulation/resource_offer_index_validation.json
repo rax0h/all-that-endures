@@ -1,0 +1,40 @@
+{
+  "base_commit": "c0946043aad3a4b81c7337ab4cd5818751413bcd",
+  "implementation_commit": "9cdd98c9227a3b3aa55aa0411fc19661054ac166",
+  "isolated_candidate": "96fbff2df734423eb985725cb80ff1dd4275e0be",
+  "short_validation_run": "https://github.com/rax0h/all-that-endures/actions/runs/36295700908",
+  "targeted_tests": {
+    "passed": 23
+  },
+  "query_benchmark": {
+    "seed": 843000,
+    "years": 200,
+    "repeats": 40,
+    "offers": 146,
+    "legacy_seconds": 0.07332617099999794,
+    "indexed_seconds": 0.05921434500000089,
+    "speedup": 1.2383176914309673,
+    "note": "Short-history microbenchmark only; not a millennium runtime claim."
+  },
+  "deterministic_smoke": {
+    "seed": 843000,
+    "years": 100,
+    "digest": "09a4c3ea1247386148d112b6d3eb83feb0bf5cfa20cc5ffa1a208207487d582a",
+    "baseline_digest": "09a4c3ea1247386148d112b6d3eb83feb0bf5cfa20cc5ffa1a208207487d582a",
+    "baseline_run": "https://github.com/rax0h/all-that-endures/actions/runs/36278414000",
+    "exact_match": true
+  },
+  "guarantees": [
+    "Legacy offer snapshots match exact resource IDs and (price, resource ID) ordering on the measured 200-year world.",
+    "Purchase prices, eligibility, ownership rules and RNG consumption are unchanged in tested histories.",
+    "The offer index is derived _query_ state and is omitted from checkpoints.",
+    "Checkpoint restore rebuilds the index from authoritative state.",
+    "A warmed-index checkpoint/resume continuation produces the same future-world digest."
+  ],
+  "exclusions": [
+    "No balance changes.",
+    "No persistence redesign.",
+    "No merge.",
+    "No Stage 1 changes."
+  ]
+}
