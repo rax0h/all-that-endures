@@ -107,7 +107,7 @@ class _ObjectBinding:
                 return ("root_scalar", namespace, getattr(obj, name))
             return self.session._prepare_root_assignment(namespace, getattr(obj, name), value, kind)
         owners = frozenset(self.owners)
-        wrapped = self.session._bind_nested(value, owners, initial=False)
+        wrapped = self.session._prepare_nested(value, owners)
         return ("owned", getattr(obj, name), owners, wrapped)
 
     def after_assignment(self, obj, name, value, token):
@@ -149,7 +149,7 @@ class _NestedMixin:
             self._session._mark_many(self._owners)
 
     def _bind(self, value):
-        return self._session._bind_nested(value, self._owners, initial=False)
+        return self._session._prepare_nested(value, self._owners)
 
     def _detach_value(self, value):
         self._session._detach(value, self._owners)
@@ -920,14 +920,16 @@ class IncrementalWorldSession:
         description = self._manifest["collections"].get(namespace)
         if type(description) is not tuple or len(description) != 3:
             raise StoreFormatError(f"missing collection description: {namespace}")
-        kind, size, _chunks = description
+        stored_kind, size, _chunks = description
         if len(value) != size:
             raise StoreIntegrityError(f"live World disagrees with snapshot size: {namespace}")
-        if kind in ("dict", "RecordTable"):
-            ordinals = {key: i for i, key in enumerate(value)}
-            if kind == "RecordTable":
+        live_kind = _kind(value, expected)
+        ordinals = self._baseline_ordinals.get(namespace, {})
+        if expected == "dict":
+            if live_kind == "RecordTable":
+                kind = stored_kind if self._base_kind(stored_kind) == "RecordTable" else "RecordTable"
                 wrapped = _RootRecordTable()
-                wrapped._setup(self, namespace, ordinals)
+                wrapped._setup(self, namespace, kind, ordinals)
                 for key, record in value.items():
                     owner = (namespace, key)
                     record = self._bind_nested(record, {owner}, initial=True)
@@ -935,7 +937,10 @@ class IncrementalWorldSession:
                     if isinstance(record, IndexedRecord):
                         object.__setattr__(record, "_index_table", weakref.ref(wrapped))
                         object.__setattr__(record, "_index_key", key)
+                if stored_kind != kind:
+                    self._manifest_dirty = True
             else:
+                kind = stored_kind
                 wrapped = _RootDict()
                 wrapped._setup(self, namespace, kind, ordinals)
                 for key, item in value.items():
@@ -945,112 +950,322 @@ class IncrementalWorldSession:
                     )
             self._root_containers[namespace] = wrapped
             return wrapped
-        if kind == "list":
+        if expected == "list":
             wrapped = _RootList()
-            wrapped._setup(self, namespace)
+            wrapped._setup(self, namespace, "list")
             for i, item in enumerate(value):
                 list.append(wrapped, self._bind_nested(item, {(namespace, i)}, initial=True))
             self._root_containers[namespace] = wrapped
             return wrapped
-        if kind == "set":
+        if expected == "set":
             wrapped = _RootSet(value)
-            wrapped._setup(self, namespace)
+            wrapped._setup(self, namespace, stored_kind, ordinals)
             self._root_containers[namespace] = wrapped
             return wrapped
-        if kind == "EventLog":
-            if type(value) is not EventLog:
-                raise StoreFormatError("bound event history must be EventLog")
-            binding = _ObjectBinding(self)
-            self._register_binding(value, binding)
-            for i, event in enumerate(value):
-                self._bind_nested(event, {(namespace, i)}, initial=True)
-            self._root_containers[namespace] = value
-            return value
-        raise StoreFormatError(f"unsupported bound collection kind: {kind}")
+        if expected == "events":
+            if live_kind == "EventLog":
+                binding = _binding(value)
+                if binding is None:
+                    binding = _ObjectBinding(self)
+                    self._register_binding(value, binding)
+                for i, event in enumerate(value):
+                    self._bind_nested(event, {(namespace, i)}, initial=True)
+                self._root_containers[namespace] = value
+                if stored_kind != "EventLog":
+                    self._manifest_dirty = True
+                return value
+            wrapped = _RootList()
+            wrapped._setup(self, namespace, "list")
+            for i, item in enumerate(value):
+                list.append(wrapped, self._bind_nested(item, {(namespace, i)}, initial=True))
+            self._root_containers[namespace] = wrapped
+            return wrapped
+        raise StoreFormatError(f"unsupported bound collection kind: {stored_kind}")
 
-    def _bind_nested(self, value, owners, *, initial):
+    def _validate_incoming(self, value, owners, *, allow_existing=False, active=None):
+        if active is None:
+            active = set()
+        cls = type(value)
+        if value is None or cls in (bool, int, float, str, bytes, FrozenDict, FrozenList):
+            return
+        ident = id(value)
+        if ident in active:
+            raise StoreError("cycles are not supported by P2B")
+        memo = self._memo.get(ident)
+        if memo is not None:
+            source, _replacement = memo
+            if source is not value:
+                raise StoreIntegrityError("identity memo address reused for a different object")
+            # Re-observing the retained raw source is sound proof of sharing.
+            return
+        tracked_owners = None
+        if isinstance(value, _NestedMixin):
+            tracked_owners = value._owners
+        else:
+            bound = _binding(value)
+            if bound is not None:
+                if bound.session is not self:
+                    raise StoreError("cross-session mutable alias")
+                tracked_owners = bound.owners
+        if tracked_owners is not None:
+            if set(owners) - set(tracked_owners) and not allow_existing:
+                raise StoreError("mutation creates unsupported shared mutable ownership")
+            return
+        active.add(ident)
+        try:
+            if _mutable_record(value):
+                for name in RECORD_FIELDS[type(value)]:
+                    self._validate_incoming(
+                        getattr(value, name), owners,
+                        allow_existing=allow_existing, active=active,
+                    )
+            elif cls in (dict, RecordTable):
+                for key, child in value.items():
+                    self._validate_incoming(key, owners, allow_existing=allow_existing, active=active)
+                    self._validate_incoming(child, owners, allow_existing=allow_existing, active=active)
+            elif cls in (list, tuple, set, frozenset):
+                for child in value:
+                    self._validate_incoming(child, owners, allow_existing=allow_existing, active=active)
+        finally:
+            active.remove(ident)
+
+    def _prepare_nested(self, value, owners, *, allow_existing=False):
+        self._validate_incoming(value, owners, allow_existing=allow_existing)
+        return self._bind_nested(
+            value, owners, initial=False, allow_existing=allow_existing
+        )
+
+    def _propagate_owners(self, value, owners, seen=None):
+        if seen is None:
+            seen = set()
+        cls = type(value)
+        if value is None or cls in (bool, int, float, str, bytes, FrozenDict, FrozenList):
+            return
+        ident = id(value)
+        if ident in seen:
+            return
+        seen.add(ident)
+        if isinstance(value, _NestedMixin):
+            value._add_owners(owners)
+        bound = _binding(value)
+        if bound is not None and bound.session is self:
+            bound.add_owners(owners)
+        if is_dataclass(value):
+            for name in RECORD_FIELDS.get(cls, ()):
+                self._propagate_owners(getattr(value, name), owners, seen)
+        elif isinstance(value, dict):
+            for key, child in value.items():
+                self._propagate_owners(key, owners, seen)
+                self._propagate_owners(child, owners, seen)
+        elif isinstance(value, (list, tuple, EventLog, set, frozenset)):
+            for child in value:
+                self._propagate_owners(child, owners, seen)
+
+    def _bind_nested(self, value, owners, *, initial, allow_existing=False):
         cls = type(value)
         if value is None or cls in (bool, int, float, str, bytes):
             return value
-        if cls in (FrozenDict, FrozenList) or cls is tuple or cls is frozenset:
-            # Immutable containers can contain mutable children only in tuples.
-            if cls is tuple:
-                rebuilt = tuple(self._bind_nested(v, owners, initial=initial) for v in value)
-                return rebuilt
+        if cls in (FrozenDict, FrozenList) or cls is frozenset:
             return value
+        if cls is tuple:
+            return tuple(
+                self._bind_nested(v, owners, initial=initial, allow_existing=allow_existing)
+                for v in value
+            )
         if isinstance(value, _NestedMixin):
             new = set(owners) - value._owners
-            if new and not initial:
+            if new and not (initial or allow_existing):
                 raise StoreError("mutation creates unsupported shared mutable ownership")
-            value._add_owners(owners)
+            if new:
+                self._propagate_owners(value, owners)
+                if not initial:
+                    self._identity_dirty = True
             return value
         existing = _binding(value)
         if existing is not None:
             if existing.session is not self:
                 raise StoreError("cross-session mutable alias")
             new = set(owners) - existing.owners
-            if new and not initial:
+            if new and not (initial or allow_existing):
                 raise StoreError("mutation creates unsupported shared mutable ownership")
-            existing.add_owners(owners)
+            if new:
+                self._propagate_owners(value, owners)
+                if not initial:
+                    self._identity_dirty = True
             return value
-        if id(value) in self._memo:
-            replacement = self._memo[id(value)]
+        memo = self._memo.get(id(value))
+        if memo is not None:
+            source, replacement = memo
+            if source is not value:
+                raise StoreIntegrityError("identity memo address reused for a different object")
             bound = _binding(replacement)
-            if bound is not None:
-                new = set(owners) - bound.owners
-                if new and not initial:
-                    raise StoreError("mutation creates unsupported shared mutable ownership")
-                bound.add_owners(owners)
-            elif hasattr(replacement, "_add_owners"):
-                replacement._add_owners(owners)
+            previous = set(bound.owners) if bound is not None else set(getattr(replacement, "_owners", ()))
+            new = set(owners) - previous
+            if new:
+                self._propagate_owners(replacement, owners)
+                if not initial:
+                    self._identity_dirty = True
+                    self._mark_many(previous | set(owners))
             return replacement
         if _mutable_record(value):
             bound = _ObjectBinding(self, owners)
             self._register_binding(value, bound)
-            self._memo[id(value)] = value
+            self._memo[id(value)] = (value, value)
             for name in RECORD_FIELDS[type(value)]:
                 child = getattr(value, name)
-                replacement = self._bind_nested(child, owners, initial=initial)
+                replacement = self._bind_nested(
+                    child, owners, initial=initial, allow_existing=allow_existing
+                )
                 if replacement is not child:
                     object.__setattr__(value, name, replacement)
             return value
         if cls in (dict, RecordTable):
             wrapped = TrackedDict()
             wrapped._setup(self, owners)
-            self._memo[id(value)] = wrapped
+            self._memo[id(value)] = (value, wrapped)
             for key, child in value.items():
-                dict.__setitem__(wrapped, key, self._bind_nested(child, owners, initial=initial))
+                dict.__setitem__(
+                    wrapped, key,
+                    self._bind_nested(child, owners, initial=initial, allow_existing=allow_existing),
+                )
             return wrapped
         if cls is list:
             wrapped = TrackedList()
             wrapped._setup(self, owners)
-            self._memo[id(value)] = wrapped
+            self._memo[id(value)] = (value, wrapped)
             for child in value:
-                list.append(wrapped, self._bind_nested(child, owners, initial=initial))
+                list.append(
+                    wrapped,
+                    self._bind_nested(child, owners, initial=initial, allow_existing=allow_existing),
+                )
             return wrapped
         if cls is set:
             wrapped = TrackedSet(value)
             wrapped._setup(self, owners)
-            self._memo[id(value)] = wrapped
+            self._memo[id(value)] = (value, wrapped)
             return wrapped
         return value
+
+    def _contains_identity(self, value, target, seen=None):
+        if value is target:
+            return True
+        if seen is None:
+            seen = set()
+        cls = type(value)
+        if value is None or cls in (bool, int, float, str, bytes, FrozenDict, FrozenList):
+            return False
+        ident = id(value)
+        if ident in seen:
+            return False
+        seen.add(ident)
+        if is_dataclass(value):
+            return any(
+                self._contains_identity(getattr(value, name), target, seen)
+                for name in RECORD_FIELDS.get(cls, ())
+            )
+        if isinstance(value, dict):
+            return any(
+                self._contains_identity(key, target, seen)
+                or self._contains_identity(child, target, seen)
+                for key, child in value.items()
+            )
+        if isinstance(value, (list, tuple, EventLog, set, frozenset)):
+            return any(self._contains_identity(child, target, seen) for child in value)
+        return False
+
+    def _owner_value(self, owner):
+        namespace, key = owner
+        if namespace in self._scalar_fields:
+            obj, name = self._scalar_fields[namespace]
+            return getattr(obj, name)
+        container = self._root_containers.get(namespace)
+        if container is None:
+            return None
+        kind = self._base_kind(self._description(namespace)[0])
+        try:
+            if kind in ("dict", "RecordTable"):
+                return container[key]
+            if kind in ("list", "EventLog"):
+                return container[key]
+            if kind == "set":
+                return container.value_for_ordinal(key)
+        except (KeyError, IndexError):
+            return None
+        return None
+
+    def _remove_owner_recursive(self, value, owner, seen=None):
+        if seen is None:
+            seen = set()
+        cls = type(value)
+        if value is None or cls in (bool, int, float, str, bytes, FrozenDict, FrozenList):
+            return
+        ident = id(value)
+        if ident in seen:
+            return
+        seen.add(ident)
+        current = self._owner_value(owner)
+        if current is not None and self._contains_identity(current, value):
+            return
+        changed = False
+        bound = _binding(value)
+        if bound is not None and bound.session is self and owner in bound.owners:
+            bound.owners.discard(owner)
+            changed = True
+        if isinstance(value, _NestedMixin) and owner in value._owners:
+            value._owners.discard(owner)
+            changed = True
+        if changed:
+            self._identity_dirty = True
+        if is_dataclass(value):
+            for name in RECORD_FIELDS.get(cls, ()):
+                self._remove_owner_recursive(getattr(value, name), owner, seen)
+        elif isinstance(value, dict):
+            for key, child in value.items():
+                self._remove_owner_recursive(key, owner, seen)
+                self._remove_owner_recursive(child, owner, seen)
+        elif isinstance(value, (list, tuple, EventLog, set, frozenset)):
+            for child in value:
+                self._remove_owner_recursive(child, owner, seen)
 
     def _detach(self, value, owners):
         if self._suspended or not self._is_mutable(value):
             return
-        bound = _binding(value)
-        if bound is not None:
-            if len(bound.owners) > len(set(bound.owners) - set(owners)):
-                remaining = set(bound.owners) - set(owners)
-                if bound.owners and remaining and len(bound.owners) > 1:
-                    raise StoreError("mutation would alter established shared-mutable identity")
-                bound.owners = remaining
-            return
-        if isinstance(value, _NestedMixin):
-            remaining = set(value._owners) - set(owners)
-            if value._owners and remaining and len(value._owners) > 1:
-                raise StoreError("mutation would alter established shared-mutable identity")
-            value._owners = remaining
+        for owner in owners:
+            self._remove_owner_recursive(value, owner)
+
+    def _prepare_root_assignment(self, namespace, old, value, kind):
+        # Bootstrap handles list->EventLog and dict->RecordTable. The only
+        # normal root replacement retained by simulation is the bounded agency
+        # action-tail slice.
+        if namespace != "world.agency.actions" or kind != "list" or type(value) is not list:
+            raise StoreError("bound root collection replacement is unsupported in P2B")
+        wrapped = _RootList()
+        wrapped._setup(self, namespace, "list")
+        for i, item in enumerate(value):
+            list.append(
+                wrapped,
+                self._prepare_nested(item, {(namespace, i)}, allow_existing=True),
+            )
+        return ("root_collection", namespace, old, wrapped)
+
+    def _finish_root_assignment(self, token):
+        _, namespace, old, wrapped = token
+        old_values = list(old)
+        self._root_containers[namespace] = wrapped
+        limit = max(len(old_values), len(wrapped))
+        for i in range(limit):
+            before = old_values[i] if i < len(old_values) else _MISSING
+            after = wrapped[i] if i < len(wrapped) else _MISSING
+            if before is after:
+                continue
+            if before is not _MISSING:
+                self._detach(before, {(namespace, i)})
+            if after is _MISSING:
+                self._delete((namespace, i))
+            else:
+                self._mark((namespace, i))
+            self._changed_member_work += 1
+        self._manifest_dirty = True
 
     def _mark(self, owner):
         self._ensure_active()
