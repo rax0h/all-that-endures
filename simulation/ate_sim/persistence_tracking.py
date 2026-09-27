@@ -368,37 +368,42 @@ class _RootDict(dict):
         self._namespace = namespace
         self._kind = kind
         self._ordinals = dict(ordinals)
+        self._next_ordinal = max(self._ordinals.values(), default=-1) + 1
 
     def ordinal(self, key):
         return self._ordinals[key]
 
+    def _stable(self):
+        if self._kind == "dict":
+            self._kind = "dict-stable/v1"
+        self._session._manifest_dirty = True
+
     def __setitem__(self, key, value):
         self._session._ensure_active()
-        exists = key in self
-        old = self.get(key)
         owner = (self._namespace, key)
-        if exists and old is not value:
+        exists = key in self
+        old = self.get(key, _MISSING)
+        wrapped = self._session._prepare_nested(value, {owner})
+        dict.__setitem__(self, key, wrapped)
+        if exists and old is not wrapped:
             self._session._detach(old, {owner})
-        value = self._session._bind_nested(value, {owner}, initial=False)
-        dict.__setitem__(self, key, value)
         if not exists:
-            self._ordinals[key] = len(self._ordinals)
+            self._ordinals[key] = self._next_ordinal
+            self._next_ordinal += 1
             self._session._manifest_dirty = True
+        self._session._changed_member_work += 1
         self._session._mark(owner)
 
     def __delitem__(self, key):
         self._session._ensure_active()
         owner = (self._namespace, key)
         old = self[key]
-        self._session._detach(old, {owner})
-        ordinal = self._ordinals.pop(key)
         dict.__delitem__(self, key)
+        self._ordinals.pop(key)
+        self._session._detach(old, {owner})
         self._session._delete(owner)
-        for other, old_ordinal in list(self._ordinals.items()):
-            if old_ordinal > ordinal:
-                self._ordinals[other] = old_ordinal - 1
-                self._session._mark((self._namespace, other))
-        self._session._manifest_dirty = True
+        self._stable()
+        self._session._changed_member_work += 1
 
     def update(self, other=(), **kwargs):
         for key, value in dict(other, **kwargs).items():
@@ -436,46 +441,52 @@ class _RootDict(dict):
 class _RootRecordTable(RecordTable):
     _ate_tracked_kind = "dict"
 
-    def _setup(self, session, namespace, ordinals):
+    def _setup(self, session, namespace, kind, ordinals):
         self._session = session
         self._namespace = namespace
+        self._kind = kind
         self._ordinals = dict(ordinals)
+        self._next_ordinal = max(self._ordinals.values(), default=-1) + 1
 
     def ordinal(self, key):
         return self._ordinals[key]
 
+    def _stable(self):
+        if self._kind in ("dict", "RecordTable"):
+            self._kind = "RecordTable-stable/v1"
+        self._session._manifest_dirty = True
+
     def __setitem__(self, key, record):
         self._session._ensure_active()
-        exists = key in self
-        old = self.get(key)
         owner = (self._namespace, key)
-        if exists and old is not record:
-            self._session._detach(old, {owner})
-        record = self._session._bind_nested(record, {owner}, initial=False)
+        exists = key in self
+        old = self.get(key, _MISSING)
+        record = self._session._prepare_nested(record, {owner})
         dict.__setitem__(self, key, record)
         if isinstance(record, IndexedRecord):
             record._index_table = weakref.ref(self)
             record._index_key = key
         self.changed(key)
+        if exists and old is not record:
+            self._session._detach(old, {owner})
         if not exists:
-            self._ordinals[key] = len(self._ordinals)
+            self._ordinals[key] = self._next_ordinal
+            self._next_ordinal += 1
             self._session._manifest_dirty = True
+        self._session._changed_member_work += 1
         self._session._mark(owner)
 
     def __delitem__(self, key):
         self._session._ensure_active()
         owner = (self._namespace, key)
         old = self[key]
-        self._session._detach(old, {owner})
-        ordinal = self._ordinals.pop(key)
         dict.__delitem__(self, key)
         self.changed(key)
+        self._ordinals.pop(key)
+        self._session._detach(old, {owner})
         self._session._delete(owner)
-        for other, old_ordinal in list(self._ordinals.items()):
-            if old_ordinal > ordinal:
-                self._ordinals[other] = old_ordinal - 1
-                self._session._mark((self._namespace, other))
-        self._session._manifest_dirty = True
+        self._stable()
+        self._session._changed_member_work += 1
 
     def update(self, records=(), **kwargs):
         for key, record in dict(records, **kwargs).items():
@@ -514,132 +525,199 @@ class _RootRecordTable(RecordTable):
 class _RootList(list):
     _ate_tracked_kind = "list"
 
-    def _setup(self, session, namespace):
+    def _setup(self, session, namespace, kind="list"):
         self._session = session
         self._namespace = namespace
+        self._kind = kind
 
     def append(self, value):
         index = len(self)
         owner = (self._namespace, index)
-        list.append(self, self._session._bind_nested(value, {owner}, initial=False))
+        wrapped = self._session._prepare_nested(value, {owner})
+        list.append(self, wrapped)
+        self._session._changed_member_work += 1
         self._session._mark(owner)
         self._session._manifest_dirty = True
 
     def extend(self, values):
-        for value in values:
+        prepared = list(values)
+        for value in prepared:
             self.append(value)
 
     def __setitem__(self, index, value):
         if isinstance(index, slice):
-            self._replace_all_after(lambda: list.__setitem__(self, index, list(value)))
+            trial = list(self)
+            raw = list(value)
+            list.__setitem__(trial, index, raw)  # validate extended slices first
+            self._replace_from(trial)
             return
         if index < 0:
             index += len(self)
         owner = (self._namespace, index)
         old = self[index]
-        if old is not value:
+        wrapped = self._session._prepare_nested(value, {owner})
+        list.__setitem__(self, index, wrapped)
+        if old is not wrapped:
             self._session._detach(old, {owner})
-        list.__setitem__(self, index, self._session._bind_nested(value, {owner}, initial=False))
+        self._session._changed_member_work += 1
         self._session._mark(owner)
 
     def __delitem__(self, index):
-        self._replace_all_after(lambda: list.__delitem__(self, index))
+        trial = list(self)
+        list.__delitem__(trial, index)
+        self._replace_from(trial)
 
     def insert(self, index, value):
-        self._replace_all_after(lambda: list.insert(self, index, value))
+        trial = list(self)
+        list.insert(trial, index, value)
+        self._replace_from(trial)
 
     def pop(self, index=-1):
-        result = self[index]
-        self._replace_all_after(lambda: list.pop(self, index))
+        trial = list(self)
+        result = list.pop(trial, index)
+        self._replace_from(trial)
         return result
 
     def remove(self, value):
-        self.pop(self.index(value))
+        trial = list(self)
+        list.remove(trial, value)
+        self._replace_from(trial)
 
     def clear(self):
-        self._replace_all_after(lambda: list.clear(self))
+        self._replace_from([])
 
     def sort(self, *args, **kwargs):
-        self._replace_all_after(lambda: list.sort(self, *args, **kwargs))
+        trial = list(self)
+        trial.sort(*args, **kwargs)
+        self._replace_from(trial)
 
     def reverse(self):
-        self._replace_all_after(lambda: list.reverse(self))
+        trial = list(self)
+        trial.reverse()
+        self._replace_from(trial)
 
     def __iadd__(self, values):
         self.extend(values)
         return self
 
     def __imul__(self, n):
-        self._replace_all_after(lambda: list.__imul__(self, n))
+        trial = list(self)
+        trial *= n
+        self._replace_from(trial)
         return self
 
-    def _replace_all_after(self, operation):
+    def _replace_from(self, raw):
         self._session._ensure_active()
         old = list(self)
-        for i, value in enumerate(old):
-            self._session._detach(value, {(self._namespace, i)})
-        operation()
-        raw = list(self)
+        prepared = [
+            self._session._prepare_nested(value, {(self._namespace, i)}, allow_existing=True)
+            for i, value in enumerate(raw)
+        ]
         list.clear(self)
-        for i, value in enumerate(raw):
-            list.append(self, self._session._bind_nested(value, {(self._namespace, i)}, initial=False))
-            self._session._mark((self._namespace, i))
-        for i in range(len(self), len(old)):
-            self._session._delete((self._namespace, i))
-        self._session._manifest_dirty = True
+        list.extend(self, prepared)
+        limit = max(len(old), len(prepared))
+        for i in range(limit):
+            old_value = old[i] if i < len(old) else _MISSING
+            new_value = prepared[i] if i < len(prepared) else _MISSING
+            if old_value is new_value:
+                continue
+            if old_value is not _MISSING:
+                self._session._detach(old_value, {(self._namespace, i)})
+            if new_value is _MISSING:
+                self._session._delete((self._namespace, i))
+            else:
+                self._session._mark((self._namespace, i))
+            self._session._changed_member_work += 1
+        if len(old) != len(prepared):
+            self._session._manifest_dirty = True
 
 
 class _RootSet(set):
     _ate_tracked_kind = "set"
 
-    def _setup(self, session, namespace):
+    def _setup(self, session, namespace, kind, ordinals):
         self._session = session
         self._namespace = namespace
+        self._kind = kind
+        self._ordinals = dict(ordinals)
+        self._by_ordinal = {ordinal: value for value, ordinal in self._ordinals.items()}
+        self._next_ordinal = max(self._by_ordinal, default=-1) + 1
 
-    def _mutate(self, operation):
-        self._session._ensure_active()
-        old = self._ordered()
-        operation()
-        new = self._ordered()
-        for i in range(max(len(old), len(new))):
-            if i >= len(new):
-                self._session._delete((self._namespace, i))
-            elif i >= len(old) or old[i] != new[i]:
-                self._session._mark((self._namespace, i))
-        if old != new:
-            self._session._manifest_dirty = True
+    def value_for_ordinal(self, ordinal):
+        return self._by_ordinal[ordinal]
 
-    def _ordered(self):
-        return sorted(self, key=self._session.codec.encode)
+    def _stable(self):
+        if self._kind == "set":
+            self._kind = "set-stable/v1"
+        self._session._manifest_dirty = True
 
     def add(self, value):
-        self._mutate(lambda: set.add(self, value))
+        self._session._ensure_active()
+        self._session._changed_member_work += 1
+        if value in self:
+            return
+        ordinal = self._next_ordinal
+        self._next_ordinal += 1
+        set.add(self, value)
+        self._ordinals[value] = ordinal
+        self._by_ordinal[ordinal] = value
+        self._session._mark((self._namespace, ordinal))
+        self._session._manifest_dirty = True
+
+    def _discard_existing(self, value):
+        ordinal = self._ordinals.pop(value)
+        self._by_ordinal.pop(ordinal)
+        set.remove(self, value)
+        self._session._delete((self._namespace, ordinal))
+        self._stable()
 
     def discard(self, value):
-        self._mutate(lambda: set.discard(self, value))
+        self._session._ensure_active()
+        self._session._changed_member_work += 1
+        if value in self:
+            self._discard_existing(value)
 
     def remove(self, value):
-        self._mutate(lambda: set.remove(self, value))
+        self._session._ensure_active()
+        self._session._changed_member_work += 1
+        if value not in self:
+            raise KeyError(value)
+        self._discard_existing(value)
 
     def pop(self):
-        box = []
-        self._mutate(lambda: box.append(set.pop(self)))
-        return box[0]
+        self._session._ensure_active()
+        if not self:
+            raise KeyError("pop from an empty set")
+        value = next(iter(self))
+        self.remove(value)
+        return value
 
     def clear(self):
-        self._mutate(lambda: set.clear(self))
+        for value in list(self):
+            self.discard(value)
 
     def update(self, *others):
-        self._mutate(lambda: set.update(self, *others))
+        for other in others:
+            for value in other:
+                self.add(value)
 
     def intersection_update(self, *others):
-        self._mutate(lambda: set.intersection_update(self, *others))
+        keep = set(self).intersection(*others)
+        for value in list(self):
+            if value not in keep:
+                self.discard(value)
 
     def difference_update(self, *others):
-        self._mutate(lambda: set.difference_update(self, *others))
+        remove = set().union(*others) if others else set()
+        for value in list(remove):
+            self.discard(value)
 
     def symmetric_difference_update(self, other):
-        self._mutate(lambda: set.symmetric_difference_update(self, other))
+        for value in list(other):
+            if value in self:
+                self.discard(value)
+            else:
+                self.add(value)
 
     def __ior__(self, other):
         self.update(other)
