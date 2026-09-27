@@ -1247,9 +1247,8 @@ class IncrementalWorldSession:
             if self._identity_index.refresh(owner, value, self._owner_path(owner)):
                 changed = True
         self._identity_dirty_owners.clear()
-        if changed:
-            self._identity_dirty = True
-            self._manifest_dirty = True
+        # Owner tags are live tracking metadata. Persisted identity is repaired
+        # from this owner's occurrence index at save time.
 
     def _owner_value(self, owner):
         namespace, key = owner
@@ -1523,6 +1522,7 @@ class IncrementalWorldSession:
         }
 
     def _changes(self):
+        self._refresh_identity_index()
         changes = []
         for namespace, key in sorted(self._deleted, key=lambda x: (x[0], self.codec.encode(x[1]))):
             changes.append(RecordChange(namespace, key, delete=True))
@@ -1534,7 +1534,7 @@ class IncrementalWorldSession:
                 "schema": self._manifest["schema"],
                 "collections": dict(self._manifest["collections"]),
                 "identity_links": (
-                    self._current_identity_links()
+                    self._identity_index.links()
                     if self._identity_dirty
                     else self._manifest["identity_links"]
                 ),
@@ -1589,6 +1589,7 @@ class IncrementalWorldSession:
         self._deleted.clear()
         self._manifest_dirty = False
         self._identity_dirty = False
+        self._identity_dirty_owners.clear()
         return generation
 
     def diagnostics(self):
