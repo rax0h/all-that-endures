@@ -1004,7 +1004,9 @@ class IncrementalWorldSession:
     def _acknowledged(self, changes, metadata, expected_generation):
         if self.store.generation != expected_generation + 1:
             return False
-        if self.store.head_metadata() != metadata:
+        expected_head = dict(metadata)
+        expected_head["namespaces"] = tuple(sorted(set(metadata["namespaces"])))
+        if self.store.head_metadata() != expected_head:
             return False
         for change in changes:
             try:
@@ -1066,9 +1068,77 @@ class IncrementalWorldSession:
                 _BINDINGS.pop(ident, None)
         self._bound_ids.clear()
 
+    def _unwrap_value(self, value, memo):
+        cls = type(value)
+        if value is None or cls in (bool, int, float, str, bytes) or cls in (FrozenDict, FrozenList):
+            return value
+        ident = id(value)
+        if ident in memo:
+            return memo[ident]
+        if cls is tuple:
+            result = tuple(self._unwrap_value(v, memo) for v in value)
+            memo[ident] = result
+            return result
+        if cls is frozenset:
+            result = frozenset(self._unwrap_value(v, memo) for v in value)
+            memo[ident] = result
+            return result
+        if isinstance(value, _RootRecordTable):
+            result = RecordTable()
+            memo[ident] = result
+            for key, record in value.items():
+                result[key] = self._unwrap_value(record, memo)
+            return result
+        if isinstance(value, (TrackedDict, _RootDict)):
+            result = {}
+            memo[ident] = result
+            for key, child in value.items():
+                result[self._unwrap_value(key, memo)] = self._unwrap_value(child, memo)
+            return result
+        if isinstance(value, (TrackedList, _RootList)):
+            result = []
+            memo[ident] = result
+            result.extend(self._unwrap_value(v, memo) for v in value)
+            return result
+        if isinstance(value, (TrackedSet, _RootSet)):
+            result = set()
+            memo[ident] = result
+            result.update(self._unwrap_value(v, memo) for v in value)
+            return result
+        if is_dataclass(value):
+            memo[ident] = value
+            for field in fields(cls):
+                child = getattr(value, field.name)
+                replacement = self._unwrap_value(child, memo)
+                if replacement is not child:
+                    object.__setattr__(value, field.name, replacement)
+            return value
+        if isinstance(value, EventLog):
+            memo[ident] = value
+            for event in value:
+                self._unwrap_value(event, memo)
+            return value
+        return value
+
+    def _unbind_world(self):
+        memo = {}
+        self._suspended += 1
+        try:
+            for root, obj in _roots(self.world):
+                for name, kind in ROOT_FIELDS[root].items():
+                    if kind == "int":
+                        continue
+                    value = getattr(obj, name)
+                    replacement = self._unwrap_value(value, memo)
+                    if replacement is not value:
+                        object.__setattr__(obj, name, replacement)
+        finally:
+            self._suspended -= 1
+
     def close(self):
         if not self._active:
             return
+        self._unbind_world()
         self._active = False
         self._clear_bindings()
         self.store.close()
