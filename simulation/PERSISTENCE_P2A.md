@@ -1,5 +1,9 @@
 # P2A — complete World adapters and exact snapshot restoration
 
+Implementation and evidence are now in
+[PERSISTENCE_P2A_VALIDATION.md](PERSISTENCE_P2A_VALIDATION.md). This specification
+remains the review contract; completion of P2A does not authorize P2B.
+
 Assignment for Sol after P1 review. Base implementation:
 `0671a9f39d4216a2cd130f177a70e35a5e0af22e`; verify the true PR #14 head first.
 The parent contract is [INCREMENTAL_PERSISTENCE.md](INCREMENTAL_PERSISTENCE.md).

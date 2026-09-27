@@ -10,6 +10,7 @@ import struct
 import tempfile
 import time
 import uuid
+from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -687,6 +688,21 @@ class TransactionalStore:
     def reset_diagnostics(self) -> None:
         self._payload_reads = self._payload_read_bytes = self._payload_writes = self._payload_write_bytes = 0
 
+    @contextmanager
+    def read_transaction(self):
+        """Pin one bounded-lifetime SQLite snapshot for a multi-record restore."""
+        self._ensure_open()
+        if self.db.in_transaction:
+            raise StoreError("store already has an active transaction")
+        self.db.execute("BEGIN")
+        try:
+            # The first read pins the snapshot in rollback-journal mode.
+            generation = self.generation
+            yield generation
+        finally:
+            if self.db.in_transaction:
+                self.db.rollback()
+
     def _decode_checked(self, payload: bytes, checksum: str, codec_version: int, expected_checksum: str) -> Any:
         if codec_version != self.codec.version:
             raise StoreFormatError("payload codec version mismatch")
@@ -696,7 +712,7 @@ class TransactionalStore:
         self._payload_read_bytes += len(payload)
         return self.codec.decode(payload)
 
-    def read_record(self, namespace: str, key: Any) -> Any:
+    def read_record(self, namespace: str, key: Any, *, expected_record_schema: int | None = None) -> Any:
         self._ensure_open(); _validate_namespace(namespace)
         typed_key = self.codec.encode(key)
         row = self.db.execute(
@@ -706,8 +722,42 @@ class TransactionalStore:
         if row is None:
             raise KeyError((namespace, key))
         payload, checksum, codec_version, record_schema, generation = row
+        if expected_record_schema is not None and record_schema != expected_record_schema:
+            raise StoreFormatError(
+                f"record schema mismatch for {(namespace, key)!r}: "
+                f"expected {expected_record_schema}, found {record_schema}"
+            )
         expected = _record_checksum(namespace, typed_key, record_schema, codec_version, generation, payload)
         return self._decode_checked(payload, checksum, codec_version, expected)
+
+    def read_records(
+        self, namespace: str, *, expected_record_schema: int | None = None
+    ) -> tuple[tuple[Any, Any, int], ...]:
+        """Return one namespace through the same checksum/schema path as point reads.
+
+        SQL row order is intentionally not authoritative; callers that model
+        ordered collections must carry and validate their own ordinals.
+        """
+        self._ensure_open(); _validate_namespace(namespace)
+        rows = self.db.execute(
+            """SELECT typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation
+               FROM records WHERE namespace=?""",
+            (namespace,),
+        )
+        out = []
+        for typed_key, payload, checksum, codec_version, record_schema, generation in rows:
+            key = self.codec.decode(typed_key)
+            if expected_record_schema is not None and record_schema != expected_record_schema:
+                raise StoreFormatError(
+                    f"record schema mismatch in {namespace!r}: "
+                    f"expected {expected_record_schema}, found {record_schema}"
+                )
+            expected = _record_checksum(
+                namespace, typed_key, record_schema, codec_version, generation, payload
+            )
+            value = self._decode_checked(payload, checksum, codec_version, expected)
+            out.append((key, value, record_schema))
+        return tuple(out)
 
     def read_segment(self, namespace: str, ordinal: int) -> Any:
         self._ensure_open(); _validate_namespace(namespace)
@@ -733,6 +783,8 @@ class TransactionalStore:
         metadata: Mapping[str, Any],
     ) -> int:
         self._ensure_open()
+        if self.db.in_transaction:
+            raise StoreError("cannot commit within an active transaction")
         if type(expected_generation) is not int or expected_generation < 0:
             raise ValueError("expected_generation must be a nonnegative int")
 
