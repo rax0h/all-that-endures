@@ -166,7 +166,7 @@ def _trainee_resources(world, person, people, supply, rng):
     historical-event queries, invented stock, discount, or annual stone limit.
     """
     from math import ceil
-    from .magic_resources import (_aspiration, _wants, _circulation_stock,
+    from .magic_resources import (_aspiration, _wants,
         resource_price, purchase_settlement_resource, _transfer_to_seeker,
         absorb_essence_resource, use_awakening_stone)
     aspiration=_aspiration(world,person)
@@ -183,11 +183,8 @@ def _trainee_resources(world, person, people, supply, rng):
         minimum=7 if kind=='essence' else 3
         if person.wealth<minimum and world.currency.wallets.get(person.id,{}).get('iron',0)<minimum:continue
         if not supply:
-            offers=world.magic_resources.inventory('settlement',person.settlement)
-            for holder in people:
-                if holder.alive and holder.age>=16:offers.extend(_circulation_stock(world,holder)[2])
-            for k in ('essence','awakening_stone'):
-                supply[k]=sorted((r for r in offers if r.kind==k),key=lambda r:(resource_price(r),r.id))
+            from .resource_offers import ordered_resource_offers
+            supply.update(ordered_resource_offers(world,person.settlement,people))
         for r in supply[kind]:
             if needed<=0:break
             if r.consumed_year is not None or not _wants(world,person,r):continue
