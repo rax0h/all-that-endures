@@ -1,4 +1,5 @@
 name: p2b-f1-f3-targeted
+# rerun after control-test correction
 on:
   push:
     branches: [sol/p2b-f1-f3]
