@@ -10,6 +10,7 @@ import struct
 import tempfile
 import time
 import uuid
+from contextlib import contextmanager
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -686,6 +687,21 @@ class TransactionalStore:
 
     def reset_diagnostics(self) -> None:
         self._payload_reads = self._payload_read_bytes = self._payload_writes = self._payload_write_bytes = 0
+
+    @contextmanager
+    def read_transaction(self):
+        """Pin one bounded-lifetime SQLite snapshot for a multi-record restore."""
+        self._ensure_open()
+        if self.db.in_transaction:
+            raise StoreError("store already has an active transaction")
+        self.db.execute("BEGIN")
+        try:
+            # The first read pins the snapshot in rollback-journal mode.
+            generation = self.generation
+            yield generation
+        finally:
+            if self.db.in_transaction:
+                self.db.rollback()
 
     def _decode_checked(self, payload: bytes, checksum: str, codec_version: int, expected_checksum: str) -> Any:
         if codec_version != self.codec.version:
