@@ -685,20 +685,27 @@ class IncrementalWorldSession:
         self._memo = {}
         self._root_containers = {}
         self._scalar_fields = {}
-        self._manifest = self.store.read_record(
-            META, "manifest", expected_record_schema=RECORD_SCHEMA
-        )
-        if type(self._manifest) is not dict or self._manifest.get("schema") != SCHEMA:
-            self.store.close()
-            raise StoreFormatError("incremental binding requires a P2A snapshot")
-        self._initial_links = self._manifest.get("identity_links")
-        if type(self._initial_links) is not list:
-            self.store.close()
-            raise StoreFormatError("invalid identity manifest")
+        self._baseline_ordinals = {}
+        self._identity_dirty = False
+        self._changed_member_work = 0
+        self._bootstrap_originals = {}
         try:
-            self._validate_bound_identity()
+            with self.store.read_transaction():
+                self.generation = self.store.generation
+                self._manifest = self.store.read_record(
+                    META, "manifest", expected_record_schema=RECORD_SCHEMA
+                )
+                if type(self._manifest) is not dict or self._manifest.get("schema") != SCHEMA:
+                    raise StoreFormatError("incremental binding requires a P2A snapshot")
+                self._initial_links = self._manifest.get("identity_links")
+                if type(self._initial_links) is not list:
+                    raise StoreFormatError("invalid identity manifest")
+                self._validate_baseline()
+                self._validate_bound_identity()
+            self._normalize_bootstrap()
             self._bind_roots()
         except Exception:
+            self._undo_bootstrap()
             self._clear_bindings()
             self.store.close()
             raise
@@ -725,6 +732,89 @@ class IncrementalWorldSession:
             raise StoreError("object is already bound to another persistence session")
         _BINDINGS[ident] = binding
         self._bound_ids.add(ident)
+
+    @staticmethod
+    def _base_kind(kind):
+        return {
+            "dict-stable/v1": "dict",
+            "RecordTable-stable/v1": "RecordTable",
+            "set-stable/v1": "set",
+        }.get(kind, kind)
+
+    def _validate_baseline(self):
+        counts = self.store.verify_all()
+        if counts["segments"]:
+            raise StoreFormatError("P2B requires P2A record snapshots")
+        head = self.store.head_metadata()
+        if (
+            head["simulation_position"] != self.world.year
+            or head["seed"] != self.world.seed
+            or head["next_ids"] != {
+                key: getattr(self.world, key)
+                for key in ("next_person", "next_household", "next_settlement", "next_event")
+            }
+        ):
+            raise StoreIntegrityError("live World metadata does not match bound snapshot")
+        compare = WorldCodec(identity_links_recorded=True)
+        for root, obj in _roots(self.world):
+            for name, expected in ROOT_FIELDS[root].items():
+                if expected == "state":
+                    continue
+                namespace = root + "." + name
+                description = self._manifest["collections"].get(namespace)
+                if type(description) is not tuple or len(description) != 3:
+                    raise StoreFormatError(f"missing collection description: {namespace}")
+                live = getattr(obj, name)
+                live_kind = _kind(live, expected)
+                stored_kind = self._base_kind(description[0])
+                if live_kind != stored_kind:
+                    raise StoreIntegrityError(f"live collection kind differs from snapshot: {namespace}")
+                restored = _restore_collection(self.store, namespace, expected, description)
+                rows = self.store.read_records(namespace, expected_record_schema=RECORD_SCHEMA)
+                ordinals = {}
+                for key, envelope, _ in rows:
+                    if type(envelope) is not tuple or len(envelope) != 2:
+                        raise StoreFormatError("invalid entry envelope")
+                    ordinal, stored_value = envelope
+                    if live_kind in ("dict", "RecordTable"):
+                        ordinals[key] = ordinal
+                    elif live_kind == "set":
+                        ordinals[stored_value] = ordinal
+                    else:
+                        ordinals[key] = ordinal
+                self._baseline_ordinals[namespace] = ordinals
+                if live_kind in ("dict", "RecordTable"):
+                    if list(live) != list(restored):
+                        raise StoreIntegrityError(f"live key/order differs from snapshot: {namespace}")
+                    for key in live:
+                        if compare.encode(self._plain(live[key])) != compare.encode(self._plain(restored[key])):
+                            raise StoreIntegrityError(f"live value differs from snapshot: {namespace}")
+                elif live_kind in ("list", "EventLog"):
+                    if len(live) != len(restored):
+                        raise StoreIntegrityError(f"live sequence size differs from snapshot: {namespace}")
+                    for left, right in zip(live, restored):
+                        if compare.encode(self._plain(left)) != compare.encode(self._plain(right)):
+                            raise StoreIntegrityError(f"live sequence differs from snapshot: {namespace}")
+                elif live_kind == "set":
+                    if {compare.encode(v) for v in live} != {compare.encode(v) for v in restored}:
+                        raise StoreIntegrityError(f"live set differs from snapshot: {namespace}")
+                elif live != restored:
+                    raise StoreIntegrityError(f"live scalar differs from snapshot: {namespace}")
+
+    def _normalize_bootstrap(self):
+        if type(self.world.events) is list:
+            self._bootstrap_originals["events"] = self.world.events
+            object.__setattr__(self.world, "events", EventLog(self.world.events))
+        for name in ("people", "households"):
+            value = getattr(self.world, name)
+            if type(value) is dict:
+                self._bootstrap_originals[name] = value
+                object.__setattr__(self.world, name, RecordTable(value))
+
+    def _undo_bootstrap(self):
+        for name, value in self._bootstrap_originals.items():
+            object.__setattr__(self.world, name, value)
+        self._bootstrap_originals.clear()
 
     def _bind_roots(self):
         for root, obj in _roots(self.world):
