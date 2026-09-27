@@ -24,6 +24,8 @@ from . import advancement, social, communities, magic_resources, materials
 SCHEMA = 'ate-world-p2a/1'
 RECORD_SCHEMA = 1
 META = 'world_snapshot'
+IDENTITY_DELTAS = 'world_identity_deltas'
+IDENTITY_DELTA_SCHEMA = 1
 # Explicitly reviewed rebuildable state. Unknown non-fields fail closed.
 CACHES = {
     World: {'_living_cache'},
@@ -367,6 +369,108 @@ def _identity_groups(links):
     )
 
 
+def _fold_identity_deltas(base_links, rows, codec):
+    """Apply append-only identity link deltas without rewriting the base manifest."""
+    state = {codec.encode(link): link for link in base_links}
+    expected = 0
+    for key, patch, _schema in rows:
+        if type(key) is not int or key != expected:
+            raise StoreIntegrityError('identity delta sequence is not contiguous')
+        expected += 1
+        if type(patch) is not tuple or len(patch) != 3 or patch[0] != 'identity-delta/v1':
+            raise StoreFormatError('invalid identity delta record')
+        removes, adds = patch[1], patch[2]
+        if type(removes) is not tuple or type(adds) is not tuple:
+            raise StoreFormatError('invalid identity delta links')
+        for link in removes:
+            state.pop(codec.encode(link), None)
+        for link in adds:
+            state[codec.encode(link)] = link
+    return list(state.values())
+
+
+def _complete_identity_groups(value, path=(), groups=None, active=None):
+    """Expand every acyclic mutable occurrence, including below shared parents."""
+    if groups is None:
+        groups = {}
+    if active is None:
+        active = set()
+    cls = type(value)
+    if value is None or cls in (bool, int, float, str, bytes) or cls is Layer:
+        return groups
+    ident = id(value)
+    if ident in active:
+        raise StoreIntegrityError('cycle in restored identity graph')
+    record = is_dataclass(value)
+    mutable = cls in (dict, list, set, RecordTable, EventLog) or (
+        record and not cls.__dataclass_params__.frozen
+    )
+    if mutable:
+        groups.setdefault(ident, []).append(path)
+    active.add(ident)
+    try:
+        if record:
+            for name in RECORD_FIELDS[cls]:
+                _complete_identity_groups(
+                    getattr(value, name), path + (('field', name),), groups, active
+                )
+        elif cls in (dict, RecordTable, FrozenDict):
+            for key, child in value.items():
+                _complete_identity_groups(
+                    child, path + (('key', key),), groups, active
+                )
+        elif cls in (list, tuple, FrozenList, EventLog):
+            for i, child in enumerate(value):
+                _complete_identity_groups(
+                    child, path + (('index', i),), groups, active
+                )
+        elif cls in (set, frozenset):
+            return groups
+    finally:
+        active.remove(ident)
+    return groups
+
+
+def _verify_identity_graph(world, links):
+    """Verify every restored alias is explained by an explicit or ancestor link."""
+    explicit = {}
+    for target, owner in links:
+        if target in explicit and explicit[target] != owner:
+            raise StoreIntegrityError('conflicting identity targets')
+        explicit[target] = owner
+        if _at_path(world, target) is not _at_path(world, owner):
+            raise StoreIntegrityError('identity link was not restored')
+
+    for paths in _complete_identity_groups(world).values():
+        if len(paths) < 2:
+            continue
+        path_set = set(paths)
+        parent = {path: path for path in paths}
+
+        def find(path):
+            while parent[path] != path:
+                parent[path] = parent[parent[path]]
+                path = parent[path]
+            return path
+
+        def union(a, b):
+            a, b = find(a), find(b)
+            if a != b:
+                parent[b] = a
+
+        for path in paths:
+            for n in range(1, len(path) + 1):
+                prefix = path[:n]
+                owner_prefix = explicit.get(prefix)
+                if owner_prefix is None:
+                    continue
+                other = owner_prefix + path[n:]
+                if other in path_set:
+                    union(path, other)
+        if len({find(path) for path in paths}) != 1:
+            raise StoreIntegrityError('restored alias group is not explained by identity links')
+
+
 def read_snapshot(path, *, rules_id):
     """Restore a detached World from one pinned generation, with a full scrub."""
     codec = WorldCodec()
@@ -385,7 +489,9 @@ def read_snapshot(path, *, rules_id):
             if type(descriptions) is not dict or set(descriptions) != expected_paths:
                 raise StoreFormatError('missing/unknown canonical collection roots')
             head = store.head_metadata()
-            if set(head['namespaces']) != expected_paths | {META}:
+            namespaces = set(head['namespaces'])
+            allowed_namespaces = expected_paths | {META}
+            if namespaces not in (allowed_namespaces, allowed_namespaces | {IDENTITY_DELTAS}):
                 raise StoreFormatError('wrong namespace inventory')
             if len(store.read_records(META, expected_record_schema=RECORD_SCHEMA)) != 1:
                 raise StoreFormatError('unexpected snapshot metadata')
@@ -395,16 +501,27 @@ def read_snapshot(path, *, rules_id):
                     namespace = root + '.' + name
                     value = objects[namespace] if kind == 'state' else _restore_collection(store, namespace, kind, descriptions[namespace])
                     object.__setattr__(obj, name, value)
+            identity_delta_rows = (
+                store.read_records(IDENTITY_DELTAS, expected_record_schema=IDENTITY_DELTA_SCHEMA)
+                if IDENTITY_DELTAS in namespaces else []
+            )
+            effective_links = _fold_identity_deltas(
+                manifest['identity_links'], identity_delta_rows,
+                WorldCodec(identity_links_recorded=True),
+            )
             world = objects['world']
             if world.seed != head['seed'] or world.year != head['simulation_position'] or head['next_ids'] != {
                 k: getattr(world, k) for k in ('next_person', 'next_household', 'next_settlement', 'next_event')
             }:
                 raise StoreIntegrityError('World disagrees with committed head')
-    _restore_identity(world, manifest['identity_links'])
-    actual_links = []
-    _audit(world, (), {}, set(), actual_links)
-    if _identity_groups(actual_links) != _identity_groups(manifest['identity_links']):
-        raise StoreIntegrityError('identity manifest does not match restored graph')
+    _restore_identity(world, effective_links)
+    if identity_delta_rows:
+        _verify_identity_graph(world, effective_links)
+    else:
+        actual_links = []
+        _audit(world, (), {}, set(), actual_links)
+        if _identity_groups(actual_links) != _identity_groups(manifest['identity_links']):
+            raise StoreIntegrityError('identity manifest does not match restored graph')
     return world
 
 
@@ -443,10 +560,12 @@ def _restore_identity(world, links):
         old, original = _at_path(world, target), _at_path(world, owner)
         if type(old) is not type(original) or comparisons.encode(old) != comparisons.encode(original):
             raise StoreIntegrityError('aliased payload copies disagree')
-        assignments.append((target, original))
-    # Owner paths are first occurrences from a deterministic traversal. All
-    # copies are checked before modifying any record, including nested aliases.
-    for target, original in assignments:
+        assignments.append((target, owner))
+    # Compare every payload copy before relinking. Then restore ancestors before
+    # descendants and re-resolve each owner path after ancestor assignments.
+    assignments.sort(key=lambda pair: (max(len(pair[0]), len(pair[1])), comparisons.encode(pair)))
+    for target, owner in assignments:
+        original = _at_path(world, owner)
         parent = _at_path(world, target[:-1])
         kind, key = target[-1]
         if kind == 'field' and type(parent) in RECORD_FIELDS and not type(parent).__dataclass_params__.frozen:
