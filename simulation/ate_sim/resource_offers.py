@@ -45,7 +45,13 @@ def _holder_signature(world, person):
 
 
 def _entry(resource):
-    return (resource.kind, resource_price(resource), resource.id)
+    return (
+        resource.kind,
+        resource_price(resource),
+        resource.id,
+        resource.owner_kind,
+        resource.owner_id,
+    )
 
 
 class _OfferBook:
@@ -53,26 +59,43 @@ class _OfferBook:
         self.rows = {kind: [] for kind in _KINDS}
         self.members = {kind: {} for kind in _KINDS}
 
-    def add(self, entries):
-        for kind, price, rid in entries:
-            if kind not in self.rows or rid in self.members[kind]:
-                continue
-            row = (price, rid)
-            insort(self.rows[kind], row)
-            self.members[kind][rid] = row
+    def _remove_row(self, kind, row):
+        rows = self.rows[kind]
+        pos = bisect_left(rows, row)
+        if pos >= len(rows) or rows[pos] != row:
+            raise AssertionError("resource offer index lost ordered membership")
+        rows.pop(pos)
 
-    def remove(self, entries):
-        for kind, _price, rid in entries:
+    def add(self, entries):
+        for kind, price, rid, owner_kind, owner_id in entries:
             if kind not in self.rows:
                 continue
-            row = self.members[kind].pop(rid, None)
-            if row is None:
+            row = (price, rid)
+            current = self.members[kind].get(rid)
+            source = (owner_kind, owner_id)
+            if current is not None:
+                current_row, current_source = current
+                if current_row == row and current_source == source:
+                    continue
+                # Ownership may have changed before the stale owner's cache is
+                # refreshed. Replace the derived row with current authority;
+                # the stale source is then unable to remove this membership.
+                self._remove_row(kind, current_row)
+            insort(self.rows[kind], row)
+            self.members[kind][rid] = (row, source)
+
+    def remove(self, entries):
+        for kind, _price, rid, owner_kind, owner_id in entries:
+            if kind not in self.rows:
                 continue
-            rows = self.rows[kind]
-            pos = bisect_left(rows, row)
-            if pos >= len(rows) or rows[pos] != row:
-                raise AssertionError("resource offer index lost ordered membership")
-            rows.pop(pos)
+            current = self.members[kind].get(rid)
+            if current is None:
+                continue
+            row, source = current
+            if source != (owner_kind, owner_id):
+                continue
+            self.members[kind].pop(rid)
+            self._remove_row(kind, row)
 
     def snapshot(self, resources):
         return {
