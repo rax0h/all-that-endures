@@ -1247,8 +1247,9 @@ class IncrementalWorldSession:
             if self._identity_index.refresh(owner, value, self._owner_path(owner)):
                 changed = True
         self._identity_dirty_owners.clear()
-        # Owner tags are live tracking metadata. Persisted identity is repaired
-        # from this owner's occurrence index at save time.
+        if changed:
+            self._identity_dirty = True
+            self._manifest_dirty = True
 
     def _owner_value(self, owner):
         namespace, key = owner
@@ -1291,9 +1292,8 @@ class IncrementalWorldSession:
         if isinstance(value, _NestedMixin) and owner in value._owners:
             value._owners.discard(owner)
             changed = True
-        if changed:
-            self._identity_dirty = True
-            self._manifest_dirty = True
+        # Owner tags are live tracking metadata. Persisted identity is repaired
+        # from this owner's occurrence index at save time.
         if is_dataclass(value):
             for name in RECORD_FIELDS.get(cls, ()):
                 self._remove_owner_recursive(getattr(value, name), owner, seen)
