@@ -1,5 +1,7 @@
 # P2B repair review — three remaining R3/R6 blockers
 
+> Review update: the repair at `dcf36a846e2f434a8f766b937d90530787d42a6c` passes the original reproductions below. Remaining identity-index cases and the current assignment are in [PERSISTENCE_P2B_IDENTITY_REVIEW.md](PERSISTENCE_P2B_IDENTITY_REVIEW.md).
+
 Reviewed implementation: `90687da9c4e195b2b778a566007144fb0638539a`.
 This supersedes the original six-item repair assignment where fixes are verified.
 Do not restart R1–R6 from scratch and do not begin P3.

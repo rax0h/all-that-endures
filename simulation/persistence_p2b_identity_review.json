@@ -1,0 +1,46 @@
+{
+  "reviewed_head": "dcf36a846e2f434a8f766b937d90530787d42a6c",
+  "disposition": "F1_F3_identity_index_repair_required",
+  "verified_ci": {
+    "targeted": {
+      "run": 36351123540,
+      "passed": 100,
+      "seconds": 73.66,
+      "head": "f9c6816e1f26f5338a2d77a7059a2471d269f178"
+    },
+    "full": {
+      "run": 36351573168,
+      "passed": 284,
+      "seconds": 324.08,
+      "head": "397c3c523cd2d7d626a48b376d622d0fac141ed2"
+    },
+    "all_three_files_match_both_candidates": true
+  },
+  "independent_controls": {
+    "same_owner_alias_restores": true,
+    "cross_session_container_rejected": "StoreError",
+    "unshared_deletion_event_visits": {
+      "100": 0,
+      "1000": 0,
+      "5000": 0
+    },
+    "bound_unbound_restored_digests": {
+      "year6": "7bd8dc5cc0832cf5f817553c985e966114236a0a1de5853ef54b23c93b1dc0b7",
+      "year8": "fd42fe521862dc58384f15385798b67e0c7ddbf3ad7a928c10dff7738b8474aa"
+    }
+  },
+  "failures": {
+    "I1_parent_and_descendant_alias": {
+      "incremental_save_succeeds": true,
+      "restore_error": "StoreIntegrityError: identity manifest does not match restored graph",
+      "full_snapshot_control_restores_both_aliases": true
+    },
+    "I2_one_alias_save_prefix_comparisons": {
+      "100": 5050,
+      "300": 45150,
+      "1000": 500500
+    }
+  },
+  "full_suite_rerun_locally": false,
+  "millennium_run": false
+}
