@@ -1,0 +1,140 @@
+{
+  "reviewed_head": "c61a9e4aed40b75f210e4eb1bd557c3594f1f37f",
+  "disposition": "changes_required_before_P3",
+  "verified_ci": {
+    "candidate": "45bba2a4ded1030351e9914322b708d455294348",
+    "product_files_byte_identical": true,
+    "targeted": {
+      "run": 36330406323,
+      "passed": 62,
+      "seconds": 28.23,
+      "fresh_process_continuation_passes": 5
+    },
+    "full": {
+      "run": 36330406318,
+      "passed": 246,
+      "seconds": 199.64
+    }
+  },
+  "independent_reproductions": [
+    {
+      "case": "baseline_value_mismatch",
+      "result": {
+        "live": 99,
+        "restored": 3,
+        "generation": 1,
+        "dirty": []
+      }
+    },
+    {
+      "case": "failed_replacement_then_valid_edit",
+      "result": {
+        "rejected": "StoreError",
+        "dirty": [],
+        "live": 9,
+        "restored": 5
+      }
+    },
+    {
+      "case": "deep_shared_child",
+      "result": {
+        "dirty": [
+          [
+            "world.currency.wallets",
+            1
+          ]
+        ],
+        "load": "StoreIntegrityError: aliased payload copies disagree"
+      }
+    },
+    {
+      "case": "fresh_insertions_object_id_reuse",
+      "result": {
+        "live": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 0,
+          "17": 0,
+          "18": 0,
+          "19": 0
+        },
+        "restored": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 0,
+          "17": 0,
+          "18": 0,
+          "19": 0
+        },
+        "distinct_wallets": 1
+      }
+    },
+    {
+      "case": "shared_primitive_control",
+      "result": "ok"
+    },
+    {
+      "case": "founder_one_year",
+      "error": "StoreError: bound root collections cannot be replaced in P2B"
+    },
+    {
+      "case": "event_id_hot_path_cost",
+      "result": [
+        {
+          "historical_ids": 100,
+          "encodes_for_one_add": 201,
+          "seconds": 0.0017632729999945695
+        },
+        {
+          "historical_ids": 1000,
+          "encodes_for_one_add": 2001,
+          "seconds": 0.0072125049999840485
+        },
+        {
+          "historical_ids": 5000,
+          "encodes_for_one_add": 10001,
+          "seconds": 0.024351835000004485
+        }
+      ]
+    },
+    {
+      "case": "bound_versus_unbound_year_5_to_6",
+      "bound": "f8584c46558ba3b615dea881f915dc76fa0d36f40358ab4b57a93c1f45eb9498",
+      "restored": "f8584c46558ba3b615dea881f915dc76fa0d36f40358ab4b57a93c1f45eb9498",
+      "unbound": "7bd8dc5cc0832cf5f817553c985e966114236a0a1de5853ef54b23c93b1dc0b7",
+      "events": [
+        1467,
+        1467
+      ]
+    }
+  ],
+  "scope": "Review-only; no product code, full suite, millennium, balance, checkpoint API or merge changes."
+}
