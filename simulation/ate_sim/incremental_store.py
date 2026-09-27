@@ -15,7 +15,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-FORMAT_VERSION = 1
+FORMAT_VERSION = 2
 CODEC_VERSION = 1
 RECEIPT_RETENTION = 64
 
@@ -151,19 +151,19 @@ class TypedCodec:
             finally:
                 active.remove(id(value))
 
-        if isinstance(value, list):
+        if type(value) is list:
             self._enter(value, active, seen_mutable, mutable=True)
             try:
                 return ["list", [self._encode_value(v, active, seen_mutable) for v in value]]
             finally:
                 active.remove(id(value))
-        if isinstance(value, tuple):
+        if type(value) is tuple:
             self._enter(value, active, seen_mutable, mutable=False)
             try:
                 return ["tuple", [self._encode_value(v, active, seen_mutable) for v in value]]
             finally:
                 active.remove(id(value))
-        if isinstance(value, set):
+        if type(value) is set:
             self._enter(value, active, seen_mutable, mutable=True)
             try:
                 encoded = [self._encode_value(v, active, seen_mutable) for v in value]
@@ -171,7 +171,7 @@ class TypedCodec:
                 return ["set", encoded]
             finally:
                 active.remove(id(value))
-        if isinstance(value, frozenset):
+        if type(value) is frozenset:
             self._enter(value, active, seen_mutable, mutable=False)
             try:
                 encoded = [self._encode_value(v, active, seen_mutable) for v in value]
@@ -179,7 +179,7 @@ class TypedCodec:
                 return ["frozenset", encoded]
             finally:
                 active.remove(id(value))
-        if isinstance(value, dict):
+        if type(value) is dict:
             self._enter(value, active, seen_mutable, mutable=True)
             try:
                 pairs = [
@@ -276,18 +276,21 @@ class TypedCodec:
                 raise CodecError(f"unregistered record type: {node[1]}")
             expected = [f.name for f in dataclasses.fields(record_type)]
             actual = []
-            kwargs = {}
+            restored = {}
             for pair in node[2]:
                 if not isinstance(pair, list) or len(pair) != 2 or not isinstance(pair[0], str):
                     raise CodecError("invalid record field")
                 actual.append(pair[0])
-                kwargs[pair[0]] = self._decode_value(pair[1])
+                restored[pair[0]] = self._decode_value(pair[1])
             if actual != expected:
                 raise CodecError("record field schema mismatch")
             try:
-                return record_type(**kwargs)
+                obj = object.__new__(record_type)
+                for field in dataclasses.fields(record_type):
+                    object.__setattr__(obj, field.name, restored[field.name])
+                return obj
             except Exception as exc:
-                raise CodecError("registered record construction failed") from exc
+                raise CodecError("registered record restoration failed") from exc
         raise CodecError(f"unknown or malformed typed tag: {tag}")
 
 
@@ -304,6 +307,7 @@ CREATE TABLE save_head(
     seed INTEGER NOT NULL,
     next_ids BLOB NOT NULL,
     namespace_inventory BLOB NOT NULL,
+    namespace_counts BLOB NOT NULL,
     head_checksum TEXT NOT NULL
 );
 CREATE TABLE records(
@@ -356,6 +360,60 @@ def _sha(payload: bytes) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def _framed_sha(*parts: bytes) -> str:
+    h = hashlib.sha256()
+    for piece in parts:
+        h.update(len(piece).to_bytes(8, "big"))
+        h.update(piece)
+    return h.hexdigest()
+
+
+def _int_bytes(value: int) -> bytes:
+    return str(value).encode("ascii")
+
+
+def _record_checksum(
+    namespace: str,
+    typed_key: bytes,
+    record_schema: int,
+    codec_version: int,
+    generation: int,
+    payload: bytes,
+) -> str:
+    return _framed_sha(
+        b"record",
+        namespace.encode("utf-8"),
+        typed_key,
+        _int_bytes(record_schema),
+        _int_bytes(codec_version),
+        _int_bytes(generation),
+        payload,
+    )
+
+
+def _segment_checksum(
+    namespace: str,
+    ordinal: int,
+    first_id: bytes,
+    last_id: bytes,
+    element_count: int,
+    codec_version: int,
+    generation: int,
+    payload: bytes,
+) -> str:
+    return _framed_sha(
+        b"segment",
+        namespace.encode("utf-8"),
+        _int_bytes(ordinal),
+        first_id,
+        last_id,
+        _int_bytes(element_count),
+        _int_bytes(codec_version),
+        _int_bytes(generation),
+        payload,
+    )
+
+
 def _validate_namespace(namespace: str) -> str:
     if not isinstance(namespace, str) or not namespace or "\x00" in namespace:
         raise ValueError("namespace must be non-empty text")
@@ -381,11 +439,67 @@ def _head_values(codec: TypedCodec, metadata: Mapping[str, Any]) -> tuple[bytes,
     )
 
 
-def _head_checksum(generation: int, parent: int | None, position: bytes, seed: int, next_ids: bytes, namespaces: bytes) -> str:
-    h = hashlib.sha256()
-    for piece in (str(generation).encode(), str(parent).encode(), position, str(seed).encode(), next_ids, namespaces):
-        h.update(len(piece).to_bytes(8, "big")); h.update(piece)
-    return h.hexdigest()
+def _namespace_counts(codec: TypedCodec, blob: bytes) -> dict[str, tuple[int, int]]:
+    raw = codec.decode(blob)
+    if type(raw) is not dict:
+        raise StoreIntegrityError("invalid namespace counts")
+    result: dict[str, tuple[int, int]] = {}
+    for namespace, pair in raw.items():
+        if type(namespace) is not str:
+            raise StoreIntegrityError("invalid namespace count key")
+        _validate_namespace(namespace)
+        if type(pair) is not tuple or len(pair) != 2 or any(type(v) is not int or v < 0 for v in pair):
+            raise StoreIntegrityError("invalid namespace count value")
+        if pair == (0, 0):
+            raise StoreIntegrityError("zero namespace count must be omitted")
+        result[namespace] = pair
+    return result
+
+
+def _counts_blob(codec: TypedCodec, counts: Mapping[str, tuple[int, int]]) -> bytes:
+    normalized = {
+        namespace: (int(pair[0]), int(pair[1]))
+        for namespace, pair in sorted(counts.items())
+        if pair != (0, 0)
+    }
+    return codec.encode(normalized)
+
+
+def _bump_count(
+    counts: dict[str, tuple[int, int]],
+    namespace: str,
+    *,
+    records: int = 0,
+    segments: int = 0,
+) -> None:
+    before = counts.get(namespace, (0, 0))
+    after = (before[0] + records, before[1] + segments)
+    if after[0] < 0 or after[1] < 0:
+        raise StoreIntegrityError("namespace count underflow")
+    if after == (0, 0):
+        counts.pop(namespace, None)
+    else:
+        counts[namespace] = after
+
+
+def _head_checksum(
+    generation: int,
+    parent: int | None,
+    position: bytes,
+    seed: int,
+    next_ids: bytes,
+    namespaces: bytes,
+    namespace_counts: bytes,
+) -> str:
+    return _framed_sha(
+        _int_bytes(generation),
+        str(parent).encode("ascii"),
+        position,
+        _int_bytes(seed),
+        next_ids,
+        namespaces,
+        namespace_counts,
+    )
 
 
 class TransactionalStore:
@@ -440,10 +554,11 @@ class TransactionalStore:
             db.executemany("INSERT INTO store_metadata(key,value) VALUES (?,?)", rows.items())
             metadata = metadata or {"simulation_position": None, "seed": 0, "next_ids": {}, "namespaces": ()}
             position, seed, next_ids, namespaces = _head_values(codec, metadata)
-            checksum = _head_checksum(0, None, position, seed, next_ids, namespaces)
+            namespace_counts = _counts_blob(codec, {})
+            checksum = _head_checksum(0, None, position, seed, next_ids, namespaces, namespace_counts)
             db.execute(
-                "INSERT INTO save_head VALUES (1,0,NULL,?,?,?,?,?)",
-                (position, seed, next_ids, namespaces, checksum),
+                "INSERT INTO save_head VALUES (1,0,NULL,?,?,?,?,?,?)",
+                (position, seed, next_ids, namespaces, namespace_counts, checksum),
             )
             db.commit()
             db.close(); db = None
@@ -493,13 +608,17 @@ class TransactionalStore:
                 raise StoreFormatError("simulation schema mismatch")
             if expected_rules_id is not None and rows.get("rules_id") != str(expected_rules_id):
                 raise StoreFormatError("rules identifier mismatch")
-            head = db.execute("SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,head_checksum FROM save_head WHERE singleton=1").fetchone()
+            head = db.execute("SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts,head_checksum FROM save_head WHERE singleton=1").fetchone()
             if head is None:
                 raise StoreIntegrityError("missing save head")
             if _head_checksum(*head[:-1]) != head[-1]:
                 raise StoreIntegrityError("save head checksum mismatch")
             # Decode only bounded head metadata on open; cold payloads are verified on access/full scrub.
             codec.decode(head[2]); codec.decode(head[4]); codec.decode(head[5])
+            counts = _namespace_counts(codec, head[6])
+            inventory = set(codec.decode(head[5]))
+            if not set(counts).issubset(inventory):
+                raise StoreIntegrityError("namespace counts are outside head inventory")
             return cls(path, db, codec)
         except Exception:
             db.close()
@@ -568,10 +687,10 @@ class TransactionalStore:
     def reset_diagnostics(self) -> None:
         self._payload_reads = self._payload_read_bytes = self._payload_writes = self._payload_write_bytes = 0
 
-    def _decode_checked(self, payload: bytes, checksum: str, codec_version: int) -> Any:
+    def _decode_checked(self, payload: bytes, checksum: str, codec_version: int, expected_checksum: str) -> Any:
         if codec_version != self.codec.version:
             raise StoreFormatError("payload codec version mismatch")
-        if _sha(payload) != checksum:
+        if checksum != expected_checksum:
             raise StoreIntegrityError("payload checksum mismatch")
         self._payload_reads += 1
         self._payload_read_bytes += len(payload)
@@ -581,24 +700,30 @@ class TransactionalStore:
         self._ensure_open(); _validate_namespace(namespace)
         typed_key = self.codec.encode(key)
         row = self.db.execute(
-            "SELECT payload,payload_checksum,codec_version FROM records WHERE namespace=? AND typed_key=?",
+            "SELECT payload,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?",
             (namespace, typed_key),
         ).fetchone()
         if row is None:
             raise KeyError((namespace, key))
-        return self._decode_checked(*row)
+        payload, checksum, codec_version, record_schema, generation = row
+        expected = _record_checksum(namespace, typed_key, record_schema, codec_version, generation, payload)
+        return self._decode_checked(payload, checksum, codec_version, expected)
 
     def read_segment(self, namespace: str, ordinal: int) -> Any:
         self._ensure_open(); _validate_namespace(namespace)
         if type(ordinal) is not int or ordinal < 0:
             raise ValueError("segment ordinal must be a nonnegative int")
         row = self.db.execute(
-            "SELECT payload,payload_checksum,codec_version FROM segments WHERE namespace=? AND ordinal=?",
+            "SELECT payload,payload_checksum,codec_version,element_count,first_id,last_id,created_generation FROM segments WHERE namespace=? AND ordinal=?",
             (namespace, ordinal),
         ).fetchone()
         if row is None:
             raise KeyError((namespace, ordinal))
-        return self._decode_checked(*row)
+        payload, checksum, codec_version, element_count, first_id, last_id, generation = row
+        expected = _segment_checksum(
+            namespace, ordinal, first_id, last_id, element_count, codec_version, generation, payload
+        )
+        return self._decode_checked(payload, checksum, codec_version, expected)
 
     def commit(
         self,
@@ -640,11 +765,10 @@ class TransactionalStore:
                     raise ValueError("duplicate membership")
                 seen_memberships.add(marker)
                 memberships.append((membership.index_name, encoded_value, membership.ordinal))
-            payload = checksum = None
+            payload = None
             if not change.delete:
                 payload = self.codec.encode(change.value)
-                checksum = _sha(payload)
-            prepared_changes.append((change, namespace, typed_key, payload, checksum, memberships))
+            prepared_changes.append((change, namespace, typed_key, payload, memberships))
 
         prepared_segments = []
         seen_segments = set()
@@ -661,23 +785,20 @@ class TransactionalStore:
                 raise ValueError("duplicate new segment")
             seen_segments.add(identity)
             payload = self.codec.encode(segment.value)
-            prepared_segments.append((segment, namespace, payload, _sha(payload), self.codec.encode(segment.first_id), self.codec.encode(segment.last_id)))
+            prepared_segments.append((segment, namespace, payload, self.codec.encode(segment.first_id), self.codec.encode(segment.last_id)))
 
         position, seed, next_ids, namespaces_blob = _head_values(self.codec, metadata)
         namespace_inventory = set(self.codec.decode(namespaces_blob))
-        touched_namespaces = {row[1] for row in prepared_changes} | {row[1] for row in prepared_segments}
-        if not touched_namespaces.issubset(namespace_inventory):
-            raise ValueError("head namespace inventory omits changed namespace")
 
         current_row = self.db.execute(
-            "SELECT generation,simulation_position,seed,next_ids,namespace_inventory FROM save_head WHERE singleton=1"
+            "SELECT generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head WHERE singleton=1"
         ).fetchone()
         if current_row is None:
             raise StoreIntegrityError("missing save head")
         current_generation = int(current_row[0])
         if current_generation != expected_generation:
             raise StoreConflictError(f"expected generation {expected_generation}, found {current_generation}")
-        if not prepared_changes and not prepared_segments and current_row[1:] == (position, seed, next_ids, namespaces_blob):
+        if not prepared_changes and not prepared_segments and current_row[1:5] == (position, seed, next_ids, namespaces_blob):
             return current_generation
 
         new_generation = current_generation + 1
@@ -686,17 +807,33 @@ class TransactionalStore:
         self.db.execute("BEGIN IMMEDIATE")
         committed = False
         try:
-            locked_generation = self.db.execute("SELECT generation FROM save_head WHERE singleton=1").fetchone()[0]
+            locked = self.db.execute(
+                "SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts,head_checksum FROM save_head WHERE singleton=1"
+            ).fetchone()
+            if locked is None:
+                raise StoreIntegrityError("missing save head")
+            if _head_checksum(*locked[:-1]) != locked[-1]:
+                raise StoreIntegrityError("save head checksum mismatch")
+            locked_generation = int(locked[0])
             if locked_generation != expected_generation:
                 raise StoreConflictError(f"expected generation {expected_generation}, found {locked_generation}")
-            for change, namespace, typed_key, payload, checksum, memberships in prepared_changes:
+            counts = _namespace_counts(self.codec, locked[6])
+            for change, namespace, typed_key, payload, memberships in prepared_changes:
+                existed = self.db.execute(
+                    "SELECT 1 FROM records WHERE namespace=? AND typed_key=?",
+                    (namespace, typed_key),
+                ).fetchone() is not None
                 if change.delete:
                     deleted = self.db.execute(
                         "DELETE FROM records WHERE namespace=? AND typed_key=?", (namespace, typed_key)
                     ).rowcount
                     if deleted:
                         record_deletes += 1
+                        _bump_count(counts, namespace, records=-1)
                     continue
+                checksum = _record_checksum(
+                    namespace, typed_key, change.record_schema, self.codec.version, new_generation, payload
+                )
                 self.db.execute(
                     """INSERT INTO records(namespace,typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation)
                        VALUES (?,?,?,?,?,?,?)
@@ -706,6 +843,8 @@ class TransactionalStore:
                          last_changed_generation=excluded.last_changed_generation""",
                     (namespace, typed_key, payload, checksum, self.codec.version, change.record_schema, new_generation),
                 )
+                if not existed:
+                    _bump_count(counts, namespace, records=1)
                 self.db.execute("DELETE FROM query_membership WHERE namespace=? AND record_key=?", (namespace, typed_key))
                 for index_name, index_value, ordinal in memberships:
                     self.db.execute(
@@ -716,7 +855,17 @@ class TransactionalStore:
                 payload_bytes += len(payload)
                 self._payload_writes += 1
                 self._payload_write_bytes += len(payload)
-            for segment, namespace, payload, checksum, first_id, last_id in prepared_segments:
+            for segment, namespace, payload, first_id, last_id in prepared_segments:
+                checksum = _segment_checksum(
+                    namespace,
+                    segment.ordinal,
+                    first_id,
+                    last_id,
+                    segment.element_count,
+                    self.codec.version,
+                    new_generation,
+                    payload,
+                )
                 try:
                     self.db.execute(
                         "INSERT INTO segments VALUES (?,?,?,?,?,?,?,?,?)",
@@ -724,16 +873,24 @@ class TransactionalStore:
                     )
                 except sqlite3.IntegrityError as exc:
                     raise StoreConflictError(f"segment already exists: {(namespace, segment.ordinal)}") from exc
+                _bump_count(counts, namespace, segments=1)
                 segment_writes += 1
                 payload_bytes += len(payload)
                 self._payload_writes += 1
                 self._payload_write_bytes += len(payload)
             self._phase_hook("during_writes")
+            retained_namespaces = set(counts)
+            missing = retained_namespaces - namespace_inventory
+            if missing:
+                raise ValueError(f"head namespace inventory omits retained namespace: {sorted(missing)}")
+            namespace_counts_blob = _counts_blob(self.codec, counts)
             parent = current_generation
-            checksum = _head_checksum(new_generation, parent, position, seed, next_ids, namespaces_blob)
+            checksum = _head_checksum(
+                new_generation, parent, position, seed, next_ids, namespaces_blob, namespace_counts_blob
+            )
             self.db.execute(
-                """UPDATE save_head SET generation=?,parent_generation=?,simulation_position=?,seed=?,next_ids=?,namespace_inventory=?,head_checksum=? WHERE singleton=1""",
-                (new_generation, parent, position, seed, next_ids, namespaces_blob, checksum),
+                """UPDATE save_head SET generation=?,parent_generation=?,simulation_position=?,seed=?,next_ids=?,namespace_inventory=?,namespace_counts=?,head_checksum=? WHERE singleton=1""",
+                (new_generation, parent, position, seed, next_ids, namespaces_blob, namespace_counts_blob, checksum),
             )
             self.db.execute(
                 "INSERT INTO save_receipts VALUES (?,?,?,?,?,?,?)",
@@ -760,29 +917,43 @@ class TransactionalStore:
         fk = self.db.execute("PRAGMA foreign_key_check").fetchone()
         if fk is not None:
             raise StoreIntegrityError("foreign key check failed")
-        head = self.db.execute("SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,head_checksum FROM save_head WHERE singleton=1").fetchone()
+        head = self.db.execute("SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts,head_checksum FROM save_head WHERE singleton=1").fetchone()
         if head is None or _head_checksum(*head[:-1]) != head[-1]:
             raise StoreIntegrityError("save head checksum mismatch")
         position = self.codec.decode(head[2]); next_ids = self.codec.decode(head[4]); namespaces = self.codec.decode(head[5])
         del position, next_ids
-        if not isinstance(namespaces, tuple) or any(not isinstance(x, str) for x in namespaces):
+        if type(namespaces) is not tuple or any(type(x) is not str for x in namespaces):
             raise StoreIntegrityError("invalid namespace inventory")
         inventory = set(namespaces)
+        expected_counts = _namespace_counts(self.codec, head[6])
+        if not set(expected_counts).issubset(inventory):
+            raise StoreIntegrityError("namespace counts are outside head inventory")
+        actual_counts: dict[str, tuple[int, int]] = {}
         record_count = segment_count = 0
-        for namespace, typed_key, payload, checksum, codec_version in self.db.execute(
-            "SELECT namespace,typed_key,payload,payload_checksum,codec_version FROM records"
+        for namespace, typed_key, payload, checksum, codec_version, record_schema, generation in self.db.execute(
+            "SELECT namespace,typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation FROM records"
         ):
             if namespace not in inventory:
                 raise StoreIntegrityError("record namespace missing from head inventory")
             self.codec.decode(typed_key)
-            self._decode_checked(payload, checksum, codec_version); record_count += 1
-        for namespace, first_id, last_id, payload, checksum, codec_version in self.db.execute(
-            "SELECT namespace,first_id,last_id,payload,payload_checksum,codec_version FROM segments"
+            expected = _record_checksum(namespace, typed_key, record_schema, codec_version, generation, payload)
+            self._decode_checked(payload, checksum, codec_version, expected)
+            _bump_count(actual_counts, namespace, records=1)
+            record_count += 1
+        for namespace, ordinal, first_id, last_id, element_count, payload, checksum, codec_version, generation in self.db.execute(
+            "SELECT namespace,ordinal,first_id,last_id,element_count,payload,payload_checksum,codec_version,created_generation FROM segments"
         ):
             if namespace not in inventory:
                 raise StoreIntegrityError("segment namespace missing from head inventory")
             self.codec.decode(first_id); self.codec.decode(last_id)
-            self._decode_checked(payload, checksum, codec_version); segment_count += 1
+            expected = _segment_checksum(
+                namespace, ordinal, first_id, last_id, element_count, codec_version, generation, payload
+            )
+            self._decode_checked(payload, checksum, codec_version, expected)
+            _bump_count(actual_counts, namespace, segments=1)
+            segment_count += 1
+        if actual_counts != expected_counts:
+            raise StoreIntegrityError("committed namespace counts do not match stored rows")
         # Membership typed values/keys must decode and already have FK-backed owners.
         for index_value, record_key in self.db.execute("SELECT index_value,record_key FROM query_membership"):
             self.codec.decode(index_value); self.codec.decode(record_key)
