@@ -1107,11 +1107,17 @@ class IncrementalWorldSession:
             return result
         if is_dataclass(value):
             memo[ident] = value
+            declared = {field.name for field in fields(cls)}
             for field in fields(cls):
                 child = getattr(value, field.name)
                 replacement = self._unwrap_value(child, memo)
                 if replacement is not child:
                     object.__setattr__(value, field.name, replacement)
+            # P2A restores dataclasses from declared fields only. Mirror that
+            # state on detach so stale query caches cannot affect continuation.
+            for name in tuple(getattr(value, "__dict__", ())):
+                if name not in declared and not (cls is Event and name == "_sealed"):
+                    value.__dict__.pop(name, None)
             return value
         if isinstance(value, EventLog):
             memo[ident] = value
@@ -1124,14 +1130,9 @@ class IncrementalWorldSession:
         memo = {}
         self._suspended += 1
         try:
-            for root, obj in _roots(self.world):
-                for name, kind in ROOT_FIELDS[root].items():
-                    if kind == "int":
-                        continue
-                    value = getattr(obj, name)
-                    replacement = self._unwrap_value(value, memo)
-                    if replacement is not value:
-                        object.__setattr__(obj, name, replacement)
+            # Walk the entire declared World graph, not only root collections,
+            # so non-field query caches are discarded exactly as P2A restore does.
+            self._unwrap_value(self.world, memo)
         finally:
             self._suspended -= 1
 
