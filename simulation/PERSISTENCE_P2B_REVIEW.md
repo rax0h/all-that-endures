@@ -1,5 +1,7 @@
 # P2B review — changes required before P3
 
+> Follow-up: the repair at `90687da9c4e195b2b778a566007144fb0638539a` fixes several findings below. The current remaining assignment is F1–F3 in [PERSISTENCE_P2B_FOLLOWUP.md](PERSISTENCE_P2B_FOLLOWUP.md). This original review is retained as historical evidence.
+
 Reviewed head: `c61a9e4aed40b75f210e4eb1bd557c3594f1f37f`.
 The true PR #14 head was verified before review. This disposition does not approve
 P2B for integration, default checkpoint replacement, Stage 0.5 freeze or merge.
