@@ -1,5 +1,13 @@
 # Current status: continued-world architecture (2026-09-27)
 
+Latest continuation: Sol's bounded Society offer-index implementation is
+validated at `596c59cbb66f766c336c1e10e5e8fc6ee072b1b0` (184 tests, green CI,
+unchanged canonical digest); `97e4781...` adds its final evidence. See
+`resource_offer_index_validation.json`. Late-stock scaling remains to be
+measured independently; the short query speedup is not a full-world claim.
+The next assignment is P1 in [INCREMENTAL_PERSISTENCE.md](INCREMENTAL_PERSISTENCE.md).
+This is the reviewed persistence contract, not implemented persistence.
+
 See [LONG_HISTORY_VALIDATION.md](LONG_HISTORY_VALIDATION.md) for the current
 tested commit, green CI and year-3000 continuation evidence. **Decision B:**
 inventory-query growth and whole-world checkpoint costs remain architectural

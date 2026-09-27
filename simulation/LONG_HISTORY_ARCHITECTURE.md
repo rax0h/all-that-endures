@@ -101,6 +101,12 @@ memories, beliefs and authored interpretations.
 
 ## Limits and validation
 
+The next persistence implementation must follow
+[INCREMENTAL_PERSISTENCE.md](INCREMENTAL_PERSISTENCE.md): explicit record
+ownership and mutation coverage, atomic publication, identity-safe lazy reads,
+unchanged canonical validation, and staged implementation. That contract is a
+design, not an already implemented replacement for schema-8 checkpoints.
+
 Compressed events still consume storage proportional to history. Other
 identity-bearing archives (people, materials, paths, transmissions and items)
 are still resident records. Unconsumed stock is genuinely current property;
