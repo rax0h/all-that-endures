@@ -1080,6 +1080,7 @@ class IncrementalWorldSession:
                 self._propagate_owners(value, owners)
                 if not initial:
                     self._identity_dirty = True
+                    self._manifest_dirty = True
             return value
         existing = _binding(value)
         if existing is not None:
@@ -1105,6 +1106,7 @@ class IncrementalWorldSession:
                 self._propagate_owners(replacement, owners)
                 if not initial:
                     self._identity_dirty = True
+                    self._manifest_dirty = True
                     self._mark_many(previous | set(owners))
             return replacement
         if _mutable_record(value):
@@ -1216,6 +1218,7 @@ class IncrementalWorldSession:
             changed = True
         if changed:
             self._identity_dirty = True
+            self._manifest_dirty = True
         if is_dataclass(value):
             for name in RECORD_FIELDS.get(cls, ()):
                 self._remove_owner_recursive(getattr(value, name), owner, seen)
@@ -1284,7 +1287,10 @@ class IncrementalWorldSession:
     def _event_appended(self, log, event):
         namespace = "world.events"
         index = len(log) - 1
-        self._bind_nested(event, {(namespace, index)}, initial=False)
+        self._bind_nested(
+            event, {(namespace, index)}, initial=False, allow_existing=True
+        )
+        self._changed_member_work += 1
         self._mark((namespace, index))
         self._manifest_dirty = True
 
@@ -1294,17 +1300,60 @@ class IncrementalWorldSession:
     def _validate_bound_identity(self):
         links = []
         _audit(self.world, (), {}, set(), links)
-        if links != self._initial_links:
+        if _identity_groups(links) != _identity_groups(self._initial_links):
             raise StoreIntegrityError("live World identity does not match snapshot manifest")
+
+    def _current_identity_links(self):
+        seen = {}
+        active = set()
+        links = []
+
+        def walk(value, path):
+            cls = type(value)
+            if value is None or cls in (bool, int, float, str, bytes) or cls in (FrozenDict, FrozenList):
+                return
+            ident = id(value)
+            if ident in active:
+                raise StoreError("cycle in bound World")
+            record = is_dataclass(value)
+            mutable = isinstance(value, (dict, list, set, EventLog)) or (
+                record and not cls.__dataclass_params__.frozen
+            )
+            if mutable and ident in seen:
+                links.append((path, seen[ident][0]))
+                return
+            if mutable:
+                seen[ident] = (path, value)
+            active.add(ident)
+            try:
+                if record:
+                    for name in RECORD_FIELDS.get(cls, ()):
+                        walk(getattr(value, name), path + (("field", name),))
+                elif isinstance(value, dict):
+                    for key, child in value.items():
+                        walk(key, path + (("map_key", key),))
+                        walk(child, path + (("key", key),))
+                elif isinstance(value, (list, tuple, EventLog)):
+                    for i, child in enumerate(value):
+                        walk(child, path + (("index", i),))
+                elif isinstance(value, (set, frozenset)):
+                    for i, child in enumerate(value):
+                        walk(child, path + (("index", i),))
+            finally:
+                active.remove(ident)
+
+        walk(self.world, ())
+        return links
 
     def _description(self, namespace):
         current = self._manifest["collections"][namespace]
-        kind = current[0]
         value = self._root_containers.get(namespace)
         if value is None:
             return current
-        chunks = len(value._chunks) if kind == "EventLog" else 0
-        return (kind, len(value), chunks)
+        if type(value) is EventLog:
+            return ("EventLog", len(value), len(value._chunks))
+        kind = getattr(value, "_kind", current[0])
+        return (kind, len(value), 0)
 
     def _plain(self, value, memo=None):
         if memo is None:
@@ -1350,14 +1399,13 @@ class IncrementalWorldSession:
             obj, name = self._scalar_fields[namespace]
             return (0, getattr(obj, name))
         container = self._root_containers[namespace]
-        kind = self._manifest["collections"][namespace][0]
+        kind = self._base_kind(self._description(namespace)[0])
         if kind in ("dict", "RecordTable"):
             return (container.ordinal(key), container[key])
         if kind in ("list", "EventLog"):
             return (key, container[key])
         if kind == "set":
-            values = sorted(container, key=self.codec.encode)
-            return (key, values[key])
+            return (key, container.value_for_ordinal(key))
         raise StoreFormatError(f"unsupported incremental namespace: {namespace}")
 
     def _metadata(self):
@@ -1382,7 +1430,11 @@ class IncrementalWorldSession:
             manifest = {
                 "schema": self._manifest["schema"],
                 "collections": dict(self._manifest["collections"]),
-                "identity_links": self._manifest["identity_links"],
+                "identity_links": (
+                    self._current_identity_links()
+                    if self._identity_dirty
+                    else self._manifest["identity_links"]
+                ),
             }
             for namespace in self._root_containers:
                 manifest["collections"][namespace] = self._description(namespace)
@@ -1433,6 +1485,7 @@ class IncrementalWorldSession:
         self._dirty.clear()
         self._deleted.clear()
         self._manifest_dirty = False
+        self._identity_dirty = False
         return generation
 
     def diagnostics(self):
@@ -1448,6 +1501,13 @@ class IncrementalWorldSession:
     @property
     def deleted(self):
         return frozenset(self._deleted)
+
+    @property
+    def changed_member_work(self):
+        return self._changed_member_work
+
+    def reset_changed_member_work(self):
+        self._changed_member_work = 0
 
     def _clear_bindings(self):
         for ident in self._bound_ids:
