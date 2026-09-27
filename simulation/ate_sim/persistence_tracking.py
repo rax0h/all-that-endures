@@ -1014,6 +1014,8 @@ class IncrementalWorldSession:
             return
         tracked_owners = None
         if isinstance(value, _NestedMixin):
+            if value._session is not self:
+                raise StoreError("cross-session mutable alias")
             tracked_owners = value._owners
         else:
             bound = _binding(value)
@@ -1087,6 +1089,8 @@ class IncrementalWorldSession:
                 for v in value
             )
         if isinstance(value, _NestedMixin):
+            if value._session is not self:
+                raise StoreError("cross-session mutable alias")
             previous = set(value._owners)
             new = set(owners) - previous
             if new and not (initial or allow_existing):
