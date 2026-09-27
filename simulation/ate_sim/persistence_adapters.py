@@ -282,7 +282,8 @@ def _restore_collection(store, namespace, expected, description):
     if type(description) is not tuple or len(description) != 3:
         raise StoreFormatError(f'invalid collection description: {namespace}')
     kind, size, chunks = description
-    allowed = {'dict': ('dict', 'RecordTable'), 'list': ('list',), 'set': ('set',),
+    allowed = {'dict': ('dict', 'RecordTable', 'dict-stable/v1', 'RecordTable-stable/v1'),
+               'list': ('list',), 'set': ('set', 'set-stable/v1'),
                'events': ('list', 'EventLog'), 'int': ('int',)}[expected]
     if kind not in allowed or type(size) is not int or size < 0 or type(chunks) is not int or chunks < 0:
         raise StoreFormatError(f'invalid collection kind/count: {namespace}')
@@ -291,37 +292,45 @@ def _restore_collection(store, namespace, expected, description):
     rows = store.read_records(namespace, expected_record_schema=RECORD_SCHEMA)
     if len(rows) != size:
         raise StoreIntegrityError(f'missing/extra collection rows: {namespace}')
+    stable = kind in ('dict-stable/v1', 'RecordTable-stable/v1', 'set-stable/v1')
+    base_kind = {'dict-stable/v1': 'dict', 'RecordTable-stable/v1': 'RecordTable',
+                 'set-stable/v1': 'set'}.get(kind, kind)
     ordered = {}
     for key, envelope, _ in rows:
         if type(envelope) is not tuple or len(envelope) != 2:
             raise StoreFormatError('invalid entry envelope')
         ordinal, value = envelope
-        if type(ordinal) is not int or not 0 <= ordinal < size or ordinal in ordered:
+        if type(ordinal) is not int or ordinal < 0 or ordinal in ordered or (not stable and ordinal >= size):
             raise StoreIntegrityError(f'duplicate/missing ordinal: {namespace}')
-        if kind not in ('dict', 'RecordTable') and (type(key) is not int or key != ordinal):
+        if base_kind not in ('dict', 'RecordTable') and (type(key) is not int or key != ordinal):
             raise StoreIntegrityError('sequence key disagrees with ordinal')
         ordered[ordinal] = (key, value)
-    pairs = [ordered[i] for i in range(size)]
-    if kind in ('dict', 'RecordTable'):
+    if stable:
+        if len(ordered) != size:
+            raise StoreIntegrityError(f'missing/extra stable ordinals: {namespace}')
+        pairs = [ordered[i] for i in sorted(ordered)]
+    else:
+        pairs = [ordered[i] for i in range(size)]
+    if base_kind in ('dict', 'RecordTable'):
         result = dict(pairs)
         if len(result) != size:
             raise StoreIntegrityError('duplicate decoded dictionary key')
-        if kind == 'RecordTable':
+        if base_kind == 'RecordTable':
             if any(not isinstance(v, IndexedRecord) for v in result.values()):
                 raise StoreFormatError('RecordTable requires indexed records')
             result = RecordTable(result)
         return result
     values = [v for _, v in pairs]
-    if kind == 'int':
+    if base_kind == 'int':
         if size != 1 or type(values[0]) is not int:
             raise StoreFormatError('missing/invalid scalar')
         return values[0]
-    if kind == 'set':
+    if base_kind == 'set':
         result = set(values)
         if len(result) != size:
             raise StoreIntegrityError('duplicate set member')
         return result
-    if kind == 'list':
+    if base_kind == 'list':
         return values
     if chunks * EventLog.chunk_size > size:
         raise StoreIntegrityError('invalid sealed event prefix')
@@ -333,6 +342,29 @@ def _restore_collection(store, namespace, expected, description):
         log._chunks.append(zlib.compress(pickle.dumps(chunk, protocol=5), level=1))
     log._tail = values[chunks * log.chunk_size:]
     return log
+
+
+def _identity_groups(links):
+    """Canonical alias groups; link list order is not part of World identity."""
+    if type(links) is not list:
+        raise StoreFormatError('invalid identity links')
+    groups = []
+    by_path = {}
+    for target, owner in links:
+        group = by_path.get(owner)
+        if group is None:
+            group = {owner};groups.append(group);by_path[owner] = group
+        other = by_path.get(target)
+        if other is not None and other is not group:
+            group.update(other)
+            for path in other:by_path[path] = group
+            groups.remove(other)
+        group.add(target);by_path[target] = group
+    codec = WorldCodec(identity_links_recorded=True)
+    return sorted(
+        (tuple(sorted((codec.encode(path) for path in group))) for group in groups),
+        key=repr,
+    )
 
 
 def read_snapshot(path, *, rules_id):
@@ -371,7 +403,7 @@ def read_snapshot(path, *, rules_id):
     _restore_identity(world, manifest['identity_links'])
     actual_links = []
     _audit(world, (), {}, set(), actual_links)
-    if actual_links != manifest['identity_links']:
+    if _identity_groups(actual_links) != _identity_groups(manifest['identity_links']):
         raise StoreIntegrityError('identity manifest does not match restored graph')
     return world
 
