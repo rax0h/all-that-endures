@@ -753,7 +753,9 @@ class IncrementalWorldSession:
         _install_assignment_hooks()
         _install_eventlog_hooks()
         self.world = world
-        self.codec = WorldCodec()
+        # Incremental records may legally contain repeated mutable descendants;
+        # the identity manifest remains the authority for reconstructing aliases.
+        self.codec = WorldCodec(identity_links_recorded=True)
         self.store = TransactionalStore.open(
             path, codec=self.codec, expected_simulation_schema=SCHEMA,
             expected_rules_id=rules_id,
@@ -940,7 +942,10 @@ class IncrementalWorldSession:
         ordinals = self._baseline_ordinals.get(namespace, {})
         if expected == "dict":
             if live_kind == "RecordTable":
-                kind = stored_kind if self._base_kind(stored_kind) == "RecordTable" else "RecordTable"
+                # Runtime query normalization is rebuildable behavior, not a
+                # persistence mutation. Keep the stored adapter kind until a
+                # structural persistence change actually requires versioning.
+                kind = stored_kind
                 wrapped = _RootRecordTable()
                 wrapped._setup(self, namespace, kind, ordinals)
                 for key, record in value.items():
@@ -950,8 +955,6 @@ class IncrementalWorldSession:
                     if isinstance(record, IndexedRecord):
                         object.__setattr__(record, "_index_table", weakref.ref(wrapped))
                         object.__setattr__(record, "_index_key", key)
-                if stored_kind != kind:
-                    self._manifest_dirty = True
             else:
                 kind = stored_kind
                 wrapped = _RootDict()
@@ -1086,7 +1089,8 @@ class IncrementalWorldSession:
                 for v in value
             )
         if isinstance(value, _NestedMixin):
-            new = set(owners) - value._owners
+            previous = set(value._owners)
+            new = set(owners) - previous
             if new and not (initial or allow_existing):
                 raise StoreError("mutation creates unsupported shared mutable ownership")
             if new:
@@ -1094,6 +1098,7 @@ class IncrementalWorldSession:
                 if not initial:
                     self._identity_dirty = True
                     self._manifest_dirty = True
+                    self._mark_many(previous | set(owners))
             return value
         existing = _binding(value)
         if existing is not None:
@@ -1250,9 +1255,30 @@ class IncrementalWorldSession:
             self._remove_owner_recursive(value, owner)
 
     def _prepare_root_assignment(self, namespace, old, value, kind):
-        # Bootstrap handles list->EventLog and dict->RecordTable. The only
-        # normal root replacement retained by simulation is the bounded agency
-        # action-tail slice.
+        # indexed(owner, name) performs an exact dict -> RecordTable runtime
+        # normalization. Accept it only when keys/order and record identities
+        # are unchanged; this is rebuildable query behavior, not persisted data.
+        if kind == "dict" and type(value) is RecordTable:
+            if list(value) != list(old) or any(value[key] is not old[key] for key in old):
+                raise StoreError("RecordTable normalization changed canonical root data")
+            current = self._root_containers[namespace]
+            wrapped = _RootRecordTable()
+            wrapped._setup(
+                self, namespace, getattr(current, "_kind", "dict"),
+                dict(getattr(current, "_ordinals", {})),
+            )
+            for key, record in value.items():
+                record = self._prepare_nested(
+                    record, {(namespace, key)}, allow_existing=True
+                )
+                dict.__setitem__(wrapped, key, record)
+                if isinstance(record, IndexedRecord):
+                    object.__setattr__(record, "_index_table", weakref.ref(wrapped))
+                    object.__setattr__(record, "_index_key", key)
+            return ("root_collection_normalize", namespace, old, wrapped)
+
+        # The retained agency action tail is the one canonical list replacement
+        # performed by normal simulation.
         if namespace != "world.agency.actions" or kind != "list" or type(value) is not list:
             raise StoreError("bound root collection replacement is unsupported in P2B")
         wrapped = _RootList()
@@ -1265,6 +1291,10 @@ class IncrementalWorldSession:
         return ("root_collection", namespace, old, wrapped)
 
     def _finish_root_assignment(self, token):
+        if token[0] == "root_collection_normalize":
+            _, namespace, _old, wrapped = token
+            self._root_containers[namespace] = wrapped
+            return
         _, namespace, old, wrapped = token
         old_values = list(old)
         self._root_containers[namespace] = wrapped
