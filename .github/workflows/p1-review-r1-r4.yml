@@ -1,0 +1,22 @@
+name: p1-review-r1-r4
+on:
+  push:
+    branches: [sol/p1-review-r1-r4]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: focused P1 review tests
+        run: pytest -q simulation/tests/test_incremental_store.py
+      - name: full unit suite once
+        run: pytest -q simulation/tests
