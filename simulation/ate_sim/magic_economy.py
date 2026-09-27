@@ -166,7 +166,7 @@ def _trainee_resources(world, person, people, supply, rng):
     historical-event queries, invented stock, discount, or annual stone limit.
     """
     from math import ceil
-    from .magic_resources import (_aspiration, _wants, _circulation_stock,
+    from .magic_resources import (_aspiration, _wants,
         resource_price, purchase_settlement_resource, _transfer_to_seeker,
         absorb_essence_resource, use_awakening_stone)
     aspiration=_aspiration(world,person)
