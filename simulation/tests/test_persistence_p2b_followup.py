@@ -222,6 +222,9 @@ def test_followup_bound_unbound_restored_continuation_control(tmp_path):
 
     restored = read_snapshot(path, rules_id=RULES)
     assert bound.digest() == control.digest() == restored.digest()
-    assert Simulation(bound).run(2).digest() == Simulation(control).run(2).digest()
+    independent = clone(control)
+    expected = Simulation(independent).run(2).digest()
+    assert Simulation(bound).run(2).digest() == expected
+    assert Simulation(control).run(2).digest() == expected
     restored = read_snapshot(path, rules_id=RULES)
-    assert Simulation(restored).run(2).digest() == Simulation(clone(control)).run(2).digest()
+    assert Simulation(restored).run(2).digest() == expected
