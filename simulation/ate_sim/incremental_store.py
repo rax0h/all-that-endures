@@ -712,7 +712,7 @@ class TransactionalStore:
         self._payload_read_bytes += len(payload)
         return self.codec.decode(payload)
 
-    def read_record(self, namespace: str, key: Any) -> Any:
+    def read_record(self, namespace: str, key: Any, *, expected_record_schema: int | None = None) -> Any:
         self._ensure_open(); _validate_namespace(namespace)
         typed_key = self.codec.encode(key)
         row = self.db.execute(
@@ -722,8 +722,42 @@ class TransactionalStore:
         if row is None:
             raise KeyError((namespace, key))
         payload, checksum, codec_version, record_schema, generation = row
+        if expected_record_schema is not None and record_schema != expected_record_schema:
+            raise StoreFormatError(
+                f"record schema mismatch for {(namespace, key)!r}: "
+                f"expected {expected_record_schema}, found {record_schema}"
+            )
         expected = _record_checksum(namespace, typed_key, record_schema, codec_version, generation, payload)
         return self._decode_checked(payload, checksum, codec_version, expected)
+
+    def read_records(
+        self, namespace: str, *, expected_record_schema: int | None = None
+    ) -> tuple[tuple[Any, Any, int], ...]:
+        """Return one namespace through the same checksum/schema path as point reads.
+
+        SQL row order is intentionally not authoritative; callers that model
+        ordered collections must carry and validate their own ordinals.
+        """
+        self._ensure_open(); _validate_namespace(namespace)
+        rows = self.db.execute(
+            """SELECT typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation
+               FROM records WHERE namespace=?""",
+            (namespace,),
+        ).fetchall()
+        out = []
+        for typed_key, payload, checksum, codec_version, record_schema, generation in rows:
+            key = self.codec.decode(typed_key)
+            if expected_record_schema is not None and record_schema != expected_record_schema:
+                raise StoreFormatError(
+                    f"record schema mismatch in {namespace!r}: "
+                    f"expected {expected_record_schema}, found {record_schema}"
+                )
+            expected = _record_checksum(
+                namespace, typed_key, record_schema, codec_version, generation, payload
+            )
+            value = self._decode_checked(payload, checksum, codec_version, expected)
+            out.append((key, value, record_schema))
+        return tuple(out)
 
     def read_segment(self, namespace: str, ordinal: int) -> Any:
         self._ensure_open(); _validate_namespace(namespace)
