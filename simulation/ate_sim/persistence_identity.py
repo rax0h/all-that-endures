@@ -1,8 +1,8 @@
 """Bootstrap-built mutable identity occurrence index for P2B.
 
-The index is allowed to walk the whole live World only at explicit binding
-bootstrap. Later refreshes scan only the persistence owners reported changed by
-the mutation tracker. Unrelated EventLog history is never rediscovered on save.
+Full graph discovery is allowed only at explicit binding/bootstrap or restore
+verification. Incremental refreshes rescan changed persistence owners and emit
+link deltas for only affected mutable identities.
 """
 from dataclasses import is_dataclass
 
@@ -16,6 +16,7 @@ class IdentityOccurrenceIndex:
         self.owner_occurrences = {}
         self.occurrences = {}
         self.links_by_ident = {}
+        self.path_to_ident = {}
 
     @staticmethod
     def _mutable(value):
@@ -48,15 +49,12 @@ class IdentityOccurrenceIndex:
                         active,
                     )
             elif isinstance(value, dict):
-                # Mutable mapping keys are unsupported by Python itself.
                 for key, child in value.items():
                     self._scan(child, path + (("key", key),), out, active)
             elif isinstance(value, (list, tuple, EventLog)):
                 for i, child in enumerate(value):
                     self._scan(child, path + (("index", i),), out, active)
             elif isinstance(value, (set, frozenset)):
-                # Set elements are hashable; mutable identity cannot be restored
-                # by an in-place set path and is outside the supported graph.
                 return
         finally:
             active.remove(ident)
@@ -73,14 +71,33 @@ class IdentityOccurrenceIndex:
             elif entry[0] is not obj:
                 raise RuntimeError("mutable identity address reused while indexed")
             entry[1].add(path)
+            self.path_to_ident[path] = ident
         return {ident for ident, _obj, _path in rows}
 
     def bootstrap(self, owners):
         for owner, value, owner_path in owners:
             self._add_occurrences(owner, value, owner_path)
-        self._rebuild_all_links()
+        # Explicit persisted links are seeded separately. Bootstrap occurrence
+        # discovery must not invent links that a legacy parent alias already
+        # implies by containment.
+        self.links_by_ident = {}
+
+    def seed_explicit_links(self, links):
+        grouped = {}
+        for link in links:
+            target, owner = link
+            target_ident = self.path_to_ident.get(target)
+            owner_ident = self.path_to_ident.get(owner)
+            if target_ident is None or target_ident != owner_ident:
+                raise RuntimeError("persisted identity link does not match live graph")
+            grouped.setdefault(target_ident, []).append(link)
+        self.links_by_ident = {
+            ident: tuple(group)
+            for ident, group in grouped.items()
+        }
 
     def refresh(self, owner, value, owner_path):
+        """Return (removed_links, added_links) for identities touched by owner."""
         affected = set()
         for ident, _obj, path in self.owner_occurrences.pop(owner, ()):
             affected.add(ident)
@@ -88,22 +105,35 @@ class IdentityOccurrenceIndex:
             if entry is None:
                 continue
             entry[1].discard(path)
+            self.path_to_ident.pop(path, None)
             if not entry[1]:
                 self.occurrences.pop(ident, None)
         if value is not None:
             affected.update(self._add_occurrences(owner, value, owner_path))
-        changed = False
+
+        removed, added = [], []
         for ident in affected:
-            before = self.links_by_ident.get(ident, ())
+            before = tuple(self.links_by_ident.get(ident, ()))
             entry = self.occurrences.get(ident)
             after = () if entry is None else tuple(self._links_for(entry[1]))
-            if tuple(before) != after:
-                changed = True
+            if before == after:
+                continue
+            before_tokens = {self.codec.encode(link): link for link in before}
+            after_tokens = {self.codec.encode(link): link for link in after}
+            removed.extend(before_tokens[token] for token in before_tokens.keys() - after_tokens.keys())
+            added.extend(after_tokens[token] for token in after_tokens.keys() - before_tokens.keys())
             if after:
                 self.links_by_ident[ident] = after
             else:
                 self.links_by_ident.pop(ident, None)
-        return changed
+        return removed, added
+
+    @staticmethod
+    def _suffix(path, prefix):
+        """Compatibility probe for review instrumentation; save no longer uses it."""
+        if len(prefix) >= len(path) or path[:len(prefix)] != prefix:
+            return None
+        return path[len(prefix):]
 
     def _links_for(self, paths):
         ordered = sorted(paths, key=self.codec.encode)
@@ -111,37 +141,3 @@ class IdentityOccurrenceIndex:
             return []
         anchor = ordered[0]
         return [(target, anchor) for target in ordered[1:]]
-
-    def _rebuild_all_links(self):
-        self.links_by_ident = {
-            ident: tuple(self._links_for(entry[1]))
-            for ident, entry in self.occurrences.items()
-            if len(entry[1]) > 1
-        }
-
-    @staticmethod
-    def _suffix(path, prefix):
-        if len(prefix) >= len(path) or path[:len(prefix)] != prefix:
-            return None
-        return path[len(prefix):]
-
-    def links(self):
-        links = [link for group in self.links_by_ident.values() for link in group]
-        links.sort(
-            key=lambda link: (
-                len(link[0]),
-                self.codec.encode(link[0]),
-                self.codec.encode(link[1]),
-            )
-        )
-        kept = []
-        for target, owner in links:
-            redundant = False
-            for parent_target, parent_owner in kept:
-                suffix = self._suffix(target, parent_target)
-                if suffix is not None and owner == parent_owner + suffix:
-                    redundant = True
-                    break
-            if not redundant:
-                kept.append((target, owner))
-        return kept
