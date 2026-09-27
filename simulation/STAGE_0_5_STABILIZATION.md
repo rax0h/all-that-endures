@@ -1,4 +1,13 @@
-# Current scope: Society recruitment (2026-09-21)
+# Current status: continued-world architecture (2026-09-27)
+
+See [LONG_HISTORY_VALIDATION.md](LONG_HISTORY_VALIDATION.md) for the current
+tested commit, green CI and year-3000 continuation evidence. **Decision B:**
+inventory-query growth and whole-world checkpoint costs remain architectural
+blockers. Active indexes, cold event segments and checkpoint-order repairs are
+implemented. The owner now treats 120 seconds as an optimization goal;
+correctness failures remain fatal. No merge. All sections below are historical.
+
+# Historical scope: Society recruitment (2026-09-21)
 
 The owner now accepts that two Diamonds may be reasonable and asks to hold
 progression fixed while supporting recurring new Irons. Runtime should be

@@ -70,6 +70,15 @@ world: `db0537187e6099c77e8cd39ad4e1cb914e9f01e31fe0d9a629f8e8f6eb9f4dfc`.
 
 ## Interactive continuation boundary
 
+The owner intends a save to remain playable without a designed end date. This
+is a continuing-world contract, not a promise of infinite history in finite
+storage. World age alone must not determine annual processing or autosave cost.
+Genuinely expanding active populations, institutions or inventories may require
+more work, but routine queries must not inspect every retained object merely
+because it exists. Historical storage can grow on disk; stable IDs, provenance
+and exact recovery cannot expire. Incremental persistence and bounded resident
+working sets remain required follow-up, not features already delivered here.
+
 The current annual step is historical-generation resolution, not an
 implementation of real-time gameplay. Do not claim that calling it once a
 second produces equivalent gameplay.
