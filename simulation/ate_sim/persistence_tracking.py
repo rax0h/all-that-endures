@@ -691,8 +691,8 @@ class IncrementalWorldSession:
             self.store.close()
             raise StoreFormatError("invalid identity manifest")
         try:
-            self._bind_roots()
             self._validate_bound_identity()
+            self._bind_roots()
         except Exception:
             self._clear_bindings()
             self.store.close()
@@ -711,7 +711,7 @@ class IncrementalWorldSession:
             raise StoreError("incremental World session is closed")
 
     def _is_mutable(self, value):
-        return type(value) in (dict, list, set, RecordTable, EventLog) or _mutable_record(value)
+        return isinstance(value, _NestedMixin) or type(value) in (dict, list, set, RecordTable, EventLog) or _mutable_record(value)
 
     def _register_binding(self, value, binding):
         ident = id(value)
@@ -804,6 +804,12 @@ class IncrementalWorldSession:
             if cls is tuple:
                 rebuilt = tuple(self._bind_nested(v, owners, initial=initial) for v in value)
                 return rebuilt
+            return value
+        if isinstance(value, _NestedMixin):
+            new = set(owners) - value._owners
+            if new and not initial:
+                raise StoreError("mutation creates unsupported shared mutable ownership")
+            value._add_owners(owners)
             return value
         existing = _binding(value)
         if existing is not None:
