@@ -21,6 +21,7 @@ from .persistence_adapters import (
     _restore_collection, _identity_groups,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
+from .persistence_identity import IdentityOccurrenceIndex
 
 
 _BINDINGS = {}
@@ -772,6 +773,8 @@ class IncrementalWorldSession:
         self._scalar_fields = {}
         self._baseline_ordinals = {}
         self._identity_dirty = False
+        self._identity_dirty_owners = set()
+        self._identity_index = None
         self._changed_member_work = 0
         self._bootstrap_originals = {}
         self._bound_root_originals = {}
@@ -790,6 +793,7 @@ class IncrementalWorldSession:
                 self._validate_bound_identity()
             self._normalize_bootstrap()
             self._bind_roots()
+            self._bootstrap_identity_index()
         except Exception:
             self._undo_bound_roots()
             self._undo_bootstrap()
