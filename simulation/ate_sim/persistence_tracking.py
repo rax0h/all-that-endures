@@ -17,8 +17,9 @@ from .incremental_store import (
     StoreIntegrityError, TransactionalStore,
 )
 from .persistence_adapters import (
-    META, RECORD_SCHEMA, SCHEMA, WorldCodec, _audit, _roots, _kind,
-    _restore_collection, _identity_groups,
+    META, RECORD_SCHEMA, SCHEMA, IDENTITY_DELTAS, IDENTITY_DELTA_SCHEMA,
+    WorldCodec, _audit, _roots, _kind, _restore_collection, _identity_groups,
+    _fold_identity_deltas, _verify_identity_graph,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
 from .persistence_identity import IdentityOccurrenceIndex
@@ -775,6 +776,9 @@ class IncrementalWorldSession:
         self._identity_dirty = False
         self._identity_dirty_owners = set()
         self._identity_index = None
+        self._identity_delta_next = 0
+        self._pending_identity_patch = None
+        self._has_identity_deltas = False
         self._changed_member_work = 0
         self._bootstrap_originals = {}
         self._bound_root_originals = {}
@@ -786,9 +790,22 @@ class IncrementalWorldSession:
                 )
                 if type(self._manifest) is not dict or self._manifest.get("schema") != SCHEMA:
                     raise StoreFormatError("incremental binding requires a P2A snapshot")
-                self._initial_links = self._manifest.get("identity_links")
-                if type(self._initial_links) is not list:
+                base_links = self._manifest.get("identity_links")
+                if type(base_links) is not list:
                     raise StoreFormatError("invalid identity manifest")
+                head_namespaces = set(self.store.head_metadata()["namespaces"])
+                delta_rows = (
+                    self.store.read_records(
+                        IDENTITY_DELTAS,
+                        expected_record_schema=IDENTITY_DELTA_SCHEMA,
+                    )
+                    if IDENTITY_DELTAS in head_namespaces else []
+                )
+                self._identity_delta_next = len(delta_rows)
+                self._has_identity_deltas = bool(delta_rows)
+                self._initial_links = _fold_identity_deltas(
+                    base_links, delta_rows, self.codec
+                )
                 self._validate_baseline()
                 self._validate_bound_identity()
             self._normalize_bootstrap()
@@ -1237,6 +1254,7 @@ class IncrementalWorldSession:
     def _bootstrap_identity_index(self):
         self._identity_index = IdentityOccurrenceIndex(self.codec, RECORD_FIELDS)
         self._identity_index.bootstrap(self._iter_identity_owners())
+        self._identity_index.seed_explicit_links(self._initial_links)
 
     def _refresh_identity_index(self):
         if not self._identity_dirty_owners:
@@ -1400,6 +1418,9 @@ class IncrementalWorldSession:
         self._manifest_dirty = True
 
     def _validate_bound_identity(self):
+        if self._has_identity_deltas:
+            _verify_identity_graph(self.world, self._initial_links)
+            return
         links = []
         _audit(self.world, (), {}, set(), links)
         if _identity_groups(links) != _identity_groups(self._initial_links):
