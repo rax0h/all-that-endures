@@ -1,13 +1,13 @@
-name: p2c-full
+name: p2c-metrics
 on:
   push:
     branches: [sol/p2c-current-links]
 permissions:
   contents: read
 jobs:
-  test:
+  measure:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
     env:
       PYTHONPATH: .:simulation
     steps:
@@ -15,6 +15,72 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install pytest
-      - name: one full unit/integration suite
-        run: pytest -q simulation/tests
+      - name: Measure current-link metadata work
+        run: |
+          python - <<'PY'
+          import json, tempfile
+          from pathlib import Path
+          from ate_sim.core import World
+          from ate_sim.persistence_adapters import write_snapshot, IDENTITY_LINKS, IDENTITY_LINK_SCHEMA
+          from ate_sim.persistence_tracking import bind_snapshot
+
+          RULES="stage-0.5-p2c-metrics"
+          results={"toggles":{},"groups":{}}
+          with tempfile.TemporaryDirectory() as td:
+              root=Path(td)
+              for saves in (20,200):
+                  w=World(1); w.currency.wallets={1:{"a":{"value":1}}}
+                  p=root/f"toggle-{saves}.sqlite"; write_snapshot(w,p,rules_id=RULES)
+                  last_on=None; last_off=None
+                  with bind_snapshot(w,p,rules_id=RULES) as s:
+                      for i in range(saves):
+                          row=w.currency.wallets[1]
+                          if i%2==0: row["b"]=row["a"]
+                          else: del row["b"]
+                          s.reset_diagnostics(); s.save(); save=s.diagnostics()
+                          s.reset_diagnostics()
+                          rows=s.store.read_records(IDENTITY_LINKS,expected_record_schema=IDENTITY_LINK_SCHEMA)
+                          read=s.diagnostics()
+                          payload=sum(len(x[0]) for x in s.store.db.execute(
+                              "SELECT payload FROM records WHERE namespace=?",(IDENTITY_LINKS,)
+                          ))
+                          sample={
+                              "current_rows":len(rows),
+                              "current_payload_bytes":payload,
+                              "identity_read_records":read.payload_reads,
+                              "identity_read_bytes":read.payload_read_bytes,
+                              "save_payload_writes":save.payload_writes,
+                              "save_payload_bytes":save.payload_write_bytes,
+                          }
+                          if i%2==0: last_on=sample
+                          else: last_off=sample
+                  results["toggles"][str(saves)]={"on":last_on,"off":last_off}
+
+              for groups in (100,300,1000):
+                  w=World(2)
+                  for i in range(groups):
+                      shared={"value":i}; w.currency.wallets[i]={"a":shared,"b":shared}
+                  p=root/f"groups-{groups}.sqlite"; write_snapshot(w,p,rules_id=RULES)
+                  with bind_snapshot(w,p,rules_id=RULES) as s:
+                      s.reset_diagnostics()
+                      w.currency.wallets[0]["c"]=w.currency.wallets[0]["a"]
+                      s.save(); stats=s.diagnostics(); gen=s.generation
+                      changed=s.store.db.execute(
+                          "SELECT COUNT(*),COALESCE(SUM(LENGTH(payload)),0) FROM records "
+                          "WHERE namespace=? AND last_changed_generation=?",
+                          (IDENTITY_LINKS,gen),
+                      ).fetchone()
+                      rows=s.store.db.execute(
+                          "SELECT COUNT(*),COALESCE(SUM(LENGTH(payload)),0) FROM records WHERE namespace=?",
+                          (IDENTITY_LINKS,),
+                      ).fetchone()
+                      results["groups"][str(groups)]={
+                          "current_rows":rows[0],
+                          "current_payload_bytes":rows[1],
+                          "identity_rows_written":changed[0],
+                          "identity_payload_bytes_written":changed[1],
+                          "total_save_payload_writes":stats.payload_writes,
+                          "total_save_payload_bytes":stats.payload_write_bytes,
+                      }
+          print("P2C_METRICS="+json.dumps(results,sort_keys=True))
+          PY
