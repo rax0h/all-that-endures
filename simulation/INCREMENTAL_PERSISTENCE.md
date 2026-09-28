@@ -214,10 +214,11 @@ resource operations. Keep the legacy checkpoint as the reference.
 P2 is split into reviewable steps. P2A's complete World adapters and P2B's opt-in
 mutation ownership/saving are accepted; see
 [P2B final validation](PERSISTENCE_P2B_VALIDATION.md).
-**The next bounded Sol assignment is P2C only**:
-[current identity state without an accumulating replay journal](PERSISTENCE_P2C.md).
-Preserve legacy compatibility and exact continuation. This does not replace
-checkpoints or authorize P3 implementation.
+P2C's [current identity state](PERSISTENCE_P2C.md) is also accepted; see
+[P2C validation](PERSISTENCE_P2C_VALIDATION.md). Legacy compatibility and exact
+continuation remain supported. This does not replace checkpoints or authorize
+P3 implementation. The next step is Astra's P3 boundary design, then a bounded
+implementation assignment.
 
 **P3 — integrate incremental saves and disk-backed immutable events.** Preserve
 EventLog order, year queries, sealed immutability, tail and event IDs; cold chunks
