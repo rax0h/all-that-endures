@@ -1,4 +1,5 @@
 name: p3a-cache-bypass
+# rerun after scrub-cache expectation correction
 on:
   push:
     branches: [sol/p3a-verify-full-cache-bypass]
