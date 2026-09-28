@@ -1315,7 +1315,6 @@ class IncrementalWorldSession:
     def _refresh_identity_index(self):
         if not self._identity_dirty_owners:
             return
-        removes, adds = [], []
         owners = sorted(
             self._identity_dirty_owners,
             key=lambda owner: (owner[0], self.codec.encode(owner[1])),
@@ -1325,10 +1324,11 @@ class IncrementalWorldSession:
             removed, added = self._identity_index.refresh(
                 owner, value, self._owner_path(owner)
             )
-            removes.extend(removed)
-            adds.extend(added)
+            # Preserve refresh order. List shifts can create a temporary
+            # old-index/new-index alias which a later owner refresh removes;
+            # final-state reducers must see add then remove, not grouped phases.
+            self._merge_identity_patch(removed, added)
         self._identity_dirty_owners.clear()
-        self._merge_identity_patch(removes, adds)
 
     def _owner_value(self, owner):
         namespace, key = owner
