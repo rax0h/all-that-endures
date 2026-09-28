@@ -26,6 +26,9 @@ RECORD_SCHEMA = 1
 META = 'world_snapshot'
 IDENTITY_DELTAS = 'world_identity_deltas'
 IDENTITY_DELTA_SCHEMA = 1
+IDENTITY_LINKS = 'world_identity_links'
+IDENTITY_LINK_SCHEMA = 1
+IDENTITY_STORAGE_CURRENT = 'current-links/v1'
 COLLECTION_LAYOUT = 'collections/v1'
 # Explicitly reviewed rebuildable state. Unknown non-fields fail closed.
 CACHES = {
@@ -221,16 +224,11 @@ def _kind(value, expected):
     return cls.__name__
 
 
-def write_snapshot(world, path, *, rules_id):
-    """Atomically publish a new full World snapshot. Never overwrite a save.
-
-    Returns P1 payload counters. Bootstrap encodes every retained record; later
-    incremental mutation tracking is deliberately not provided here.
-    """
+def _write_snapshot(world, path, *, rules_id, legacy_identity=False):
+    """Atomically publish a full World snapshot without overwriting destination."""
     validate_schema()
     if type(world) is not World:
         raise CodecError('expected World from this package registry')
-    # Mid-step snapshots are unsupported: current/rank scopes belong to a step.
     if world.__dict__.get('_index_current_people') or world.advancement.__dict__.get('_rank_cache') is not None:
         raise CodecError('snapshot requires a completed simulation step')
     links = []
@@ -259,26 +257,65 @@ def write_snapshot(world, path, *, rules_id):
             for ordinal, (key, entry) in enumerate(entries):
                 changes.append(RecordChange(namespace, key, (ordinal, entry)))
                 size += 1
-            descriptions[namespace] = (kind, size, len(item._chunks) if kind == 'EventLog' else 0)
-    manifest = {'schema': SCHEMA, 'collections': descriptions, 'identity_links': links}
+            descriptions[namespace] = (
+                kind, size, len(item._chunks) if kind == 'EventLog' else 0
+            )
+    if legacy_identity:
+        manifest = {
+            'schema': SCHEMA,
+            'collections': descriptions,
+            'identity_links': links,
+        }
+        namespaces = tuple(descriptions) + (META,)
+    else:
+        manifest = {
+            'schema': SCHEMA,
+            'collections': descriptions,
+            'identity_storage': IDENTITY_STORAGE_CURRENT,
+        }
+        for target, owner in links:
+            changes.append(RecordChange(
+                IDENTITY_LINKS, target, owner,
+                record_schema=IDENTITY_LINK_SCHEMA,
+            ))
+        # The current-link namespace is an explicit authority even when empty.
+        namespaces = tuple(descriptions) + (META, IDENTITY_LINKS)
     changes.append(RecordChange(META, 'manifest', manifest))
     path = Path(path)
     if path.exists():
         raise FileExistsError(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    # Publish only a completely committed World; no generation-zero World at path.
     with tempfile.TemporaryDirectory(prefix='.ate-world-', dir=path.parent) as directory:
         temporary = Path(directory) / 'snapshot.sqlite'
-        with TransactionalStore.create(temporary, simulation_schema=SCHEMA, rules_id=rules_id, codec=codec) as store:
+        with TransactionalStore.create(
+            temporary,
+            simulation_schema=SCHEMA,
+            rules_id=rules_id,
+            codec=codec,
+        ) as store:
             store.commit(0, changes, (), {
-                'simulation_position': world.year, 'seed': world.seed,
-                'next_ids': {k: getattr(world, k) for k in ('next_person', 'next_household', 'next_settlement', 'next_event')},
-                'namespaces': tuple(descriptions) + (META,),
+                'simulation_position': world.year,
+                'seed': world.seed,
+                'next_ids': {
+                    k: getattr(world, k)
+                    for k in ('next_person', 'next_household', 'next_settlement', 'next_event')
+                },
+                'namespaces': namespaces,
             })
             diagnostics = store.diagnostics()
-        os.link(temporary, path)  # atomic no-overwrite publication on the same filesystem
+        os.link(temporary, path)
         TransactionalStore._fsync_dir(path.parent)
     return diagnostics
+
+
+def write_snapshot(world, path, *, rules_id):
+    """Write the P2C current-link snapshot format (the opt-in snapshot default)."""
+    return _write_snapshot(world, path, rules_id=rules_id, legacy_identity=False)
+
+
+def _write_legacy_snapshot(world, path, *, rules_id):
+    """Test/compatibility helper producing the genuine pre-P2C manifest shape."""
+    return _write_snapshot(world, path, rules_id=rules_id, legacy_identity=True)
 
 
 def _restore_collection(store, namespace, expected, description):
