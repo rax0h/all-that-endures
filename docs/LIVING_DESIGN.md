@@ -1,10 +1,15 @@
 # ALL THAT ENDURES — Living Design Document
 
 **Status:** Living design authority for new simulation direction.  
-**Last cohesive update:** 2026-09-15  
+**Last cohesive update:** 2026-09-28  
 **Purpose:** Preserve design decisions as they become coherent. Before replacing an existing system, inspect the repository and extend shared causal primitives where possible.
 
 > **North star:** Not simulated stories. Simulated people whose lives become stories.
+
+## Player-facing game vision
+
+The simulation exists to become a playable living world, not an isolated historical model. The long-term player-facing authority is [`GAMEPLAY_MAGIC_PARTY_DIALOGUE_LIVING_WORLD.md`](GAMEPLAY_MAGIC_PARTY_DIALOGUE_LIVING_WORLD.md). It preserves the current vision for full-3D presentation, emergent story legibility, magic expression, party control and synergy, free-form simulation-constrained dialogue, generated voice, social texture, and the principle that the player enters an already living history as another causal participant.
+
 
 ATE should not merely simulate a fantasy setting. It should simulate the processes by which a fantasy civilization becomes a civilization. The world should not know what kind of story it is telling. It should know that people remember, want, believe, choose, act, succeed or fail, change, influence others, build things, form institutions, preserve or lose knowledge, and eventually die.
 
