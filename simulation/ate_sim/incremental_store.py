@@ -76,6 +76,18 @@ class StoreDiagnostics:
     payload_write_bytes: int
 
 
+@dataclass(frozen=True)
+class CheckedSegment:
+    """Decoded immutable segment plus checksum-protected storage metadata."""
+
+    value: Any
+    element_count: int
+    first_id: Any
+    last_id: Any
+    created_generation: int
+    payload_bytes: int
+
+
 class TypedCodec:
     """Versioned, allowlisted, lossless serializer for persistence payloads."""
 
@@ -759,7 +771,8 @@ class TransactionalStore:
             out.append((key, value, record_schema))
         return tuple(out)
 
-    def read_segment(self, namespace: str, ordinal: int) -> Any:
+    def read_segment_checked(self, namespace: str, ordinal: int) -> CheckedSegment:
+        """Read one segment with its checksum-protected count/ID metadata."""
         self._ensure_open(); _validate_namespace(namespace)
         if type(ordinal) is not int or ordinal < 0:
             raise ValueError("segment ordinal must be a nonnegative int")
@@ -773,7 +786,18 @@ class TransactionalStore:
         expected = _segment_checksum(
             namespace, ordinal, first_id, last_id, element_count, codec_version, generation, payload
         )
-        return self._decode_checked(payload, checksum, codec_version, expected)
+        value = self._decode_checked(payload, checksum, codec_version, expected)
+        return CheckedSegment(
+            value=value,
+            element_count=element_count,
+            first_id=self.codec.decode(first_id),
+            last_id=self.codec.decode(last_id),
+            created_generation=generation,
+            payload_bytes=len(payload),
+        )
+
+    def read_segment(self, namespace: str, ordinal: int) -> Any:
+        return self.read_segment_checked(namespace, ordinal).value
 
     def commit(
         self,
