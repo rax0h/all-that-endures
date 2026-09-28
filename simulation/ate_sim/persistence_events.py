@@ -333,14 +333,11 @@ class SealedEventPrefix(Sequence):
             raise StoreError("sealed-event reader store identity changed")
         self._store._ensure_open()
 
-    def _load_segment(self, ordinal: int) -> tuple[Event, ...]:
+    def _read_segment_from_store(self, ordinal: int) -> tuple[Event, ...]:
+        """Reread and validate one captured segment through P1 storage."""
         self._ensure_readable()
         if ordinal < 0 or ordinal >= self._descriptor.segment_count:
             raise IndexError(ordinal)
-        cached = self._cache.get(ordinal)
-        if cached is not None:
-            self._cache.move_to_end(ordinal)
-            return cached
         try:
             checked = self._store.read_segment_checked(SEALED_EVENTS, ordinal)
         except KeyError as exc:
@@ -361,6 +358,17 @@ class SealedEventPrefix(Sequence):
         events = _decode_segment(checked.value, ordinal)
         if events[0].id != checked.first_id or events[-1].id != checked.last_id:
             raise StoreIntegrityError("sealed-event payload disagrees with segment metadata")
+        return events
+
+    def _load_segment(self, ordinal: int) -> tuple[Event, ...]:
+        self._ensure_readable()
+        if ordinal < 0 or ordinal >= self._descriptor.segment_count:
+            raise IndexError(ordinal)
+        cached = self._cache.get(ordinal)
+        if cached is not None:
+            self._cache.move_to_end(ordinal)
+            return cached
+        events = self._read_segment_from_store(ordinal)
         self._cache[ordinal] = events
         self._cache.move_to_end(ordinal)
         while len(self._cache) > CACHE_SIZE:
@@ -425,7 +433,9 @@ class SealedEventPrefix(Sequence):
         previous_year = None
         final_year = None
         for ordinal in range(self._descriptor.segment_count):
-            events = self._load_segment(ordinal)
+            # A full scrub must never trust reader-cache contents: reread every
+            # captured segment through P1's checksum-protected storage API.
+            events = self._read_segment_from_store(ordinal)
             for event in events:
                 if event.id != expected_id:
                     raise StoreIntegrityError("sealed-event full verification ID mismatch")
