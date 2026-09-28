@@ -621,7 +621,9 @@ def test_full_verification_reports_captured_prefix_without_reopening_or_pinning(
         assert result["segments"] == 4
         assert result["events"] == 4 * CHUNK_SIZE
         assert stats.segment_reads == 4
-        assert stats.resident_segments == 4
+        # Full verification streams checked storage reads and does not populate
+        # an otherwise-cold ordinary reader cache.
+        assert stats.resident_segments == 0
         assert not store.db.in_transaction
         reader.close()
         assert store.generation >= 1
