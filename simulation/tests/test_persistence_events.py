@@ -80,7 +80,7 @@ def event(event_id, year=None, *, sealed=True):
     return value
 
 
-def events(first_id, count, *, year_offset=0):
+def events(first_id, count, *, year_offset=-9):
     return [
         event(i, year=year_offset + (i - 1) // 3)
         for i in range(first_id, first_id + count)
