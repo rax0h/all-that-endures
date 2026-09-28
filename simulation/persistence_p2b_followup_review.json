@@ -1,0 +1,85 @@
+{
+  "reviewed_head": "90687da9c4e195b2b778a566007144fb0638539a",
+  "disposition": "R3_and_R6_repair_required",
+  "verified_ci": {
+    "targeted": {
+      "run": 36349237502,
+      "passed": 83,
+      "seconds": 53.58,
+      "candidate": "acb3b7a5444821d6f38ffee09eb32ca894d6fa08"
+    },
+    "full": {
+      "run": 36349333907,
+      "passed": 267,
+      "seconds": 168.8,
+      "candidate": "28fa438203b595826e85af749ca344d75c94f030"
+    },
+    "product_blobs_match_both_candidates": true
+  },
+  "reproductions": [
+    {
+      "case": "original_R1_fresh_values",
+      "result": {
+        "values_correct": true,
+        "distinct": 20,
+        "restore_match": true
+      }
+    },
+    {
+      "case": "original_R2_rejected_edit",
+      "result": 9
+    },
+    {
+      "case": "R3_new_same_owner_alias",
+      "result": {
+        "restored_shared_identity": false,
+        "live_right": 8,
+        "restored_right": 1
+      }
+    },
+    {
+      "case": "R3_cross_session_container",
+      "result": {
+        "rejected": false,
+        "other_world_changed": 8,
+        "a_dirty": [],
+        "b_dirty": [
+          [
+            "world.currency.wallets",
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "case": "R6_save_identity_scan",
+      "result": [
+        {
+          "events": 100,
+          "events_visited_saving_one_wallet_deletion": 100,
+          "changed_member_work": 1
+        },
+        {
+          "events": 1000,
+          "events_visited_saving_one_wallet_deletion": 1000,
+          "changed_member_work": 1
+        },
+        {
+          "events": 5000,
+          "events_visited_saving_one_wallet_deletion": 5000,
+          "changed_member_work": 1
+        }
+      ]
+    },
+    {
+      "case": "original_R4_mismatch",
+      "rejected": true
+    },
+    {
+      "case": "bound_unbound_restore_control",
+      "bound": "7bd8dc5cc0832cf5f817553c985e966114236a0a1de5853ef54b23c93b1dc0b7",
+      "control": "7bd8dc5cc0832cf5f817553c985e966114236a0a1de5853ef54b23c93b1dc0b7",
+      "restored": "7bd8dc5cc0832cf5f817553c985e966114236a0a1de5853ef54b23c93b1dc0b7"
+    }
+  ]
+}

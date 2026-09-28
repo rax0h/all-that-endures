@@ -1,14 +1,38 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
+from contextlib import contextmanager
 import hashlib,re
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+ from .mastery_training import ResponseModel
 from .semantic_dictionary import ESSENCES,AWAKENING_STONES,stone as stone_semantics
-RANKS=('ordinary','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
+RANKS=('unranked','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
+@dataclass
+class Understanding:
+ # At most six successful applications and two held-out transfer proofs per tier.
+ evidence:dict[str,int]=field(default_factory=dict)
+ applications:dict[str,dict]=field(default_factory=dict)
+ transfers:list[dict]=field(default_factory=list)
+ integration:float=0.
+ def ready(self,rank):
+  # Reflection cannot fabricate application or generalization evidence.
+  return len(self.transfers)>=(1 if rank==3 else 2) and all(t['difficulty']>=rank for t in self.transfers) and self.integration>=rank
+ def reflect(self,application,reflection):
+  if application>0 and reflection>0:
+   self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*.08)
 @dataclass
 class AbilityProgress:
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
+ response_model:ResponseModel|None=None
+ milestone_event:int|None=None
+ understanding:Understanding=field(default_factory=Understanding)
+ def __post_init__(self):
+  if self.response_model is None:
+   from .mastery_training import ResponseModel
+   self.response_model=ResponseModel()
 @dataclass
 class EssencePath:
- base_essences:list[str]=field(default_factory=list);confluence:str|None=None;confluence_name:str|None=None;confluence_concepts:tuple[str,...]=();abilities:list[AbilityProgress]=field(default_factory=list);core_fraction:float=0.;revelation:float=0.;integrated:float=0.
+ base_essences:list[str]=field(default_factory=list);confluence:str|None=None;confluence_name:str|None=None;confluence_concepts:tuple[str,...]=();abilities:list[AbilityProgress]=field(default_factory=list);core_fraction:float=0.
  @property
  def essences(self):return tuple(self.base_essences)+(() if self.confluence is None else (self.confluence,))
  @property
@@ -17,6 +41,19 @@ class EssencePath:
 @dataclass
 class AdvancementState:
  paths:dict[int,EssencePath]=field(default_factory=dict)
+ def __getstate__(self):return {k:v for k,v in self.__dict__.items() if k!='_rank_cache'}
+ @contextmanager
+ def rank_scope(self):
+  # Annual current-state cache only. All normal configuration/rank mutations
+  # invalidate it; direct fixture edits between steps remain fully visible.
+  previous=self.__dict__.get('_rank_cache');self._rank_cache={}
+  try:yield
+  finally:
+   if previous is None:self.__dict__.pop('_rank_cache',None)
+   else:previous.clear();self._rank_cache=previous
+ def _invalidate_rank(self,pid):
+  cache=self.__dict__.get('_rank_cache')
+  if cache is not None:cache.pop(pid,None)
  def path(self,pid):return self.paths.get(pid)
  def essence_user(self,pid):return pid in self.paths
  def _pick(self,v,k,o=0):return v[(int(k[o:o+8],16) if len(k)>=o+8 else int(k[:8],16))%len(v)] if v else 'manifestation'
@@ -50,6 +87,7 @@ class AdvancementState:
   if essence not in ESSENCES:raise ValueError(f'unknown essence: {essence}')
   p=self.paths.setdefault(pid,EssencePath())
   if essence in p.base_essences or len(p.base_essences)>=MAX_BASE_ESSENCES:return p,[]
+  self._invalidate_rank(pid)
   p.base_essences.append(essence);created=[self._semantic_ability(p,essence,'essence',year,semantic_context,origin_event)]
   if len(p.base_essences)==MAX_BASE_ESSENCES and p.confluence is None:
    p.confluence,p.confluence_name,p.confluence_concepts=self._confluence(p.base_essences,semantic_context);created.append(self._semantic_ability(p,p.confluence,'confluence',year,semantic_context,origin_event))
@@ -63,6 +101,7 @@ class AdvancementState:
  def awaken_skill(self,pid,stone,year,semantic_context=(),origin_event=None,target_essence=None):
   p=self.paths.get(pid)
   if p is None:return None
+  self._invalidate_rank(pid)
   sd=self._stone(stone);stone_name=next(name for name,data in AWAKENING_STONES.items() if data is sd)
   available=[e for e in p.essences if len(p.abilities_for(e))<SKILLS_PER_ESSENCE]
   if target_essence is not None:
@@ -72,17 +111,71 @@ class AdvancementState:
    raw='|'.join(p.essences)+'|'+stone_name+'|'+'|'.join(map(str,semantic_context))+'|'+str(len(p.abilities));key=hashlib.blake2b(raw.encode(),digest_size=8).hexdigest();essence=available[int(key[:8],16)%len(available)] if available else None
   return None if essence is None else self._semantic_ability(p,essence,'stone:'+stone_name,year,semantic_context,origin_event)
  def rank(self,pid):
-  p=self.paths.get(pid);return 0 if p is None or not p.abilities else min(a.rank for a in p.abilities)
+  cache=self.__dict__.get('_rank_cache')
+  if cache is None:return self._uncached_rank(pid)
+  if pid not in cache:cache[pid]=self._uncached_rank(pid)
+  return cache[pid]
+ def _uncached_rank(self,pid):
+  p=self.paths.get(pid)
+  if p is None or len(p.base_essences)!=3 or p.confluence is None:return 0
+  if len(p.abilities)!=MAX_SKILLS:return 0
+  counts={e:0 for e in p.essences}
+  for a in p.abilities:
+   if a.essence not in counts:return 0
+   counts[a.essence]+=1
+  if len(counts)!=4 or any(n!=SKILLS_PER_ESSENCE for n in counts.values()):return 0
+  return min(a.rank for a in p.abilities)
  def practice(self,pid,ability,meaningful_use,reflection=0.,core=0.):
+  return self._practice(pid,ability,meaningful_use,reflection,core,self.rank(pid))
+ def practice_batch(self,pid):return PracticeBatch(self,pid)
+ def _practice(self,pid,ability,meaningful_use,reflection,core,body_rank):
   p=self.paths.get(pid)
   if p is None or not p.abilities:return None
-  a=p.abilities[ability%len(p.abilities)];r=a.rank;gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
+  a=p.abilities[ability%len(p.abilities)];r=a.rank
+  # Partial essence users can develop a Bronze ability without gaining bodily
+  # Iron benefits. An ability waits at the next tier's entry until the body
+  # catches up; practice cannot bank progress beyond that ceiling.
+  ceiling=min(5,max(1,body_rank)+1)
+  if r>=ceiling:return a
+  gain=max(0.,meaningful_use)*(1.,.55,.28,.12,.035,.0)[min(r,5)]
   if core>0:gain+=core*(.8,.65,.5,.3,.0,.0)[min(r,5)];p.core_fraction=min(1.,p.core_fraction+core*.01)
-  if r==4:p.revelation=min(1.,p.revelation+max(0.,reflection)*.004*(1-.75*p.core_fraction));p.integrated=min(1.,p.integrated+max(0.,reflection)*.002)
+  if r>=3:a.understanding.reflect(meaningful_use,reflection)
   a.progress+=gain
   while a.progress>=1 and a.rank<5:
    a.progress-=1;a.level+=1
    if a.level>=10:
-    if a.rank==4 and min(p.revelation,p.integrated)<.92:a.level=9;a.progress=.999;break
-    a.rank+=1;a.level=0
+    if a.rank>=3 and (not a.understanding.ready(a.rank) or (a.rank==4 and p.core_fraction>0)):
+     a.level=9;a.progress=.999;break
+    a.rank+=1;self._invalidate_rank(pid);a.level=0;a.understanding=Understanding()
+    from .mastery_training import ResponseModel
+    a.response_model=ResponseModel()
+    if a.rank>=ceiling:a.progress=0.;break
   return a
+ def blockers(self,pid):
+  p=self.paths.get(pid)
+  if p is None:return ('no_essences',)
+  if len(p.base_essences)!=3 or p.confluence is None:return ('incomplete_essences',)
+  if len(p.abilities)!=20:return ('unawakened_abilities',)
+  rank=self.rank(pid)
+  if rank==5:return ()
+  out=['ability_readiness'] if any(a.rank<=rank for a in p.abilities) else []
+  if rank>=3 and any(a.rank==rank and not a.understanding.ready(rank) for a in p.abilities):out.append('understanding')
+  if rank==4 and p.core_fraction>0:out.append('core_taint')
+  return tuple(out)
+
+class PracticeBatch:
+ """Disposable session: validate once, track mid-session body transitions.
+
+ No absorption or awakening occurs within a session; never persistent state.
+ """
+ def __init__(self,state,pid):
+  self.state=state;self.pid=pid;self.path=state.path(pid);self.rank=state.rank(pid);self.counts=[0]*6
+  if self.rank:
+   for a in self.path.abilities:self.counts[a.rank]+=1
+ def practice(self,index,meaningful_use,reflection=0.):
+  before=self.path.abilities[index%len(self.path.abilities)].rank
+  result=self.state._practice(self.pid,index,meaningful_use,reflection,0.,self.rank)
+  if self.rank and result.rank!=before:
+   self.counts[before]-=1;self.counts[result.rank]+=1
+   while not self.counts[self.rank]:self.rank+=1
+  return result

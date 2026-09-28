@@ -1,0 +1,65 @@
+{
+  "scope": "P2A full snapshot adapters only",
+  "base": "7235612c0be57c74b87b7dc823677ea5c0deab47",
+  "reused_branch_head": "1c2c982 (Sol isolated introspection branch; only P1 read additions reused)",
+  "record_types": 66,
+  "world_fields": 36,
+  "root_states": 23,
+  "collections": 85,
+  "targeted": "51 passed in 17.32s; additional immutable-reference regression passed in 0.15s",
+  "full_suite": {
+    "passed": 235,
+    "elapsed_seconds": 248.56,
+    "command": "PYTHONPATH=.:simulation python -m pytest -q --durations=10 simulation/tests",
+    "runs": 1
+  },
+  "fixtures": [
+    {
+      "mature": false,
+      "years": 0,
+      "before": "fda429da8d2806111c5d9a98905c9f7b5c2b5f9a4182df3e9329c21944126833",
+      "continued": "73acf7a0118ad9b5add69cdc0d78132dcb3ad3e9241f98bc9c96a1dba9d3d684",
+      "write_seconds": 0.12973119599996608,
+      "read_seconds": 0.14828784499991343,
+      "file_bytes": 1101824,
+      "payload_bytes": 611595,
+      "records": 1927,
+      "events_after_continue": 261
+    },
+    {
+      "mature": false,
+      "years": 12,
+      "before": "e396d345212a03ba96e1552f21598bfe80709966373f92bd87b853dad3a2ed7d",
+      "continued": "33b94fed8eed213afaede0db03276af4c44eafd6ee383c7f7e52c8558a6bbf57",
+      "write_seconds": 0.26355929500005004,
+      "read_seconds": 0.344898306999994,
+      "file_bytes": 3309568,
+      "payload_bytes": 1895596,
+      "records": 6241,
+      "events_after_continue": 683
+    },
+    {
+      "mature": true,
+      "years": 30,
+      "before": "b441101377a927367c7311d1b77534da2ea1577e378293801cba4219fc491899",
+      "continued": "6e75625727fed7092e4d727b0b3994a4cdca9e2f4786f638a4797fbed606d972",
+      "write_seconds": 1.5060449199999084,
+      "read_seconds": 1.2907702359999575,
+      "file_bytes": 9555968,
+      "payload_bytes": 5982758,
+      "records": 16674,
+      "events_after_continue": 3487
+    }
+  ],
+  "limits": [
+    "Full bootstrap and restore are O(retained state); no incremental speedup claim",
+    "Cycles and unsupported identity boundaries fail closed",
+    "No default checkpoint replacement, lazy eviction, disk-backed events, millennium or rule changes"
+  ],
+  "tested_files_sha256": {
+    "simulation/ate_sim/incremental_store.py": "ac79c77216217d13fb3333281ed9d535f8ed3bb2c1c186eda657ec3c93ffc659",
+    "simulation/ate_sim/persistence_schema.py": "2a59036c05436fc75ce42ac42d194a49351855345c4f2c7891d0b565bf7beb17",
+    "simulation/ate_sim/persistence_adapters.py": "7e767eb9c959f4f2eb17d13a6e16fa3151e1a18c434ae2d66e334ed54c281162",
+    "simulation/tests/test_persistence_adapters.py": "7cf5a66a8a8b10ba37ed54fa40985a330f345773935c3ce75f58b03bc2a01e94"
+  }
+}

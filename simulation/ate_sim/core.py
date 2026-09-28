@@ -29,16 +29,28 @@ from .warfare import WarfareState
 from .society_accountability import SocietyAccountabilityState
 from .currency import RankedCurrencyState
 from .threat_ecology import ThreatEcologyState
+from .record_index import IndexedRecord, indexed
+from .event_log import EventLog, freeze
 class Layer(str,Enum): REALITY='reality'; SOCIETY='society'; KNOWLEDGE='knowledge'; NARRATIVE='narrative'
 @dataclass(frozen=True)
 class Ref: kind:str; id:int
 @dataclass
-class Event: id:int; year:int; kind:str; layer:Layer; actors:tuple[Ref,...]=(); location:Ref|None=None; causes:tuple[int,...]=(); data:dict[str,Any]=field(default_factory=dict)
+class Event:
+ id:int; year:int; kind:str; layer:Layer; actors:tuple[Ref,...]=(); location:Ref|None=None; causes:tuple[int,...]=(); data:dict[str,Any]=field(default_factory=dict)
+ def __setattr__(self,name,value):
+  if self.__dict__.get('_sealed',False):raise TypeError('sealed historical events are immutable; append a new cause')
+  object.__setattr__(self,name,value)
+ def __delattr__(self,name):
+  if self.__dict__.get('_sealed',False):raise TypeError('sealed historical events are immutable; append a new cause')
+  object.__delattr__(self,name)
+ def seal(self):
+  if not self.__dict__.get('_sealed',False):
+   self.data=freeze(self.data);self._sealed=True
 @dataclass
-class Person:
+class Person(IndexedRecord):
  id:int; born:int; settlement:int; household:int; alive:bool=True; age:int=0; wealth:float=0.; health:float=1.; temperament:float=.5; attachment:float=.5; curiosity:float=.5; inhibition:float=.5; grief:float=0.; fear:float=0.; rank:int=0; species:str='human'; occupation:str='labor'; parents:tuple[int,...]=()
 @dataclass
-class Household: id:int; settlement:int; members:list[int]=field(default_factory=list); wealth:float=0.; food:float=10.; preparedness:float=.2; lineage:str=''; alive:bool=True
+class Household(IndexedRecord): id:int; settlement:int; members:list[int]=field(default_factory=list); wealth:float=0.; food:float=10.; preparedness:float=.2; lineage:str=''; alive:bool=True
 @dataclass
 class Settlement: id:int; x:int; y:int; households:list[int]=field(default_factory=list); food_stock:float=100.; defense:float=.1; irrigation:float=.1; roads:float=.1; prosperity:float=.3; memory:dict[str,float]=field(default_factory=dict)
 @dataclass
@@ -55,8 +67,8 @@ def _canonical(value):
  if isinstance(value,Enum):return value.value
  if is_dataclass(value):return {key:_canonical(getattr(value,name)) for key,name in _canonical_fields(type(value))}
  if isinstance(value,dict):return {repr(k):_canonical(v) for k,v in sorted(value.items(),key=lambda kv:repr(kv[0]))}
- if isinstance(value,(list,tuple)):return [_canonical(v) for v in value]
- if isinstance(value,set):return sorted((_canonical(v) for v in value),key=repr)
+ if isinstance(value,(list,tuple,EventLog)):return [_canonical(v) for v in value]
+ if isinstance(value,(set,frozenset)):return sorted((_canonical(v) for v in value),key=repr)
  return value
 @dataclass
 class World:
@@ -65,11 +77,15 @@ class World:
   if layer is None:raise ValueError('events require an explicit layer')
   if any(c not in self.event_ids for c in causes):raise ValueError('event cause does not exist')
   if kind in ('birth','death','resurrection'):self.__dict__.pop('_living_cache',None)
-  e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id);return e
+  e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id)
+  from .magic_progression import observe_experience
+  observe_experience(self,e)
+  return e
  def events_between(self,first_year,last_year=None):
   # Events append in simulation-year order; binary search touches no old payloads.
   last_year=self.year if last_year is None else last_year
   if last_year<first_year:return []
+  if isinstance(self.events,EventLog):return self.events.between(first_year,last_year)
   key=attrgetter('year');start=bisect_left(self.events,first_year,key=key);stop=bisect_right(self.events,last_year,key=key)
   return self.events[start:stop]
  @contextmanager
@@ -84,16 +100,21 @@ class World:
  def current_people(self):
   cached=self.__dict__.get('_living_cache')
   if cached is None:
-   cached=tuple(p for p in self.people.values() if p.alive)
+   cached=tuple(indexed(self,'people').select('alive',True))
    if self.__dict__.get('_index_current_people'):self._living_cache=cached
   return cached
  def living(self):return list(self.current_people())
+ def active_households(self):return indexed(self,'households').select('alive',True)
+ def occupied_households(self):
+  return [self.households[hid] for hid in sorted({p.household for p in self.current_people()})]
  def living_by_settlement(self):
   out={sid:[] for sid in self.settlements}
   for p in self.current_people():
    if p.alive:out[p.settlement].append(p)
   return out
- def digest(self):return hashlib.sha256(json.dumps(_canonical(self),sort_keys=True,separators=(',',':'),ensure_ascii=False).encode()).hexdigest()
+ def digest(self):
+  from .canonical_stream import digest
+  return digest(self,_canonical,_canonical_fields)
 
 _MASK=(1<<64)-1
 class _FastRandom:

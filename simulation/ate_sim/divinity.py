@@ -74,6 +74,7 @@ def _eligible_clergy(world,sid):return [p for p in world.current_people() if p.a
 def divine_step(world,rng):
  from .core import Layer,Ref
  world.divinity.seed_pantheon()
+ living_ids={p.id for p in world.current_people()}
  for sid in sorted(world.settlements):
   residents=_eligible_clergy(world,sid)
   if not residents:continue
@@ -86,7 +87,9 @@ def divine_step(world,rng):
    god=world.divinity.gods[c.god];rr=rng.stream('church_life',world.year,c.id);candidates=[p for p in residents if p.id not in c.followers]
    if candidates and rr.random()<.08:
     p=candidates[int(rr.random()*len(candidates))];c.followers.add(p.id);god.relationships[p.id]=min(1.,god.relationships.get(p.id,0.)+.08)
-   for pid in list(c.followers):
+   # Membership is historical; process living followers in canonical order.
+   # A set's pickle layout must never allocate this church's RNG draws.
+   for pid in sorted(c.followers & living_ids):
     p=world.people.get(pid)
     if p is None or not p.alive:continue
     devotion=god.relationships.get(pid,.1);god.relationships[pid]=min(1.,devotion+.002*(.4+p.attachment));path=world.advancement.path(pid)

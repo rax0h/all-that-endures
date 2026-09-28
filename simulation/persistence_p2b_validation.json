@@ -1,0 +1,72 @@
+{
+  "reviewed_sol_head": "e5f07b4f040f8c0e9a32001f47579b055ea7bedd",
+  "disposition": "P2B_opt_in_accepted_Stage_0_5_remains_B",
+  "final_tests": {
+    "focused_battery": {
+      "passed": 120,
+      "seconds": 53.54
+    },
+    "additional_atomicity_tests": {
+      "passed": 2,
+      "seconds": 0.1
+    },
+    "full_suite": {
+      "passed": 306,
+      "seconds": 252.39,
+      "runs": 1,
+      "environment": "local Python 3.12 / pytest 9.1.1"
+    }
+  },
+  "verified_sol_ci": {
+    "targeted": {
+      "run": 36353518325,
+      "passed": 111,
+      "seconds": 87.14
+    },
+    "full": {
+      "run": 36353647423,
+      "passed": 295,
+      "seconds": 333.06
+    },
+    "four_files_match_both_candidates": true
+  },
+  "review_findings_fixed": {
+    "delta_replay": {
+      "before": "eleventh successful save cannot restore; SQL keys 0,1,10,2,...",
+      "after": "24 saves with every restore verified, rebind after 12; strict key/gap/duplicate validation"
+    },
+    "structural_metadata": {
+      "before_bytes": {
+        "100": 45215,
+        "1000": 385416
+      },
+      "after_bytes": {
+        "100": 7517,
+        "300": 7517,
+        "1000": 7518
+      },
+      "payload_writes": 1,
+      "base_manifest_unchanged": true
+    }
+  },
+  "independent_alias_save_bytes": {
+    "100": 637,
+    "300": 637,
+    "1000": 637
+  },
+  "independent_alias_save_payload_writes": 2,
+  "changed_code_sha256": {
+    "simulation/ate_sim/persistence_adapters.py": "664918b6586937ba07ba012c6feb217d1a4743b350e63096caf823b9f2910b26",
+    "simulation/ate_sim/persistence_tracking.py": "e7dc8b8c4b0b710db65f71c4c8a4ff05a041d2ea1c65a12dcc7b1f8a7f0e980d",
+    "simulation/tests/test_persistence_p2b_identity_review.py": "0b775f19363a821d966d743ebb8808777280a230315d0a8e7d9c3985a81ebd97"
+  },
+  "millennium_run": false,
+  "merge": false,
+  "remaining": [
+    "production checkpoint integration",
+    "cold history / resident memory",
+    "identity metadata replay growth / safe compaction or current-state representation",
+    "growing nested record histories",
+    "long-horizon integrated scaling validation"
+  ]
+}

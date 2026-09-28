@@ -8,6 +8,7 @@ import json
 import os
 import sqlite3
 import tempfile
+from .event_log import EventLog
 
 SCHEMA_VERSION = 1
 # Explicit authoritative collections. Runtime indexes/caches are not exported.
@@ -24,7 +25,7 @@ COLLECTIONS = {
     'transmission': 'transmission.records', 'lineage': 'lineage.nodes',
     'infrastructure': 'infrastructure.assets', 'institution': 'institutions.institutions',
     'institution_branch': 'institutions.branches', 'magic_registration': 'institutions.magic_records',
-    'notice': 'institutions.notices', 'application': 'institutions.applications',
+    'coin_supply': 'currency.minted', 'coin_consumption': 'currency.consumed', 'treasury': 'currency.treasuries', 'notice': 'institutions.notices', 'application': 'institutions.applications',
     'path': 'advancement.paths', 'aspiration': 'magic_resources.aspirations',
     'motive': 'agency.motives', 'soul': 'metaphysics.souls',
     'resurrection_token': 'metaphysics.resurrection_tokens', 'church': 'divinity.churches',
@@ -111,9 +112,10 @@ def export_archive(world, path, *, digest=None):
                     'collections': COLLECTIONS}
         for k, v in sorted(metadata.items()): insert('metadata', (k, encode(v)))
         # Insert all event nodes before foreign-key edges; validate chronology.
-        for e in sorted(world.events, key=lambda e: e.id):
+        ordered=world.events if isinstance(world.events,EventLog) else sorted(world.events,key=lambda e:e.id)
+        for e in ordered:
             insert('events', (e.id, e.year, e.kind, e.layer.value, encode(e)))
-        for e in sorted(world.events, key=lambda e: e.id):
+        for e in ordered:
             for n, c in enumerate(e.causes):
                 if c >= e.id: raise ValueError('non-causal event reference')
                 insert('causes', (e.id, c, n))
@@ -138,7 +140,8 @@ def export_archive(world, path, *, digest=None):
                     if kind == 'relationship':
                         link(kind, rid, 'endpoint', 'person', obj.a, 0); link(kind, rid, 'endpoint', 'person', obj.b, 1)
                     if kind == 'household':
-                        for n, pid in enumerate(obj.members): link(kind, rid, 'member_at_export', 'person', pid, n)
+                        members=sorted(obj.members) if isinstance(obj.members,(set,frozenset)) else obj.members
+                        for n, pid in enumerate(members): link(kind, rid, 'member_at_export', 'person', pid, n)
                     if kind == 'lineage':
                         # Link to lineage nodes, not a guessed institution registry.
                         for n, parent in enumerate(obj.parents): link(kind, rid, 'lineage_parent', 'lineage', parent, n)

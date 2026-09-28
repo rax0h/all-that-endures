@@ -1,0 +1,70 @@
+{
+  "base_commit": "c0946043aad3a4b81c7337ab4cd5818751413bcd",
+  "implementation_commit": "9cdd98c9227a3b3aa55aa0411fc19661054ac166",
+  "isolated_candidate": "96fbff2df734423eb985725cb80ff1dd4275e0be",
+  "short_validation_run": "https://github.com/rax0h/all-that-endures/actions/runs/36295700908",
+  "targeted_tests": {
+    "passed": 23
+  },
+  "query_benchmark": {
+    "seed": 843000,
+    "years": 200,
+    "repeats": 40,
+    "offers": 146,
+    "legacy_seconds": 0.07332617099999794,
+    "indexed_seconds": 0.05921434500000089,
+    "speedup": 1.2383176914309673,
+    "note": "Short-history microbenchmark only; not a millennium runtime claim."
+  },
+  "deterministic_smoke": {
+    "seed": 843000,
+    "years": 100,
+    "digest": "09a4c3ea1247386148d112b6d3eb83feb0bf5cfa20cc5ffa1a208207487d582a",
+    "baseline_digest": "09a4c3ea1247386148d112b6d3eb83feb0bf5cfa20cc5ffa1a208207487d582a",
+    "baseline_run": "https://github.com/rax0h/all-that-endures/actions/runs/36278414000",
+    "exact_match": true
+  },
+  "guarantees": [
+    "Legacy offer snapshots match exact resource IDs and (price, resource ID) ordering on the measured 200-year world.",
+    "Purchase prices, eligibility, ownership rules and RNG consumption are unchanged in tested histories.",
+    "The offer index is derived _query_ state and is omitted from checkpoints.",
+    "Checkpoint restore rebuilds the index from authoritative state.",
+    "A warmed-index checkpoint/resume continuation produces the same future-world digest."
+  ],
+  "exclusions": [
+    "No balance changes.",
+    "No persistence redesign.",
+    "No merge.",
+    "No Stage 1 changes."
+  ],
+  "full_ci": {
+    "tested_commit": "596c59cbb66f766c336c1e10e5e8fc6ee072b1b0",
+    "run": "https://github.com/rax0h/all-that-endures/actions/runs/36295779440",
+    "tests": {
+      "passed": 184,
+      "suite_seconds": 263.64
+    },
+    "deterministic_100_year": {
+      "seed": 843000,
+      "years": 100,
+      "digest": "09a4c3ea1247386148d112b6d3eb83feb0bf5cfa20cc5ffa1a208207487d582a",
+      "exact_pre_index_match": true
+    },
+    "canonical_1000_year": {
+      "seed": 843000,
+      "years": 1000,
+      "simulation_seconds": 266.980017787,
+      "diagnostic_seconds": 96.18934807199992,
+      "validation_seconds": 17.06875895899998,
+      "digest_seconds": 65.36557513399998,
+      "world_digest": "d2e8c476174d5497da24dfe6fa79ed6ad94fb22b3b3b2e1b15f9f5064a630584",
+      "archive_seconds": 283.192245275,
+      "archive_bytes": 1567444992,
+      "archive_logical_sha256": "6e70d81037460d67c5c5abc69bd35f192b18dc310ee518f239cdc4813a435d55",
+      "progression_currency_audit_valid": true,
+      "violations": []
+    },
+    "interpretation": "Full CI confirms exact canonical world/archive digests and zero progression/currency violations. The 266.98s millennium is not claimed as a speed improvement over the prior 248.28s runner result; the demonstrated performance evidence is the isolated offer-query benchmark, and late-history impact remains to be measured separately."
+  },
+  "status": "bounded resource-offer indexing pass validated; incremental persistence remains the separate Stage 0.5 architectural blocker"
+}

@@ -85,15 +85,29 @@ def test_saturated_crafting_capacity_never_scans_stock_after_index_build():
     for _ in range(100):
         assert state.crafting_capacity(1,10) == 10
 
-def test_selection_ids_tracks_exact_active_set_order_and_only_invalidates_on_membership_change():
+def test_selection_ids_tracks_stable_id_order_incrementally():
     state = MaterialEconomy()
     for n in range(100):
         state.create_lot("ore",2.,.5,1,1,n,n)
     pool=state.selection_ids(1)
-    assert list(pool) == [l.id for l in state.available(1)]
+    assert list(pool) == sorted(l.id for l in state.available(1))
     state.consume(state.lots[pool[0]],.5)
     assert state.selection_ids(1) is pool
     state.consume(state.lots[pool[0]],2.)
-    assert list(state.selection_ids(1)) == [l.id for l in state.available(1)]
+    assert list(state.selection_ids(1)) == sorted(l.id for l in state.available(1))
     state.create_lot("stone",3.,.6,1,1,101,101)
-    assert list(state.selection_ids(1)) == [l.id for l in state.available(1)]
+    assert list(state.selection_ids(1)) == sorted(l.id for l in state.available(1))
+
+def test_order_statistics_match_sorted_inventory_through_compaction_and_restore():
+    from simulation.ate_sim.selection_pool import SelectionPool
+    pool=SelectionPool(range(4000))
+    active=set(range(4000))
+    for key in range(3300):
+        pool.discard(key);active.discard(key)
+    for key in range(4000,4100):pool.add(key);active.add(key)
+    expected=sorted(active)
+    for restored in (pool,deepcopy(pool),pickle.loads(pickle.dumps(pool))):
+        assert list(restored)==expected
+        assert [restored[i] for i in range(len(restored))]==expected
+        assert restored[-1]==expected[-1]
+    assert len(pool._ids)<2*len(pool)
