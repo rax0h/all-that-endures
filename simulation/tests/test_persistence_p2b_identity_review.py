@@ -291,7 +291,7 @@ def test_i2_local_alias_removal_does_not_touch_unrelated_groups(
         shared = {"value": i}
         wallets[i] = {"a": shared, "b": shared}
     world.currency.wallets = wallets
-    path = snap(tmp_path, world, f"remove-{groups}.sqlite")
+    path = legacy_snap(tmp_path, world, f"remove-{groups}.sqlite")
 
     with bind_snapshot(world, path, rules_id=RULES) as session:
         calls = {"suffix": 0}
