@@ -513,22 +513,39 @@ def _verify_identity_graph(world, links):
             raise StoreIntegrityError('restored alias group is not explained by identity links')
 
 
-def _read_manifest(store):
-    """Read fixed bootstrap identity and the optional bounded live layout.
+def _identity_mode(manifest):
+    if type(manifest) is not dict or manifest.get('schema') != SCHEMA:
+        raise StoreFormatError('unsupported World adapter schema')
+    keys = set(manifest)
+    if keys == {'schema', 'collections', 'identity_links'}:
+        if type(manifest['identity_links']) is not list:
+            raise StoreFormatError('invalid legacy identity links')
+        return 'legacy'
+    if keys == {'schema', 'collections', 'identity_storage'}:
+        if manifest['identity_storage'] != IDENTITY_STORAGE_CURRENT:
+            raise StoreFormatError('unknown identity storage mode')
+        return 'current'
+    raise StoreFormatError('mixed/unsupported identity manifest')
 
-    P2A snapshots contain only manifest. Incremental structural saves update
-    collections/v1 independently so historical base links are never rewritten.
-    Both records are read inside the caller's pinned transaction.
-    """
-    metadata = {key: value for key, value, _ in
-                store.read_records(META, expected_record_schema=RECORD_SCHEMA)}
+
+def _read_manifest(store):
+    """Read fixed manifest plus optional live collection-layout overlay."""
+    metadata = {
+        key: value
+        for key, value, _ in store.read_records(
+            META, expected_record_schema=RECORD_SCHEMA
+        )
+    }
     if set(metadata) not in ({'manifest'}, {'manifest', COLLECTION_LAYOUT}):
         raise StoreFormatError('unexpected snapshot metadata')
     manifest = metadata['manifest']
-    if type(manifest) is not dict or set(manifest) != {'schema', 'collections', 'identity_links'} or manifest['schema'] != SCHEMA:
-        raise StoreFormatError('unsupported World adapter schema')
-    expected_paths = {root + '.' + name for root, names in ROOT_FIELDS.items()
-                      for name, kind in names.items() if kind != 'state'}
+    _identity_mode(manifest)
+    expected_paths = {
+        root + '.' + name
+        for root, names in ROOT_FIELDS.items()
+        for name, kind in names.items()
+        if kind != 'state'
+    }
     if type(manifest['collections']) is not dict or set(manifest['collections']) != expected_paths:
         raise StoreFormatError('missing/unknown canonical collection roots')
     if COLLECTION_LAYOUT in metadata:
@@ -537,6 +554,63 @@ def _read_manifest(store):
             raise StoreFormatError('missing/unknown canonical collection roots')
         manifest = dict(manifest, collections=layout)
     return manifest
+
+
+def _validate_identity_link(target, owner):
+    if type(target) is not tuple or type(owner) is not tuple:
+        raise StoreFormatError('identity paths require tuples')
+    if not target or target == owner:
+        raise StoreIntegrityError('duplicate/invalid identity target')
+    for path in (target, owner):
+        for component in path:
+            if type(component) is not tuple or len(component) != 2:
+                raise StoreFormatError('invalid identity path component')
+            kind, _key = component
+            if kind not in ('field', 'key', 'index'):
+                raise StoreFormatError('invalid identity path component')
+
+
+def _read_identity_links(store, manifest, namespaces):
+    mode = _identity_mode(manifest)
+    expected_paths = {
+        root + '.' + name
+        for root, names in ROOT_FIELDS.items()
+        for name, kind in names.items()
+        if kind != 'state'
+    }
+    base = expected_paths | {META}
+    if mode == 'current':
+        if namespaces != base | {IDENTITY_LINKS}:
+            raise StoreFormatError('wrong namespace inventory for current identity storage')
+        rows = store.read_records(
+            IDENTITY_LINKS, expected_record_schema=IDENTITY_LINK_SCHEMA
+        )
+        links = []
+        seen = set()
+        for target, owner, _schema in rows:
+            _validate_identity_link(target, owner)
+            if target in seen:
+                raise StoreIntegrityError('duplicate identity target')
+            seen.add(target)
+            links.append((target, owner))
+        return mode, links
+    if IDENTITY_LINKS in namespaces or namespaces not in (
+        base, base | {IDENTITY_DELTAS}
+    ):
+        raise StoreFormatError('wrong namespace inventory for legacy identity storage')
+    delta_rows = (
+        store.read_records(
+            IDENTITY_DELTAS, expected_record_schema=IDENTITY_DELTA_SCHEMA
+        )
+        if IDENTITY_DELTAS in namespaces else []
+    )
+    links = _fold_identity_deltas(
+        manifest['identity_links'], delta_rows,
+        WorldCodec(identity_links_recorded=True),
+    )
+    for target, owner in links:
+        _validate_identity_link(target, owner)
+    return mode, links
 
 
 def read_snapshot(path, *, rules_id):
@@ -556,30 +630,22 @@ def read_snapshot(path, *, rules_id):
                 raise StoreFormatError('missing/unknown canonical collection roots')
             head = store.head_metadata()
             namespaces = set(head['namespaces'])
-            allowed_namespaces = expected_paths | {META}
-            if namespaces not in (allowed_namespaces, allowed_namespaces | {IDENTITY_DELTAS}):
-                raise StoreFormatError('wrong namespace inventory')
+            identity_mode, effective_links = _read_identity_links(
+                store, manifest, namespaces
+            )
             objects = {root: object.__new__(cls) for root, cls in ROOT_TYPES.items()}
             for root, obj in objects.items():
                 for name, kind in ROOT_FIELDS[root].items():
                     namespace = root + '.' + name
                     value = objects[namespace] if kind == 'state' else _restore_collection(store, namespace, kind, descriptions[namespace])
                     object.__setattr__(obj, name, value)
-            identity_delta_rows = (
-                store.read_records(IDENTITY_DELTAS, expected_record_schema=IDENTITY_DELTA_SCHEMA)
-                if IDENTITY_DELTAS in namespaces else []
-            )
-            effective_links = _fold_identity_deltas(
-                manifest['identity_links'], identity_delta_rows,
-                WorldCodec(identity_links_recorded=True),
-            )
             world = objects['world']
             if world.seed != head['seed'] or world.year != head['simulation_position'] or head['next_ids'] != {
                 k: getattr(world, k) for k in ('next_person', 'next_household', 'next_settlement', 'next_event')
             }:
                 raise StoreIntegrityError('World disagrees with committed head')
     _restore_identity(world, effective_links)
-    if identity_delta_rows:
+    if identity_mode == 'current' or IDENTITY_DELTAS in namespaces:
         _verify_identity_graph(world, effective_links)
     else:
         actual_links = []
@@ -587,6 +653,25 @@ def read_snapshot(path, *, rules_id):
         if _identity_groups(actual_links) != _identity_groups(manifest['identity_links']):
             raise StoreIntegrityError('identity manifest does not match restored graph')
     return world
+
+
+def convert_legacy_snapshot(source, destination, *, rules_id):
+    """Full-cost, explicit no-overwrite conversion from legacy P2A/P2B to P2C."""
+    source = Path(source)
+    destination = Path(destination)
+    codec = WorldCodec()
+    with TransactionalStore.open(
+        source, codec=codec, expected_simulation_schema=SCHEMA,
+        expected_rules_id=rules_id,
+    ) as store:
+        with store.read_transaction():
+            manifest = _read_manifest(store)
+            if _identity_mode(manifest) != 'legacy':
+                raise StoreFormatError('conversion source is not a legacy snapshot')
+            # Validate the full source before reading it through the World adapter.
+            store.verify_all()
+    world = read_snapshot(source, rules_id=rules_id)
+    return write_snapshot(world, destination, rules_id=rules_id)
 
 
 def _at_path(world, path):
