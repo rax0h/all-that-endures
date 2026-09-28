@@ -100,7 +100,7 @@ def commit_preparation(store, prepared):
     )
 
 
-def append_chunks(store, first_id, chunks, *, year_offset=0, batch=4):
+def append_chunks(store, first_id, chunks, *, year_offset=-9, batch=4):
     remaining = chunks
     next_id = first_id
     while remaining:
@@ -123,7 +123,10 @@ def descriptor_value(segment_count, event_count, last_year):
 
 
 def test_values_order_types_year_queries_and_tail_not_exported(tmp_path):
-    source_events = events(1, 4 * CHUNK_SIZE + 7)
+    source_events = [
+        event(i, sealed=False)
+        for i in range(1, 4 * CHUNK_SIZE + 8)
+    ]
     log = EventLog(source_events)
     log.seal_before(10**9)
     assert len(log._chunks) == 4 and len(log._tail) == 7
