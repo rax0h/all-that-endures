@@ -1,0 +1,20 @@
+name: p3a-cache-bypass
+on:
+  push:
+    branches: [sol/p3a-verify-full-cache-bypass]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: affected P1 and P3A persistence tests
+        run: pytest -q -s simulation/tests/test_incremental_store.py simulation/tests/test_persistence_events.py
