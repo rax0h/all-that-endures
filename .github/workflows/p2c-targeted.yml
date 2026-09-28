@@ -1,4 +1,5 @@
 name: p2c-targeted
+# rerun after current-link shift repair
 on:
   push:
     branches: [sol/p2c-current-links]
