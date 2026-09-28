@@ -202,6 +202,30 @@ def test_local_alias_save_writes_only_affected_current_link(tmp_path, groups):
     assert restored.currency.wallets[0]["b"] is restored.currency.wallets[0]["c"]
 
 
+@pytest.mark.parametrize("groups", [100, 300, 1000])
+def test_local_alias_removal_deletes_only_affected_current_link(tmp_path, groups):
+    world = World(9051)
+    for i in range(groups):
+        shared = {"value": i}
+        world.currency.wallets[i] = {"a": shared, "b": shared}
+    path = tmp_path / f"remove-groups-{groups}.sqlite"
+    write_snapshot(world, path, rules_id=RULES)
+
+    with bind_snapshot(world, path, rules_id=RULES) as session:
+        session.reset_diagnostics()
+        del world.currency.wallets[0]["a"]
+        session.save()
+        stats = session.diagnostics()
+        assert stats.payload_writes == 1
+        assert stats.payload_write_bytes < 20000
+        assert len(current_rows(session.store)) == groups - 1
+
+    restored = read_snapshot(path, rules_id=RULES)
+    assert "a" not in restored.currency.wallets[0]
+    assert restored.currency.wallets[0]["b"]["value"] == 0
+    assert restored.currency.wallets[1]["a"] is restored.currency.wallets[1]["b"]
+
+
 @pytest.mark.parametrize("phase", ["before_commit", "after_commit"])
 def test_current_identity_and_world_edits_fail_or_ack_atomically(
     tmp_path, monkeypatch, phase
