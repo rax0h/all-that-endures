@@ -1,0 +1,20 @@
+name: p2c-targeted
+on:
+  push:
+    branches: [sol/p2c-current-links]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: focused P1 P2A P2B P2C persistence
+        run: pytest -q -s simulation/tests/test_incremental_store.py simulation/tests/test_persistence_adapters.py simulation/tests/test_persistence_tracking.py simulation/tests/test_persistence_p2b_review_regressions.py simulation/tests/test_persistence_p2b_followup.py simulation/tests/test_persistence_p2b_identity_review.py simulation/tests/test_persistence_p2c.py
