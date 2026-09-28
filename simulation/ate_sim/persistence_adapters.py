@@ -26,6 +26,7 @@ RECORD_SCHEMA = 1
 META = 'world_snapshot'
 IDENTITY_DELTAS = 'world_identity_deltas'
 IDENTITY_DELTA_SCHEMA = 1
+COLLECTION_LAYOUT = 'collections/v1'
 # Explicitly reviewed rebuildable state. Unknown non-fields fail closed.
 CACHES = {
     World: {'_living_cache'},
@@ -372,8 +373,12 @@ def _identity_groups(links):
 def _fold_identity_deltas(base_links, rows, codec):
     """Apply append-only identity link deltas without rewriting the base manifest."""
     state = {codec.encode(link): link for link in base_links}
+    # P1 enumeration has no authoritative order. Typed integer keys sort
+    # lexically in SQLite (0, 1, 10, 2, ...), not by delta sequence number.
+    if any(type(key) is not int or key < 0 for key, _patch, _schema in rows):
+        raise StoreIntegrityError('invalid identity delta sequence key')
     expected = 0
-    for key, patch, _schema in rows:
+    for key, patch, _schema in sorted(rows, key=lambda row: row[0]):
         if type(key) is not int or key != expected:
             raise StoreIntegrityError('identity delta sequence is not contiguous')
         expected += 1
@@ -471,6 +476,32 @@ def _verify_identity_graph(world, links):
             raise StoreIntegrityError('restored alias group is not explained by identity links')
 
 
+def _read_manifest(store):
+    """Read fixed bootstrap identity and the optional bounded live layout.
+
+    P2A snapshots contain only manifest. Incremental structural saves update
+    collections/v1 independently so historical base links are never rewritten.
+    Both records are read inside the caller's pinned transaction.
+    """
+    metadata = {key: value for key, value, _ in
+                store.read_records(META, expected_record_schema=RECORD_SCHEMA)}
+    if set(metadata) not in ({'manifest'}, {'manifest', COLLECTION_LAYOUT}):
+        raise StoreFormatError('unexpected snapshot metadata')
+    manifest = metadata['manifest']
+    if type(manifest) is not dict or set(manifest) != {'schema', 'collections', 'identity_links'} or manifest['schema'] != SCHEMA:
+        raise StoreFormatError('unsupported World adapter schema')
+    expected_paths = {root + '.' + name for root, names in ROOT_FIELDS.items()
+                      for name, kind in names.items() if kind != 'state'}
+    if type(manifest['collections']) is not dict or set(manifest['collections']) != expected_paths:
+        raise StoreFormatError('missing/unknown canonical collection roots')
+    if COLLECTION_LAYOUT in metadata:
+        layout = metadata[COLLECTION_LAYOUT]
+        if type(layout) is not dict or set(layout) != expected_paths:
+            raise StoreFormatError('missing/unknown canonical collection roots')
+        manifest = dict(manifest, collections=layout)
+    return manifest
+
+
 def read_snapshot(path, *, rules_id):
     """Restore a detached World from one pinned generation, with a full scrub."""
     codec = WorldCodec()
@@ -480,9 +511,7 @@ def read_snapshot(path, *, rules_id):
             counts = store.verify_all()
             if counts['segments']:
                 raise StoreFormatError('P2A does not use store segments')
-            manifest = store.read_record(META, 'manifest', expected_record_schema=RECORD_SCHEMA)
-            if type(manifest) is not dict or set(manifest) != {'schema', 'collections', 'identity_links'} or manifest['schema'] != SCHEMA:
-                raise StoreFormatError('unsupported World adapter schema')
+            manifest = _read_manifest(store)
             descriptions = manifest['collections']
             expected_paths = {root + '.' + name for root, names in ROOT_FIELDS.items()
                               for name, kind in names.items() if kind != 'state'}
@@ -493,8 +522,6 @@ def read_snapshot(path, *, rules_id):
             allowed_namespaces = expected_paths | {META}
             if namespaces not in (allowed_namespaces, allowed_namespaces | {IDENTITY_DELTAS}):
                 raise StoreFormatError('wrong namespace inventory')
-            if len(store.read_records(META, expected_record_schema=RECORD_SCHEMA)) != 1:
-                raise StoreFormatError('unexpected snapshot metadata')
             objects = {root: object.__new__(cls) for root, cls in ROOT_TYPES.items()}
             for root, obj in objects.items():
                 for name, kind in ROOT_FIELDS[root].items():

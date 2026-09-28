@@ -1,5 +1,7 @@
 # P2B identity-index review — finish F1 and F3
 
+> Final review and repair results are recorded in [PERSISTENCE_P2B_VALIDATION.md](PERSISTENCE_P2B_VALIDATION.md). This assignment is retained as historical evidence.
+
 Reviewed implementation: `dcf36a846e2f434a8f766b937d90530787d42a6c`.
 Disposition: changes required. Preserve this implementation's verified repairs.
 This narrows the remaining work from `PERSISTENCE_P2B_FOLLOWUP.md`; do not restart

@@ -4,8 +4,135 @@ from ate_sim.core import World
 from ate_sim.persistence_adapters import read_snapshot, write_snapshot
 from ate_sim.persistence_tracking import bind_snapshot
 from ate_sim.persistence_identity import IdentityOccurrenceIndex
+from ate_sim.incremental_store import StoreIntegrityError
 
 RULES = "stage-0.5-p2b-identity-review"
+
+
+def test_identity_delta_replay_after_double_digit_saves_and_rebind(tmp_path):
+    world = World(812)
+    world.currency.wallets = {1: {"a": {"value": 1}}}
+    path = snap(tmp_path, world, "many-deltas.sqlite")
+    # Rebind partway through; the store must replay numeric sequence order both
+    # when restoring and when constructing a new incremental session.
+    for start, stop in ((0, 12), (12, 24)):
+        with bind_snapshot(world, path, rules_id=RULES) as session:
+            for i in range(start, stop):
+                row = world.currency.wallets[1]
+                if i % 2 == 0:
+                    row["b"] = row["a"]
+                else:
+                    del row["b"]
+                row["a"]["value"] = i
+                session.save()
+                restored = read_snapshot(path, rules_id=RULES)
+                saved = restored.currency.wallets[1]
+                assert saved["a"]["value"] == i
+                if i % 2 == 0:
+                    assert saved["a"] is saved["b"]
+                else:
+                    assert "b" not in saved
+        world = read_snapshot(path, rules_id=RULES)
+
+
+@pytest.mark.parametrize("keys", [[1], [0, 0], [0, 2], [-1], [True], ["0"]])
+def test_identity_delta_replay_rejects_invalid_sequence(keys):
+    from ate_sim.persistence_adapters import _fold_identity_deltas, WorldCodec
+
+    rows = [(key, ("identity-delta/v1", (), ()), 1) for key in keys]
+    with pytest.raises(StoreIntegrityError):
+        _fold_identity_deltas([], rows, WorldCodec())
+
+
+def test_structural_saves_do_not_rewrite_bootstrap_aliases(tmp_path):
+    from ate_sim.persistence_adapters import META
+
+    sizes = []
+    for count in (100, 300, 1000):
+        world = World(813)
+        for i in range(count):
+            shared = {"value": i}
+            world.currency.wallets[i] = {"a": shared, "b": shared}
+        world.currency.wallets[-1] = {"iron": 1}
+        path = snap(tmp_path, world, f"structural-{count}.sqlite")
+        with bind_snapshot(world, path, rules_id=RULES) as session:
+            before = session.store.read_record(META, "manifest")
+            session.reset_diagnostics()
+            del world.currency.wallets[-1]
+            session.save()
+            stats = session.diagnostics()
+            assert stats.payload_writes == 1
+            sizes.append(stats.payload_write_bytes)
+            assert session.store.read_record(META, "manifest") == before
+        restored = read_snapshot(path, rules_id=RULES)
+        assert -1 not in restored.currency.wallets
+        assert restored.currency.wallets[0]["a"] is restored.currency.wallets[0]["b"]
+        with bind_snapshot(restored, path, rules_id=RULES) as session:
+            restored.currency.wallets[-2] = {"iron": 3}
+            session.save()
+        final = read_snapshot(path, rules_id=RULES)
+        assert list(final.currency.wallets) == list(range(count)) + [-2]
+        assert final.currency.wallets[-2] == {"iron": 3}
+    # The only size variation is the decimal collection count in fixed-schema
+    # layout metadata, independent of the number of bootstrap identity links.
+    assert max(sizes) - min(sizes) <= 2
+    assert max(sizes) < 10000
+
+
+def test_invalid_live_collection_layout_is_rejected(tmp_path):
+    from ate_sim.persistence_adapters import META, COLLECTION_LAYOUT
+    from ate_sim.incremental_store import RecordChange, StoreFormatError
+
+    world = World(814)
+    path = snap(tmp_path, world, "invalid-layout.sqlite")
+    with bind_snapshot(world, path, rules_id=RULES) as session:
+        world.currency.wallets[1] = {"iron": 1}
+        session.save()
+        layout = session.store.read_record(META, COLLECTION_LAYOUT)
+        del layout["world.currency.wallets"]
+        session.store.commit(session.generation,
+                             [RecordChange(META, COLLECTION_LAYOUT, layout)], (),
+                             session.store.head_metadata())
+    with pytest.raises(StoreFormatError):
+        read_snapshot(path, rules_id=RULES)
+    with pytest.raises(StoreFormatError):
+        bind_snapshot(world, path, rules_id=RULES)
+
+
+@pytest.mark.parametrize("phase", ["before_commit", "after_commit"])
+def test_identity_delta_and_live_layout_commit_together(tmp_path, monkeypatch, phase):
+    from ate_sim.persistence_adapters import IDENTITY_DELTAS
+
+    world = World(815)
+    world.currency.wallets = {1: {"a": {"value": 1}}}
+    path = snap(tmp_path, world, f"atomic-{phase}.sqlite")
+    with bind_snapshot(world, path, rules_id=RULES) as session:
+        world.currency.wallets[1]["b"] = world.currency.wallets[1]["a"]
+        world.currency.wallets[2] = {"iron": 2}
+        original = session.store._phase_hook
+
+        def fail(current):
+            if current == phase:
+                raise OSError("injected identity commit failure")
+            return original(current)
+
+        monkeypatch.setattr(session.store, "_phase_hook", fail)
+        if phase == "before_commit":
+            with pytest.raises(OSError, match="injected"):
+                session.save()
+            old = read_snapshot(path, rules_id=RULES)
+            assert list(old.currency.wallets) == [1]
+            assert "b" not in old.currency.wallets[1]
+            monkeypatch.setattr(session.store, "_phase_hook", original)
+            assert session.save() == 2
+        else:
+            assert session.save() == 2  # lost acknowledgement is resolved
+            monkeypatch.setattr(session.store, "_phase_hook", original)
+        assert session.save() == 2  # no duplicate delta on retry/no-op
+        assert len(session.store.read_records(IDENTITY_DELTAS)) == 1
+    restored = read_snapshot(path, rules_id=RULES)
+    assert restored.currency.wallets[1]["a"] is restored.currency.wallets[1]["b"]
+    assert restored.currency.wallets[2] == {"iron": 2}
 
 
 def snap(tmp_path, world, name):

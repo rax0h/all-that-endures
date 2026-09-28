@@ -20,6 +20,7 @@ from .persistence_adapters import (
     META, RECORD_SCHEMA, SCHEMA, IDENTITY_DELTAS, IDENTITY_DELTA_SCHEMA,
     WorldCodec, _audit, _roots, _kind, _restore_collection, _identity_groups,
     _fold_identity_deltas, _verify_identity_graph,
+    _read_manifest, COLLECTION_LAYOUT,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
 from .persistence_identity import IdentityOccurrenceIndex
@@ -785,9 +786,7 @@ class IncrementalWorldSession:
         try:
             with self.store.read_transaction():
                 self.generation = self.store.generation
-                self._manifest = self.store.read_record(
-                    META, "manifest", expected_record_schema=RECORD_SCHEMA
-                )
+                self._manifest = _read_manifest(self.store)
                 if type(self._manifest) is not dict or self._manifest.get("schema") != SCHEMA:
                     raise StoreFormatError("incremental binding requires a P2A snapshot")
                 base_links = self._manifest.get("identity_links")
@@ -1598,14 +1597,10 @@ class IncrementalWorldSession:
                 record_schema=IDENTITY_DELTA_SCHEMA,
             ))
         if self._manifest_dirty:
-            manifest = {
-                "schema": self._manifest["schema"],
-                "collections": dict(self._manifest["collections"]),
-                "identity_links": self._manifest["identity_links"],
-            }
+            collections = dict(self._manifest["collections"])
             for namespace in self._root_containers:
-                manifest["collections"][namespace] = self._description(namespace)
-            changes.append(RecordChange(META, "manifest", self._plain(manifest), record_schema=RECORD_SCHEMA))
+                collections[namespace] = self._description(namespace)
+            changes.append(RecordChange(META, COLLECTION_LAYOUT, collections, record_schema=RECORD_SCHEMA))
         return changes
 
     def _acknowledged(self, changes, metadata, expected_generation):
@@ -1648,7 +1643,9 @@ class IncrementalWorldSession:
                 raise
         self.generation = generation
         if self._manifest_dirty:
-            self._manifest = next(c.value for c in changes if c.namespace == META and c.key == "manifest")
+            self._manifest["collections"] = next(
+                c.value for c in changes if c.namespace == META and c.key == COLLECTION_LAYOUT
+            )
         self._dirty.clear()
         self._deleted.clear()
         self._manifest_dirty = False

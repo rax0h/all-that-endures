@@ -1,6 +1,9 @@
 # Continuing-world persistence contract
 
-Status: **selected engineering direction; not implemented or release-validated**.
+Status: **P1/P2A and opt-in P2B implemented and validated; production integration
+and cold storage are not release-validated**. See
+[PERSISTENCE_P2B_VALIDATION.md](PERSISTENCE_P2B_VALIDATION.md) for the current
+acceptance boundary and the identity-metadata replay limitation.
 Prepared against `97e4781c2004509087766f958cbcfab808ce1cb8` on PR #14.
 This document does not declare Stage 0.5 complete or change simulation rules.
 
