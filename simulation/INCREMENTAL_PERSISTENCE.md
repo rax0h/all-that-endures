@@ -217,8 +217,9 @@ mutation ownership/saving are accepted; see
 P2C's [current identity state](PERSISTENCE_P2C.md) is also accepted; see
 [P2C validation](PERSISTENCE_P2C_VALIDATION.md). Legacy compatibility and exact
 continuation remain supported. This does not replace checkpoints or authorize
-P3 implementation. The next step is Astra's P3 boundary design, then a bounded
-implementation assignment.
+the complete P3 implementation. The next bounded assignment is
+[P3A immutable event storage and reader](PERSISTENCE_P3A.md). World/session
+integration remains P3B and needs a separate review boundary.
 
 **P3 — integrate incremental saves and disk-backed immutable events.** Preserve
 EventLog order, year queries, sealed immutability, tail and event IDs; cold chunks
