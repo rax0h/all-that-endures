@@ -211,10 +211,13 @@ bootstrap followed by a no-op save and selected nested mutations must prove
 only affected records are encoded. Test direct aliases and cross-record money/
 resource operations. Keep the legacy checkpoint as the reference.
 
-P2 is split into reviewable steps. **The next bounded Sol assignment is P2A only**:
-[complete World adapters and exact full snapshot restoration](PERSISTENCE_P2A.md).
-Prove field coverage, ordering, identity and continuation before P2B adds mutation
-ownership/tracking. P2A does not claim incremental save cost or replace checkpoints.
+P2 is split into reviewable steps. P2A's complete World adapters and P2B's opt-in
+mutation ownership/saving are accepted; see
+[P2B final validation](PERSISTENCE_P2B_VALIDATION.md).
+**The next bounded Sol assignment is P2C only**:
+[current identity state without an accumulating replay journal](PERSISTENCE_P2C.md).
+Preserve legacy compatibility and exact continuation. This does not replace
+checkpoints or authorize P3 implementation.
 
 **P3 — integrate incremental saves and disk-backed immutable events.** Preserve
 EventLog order, year queries, sealed immutability, tail and event IDs; cold chunks
