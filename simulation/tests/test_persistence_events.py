@@ -547,6 +547,68 @@ def test_backup_relocation_close_store_close_and_retained_immutability(tmp_path)
     assert cached.id == 1
 
 
+@pytest.mark.parametrize("damage", ["corrupt", "delete"])
+def test_full_verification_bypasses_warmed_cache_and_detects_storage_damage(
+    tmp_path, damage
+):
+    path = tmp_path / f"cached-{damage}.sqlite"
+    with make_store(path) as store:
+        append_chunks(store, 1, 4)
+        reader = SealedEventPrefix(store)
+        try:
+            cached_ordinal = 1
+            cached_event = reader[cached_ordinal * CHUNK_SIZE]
+            assert cached_event.id == cached_ordinal * CHUNK_SIZE + 1
+            assert cached_ordinal in reader._cache
+
+            if damage == "corrupt":
+                store.db.execute(
+                    "UPDATE segments SET payload=? WHERE namespace=? AND ordinal=?",
+                    (b"corrupt", SEALED_EVENTS, cached_ordinal),
+                )
+            else:
+                store.db.execute(
+                    "DELETE FROM segments WHERE namespace=? AND ordinal=?",
+                    (SEALED_EVENTS, cached_ordinal),
+                )
+            store.db.commit()
+
+            # Ordinary point access still uses the warmed immutable cache.
+            assert reader[cached_ordinal * CHUNK_SIZE] is cached_event
+
+            reader.reset_diagnostics()
+            with pytest.raises(StoreIntegrityError):
+                reader.verify_full()
+            # The scrub rereads storage rather than trusting the cached object.
+            assert reader.diagnostics().segment_reads >= 1
+            assert reader.resident_segments <= CACHE_SIZE
+        finally:
+            reader.close()
+
+
+def test_full_verification_rereads_every_segment_when_prefix_is_warmed(tmp_path):
+    path = tmp_path / "warmed-healthy.sqlite"
+    with make_store(path) as store:
+        append_chunks(store, 1, 4)
+        reader = SealedEventPrefix(store)
+        try:
+            for ordinal in range(4):
+                assert reader[ordinal * CHUNK_SIZE].id == ordinal * CHUNK_SIZE + 1
+            assert reader.resident_segments == 4
+
+            reader.reset_diagnostics()
+            result = reader.verify_full()
+            stats = reader.diagnostics()
+
+            assert result["segments"] == 4
+            assert result["events"] == 4 * CHUNK_SIZE
+            assert stats.segment_reads == 4
+            assert stats.segment_read_bytes > 0
+            assert stats.resident_segments == 4
+        finally:
+            reader.close()
+
+
 def test_full_verification_reports_captured_prefix_without_reopening_or_pinning(tmp_path):
     path = tmp_path / "verify.sqlite"
     with make_store(path) as store:
