@@ -17,10 +17,12 @@ from .incremental_store import (
     StoreIntegrityError, TransactionalStore,
 )
 from .persistence_adapters import (
-    META, RECORD_SCHEMA, SCHEMA, IDENTITY_DELTAS, IDENTITY_DELTA_SCHEMA,
+    META, RECORD_SCHEMA, SCHEMA,
+    IDENTITY_DELTAS, IDENTITY_DELTA_SCHEMA,
+    IDENTITY_LINKS, IDENTITY_LINK_SCHEMA, IDENTITY_STORAGE_CURRENT,
     WorldCodec, _audit, _roots, _kind, _restore_collection, _identity_groups,
-    _fold_identity_deltas, _verify_identity_graph,
-    _read_manifest, COLLECTION_LAYOUT,
+    _verify_identity_graph, _read_manifest, _identity_mode, _read_identity_links,
+    COLLECTION_LAYOUT,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
 from .persistence_identity import IdentityOccurrenceIndex
@@ -777,9 +779,13 @@ class IncrementalWorldSession:
         self._identity_dirty = False
         self._identity_dirty_owners = set()
         self._identity_index = None
+        self._identity_mode = None
         self._identity_delta_next = 0
         self._pending_identity_patch = None
         self._has_identity_deltas = False
+        self._committed_identity_targets = {}
+        self._live_identity_targets = {}
+        self._pending_identity_current = {}
         self._changed_member_work = 0
         self._bootstrap_originals = {}
         self._bound_root_originals = {}
@@ -789,22 +795,23 @@ class IncrementalWorldSession:
                 self._manifest = _read_manifest(self.store)
                 if type(self._manifest) is not dict or self._manifest.get("schema") != SCHEMA:
                     raise StoreFormatError("incremental binding requires a P2A snapshot")
-                base_links = self._manifest.get("identity_links")
-                if type(base_links) is not list:
-                    raise StoreFormatError("invalid identity manifest")
                 head_namespaces = set(self.store.head_metadata()["namespaces"])
-                delta_rows = (
-                    self.store.read_records(
-                        IDENTITY_DELTAS,
-                        expected_record_schema=IDENTITY_DELTA_SCHEMA,
+                self._identity_mode, self._initial_links = _read_identity_links(
+                    self.store, self._manifest, head_namespaces
+                )
+                if self._identity_mode == "legacy":
+                    delta_rows = (
+                        self.store.read_records(
+                            IDENTITY_DELTAS,
+                            expected_record_schema=IDENTITY_DELTA_SCHEMA,
+                        )
+                        if IDENTITY_DELTAS in head_namespaces else []
                     )
-                    if IDENTITY_DELTAS in head_namespaces else []
-                )
-                self._identity_delta_next = len(delta_rows)
-                self._has_identity_deltas = bool(delta_rows)
-                self._initial_links = _fold_identity_deltas(
-                    base_links, delta_rows, self.codec
-                )
+                    self._identity_delta_next = len(delta_rows)
+                    self._has_identity_deltas = bool(delta_rows)
+                else:
+                    self._committed_identity_targets = dict(self._initial_links)
+                    self._live_identity_targets = dict(self._initial_links)
                 self._validate_baseline()
                 self._validate_bound_identity()
             self._normalize_bootstrap()
@@ -1253,7 +1260,30 @@ class IncrementalWorldSession:
         self._identity_index.bootstrap(self._iter_identity_owners())
         self._identity_index.seed_explicit_links(self._initial_links)
 
+    def _merge_current_identity_patch(self, removes, adds):
+        touched = set()
+        for target, _owner in removes:
+            self._live_identity_targets.pop(target, None)
+            touched.add(target)
+        for target, owner in adds:
+            self._live_identity_targets[target] = owner
+            touched.add(target)
+        for target in touched:
+            before = self._committed_identity_targets.get(target, _MISSING)
+            after = self._live_identity_targets.get(target, _MISSING)
+            if (
+                (before is _MISSING and after is _MISSING)
+                or (before is not _MISSING and after is not _MISSING and before == after)
+            ):
+                self._pending_identity_current.pop(target, None)
+            else:
+                self._pending_identity_current[target] = after
+        self._identity_dirty = bool(self._pending_identity_current)
+
     def _merge_identity_patch(self, removes, adds):
+        if self._identity_mode == "current":
+            self._merge_current_identity_patch(removes, adds)
+            return
         pending_removes, pending_adds = {}, {}
         if self._pending_identity_patch is not None:
             for link in self._pending_identity_patch[0]:
@@ -1285,7 +1315,6 @@ class IncrementalWorldSession:
     def _refresh_identity_index(self):
         if not self._identity_dirty_owners:
             return
-        removes, adds = [], []
         owners = sorted(
             self._identity_dirty_owners,
             key=lambda owner: (owner[0], self.codec.encode(owner[1])),
@@ -1295,10 +1324,11 @@ class IncrementalWorldSession:
             removed, added = self._identity_index.refresh(
                 owner, value, self._owner_path(owner)
             )
-            removes.extend(removed)
-            adds.extend(added)
+            # Preserve refresh order. List shifts can create a temporary
+            # old-index/new-index alias which a later owner refresh removes;
+            # final-state reducers must see add then remove, not grouped phases.
+            self._merge_identity_patch(removed, added)
         self._identity_dirty_owners.clear()
-        self._merge_identity_patch(removes, adds)
 
     def _owner_value(self, owner):
         namespace, key = owner
@@ -1449,7 +1479,7 @@ class IncrementalWorldSession:
         self._manifest_dirty = True
 
     def _validate_bound_identity(self):
-        if self._has_identity_deltas:
+        if self._identity_mode == "current" or self._has_identity_deltas:
             _verify_identity_graph(self.world, self._initial_links)
             return
         links = []
@@ -1564,7 +1594,9 @@ class IncrementalWorldSession:
 
     def _metadata(self):
         namespaces = tuple(self._manifest["collections"]) + (META,)
-        if self._has_identity_deltas or self._pending_identity_patch is not None:
+        if self._identity_mode == "current":
+            namespaces += (IDENTITY_LINKS,)
+        elif self._has_identity_deltas or self._pending_identity_patch is not None:
             namespaces += (IDENTITY_DELTAS,)
         return {
             "simulation_position": self.world.year,
@@ -1584,7 +1616,20 @@ class IncrementalWorldSession:
         for namespace, key in sorted(self._dirty, key=lambda x: (x[0], self.codec.encode(x[1]))):
             envelope = self._plain(self._record_value(namespace, key))
             changes.append(RecordChange(namespace, key, envelope, record_schema=RECORD_SCHEMA))
-        if self._pending_identity_patch is not None:
+        if self._identity_mode == "current":
+            for target in sorted(
+                self._pending_identity_current,
+                key=self.codec.encode,
+            ):
+                owner = self._pending_identity_current[target]
+                changes.append(RecordChange(
+                    IDENTITY_LINKS,
+                    target,
+                    None if owner is _MISSING else owner,
+                    record_schema=IDENTITY_LINK_SCHEMA,
+                    delete=owner is _MISSING,
+                ))
+        elif self._pending_identity_patch is not None:
             patch = (
                 "identity-delta/v1",
                 self._pending_identity_patch[0],
@@ -1649,7 +1694,14 @@ class IncrementalWorldSession:
         self._dirty.clear()
         self._deleted.clear()
         self._manifest_dirty = False
-        if self._pending_identity_patch is not None:
+        if self._identity_mode == "current":
+            for target, owner in self._pending_identity_current.items():
+                if owner is _MISSING:
+                    self._committed_identity_targets.pop(target, None)
+                else:
+                    self._committed_identity_targets[target] = owner
+            self._pending_identity_current.clear()
+        elif self._pending_identity_patch is not None:
             self._identity_delta_next += 1
             self._has_identity_deltas = True
             self._pending_identity_patch = None

@@ -17,6 +17,7 @@ from ate_sim.history_archive import export_archive, HistoryArchive
 from ate_sim.resource_offers import ordered_resource_offers
 from ate_sim.persistence_adapters import (
     WorldCodec, write_snapshot, read_snapshot, validate_schema, SCHEMA, META,
+    IDENTITY_LINKS,
 )
 from ate_sim.persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
 from ate_sim.incremental_store import (
@@ -91,7 +92,10 @@ def test_real_world_roundtrip_and_continuation(tmp_path, mature, years):
         # Real training evidence aliases its still-mutable objective event.
         from ate_sim.persistence_adapters import _at_path
         with open_store(path) as store:
-            links = store.read_record(META, 'manifest')['identity_links']
+            links = [
+                (target, owner)
+                for target, owner, _schema in store.read_records(IDENTITY_LINKS)
+            ]
         assert links
         for target, owner in links:
             assert _at_path(w, target) is _at_path(w, owner)
@@ -275,6 +279,10 @@ def test_archive_linked_history_equal(tmp_path):
 def test_committed_but_invalid_adapter_records_rejected(tmp_path, damage):
     w = World(1)
     w.people = {7: Person(7, 0, 1, 1), 2: Person(2, 0, 1, 1)}
+    if damage == 'identity':
+        w.currency.wallets = {
+            1: {'a': {'value': 1}, 'b': {'value': 2}},
+        }
     path = tmp_path/'w'
     write_snapshot(w, path, rules_id=RULES)
     with open_store(path) as store:
@@ -288,7 +296,16 @@ def test_committed_but_invalid_adapter_records_rejected(tmp_path, damage):
         elif damage == 'ordinal': changes.append(RecordChange('world.people', 2, (0, w.people[2])))
         elif damage == 'schema': changes.append(RecordChange('world.people', 2, (1, w.people[2]), record_schema=2))
         elif damage == 'namespace': head['namespaces'] += ('unknown',)
-        elif damage == 'identity': manifest['identity_links'] = [((('field', 'year'),), (('field', 'seed'),))]
+        elif damage == 'identity':
+            target = (
+                ('field', 'currency'), ('field', 'wallets'),
+                ('key', 1), ('key', 'a'),
+            )
+            owner = (
+                ('field', 'currency'), ('field', 'wallets'),
+                ('key', 1), ('key', 'b'),
+            )
+            changes.append(RecordChange(IDENTITY_LINKS, target, owner))
         changes.append(RecordChange(META, 'manifest', manifest))
         store.commit(store.generation, changes, (), head)
     with pytest.raises((StoreFormatError, StoreIntegrityError)):

@@ -1,7 +1,9 @@
 import pytest
 
 from ate_sim.core import World
-from ate_sim.persistence_adapters import read_snapshot, write_snapshot
+from ate_sim.persistence_adapters import (
+    read_snapshot, write_snapshot, _write_legacy_snapshot,
+)
 from ate_sim.persistence_tracking import bind_snapshot
 from ate_sim.persistence_identity import IdentityOccurrenceIndex
 from ate_sim.incremental_store import StoreIntegrityError
@@ -12,7 +14,7 @@ RULES = "stage-0.5-p2b-identity-review"
 def test_identity_delta_replay_after_double_digit_saves_and_rebind(tmp_path):
     world = World(812)
     world.currency.wallets = {1: {"a": {"value": 1}}}
-    path = snap(tmp_path, world, "many-deltas.sqlite")
+    path = legacy_snap(tmp_path, world, "many-deltas.sqlite")
     # Rebind partway through; the store must replay numeric sequence order both
     # when restoring and when constructing a new incremental session.
     for start, stop in ((0, 12), (12, 24)):
@@ -105,7 +107,7 @@ def test_identity_delta_and_live_layout_commit_together(tmp_path, monkeypatch, p
 
     world = World(815)
     world.currency.wallets = {1: {"a": {"value": 1}}}
-    path = snap(tmp_path, world, f"atomic-{phase}.sqlite")
+    path = legacy_snap(tmp_path, world, f"atomic-{phase}.sqlite")
     with bind_snapshot(world, path, rules_id=RULES) as session:
         world.currency.wallets[1]["b"] = world.currency.wallets[1]["a"]
         world.currency.wallets[2] = {"iron": 2}
@@ -133,6 +135,12 @@ def test_identity_delta_and_live_layout_commit_together(tmp_path, monkeypatch, p
     restored = read_snapshot(path, rules_id=RULES)
     assert restored.currency.wallets[1]["a"] is restored.currency.wallets[1]["b"]
     assert restored.currency.wallets[2] == {"iron": 2}
+
+
+def legacy_snap(tmp_path, world, name):
+    path = tmp_path / name
+    _write_legacy_snapshot(world, path, rules_id=RULES)
+    return path
 
 
 def snap(tmp_path, world, name):
@@ -283,7 +291,7 @@ def test_i2_local_alias_removal_does_not_touch_unrelated_groups(
         shared = {"value": i}
         wallets[i] = {"a": shared, "b": shared}
     world.currency.wallets = wallets
-    path = snap(tmp_path, world, f"remove-{groups}.sqlite")
+    path = legacy_snap(tmp_path, world, f"remove-{groups}.sqlite")
 
     with bind_snapshot(world, path, rules_id=RULES) as session:
         calls = {"suffix": 0}
