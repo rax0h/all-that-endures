@@ -1,5 +1,4 @@
-name: p3a-targeted
-# rerun after fixture correction
+name: p3a-full
 on:
   push:
     branches: [sol/p3a-sealed-event-prefix]
@@ -17,5 +16,5 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest
-      - name: focused P1 P2 P3A persistence
-        run: pytest -q -s simulation/tests/test_incremental_store.py simulation/tests/test_persistence_adapters.py simulation/tests/test_persistence_tracking.py simulation/tests/test_persistence_p2b_review_regressions.py simulation/tests/test_persistence_p2b_followup.py simulation/tests/test_persistence_p2b_identity_review.py simulation/tests/test_persistence_p2c.py simulation/tests/test_persistence_events.py
+      - name: one full suite for P3A
+        run: pytest -q simulation/tests
