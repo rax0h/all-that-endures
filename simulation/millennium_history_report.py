@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict
+from functools import lru_cache
 import json
+from time import perf_counter
 
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
@@ -11,39 +13,48 @@ SEED = 843017
 YEARS = 1000
 
 
-def pid_from_event(event):
-    for ref in event.actors:
-        if ref.kind == "person":
-            return ref.id
-    return None
+def emit(label, value):
+    print(label + "=" + json.dumps(value, sort_keys=True, separators=(",", ":")), flush=True)
 
 
 def main():
+    started = perf_counter()
     world = generate_world(SEED, mature=True)
-    Simulation(world).run(YEARS)
-    events = list(world.events)
+    sim = Simulation(world)
+    for mark in range(100, YEARS + 1, 100):
+        sim.run(100)
+        emit("PROGRESS", {
+            "year": world.year,
+            "people": len(world.people),
+            "alive": sum(p.alive for p in world.people.values()),
+            "events": len(world.events),
+            "elapsed_seconds": round(perf_counter() - started, 3),
+        })
 
-    deaths = defaultdict(list)
-    births = defaultdict(list)
+    analysis_started = perf_counter()
+    events = list(world.events)
+    event_by_id = {e.id: e for e in events}
     person_events = defaultdict(list)
+    death_event = {}
     for e in events:
         for ref in e.actors:
             if ref.kind == "person":
                 person_events[ref.id].append(e)
         if e.kind == "death":
-            pid = pid_from_event(e)
+            pid = next((r.id for r in e.actors if r.kind == "person"), None)
             if pid is not None:
-                deaths[pid].append(e)
-        elif e.kind == "birth":
-            pid = pid_from_event(e)
-            if pid is not None:
-                births[pid].append(e)
-
-    def death_year(pid):
-        return deaths[pid][-1].year if deaths.get(pid) else None
+                death_event[pid] = e
 
     def rank(pid):
         return world.advancement.rank(pid)
+
+    def death_year(pid):
+        e = death_event.get(pid)
+        return None if e is None else e.year
+
+    def death_cause(pid):
+        e = death_event.get(pid)
+        return None if e is None else e.data.get("cause")
 
     def person_card(pid):
         p = world.people[pid]
@@ -52,6 +63,7 @@ def main():
             "id": pid,
             "born": p.born,
             "death_year": death_year(pid),
+            "death_cause": death_cause(pid),
             "alive": p.alive,
             "species": p.species,
             "settlement_at_end": p.settlement,
@@ -70,79 +82,86 @@ def main():
     parents = {pid: tuple(world.genealogy.parents.get(pid, p.parents or ())) for pid, p in world.people.items()}
     children = {pid: tuple(world.genealogy.children.get(pid, ())) for pid in world.people}
 
-    roots = [pid for pid in world.people if not parents.get(pid)]
+    @lru_cache(maxsize=None)
+    def founder_roots(pid):
+        ps = tuple(p for p in parents.get(pid, ()) if p in world.people)
+        if not ps:
+            return frozenset((pid,))
+        roots = set()
+        for p in ps:
+            roots.update(founder_roots(p))
+        return frozenset(roots)
 
-    def descendant_set(root):
-        seen = set()
-        stack = list(children.get(root, ()))
-        while stack:
-            pid = stack.pop()
-            if pid in seen:
+    @lru_cache(maxsize=None)
+    def deepest_chain_to(pid):
+        ps = tuple(p for p in parents.get(pid, ()) if p in world.people)
+        if not ps:
+            return (pid,)
+        best = max((deepest_chain_to(p) for p in ps), key=len)
+        return best + (pid,)
+
+    root_stats = defaultdict(lambda: {
+        "descendants": 0,
+        "living_descendants": 0,
+        "ranked_descendants": 0,
+        "war_dead_descendants": 0,
+        "species": set(),
+    })
+    for pid, p in world.people.items():
+        for root in founder_roots(pid):
+            if pid == root:
                 continue
-            seen.add(pid)
-            stack.extend(children.get(pid, ()))
-        return seen
-
-    def best_chain_from(root, require_living=False):
-        best = [root]
-        stack = [(root, [root])]
-        while stack:
-            pid, path = stack.pop()
-            if (not require_living or world.people[pid].alive) and len(path) > len(best):
-                best = path
-            for child in children.get(pid, ()):
-                if child in world.people:
-                    stack.append((child, path + [child]))
-        return best
+            s = root_stats[root]
+            s["descendants"] += 1
+            s["living_descendants"] += int(p.alive)
+            s["ranked_descendants"] += int(rank(pid) > 0)
+            s["war_dead_descendants"] += int(death_cause(pid) == "war")
+            s["species"].add(p.species)
 
     families = []
-    for root in roots:
-        desc = descendant_set(root)
-        if not desc:
-            continue
-        living = [d for d in desc if world.people[d].alive]
-        ranked = [d for d in desc if rank(d) > 0]
-        war_dead = [
-            d for d in desc
-            if any(e.data.get("cause") == "war" for e in deaths.get(d, ()))
-        ]
-        species = sorted({world.people[d].species for d in desc | {root}})
-        chain = best_chain_from(root)
-        living_chain = best_chain_from(root, require_living=True) if living else []
+    for root, s in root_stats.items():
+        descendants = [pid for pid in world.people if root in founder_roots(pid) and pid != root]
+        deepest_pid = max(descendants, key=lambda pid: len(deepest_chain_to(pid)), default=root)
+        living = [pid for pid in descendants if world.people[pid].alive]
+        deepest_living_pid = max(living, key=lambda pid: len(deepest_chain_to(pid)), default=None)
         families.append({
             "root": root,
-            "descendants": len(desc),
-            "living_descendants": len(living),
-            "ranked_descendants": len(ranked),
-            "war_dead_descendants": len(war_dead),
-            "species": species,
-            "deepest_generations": len(chain) - 1,
-            "deepest_chain_ids": chain,
-            "living_chain_ids": living_chain,
             "root_card": person_card(root),
+            "descendants": s["descendants"],
+            "living_descendants": s["living_descendants"],
+            "ranked_descendants": s["ranked_descendants"],
+            "war_dead_descendants": s["war_dead_descendants"],
+            "species": sorted(s["species"] | {world.people[root].species}),
+            "deepest_generations": len(deepest_chain_to(deepest_pid)) - 1,
+            "deepest_chain_ids": list(deepest_chain_to(deepest_pid)),
+            "deepest_living_chain_ids": [] if deepest_living_pid is None else list(deepest_chain_to(deepest_living_pid)),
         })
     families.sort(key=lambda f: (f["descendants"], f["deepest_generations"], f["living_descendants"]), reverse=True)
 
-    deepest_family = max(families, key=lambda f: f["deepest_generations"], default=None)
-    deepest_chain = [person_card(pid) for pid in deepest_family["deepest_chain_ids"]] if deepest_family else []
-    living_families = [f for f in families if f["living_descendants"]]
-    deepest_living = max(living_families, key=lambda f: len(f["living_chain_ids"]), default=None)
-    deepest_living_chain = [person_card(pid) for pid in deepest_living["living_chain_ids"]] if deepest_living else []
+    deepest_pid = max(world.people, key=lambda pid: len(deepest_chain_to(pid)))
+    living_ids = [pid for pid, p in world.people.items() if p.alive]
+    deepest_living_pid = max(living_ids, key=lambda pid: len(deepest_chain_to(pid))) if living_ids else None
+    deepest_chain = [person_card(pid) for pid in deepest_chain_to(deepest_pid)]
+    deepest_living_chain = [] if deepest_living_pid is None else [person_card(pid) for pid in deepest_chain_to(deepest_living_pid)]
 
     battles_by_conflict = defaultdict(list)
+    battle_to_conflict = {}
     for e in events:
         if e.kind == "battle":
-            battles_by_conflict[e.data.get("conflict")].append(e)
+            cid = e.data.get("conflict")
+            battles_by_conflict[cid].append(e)
+            battle_to_conflict[e.id] = cid
+
+    casualties_by_conflict = defaultdict(list)
+    for pid, d in death_event.items():
+        if d.data.get("cause") != "war":
+            continue
+        cid = next((battle_to_conflict[c] for c in d.causes if c in battle_to_conflict), None)
+        if cid is not None:
+            casualties_by_conflict[cid].append(person_card(pid))
 
     wars = []
     for cid, c in sorted(world.warfare.conflicts.items()):
-        battle_ids = {e.id for e in battles_by_conflict.get(cid, ())}
-        casualties = []
-        for pid, ds in deaths.items():
-            for d in ds:
-                if d.data.get("cause") == "war" and any(cause in battle_ids for cause in d.causes):
-                    casualties.append(person_card(pid))
-                    break
         wars.append({
             "id": cid,
             "attacker": c.attacker,
@@ -156,52 +175,16 @@ def main():
             "attacker_losses": c.attacker_losses,
             "defender_losses": c.defender_losses,
             "battle_years": [e.year for e in battles_by_conflict.get(cid, ())],
-            "casualties": casualties,
+            "casualties": casualties_by_conflict.get(cid, []),
         })
-
-    significant_kinds = {
-        "war_declared", "peace_settlement", "church_founded", "god_manifested",
-        "resurrection", "ranked_magic_manifested", "ranked_threat_resolved",
-        "ranked_threat_escalated", "settlement_founded", "household_migrated",
-        "society_trainee_graduated", "rank_advanced", "death", "birth",
-    }
-
-    def major_event(e):
-        if e.kind not in significant_kinds:
-            return False
-        if e.kind == "rank_advanced":
-            return e.data.get("to_rank", 0) >= 3
-        if e.kind in ("ranked_magic_manifested", "ranked_threat_resolved"):
-            return e.data.get("rank", e.data.get("threat_rank", 0)) >= 4
-        if e.kind in ("death", "birth", "society_trainee_graduated"):
-            return False
-        return True
-
-    def compact_event(e):
-        data = {}
-        for k, v in e.data.items():
-            if isinstance(v, (str, int, float, bool)) or v is None:
-                data[k] = v
-        return {
-            "id": e.id,
-            "year": e.year,
-            "kind": e.kind,
-            "actors": [{"kind": r.kind, "id": r.id} for r in e.actors],
-            "location": None if e.location is None else {"kind": e.location.kind, "id": e.location.id},
-            "causes": list(e.causes),
-            "data": data,
-        }
-
-    major_events = [compact_event(e) for e in events if major_event(e)]
 
     centuries = []
     for start in range(1, YEARS + 1, 100):
-        end = min(YEARS, start + 99)
-        es = [e for e in events if start <= e.year <= end]
-        kinds = Counter(e.kind for e in es)
+        end = start + 99
+        kinds = Counter(e.kind for e in events if start <= e.year <= end)
         centuries.append({
             "years": [start, end],
-            "events": len(es),
+            "events": sum(kinds.values()),
             "births": kinds["birth"],
             "deaths": kinds["death"],
             "wars_declared": kinds["war_declared"],
@@ -214,121 +197,106 @@ def main():
             "top_event_kinds": kinds.most_common(12),
         })
 
-    rank_counts = Counter(RANKS[rank(p.id)] for p in world.people.values() if p.alive)
-    species_counts = Counter(p.species for p in world.people.values() if p.alive)
-    settlement_counts = Counter(p.settlement for p in world.people.values() if p.alive)
-
     ranked_people = sorted(
         world.people,
-        key=lambda pid: (
-            rank(pid),
-            len(world.genealogy.children.get(pid, ())),
-            len(person_events.get(pid, ())),
-            -pid,
-        ),
+        key=lambda pid: (rank(pid), len(children.get(pid, ())), len(person_events.get(pid, ())), -pid),
         reverse=True,
     )
-    notable_people = [person_card(pid) for pid in ranked_people[:20] if rank(pid) > 0]
+    notable_people = [person_card(pid) for pid in ranked_people if rank(pid) > 0][:30]
 
-    prolific = sorted(
-        world.people,
-        key=lambda pid: (len(children.get(pid, ())), len(descendant_set(pid)), -pid),
-        reverse=True,
-    )
-    prolific_people = [
-        {
-            **person_card(pid),
-            "descendant_count": len(descendant_set(pid)),
-        }
-        for pid in prolific[:15] if children.get(pid)
-    ]
+    prolific = sorted(world.people, key=lambda pid: (len(children.get(pid, ())), -pid), reverse=True)
+    prolific_people = [person_card(pid) for pid in prolific if children.get(pid)][:20]
 
-    war_dead = []
-    for pid, ds in deaths.items():
-        if any(e.data.get("cause") == "war" for e in ds):
-            war_dead.append(person_card(pid))
-
-    threat_rows = []
+    threats = []
     for tid, t in sorted(world.threat_ecology.threats.items()):
-        if t.rank >= 3:
-            resolution_id = world.threat_ecology.resolutions.get(t.origin_event)
-            resolver = None
-            if resolution_id is not None:
-                ev = next((e for e in events if e.id == resolution_id), None)
-                if ev:
-                    resolver = pid_from_event(ev)
-            threat_rows.append({
-                "id": tid,
-                "kind": t.kind,
-                "form": t.form,
-                "rank": t.rank,
-                "location": t.location,
-                "created_year": t.created_year,
-                "status": t.status,
-                "resolver": resolver,
-                "resolver_card": person_card(resolver) if resolver in world.people else None,
-            })
-
-    churches = []
-    for cid, c in sorted(world.divinity.churches.items()):
-        churches.append({
-            "id": cid,
-            "god": c.god,
-            "settlement": c.settlement,
-            "founded_year": c.founded_year,
-            "authority": round(c.authority, 3),
-            "living_followers": sum(1 for pid in c.followers if pid in world.people and world.people[pid].alive),
-            "followers_recorded": len(c.followers),
-            "clergy_recorded": len(c.clergy),
+        if t.rank < 3:
+            continue
+        resolution_id = world.threat_ecology.resolutions.get(t.origin_event)
+        resolver = None
+        if resolution_id is not None:
+            ev = event_by_id.get(resolution_id)
+            if ev:
+                resolver = next((r.id for r in ev.actors if r.kind == "person"), None)
+        threats.append({
+            "id": tid,
+            "kind": t.kind,
+            "form": t.form,
+            "rank": t.rank,
+            "location": t.location,
+            "created_year": t.created_year,
+            "status": t.status,
+            "resolver": resolver,
+            "resolver_card": person_card(resolver) if resolver in world.people else None,
         })
 
-    god_manifestations = [compact_event(e) for e in events if e.kind == "god_manifested"]
-    resurrections = [compact_event(e) for e in events if e.kind == "resurrection"]
+    churches = [{
+        "id": cid,
+        "god": c.god,
+        "settlement": c.settlement,
+        "founded_year": c.founded_year,
+        "authority": round(c.authority, 3),
+        "living_followers": sum(1 for pid in c.followers if pid in world.people and world.people[pid].alive),
+        "followers_recorded": len(c.followers),
+        "clergy_recorded": len(c.clergy),
+    } for cid, c in sorted(world.divinity.churches.items())]
 
-    event_counts = Counter(e.kind for e in events)
-    report = {
+    def compact_event(e):
+        data = {k: v for k, v in e.data.items() if isinstance(v, (str, int, float, bool)) or v is None}
+        return {
+            "id": e.id, "year": e.year, "kind": e.kind,
+            "actors": [{"kind": r.kind, "id": r.id} for r in e.actors],
+            "location": None if e.location is None else {"kind": e.location.kind, "id": e.location.id},
+            "causes": list(e.causes), "data": data,
+        }
+
+    special = []
+    for e in events:
+        if e.kind in ("war_declared", "peace_settlement", "god_manifested", "resurrection"):
+            special.append(compact_event(e))
+        elif e.kind == "rank_advanced" and e.data.get("to_rank", 0) >= 3:
+            special.append(compact_event(e))
+        elif e.kind in ("ranked_magic_manifested", "ranked_threat_resolved") and e.data.get("rank", e.data.get("threat_rank", 0)) >= 4:
+            special.append(compact_event(e))
+
+    meta = {
         "seed": SEED,
         "year": world.year,
         "digest": world.digest(),
-        "population": {
-            "alive": sum(p.alive for p in world.people.values()),
-            "people_ever_recorded": len(world.people),
-            "species_alive": dict(species_counts),
-            "settlements_alive_population": dict(settlement_counts),
-            "ranks_alive": dict(rank_counts),
-            "households_alive": sum(1 for h in world.households.values() if h.alive and any(world.people[pid].alive for pid in h.members if pid in world.people)),
-        },
+        "simulation_seconds": round(analysis_started - started, 3),
+        "analysis_seconds": round(perf_counter() - analysis_started, 3),
+        "alive": sum(p.alive for p in world.people.values()),
+        "people_ever_recorded": len(world.people),
         "events_total": len(events),
-        "event_counts_top": event_counts.most_common(50),
-        "wars": wars,
-        "war_deaths": war_dead,
-        "families_top": families[:10],
-        "deepest_chain": deepest_chain,
-        "deepest_living_chain": deepest_living_chain,
-        "notable_ranked_people": notable_people,
-        "prolific_people": prolific_people,
-        "major_events": major_events[:250],
-        "major_events_truncated": len(major_events) > 250,
-        "centuries": centuries,
-        "rank3plus_threats": threat_rows,
-        "churches": churches,
-        "god_manifestations": god_manifestations,
-        "resurrections": resurrections,
-        "counts": {
-            "conflicts": len(world.warfare.conflicts),
-            "churches": len(world.divinity.churches),
-            "threats": len(world.threat_ecology.threats),
-            "threat_resolutions": len(world.threat_ecology.resolutions),
-            "practices": len(world.culture.practices),
-            "laws": len(world.culture.laws),
-            "relationships": len(world.social.edges),
-            "partnerships": len(world.social.partnerships),
-            "genealogical_births": len(world.genealogy.parents),
-            "trade_routes": len(world.trade_routes),
-            "trade_exchanges": sum(r.exchanges for r in world.trade_routes.values()),
-        },
+        "species_alive": dict(Counter(p.species for p in world.people.values() if p.alive)),
+        "settlement_population": dict(Counter(p.settlement for p in world.people.values() if p.alive)),
+        "ranks_alive": dict(Counter(RANKS[rank(p.id)] for p in world.people.values() if p.alive)),
+        "households_alive": sum(1 for h in world.households.values() if h.alive and any(world.people[pid].alive for pid in h.members if pid in world.people)),
+        "conflicts": len(world.warfare.conflicts),
+        "churches": len(world.divinity.churches),
+        "threats": len(world.threat_ecology.threats),
+        "threat_resolutions": len(world.threat_ecology.resolutions),
+        "practices": len(world.culture.practices),
+        "laws": len(world.culture.laws),
+        "relationships": len(world.social.edges),
+        "partnerships": len(world.social.partnerships),
+        "genealogical_births": len(world.genealogy.parents),
+        "trade_routes": len(world.trade_routes),
+        "trade_exchanges": sum(r.exchanges for r in world.trade_routes.values()),
+        "event_counts_top": Counter(e.kind for e in events).most_common(60),
     }
-    print("HISTORY_REPORT_JSON=" + json.dumps(report, sort_keys=True, separators=(",", ":")))
+
+    emit("REPORT_META", meta)
+    emit("WARS_JSON", wars)
+    emit("FAMILIES_JSON", families[:12])
+    emit("DEEPEST_CHAIN_JSON", deepest_chain)
+    emit("DEEPEST_LIVING_CHAIN_JSON", deepest_living_chain)
+    emit("NOTABLE_PEOPLE_JSON", notable_people)
+    emit("PROLIFIC_PEOPLE_JSON", prolific_people)
+    emit("CENTURIES_JSON", centuries)
+    emit("THREATS_JSON", threats[:80])
+    emit("CHURCHES_JSON", churches)
+    emit("SPECIAL_EVENTS_JSON", special[:300])
+    emit("DONE", {"ok": True, "elapsed_seconds": round(perf_counter() - started, 3)})
 
 
 if __name__ == "__main__":
