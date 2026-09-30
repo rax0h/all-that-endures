@@ -1,0 +1,23 @@
+name: multiseed-war-scan
+on:
+  push:
+    branches: [sol/multiseed-war-scan]
+permissions:
+  contents: read
+jobs:
+  scan:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [843001, 843017, 843103, 843211, 843509, 844003, 844321, 845009, 846013, 847117, 848501, 849999]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan 1000-year warfare emergence
+        run: python simulation/multiseed_war_scan.py ${{ matrix.seed }} --years 1000
