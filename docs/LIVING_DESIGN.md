@@ -1,7 +1,7 @@
 # ALL THAT ENDURES — Living Design Document
 
 **Status:** Living design authority for new simulation direction.  
-**Last cohesive update:** 2026-09-15  
+**Last cohesive update:** 2026-09-30  
 **Purpose:** Preserve design decisions as they become coherent. Before replacing an existing system, inspect the repository and extend shared causal primitives where possible.
 
 > **North star:** Not simulated stories. Simulated people whose lives become stories.
@@ -376,3 +376,112 @@ The answer should be traceable to the person and the world — never merely beca
 ## 33. Living-document rule
 
 This file is intended to remain in the repository and evolve. Add concepts after they are reconciled with existing canon and architecture. When implementation reveals that a design assumption is wrong, update this document alongside the code rather than letting design and simulation silently diverge.
+
+## 34. Simulation-driven visual realization and procedural 3D world
+
+ATE's long-term presentation target is a full 3D, AAA-quality RPG, intended to support first- or third-person play and eventual Unreal Engine 5-class production. Older 2.75D work may remain useful as a prototype or Visual World Laboratory, but it is not the final visual ceiling.
+
+The visual system must be built around one governing rule:
+
+> **The simulation owns reality. The renderer realizes that reality.**
+
+The simulation must never need to know what a mesh, particle system, texture, shader, LOD, neural renderer, or engine-specific asset is. It should know what physically and historically exists: materials, dimensions, age, condition, ownership, construction, repairs, damage, climate exposure, culture, wealth, use, terrain, vegetation, weather, bodies, clothing, equipment, and other causal state. A replaceable presentation layer translates those truths into the best graphics technology available.
+
+The intended pipeline is:
+
+**Simulation state -> physical/world description -> deterministic visual realization -> engine scene -> lighting/VFX/material rendering -> neural/future rendering layer.**
+
+This boundary is important because rendering technology will change much faster than the simulation. ATE should be able to adopt future neural rendering, reconstruction, lighting, material, animation, and generation systems without rewriting what happened in the world.
+
+### Procedural does not mean temporary or arbitrary
+
+World seeds and simulated history produce different settlements, landscapes, buildings, interiors, people, damage states, and cultural mixtures. The game therefore cannot depend on a fixed library of preset towns.
+
+Instead, visual realization should compile simulated state into persistent deterministic 3D form.
+
+- Stable world/entity identifiers plus deterministic visual seeds should reproduce the same unchanged place exactly.
+- Returning to a house should not reroll it.
+- When history changes the house, only the consequences of that history should change its realized form.
+- Expensive realized geometry may be cached or streamed; the authoritative source remains simulation state plus the minimum visual realization state needed for exact reproduction.
+- Large world changes should be patched incrementally rather than regenerating unrelated regions.
+
+A town is therefore not a prefab. It is the current visual projection of its terrain, economy, culture, population, infrastructure, construction history, disasters, maintenance, wealth, migration, conflict, trade, and individual lives.
+
+### Build visual languages, not maps
+
+The art workload should focus on high-quality visual grammars capable of expressing many historically valid worlds.
+
+Examples include structural systems, wall and roof families, foundations, beams, doors, windows, stairs, roads, bridges, furniture, tools, vegetation, clothing construction, material systems, damage states, decoration, and cultural motifs. Rules combine these elements according to actual simulated conditions.
+
+Architecture should emerge from constraints such as:
+
+- available local and traded materials;
+- climate, rainfall, wind, snow and terrain;
+- wealth and labor;
+- building skill and known techniques;
+- cultural preferences and prestige;
+- laws, defensive needs and land availability;
+- age, maintenance, expansion, fire, flood, storm and war damage;
+- historical contact, migration, conquest, imitation and trade.
+
+This allows one carefully authored architectural tradition to generate thousands of coherent buildings without making them look randomly assembled.
+
+### History must remain visible
+
+Visual state should expose actual history rather than select generic "old," "damaged," or "poor" variants.
+
+A building may visibly carry its construction age, materials, repairs, additions, water exposure, soot, cracking, replacement roof sections, storm damage, ownership changes, cheap repairs, abandonment, or later reuse. Roads can preserve ancient routes after the reason for the route has disappeared. A modern street can remain crooked because it once followed a creek centuries earlier. Border architecture can show genuine blended ancestry between cultures.
+
+The same principle applies to people and objects.
+
+A person's appearance may express inherited morphology, age, occupation, injuries, rank transformation, nutrition, climate exposure, fashion, wealth, sleep, labor, equipment and personal preference without replacing that person with a newly generated identity.
+
+An artifact's present appearance may derive from its material, maker, age, owners, repairs, use, storage, environmental exposure, battles, fire, water, magic and neglect. Do not select `OldSwordTexture07`; realize what this particular sword has become.
+
+### Hierarchical realization and streaming
+
+The same authoritative world should support multiple visual resolutions depending on distance and relevance.
+
+At continental or extreme distance, the renderer may need only terrain, water, vegetation masses, settlement silhouettes and large atmospheric systems. Closer ranges progressively realize roads, structures, vegetation, crowds, props, interiors, wear, possessions and fine material state.
+
+This is a presentation optimization, not a change in reality. The underlying settlement and its history remain the same at every distance.
+
+### Weather, disasters and physical consequences
+
+Dynamic events should be realized from their actual simulated state rather than by choosing canned spectacle.
+
+A tornado, flood, wildfire, blizzard, battle, magical disaster or structural collapse should inherit its appearance and effects from the conditions that produced it and the environment it encounters.
+
+For a tornado, relevant state may include wind field, pressure, moisture, terrain, soil, vegetation, structures, debris sources, rain, visibility and motion. Debris should come from actual affected materials where feasible. Damage should persist afterward because the same world was changed; there is no separate "after tornado" map.
+
+The goal is not merely movie-quality weather. The goal is a visually extraordinary event whose details are consequences of a real event in the simulation.
+
+### Neural rendering and future graphics technology
+
+ATE should be designed to benefit from neural rendering without depending on one named product or version.
+
+Technologies such as DLSS-style neural rendering can increasingly supply expensive final-frame detail, material response, lighting fidelity, reconstruction and related visual richness. Treat that capability as a replaceable renderer layer, not as the owner of world truth.
+
+This lets the project concentrate human effort where it has the highest enduring value:
+
+- simulation depth;
+- art direction;
+- coherent geometry and visual grammars;
+- persistent identity;
+- physical and historical state;
+- animation and behavior;
+- lighting intent;
+- causal environmental interaction.
+
+Future rendering systems may radically improve the final image. They must not be allowed to invent or overwrite the underlying history merely to make an attractive frame.
+
+### Visual architecture test
+
+For any visible thing, ask:
+
+> **If the graphics system were replaced tomorrow, would the simulation still contain enough truth to reconstruct why this thing looks this way?**
+
+If the answer is no, too much world truth has leaked into the renderer.
+
+ATE should not hand-author every possible world. It should build an exceptionally strong visual language and let thousands of years of simulation write with it.
+
