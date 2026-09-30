@@ -6,6 +6,8 @@ from time import perf_counter
 
 from ate_sim.worldgen import generate_world
 from ate_sim.engine import Simulation
+import ate_sim.engine as engine_module
+from ate_sim.warfare import warfare_step as base_warfare_step
 
 THRESHOLD = 0.58
 
@@ -46,31 +48,38 @@ def main(seed, years=1000):
     conflict_count_seen = 0
     first_conflict_year = None
 
-    for _ in range(years):
-        sim.step()
-        for pair, tension in sorted(world.warfare.tensions.items()):
+    def tracked_warfare_step(tracked_world, rng):
+        nonlocal conflict_count_seen, first_conflict_year
+        base_warfare_step(tracked_world, rng)
+        for pair, tension in sorted(tracked_world.warfare.tensions.items()):
             if pair not in peak or tension > peak[pair]["tension"]:
                 peak[pair] = {
                     "tension": round(tension, 6),
-                    "year": world.year,
-                    "context": pair_context(world, pair),
+                    "year": tracked_world.year,
+                    "context": pair_context(tracked_world, pair),
                 }
             above = tension >= THRESHOLD
             if above:
                 years_above[pair] += 1
                 current_streak[pair] += 1
                 longest_streak[pair] = max(longest_streak[pair], current_streak[pair])
-                first_above.setdefault(pair, world.year)
+                first_above.setdefault(pair, tracked_world.year)
                 if not was_above[pair]:
                     threshold_entries[pair] += 1
             else:
                 current_streak[pair] = 0
             was_above[pair] = above
-
-        if len(world.warfare.conflicts) > conflict_count_seen:
-            conflict_count_seen = len(world.warfare.conflicts)
+        if len(tracked_world.warfare.conflicts) > conflict_count_seen:
+            conflict_count_seen = len(tracked_world.warfare.conflicts)
             if first_conflict_year is None:
-                first_conflict_year = world.year
+                first_conflict_year = tracked_world.year
+
+    original_warfare_step = engine_module.warfare_step
+    engine_module.warfare_step = tracked_warfare_step
+    try:
+        sim.run(years)
+    finally:
+        engine_module.warfare_step = original_warfare_step
 
     event_counts = defaultdict(int)
     for e in world.events:
