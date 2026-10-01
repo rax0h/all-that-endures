@@ -25,7 +25,7 @@ def _font(size: int):
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Render multiple seed-specific settlement layouts as one comparison image.")
-    parser.add_argument("--seeds", type=int, nargs="+", default=[843000, 843001, 731])
+    parser.add_argument("--seeds", type=int, nargs="+", default=[843000, 23, 11, 1])
     parser.add_argument("--years", type=int, default=100)
     parser.add_argument("--settlement", type=int, default=1)
     parser.add_argument("--out", type=Path, required=True)
