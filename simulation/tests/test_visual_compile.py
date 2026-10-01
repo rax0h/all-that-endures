@@ -7,8 +7,11 @@ def test_compiler_uses_real_settlement_spatial_state():
     world = generate_world(843000)
     Simulation(world).run(5)
     spec = compile_settlement_visual_spec(world, 1)
-    settlement = world.settlements[1]
-    center = world.cells[(settlement.x, settlement.y)]
+    center_patch = next(
+        patch
+        for patch in world.settlement_space.terrain_patches.values()
+        if patch.settlement == 1 and patch.grid_x == 0 and patch.grid_y == 0
+    )
 
     assert spec.world_seed == world.seed
     assert spec.time_slice_year == 5
@@ -17,8 +20,13 @@ def test_compiler_uses_real_settlement_spatial_state():
     assert spec.metadata["population"] == str(
         sum(1 for p in world.people.values() if p.alive and p.settlement == 1)
     )
-    assert spec.terrain_regions[0].elevation_band == (center.elevation, center.elevation)
-    assert spec.terrain_regions[0].moisture == center.moisture
+    compiled_center = next(
+        region
+        for region in spec.terrain_regions
+        if region.region_id == f"terrain-patch:{center_patch.id}"
+    )
+    assert compiled_center.elevation_band == (center_patch.elevation, center_patch.elevation)
+    assert compiled_center.moisture == center_patch.moisture
     assert len(spec.parcels) > 0
     assert len(spec.buildings) > 0
     assert len(spec.roads) > 0
