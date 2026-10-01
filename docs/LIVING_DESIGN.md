@@ -688,3 +688,236 @@ For every deep simulation feature, ask two separate questions:
 Complexity belongs beneath the player.
 
 Clarity, responsiveness, beauty, danger, discovery, agency, and consequence belong in front of them.
+
+
+## 36. Life-path depth: no disposable side activities
+
+ATE should not divide the world into "the real game" and shallow side activities.
+
+> **If a person could plausibly build a life around something, that thing must eventually be rich enough to support a life.**
+
+Fishing, farming, cooking, smithing, trade, medicine, hunting, construction, scholarship, teaching, tailoring, mining, animal husbandry, sailing, crafting, and similar pursuits should not be reduced to decorative minigames or a single skill number that silently increases output.
+
+This does not mean every profession needs maximum mechanical complexity or thousands of bespoke interactions. It means each life-path needs meaningful internal structure.
+
+Where appropriate, a mature profession should contain:
+
+- real knowledge that can be discovered, remembered, taught, guarded, forgotten, improved, or passed through families and institutions;
+- tools with properties and intended uses rather than generic numerical upgrades;
+- techniques, judgment, timing, environment, preparation, and experience;
+- meaningful differences between novices, competent practitioners, specialists, and masters;
+- regional, cultural, family, institutional, and personal traditions;
+- relationships with other professions and supply chains;
+- mistakes, risks, shortcuts, innovation, and changing conditions;
+- outputs whose usefulness, quality, provenance, and reputation can matter;
+- enough variety that two masters in the same profession can practice it differently.
+
+### Fishing as the model example
+
+Fishing should illustrate the intended standard.
+
+A skilled fisher may learn depth, current, temperature, weather, seasonal movement, spawning behavior, prey, vegetation, shade, bottom composition, water clarity, predator pressure, magical ecology, bait, lure behavior, hook choice, line, boats, nets, preservation, and local geography.
+
+A good fishing location is good because conditions make it good, not because it contains a hidden `rare_fish_bonus`.
+
+Those conditions can change.
+
+Floods can reshape channels. Construction can alter flow. Pollution can ruin spawning grounds. Predators can move in or disappear. Climate and weather can shift seasonal behavior. Human pressure can overfish a population. A bridge, mill, dam, settlement, magical event, or ecological change can make old knowledge obsolete or create new opportunities.
+
+A fisher who spends decades learning one river may possess knowledge no newcomer has. That knowledge can be taught to children or apprentices, sold, concealed, written down, distorted, or lost.
+
+The player should also become better through experience. Character capability and accumulated knowledge can expose useful observations and improve execution without reducing the activity to automated success.
+
+### Knowledge creates professional history
+
+Professional knowledge should participate in the same historical model as everything else.
+
+A family may know a river for generations. A smithing tradition may develop characteristic methods. A healer may discover a treatment others later teach. A cook may create a preparation that becomes regional cuisine. A lure-maker may invent a design that carries a family name centuries later. Farming practices may adapt through generations of observation and selective breeding.
+
+Professions are therefore not isolated mechanics. They are domains through which civilization develops.
+
+### Depth without chores
+
+Richness does not mean requiring the player to perform every microscopic repetition forever.
+
+A master smith should not become "deeper" because the player must click the hammer thousands of times. Expertise should allow the player to operate at the level where decisions remain meaningful while routine execution becomes increasingly fluent, delegated, embodied, or automated where that makes sense in-world.
+
+The target is not maximum complication.
+
+The target is maximum meaningfulness.
+
+An adventurer who fishes twice should feel that fishing belongs to a deep discipline. A player who devotes an entire life to fishing should find enough knowledge, challenge, change, mastery, relationships, equipment, ecology, economics, and personal history to make that life worth playing.
+
+## 37. Diegetic multiplayer, intersecting worlds, expeditions, and shared risk
+
+ATE must remain a complete and exceptional single-player game.
+
+Multiplayer must never require turning the player's living world into a conventional public server, lobby, or MMO shard. It should arise from capabilities, places, artifacts, institutions, and cosmological rules that genuinely exist inside the setting.
+
+> **Multiplayer adds human presence to the living world. It must not turn the living world into a multiplayer lobby.**
+
+A player who never uses networked features should still receive the complete core RPG and living-world experience.
+
+### Multiplayer requires an in-world reason
+
+The game should not treat a Steam friend list or menu button as sufficient fictional justification for crossing worlds.
+
+If someone enters an astral space, they must reach or possess whatever enables that transit.
+
+If another player is invited into a personal world, some real capability must make that possible: portal magic, an artifact, a ritual, infrastructure, a soulspace ability, an institution, a stable dimensional route, or another setting-consistent mechanism.
+
+The exact mechanisms remain open to cosmology design, but the governing principle is not open:
+
+> **If something happens to a person in ATE, there must be an in-world reason it can happen to that person.**
+
+This applies equally to multiplayer access, inter-world travel, world invitations, shared expeditions, tournaments, special housing, trade, and other networked interactions.
+
+### Personal worlds remain personal
+
+A player's world contains actual history: families, settlements, dead characters, artifacts, former player-inhabited people, mistakes, relationships, wars, businesses, institutions, and places with potentially hundreds of hours of accumulated meaning.
+
+Inviting another human into that world should therefore become a meaningful act rather than casual lobby access.
+
+Different degrees of presence may eventually exist — observation, projection, limited interaction, full physical access, or other forms — but full consequential presence should require genuine trust and suitable in-world capability.
+
+If another player is truly present and capable of acting materially, their actions should be real. Saving someone, destroying property, stealing an object, killing a person, helping construct something, changing a relationship, or altering history cannot become consequence-free simply because the actor is another human.
+
+The host must nevertheless retain sufficient protection against unwanted destruction of a long-lived world. The exact player-safety and permission design remains open and should be reconciled with the fiction rather than ignored.
+
+The emotional target is:
+
+> **You do not merely invite someone to a session. You invite them into your history.**
+
+### Shared spaces can have different stakes
+
+Not every connected space should follow the same death rule.
+
+**Mirage spaces** are projected or otherwise protected spaces in which participants can train, duel, compete, experiment, and die within the experience without that death automatically killing the actual person. They can support tournaments, organized PvP, team contests, training environments, and spectacular rule sets without trivializing mortality in the real world.
+
+**Astral spaces** can be genuinely dangerous. Entering them may expose the actual soul or otherwise place the person at real risk. Death can be real where the cosmology says it is real.
+
+**Physical or astral expeditions** may also carry genuine mortality. Some expeditions may use protected projection; others may transport people into places from which they may not return.
+
+The entry mechanism and nature of the destination determine the stakes. Do not impose one universal multiplayer death rule.
+
+This distinction should create different cultures of preparation.
+
+A tournament can encourage wild experimentation.
+
+A lethal astral expedition should make people prepare equipment, party composition, healing, escape plans, logistics, contracts, and whether the reward is worth risking an actual life.
+
+### Mirage chambers and tournament realms
+
+Mirage chambers can become real institutions and places in civilization rather than matchmaking terminals disguised as architecture.
+
+Cities may maintain famous chambers. Cultures may use them differently: athletics, military training, magical research, prestige competition, public entertainment, private dueling, or professional tournament circuits.
+
+Tournament spaces can range from simple arenas to large generated environments: forests, ruins, cities, mountains, naval spaces, survival trials, monster hunts, team battles, objective-based conflicts, or other magical realms.
+
+Tournaments can accumulate genuine history.
+
+Participants can become famous. Rivalries can persist outside the chamber. Institutions can sponsor competitors. Spectators can attend. Wagers, careers, training traditions, scandals, and legendary matches can emerge around them.
+
+### Expeditions are undertakings, not a game mode
+
+"Expedition" should describe what people are doing, not a predefined content category.
+
+An expedition emerges when one or more people decide that something worth accomplishing requires leaving ordinary safety, assembling capability, traveling somewhere difficult, and accepting unusual uncertainty or risk.
+
+The causes can be almost anything:
+
+- exploration;
+- monster hunting;
+- archaeology;
+- rescue;
+- scholarship or mapping;
+- acquisition of an artifact;
+- collection of rare medicine or magical material;
+- pilgrimage;
+- trade-route establishment;
+- diplomacy or first contact;
+- military reconnaissance;
+- colonization or settlement;
+- mining or resource surveys;
+- ecological study;
+- a search for a missing person;
+- recovery of lost property;
+- a dangerous hunt or fishery;
+- personal curiosity;
+- a private patron's unusual objective.
+
+Some expeditions are carefully financed and organized for years. Others begin with a few people deciding to see what is over a mountain.
+
+An expedition should have whatever its circumstances actually require: purpose, destination, leadership, participants, knowledge, transportation, supplies, financing, contracts, reward terms, specialists, rank restrictions, legal or institutional authority, and risk.
+
+Not every expedition succeeds. Some return rich. Some discover nothing. Some lose people. Some disappear. Some accidentally change history. Some become famous only after later generations understand what they found.
+
+The simulation does not declare an expedition historically important in advance.
+
+### Restrictions should arise from the place
+
+A destination may be accessible only to certain ranks, physiologies, magical characteristics, numbers of people, or forms of transit because the place itself imposes those conditions.
+
+A powerful Gold- or Diamond-ranker may therefore genuinely need Iron-rank people to accomplish something they cannot personally do.
+
+For example, a high-rank patron might seek an artifact inside a realm that only Iron-rankers can enter. They could recruit a large group, finance the journey, set contract terms, and offer a spectacular reward to whoever succeeds.
+
+This is not a `Required Level: 20` gate.
+
+It is a property of reality.
+
+That distinction allows low-rank people to matter to extremely powerful people without pretending their raw capabilities are equivalent.
+
+### Multiplayer participants and simulated participants coexist
+
+Expeditions, tournaments, organizations, and shared spaces do not need to segregate humans from simulated people.
+
+An expedition might contain one human player and five simulated companions, four human players among thirty simulated participants, or a large event with many humans present.
+
+The world should not need to treat human-controlled people as a separate species of person.
+
+### Cross-world exchange must remain part of the world
+
+Inter-world trade, if adopted, must not flatten local economies into an unrestricted global auction house.
+
+Goods crossing worlds should remain actual objects with provenance, makers, materials, histories, restrictions, transport mechanisms, scarcity, and consequences.
+
+A weapon forged by a player's smith in another world can be meaningful precisely because it remains the work of that person. If the smith later dies, surviving objects can outlive them in other histories.
+
+The exact scope of cross-world markets remains open. Protect local causality and avoid allowing network optimization or real-money-style pressures to erase the simulated economies.
+
+### Asynchronous traces and messages remain promising but open
+
+Souls-like messages, notes, warnings, discoveries, rumors, maps, or other limited traces between players could fit ATE extremely well if grounded in an actual magical or cosmological mechanism.
+
+Do not yet canonize the exact form.
+
+The important boundary is that asynchronous presence should enrich discovery without filling intimate worlds with immersion-breaking spam or omniscient information.
+
+### Cloud houses are real magical property
+
+Cloud houses should exist in ATE.
+
+They are not cosmetic housing skins or menu instances. They are actual magical homes with ownership, location or movement, interiors, storage, guests, history, provenance, and whatever capabilities their individual construction provides.
+
+Different cloud houses may vary substantially in size, quality, mobility, defenses, comfort, magical features, prestige, age, condition, and history.
+
+They can be awarded, purchased, inherited, gifted, damaged, repaired, modified, lost, stolen where possible, or passed down.
+
+A cloud house awarded as the prize for a dangerous expedition should remain that same object centuries later. Its history can include its builder, owners, journeys, repairs, battles, accidents, guests, deaths, modifications, and changing social meaning.
+
+Do not generate "legendary player housing."
+
+Let a house become legendary because of what actually happened to it.
+
+### Networked-world design test
+
+For any multiplayer feature, ask:
+
+1. **What exists inside the world that allows this interaction to happen?**
+2. **What form of the person actually crosses the boundary — projection, soul, body, object, information, or something else?**
+3. **What are the real stakes of that form of entry?**
+4. **Can a player ignore the feature completely and still have the full single-player game?**
+5. **Does the feature preserve local history and causality rather than replacing them with lobby logic?**
+
+If those questions cannot be answered coherently, the multiplayer feature is not ready to become canon.
