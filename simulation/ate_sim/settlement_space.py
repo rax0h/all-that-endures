@@ -564,29 +564,6 @@ def _origin_event_for_household(world, hid):
     return None
 
 
-def _next_slot(world, sid, rng):
-    state = world.settlement_space
-    index = state.lot_cursor.get(sid, 0)
-    if index >= len(_LOT_SLOTS):
-        # Beyond the authored slot envelope, extend outward in deterministic rings.
-        ring_index = index - len(_LOT_SLOTS)
-        ring = 1 + ring_index // 24
-        offset = ring_index % 24
-        angle = 2 * math.pi * (offset / 24.0)
-        radius = 175 + ring * 24
-        x = math.cos(angle) * radius
-        y = math.sin(angle) * radius
-        street_key = "main" if abs(y) < abs(x) else "cross"
-        facing = math.degrees(math.atan2(-y, -x))
-    else:
-        street_key, x, y, facing = _LOT_SLOTS[index]
-    state.lot_cursor[sid] = index + 1
-    _ensure_street(world, sid, street_key, rng)
-    angle = _ensure_orientation(world, sid, rng)
-    rx, ry = _rotate(x, y, angle)
-    return rx, ry, (facing + angle) % 360.0
-
-
 def _residence_dimensions(world, hid):
     household = world.households[hid]
     living = sum(1 for pid in household.members if world.people[pid].alive)
