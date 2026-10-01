@@ -49,7 +49,7 @@ def visual_spec_from_dict(payload: Mapping[str, Any]) -> SettlementVisualSpec:
             elevation_band=tuple(float(v) for v in item.get("elevation_band", (0.0, 0.0))),
             soil_family=str(item.get("soil_family", "unknown")),
             moisture=float(item.get("moisture", 0.0)),
-            disturbance=float(item.get("disturbance", 0.0)),
+            disturbance=(None if item.get("disturbance") is None else float(item.get("disturbance"))),
             provenance=_prov(item.get("provenance")),
             surface_kind=str(item.get("surface_kind", "land")),
         )
@@ -174,6 +174,7 @@ def visual_spec_from_dict(payload: Mapping[str, Any]) -> SettlementVisualSpec:
         weather=weather,
         magic_manifestations=magic,
         metadata={str(k): str(v) for k, v in payload.get("metadata", {}).items()},
+        focus_position=(_vec(payload["focus_position"]) if payload.get("focus_position") is not None else None),
         schema_version=str(payload["schema_version"]),
     )
 
