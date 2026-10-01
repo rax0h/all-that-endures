@@ -104,3 +104,66 @@ def test_physical_intersettlement_roads_create_local_gateways():
         a, b = asset.settlements
         assert (a, f"gateway:{b}") in world.settlement_space.street_ids
         assert (b, f"gateway:{a}") in world.settlement_space.street_ids
+
+
+
+def test_local_terrain_is_authoritative_and_persistent():
+    world = generate_world(843000)
+
+    patches = [
+        patch
+        for patch in world.settlement_space.terrain_patches.values()
+        if patch.settlement == 1
+    ]
+    assert len(patches) == 19 * 19
+    assert all(0.0 <= patch.elevation <= 1.0 for patch in patches)
+    assert all(0.0 <= patch.moisture <= 1.0 for patch in patches)
+    assert all(0.0 <= patch.fertility <= 1.0 for patch in patches)
+    assert all(0.0 <= patch.forest <= 1.0 for patch in patches)
+    assert {patch.surface_kind for patch in patches} <= {"land", "wetland", "rock"}
+
+    restored = loads(dumps(world))
+    assert restored.settlement_space.terrain_patches == world.settlement_space.terrain_patches
+
+
+def test_founder_fields_are_real_land_use_with_provenance():
+    world = generate_world(843000)
+
+    fields = [
+        field
+        for field in world.settlement_space.fields.values()
+        if field.settlement == 1 and field.active
+    ]
+    assert fields
+    for field in fields:
+        patch = world.settlement_space.terrain_patches[field.terrain_patch]
+        assert patch.settlement == 1
+        assert field.origin_event in world.event_ids
+        event = next(e for e in world.events if e.id == field.origin_event)
+        assert event.kind == "field_cleared"
+
+
+def test_fields_can_expand_with_settlement_history():
+    world = generate_world(843000)
+    before = sum(
+        1 for field in world.settlement_space.fields.values()
+        if field.settlement == 1 and field.active
+    )
+
+    Simulation(world).run(100)
+
+    after = sum(
+        1 for field in world.settlement_space.fields.values()
+        if field.settlement == 1 and field.active
+    )
+    assert after >= before
+
+
+def test_local_hydrology_is_seeded_from_site_conditions():
+    world = generate_world(843000)
+
+    assert world.settlement_space.watercourses
+    for water in world.settlement_space.watercourses.values():
+        assert water.width_m > 0
+        assert len(water.points_m) >= 2
+        assert water.kind in {"river", "stream", "seasonal_drainage"}
