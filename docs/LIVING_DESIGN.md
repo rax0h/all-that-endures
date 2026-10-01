@@ -921,3 +921,112 @@ For any multiplayer feature, ask:
 5. **Does the feature preserve local history and causality rather than replacing them with lobby logic?**
 
 If those questions cannot be answered coherently, the multiplayer feature is not ready to become canon.
+
+
+## 38. Emergent roles: do the thing before the world names it
+
+ATE should avoid career-mode selectors, identity buttons, and abstract role assignment wherever a lived path can emerge from ordinary action.
+
+The player should not choose `Become Merchant`, `Become Criminal`, `Become Hunter`, `Become Scholar`, `Create Gang`, `Found School`, or similar high-level identities from a menu unless an in-world institution is literally offering a formal role that requires such a choice.
+
+Instead:
+
+> **Do the thing. Become known for doing the thing. Let the world decide what that makes you.**
+
+A person becomes a merchant by trading, building supplier relationships, moving goods, managing risk, learning prices, extending credit, hiring help, and developing a reputation.
+
+A person becomes a hunter by learning animals, terrain, signs, weather, weapons, processing, danger, and where the work is.
+
+A person becomes a teacher because other people begin learning from them.
+
+A group becomes a gang, guild, company, school, expedition party, household name, political faction, or institution because repeated relationships and coordinated activity make that description increasingly true.
+
+The simulation should prefer **behavior first, label second**.
+
+### Opportunity comes from the world
+
+ATE should repeatedly ask:
+
+**What is the player trying to do, and do they actually have the means to do it?**
+
+That means a desired life-path should arise through concrete access:
+
+- knowledge;
+- tools;
+- money;
+- relationships;
+- reputation;
+- location;
+- timing;
+- physical ability;
+- magic;
+- legal standing;
+- transportation;
+- information;
+- opportunity;
+- willingness to accept risk.
+
+If the player wants to do something unusual, the game should not first ask whether a predefined career supports it.
+
+It should ask whether the world supports it.
+
+### Preparation is part of play
+
+Many meaningful activities should reward observation and preparation rather than appearing as instant context actions.
+
+A person who wants to intercept trade, discover a resource, open a business, hunt a dangerous creature, organize an expedition, become a respected craftsperson, manipulate a market, investigate a mystery, or build an institution may need to spend time learning how the surrounding world actually works.
+
+That can include watching routes, learning schedules, asking questions, cultivating contacts, testing tools, studying terrain, gaining trust, securing financing, training, scouting, experimenting, or simply waiting for the right conditions.
+
+Preparation should not become mandatory busywork. It matters when the undertaking itself logically requires knowledge or setup.
+
+### Consequences emerge from affected people and systems
+
+ATE should resist generic consequence meters when more specific causal consequences are available.
+
+An action can alter:
+
+- what particular people know or believe;
+- relationships;
+- prices and availability;
+- security;
+- travel behavior;
+- local reputation;
+- institutional policy;
+- family decisions;
+- employment;
+- ecological pressure;
+- political responses;
+- investigation;
+- opportunity;
+- future risk.
+
+The world reacts because something happened to someone or something, not because the player filled a hidden morality, crime, career, or prosperity bar.
+
+Abstract summaries may exist where useful, but they must summarize deeper state rather than replace it.
+
+### Discovery over feature advertising
+
+ATE should not present itself as "a game where you can do everything."
+
+That promise is both impossible and contrary to the desired player experience.
+
+The better goal is:
+
+> **The player should repeatedly discover that something they assumed was background scenery is actually part of the playable world.**
+
+A boat can be owned because boats are real property.
+A forge can be worked because smithing is a real discipline.
+A caravan can be joined because it is actually traveling somewhere.
+A route can be established because goods and people genuinely move.
+A life can be built around fishing because the water, fish, knowledge, tools, buyers, weather, and traditions all exist.
+
+The desired reaction is not:
+
+*"The feature list says I can do this."*
+
+It is:
+
+*"Wait. I can actually do this?"*
+
+ATE should cultivate unexpected possibility rather than advertise infinite possibility.
