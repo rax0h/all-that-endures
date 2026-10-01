@@ -58,3 +58,49 @@ def test_spatial_state_contains_real_streets_and_nonresidential_structures_after
     assert "dwelling" in kinds or "leased_dwelling" in kinds
     # Repeated trade establishes a market in at least one settlement in the canonical seed.
     assert any(kind == "market_hall" for kind in kinds)
+
+
+
+def test_different_world_seeds_produce_different_site_plans():
+    first = generate_world(843000)
+    second = generate_world(843001)
+
+    profile_a = first.settlement_space.site_profiles[1]
+    profile_b = second.settlement_space.site_profiles[1]
+    plan_a = (
+        profile_a.archetype,
+        round(profile_a.main_angle_degrees, 4),
+        round(profile_a.curvature_m, 4),
+        tuple(
+            (round(p.center_x_m, 3), round(p.center_y_m, 3))
+            for p in sorted(first.settlement_space.parcels.values(), key=lambda p: p.id)
+            if p.settlement == 1
+        ),
+    )
+    plan_b = (
+        profile_b.archetype,
+        round(profile_b.main_angle_degrees, 4),
+        round(profile_b.curvature_m, 4),
+        tuple(
+            (round(p.center_x_m, 3), round(p.center_y_m, 3))
+            for p in sorted(second.settlement_space.parcels.values(), key=lambda p: p.id)
+            if p.settlement == 1
+        ),
+    )
+
+    assert plan_a != plan_b
+
+
+def test_physical_intersettlement_roads_create_local_gateways():
+    world = Simulation(generate_world(843000)).run(100)
+
+    physical = [
+        asset
+        for asset in world.infrastructure.assets.values()
+        if asset.kind == "road" and len(asset.settlements) == 2
+    ]
+    assert physical
+    for asset in physical:
+        a, b = asset.settlements
+        assert (a, f"gateway:{b}") in world.settlement_space.street_ids
+        assert (b, f"gateway:{a}") in world.settlement_space.street_ids
