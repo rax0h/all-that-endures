@@ -27,3 +27,18 @@ jobs:
         run: python simulation/specific_test.py --seed 843000 --years 10 --section all
       - name: deterministic 100-year smoke history
         run: python simulation/run_long_history.py 843000 100
+      - name: render simulated settlement preview
+        run: |
+          mkdir -p artifacts
+          python simulation/render_simulated_settlement.py \
+            --seed 843000 \
+            --years 100 \
+            --settlement 1 \
+            --radius-cells 6 \
+            --out-spec artifacts/settlement_843000_y100_s1.json \
+            --out-map artifacts/settlement_843000_y100_s1.png
+      - name: upload simulated settlement preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulated-settlement-preview
+          path: artifacts/
