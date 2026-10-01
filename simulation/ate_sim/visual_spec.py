@@ -47,6 +47,18 @@ class TerrainRegionSpec:
 
 
 @dataclass(frozen=True)
+class ParcelSpec:
+    parcel_id: str
+    position: Vec3
+    facing_degrees: float
+    size_m: tuple[float, float]
+    land_use: str
+    owner_kind: str | None
+    owner_id: str | None
+    provenance: ProvenanceRef
+
+
+@dataclass(frozen=True)
 class RoadSpec:
     road_id: str
     centerline: Polyline
@@ -143,6 +155,7 @@ class SettlementVisualSpec:
     visual_seed: int
     time_slice_year: int
     terrain_regions: tuple[TerrainRegionSpec, ...] = ()
+    parcels: tuple[ParcelSpec, ...] = ()
     roads: tuple[RoadSpec, ...] = ()
     buildings: tuple[BuildingSpec, ...] = ()
     vegetation_zones: tuple[VegetationZoneSpec, ...] = ()
@@ -223,6 +236,9 @@ def require_major_provenance(spec: SettlementVisualSpec) -> None:
     for region in spec.terrain_regions:
         if region.provenance is None:
             missing.append(f"terrain:{region.region_id}")
+    for parcel in spec.parcels:
+        if parcel.provenance is None:
+            missing.append(f"parcel:{parcel.parcel_id}")
     for road in spec.roads:
         if road.provenance is None:
             missing.append(f"road:{road.road_id}")
