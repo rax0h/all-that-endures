@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import hashlib
 import math
 from pathlib import Path
 from typing import Iterable
@@ -18,8 +19,13 @@ class PreviewStyle:
     background: str = "#d8d0bd"
     land: str = "#b8aa86"
     disturbed_land: str = "#a99370"
-    water: str = "#6f9fb2"
-    vegetation: str = "#6f8657"
+    water: str = "#5d96ad"
+    seasonal_water: str = "#88a9ad"
+    wetland: str = "#7f9981"
+    field: str = "#b7a66b"
+    field_line: str = "#8f7e4f"
+    rock: str = "#918d84"
+    vegetation: str = "#5f7f4d"
     vegetation_outline: str = "#506441"
     road: str = "#685a48"
     parcel_fill: str = "#d8c9a4"
@@ -39,6 +45,8 @@ def _all_points(spec: SettlementVisualSpec) -> Iterable[Vec3]:
         yield from region.boundary
     for parcel in spec.parcels:
         yield parcel.position
+    for watercourse in spec.watercourses:
+        yield from watercourse.centerline.points
     for road in spec.roads:
         yield from road.centerline.points
     for building in spec.buildings:
@@ -150,9 +158,15 @@ def render_settlement_preview(
             continue
         if region.surface_kind == "water":
             fill = style.water
+        elif region.surface_kind == "wetland":
+            fill = style.wetland
+        elif region.surface_kind == "field":
+            fill = style.field
+        elif region.surface_kind == "rock":
+            fill = style.rock
         else:
-            # Use only supplied terrain facts. Elevation darkens the base earth tone;
-            # moisture adds a green cast. This is diagnostic styling, not new world state.
+            # Elevation and moisture are real supplied terrain facts. The palette
+            # converts them into readable map shading without inventing geometry.
             elevation = sum(region.elevation_band) / 2.0
             moisture = max(0.0, min(1.0, region.moisture))
             base = (184, 170, 134)
@@ -160,9 +174,31 @@ def render_settlement_preview(
             g = int(max(70, min(210, base[1] - elevation * 35 + moisture * 26)))
             b = int(max(70, min(210, base[2] - elevation * 18)))
             fill = (r, g, b, 255)
-            if region.disturbance is not None and region.disturbance >= 0.45:
-                fill = style.disturbed_land
-        draw.polygon(polygon, fill=fill, outline=style.text)
+        # No hard per-patch outline: local terrain should read as a landscape,
+        # not return to the spreadsheet grid that the first preview exposed.
+        draw.polygon(polygon, fill=fill)
+
+        if region.surface_kind == "field" and len(polygon) == 4:
+            # Diagnostic furrows make cultivated terrain legible while preserving
+            # the exact field polygon supplied by the simulation.
+            p0, p1, p2, p3 = polygon
+            for step in (0.2, 0.4, 0.6, 0.8):
+                ax = p0[0] + (p3[0] - p0[0]) * step
+                ay = p0[1] + (p3[1] - p0[1]) * step
+                bx = p1[0] + (p2[0] - p1[0]) * step
+                by = p1[1] + (p2[1] - p1[1]) * step
+                draw.line((ax, ay, bx, by), fill=style.field_line, width=1)
+
+    # Watercourses.
+    for watercourse in spec.watercourses:
+        points = [_transform(point, bounds, style) for point in watercourse.centerline.points]
+        if len(points) < 2:
+            continue
+        width = max(3, round(watercourse.width_m * world_scale))
+        # A darker bank edge helps the water sit inside the terrain.
+        draw.line(points, fill="#4f716f", width=width + 4, joint="curve")
+        water_fill = style.water if watercourse.perennial else style.seasonal_water
+        draw.line(points, fill=water_fill, width=width, joint="curve")
 
     # Vegetation.
     for zone in spec.vegetation_zones:
@@ -173,8 +209,25 @@ def render_settlement_preview(
         draw.polygon(
             polygon,
             fill=style.vegetation + f"{alpha:02x}",
-            outline=style.vegetation_outline,
         )
+        # Stable stippling gives forest mass some texture and makes its edge read
+        # without claiming exact tree-by-tree positions.
+        seed = hashlib.sha256(zone.zone_id.encode("utf-8")).digest()
+        count = max(2, min(14, round(zone.density * 13)))
+        xs = [point[0] for point in polygon]
+        ys = [point[1] for point in polygon]
+        left, right = min(xs), max(xs)
+        top, bottom = min(ys), max(ys)
+        for index in range(count):
+            a = seed[(index * 2) % len(seed)] / 255.0
+            b = seed[(index * 2 + 1) % len(seed)] / 255.0
+            x = left + (right - left) * (0.12 + 0.76 * a)
+            y = top + (bottom - top) * (0.12 + 0.76 * b)
+            radius = max(1.0, min(3.0, 0.7 + zone.density * 2.0))
+            draw.ellipse(
+                (x - radius, y - radius, x + radius, y + radius),
+                fill=style.vegetation_outline + "b0",
+            )
 
     # Parcels.
     for parcel in spec.parcels:
@@ -291,8 +344,10 @@ def render_settlement_preview(
             outline=style.text,
         )
         entries = [
-            ("water", style.water),
-            ("vegetation", style.vegetation),
+            ("watercourse", style.water),
+            ("wetland", style.wetland),
+            ("field", style.field),
+            ("forest", style.vegetation),
             ("parcel", style.parcel_outline),
             ("road", style.road),
             ("building", style.building),
