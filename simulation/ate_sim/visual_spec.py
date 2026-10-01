@@ -43,6 +43,7 @@ class TerrainRegionSpec:
     moisture: float
     disturbance: float
     provenance: ProvenanceRef
+    surface_kind: str = "land"
 
 
 @dataclass(frozen=True)
@@ -81,6 +82,7 @@ class BuildingSpec:
     occupancy: str
     phases: tuple[BuildingPhaseSpec, ...]
     provenance: ProvenanceRef
+    footprint_size_m: tuple[float, float] = (8.0, 6.0)
 
 
 @dataclass(frozen=True)
