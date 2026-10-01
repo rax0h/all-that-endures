@@ -181,6 +181,7 @@ def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int 
         if household.alive and any(world.people[pid].alive for pid in household.members)
     ]
 
+    profile = world.settlement_space.site_profiles.get(settlement_id)
     metadata = {
         "ambient_magic": f"{ambient.level:.3f}",
         "buildings": str(len(buildings)),
@@ -196,6 +197,15 @@ def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int 
         "roads_index": f"{settlement.roads:.3f}",
         "scarcity": f"{local.scarcity:.3f}",
     }
+    if profile is not None:
+        metadata.update({
+            "site_archetype": profile.archetype,
+            "site_main_axis": f"{profile.main_angle_degrees:.1f} deg",
+            "site_slope": f"{profile.slope_strength:.4f}",
+            "site_moisture_gradient": f"{profile.moisture_gradient:.4f}",
+            "site_forest_gradient": f"{profile.forest_gradient:.4f}",
+            "growth_bias": f"{profile.growth_bias_degrees:.1f} deg",
+        })
 
     return SettlementVisualSpec(
         settlement_id=f"settlement:{settlement_id}",
