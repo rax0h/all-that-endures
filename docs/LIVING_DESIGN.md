@@ -1030,3 +1030,375 @@ It is:
 *"Wait. I can actually do this?"*
 
 ATE should cultivate unexpected possibility rather than advertise infinite possibility.
+
+## 39. Future-facing development architecture
+
+ATE should be designed for the game-development environment that is arriving, not only for the production constraints of 2026.
+
+AI-assisted coding, neural rendering, generated animation, dynamic voice, procedural asset realization, automated testing, system analysis, and agent-driven implementation are expected to change rapidly during the years in which ATE is being built. The project should therefore avoid binding its deepest simulation work to whichever rendering, content-production, or authoring techniques happen to be current when a subsystem is first implemented.
+
+The governing principle is:
+
+> **Reality first. Generation second.**
+
+The canonical world state must determine what is true.
+
+Presentation systems may interpret and express that truth through meshes, animation, speech, neural rendering, conventional rendering, procedural generation, sound, cinematography, or future techniques that do not yet exist. Those presentation systems must not become the authority for what happened.
+
+A town should exist because the simulation contains the people, buildings, roads, ownership, history, ecology, economy, institutions, and conditions that make the town real. A future realization layer may then decide how that state becomes a visible AAA-quality environment.
+
+The same principle applies to characters.
+
+The simulation should know who a person is, what they remember, what they believe, what they can do, what injuries they carry, what relationships they have, what languages they know, what promises they have made, and what they are trying to accomplish. A dialogue or voice system may then express that person. It must not invent a replacement person every time the player speaks to them.
+
+This allows future technology to improve the presentation without forcing the world model to be rebuilt.
+
+### Separate canonical state from realization
+
+Where practical, preserve a clear conceptual chain:
+
+**canonical simulation state -> interpretation/intent -> realization/presentation**
+
+The realization layer can become radically more capable over time while the underlying world remains coherent.
+
+A neural renderer may eventually replace large parts of a conventional materials pipeline.
+A generated animation system may eventually realize actions that once required large libraries of bespoke clips.
+A voice system may preserve identity, age, injury, language, accent, mood, and history dynamically.
+An AI direction layer may frame a conversation or battle cinematically.
+None of those systems should be permitted to rewrite the causal state merely because they can produce convincing output.
+
+ATE should therefore be built so that a better presentation system can be attached later rather than requiring a new world underneath it.
+
+### Build for machine comprehension as well as human comprehension
+
+Future development may involve many short-lived or specialized software agents inspecting, modifying, testing, and comparing parts of the codebase.
+
+The code should therefore favor:
+
+- explicit subsystem boundaries;
+- stable contracts;
+- clear data ownership;
+- canonical source-of-truth state;
+- deterministic or reproducible tests where appropriate;
+- strong invariants;
+- modular components;
+- documented reasons for non-obvious behavior;
+- instrumentation;
+- versioned interfaces;
+- small replaceable implementation surfaces around stable concepts.
+
+This is not an excuse to over-abstract everything. It is a requirement that important systems be understandable enough that both human developers and future engineering agents can change one part without casually breaking five others.
+
+The long-term production advantage should come from the quality of the world model and the project's design judgment, not from making the code difficult to inspect.
+
+## 40. Reference-system study: learn the essence, rebuild the system
+
+ATE may study existing games deeply, including through lawful reverse engineering of observable behavior, technical analysis, frame/timing measurement, public research, open-source analogues, and controlled experimentation.
+
+The purpose is not to clone proprietary games.
+
+The purpose is to discover **why a strong system works**.
+
+The development method should be:
+
+> **Observe -> Decompose -> Abstract -> Rebuild -> Integrate -> Simulate -> Playtest**
+
+Do not ask only:
+
+*"How do we make combat like Elden Ring?"*
+
+Ask:
+
+- What creates weight?
+- What creates readable danger?
+- What creates commitment?
+- What makes spacing matter?
+- What makes mistakes feel earned?
+- Which of those principles survive when the surrounding game is completely different?
+
+Do not ask only:
+
+*"How do we copy UFC grappling?"*
+
+Ask:
+
+- Which representations of range, stance, leverage, control, fatigue, takedown threat, and positional advantage make close combat feel intelligible?
+- Which of those truths can be represented with a much simpler player-facing control system?
+- Which details become relevant only for characters who specialize deeply in the discipline?
+
+The same process can be used for traversal, riding, archery, ecology, economy, crafting, sailing, construction, social systems, tactics, party control, survival, investigation, or any other domain.
+
+### Extract principles, not protected expression
+
+ATE should not depend on copied proprietary source code, art, maps, animations, writing, audio, or other protected content.
+
+The goal is independent implementation informed by what can be learned from successful systems.
+
+When a reference system is useful, document the underlying principle in neutral terms rather than preserving implementation-specific quirks merely because another game has them.
+
+A useful result of studying a game is not:
+
+> "We reproduced its dodge roll."
+
+A useful result is:
+
+> "We learned that commitment, recovery time, readable intent, spacing, and the cost of panic inputs create a particular kind of combat tension. Here is how those truths belong inside ATE."
+
+### A mechanics laboratory
+
+ATE should eventually support rapid experimental implementations of important systems.
+
+When feasible, build competing prototypes under the same test conditions.
+
+For example:
+
+- locomotion model A emphasizes inertia;
+- locomotion model B emphasizes immediate responsiveness;
+- locomotion model C preserves inertia but permits magical impulse correction.
+
+Run them with the same character, terrain, controller assumptions, and instrumentation. Compare measurable behavior, then play them.
+
+The project should be willing to discard a technically impressive implementation when it does not feel right.
+
+AI-assisted development should make these experiments cheaper, but design judgment remains the authority.
+
+The target is not a collage of recognizable systems from other games.
+
+The target is a system that could only exist once those lessons were rebuilt around ATE's simulation, magic, people, and world.
+
+## 41. Combat: accessible surface, deep physical interior
+
+ATE combat should seek a combination of:
+
+- Souls-like consequence, readability, spacing, danger, and action commitment;
+- simulator-style causality and physical consequence;
+- the useful essence of real combat sports and martial systems;
+- meaningful weapon, armor, terrain, physiology, party, and magical differences.
+
+It should **not** require every player to operate a full UFC simulation, historical fencing simulator, biomechanics laboratory, or tactical command interface every time a fight begins.
+
+> **The world may understand far more about the fight than the controls ask the player to specify.**
+
+### The simulation can know more than the input exposes
+
+A relatively simple player intent such as strike, guard, evade, grapple, shove, takedown, break control, or disengage can be resolved through a much deeper internal state.
+
+The combat model may consider:
+
+- range;
+- facing;
+- stance;
+- center of mass;
+- planted feet;
+- momentum;
+- balance;
+- leverage;
+- grip;
+- guard position;
+- reach;
+- relative mass;
+- fatigue;
+- wounds;
+- pain;
+- armor;
+- carried equipment;
+- terrain;
+- nearby obstacles;
+- current magical effects;
+- training;
+- practiced technique;
+- perception;
+- reaction;
+- intent.
+
+This depth should produce contextually appropriate outcomes without demanding that every player manually select every mechanical detail.
+
+A takedown should not always be one canned animation merely because the same button was pressed. The available result can differ because one combatant is off-balance, another has inside control, one leg is injured, a wall is nearby, footing is poor, the attacker is stronger, or the defender is much more technically skilled.
+
+### Combat should be layered
+
+The combat architecture should remain conceptually separable into at least these layers:
+
+1. **Physical state** — bodies, contact, mass, velocity, posture, footing, collision, reach, terrain.
+2. **Combat intent** — what the person is trying to accomplish.
+3. **Technique/execution** — how training and experience turn intent into action.
+4. **Character state** — injury, fatigue, fear, concentration, equipment, physiology, magic.
+5. **Tactical intelligence** — what a person chooses to attempt and why.
+6. **Presentation** — animation, sound, camera, effects, hit reaction, neural or conventional realization.
+
+Do not allow presentation to become the hidden combat rules.
+
+### Take the essence of combat sports, not their entire interface
+
+Modern combat-sport games can provide useful lessons about distance, stance, guard, clinch control, takedowns, sprawls, transitions, body targeting, positional advantage, and fatigue.
+
+ATE should use only the amount of that depth necessary to make physical combat convincing.
+
+A general adventurer should be able to fight competently with an understandable control vocabulary.
+
+A dedicated wrestler, prizefighter, soldier, duelist, martial instructor, assassin, or other specialist may develop access to richer technique, better contextual choices, specialized counters, stance work, chain attacks, clinch skill, weapon retention, throws, ground control, feints, or other domain-specific mastery.
+
+This follows the same life-path rule established elsewhere:
+
+> **Simple usable surface. Deep simulated interior. More of the interior becomes relevant when a person's life makes that depth meaningful.**
+
+### Weapons are different physical problems
+
+Do not reduce weapons to animation sets with damage numbers.
+
+A spear changes distance and leverage.
+A shield changes posture, vision, protection, and available actions.
+Heavy armor changes movement, endurance, heat, protection, and vulnerability.
+A bow changes positioning, timing, ammunition, line of sight, and exposure.
+Mounted combat changes velocity, reach, stability, collision, animal behavior, and terrain.
+
+Each weapon family should inherit as much as possible from shared physical/combat primitives while preserving the things that actually make it distinct.
+
+### Party competence should be learned
+
+Long-term companions should not merely gain statistical synergy bonuses.
+
+People who have fought together for years can learn one another's habits, timing, preferred openings, retreat patterns, signals, strengths, weaknesses, and magical combinations.
+
+A veteran companion may recognize what the player is setting up before receiving an explicit command.
+
+Team competence should emerge from experience, training, communication, relationships, shared doctrine, and memory.
+
+## 42. Profession depth is selective, expandable, and contextual
+
+The existing life-path rule does not require maximum simulation detail everywhere at once.
+
+The project should seek the **minimum depth necessary to make a discipline feel true**, then expand where player specialization, profession, culture, technology, or magic makes additional depth worthwhile.
+
+A person who fishes twice should not need to learn a professional fishing simulator.
+
+A person who spends twenty in-world years fishing should discover considerably more beneath the surface.
+
+The same applies to fighting, smithing, medicine, hunting, sailing, farming, trade, scholarship, construction, and other lives.
+
+This creates an important production rule:
+
+> **Implement the shared causal truth first. Expose additional resolution where expertise makes it meaningful.**
+
+For hand-to-hand combat, the baseline may represent balance, distance, guard, stamina, leverage, injury, and control.
+
+A specialized grappler may later require much more detailed positional and transition logic.
+
+For fishing, the baseline may represent species, water, weather, equipment, knowledge, and skill.
+
+A professional fisher may later interact with finer-grained behavior involving season, depth, current, feeding, spawning, boat handling, preservation, markets, and regional knowledge.
+
+The system should therefore be expandable without requiring every subsystem to begin at maximum complexity.
+
+## 43. Magic is a capability architecture, not a class overlay
+
+The HWFWM-inspired Essence/Confluence/Awakening structure is one of ATE's major departures from conventional recent RPG design.
+
+ATE should not reduce that structure to classes wearing different names.
+
+A person's magical identity emerges from their Essence combination, Confluence, awakened abilities, rank, training, experience, equipment, physiology, circumstances, and personal style.
+
+Two people at the same rank should be capable of fighting, traveling, working, solving problems, and experiencing the world in radically different ways.
+
+Combat and world systems must therefore reason about **capabilities**, not predefined classes.
+
+### Magic should alter causes, not merely numbers
+
+When practical, an ability should interact with the system it claims to affect.
+
+A strength ability should not automatically collapse into `+30% melee damage`.
+
+It might alter acceleration, grip, lifting force, striking force, posture, jump capability, load carrying, resistance to displacement, or the ability to impose movement on another body.
+
+A kinetic ability may alter momentum transfer.
+
+An air ability may alter movement, pressure, footing, projectiles, sound, breathing, or environment depending on its actual design.
+
+A perception ability may change what information is available and how quickly it is processed rather than simply granting a universal critical-hit bonus.
+
+A healing ability should participate in the health/injury system rather than merely refill an abstract combat bar.
+
+The same ability may therefore matter in combat, travel, work, rescue, construction, crime, medicine, logistics, sport, exploration, or ordinary life.
+
+### Magic belongs to the world's physics
+
+ATE magic is not solely a combat feature.
+
+If a person can move heavy objects magically, that affects labor and construction.
+If a person can heal, that affects medicine, war, childbirth, risk, work, status, and institutions.
+If a person can alter water, that affects travel, irrigation, drought, fishing, settlement, and disaster.
+If a person can move goods unusually efficiently, someone may eventually build a business around it.
+
+The simulation should ask what people would actually do with capabilities that exist.
+
+Do not reserve magical creativity for the player.
+
+### Rank changes the space of possible combat
+
+At low rank, a person may still fight largely within human physical assumptions while gaining important magical advantages.
+
+At higher ranks, those assumptions can progressively break.
+
+Greater speed, durability, perception, movement, recovery, environmental manipulation, aura, range, summoned entities, transformation, and other capabilities can make higher-rank combat qualitatively different rather than merely numerically larger.
+
+The underlying combat architecture should remain coherent enough that superhuman action still has causes.
+
+A powerful combatant may jump farther, redirect momentum, survive greater impacts, use terrain differently, or fight through injuries that would disable an ordinary person. The system should understand why.
+
+### Emergence through interaction
+
+The strongest magical moments should often come from systems interacting rather than from bespoke cinematic scripts.
+
+A character redirects momentum.
+A companion strikes the target from another angle.
+The target collides with a damaged structure.
+The structure fails.
+Debris blocks a route.
+Fire spreads.
+Bystanders react.
+Property is destroyed.
+Witnesses remember who caused it.
+
+No designer needed to author a specific "monster crashes through this wall" quest beat.
+
+The world produced an event because its systems agreed that the event could happen.
+
+That is the target.
+
+## 44. Commercial resilience in an AI/open-source future
+
+ATE should be finished regardless of how the surrounding game industry changes.
+
+The project should not make its long-term commercial value dependent on code secrecy.
+
+AI-assisted development may make competent game construction dramatically cheaper. Open-source indie development may become increasingly normal. Mechanics may become easier to analyze and independently reproduce. None of those futures should invalidate the project.
+
+The durable value should come from the quality and continuity of the actual world:
+
+- the canonical setting;
+- the official universe and history;
+- trusted releases;
+- long-term development;
+- community;
+- curation;
+- art direction;
+- official content;
+- persistent player histories;
+- creator ecosystems;
+- hosted infrastructure where useful;
+- the accumulated quality of the complete experience.
+
+An eventual model such as **open engine / owned universe** may be viable, but it is not yet a binding licensing decision.
+
+The binding principle is simpler:
+
+> **Do not build a moat out of inaccessible code. Build a world worth returning to.**
+
+If future players can easily create thousands or millions of games, abundance does not eliminate the value of authorship, taste, continuity, coherence, trust, and a world people care about.
+
+ATE's development strategy should therefore remain flexible enough to thrive whether the final commercial environment favors conventional premium releases, open-source ecosystems, creator platforms, hosted persistent worlds, major expansions, or some combination that does not yet exist.
+
+The path may change.
+
+The project does not.
+
