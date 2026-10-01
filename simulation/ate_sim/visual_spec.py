@@ -41,7 +41,7 @@ class TerrainRegionSpec:
     elevation_band: tuple[float, float]
     soil_family: str
     moisture: float
-    disturbance: float
+    disturbance: float | None
     provenance: ProvenanceRef
     surface_kind: str = "land"
 
@@ -150,6 +150,7 @@ class SettlementVisualSpec:
     weather: WeatherSpec | None = None
     magic_manifestations: tuple[MagicManifestationSpec, ...] = ()
     metadata: Mapping[str, str] = field(default_factory=dict)
+    focus_position: Vec3 | None = None
     schema_version: str = SCHEMA_VERSION
 
     def to_dict(self) -> dict[str, Any]:
