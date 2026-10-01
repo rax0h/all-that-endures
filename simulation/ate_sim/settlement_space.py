@@ -59,6 +59,23 @@ class Street:
 
 
 @dataclass
+class SettlementSiteProfile:
+    settlement: int
+    archetype: str
+    main_angle_degrees: float
+    wet_side_degrees: float
+    forest_side_degrees: float
+    high_side_degrees: float
+    growth_bias_degrees: float
+    slope_strength: float
+    moisture_gradient: float
+    forest_gradient: float
+    lane_spacing_m: float
+    parcel_spacing_m: float
+    curvature_m: float
+
+
+@dataclass
 class SettlementSpatialState:
     parcels: dict[int, Parcel] = field(default_factory=dict)
     structures: dict[int, Structure] = field(default_factory=dict)
@@ -74,6 +91,7 @@ class SettlementSpatialState:
     lot_cursor: dict[int, int] = field(default_factory=dict)
     settlement_orientation: dict[int, float] = field(default_factory=dict)
     street_ids: dict[tuple[int, str], int] = field(default_factory=dict)
+    site_profiles: dict[int, SettlementSiteProfile] = field(default_factory=dict)
 
     def create_parcel(
         self,
@@ -184,35 +202,8 @@ class SettlementSpatialState:
         return street
 
 
-# Slots are persistent town lots beside a small road hierarchy. Roads are created
-# only when a used slot requires them, so settlement growth physically expands
-# the street network rather than revealing a fully built grid at year zero.
-def _slot_catalog():
-    slots = []
-
-    def add_row(street, axis, fixed, positions, side_offsets, facing):
-        for position in positions:
-            for side in side_offsets:
-                if axis == "x":
-                    slots.append((street, position, fixed + side, facing if side > 0 else facing + 180))
-                else:
-                    slots.append((street, fixed + side, position, facing if side < 0 else facing + 180))
-
-    main_positions = [x for x in range(-132, 133, 22) if abs(x) > 12]
-    cross_positions = [y for y in range(-110, 111, 22) if abs(y) > 12]
-    lane_positions = [x for x in range(-120, 121, 24) if abs(x) > 20]
-    vertical_positions = [y for y in range(-96, 97, 24) if abs(y) > 20]
-
-    add_row("main", "x", 0, main_positions, (-15, 15), 0)
-    add_row("cross", "y", 0, cross_positions, (-15, 15), 90)
-    add_row("north", "x", 48, lane_positions, (-14, 14), 0)
-    add_row("south", "x", -48, lane_positions, (-14, 14), 0)
-    add_row("east", "y", 76, vertical_positions, (-14, 14), 90)
-    add_row("west", "y", -76, vertical_positions, (-14, 14), 90)
-    return tuple(slots)
-
-
-_LOT_SLOTS = _slot_catalog()
+# Settlement geometry is derived from the physical site first, then history
+# grows the town through persistent roads, parcels and structures.
 
 
 def _rotate(x, y, degrees):
@@ -221,26 +212,147 @@ def _rotate(x, y, degrees):
     return x * c - y * s, x * s + y * c
 
 
-def _street_geometry(key):
-    if key == "main":
-        return ((-170, -5), (-85, 3), (0, 0), (85, -4), (170, 5)), 7.0, "main"
-    if key == "cross":
-        return ((-3, -130), (2, -65), (0, 0), (5, 65), (2, 130)), 5.5, "cross"
-    if key == "north":
-        return ((-145, 48), (-70, 51), (0, 48), (75, 45), (145, 49)), 4.2, "lane"
-    if key == "south":
-        return ((-145, -48), (-70, -45), (0, -48), (75, -51), (145, -47)), 4.2, "lane"
-    if key == "east":
-        return ((76, -120), (73, -55), (76, 0), (79, 60), (76, 120)), 4.0, "lane"
-    return ((-76, -120), (-79, -55), (-76, 0), (-73, 60), (-76, 120)), 4.0, "lane"
+def _bearing(x, y, fallback=0.0):
+    if abs(x) + abs(y) < 1e-12:
+        return fallback
+    return math.degrees(math.atan2(y, x))
+
+
+def _gradient(world, sid, attribute):
+    settlement = world.settlements[sid]
+    center = world.cells[(settlement.x, settlement.y)]
+    gx = 0.0
+    gy = 0.0
+    weight_sum = 0.0
+    for dy in range(-2, 3):
+        for dx in range(-2, 3):
+            if dx == 0 and dy == 0:
+                continue
+            cell = world.cells.get((settlement.x + dx, settlement.y + dy))
+            if cell is None:
+                continue
+            distance = math.hypot(dx, dy)
+            weight = 1.0 / distance
+            delta = getattr(cell, attribute) - getattr(center, attribute)
+            gx += delta * (dx / distance) * weight
+            gy += delta * (dy / distance) * weight
+            weight_sum += weight
+    if weight_sum:
+        gx /= weight_sum
+        gy /= weight_sum
+    return gx, gy
+
+
+def _regional_axis(world, sid):
+    settlement = world.settlements[sid]
+    choices = []
+    for other_id, other in world.settlements.items():
+        if other_id == sid:
+            continue
+        dx = other.x - settlement.x
+        dy = other.y - settlement.y
+        distance = math.hypot(dx, dy)
+        choices.append((distance, other_id, dx, dy))
+    if not choices:
+        return (1.0, 0.0)
+    _, _, dx, dy = min(choices)
+    length = max(1e-9, math.hypot(dx, dy))
+    return dx / length, dy / length
+
+
+def _ensure_site_profile(world, sid, rng):
+    state = world.settlement_space
+    old = state.site_profiles.get(sid)
+    if old is not None:
+        return old
+
+    settlement = world.settlements[sid]
+    cell = world.cells[(settlement.x, settlement.y)]
+    egx, egy = _gradient(world, sid, "elevation")
+    mgx, mgy = _gradient(world, sid, "moisture")
+    fgx, fgy = _gradient(world, sid, "forest")
+    hgx, hgy = _gradient(world, sid, "hazard")
+    slope = math.hypot(egx, egy)
+    moisture_gradient = math.hypot(mgx, mgy)
+    forest_gradient = math.hypot(fgx, fgy)
+
+    regional_x, regional_y = _regional_axis(world, sid)
+
+    # Roads prefer contours when slope is meaningful, but still acknowledge the
+    # direction of regional travel. This makes the founding plan site-specific.
+    if slope > 0.012:
+        contour_x, contour_y = -egy, egx
+        if contour_x * regional_x + contour_y * regional_y < 0:
+            contour_x, contour_y = -contour_x, -contour_y
+        contour_len = max(1e-9, math.hypot(contour_x, contour_y))
+        contour_x /= contour_len
+        contour_y /= contour_len
+        main_x = contour_x * 0.72 + regional_x * 0.28
+        main_y = contour_y * 0.72 + regional_y * 0.28
+    else:
+        main_x, main_y = regional_x, regional_y
+
+    main_angle = _bearing(main_x, main_y)
+    wet_angle = _bearing(mgx, mgy, main_angle + 90.0)
+    forest_angle = _bearing(fgx, fgy, main_angle + 90.0)
+    high_angle = _bearing(egx, egy, main_angle)
+    # Expansion prefers drier, safer ground while still leaning toward regional travel.
+    growth_x = regional_x * 0.38 - mgx * 4.8 - hgx * 2.2
+    growth_y = regional_y * 0.38 - mgy * 4.8 - hgy * 2.2
+    growth_angle = _bearing(growth_x, growth_y, main_angle)
+
+    if cell.moisture >= 0.67 or moisture_gradient >= 0.045:
+        archetype = "waterside"
+    elif cell.forest >= 0.62 or forest_gradient >= 0.055:
+        archetype = "woodland"
+    elif cell.elevation >= 0.60 or slope >= 0.055:
+        archetype = "upland"
+    elif cell.fertility >= 0.66 and cell.forest < 0.52:
+        archetype = "open_crossroads"
+    else:
+        archetype = "mixed"
+
+    lane_spacing = {
+        "waterside": 43.0,
+        "woodland": 56.0,
+        "upland": 38.0,
+        "open_crossroads": 47.0,
+        "mixed": 48.0,
+    }[archetype]
+    parcel_spacing = {
+        "waterside": 24.0,
+        "woodland": 29.0,
+        "upland": 22.0,
+        "open_crossroads": 21.0,
+        "mixed": 23.0,
+    }[archetype]
+    curvature = min(
+        22.0,
+        3.0 + slope * 120.0 + moisture_gradient * 85.0 + forest_gradient * 45.0,
+    )
+
+    profile = SettlementSiteProfile(
+        settlement=sid,
+        archetype=archetype,
+        main_angle_degrees=main_angle,
+        wet_side_degrees=wet_angle,
+        forest_side_degrees=forest_angle,
+        high_side_degrees=high_angle,
+        growth_bias_degrees=growth_angle,
+        slope_strength=slope,
+        moisture_gradient=moisture_gradient,
+        forest_gradient=forest_gradient,
+        lane_spacing_m=lane_spacing,
+        parcel_spacing_m=parcel_spacing,
+        curvature_m=curvature,
+    )
+    state.site_profiles[sid] = profile
+    state.settlement_orientation[sid] = main_angle
+    return profile
 
 
 def _ensure_orientation(world, sid, rng):
-    state = world.settlement_space
-    if sid not in state.settlement_orientation:
-        rr = rng.stream("settlement_orientation", 0, sid)
-        state.settlement_orientation[sid] = rr.uniform(-28.0, 28.0)
-    return state.settlement_orientation[sid]
+    return _ensure_site_profile(world, sid, rng).main_angle_degrees
 
 
 def _surface_for(world, sid):
@@ -248,14 +360,74 @@ def _surface_for(world, sid):
     return "compacted_gravel" if s.prosperity >= 0.42 else "packed_earth"
 
 
+def _street_geometry(profile, key):
+    c = profile.curvature_m
+    spacing = profile.lane_spacing_m
+
+    if key == "main":
+        return (
+            (-180, c * 0.18),
+            (-95, -c * 0.30),
+            (0, 0),
+            (92, c * 0.34),
+            (180, -c * 0.12),
+        ), 7.0, "main"
+
+    if key == "cross":
+        cross_len = 145 if profile.archetype == "open_crossroads" else 118
+        return (
+            (-c * 0.10, -cross_len),
+            (c * 0.20, -60),
+            (0, 0),
+            (-c * 0.18, 60),
+            (c * 0.08, cross_len),
+        ), 5.5, "cross"
+
+    if key == "lane_a":
+        return (
+            (-150, spacing),
+            (-72, spacing + c * 0.22),
+            (0, spacing - c * 0.12),
+            (74, spacing + c * 0.16),
+            (150, spacing),
+        ), 4.2, "lane"
+
+    if key == "lane_b":
+        return (
+            (-145, -spacing),
+            (-72, -spacing - c * 0.12),
+            (0, -spacing + c * 0.18),
+            (72, -spacing - c * 0.22),
+            (145, -spacing),
+        ), 4.2, "lane"
+
+    if key == "spur_a":
+        return (
+            (-18, 8),
+            (35, 42),
+            (82, 78),
+            (132, 112),
+        ), 3.8, "spur"
+
+    if key == "spur_b":
+        return (
+            (14, -10),
+            (-34, -43),
+            (-79, -82),
+            (-124, -116),
+        ), 3.8, "spur"
+
+    raise KeyError(key)
+
+
 def _ensure_street(world, sid, key, rng, origin_event=None):
     state = world.settlement_space
     old = state.street_ids.get((sid, key))
     if old is not None:
         return state.streets[old]
-    angle = _ensure_orientation(world, sid, rng)
-    points, width, kind = _street_geometry(key)
-    rotated = tuple(_rotate(x, y, angle) for x, y in points)
+    profile = _ensure_site_profile(world, sid, rng)
+    points, width, kind = _street_geometry(profile, key)
+    rotated = tuple(_rotate(x, y, profile.main_angle_degrees) for x, y in points)
     return state.create_street(
         sid,
         key,
@@ -267,6 +439,93 @@ def _ensure_street(world, sid, key, rng, origin_event=None):
         origin_event,
         condition=max(0.25, world.settlements[sid].roads),
     )
+
+
+def _add_row(slots, street, axis, fixed, positions, side_offsets, facing):
+    for position in positions:
+        for side in side_offsets:
+            if axis == "x":
+                slots.append((street, position, fixed + side, facing if side > 0 else facing + 180))
+            else:
+                slots.append((street, fixed + side, position, facing if side < 0 else facing + 180))
+
+
+def _site_slots(profile):
+    spacing = profile.parcel_spacing_m
+    long_positions = [
+        -6 * spacing, -5 * spacing, -4 * spacing, -3 * spacing,
+        -2 * spacing, -spacing, spacing, 2 * spacing,
+        3 * spacing, 4 * spacing, 5 * spacing, 6 * spacing,
+    ]
+    short_positions = [-4 * spacing, -3 * spacing, -2 * spacing, -spacing, spacing, 2 * spacing, 3 * spacing, 4 * spacing]
+    side = 14.0
+    slots = []
+
+    # Every settlement begins on its terrain-selected founding axis.
+    _add_row(slots, "main", "x", 0.0, long_positions, (-side, side), 0)
+
+    if profile.archetype == "waterside":
+        # Determine which side of the main road is wetter; early growth favors the dry bank.
+        relative = math.radians(profile.wet_side_degrees - profile.main_angle_degrees)
+        wet_sign = 1 if math.sin(relative) >= 0 else -1
+        dry_fixed = -wet_sign * profile.lane_spacing_m
+        wet_fixed = wet_sign * profile.lane_spacing_m
+        _add_row(slots, "lane_b" if dry_fixed < 0 else "lane_a", "x", dry_fixed, long_positions, (-side, side), 0)
+        _add_row(slots, "cross", "y", 0.0, short_positions, (-side, side), 90)
+        # The wet side fills later and more sparsely.
+        sparse = long_positions[::2]
+        _add_row(slots, "lane_a" if wet_fixed > 0 else "lane_b", "x", wet_fixed, sparse, (-side, side), 0)
+    elif profile.archetype == "woodland":
+        _add_row(slots, "spur_a", "x", 0.0, short_positions, (-13.0, 13.0), 34)
+        _add_row(slots, "spur_b", "x", 0.0, short_positions, (-13.0, 13.0), 214)
+        _add_row(slots, "cross", "y", 0.0, short_positions[::2], (-14.0, 14.0), 90)
+        _add_row(slots, "lane_a", "x", profile.lane_spacing_m, short_positions[1::2], (-13.0, 13.0), 0)
+    elif profile.archetype == "upland":
+        _add_row(slots, "lane_a", "x", profile.lane_spacing_m, long_positions, (-12.0, 12.0), 0)
+        _add_row(slots, "lane_b", "x", -profile.lane_spacing_m, short_positions, (-12.0, 12.0), 0)
+        _add_row(slots, "cross", "y", 0.0, short_positions[::2], (-13.0, 13.0), 90)
+    elif profile.archetype == "open_crossroads":
+        _add_row(slots, "cross", "y", 0.0, long_positions, (-14.0, 14.0), 90)
+        _add_row(slots, "lane_a", "x", profile.lane_spacing_m, long_positions, (-13.0, 13.0), 0)
+        _add_row(slots, "lane_b", "x", -profile.lane_spacing_m, long_positions, (-13.0, 13.0), 0)
+    else:
+        _add_row(slots, "cross", "y", 0.0, short_positions, (-14.0, 14.0), 90)
+        _add_row(slots, "lane_a", "x", profile.lane_spacing_m, short_positions, (-13.0, 13.0), 0)
+        _add_row(slots, "lane_b", "x", -profile.lane_spacing_m, short_positions, (-13.0, 13.0), 0)
+
+    return tuple(slots)
+
+
+def _next_slot(world, sid, rng):
+    state = world.settlement_space
+    profile = _ensure_site_profile(world, sid, rng)
+    slots = _site_slots(profile)
+    index = state.lot_cursor.get(sid, 0)
+
+    if index < len(slots):
+        street_key, x, y, facing = slots[index]
+        _ensure_street(world, sid, street_key, rng)
+        state.lot_cursor[sid] = index + 1
+        rx, ry = _rotate(x, y, profile.main_angle_degrees)
+        return rx, ry, (facing + profile.main_angle_degrees) % 360.0
+
+    # Late growth forms an irregular outer ring biased toward the safer/drier
+    # growth direction selected by the site's actual gradients.
+    ring_index = index - len(slots)
+    ring = 1 + ring_index // 28
+    offset = ring_index % 28
+    relative_bias = math.radians(profile.growth_bias_degrees - profile.main_angle_degrees)
+    golden = math.radians(137.507764)
+    theta = relative_bias + offset * golden
+    radius = 180 + ring * (26 if profile.archetype != "woodland" else 32)
+    x = math.cos(theta) * radius
+    y = math.sin(theta) * radius
+    street_key = "main" if abs(y) < abs(x) else "cross"
+    _ensure_street(world, sid, street_key, rng)
+    state.lot_cursor[sid] = index + 1
+    rx, ry = _rotate(x, y, profile.main_angle_degrees)
+    facing = math.degrees(math.atan2(-ry, -rx))
+    return rx, ry, facing % 360.0
 
 
 def _property_for_household(world, hid, sid):
@@ -484,6 +743,41 @@ def _ensure_workshops(world, rng, sid):
         state.workshop_structure[person.household] = structure.id
 
 
+def _ensure_trade_gateways(world, rng, sid):
+    state = world.settlement_space
+    origin = world.settlements[sid]
+    profile = _ensure_site_profile(world, sid, rng)
+    for asset in sorted(world.infrastructure.assets.values(), key=lambda a: a.id):
+        if asset.kind != "road" or sid not in asset.settlements or len(asset.settlements) != 2:
+            continue
+        destination = asset.settlements[0] if asset.settlements[1] == sid else asset.settlements[1]
+        key = f"gateway:{destination}"
+        if (sid, key) in state.street_ids:
+            continue
+        target = world.settlements[destination]
+        bearing = math.degrees(math.atan2(target.y - origin.y, target.x - origin.x))
+        radians = math.radians(bearing)
+        nx, ny = -math.sin(radians), math.cos(radians)
+        bend = min(16.0, profile.curvature_m * 0.55)
+        points = (
+            (0.0, 0.0),
+            (math.cos(radians) * 72 + nx * bend, math.sin(radians) * 72 + ny * bend),
+            (math.cos(radians) * 145 - nx * bend * 0.4, math.sin(radians) * 145 - ny * bend * 0.4),
+            (math.cos(radians) * 205, math.sin(radians) * 205),
+        )
+        state.create_street(
+            sid,
+            key,
+            "gateway",
+            points,
+            5.0 + asset.condition * 2.0,
+            _surface_for(world, sid),
+            asset.built,
+            asset.origin_event,
+            condition=asset.condition,
+        )
+
+
 def seed_settlement_space(world, rng):
     for sid in sorted(world.settlements):
         founded = next(
@@ -496,7 +790,7 @@ def seed_settlement_space(world, rng):
             ),
             None,
         )
-        _ensure_orientation(world, sid, rng)
+        _ensure_site_profile(world, sid, rng)
         _ensure_street(world, sid, "main", rng, founded)
         for hid in sorted(world.settlements[sid].households):
             ensure_household_residence(world, rng, hid)
@@ -507,6 +801,7 @@ def settlement_space_step(world, rng):
     for hid in sorted(world.households):
         ensure_household_residence(world, rng, hid)
     for sid in sorted(world.settlements):
+        _ensure_trade_gateways(world, rng, sid)
         _ensure_market(world, rng, sid)
         _ensure_institutions(world, rng, sid)
         _ensure_workshops(world, rng, sid)
