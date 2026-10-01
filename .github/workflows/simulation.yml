@@ -47,7 +47,7 @@ jobs:
       - name: render settlement seed comparison
         run: |
           python simulation/render_settlement_comparison.py \
-            --seeds 843000 843001 731 \
+            --seeds 843000 23 11 1 \
             --years 100 \
             --settlement 1 \
             --out artifacts/settlement_seed_comparison_y100.png
