@@ -301,13 +301,15 @@ def _ensure_site_profile(world, sid, rng):
     growth_y = regional_y * 0.38 - mgy * 4.8 - hgy * 2.2
     growth_angle = _bearing(growth_x, growth_y, main_angle)
 
-    if cell.moisture >= 0.67 or moisture_gradient >= 0.045:
-        archetype = "waterside"
-    elif cell.forest >= 0.62 or forest_gradient >= 0.055:
-        archetype = "woodland"
-    elif cell.elevation >= 0.60 or slope >= 0.055:
+    # Founding sites are intentionally fertile, so absolute wetness alone is
+    # not discriminating. Classify by relative local landform instead.
+    if slope >= 0.10 or cell.elevation >= 0.455:
         archetype = "upland"
-    elif cell.fertility >= 0.66 and cell.forest < 0.52:
+    elif cell.forest >= 0.82 or forest_gradient >= 0.055:
+        archetype = "woodland"
+    elif moisture_gradient >= 0.045:
+        archetype = "waterside"
+    elif cell.forest <= 0.66 and slope <= 0.075:
         archetype = "open_crossroads"
     else:
         archetype = "mixed"
@@ -509,6 +511,42 @@ def _site_slots(profile):
     return tuple(slots)
 
 
+def _ensure_growth_street(world, sid, rng, key, angle_degrees, length_m):
+    state = world.settlement_space
+    old = state.street_ids.get((sid, key))
+    if old is not None:
+        return state.streets[old]
+    profile = _ensure_site_profile(world, sid, rng)
+    radians = math.radians(angle_degrees)
+    nx, ny = -math.sin(radians), math.cos(radians)
+    bend = min(14.0, profile.curvature_m * 0.45)
+    points = (
+        (math.cos(radians) * 82.0, math.sin(radians) * 82.0),
+        (math.cos(radians) * (length_m * 0.52) + nx * bend, math.sin(radians) * (length_m * 0.52) + ny * bend),
+        (math.cos(radians) * length_m, math.sin(radians) * length_m),
+    )
+    from .core_types import layer_ref
+    Layer, Ref = layer_ref()
+    event = world.emit(
+        "local_street_extended",
+        Layer.REALITY,
+        location=Ref("settlement", sid),
+        street_key=key,
+        reason="residential_expansion",
+    )
+    return state.create_street(
+        sid,
+        key,
+        "growth_lane",
+        points,
+        3.8,
+        _surface_for(world, sid),
+        world.year,
+        event.id,
+        condition=max(0.22, world.settlements[sid].roads),
+    )
+
+
 def _next_slot(world, sid, rng):
     state = world.settlement_space
     profile = _ensure_site_profile(world, sid, rng)
@@ -522,23 +560,33 @@ def _next_slot(world, sid, rng):
         rx, ry = _rotate(x, y, profile.main_angle_degrees)
         return rx, ry, (facing + profile.main_angle_degrees) % 360.0
 
-    # Late growth forms an irregular outer ring biased toward the safer/drier
-    # growth direction selected by the site's actual gradients.
+    # Late growth pushes out along a few persistent expansion corridors rather
+    # than scattering disconnected houses around the town.
     ring_index = index - len(slots)
-    ring = 1 + ring_index // 28
-    offset = ring_index % 28
-    relative_bias = math.radians(profile.growth_bias_degrees - profile.main_angle_degrees)
-    golden = math.radians(137.507764)
-    theta = relative_bias + offset * golden
-    radius = 180 + ring * (26 if profile.archetype != "woodland" else 32)
-    x = math.cos(theta) * radius
-    y = math.sin(theta) * radius
-    street_key = "main" if abs(y) < abs(x) else "cross"
-    _ensure_street(world, sid, street_key, rng)
+    ring = 1 + ring_index // 32
+    within_ring = ring_index % 32
+    sector = within_ring // 8
+    within = within_ring % 8
+    angle = (profile.growth_bias_degrees + sector * 83.0 + ring * 7.0) % 360.0
+    radians = math.radians(angle)
+    nx, ny = -math.sin(radians), math.cos(radians)
+    base_radius = 148 + ring * (42 if profile.archetype != "woodland" else 50)
+    distance = base_radius + (within // 2) * profile.parcel_spacing_m
+    side = -13.0 if within % 2 == 0 else 13.0
+    x = math.cos(radians) * distance + nx * side
+    y = math.sin(radians) * distance + ny * side
+    street_key = f"growth:{ring}:{sector}"
+    _ensure_growth_street(
+        world,
+        sid,
+        rng,
+        street_key,
+        angle,
+        base_radius + 4 * profile.parcel_spacing_m + 45.0,
+    )
     state.lot_cursor[sid] = index + 1
-    rx, ry = _rotate(x, y, profile.main_angle_degrees)
-    facing = math.degrees(math.atan2(-ry, -rx))
-    return rx, ry, facing % 360.0
+    facing = angle if side > 0 else angle + 180.0
+    return x, y, facing % 360.0
 
 
 def _property_for_household(world, hid, sid):
