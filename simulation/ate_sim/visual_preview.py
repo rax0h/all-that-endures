@@ -45,6 +45,8 @@ def _all_points(spec: SettlementVisualSpec) -> Iterable[Vec3]:
         yield person.position
     for manifestation in spec.magic_manifestations:
         yield manifestation.position
+    if spec.focus_position is not None:
+        yield spec.focus_position
 
 
 def _bounds(spec: SettlementVisualSpec) -> tuple[float, float, float, float]:
@@ -145,7 +147,17 @@ def render_settlement_preview(
         if region.surface_kind == "water":
             fill = style.water
         else:
-            fill = style.disturbed_land if region.disturbance >= 0.45 else style.land
+            # Use only supplied terrain facts. Elevation darkens the base earth tone;
+            # moisture adds a green cast. This is diagnostic styling, not new world state.
+            elevation = sum(region.elevation_band) / 2.0
+            moisture = max(0.0, min(1.0, region.moisture))
+            base = (184, 170, 134)
+            r = int(max(70, min(210, base[0] - elevation * 55 - moisture * 18)))
+            g = int(max(70, min(210, base[1] - elevation * 35 + moisture * 26)))
+            b = int(max(70, min(210, base[2] - elevation * 18)))
+            fill = (r, g, b, 255)
+            if region.disturbance is not None and region.disturbance >= 0.45:
+                fill = style.disturbed_land
         draw.polygon(polygon, fill=fill, outline=style.text)
 
     # Vegetation.
@@ -194,6 +206,14 @@ def render_settlement_preview(
             r = 3 if person.representation_tier != "embodied" else 5
             draw.ellipse((x - r, y - r, x + r, y + r), fill=style.person)
 
+    # Settlement focus marker for truth-only simulation previews.
+    if spec.focus_position is not None:
+        x, y = _transform(spec.focus_position, bounds, style)
+        r = 9
+        draw.ellipse((x - r, y - r, x + r, y + r), fill=style.panel, outline=style.text, width=3)
+        draw.line((x - 14, y, x + 14, y), fill=style.text, width=2)
+        draw.line((x, y - 14, x, y + 14), fill=style.text, width=2)
+
     # Magic markers.
     for manifestation in spec.magic_manifestations:
         x, y = _transform(manifestation.position, bounds, style)
@@ -210,6 +230,22 @@ def render_settlement_preview(
         title = f"{spec.settlement_id}  |  year {spec.time_slice_year}  |  seed {spec.world_seed}"
         draw.rounded_rectangle((18, 16, 560, 48), radius=8, fill=style.panel, outline=style.text)
         draw.text((30, 26), title, fill=style.text, font=font)
+
+        if spec.metadata:
+            panel_x0 = style.width - 290
+            panel_y0 = 16
+            rows = list(sorted(spec.metadata.items()))[:14]
+            panel_h = 26 + len(rows) * 15
+            draw.rounded_rectangle(
+                (panel_x0, panel_y0, style.width - 18, panel_y0 + panel_h),
+                radius=8,
+                fill=style.panel,
+                outline=style.text,
+            )
+            draw.text((panel_x0 + 12, panel_y0 + 9), "simulation facts", fill=style.text, font=font)
+            for index, (key, value) in enumerate(rows):
+                y = panel_y0 + 27 + index * 15
+                draw.text((panel_x0 + 12, y), f"{key}: {value}", fill=style.text, font=font)
 
         legend_y = style.height - 152
         draw.rounded_rectangle(
