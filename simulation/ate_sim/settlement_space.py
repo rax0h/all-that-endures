@@ -59,6 +59,51 @@ class Street:
 
 
 @dataclass
+class LocalTerrainPatch:
+    id: int
+    settlement: int
+    grid_x: int
+    grid_y: int
+    center_x_m: float
+    center_y_m: float
+    size_m: float
+    elevation: float
+    moisture: float
+    fertility: float
+    forest: float
+    hazard: float
+    usable_score: float
+    surface_kind: str
+
+
+@dataclass
+class Watercourse:
+    id: int
+    settlement: int
+    kind: str
+    points_m: tuple[tuple[float, float], ...]
+    width_m: float
+    perennial: bool
+    origin_event: int | None
+
+
+@dataclass
+class FieldPlot:
+    id: int
+    settlement: int
+    terrain_patch: int
+    owner_household: int | None
+    center_x_m: float
+    center_y_m: float
+    width_m: float
+    depth_m: float
+    facing_degrees: float
+    created_year: int
+    origin_event: int | None
+    active: bool = True
+
+
+@dataclass
 class SettlementSiteProfile:
     settlement: int
     archetype: str
@@ -92,6 +137,13 @@ class SettlementSpatialState:
     settlement_orientation: dict[int, float] = field(default_factory=dict)
     street_ids: dict[tuple[int, str], int] = field(default_factory=dict)
     site_profiles: dict[int, SettlementSiteProfile] = field(default_factory=dict)
+    terrain_patches: dict[int, LocalTerrainPatch] = field(default_factory=dict)
+    watercourses: dict[int, Watercourse] = field(default_factory=dict)
+    fields: dict[int, FieldPlot] = field(default_factory=dict)
+    terrain_patch_ids: dict[tuple[int, int, int], int] = field(default_factory=dict)
+    next_terrain_patch: int = 1
+    next_watercourse: int = 1
+    next_field: int = 1
 
     def create_parcel(
         self,
@@ -200,6 +252,102 @@ class SettlementSpatialState:
         self.streets[sid] = street
         self.street_ids[(settlement, key)] = sid
         return street
+
+
+    def create_terrain_patch(
+        self,
+        settlement,
+        grid_x,
+        grid_y,
+        center_x_m,
+        center_y_m,
+        size_m,
+        elevation,
+        moisture,
+        fertility,
+        forest,
+        hazard,
+        usable_score,
+        surface_kind,
+    ):
+        old = self.terrain_patch_ids.get((settlement, grid_x, grid_y))
+        if old is not None:
+            return self.terrain_patches[old]
+        pid = self.next_terrain_patch
+        self.next_terrain_patch += 1
+        patch = LocalTerrainPatch(
+            pid,
+            settlement,
+            grid_x,
+            grid_y,
+            center_x_m,
+            center_y_m,
+            size_m,
+            elevation,
+            moisture,
+            fertility,
+            forest,
+            hazard,
+            usable_score,
+            surface_kind,
+        )
+        self.terrain_patches[pid] = patch
+        self.terrain_patch_ids[(settlement, grid_x, grid_y)] = pid
+        return patch
+
+    def create_watercourse(
+        self,
+        settlement,
+        kind,
+        points_m,
+        width_m,
+        perennial,
+        origin_event=None,
+    ):
+        wid = self.next_watercourse
+        self.next_watercourse += 1
+        feature = Watercourse(
+            wid,
+            settlement,
+            kind,
+            tuple(points_m),
+            width_m,
+            bool(perennial),
+            origin_event,
+        )
+        self.watercourses[wid] = feature
+        return feature
+
+    def create_field(
+        self,
+        settlement,
+        terrain_patch,
+        owner_household,
+        center_x_m,
+        center_y_m,
+        width_m,
+        depth_m,
+        facing_degrees,
+        created_year,
+        origin_event=None,
+    ):
+        fid = self.next_field
+        self.next_field += 1
+        plot = FieldPlot(
+            fid,
+            settlement,
+            terrain_patch,
+            owner_household,
+            center_x_m,
+            center_y_m,
+            width_m,
+            depth_m,
+            facing_degrees,
+            created_year,
+            origin_event,
+        )
+        self.fields[fid] = plot
+        return plot
 
 
 # Settlement geometry is derived from the physical site first, then history
@@ -589,6 +737,253 @@ def _next_slot(world, sid, rng):
     return x, y, facing % 360.0
 
 
+
+def _clamp01(value):
+    return max(0.0, min(1.0, value))
+
+
+def _sample_local_attribute(world, sid, x_m, y_m, attribute):
+    settlement = world.settlements[sid]
+    # One coarse world cell represents a broad local district. Interpolate from
+    # neighboring authoritative cells so the settlement inherits the real regional
+    # landform instead of receiving a decorative random heightmap.
+    world_x = settlement.x + x_m / 220.0
+    world_y = settlement.y + y_m / 220.0
+    x0 = math.floor(world_x)
+    y0 = math.floor(world_y)
+    samples = []
+    for oy in (0, 1):
+        for ox in (0, 1):
+            cell = world.cells.get((x0 + ox, y0 + oy))
+            if cell is None:
+                continue
+            dx = world_x - (x0 + ox)
+            dy = world_y - (y0 + oy)
+            weight = 1.0 / max(0.08, math.hypot(dx, dy))
+            samples.append((weight, getattr(cell, attribute)))
+    if not samples:
+        return getattr(world.cells[(settlement.x, settlement.y)], attribute)
+    total = sum(weight for weight, _ in samples)
+    return sum(weight * value for weight, value in samples) / total
+
+
+def _point_segment_distance(px, py, ax, ay, bx, by):
+    vx, vy = bx - ax, by - ay
+    wx, wy = px - ax, py - ay
+    length2 = vx * vx + vy * vy
+    if length2 <= 1e-9:
+        return math.hypot(px - ax, py - ay)
+    t = max(0.0, min(1.0, (wx * vx + wy * vy) / length2))
+    cx, cy = ax + t * vx, ay + t * vy
+    return math.hypot(px - cx, py - cy)
+
+
+def _distance_to_water(world, sid, x, y):
+    best = float("inf")
+    for water in world.settlement_space.watercourses.values():
+        if water.settlement != sid:
+            continue
+        for a, b in zip(water.points_m, water.points_m[1:]):
+            best = min(best, _point_segment_distance(x, y, a[0], a[1], b[0], b[1]) - water.width_m / 2)
+    return best
+
+
+def _generate_local_terrain(world, rng, sid):
+    state = world.settlement_space
+    if any(p.settlement == sid for p in state.terrain_patches.values()):
+        return
+
+    profile = _ensure_site_profile(world, sid, rng)
+    settlement = world.settlements[sid]
+    center = world.cells[(settlement.x, settlement.y)]
+    spacing = 36.0
+    radius = 9
+
+    for gy in range(-radius, radius + 1):
+        for gx in range(-radius, radius + 1):
+            x = gx * spacing
+            y = gy * spacing
+            entity = sid * 100000 + (gy + radius) * (radius * 2 + 1) + (gx + radius)
+            rr = rng.stream("settlement_local_terrain", 0, entity)
+
+            elevation = _clamp01(_sample_local_attribute(world, sid, x, y, "elevation") + rr.uniform(-0.012, 0.012))
+            moisture = _clamp01(_sample_local_attribute(world, sid, x, y, "moisture") + rr.uniform(-0.025, 0.025))
+            fertility = _clamp01(_sample_local_attribute(world, sid, x, y, "fertility") + rr.uniform(-0.018, 0.018))
+            forest = _clamp01(_sample_local_attribute(world, sid, x, y, "forest") + rr.uniform(-0.035, 0.035))
+            hazard = _clamp01(_sample_local_attribute(world, sid, x, y, "hazard") + rr.uniform(-0.015, 0.015))
+
+            usable = _clamp01(
+                0.42 * fertility
+                + 0.20 * (1.0 - forest)
+                + 0.18 * (1.0 - hazard)
+                + 0.20 * (1.0 - min(1.0, abs(moisture - 0.56) * 2.2))
+                - min(0.24, profile.slope_strength * 1.25)
+            )
+
+            relative_elevation = elevation - center.elevation
+            if moisture >= 0.82 and relative_elevation <= 0.035:
+                surface_kind = "wetland"
+            elif relative_elevation >= 0.105 and fertility < 0.58:
+                surface_kind = "rock"
+            else:
+                surface_kind = "land"
+
+            state.create_terrain_patch(
+                sid,
+                gx,
+                gy,
+                x,
+                y,
+                spacing,
+                elevation,
+                moisture,
+                fertility,
+                forest,
+                hazard,
+                usable,
+                surface_kind,
+            )
+
+    # Hydrology is now part of Reality. Wet settlements receive a persistent
+    # river/stream/drainage corridor positioned on the actual wet side of the site.
+    if profile.archetype == "waterside" or center.moisture >= 0.60 or profile.moisture_gradient >= 0.035:
+        rr = rng.stream("settlement_watercourse", 0, sid)
+        wet = math.radians(profile.wet_side_degrees)
+        direction = wet + math.pi / 2.0
+        offset = 95.0 if profile.archetype == "waterside" else 145.0
+        ox, oy = math.cos(wet) * offset, math.sin(wet) * offset
+        nx, ny = -math.sin(direction), math.cos(direction)
+        dx, dy = math.cos(direction), math.sin(direction)
+        points = []
+        for index, distance in enumerate((-360, -240, -120, 0, 120, 240, 360)):
+            wiggle = math.sin(index * 1.37 + sid) * (12.0 + profile.curvature_m * 0.4)
+            wiggle += rr.uniform(-5.0, 5.0)
+            points.append((ox + dx * distance + nx * wiggle, oy + dy * distance + ny * wiggle))
+        width = 5.5 + center.moisture * 8.0 + profile.moisture_gradient * 70.0
+        perennial = center.moisture >= 0.67 or profile.archetype == "waterside"
+        state.create_watercourse(
+            sid,
+            "river" if width >= 11.5 else ("stream" if perennial else "seasonal_drainage"),
+            points,
+            round(width, 2),
+            perennial,
+            None,
+        )
+
+
+def _field_candidates(world, sid):
+    state = world.settlement_space
+    existing_patch_ids = {
+        field.terrain_patch
+        for field in state.fields.values()
+        if field.settlement == sid and field.active
+    }
+    candidates = []
+    for patch in state.terrain_patches.values():
+        if patch.settlement != sid or patch.id in existing_patch_ids:
+            continue
+        radius = math.hypot(patch.center_x_m, patch.center_y_m)
+        if radius < 145.0 or radius > 315.0:
+            continue
+        if patch.surface_kind != "land":
+            continue
+        if patch.moisture < 0.28 or patch.moisture > 0.80:
+            continue
+        if patch.forest > 0.74 or patch.hazard > 0.62:
+            continue
+        water_distance = _distance_to_water(world, sid, patch.center_x_m, patch.center_y_m)
+        if water_distance < 24.0:
+            continue
+        score = (
+            patch.usable_score * 0.52
+            + patch.fertility * 0.28
+            + (1.0 - patch.forest) * 0.12
+            + max(0.0, 1.0 - water_distance / 210.0) * 0.08
+        )
+        candidates.append((score, -radius, patch.id))
+    candidates.sort(reverse=True)
+    return [patch_id for _, _, patch_id in candidates]
+
+
+def _household_agriculture_score(world, hid):
+    household = world.households[hid]
+    scores = [
+        world.skills.get(pid, "agriculture").level
+        for pid in household.members
+        if pid in world.people and world.people[pid].alive
+    ]
+    return max(scores, default=0.0)
+
+
+def _ensure_fields(world, rng, sid):
+    state = world.settlement_space
+    living_households = [
+        hid
+        for hid in world.settlements[sid].households
+        if hid in world.households
+        and world.households[hid].alive
+        and any(world.people[pid].alive for pid in world.households[hid].members)
+    ]
+    if not living_households:
+        return
+
+    local = world.local[sid]
+    settlement = world.settlements[sid]
+    target = min(
+        28,
+        max(
+            3,
+            int(
+                math.ceil(len(living_households) * 0.23)
+                + round(settlement.irrigation * 3.0)
+                + round(local.scarcity * 4.0)
+            ),
+        ),
+    )
+    existing = [
+        field
+        for field in state.fields.values()
+        if field.settlement == sid and field.active
+    ]
+    if len(existing) >= target:
+        return
+
+    candidates = _field_candidates(world, sid)
+    owners = sorted(
+        living_households,
+        key=lambda hid: (-_household_agriculture_score(world, hid), hid),
+    )
+    profile = _ensure_site_profile(world, sid, rng)
+
+    from .core_types import layer_ref
+    Layer, Ref = layer_ref()
+
+    for n in range(min(target - len(existing), len(candidates))):
+        patch = state.terrain_patches[candidates[n]]
+        owner = owners[(len(existing) + n) % len(owners)]
+        rr = rng.stream("field_geometry", world.year, patch.id)
+        event = world.emit(
+            "field_cleared",
+            Layer.REALITY,
+            location=Ref("settlement", sid),
+            household=owner,
+            terrain_patch=patch.id,
+            fertility=round(patch.fertility, 3),
+        )
+        state.create_field(
+            sid,
+            patch.id,
+            owner,
+            patch.center_x_m,
+            patch.center_y_m,
+            patch.size_m * 0.84,
+            patch.size_m * 0.70,
+            (profile.main_angle_degrees + rr.uniform(-13.0, 13.0)) % 360.0,
+            world.year,
+            event.id,
+        )
+
+
 def _property_for_household(world, hid, sid):
     candidates = [
         prop
@@ -829,9 +1224,11 @@ def seed_settlement_space(world, rng):
             None,
         )
         _ensure_site_profile(world, sid, rng)
+        _generate_local_terrain(world, rng, sid)
         _ensure_street(world, sid, "main", rng, founded)
         for hid in sorted(world.settlements[sid].households):
             ensure_household_residence(world, rng, hid)
+        _ensure_fields(world, rng, sid)
 
 
 def settlement_space_step(world, rng):
@@ -843,6 +1240,7 @@ def settlement_space_step(world, rng):
         _ensure_market(world, rng, sid)
         _ensure_institutions(world, rng, sid)
         _ensure_workshops(world, rng, sid)
+        _ensure_fields(world, rng, sid)
 
     # Slow physical wear; prosperous towns preserve buildings better.
     for structure in world.settlement_space.structures.values():
