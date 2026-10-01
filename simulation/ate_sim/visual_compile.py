@@ -10,6 +10,8 @@ from .visual_spec import (
     SettlementVisualSpec,
     TerrainRegionSpec,
     Vec3,
+    VegetationZoneSpec,
+    WatercourseSpec,
 )
 
 
@@ -43,55 +45,151 @@ def _wealth_band(world, structure) -> str:
     return "institutional" if "hall" in structure.kind else "unknown"
 
 
-def _extent(world, sid):
+def _square_boundary(x: float, y: float, size: float) -> tuple[Vec3, ...]:
+    half = size / 2.0
+    return (
+        Vec3(x - half, y - half),
+        Vec3(x + half, y - half),
+        Vec3(x + half, y + half),
+        Vec3(x - half, y + half),
+    )
+
+
+def _rotated_boundary(
+    x: float,
+    y: float,
+    width: float,
+    depth: float,
+    degrees: float,
+) -> tuple[Vec3, ...]:
+    import math
+
+    angle = math.radians(degrees)
+    c, s = math.cos(angle), math.sin(angle)
     points = []
-    for parcel in world.settlement_space.parcels.values():
-        if parcel.settlement != sid or not parcel.active:
-            continue
-        points.extend(
-            (
-                parcel.center_x_m - parcel.width_m / 2,
-                parcel.center_x_m + parcel.width_m / 2,
-                parcel.center_y_m - parcel.depth_m / 2,
-                parcel.center_y_m + parcel.depth_m / 2,
-            )
-        )
-    for street in world.settlement_space.streets.values():
-        if street.settlement != sid or not street.active:
-            continue
-        for x, y in street.points_m:
-            points.extend((x, x, y, y))
-    if not points:
-        return 180.0
-    return max(180.0, max(abs(value) for value in points) + 28.0)
+    for lx, ly in (
+        (-width / 2, -depth / 2),
+        (width / 2, -depth / 2),
+        (width / 2, depth / 2),
+        (-width / 2, depth / 2),
+    ):
+        points.append(Vec3(x + lx * c - ly * s, y + lx * s + ly * c))
+    return tuple(points)
 
 
 def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int = 5) -> SettlementVisualSpec:
-    """Compile the persistent local settlement layout now stored in Reality."""
+    """Compile persistent settlement geography and built state from Reality."""
 
     if settlement_id not in world.settlements:
         raise KeyError(f"unknown settlement {settlement_id}")
 
+    state = world.settlement_space
     settlement = world.settlements[settlement_id]
-    cell = world.cells[(settlement.x, settlement.y)]
-    extent = _extent(world, settlement_id)
 
-    terrain = (
-        TerrainRegionSpec(
-            region_id=f"settlement-ground:{settlement_id}",
-            boundary=(
-                Vec3(-extent, -extent),
-                Vec3(extent, -extent),
-                Vec3(extent, extent),
-                Vec3(-extent, extent),
+    field_patch_ids = {
+        field.terrain_patch
+        for field in state.fields.values()
+        if field.settlement == settlement_id and field.active
+    }
+
+    terrain = []
+    vegetation = []
+    for patch in sorted(state.terrain_patches.values(), key=lambda p: p.id):
+        if patch.settlement != settlement_id:
+            continue
+        terrain.append(
+            TerrainRegionSpec(
+                region_id=f"terrain-patch:{patch.id}",
+                boundary=_square_boundary(
+                    patch.center_x_m,
+                    patch.center_y_m,
+                    patch.size_m,
+                ),
+                elevation_band=(patch.elevation, patch.elevation),
+                soil_family="local_ground",
+                moisture=patch.moisture,
+                disturbance=1.0 - patch.usable_score,
+                provenance=_prov(
+                    "local_terrain_patch",
+                    str(patch.id),
+                    0,
+                    None,
+                ),
+                surface_kind=patch.surface_kind,
+            )
+        )
+        if patch.forest >= 0.38 and patch.id not in field_patch_ids:
+            vegetation.append(
+                VegetationZoneSpec(
+                    zone_id=f"forest-patch:{patch.id}",
+                    boundary=_square_boundary(
+                        patch.center_x_m,
+                        patch.center_y_m,
+                        patch.size_m,
+                    ),
+                    community_family=(
+                        "riparian_woodland"
+                        if patch.moisture >= 0.72
+                        else "local_woodland"
+                    ),
+                    density=patch.forest,
+                    maturity=min(1.0, 0.35 + patch.forest * 0.58),
+                    disturbance=max(0.0, 0.25 - patch.usable_score * 0.12),
+                    provenance=_prov(
+                        "local_terrain_patch",
+                        str(patch.id),
+                        0,
+                        None,
+                    ),
+                )
+            )
+
+    # Cultivation is a historical overlay on the generated terrain rather than a
+    # renderer decoration. Each field points back to the field-clearing event.
+    for field in sorted(state.fields.values(), key=lambda f: f.id):
+        if field.settlement != settlement_id or not field.active:
+            continue
+        patch = state.terrain_patches[field.terrain_patch]
+        terrain.append(
+            TerrainRegionSpec(
+                region_id=f"field:{field.id}",
+                boundary=_rotated_boundary(
+                    field.center_x_m,
+                    field.center_y_m,
+                    field.width_m,
+                    field.depth_m,
+                    field.facing_degrees,
+                ),
+                elevation_band=(patch.elevation, patch.elevation),
+                soil_family="cultivated",
+                moisture=patch.moisture,
+                disturbance=0.72,
+                provenance=_prov(
+                    "field_plot",
+                    str(field.id),
+                    field.created_year,
+                    field.origin_event,
+                ),
+                surface_kind="field",
+            )
+        )
+
+    watercourses = tuple(
+        WatercourseSpec(
+            watercourse_id=f"watercourse:{water.id}",
+            centerline=Polyline(tuple(Vec3(x, y) for x, y in water.points_m)),
+            width_m=water.width_m,
+            kind=water.kind,
+            perennial=water.perennial,
+            provenance=_prov(
+                "local_watercourse",
+                str(water.id),
+                0,
+                water.origin_event,
             ),
-            elevation_band=(cell.elevation, cell.elevation),
-            soil_family="local_ground",
-            moisture=cell.moisture,
-            disturbance=None,
-            provenance=_prov("worldgen_cell", f"{settlement.x},{settlement.y}", 0, None),
-            surface_kind="land",
-        ),
+        )
+        for water in sorted(state.watercourses.values(), key=lambda w: w.id)
+        if water.settlement == settlement_id
     )
 
     parcels = tuple(
@@ -110,7 +208,7 @@ def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int 
                 parcel.origin_event,
             ),
         )
-        for parcel in sorted(world.settlement_space.parcels.values(), key=lambda p: p.id)
+        for parcel in sorted(state.parcels.values(), key=lambda p: p.id)
         if parcel.settlement == settlement_id and parcel.active
     )
 
@@ -120,7 +218,13 @@ def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int 
             centerline=Polyline(tuple(Vec3(x, y) for x, y in street.points_m)),
             width_m=street.width_m,
             surface_family=street.surface_family,
-            use_intensity={"main": 0.85, "cross": 0.68, "lane": 0.45}.get(street.kind, 0.4),
+            use_intensity={
+                "main": 0.85,
+                "cross": 0.68,
+                "lane": 0.45,
+                "gateway": 0.78,
+                "growth_lane": 0.38,
+            }.get(street.kind, 0.4),
             condition=street.condition,
             provenance=_prov(
                 "settlement_street",
@@ -129,12 +233,12 @@ def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int 
                 street.origin_event,
             ),
         )
-        for street in sorted(world.settlement_space.streets.values(), key=lambda s: s.id)
+        for street in sorted(state.streets.values(), key=lambda s: s.id)
         if street.settlement == settlement_id and street.active
     )
 
     buildings = []
-    for structure in sorted(world.settlement_space.structures.values(), key=lambda s: s.id):
+    for structure in sorted(state.structures.values(), key=lambda s: s.id):
         if structure.settlement != settlement_id or not structure.active:
             continue
         provenance = _prov(
@@ -160,7 +264,11 @@ def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int 
                 style_lineage_ids=(),
                 wealth_band=_wealth_band(world, structure),
                 maintenance=structure.condition,
-                occupancy=("occupied" if structure.occupied_by_household is not None else "unoccupied"),
+                occupancy=(
+                    "occupied"
+                    if structure.occupied_by_household is not None
+                    else "unoccupied"
+                ),
                 phases=(phase,),
                 provenance=provenance,
                 footprint_size_m=(structure.width_m, structure.depth_m),
@@ -178,15 +286,25 @@ def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int 
         household
         for household_id in settlement.households
         for household in [world.households[household_id]]
-        if household.alive and any(world.people[pid].alive for pid in household.members)
+        if household.alive
+        and any(world.people[pid].alive for pid in household.members)
     ]
 
-    profile = world.settlement_space.site_profiles.get(settlement_id)
+    profile = state.site_profiles.get(settlement_id)
+    local_patches = [
+        patch for patch in state.terrain_patches.values()
+        if patch.settlement == settlement_id
+    ]
     metadata = {
         "ambient_magic": f"{ambient.level:.3f}",
         "buildings": str(len(buildings)),
         "defense": f"{settlement.defense:.3f}",
+        "fields": str(sum(1 for f in state.fields.values() if f.settlement == settlement_id and f.active)),
         "food_stock": f"{settlement.food_stock:.1f}",
+        "forest_cover": (
+            f"{sum(p.forest for p in local_patches) / len(local_patches):.3f}"
+            if local_patches else "0.000"
+        ),
         "households": str(len(living_households)),
         "irrigation": f"{settlement.irrigation:.3f}",
         "parcels": str(len(parcels)),
@@ -194,8 +312,9 @@ def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int 
         "prosperity": f"{settlement.prosperity:.3f}",
         "rain": f"{local.rain:.3f}",
         "roads": str(len(roads)),
-        "roads_index": f"{settlement.roads:.3f}",
         "scarcity": f"{local.scarcity:.3f}",
+        "terrain_patches": str(len(local_patches)),
+        "watercourses": str(len(watercourses)),
     }
     if profile is not None:
         metadata.update({
@@ -212,11 +331,12 @@ def compile_settlement_visual_spec(world, settlement_id: int, radius_cells: int 
         world_seed=world.seed,
         visual_seed=_visual_seed(world.seed, settlement_id, world.year),
         time_slice_year=world.year,
-        terrain_regions=terrain,
+        terrain_regions=tuple(terrain),
         parcels=parcels,
+        watercourses=watercourses,
         roads=roads,
         buildings=tuple(buildings),
-        vegetation_zones=(),
+        vegetation_zones=tuple(vegetation),
         population=(),
         weather=None,
         magic_manifestations=(),
