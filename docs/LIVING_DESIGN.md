@@ -485,3 +485,206 @@ If the answer is no, too much world truth has leaked into the renderer.
 
 ATE should not hand-author every possible world. It should build an exceptionally strong visual language and let thousands of years of simulation write with it.
 
+
+
+## 35. Player inhabitation, lived interfaces, and settlement change through participation
+
+ATE must remain, first and foremost, a breathtakingly good RPG. The deep simulation exists to make the role-playing, adventuring, combat, exploration, magic, relationships, discovery, danger, and long-term consequences better — not to turn the player into an administrator watching systems from above.
+
+A player must be able to choose one person, remain with that person for a long time, become a formidable adventurer, build a party, hunt monsters, explore dangerous places, develop an extraordinary magical identity, acquire wealth and reputation, and experience a complete RPG life without ever needing to switch characters.
+
+At the same time, the world supports a broader form of play:
+
+> **The player can inhabit people, shape portions of their lives, release them back into autonomous existence, and encounter them again after the world has continued without the player.**
+
+### Inhabiting and releasing people
+
+The player is not limited to one permanent protagonist. Across a continuing world, the player may create a person, inhabit an existing person where the game permits it, or move among multiple lives over years, decades, generations, and longer historical spans.
+
+Leaving a person does not freeze, store, despawn, or demote them into a dormant former-player-character state. They return fully to the same autonomous simulation as everyone else.
+
+They may:
+
+- marry, separate, have children, lose family, or form new relationships;
+- change profession, ambitions, loyalties, residence, habits, beliefs, or social position;
+- gain or lose wealth and property;
+- continue training or abandon it;
+- learn techniques the player never selected;
+- join organizations or leave them;
+- become respected, forgotten, notorious, comfortable, bitter, powerful, poor, injured, disabled, old, or dead;
+- become involved in historical events the player did not plan;
+- live a completely ordinary and satisfying life.
+
+Returning to such a person means returning to the life that actually occurred. The player does not reload the earlier version of the character.
+
+A person briefly inhabited at nineteen might next be encountered at fifty-three with a spouse, adult children, obligations, scars, friends, enemies, property, debts, skills, beliefs, memories, and decades of history the player did not personally direct.
+
+> **The player leaves people behind, not characters behind.**
+
+Released people belong to themselves again.
+
+### Player influence is history, not permanent puppetry
+
+Actions taken while inhabiting someone become part of that person's actual history, but they do not erase the person's temperament, values, relationships, memories, circumstances, or later agency.
+
+Player control should leave fingerprints rather than permanent mind-control scars.
+
+A character the player pushed toward adventuring may later decide to stop. A deliberately optimized fighter may become a parent, teacher, farmer, merchant, official, recluse, or something else if later circumstances support it. A character whose build seemed disappointing to the player may find an excellent life or profession for that exact magic.
+
+This is especially important because not every person is supposed to become historically important. A baker, fisher, farmer, craftsperson, caravan guard, healer, teacher, or shopkeeper can remain an entirely valid life to inhabit.
+
+The world should occasionally make more of an abandoned character than the player did — and sometimes less.
+
+### Old characters can return naturally
+
+Formerly inhabited people may later re-enter the player's experience because their lives intersect with current events, not because the game artificially preserves them for a callback.
+
+A former adventurer may become a captain in a later war. A briefly played healer may run a field hospital decades later. A farmer may become locally famous for magical agriculture. A forgotten child may become a merchant, criminal, official, teacher, parent, or nobody in particular.
+
+Sometimes the return is dramatic. Sometimes the player simply recognizes an elderly shopkeeper and realizes they once played that person as a teenager.
+
+That ordinary continuity is as important as spectacular historical payoff.
+
+### Knowledge of former characters is not automatically omniscient
+
+The player should not necessarily possess perfect current information about every person ever inhabited.
+
+If a former character has not been seen, heard from, written to, recorded, or otherwise tracked for twenty years, their current location or status may genuinely be unknown.
+
+Finding them again can itself become play.
+
+Any history or character-record interface should distinguish what the player actually knows from hidden simulation truth.
+
+### One world can support many styles of play
+
+The same world should support radically different player relationships with history.
+
+A player may:
+
+- spend a hundred hours with one adventurer and never switch;
+- inhabit many people for short stretches;
+- follow one family across generations;
+- return repeatedly to a small group of favorite people;
+- briefly steer people toward magical, professional, social, or economic paths and release them;
+- remain attached to one long-lived high-rank person across centuries;
+- use different lives to experience the same settlement, conflict, organization, or historical event from multiple legitimate perspectives.
+
+None of these is the privileged "correct" mode.
+
+### The player shapes settlements by living inside them
+
+ATE should never reduce settlement well-being to a direct player-facing prosperity control.
+
+There should be no generic action such as `Improve Town`, no invisible player lever called `Prosperity +10`, and no requirement that the player become a mayor or city-builder to affect a place deeply.
+
+The player changes the conditions under which people live.
+
+The settlement changes because people respond.
+
+A merchant may establish a viable trade route. A fisher may discover productive waters and build knowledge around seasons, techniques, and locations. A farmer may introduce a crop or magical agricultural practice. A blacksmith may benefit from more reliable iron. A healer may reduce mortality during an epidemic. A builder may solve a recurring infrastructure problem. A teacher may begin a school. A religious figure may make the town a destination. A wealthy family may finance construction.
+
+An adventurer or monster hunter can alter the same settlement just as powerfully without participating directly in commerce.
+
+Clearing dangerous territory may:
+
+- make a road usable;
+- reduce caravan losses;
+- allow travelers to return;
+- make previously dangerous land viable for settlement;
+- reduce livestock loss;
+- permit hunters, loggers, farmers, miners, or gatherers to work farther from protection;
+- lower some transport risks;
+- attract workers, families, merchants, guards, or competing interests;
+- create new consequences by disturbing ecology, territory, politics, or existing livelihoods.
+
+The causal sequence matters.
+
+For example:
+
+**monster pressure falls -> road becomes safer -> traffic returns -> trade becomes viable -> material availability changes -> local production changes -> employment changes -> migration becomes more attractive -> construction follows demand**
+
+No step exists merely to reward the player with a town-upgrade token.
+
+### Prosperity is a description, not a governing variable
+
+"Prosperity" may be useful language for a player, historian, or designer describing a settlement after the fact, but it should not be the master cause from which local life is generated.
+
+Two places that both look prosperous may have reached that state through completely different histories and may therefore be fundamentally different places.
+
+One may thrive on trade. Another on agriculture. Another on monster-hunting traffic. Another on mining. Another on pilgrimage. Another because an unusually powerful protector makes the region safe. Another may be rich while most residents remain miserable.
+
+Settlement conditions emerge from interacting realities such as:
+
+- people and households;
+- food and water;
+- housing and land;
+- work and wages;
+- prices and material availability;
+- skills and professions;
+- trade and transportation;
+- safety and monster pressure;
+- property and accumulated wealth;
+- institutions;
+- political legitimacy;
+- crime;
+- health and disease;
+- ecology and weather;
+- magic;
+- migration;
+- family and dependency networks;
+- historical events and individual choices.
+
+Do not collapse those causes into one simulation slider merely because the resulting settlement can later be described as thriving, declining, wealthy, poor, safe, dangerous, stable, or strained.
+
+> **The player does not improve a settlement directly. The player changes reality, and people build their lives around the changed reality.**
+
+### Consequences need not be cleanly positive
+
+A player may make a place safer and unintentionally create later problems.
+
+Removing a predator may destabilize another population. Opening a road may enable invasion as well as commerce. A lucrative resource may create inequality, exploitation, crime, territorial conflict, or ecological exhaustion. Successful monster hunters may produce a local boom economy that collapses after they leave. A newly safe valley may attract settlers into land another community already considers theirs.
+
+The simulation should not need to decide whether the player "helped the town."
+
+It should resolve what changed.
+
+People decide what happens next.
+
+### Subjective lived interface
+
+ATE should distinguish simulation truth from what a person experiences.
+
+Most people should be capable of living inside their magic by feel: knowing an ability is nearly ready, sensing exhaustion, recognizing that aura pressure is wrong, feeling that they have enough strength for another attempt, or understanding familiar magic through practice rather than explicit floating statistics.
+
+A more formal game-like magical interface can exist as an in-world phenomenon, especially through soulspace or related magic, but it must obey the same epistemic rule as every other part of ATE:
+
+> **An interface may organize what a person can legitimately know or perceive. It may not expose hidden simulation truth simply because the player is looking.**
+
+Thus the player should never walk into a settlement and receive an omniscient `Economic Health: 63%` readout.
+
+A merchant who has gathered prices, contracts, supply information, local knowledge, and observations may have that information organized exceptionally well. A healer may experience health information differently. A monster specialist may recognize a creature that another person cannot identify. A soldier may organize threats and terrain differently from a fisher.
+
+Different people can therefore experience the same world through different informational affordances while the game's controls remain understandable and usable.
+
+Whether a broadly available soulspace interface eventually becomes universal, historically spreads, or remains restricted is a world/cosmology decision still open to further design.
+
+### Looting remains an open design decision
+
+Do not yet canonize universal magical looting.
+
+Physical scavenging and magical loot extraction should remain conceptually distinct while the design is unresolved.
+
+Anyone may be able to take actual physical possessions or harvest physical remains when capable of doing so. Whether essences, awakening stones, condensed magical resources, or other special rewards require a dedicated looting power, specialist, familiar, item, technique, profession, soulspace function, or later universal interface remains open.
+
+Preserve the value of looting as a potentially meaningful magical niche until this question is resolved.
+
+### Player-facing design test
+
+For every deep simulation feature, ask two separate questions:
+
+1. **Is the world causally deep enough that this outcome actually makes sense?**
+2. **Is the player's immediate experience still that of an exceptional RPG rather than operating a simulation dashboard?**
+
+Complexity belongs beneath the player.
+
+Clarity, responsiveness, beauty, danger, discovery, agency, and consequence belong in front of them.
