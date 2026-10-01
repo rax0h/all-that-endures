@@ -450,6 +450,18 @@ def _add_row(slots, street, axis, fixed, positions, side_offsets, facing):
                 slots.append((street, fixed + side, position, facing if side < 0 else facing + 180))
 
 
+def _add_spur_slots(slots, street, angle_degrees, distances, side_offsets):
+    radians = math.radians(angle_degrees)
+    dx, dy = math.cos(radians), math.sin(radians)
+    nx, ny = -dy, dx
+    for distance in distances:
+        for side in side_offsets:
+            x = dx * distance + nx * side
+            y = dy * distance + ny * side
+            facing = angle_degrees if side > 0 else angle_degrees + 180
+            slots.append((street, x, y, facing))
+
+
 def _site_slots(profile):
     spacing = profile.parcel_spacing_m
     long_positions = [
@@ -476,8 +488,9 @@ def _site_slots(profile):
         sparse = long_positions[::2]
         _add_row(slots, "lane_a" if wet_fixed > 0 else "lane_b", "x", wet_fixed, sparse, (-side, side), 0)
     elif profile.archetype == "woodland":
-        _add_row(slots, "spur_a", "x", 0.0, short_positions, (-13.0, 13.0), 34)
-        _add_row(slots, "spur_b", "x", 0.0, short_positions, (-13.0, 13.0), 214)
+        spur_distances = [38.0, 62.0, 88.0, 114.0, 140.0]
+        _add_spur_slots(slots, "spur_a", 34.0, spur_distances, (-13.0, 13.0))
+        _add_spur_slots(slots, "spur_b", 214.0, spur_distances, (-13.0, 13.0))
         _add_row(slots, "cross", "y", 0.0, short_positions[::2], (-14.0, 14.0), 90)
         _add_row(slots, "lane_a", "x", profile.lane_spacing_m, short_positions[1::2], (-13.0, 13.0), 0)
     elif profile.archetype == "upland":
