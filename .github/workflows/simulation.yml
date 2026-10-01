@@ -44,6 +44,13 @@ jobs:
             --years 100 \
             --settlement 1 \
             --out artifacts/world_843000_y100.png
+      - name: render settlement seed comparison
+        run: |
+          python simulation/render_settlement_comparison.py \
+            --seeds 843000 843001 731 \
+            --years 100 \
+            --settlement 1 \
+            --out artifacts/settlement_seed_comparison_y100.png
       - name: upload simulated settlement preview
         uses: actions/upload-artifact@v4
         with:
