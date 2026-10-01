@@ -19,6 +19,7 @@ from .visual_spec import (
     Vec3,
     VegetationZoneSpec,
     WeatherSpec,
+    WatercourseSpec,
 )
 
 
@@ -69,6 +70,20 @@ def visual_spec_from_dict(payload: Mapping[str, Any]) -> SettlementVisualSpec:
             provenance=_prov(item.get("provenance")),
         )
         for item in payload.get("parcels", ())
+    )
+
+    watercourses = tuple(
+        WatercourseSpec(
+            watercourse_id=str(item["watercourse_id"]),
+            centerline=Polyline(
+                tuple(_vec(point) for point in item.get("centerline", {}).get("points", ()))
+            ),
+            width_m=float(item.get("width_m", 1.0)),
+            kind=str(item.get("kind", "stream")),
+            perennial=bool(item.get("perennial", False)),
+            provenance=_prov(item.get("provenance")),
+        )
+        for item in payload.get("watercourses", ())
     )
 
     roads = tuple(
@@ -183,6 +198,7 @@ def visual_spec_from_dict(payload: Mapping[str, Any]) -> SettlementVisualSpec:
         time_slice_year=int(payload["time_slice_year"]),
         terrain_regions=terrain,
         parcels=parcels,
+        watercourses=watercourses,
         roads=roads,
         buildings=tuple(buildings),
         vegetation_zones=vegetation,
