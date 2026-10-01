@@ -37,6 +37,13 @@ jobs:
             --radius-cells 6 \
             --out-spec artifacts/settlement_843000_y100_s1.json \
             --out-map artifacts/settlement_843000_y100_s1.png
+      - name: render world overview preview
+        run: |
+          python simulation/render_world_overview.py \
+            --seed 843000 \
+            --years 100 \
+            --settlement 1 \
+            --out artifacts/world_843000_y100.png
       - name: upload simulated settlement preview
         uses: actions/upload-artifact@v4
         with:
