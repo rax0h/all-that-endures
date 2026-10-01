@@ -22,6 +22,8 @@ class PreviewStyle:
     vegetation: str = "#6f8657"
     vegetation_outline: str = "#506441"
     road: str = "#685a48"
+    parcel_fill: str = "#d8c9a4"
+    parcel_outline: str = "#8a775d"
     building: str = "#5b5a56"
     building_outline: str = "#343431"
     damaged: str = "#b85c3f"
@@ -35,6 +37,8 @@ class PreviewStyle:
 def _all_points(spec: SettlementVisualSpec) -> Iterable[Vec3]:
     for region in spec.terrain_regions:
         yield from region.boundary
+    for parcel in spec.parcels:
+        yield parcel.position
     for road in spec.roads:
         yield from road.centerline.points
     for building in spec.buildings:
@@ -172,6 +176,26 @@ def render_settlement_preview(
             outline=style.vegetation_outline,
         )
 
+    # Parcels.
+    for parcel in spec.parcels:
+        center = _transform(parcel.position, bounds, style)
+        width_m, depth_m = parcel.size_m
+        polygon = _rotated_rect(
+            center,
+            max(4.0, width_m * world_scale),
+            max(4.0, depth_m * world_scale),
+            parcel.facing_degrees,
+        )
+        alpha = 90 if parcel.land_use == "residential" else 120
+        fill = style.parcel_fill + f"{alpha:02x}"
+        if parcel.land_use == "institutional":
+            fill = "#c6b88c99"
+        elif parcel.land_use == "workshop":
+            fill = "#c9aa7a99"
+        elif parcel.land_use == "public":
+            fill = "#d5c58db0"
+        draw.polygon(polygon, fill=fill, outline=style.parcel_outline)
+
     # Roads.
     for road in spec.roads:
         points = [_transform(point, bounds, style) for point in road.centerline.points]
@@ -190,7 +214,16 @@ def render_settlement_preview(
             max(4.0, height_m * world_scale),
             building.facing_degrees,
         )
-        draw.polygon(polygon, fill=style.building, outline=style.building_outline)
+        building_fill = style.building
+        if building.function in ("market_hall",):
+            building_fill = "#9a7748"
+        elif "society" in building.function or building.function == "guildhall":
+            building_fill = "#6f667f"
+        elif building.function in ("smithy", "pottery", "carpenter_shop", "mason_yard", "weaving_house", "food_workshop", "workshop"):
+            building_fill = "#7b5b45"
+        elif building.function == "leased_dwelling":
+            building_fill = "#686762"
+        draw.polygon(polygon, fill=building_fill, outline=style.building_outline)
         damage, repair = _building_damage(building)
         if damage > 0.0:
             draw.line(polygon + [polygon[0]], fill=style.damaged, width=max(2, round(3 + 5 * damage)))
@@ -198,6 +231,9 @@ def render_settlement_preview(
             x, y = center
             radius = max(3, round(4 + 8 * repair))
             draw.ellipse((x - radius, y - radius, x + radius, y + radius), outline=style.repaired, width=2)
+        if show_labels and building.function not in ("dwelling", "leased_dwelling"):
+            label = building.function.replace("_", " ")
+            draw.text((center[0] + 6, center[1] - 6), label, fill=style.text, font=font)
 
     # People markers.
     if show_people:
@@ -257,6 +293,7 @@ def render_settlement_preview(
         entries = [
             ("water", style.water),
             ("vegetation", style.vegetation),
+            ("parcel", style.parcel_outline),
             ("road", style.road),
             ("building", style.building),
             ("damage", style.damaged),
