@@ -8,6 +8,7 @@ from .visual_spec import (
     BuildingPhaseSpec,
     BuildingSpec,
     MagicManifestationSpec,
+    ParcelSpec,
     Polyline,
     PopulationRepresentationSpec,
     ProvenanceRef,
@@ -54,6 +55,20 @@ def visual_spec_from_dict(payload: Mapping[str, Any]) -> SettlementVisualSpec:
             surface_kind=str(item.get("surface_kind", "land")),
         )
         for item in payload.get("terrain_regions", ())
+    )
+
+    parcels = tuple(
+        ParcelSpec(
+            parcel_id=str(item["parcel_id"]),
+            position=_vec(item["position"]),
+            facing_degrees=float(item.get("facing_degrees", 0.0)),
+            size_m=(float(item.get("size_m", (10.0, 10.0))[0]), float(item.get("size_m", (10.0, 10.0))[1])),
+            land_use=str(item.get("land_use", "unknown")),
+            owner_kind=item.get("owner_kind"),
+            owner_id=(None if item.get("owner_id") is None else str(item.get("owner_id"))),
+            provenance=_prov(item.get("provenance")),
+        )
+        for item in payload.get("parcels", ())
     )
 
     roads = tuple(
@@ -167,6 +182,7 @@ def visual_spec_from_dict(payload: Mapping[str, Any]) -> SettlementVisualSpec:
         visual_seed=int(payload["visual_seed"]),
         time_slice_year=int(payload["time_slice_year"]),
         terrain_regions=terrain,
+        parcels=parcels,
         roads=roads,
         buildings=tuple(buildings),
         vegetation_zones=vegetation,
