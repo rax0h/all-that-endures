@@ -53,3 +53,27 @@ def test_compiler_is_deterministic():
 
     assert a.canonical_json() == b.canonical_json()
     assert a.digest() == b.digest()
+
+
+
+def test_compiler_exposes_real_local_terrain_layers():
+    world = Simulation(generate_world(843000)).run(20)
+    spec = compile_settlement_visual_spec(world, 1)
+
+    patch_count = sum(
+        1 for patch in world.settlement_space.terrain_patches.values()
+        if patch.settlement == 1
+    )
+    field_count = sum(
+        1 for field in world.settlement_space.fields.values()
+        if field.settlement == 1 and field.active
+    )
+    assert len([r for r in spec.terrain_regions if r.region_id.startswith("terrain-patch:")]) == patch_count
+    assert len([r for r in spec.terrain_regions if r.surface_kind == "field"]) == field_count
+    assert len(spec.watercourses) == sum(
+        1 for water in world.settlement_space.watercourses.values()
+        if water.settlement == 1
+    )
+    assert spec.vegetation_zones
+    assert int(spec.metadata["terrain_patches"]) == patch_count
+    assert int(spec.metadata["fields"]) == field_count
