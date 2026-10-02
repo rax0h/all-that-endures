@@ -8,6 +8,11 @@ class Genealogy:
         self.parents[child]=parents
         for p in parents:self.children.setdefault(p,[]).append(child)
     def ancestors(self,pid:int,depth=8):
+        # Parentage is immutable after birth, so ancestry is a derived value
+        # that can be cached without becoming canonical simulation state.
+        cache=self.__dict__.setdefault('_ancestor_cache',{})
+        key=(pid,depth);cached=cache.get(key)
+        if cached is not None:return set(cached)
         out=set(); frontier={pid}
         for _ in range(depth):
             nxt=set()
@@ -16,4 +21,5 @@ class Genealogy:
                     if p not in out:out.add(p); nxt.add(p)
             frontier=nxt
             if not frontier:break
-        return out
+        cache[key]=frozenset(out)
+        return set(out)

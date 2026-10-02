@@ -1,5 +1,5 @@
 """Frozen agency step from 216c2660 for differential stabilization tests."""
-from simulation.ate_sim.agency import ActionRecord, _practice_path
+from simulation.ate_sim.agency import ActionRecord, _practice_path, ORDINARY_WORK_INCOME
 from simulation.ate_sim.rank_ecology import rank_ecology_step
 
 def legacy_agency_step(world,rng):
@@ -15,7 +15,7 @@ def legacy_agency_step(world,rng):
   _practice_path(world,p,rr,action,strength)
   if action=='secure_food':world.households[p.household].food+=.08+.2*strength
   elif action=='prepare':world.households[p.household].preparedness=min(1.,world.households[p.household].preparedness+.002*strength)
-  elif action=='work':p.wealth+=.03*strength
+  elif action=='work':p.wealth+=ORDINARY_WORK_INCOME*strength
   world.agency.actions.append(ActionRecord(world.year,p.id,action,motive,strength,None if event is None else event.id))
  if len(world.agency.actions)>50000:world.agency.actions=world.agency.actions[-50000:]
  rank_ecology_step(world,rng)

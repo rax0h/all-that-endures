@@ -30,10 +30,42 @@ from .society_accountability import SocietyAccountabilityState
 from .currency import RankedCurrencyState
 from .threat_ecology import ThreatEcologyState
 class Layer(str,Enum): REALITY='reality'; SOCIETY='society'; KNOWLEDGE='knowledge'; NARRATIVE='narrative'
+_REF_CACHE={}
 @dataclass(frozen=True)
-class Ref: kind:str; id:int
-@dataclass
+class Ref:
+ kind:str; id:int
+ def __new__(cls,kind=None,id=None):
+  # Refs are immutable value objects and recur millions of times in event
+  # history. Reuse one object per (kind,id) during normal construction. The
+  # no-arg path preserves pickle/deepcopy reconstruction compatibility.
+  if kind is None:return super().__new__(cls)
+  key=(kind,id);cached=_REF_CACHE.get(key)
+  if cached is None:
+   cached=super().__new__(cls);_REF_CACHE[key]=cached
+  return cached
+@dataclass(slots=True)
 class Event: id:int; year:int; kind:str; layer:Layer; actors:tuple[Ref,...]=(); location:Ref|None=None; causes:tuple[int,...]=(); data:dict[str,Any]=field(default_factory=dict)
+@dataclass(slots=True)
+class EventIdIndex:
+ max_id:int=0
+ missing:set[int]=field(default_factory=set)
+ def add(self,value):
+  if value==self.max_id+1:self.max_id=value;return
+  if 0<value<=self.max_id:self.missing.discard(value);return
+  # Out-of-order future IDs are not a normal simulation state; represent the
+  # gap explicitly so membership remains correct for fixtures/checkpoints.
+  if value>self.max_id+1:
+   self.missing.update(range(self.max_id+1,value));self.max_id=value
+ def discard(self,value):
+  if 0<value<=self.max_id:self.missing.add(value)
+ def remove(self,value):
+  if value not in self:raise KeyError(value)
+  self.discard(value)
+ def __contains__(self,value):return 0<value<=self.max_id and value not in self.missing
+ def __len__(self):return self.max_id-len(self.missing)
+ def __iter__(self):
+  return (i for i in range(1,self.max_id+1) if i not in self.missing)
+
 @dataclass
 class Person:
  id:int; born:int; settlement:int; household:int; alive:bool=True; age:int=0; wealth:float=0.; health:float=1.; temperament:float=.5; attachment:float=.5; curiosity:float=.5; inhibition:float=.5; grief:float=0.; fear:float=0.; rank:int=0; species:str='human'; occupation:str='labor'; parents:tuple[int,...]=()
@@ -60,18 +92,64 @@ def _canonical(value):
  return value
 @dataclass
 class World:
- seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); trade_routes:dict[tuple[int,int],TradeRoute]=field(default_factory=dict); events:list[Event]=field(default_factory=list); event_ids:set[int]=field(default_factory=set); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); lineage:LineageState=field(default_factory=LineageState); communities:CommunityState=field(default_factory=CommunityState); transmission:TransmissionState=field(default_factory=TransmissionState); skills:SkillState=field(default_factory=SkillState); infrastructure:InfrastructureState=field(default_factory=InfrastructureState); agency:AgencyState=field(default_factory=AgencyState); advancement:AdvancementState=field(default_factory=AdvancementState); magic_resources:MagicResourceState=field(default_factory=MagicResourceState); institutions:InstitutionState=field(default_factory=InstitutionState); metaphysics:MetaphysicalState=field(default_factory=MetaphysicalState); divinity:DivineState=field(default_factory=DivineState); materials:MaterialEconomy=field(default_factory=MaterialEconomy); ambient_magic:AmbientMagicState=field(default_factory=AmbientMagicState); warfare:WarfareState=field(default_factory=WarfareState); society_accountability:SocietyAccountabilityState=field(default_factory=SocietyAccountabilityState); currency:RankedCurrencyState=field(default_factory=RankedCurrencyState); threat_ecology:ThreatEcologyState=field(default_factory=ThreatEcologyState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
+ seed:int; year:int=0; cells:dict[tuple[int,int],Cell]=field(default_factory=dict); people:dict[int,Person]=field(default_factory=dict); households:dict[int,Household]=field(default_factory=dict); settlements:dict[int,Settlement]=field(default_factory=dict); local:dict[int,LocalState]=field(default_factory=dict); trade_routes:dict[tuple[int,int],TradeRoute]=field(default_factory=dict); events:list[Event]=field(default_factory=list); event_ids:EventIdIndex|set[int]=field(default_factory=EventIdIndex); genealogy:Genealogy=field(default_factory=Genealogy); social:SocialGraph=field(default_factory=SocialGraph); economy:Economy=field(default_factory=Economy); knowledge:KnowledgeState=field(default_factory=KnowledgeState); culture:CulturalState=field(default_factory=CulturalState); lineage:LineageState=field(default_factory=LineageState); communities:CommunityState=field(default_factory=CommunityState); transmission:TransmissionState=field(default_factory=TransmissionState); skills:SkillState=field(default_factory=SkillState); infrastructure:InfrastructureState=field(default_factory=InfrastructureState); agency:AgencyState=field(default_factory=AgencyState); advancement:AdvancementState=field(default_factory=AdvancementState); magic_resources:MagicResourceState=field(default_factory=MagicResourceState); institutions:InstitutionState=field(default_factory=InstitutionState); metaphysics:MetaphysicalState=field(default_factory=MetaphysicalState); divinity:DivineState=field(default_factory=DivineState); materials:MaterialEconomy=field(default_factory=MaterialEconomy); ambient_magic:AmbientMagicState=field(default_factory=AmbientMagicState); warfare:WarfareState=field(default_factory=WarfareState); society_accountability:SocietyAccountabilityState=field(default_factory=SocietyAccountabilityState); currency:RankedCurrencyState=field(default_factory=RankedCurrencyState); threat_ecology:ThreatEcologyState=field(default_factory=ThreatEcologyState); next_person:int=1; next_household:int=1; next_settlement:int=1; next_event:int=1
  def emit(self,kind,layer,actors=(),location=None,causes=(),**data):
   if layer is None:raise ValueError('events require an explicit layer')
-  if any(c not in self.event_ids for c in causes):raise ValueError('event cause does not exist')
+  # Event IDs are contiguous and append-only from 1..next_event-1. Validate
+  # against that range instead of hashing every cause into a million-entry set.
+  if causes:
+   limit=self.next_event
+   if len(self.event_ids)==limit-1:
+    for cause in causes:
+     if cause<=0 or cause>=limit:raise ValueError('event cause does not exist')
+   elif any(cause not in self.event_ids for cause in causes):
+    raise ValueError('event cause does not exist')
   if kind in ('birth','death','resurrection'):self.__dict__.pop('_living_cache',None)
-  e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id);return e
+  e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id)
+  return e
+ def event(self,event_id):
+  """Return a retained event payload by absolute id.
+
+  Canonical runs retain the complete list. Longevity observations may prune an
+  old prefix after aggregating it; absolute IDs and event_ids remain permanent.
+  """
+  sparse=self.__dict__.get('_retained_event_payloads')
+  if sparse is not None and event_id in sparse:return sparse[event_id]
+  base=self.__dict__.get('_event_base_id',1)
+  idx=event_id-base
+  if 0<=idx<len(self.events):
+   event=self.events[idx]
+   if event.id==event_id:return event
+  return None
  def events_between(self,first_year,last_year=None):
   # Events append in simulation-year order; binary search touches no old payloads.
   last_year=self.year if last_year is None else last_year
   if last_year<first_year:return []
   key=attrgetter('year');start=bisect_left(self.events,first_year,key=key);stop=bisect_right(self.events,last_year,key=key)
   return self.events[start:stop]
+ def prune_event_payloads_before_year(self,first_year_to_keep,protected_ids=()):
+  """Drop an old event-payload prefix while preserving permanent causal IDs.
+
+  A tiny sparse set of operationally referenced old payloads may be protected.
+  This is for non-canonical longevity observation only; archive/digest runs must
+  retain the complete event list and must not call it.
+  """
+  if not self.events:return 0
+  key=attrgetter('year');cut=bisect_left(self.events,first_year_to_keep,key=key)
+  if cut<=0:return 0
+  protected=set(protected_ids)
+  if protected:
+   sparse=self.__dict__.setdefault('_retained_event_payloads',{})
+   for event in self.events[:cut]:
+    if event.id in protected:sparse[event.id]=event
+   for eid in tuple(sparse):
+    if eid not in protected:sparse.pop(eid,None)
+  elif '_retained_event_payloads' in self.__dict__:
+   self._retained_event_payloads.clear()
+  removed=cut
+  del self.events[:cut]
+  self._event_base_id=self.events[0].id if self.events else self.next_event
+  return removed
  @contextmanager
  def current_people_scope(self):
   # A step-local index: direct edits between steps and loaded checkpoints need

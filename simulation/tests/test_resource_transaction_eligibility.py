@@ -2,6 +2,7 @@ from copy import deepcopy
 import pytest
 from simulation.ate_sim import generate_world
 from simulation.ate_sim import magic_resources as magic
+from simulation.ate_sim import magic_trade
 from simulation.ate_sim.core import RNG, Layer, Ref
 from simulation.ate_sim.semantic_dictionary import ESSENCE_IDS, STONE_IDS
 
@@ -60,21 +61,41 @@ def test_affordability_does_not_bypass_essence_compatibility():
     assert r.owner_id==h.id
 
 
-def test_settlement_cache_falls_through_after_first_buyer_spends_their_money():
+def test_full_path_aspirant_buys_and_absorbs_all_three_affordable_bases_in_one_visit():
+    w,h,poor,buyer,_,_=setup_market()
+    w.people={buyer.id:buyer};buyer.wealth=10
+    a=magic._aspiration(w,buyer);a.desired_base_essences=3;a.desired_abilities=20;a.completion_goal=True
+    w.magic_resources.resources.clear();w.magic_resources.owner_index.clear()
+    stock=[w.magic_resources.create('essence',ESSENCE_IDS[i],'common',0,buyer.settlement,'settlement',buyer.settlement) for i in range(3)]
+    magic_trade._retail_browse(w,{buyer.settlement:[buyer]})
+    path=w.advancement.path(buyer.id)
+    assert path is not None and len(path.base_essences)==3
+    assert all(resource.consumed_by==buyer.id for resource in stock)
+    assert buyer.wealth==pytest.approx(7)
+    assert sum(e.kind=='magic_resource_purchased' for e in w.events)==3
+
+
+def test_failed_shop_purchase_leaves_stock_for_later_buyer():
     w,h,poor,buyer,_,_=setup_market()
     w.people={p.id:p for p in (h,poor,buyer)}
-    h.wealth=7;buyer.wealth=14
-    w.magic_resources.aspirations[h.id].urgency=.8
+    h.wealth=poor.wealth=buyer.wealth=0
     w.magic_resources.resources.clear();w.magic_resources.owner_index.clear()
-    stock=[w.magic_resources.create('essence',ESSENCE_IDS[0],'common',0,h.settlement,'settlement',h.settlement) for _ in range(4)]
-    class NoRandomActions:
-        def stream(self,*args):return self
-        def random(self):return 1.
-    magic.magic_ecology_step(w,NoRandomActions())
-    assert [r.owner_id for r in stock[:3]]==[h.id,buyer.id,buyer.id]
-    assert stock[3].owner_kind=='settlement'
-    assert h.wealth==buyer.wealth==poor.wealth==0
-    assert sum(e.kind=='magic_resource_purchased' for e in w.events)==3
+    resource=w.magic_resources.create('essence',ESSENCE_IDS[0],'common',0,h.settlement,'settlement',h.settlement)
+    magic_trade._retail_browse(w,{h.settlement:[h,poor,buyer]})
+    assert resource.owner_kind=='settlement' and not resource.transfers
+    buyer.wealth=1
+    magic_trade._retail_browse(w,{h.settlement:[h,poor,buyer]})
+    assert resource.owner_kind=='person' and resource.owner_id==buyer.id
+    assert buyer.wealth==0
+
+
+def test_civilian_essence_prices_put_rarity_not_basic_access_on_the_curve():
+    class R:
+        kind='essence'
+        def __init__(self,rarity):self.rarity=rarity
+    prices=[magic_trade._retail_price(R(r)) for r in ('common','uncommon','Rare','Epic','Legendary','Mythic','Transcendent')]
+    assert prices==sorted(prices)
+    assert prices[0]==1 and prices[1]==1.5 and prices[-1]==21
 
 
 def test_transfer_is_deterministic_with_affordable_candidates():
@@ -82,3 +103,20 @@ def test_transfer_is_deterministic_with_affordable_candidates():
     magic._transfer_to_seeker(w,r,h,[h,poor,buyer],RNG(17))
     magic._transfer_to_seeker(other,other.magic_resources.resources[r.id],other.people[h.id],[other.people[p.id] for p in (h,poor,buyer)],RNG(17))
     assert w.digest()==other.digest()
+
+
+def test_urgent_long_waiting_shopper_arrives_before_low_urgency_shopper():
+    w,h,poor,buyer,_,_=setup_market()
+    w.people={p.id:p for p in (h,buyer)}
+    h.wealth=buyer.wealth=10
+    ah=magic._aspiration(w,h);ab=magic._aspiration(w,buyer)
+    ah.desired_base_essences=ab.desired_base_essences=1
+    ah.urgency=.10;ah.drive=.10;ah.preparation=0.;ah.search_years=0
+    ab.urgency=.95;ab.drive=.60;ab.preparation=.40;ab.search_years=20
+    w.magic_resources.resources.clear();w.magic_resources.owner_index.clear()
+    r=w.magic_resources.create('essence',ESSENCE_IDS[0],'common',0,h.settlement,'settlement',h.settlement)
+    class SameArrival:
+        def stream(self,*args):return self
+        def random(self):return .5
+    magic_trade._retail_browse(w,{h.settlement:[h,buyer]},SameArrival())
+    assert r.owner_kind=='person' and r.owner_id==buyer.id

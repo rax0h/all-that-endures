@@ -1,6 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
+from .currency import denomination_for_rank
+from .magic_progression import record_application
 
 RANK_NAMES=('mundane','iron','bronze','silver','gold','diamond','transcendent')
 
@@ -11,6 +13,7 @@ class MagicalThreat:
 @dataclass
 class ThreatEcologyState:
  threats:dict[int,MagicalThreat]=field(default_factory=dict);next_id:int=1
+ resolutions:dict[int,int]=field(default_factory=dict)
  def active(self,sid=None):
   return [t for t in self.threats.values() if t.status=='active' and (sid is None or t.location==sid)]
 
@@ -69,7 +72,7 @@ def _manifestation_form(kind,tags,rr):
 
 def effective_response_rank(world,p):
  """Preparation and a complete, coherent path can let an exceptional actor punch up one tier."""
- rank=world.advancement.rank(p.id) if world.advancement.essence_user(p.id) else 0
+ rank=p.rank if world.advancement.essence_user(p.id) else 0
  path=world.advancement.path(p.id)
  complete=path is not None and len(path.abilities)>=20
  quality=.34*p.health+.26*p.curiosity+.20*(1-p.inhibition)+.20*min(1.,p.wealth/25.)
@@ -77,6 +80,12 @@ def effective_response_rank(world,p):
 
 def threat_ecology_step(world,rng):
  Layer,Ref=layer_ref();state=world.threat_ecology;living=world.living_by_settlement()
+ dispatched={}
+ for notice in world.institutions.active_notices():
+  if notice.kind=='ranked_magic_manifested' and notice.status=='assigned' and notice.assigned_to is not None:
+   person=world.people.get(notice.assigned_to)
+   if person and person.alive and person.settlement!=notice.location and world.infrastructure.route_condition(person.settlement,notice.location)>0:
+    dispatched[notice.cause_event]=person
  for sid,s in sorted(world.settlements.items()):
   rr=rng.stream('ranked_threat_ecology',world.year,sid);field=world.ambient_magic.field(sid);cell=world.cells[(s.x,s.y)];tags=environment_tags(world,sid)
   ceiling=supported_rank(field.level,cell.hazard)
@@ -86,14 +95,30 @@ def threat_ecology_step(world,rng):
    e=world.emit('ranked_magic_manifested',Layer.REALITY,location=Ref('settlement',sid),manifestation_kind=manifestation_kind,form=form,environment_tags=tags,manifestation_basis='ambient magic expressing local conditions',rank=rank,rank_name=RANK_NAMES[rank],ambient=round(field.level,3),ecological_ceiling=RANK_NAMES[ceiling])
    tid=state.next_id;state.next_id+=1;state.threats[tid]=MagicalThreat(tid,manifestation_kind,rank,sid,world.year,field.level,origin_event=e.id,form=form,environment_tags=tags)
   residents=[p for p in living.get(sid,()) if p.age>=16]
-  responders=sorted(residents,key=lambda p:(effective_response_rank(world,p),world.advancement.rank(p.id) if world.advancement.essence_user(p.id) else 0,p.health),reverse=True)
+  responders=sorted(residents,key=lambda p:(effective_response_rank(world,p),p.rank if world.advancement.essence_user(p.id) else 0,p.health),reverse=True)
   for threat in sorted(state.active(sid),key=lambda t:(-t.rank,t.id))[:3]:
-   if not responders:continue
-   best=responders[0];effective=effective_response_rank(world,best);gap=threat.rank-effective
-   if gap>1:continue
+   visitor=dispatched.get(threat.origin_event)
+   candidates=responders if visitor is None else sorted((*responders,visitor),key=lambda p:(effective_response_rank(world,p),p.rank,p.health),reverse=True)
+   if not candidates:continue
+   best=candidates[0];effective=effective_response_rank(world,best);gap=threat.rank-effective
+   actual=best.rank;difference=threat.rank-actual
+   if gap>0 or difference>1:continue
+   path=world.advancement.path(best.id)
+   applicable=[a for a in path.abilities if a.function in ('attack','destruction','damage','control','movement','defense','enhancement','detection','support','sense','technique','precision','reaction','suppression','affliction','deception','concealment','redirection','timing','detection-denial','disruption','drain','pressure','multitasking','persistence','manipulation')] if path else []
+   used=sorted(applicable,key=lambda a:(len(a.understanding.applications),a.level,a.semantic_key))[:3]
    base={-4:.99,-3:.98,-2:.96,-1:.91,0:.72,1:.22}.get(gap,.02)
    teamwork=min(.18,.025*sum(1 for p in responders[:8] if effective_response_rank(world,p)>=max(0,threat.rank-1)))
-   if rr.random()<min(.98,base+teamwork):
-    threat.status='resolved';world.emit('ranked_threat_resolved',Layer.SOCIETY,(Ref('person',best.id),),Ref('settlement',sid),((threat.origin_event,) if threat.origin_event else ()),threat=threat.id,manifestation_kind=threat.kind,form=threat.form,threat_rank=threat.rank,threat_rank_name=RANK_NAMES[threat.rank],responder_rank=world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0,effective_rank=effective,punched_up=effective>=threat.rank and (world.advancement.rank(best.id) if world.advancement.essence_user(best.id) else 0)<threat.rank)
+   constraints=sum(bool(set(threat.environment_tags)&set(axis)) for axis in (('wet','flood'),('forest','scrub'),('hazard','poison'),('settled','waste')))
+   complexity=min(5,max(threat.rank,1+constraints))
+   if best.settlement!=sid:
+    world.emit('ranked_response_journey',Layer.REALITY,(Ref('person',best.id),),Ref('settlement',sid),(threat.origin_event,),origin_settlement=best.settlement,destination=sid,threat=threat.id,mechanism='Society dispatch over an existing road; temporary journey')
+   if rr.random()<min(.98,base+teamwork+.005*sum(a.level for a in used)-.025*constraints):
+    threat.status='resolved';resolution=world.emit('ranked_threat_resolved',Layer.SOCIETY,(Ref('person',best.id),),Ref('settlement',sid),((threat.origin_event,) if threat.origin_event else ()),challenge_complexity=complexity,used_abilities=tuple(a.semantic_key for a in used),threat=threat.id,manifestation_kind=threat.kind,form=threat.form,threat_rank=threat.rank,threat_rank_name=RANK_NAMES[threat.rank],responder_rank=best.rank if world.advancement.essence_user(best.id) else 0,effective_rank=effective,punched_up=effective>=threat.rank and (best.rank if world.advancement.essence_user(best.id) else 0)<threat.rank)
+    for ability in used:
+     record_application(world,best,ability,resolution,constraint=f'{threat.kind}:{threat.form}:{sid}',difficulty=complexity,outcome=1.)
+    if threat.origin_event is not None:state.resolutions[threat.origin_event]=resolution.id
+    if threat.kind=='monster':
+     harvested=world.emit('monster_remains_harvested',Layer.REALITY,(Ref('person',best.id),),Ref('settlement',sid),(resolution.id,),threat=threat.id,material_rank=threat.rank,valuation_denomination=denomination_for_rank(threat.rank),mechanism='physical_harvest',quantity=1.)
+     world.materials.create_lot('monster_remains',1.,.5+.05*threat.rank,sid,best.id,world.year,harvested.id,(threat.form,),threat.rank)
    elif gap>=0 and rr.random()<.08+.05*gap:
     world.emit('ranked_threat_escalated',Layer.REALITY,location=Ref('settlement',sid),causes=((threat.origin_event,) if threat.origin_event else ()),threat=threat.id,form=threat.form,rank=threat.rank,rank_name=RANK_NAMES[threat.rank])

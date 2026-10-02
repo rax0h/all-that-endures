@@ -7,6 +7,7 @@ from .development import development_step
 from .agency import agency_step
 from .institutions import institution_step
 from .magic_resources import magic_ecology_step
+from .magic_trade import magic_trade_step
 from .materials import material_economy_step
 from .ambient_magic import ambient_magic_step
 from .divinity import divine_step
@@ -24,7 +25,7 @@ class Simulation:
   return self.w
  def step(self):
   with self.w.current_people_scope():
-   self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
+   self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); magic_trade_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
  def _weather(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("weather",self.w.year,sid);q=self.w.local[sid];q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38)));q.drought=max(0,.35-q.rain);q.flood=max(0,q.rain-.82)
@@ -54,7 +55,7 @@ class Simulation:
   for oid in survivors:
    q=self.w.people[oid];rel=self.w.social.get(p.id,oid);q.grief=min(1,q.grief+.12+.55*rel.attachment);self.w.social.record(p.id,oid,e.id,attachment=.01);self.w.emit("bereavement",Layer.SOCIETY,(Ref("person",oid),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),grief=q.grief)
   if survivors:
-   children=[x for x in self.w.genealogy.children.get(p.id,[]) if self.w.people.get(x) and self.w.people[x].alive];heir=min(children) if children else min(survivors);inherited=p.wealth;self.w.people[heir].wealth+=inherited;p.wealth=0.;self.w.emit("inheritance",Layer.SOCIETY,(Ref("person",heir),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),wealth=inherited)
+   children=[x for x in self.w.genealogy.children.get(p.id,[]) if self.w.people.get(x) and self.w.people[x].alive];heir=min(children) if children else min(survivors);inherited=p.wealth;self.w.people[heir].wealth+=inherited;p.wealth=0.;coins=dict(self.w.currency.wallets.get(p.id,{}));self.w.currency.transfer(p.id,heir,coins);self.w.emit("inheritance",Layer.SOCIETY,(Ref("person",heir),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),wealth=inherited,coin_transfer=coins)
  def _capacity(self,sid):
   s=self.w.settlements[sid];c=self.w.cells[(s.x,s.y)];return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
  def _demography(self):
@@ -76,8 +77,25 @@ class Simulation:
    sp=child_species(a,b,rr);p=Person(pid,self.w.year,sid,hid,age=0,temperament=inh("temperament"),attachment=inh("attachment"),curiosity=inh("curiosity"),inhibition=inh("inhibition"),species=sp,parents=pair);self.w.people[pid]=p;self.w.metaphysics.soul(pid);h.members.append(pid);self.w.genealogy.birth(pid,pair);alive_by_settlement[sid].append(p);dependent_count[key]=child_count+1;e=self.w.emit("birth",Layer.REALITY,(Ref("person",pid),Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(formed,),household=hid,species=sp,reproductive_opportunity=bio_opportunity);self.w.lineage.register("person",pid,tuple(("person",x) for x in pair),e.id,self.w.year);inherited=self.w.communities.inherit(pid,pair)
    for cid,strength in inherited.items():self.w.transmission.record(self.w.year,"parenting","community_membership",cid,"parents",min(pair),"person",pid,e.id,reliability=strength)
    for parent in pair:self.w.social.record(parent,pid,e.id,trust=.15,attachment=.3,obligation=.25)
-  for h in self.w.households.values():
-   if h.alive and not any(self.w.people[i].alive for i in h.members):h.alive=False
+  # Household records are permanent history. Maintain a derived live-id set
+  # so this cleanup scales with the current population, not every household
+  # created across a millennium. New household ids are monotonic.
+  active=self.w.__dict__.get('_active_household_ids')
+  seen_next=self.w.__dict__.get('_active_household_seen_next')
+  if active is None or seen_next is None or seen_next>self.w.next_household:
+   active={hid for hid,h in self.w.households.items() if h.alive}
+  elif seen_next<self.w.next_household:
+   for hid in range(seen_next,self.w.next_household):
+    h=self.w.households.get(hid)
+    if h is not None and h.alive:active.add(hid)
+  self.w._active_household_seen_next=self.w.next_household
+  for hid in tuple(active):
+   h=self.w.households.get(hid)
+   if h is None or not h.alive:
+    active.discard(hid);continue
+   if not any(self.w.people[i].alive for i in h.members):
+    h.alive=False;active.discard(hid)
+  self.w._active_household_ids=active
  def _pressure(self):
   by_settlement={sid:[] for sid in self.w.settlements}
   for p in self.w.current_people():
