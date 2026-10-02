@@ -9,7 +9,7 @@ import os
 import sqlite3
 import tempfile
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 # Explicit authoritative collections. Runtime indexes/caches are not exported.
 COLLECTIONS = {
     'person': 'people', 'household': 'households', 'settlement': 'settlements',
@@ -24,7 +24,8 @@ COLLECTIONS = {
     'transmission': 'transmission.records', 'lineage': 'lineage.nodes',
     'infrastructure': 'infrastructure.assets', 'institution': 'institutions.institutions',
     'institution_branch': 'institutions.branches', 'magic_registration': 'institutions.magic_records',
-    'notice': 'institutions.notices', 'application': 'institutions.applications',
+    'cadet_cohort': 'institutions.cadet_cohorts', 'health_condition': 'health.active',
+    'coin_supply': 'currency.minted', 'coin_consumption': 'currency.consumed', 'treasury': 'currency.treasuries', 'notice': 'institutions.notices', 'application': 'institutions.applications',
     'path': 'advancement.paths', 'aspiration': 'magic_resources.aspirations',
     'motive': 'agency.motives', 'soul': 'metaphysics.souls',
     'resurrection_token': 'metaphysics.resurrection_tokens', 'church': 'divinity.churches',
@@ -41,6 +42,8 @@ COVERAGE = {
     'life': 'no invented birthplace, childhood, education or ownership intervals',
     'lineage': 'raw typed refs retained; legacy institution IDs can be ambiguous across registries',
     'expression': 'no language, prose, self-concept or autobiographical memory generated',
+    'health': 'active conditions plus onset/recovery events; absence is not invented as a diagnosis',
+    'cadets': 'cohort membership/graduation is objective institutional history with physical resource events',
 }
 
 
@@ -153,6 +156,19 @@ def export_archive(world, path, *, digest=None):
                     if kind == 'transmission':
                         for side in ('source', 'target'): link(kind, rid, side, getattr(obj, side+'_kind'), getattr(obj, side+'_id'))
                         link(kind, rid, 'transmitted_item', obj.item_kind, obj.item_id)
+                    if kind == 'institution_branch':
+                        link(kind,rid,'institution','institution',obj.institution)
+                        link(kind,rid,'settlement','settlement',obj.settlement)
+                    if kind == 'notice':
+                        link(kind,rid,'branch','institution_branch',obj.branch)
+                    if kind == 'application':
+                        link(kind,rid,'branch','institution_branch',obj.branch)
+                    if kind == 'cadet_cohort':
+                        link(kind,rid,'branch','institution_branch',obj.branch)
+                        for n,pid in enumerate(sorted(obj.cadets)):link(kind,rid,'cadet','person',pid,n)
+                        for n,pid in enumerate(sorted(obj.graduates)):link(kind,rid,'graduate','person',pid,n)
+                    if kind == 'health_condition':
+                        link(kind,rid,'person','person',obj.person)
                 if kind in ('path', 'aspiration', 'motive', 'soul', 'wallet'):
                     link(kind, rid, 'person', 'person', rid)
                 if kind in ('belief', 'membership'):
