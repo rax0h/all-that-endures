@@ -24,7 +24,7 @@ COLLECTIONS = {
     'transmission': 'transmission.records', 'lineage': 'lineage.nodes',
     'infrastructure': 'infrastructure.assets', 'institution': 'institutions.institutions',
     'institution_branch': 'institutions.branches', 'magic_registration': 'institutions.magic_records',
-    'notice': 'institutions.notices', 'application': 'institutions.applications',
+    'coin_supply': 'currency.minted', 'coin_consumption': 'currency.consumed', 'treasury': 'currency.treasuries', 'notice': 'institutions.notices', 'application': 'institutions.applications',
     'path': 'advancement.paths', 'aspiration': 'magic_resources.aspirations',
     'motive': 'agency.motives', 'soul': 'metaphysics.souls',
     'resurrection_token': 'metaphysics.resurrection_tokens', 'church': 'divinity.churches',

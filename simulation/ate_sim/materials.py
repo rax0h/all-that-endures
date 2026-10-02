@@ -1,6 +1,10 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
+from .rank import cognition
+from .magic_progression import record_application
+from .currency import denomination_for_rank,can_pay_tier
+from math import ceil
 from heapq import heappush, heappop, heapify
 RARITIES=('common','uncommon','rare','epic','legendary','mythic','transcendent')
 @dataclass
@@ -16,6 +20,7 @@ class MaterialEconomy:
   i=self.next_lot;self.next_lot+=1;l=MaterialLot(i,kind,quantity,quality,sid,producer,year,event,'person',producer,tuple(properties),0,[],material_rank);self.lots[i]=l;self.lot_index.setdefault(sid,[]).append(i);self.active_lot_index.setdefault(sid,set()).add(i)
   if hasattr(self,'_selection_index'):
    heaps,counts=self._selection_index;heappush(heaps.setdefault(sid,[]),self._selection_key(l));counts[sid]=counts.get(sid,0)+bool(l.magical_properties)
+  if hasattr(self,'_rank_heaps'):heappush(self._rank_heaps.setdefault((sid,material_rank),[]),self._selection_key(l))
   if hasattr(self,'_selection_ids'):self._selection_ids.pop(sid,None)
   if hasattr(self,'_whole_units'):self._whole_units[sid]=self._whole_units.get(sid,0)+int(max(0.,l.quantity-l.consumed))
   return l
@@ -35,6 +40,7 @@ class MaterialEconomy:
   if hasattr(self,'_whole_units'):self._whole_units[lot.settlement]=self._whole_units.get(lot.settlement,0)+int(max(0.,lot.quantity-lot.consumed))-old_whole
   return used
  def rebuild_active_index(self):
+  self.__dict__.pop('_rank_heaps',None)
   self.__dict__.pop('_selection_index',None)
   self.__dict__.pop('_whole_units',None)
   self.__dict__.pop('_selection_ids',None)
@@ -58,6 +64,15 @@ class MaterialEconomy:
   return bool(self.active_lot_index.get(sid))
  def best_available(self,sid):
   heaps,_=self._ensure_selection_index();heap=heaps.get(sid,[]);active=self.active_lot_index.get(sid,())
+  while heap and heap[0][1] not in active:heappop(heap)
+  return self.lots[heap[0][1]] if heap else None
+ def best_at_rank(self,sid,rank):
+  if not hasattr(self,'_rank_heaps'):
+   self._rank_heaps={}
+   for place,ids in self.active_lot_index.items():
+    for i in ids:
+     lot=self.lots[i];heappush(self._rank_heaps.setdefault((place,lot.material_rank),[]),self._selection_key(lot))
+  heap=self._rank_heaps.get((sid,rank),[]);active=self.active_lot_index.get(sid,())
   while heap and heap[0][1] not in active:heappop(heap)
   return self.lots[heap[0][1]] if heap else None
  def magical_available_count(self,sid):
@@ -112,7 +127,7 @@ def _magical_craft_permission(world,crafter,target_rank,craft_skill):
  if path is None:return False
  craft_domains=('craft','forge','creation','rune','transformation','weave')
  gift=any(any(k in (a.domain or '').lower() or k in (a.function or '').lower() for k in craft_domains) for a in path.abilities)
- return gift and target_rank<=maker+1 and craft_skill>=2.5
+ return gift and target_rank<=maker+1 and craft_skill>=.85
 
 def _produce_lot(world,sid,producer,rr,Layer,Ref):
  s=world.settlements[sid];cell=world.cells[(s.x,s.y)];kind=_raw_kind(cell,rr);skill=world.skills.get(producer.id,'agriculture' if kind in ('grain','wool','timber') else 'craft').level;quality=max(.05,min(1.25,.25+.08*skill+.2*rr.random()));props=_magic_property(world,producer,kind,sid,rr);mr=_material_rank(world,sid,props,rr)
@@ -120,17 +135,43 @@ def _produce_lot(world,sid,producer,rr,Layer,Ref):
 def _craft_once(world,sid,crafter,rr,Layer,Ref):
  craft_skill=world.skills.get(crafter.id,'craft').level
  if craft_skill<.7 or not world.materials.has_available(sid):return False
- if craft_skill>=2:lot=world.materials.best_available(sid)
+ if crafter.rank>=2:
+  options=[]
+  for tier in range(min(5,crafter.rank+1)+1):
+   candidate=world.materials.best_at_rank(sid,tier)
+   if candidate is None:continue
+   if tier>crafter.rank and not _magical_craft_permission(world,crafter,tier,craft_skill):continue
+   cost=ceil(max(.05,(1+candidate.quality)*(1+.5*len(candidate.magical_properties))*(1+.4*tier)))
+   if candidate.owner_id==crafter.id or (tier>=2 and can_pay_tier(world,crafter.id,denomination_for_rank(tier),cost)) or (tier<2 and crafter.wealth>=cost):options.append(candidate)
+  if not options:return False
+  lot=min(options,key=world.materials._selection_key)
+ elif craft_skill>=2:lot=world.materials.best_available(sid)
  else:
   available=world.materials.selection_ids(sid);lot=world.materials.lots[available[int(rr.random()*len(available))%len(available)]]
+ if lot.material_rank>world.advancement.rank(crafter.id) and not _magical_craft_permission(world,crafter,lot.material_rank,craft_skill):return False
  if lot.owner_kind=='person' and lot.owner_id!=crafter.id:
   seller=world.people.get(lot.owner_id);price=max(.05,(1+lot.quality)*(1+.5*len(lot.magical_properties))*(1+.4*lot.material_rank))
-  if seller is None or crafter.wealth<price:return False
-  crafter.wealth-=price;seller.wealth+=price;t=world.emit('material_purchased',Layer.SOCIETY,(Ref('person',crafter.id),Ref('person',seller.id)),Ref('settlement',sid),(lot.origin_event,),material_lot=lot.id,price=round(price,3));lot.owner_id=crafter.id;lot.transfers.append(t.id)
- used=world.materials.consume(lot,1.);rank=world.advancement.rank(crafter.id);q=max(.05,min(1.5,.45*lot.quality+.09*craft_skill+.04*rank+rr.uniform(-.08,.08)));target=max(0,min(lot.material_rank,rank+1));magical=bool(lot.magical_properties) and _magical_craft_permission(world,crafter,target,craft_skill);item_props=lot.magical_properties if magical else ();rarity=_rarity(q,rank,magical)
+  coins={}
+  if seller is None:return False
+  if lot.material_rank>=2:
+   denomination=denomination_for_rank(lot.material_rank);count=ceil(price)
+   if not can_pay_tier(world,crafter.id,denomination,count):return False
+   coins=world.currency.transfer(crafter.id,seller.id,{denomination:count})
+  else:
+   if crafter.wealth<price:return False
+   crafter.wealth-=price;seller.wealth+=price
+  t=world.emit('material_purchased',Layer.SOCIETY,(Ref('person',crafter.id),Ref('person',seller.id)),Ref('settlement',sid),(lot.origin_event,),material_lot=lot.id,price=round(price,3),coin_transfer=coins,price_domain='ranked_coin' if coins else 'ordinary_wealth');lot.owner_id=crafter.id;lot.transfers.append(t.id)
+ if lot.material_rank>world.advancement.rank(crafter.id) and not _magical_craft_permission(world,crafter,lot.material_rank,craft_skill):return False
+ used=world.materials.consume(lot,1.);rank=world.advancement.rank(crafter.id);precision=1.+min(1.,craft_skill/3.)*(cognition(rank).magical_modeling-1.);q=max(.05,min(1.5,.45*lot.quality+.09*craft_skill+.04*rank+rr.uniform(-.08,.08)/precision));target=max(0,min(lot.material_rank,rank+1));magical=bool(lot.magical_properties) and _magical_craft_permission(world,crafter,target,craft_skill);item_props=lot.magical_properties if magical else ();rarity=_rarity(q,rank,magical)
  if used<=0:return False
  if not magical and lot.magical_properties:rarity=_rarity(q,0,False)
- ce=world.emit('item_crafted',Layer.REALITY,(Ref('person',crafter.id),),Ref('settlement',sid),(lot.origin_event,),item_kind=_craft_kind(lot.kind),material_lots=(lot.id,),quality=round(q,3),rarity=rarity,magical=magical,item_rank=target if magical else 0,magical_properties=item_props,material_properties_retained=lot.magical_properties if not magical else ());world.materials.create_item(_craft_kind(lot.kind),q,rarity,sid,crafter.id,world.year,ce.id,(lot.id,),item_props,target if magical else 0,magical)
+ path=world.advancement.path(crafter.id)
+ helpers=[a for a in path.abilities if a.function in ('creation','transformation','enhancement','control','repair') and a.rank>=target] if magical and path else []
+ helper=min(helpers,key=lambda a:(len(a.understanding.applications),a.semantic_key)) if helpers else None
+ if helper:q=min(1.5,q+.005*helper.level+.005*helper.response_model.validated)
+ ce=world.emit('item_crafted',Layer.REALITY,(Ref('person',crafter.id),),Ref('settlement',sid),(lot.origin_event,),used_abilities=() if helper is None else (helper.semantic_key,),item_kind=_craft_kind(lot.kind),craft_precision=precision,material_lots=(lot.id,),quality=round(q,3),rarity=rarity,magical=magical,item_rank=target if magical else 0,magical_properties=item_props,material_properties_retained=lot.magical_properties if not magical else ());world.materials.create_item(_craft_kind(lot.kind),q,rarity,sid,crafter.id,world.year,ce.id,(lot.id,),item_props,target if magical else 0,magical)
+ if helper:
+  record_application(world,crafter,helper,ce,constraint=f'{lot.kind}:{lot.magical_properties}:{sid}',difficulty=target,outcome=q)
  if craft_skill>=2.5:crafter.occupation='craftsperson'
  return True
 

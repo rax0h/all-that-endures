@@ -65,7 +65,10 @@ class World:
   if layer is None:raise ValueError('events require an explicit layer')
   if any(c not in self.event_ids for c in causes):raise ValueError('event cause does not exist')
   if kind in ('birth','death','resurrection'):self.__dict__.pop('_living_cache',None)
-  e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id);return e
+  e=Event(self.next_event,self.year,kind,layer,tuple(actors),location,tuple(causes),data);self.next_event+=1;self.events.append(e);self.event_ids.add(e.id)
+  from .magic_progression import observe_experience
+  observe_experience(self,e)
+  return e
  def events_between(self,first_year,last_year=None):
   # Events append in simulation-year order; binary search touches no old payloads.
   last_year=self.year if last_year is None else last_year

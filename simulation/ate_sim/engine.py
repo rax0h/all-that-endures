@@ -54,7 +54,7 @@ class Simulation:
   for oid in survivors:
    q=self.w.people[oid];rel=self.w.social.get(p.id,oid);q.grief=min(1,q.grief+.12+.55*rel.attachment);self.w.social.record(p.id,oid,e.id,attachment=.01);self.w.emit("bereavement",Layer.SOCIETY,(Ref("person",oid),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),grief=q.grief)
   if survivors:
-   children=[x for x in self.w.genealogy.children.get(p.id,[]) if self.w.people.get(x) and self.w.people[x].alive];heir=min(children) if children else min(survivors);inherited=p.wealth;self.w.people[heir].wealth+=inherited;p.wealth=0.;self.w.emit("inheritance",Layer.SOCIETY,(Ref("person",heir),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),wealth=inherited)
+   children=[x for x in self.w.genealogy.children.get(p.id,[]) if self.w.people.get(x) and self.w.people[x].alive];heir=min(children) if children else min(survivors);inherited=p.wealth;self.w.people[heir].wealth+=inherited;p.wealth=0.;coins=dict(self.w.currency.wallets.get(p.id,{}));self.w.currency.transfer(p.id,heir,coins);self.w.emit("inheritance",Layer.SOCIETY,(Ref("person",heir),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),wealth=inherited,coin_transfer=coins)
  def _capacity(self,sid):
   s=self.w.settlements[sid];c=self.w.cells[(s.x,s.y)];return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
  def _demography(self):

@@ -1,6 +1,8 @@
 from __future__ import annotations
 from .core_types import layer_ref
+from .magic_progression import practice_ability,record_body_transition
 from .magic_resources import _aspiration
+from .mastery_training import mastery_training_step
 
 ACTION_FUNCTIONS={
  'secure_food':{'creation','control','support','detection','recovery'},
@@ -69,6 +71,8 @@ def rank_ecology_step(world,rng):
   rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates);before=world.advancement.rank(p.id)
   for i,a in candidates[:uses]:
    reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity)
-   world.advancement.practice(p.id,i,exposure*(.8+.4*rr.random()),reflection)
+   practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action)
+  if len(path.abilities)==20 and (member or action in ('work','learn','teach','build','prepare')):
+   mastery_training_step(world,p,path,rng.stream('mastery_training',world.year,p.id))
   after=world.advancement.rank(p.id);p.rank=after
-  if after>before:world.emit('rank_advanced',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),from_rank=before,to_rank=after,practice_context=action,dedicated_training=career is not None or member)
+  record_body_transition(world,p,before,context=action)
