@@ -7,7 +7,10 @@ chronology never change.
 from bisect import bisect_left, bisect_right
 from collections import OrderedDict
 from collections.abc import Sequence
+from dataclasses import fields, is_dataclass
+from enum import Enum
 import pickle
+import struct
 import zlib
 
 
@@ -30,6 +33,35 @@ def freeze(value):
     if isinstance(value,tuple):return tuple(freeze(v) for v in value)
     if isinstance(value,set):return frozenset(freeze(v) for v in value)
     return value
+
+
+def _typed_value_token(value):
+    """Lossless value token matching persistence's typed-value semantics."""
+    cls=type(value)
+    if value is None:return ('none',)
+    if cls is bool:return ('bool',value)
+    if cls is int:return ('int',value)
+    if cls is float:return ('float64',struct.pack('>d',value))
+    if cls is str:return ('str',value)
+    if cls is bytes:return ('bytes',value)
+    if isinstance(value,Enum):return ('enum',cls,value.name)
+    if is_dataclass(value):
+        return ('record',cls,tuple(
+            (field.name,_typed_value_token(getattr(value,field.name)))
+            for field in fields(value)
+        ))
+    if isinstance(value,dict):
+        return ('mapping',cls,tuple(
+            (_typed_value_token(key),_typed_value_token(child))
+            for key,child in value.items()
+        ))
+    if isinstance(value,(list,tuple)):
+        return ('sequence',cls,tuple(_typed_value_token(child) for child in value))
+    if isinstance(value,(set,frozenset)):
+        items=[_typed_value_token(child) for child in value]
+        items.sort(key=repr)
+        return ('set',cls,tuple(items))
+    raise TypeError(f'unsupported persisted event value: {cls.__name__}')
 
 
 class EventLog(Sequence):
@@ -220,6 +252,8 @@ class EventLog(Sequence):
         if transferred_events>pending:raise ValueError('transfer exceeds pending sealed history')
         if not self._disk_prefix._shares_store_authority(new_prefix):
             raise ValueError('replacement prefix belongs to an unrelated store')
+        if new_prefix.captured_generation<self._disk_prefix.captured_generation:
+            raise ValueError('replacement prefix captured generation regressed')
         new_count=self._checked_prefix_count(new_prefix)
         expected_count=self._disk_count+transferred_events
         if new_count!=expected_count:
@@ -240,7 +274,8 @@ class EventLog(Sequence):
                     first_ordinal+local_ordinal
                 )
                 if len(source)!=len(replacement) or any(
-                    type(a) is not type(b) or vars(a)!=vars(b)
+                    type(a) is not type(b)
+                    or _typed_value_token(vars(a))!=_typed_value_token(vars(b))
                     for a,b in zip(source,replacement)
                 ):
                     raise ValueError(

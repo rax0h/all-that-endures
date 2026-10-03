@@ -625,3 +625,190 @@ def test_adoption_rejects_divergent_same_store_values_before_retirement(
         if old_reader is not None:
             old_reader.close()
         store.close()
+
+
+
+def test_adoption_accepts_exact_persisted_nan_values(tmp_path):
+    store = make_store(tmp_path / "nan-values.sqlite")
+    old_reader = new_reader = None
+    try:
+        append_segments(store, 1)
+        old_reader = SealedEventPrefix(store)
+        suffix = events(CHUNK_SIZE + 1, CHUNK_SIZE)
+        suffix[23].data["nan"] = float("nan")
+        for item in suffix:
+            item.seal()
+        log = EventLog.from_disk_prefix(
+            old_reader, suffix, pending_sealed_events=CHUNK_SIZE
+        )
+        prepared = prepare_sealed_append(store, log[CHUNK_SIZE:2 * CHUNK_SIZE])
+        commit_preparation(store, prepared)
+        new_reader = SealedEventPrefix(store)
+        returned = log._adopt_committed_prefix(
+            new_reader, transferred_events=CHUNK_SIZE
+        )
+        assert returned is old_reader
+        assert log.disk_event_count == 2 * CHUNK_SIZE
+    finally:
+        if new_reader is not None:
+            new_reader.close()
+        if old_reader is not None:
+            old_reader.close()
+        store.close()
+
+
+def test_adoption_rejects_bool_int_value_aliasing(tmp_path):
+    store = make_store(tmp_path / "bool-int.sqlite")
+    old_reader = new_reader = None
+    try:
+        append_segments(store, 1)
+        old_reader = SealedEventPrefix(store)
+        suffix = events(CHUNK_SIZE + 1, CHUNK_SIZE, sealed=True)
+        log = EventLog.from_disk_prefix(
+            old_reader, suffix, pending_sealed_events=CHUNK_SIZE
+        )
+        prepared = prepare_sealed_append(store, log[CHUNK_SIZE:2 * CHUNK_SIZE])
+        commit_preparation(store, prepared)
+        new_reader = SealedEventPrefix(store)
+        original_read = new_reader._read_segment_from_store
+
+        def divergent_read(ordinal):
+            result = original_read(ordinal)
+            if ordinal != 1:
+                return result
+            changed = list(result)
+            replacement = event(CHUNK_SIZE + 10)
+            replacement.data["nested"][1]["ok"] = 1
+            replacement.seal()
+            changed[9] = replacement
+            return tuple(changed)
+
+        new_reader._read_segment_from_store = divergent_read
+        with pytest.raises(ValueError, match="values disagree"):
+            log._adopt_committed_prefix(
+                new_reader, transferred_events=CHUNK_SIZE
+            )
+        assert log.pending_sealed_event_count == CHUNK_SIZE
+    finally:
+        if new_reader is not None:
+            new_reader.close()
+        if old_reader is not None:
+            old_reader.close()
+        store.close()
+
+
+def test_adoption_rejects_signed_zero_bit_change(tmp_path):
+    store = make_store(tmp_path / "signed-zero.sqlite")
+    old_reader = new_reader = None
+    try:
+        append_segments(store, 1)
+        old_reader = SealedEventPrefix(store)
+        suffix = events(CHUNK_SIZE + 1, CHUNK_SIZE)
+        suffix[31].data["zero"] = 0.0
+        for item in suffix:
+            item.seal()
+        log = EventLog.from_disk_prefix(
+            old_reader, suffix, pending_sealed_events=CHUNK_SIZE
+        )
+        prepared = prepare_sealed_append(store, log[CHUNK_SIZE:2 * CHUNK_SIZE])
+        commit_preparation(store, prepared)
+        new_reader = SealedEventPrefix(store)
+        original_read = new_reader._read_segment_from_store
+
+        def divergent_read(ordinal):
+            result = original_read(ordinal)
+            if ordinal != 1:
+                return result
+            changed = list(result)
+            replacement = event(CHUNK_SIZE + 32)
+            replacement.data["zero"] = -0.0
+            replacement.seal()
+            changed[31] = replacement
+            return tuple(changed)
+
+        new_reader._read_segment_from_store = divergent_read
+        with pytest.raises(ValueError, match="values disagree"):
+            log._adopt_committed_prefix(
+                new_reader, transferred_events=CHUNK_SIZE
+            )
+        assert log.pending_sealed_event_count == CHUNK_SIZE
+    finally:
+        if new_reader is not None:
+            new_reader.close()
+        if old_reader is not None:
+            old_reader.close()
+        store.close()
+
+
+def test_adoption_rejects_nested_numeric_type_change(tmp_path):
+    store = make_store(tmp_path / "numeric-type.sqlite")
+    old_reader = new_reader = None
+    try:
+        append_segments(store, 1)
+        old_reader = SealedEventPrefix(store)
+        suffix = events(CHUNK_SIZE + 1, CHUNK_SIZE)
+        suffix[41].data["number"] = 1
+        for item in suffix:
+            item.seal()
+        log = EventLog.from_disk_prefix(
+            old_reader, suffix, pending_sealed_events=CHUNK_SIZE
+        )
+        prepared = prepare_sealed_append(store, log[CHUNK_SIZE:2 * CHUNK_SIZE])
+        commit_preparation(store, prepared)
+        new_reader = SealedEventPrefix(store)
+        original_read = new_reader._read_segment_from_store
+
+        def divergent_read(ordinal):
+            result = original_read(ordinal)
+            if ordinal != 1:
+                return result
+            changed = list(result)
+            replacement = event(CHUNK_SIZE + 42)
+            replacement.data["number"] = 1.0
+            replacement.seal()
+            changed[41] = replacement
+            return tuple(changed)
+
+        new_reader._read_segment_from_store = divergent_read
+        with pytest.raises(ValueError, match="values disagree"):
+            log._adopt_committed_prefix(
+                new_reader, transferred_events=CHUNK_SIZE
+            )
+        assert log.pending_sealed_event_count == CHUNK_SIZE
+    finally:
+        if new_reader is not None:
+            new_reader.close()
+        if old_reader is not None:
+            old_reader.close()
+        store.close()
+
+
+def test_adoption_rejects_regressing_reader_generation(tmp_path):
+    store = make_store(tmp_path / "generation-regression.sqlite")
+    stale_reader = current_reader = None
+    try:
+        append_segments(store, 1)
+        stale_reader = SealedEventPrefix(store)
+        store.commit(
+            store.generation,
+            [RecordChange(
+                EVENT_STORAGE,
+                "review-generation-marker",
+                ("marker", 1),
+                record_schema=DESCRIPTOR_SCHEMA,
+            )],
+            [],
+            store.head_metadata(),
+        )
+        current_reader = SealedEventPrefix(store)
+        log = EventLog.from_disk_prefix(current_reader)
+        with pytest.raises(ValueError, match="generation regressed"):
+            log._adopt_committed_prefix(stale_reader, transferred_events=0)
+        assert log._disk_prefix is current_reader
+        assert log.disk_event_count == CHUNK_SIZE
+    finally:
+        if current_reader is not None:
+            current_reader.close()
+        if stale_reader is not None:
+            stale_reader.close()
+        store.close()
