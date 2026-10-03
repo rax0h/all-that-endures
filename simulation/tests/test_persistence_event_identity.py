@@ -254,7 +254,9 @@ def test_root_log_aliases_tail_sharing_and_nonlog_sealed_event_survive():
 
     assert len(index.occurrences[id(log)][1]) == 2
     assert len(index.occurrences[id(shared_parent)][1]) == 3
-    assert len(index.occurrences[id(shared_child)][1]) == 3
+    # The child appears through both log aliases, directly, and below the
+    # separately reachable shared parent.
+    assert len(index.occurrences[id(shared_child)][1]) == 4
 
     sealed_paths = index.occurrences[id(sealed)][1]
     assert len(sealed_paths) == 2
@@ -368,11 +370,16 @@ def test_batched_retirement_after_real_sealing_reanchors_survivors():
     assert id(one_survivor) in index.occurrences
     assert len(index.occurrences[id(one_survivor)][1]) == 1
     assert id(one_survivor) not in index.links_by_ident
-    for ident in (id(parent), id(child)):
-        paths = index.occurrences[ident][1]
-        assert len(paths) == 2
-        assert all(("field", "events") not in path for path in paths)
-        assert len(index.links_by_ident[ident]) == 1
+    parent_paths = index.occurrences[id(parent)][1]
+    child_paths = index.occurrences[id(child)][1]
+    assert len(parent_paths) == 2
+    # Each surviving parent path also contributes a descendant child path,
+    # in addition to the two direct child owners.
+    assert len(child_paths) == 4
+    assert all(("field", "events") not in path for path in parent_paths)
+    assert all(("field", "events") not in path for path in child_paths)
+    assert len(index.links_by_ident[id(parent)]) == 1
+    assert len(index.links_by_ident[id(child)]) == 3
 
     assert not any(
         owner[0] == "world.events" and owner[1] < CHUNK_SIZE
