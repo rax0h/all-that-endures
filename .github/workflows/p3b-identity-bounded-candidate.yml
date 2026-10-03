@@ -1,0 +1,20 @@
+name: p3b-identity-bounded-candidate
+
+on:
+  push:
+    branches: [sol/p3b-identity-bounded-20261003]
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: focused identity slice
+        run: python -m pytest -q -s simulation/tests/test_persistence_event_identity.py
