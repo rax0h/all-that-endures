@@ -16,7 +16,7 @@ from ate_sim.persistence_adapters import (
 from ate_sim.persistence_events import CHUNK_SIZE
 from ate_sim.persistence_identity import IdentityOccurrenceIndex
 from ate_sim.persistence_schema import RECORD_FIELDS
-from ate_sim.persistence_tracking import bind_snapshot
+from ate_sim.persistence_tracking import IncrementalWorldSession, bind_snapshot
 
 
 RULES = "stage-0.5-p3b-identity-tests"
@@ -352,3 +352,36 @@ def test_cold_identity_mode_keeps_cross_session_alias_rejection(tmp_path):
     ):
         with pytest.raises(StoreError, match="cross-session"):
             right.currency.wallets[1] = left.currency.wallets[1]
+
+
+
+def test_session_identity_owner_enumerator_uses_absolute_mutable_tail_only():
+    prefix, log, mutable_a, sealed_tail, mutable_b = cold_log(40)
+    world = World(61)
+    world.events = log
+
+    session = object.__new__(IncrementalWorldSession)
+    session.world = world
+    session._cold_event_identity = True
+    session._owner_path = lambda owner: (
+        ("namespace", owner[0]),
+        ("index", owner[1]),
+    )
+
+    event_rows = [
+        (owner, child, path)
+        for owner, child, path in session._iter_identity_owners()
+        if owner[0] == "world.events"
+    ]
+    start = 40 * CHUNK_SIZE + CHUNK_SIZE
+    assert [owner for owner, _child, _path in event_rows] == [
+        ("world.events", start),
+        ("world.events", start + 2),
+    ]
+    assert [child for _owner, child, _path in event_rows] == [
+        mutable_a,
+        mutable_b,
+    ]
+    assert sealed_tail not in [child for _owner, child, _path in event_rows]
+    assert prefix.segment_reads == 0
+    assert len(log._cache) == 0
