@@ -13,6 +13,7 @@ import zlib
 
 from .core import World, Event, Layer
 from .event_log import EventLog, FrozenDict, FrozenList
+from .persistence_identity import iter_mutable_event_items
 from .record_index import RecordTable, IndexedRecord
 from .incremental_store import (
     TypedCodec, CodecError, RecordChange, TransactionalStore,
@@ -449,8 +450,10 @@ def _fold_identity_deltas(base_links, rows, codec):
     return list(state.values())
 
 
-def _complete_identity_groups(value, path=(), groups=None, active=None):
-    """Expand every acyclic mutable occurrence, including below shared parents."""
+def _complete_identity_groups(
+    value, path=(), groups=None, active=None, *, mutable_event_tail_only=False
+):
+    """Expand mutable occurrences in the selected identity projection."""
     if groups is None:
         groups = {}
     if active is None:
@@ -458,6 +461,15 @@ def _complete_identity_groups(value, path=(), groups=None, active=None):
     cls = type(value)
     if value is None or cls in (bool, int, float, str, bytes) or cls is Layer:
         return groups
+    if mutable_event_tail_only and cls in (FrozenDict, FrozenList):
+        return groups
+    if isinstance(value, EventLog):
+        value._ensure_backend_readable()
+        if value._disk_prefix is not None and not mutable_event_tail_only:
+            raise StoreFormatError(
+                'disk-backed EventLog identity traversal requires '
+                'mutable_event_tail_only=True'
+            )
     ident = id(value)
     if ident in active:
         raise StoreIntegrityError('cycle in restored identity graph')
@@ -472,17 +484,42 @@ def _complete_identity_groups(value, path=(), groups=None, active=None):
         if record:
             for name in RECORD_FIELDS[cls]:
                 _complete_identity_groups(
-                    getattr(value, name), path + (('field', name),), groups, active
+                    getattr(value, name),
+                    path + (('field', name),),
+                    groups,
+                    active,
+                    mutable_event_tail_only=mutable_event_tail_only,
                 )
         elif cls in (dict, RecordTable, FrozenDict):
             for key, child in value.items():
                 _complete_identity_groups(
-                    child, path + (('key', key),), groups, active
+                    child,
+                    path + (('key', key),),
+                    groups,
+                    active,
+                    mutable_event_tail_only=mutable_event_tail_only,
                 )
-        elif cls in (list, tuple, FrozenList, EventLog):
-            for i, child in enumerate(value):
+        elif cls is EventLog:
+            items = (
+                iter_mutable_event_items(value)
+                if mutable_event_tail_only else enumerate(value)
+            )
+            for index, child in items:
                 _complete_identity_groups(
-                    child, path + (('index', i),), groups, active
+                    child,
+                    path + (('index', index),),
+                    groups,
+                    active,
+                    mutable_event_tail_only=mutable_event_tail_only,
+                )
+        elif cls in (list, tuple, FrozenList):
+            for index, child in enumerate(value):
+                _complete_identity_groups(
+                    child,
+                    path + (('index', index),),
+                    groups,
+                    active,
+                    mutable_event_tail_only=mutable_event_tail_only,
                 )
         elif cls in (set, frozenset):
             return groups
@@ -491,17 +528,31 @@ def _complete_identity_groups(value, path=(), groups=None, active=None):
     return groups
 
 
-def _verify_identity_graph(world, links):
-    """Verify every restored alias is explained by an explicit or ancestor link."""
+def _verify_identity_graph(world, links, *, mutable_event_tail_only=False):
+    """Verify every projected alias is explained by an explicit/ancestor link."""
+    if type(links) is not list:
+        raise StoreFormatError('invalid identity links')
     explicit = {}
-    for target, owner in links:
+    for link in links:
+        if type(link) is not tuple or len(link) != 2:
+            raise StoreFormatError('invalid identity link')
+        target, owner = link
         if target in explicit and explicit[target] != owner:
             raise StoreIntegrityError('conflicting identity targets')
         explicit[target] = owner
-        if _at_path(world, target) is not _at_path(world, owner):
+        if _at_path(
+            world, target,
+            mutable_event_tail_only=mutable_event_tail_only,
+        ) is not _at_path(
+            world, owner,
+            mutable_event_tail_only=mutable_event_tail_only,
+        ):
             raise StoreIntegrityError('identity link was not restored')
 
-    for paths in _complete_identity_groups(world).values():
+    groups = _complete_identity_groups(
+        world, mutable_event_tail_only=mutable_event_tail_only
+    )
+    for paths in groups.values():
         if len(paths) < 2:
             continue
         path_set = set(paths)
@@ -528,7 +579,9 @@ def _verify_identity_graph(world, links):
                 if other in path_set:
                     union(path, other)
         if len({find(path) for path in paths}) != 1:
-            raise StoreIntegrityError('restored alias group is not explained by identity links')
+            raise StoreIntegrityError(
+                'restored alias group is not explained by identity links'
+            )
 
 
 def _identity_mode(manifest):
@@ -692,7 +745,7 @@ def convert_legacy_snapshot(source, destination, *, rules_id):
     return write_snapshot(world, destination, rules_id=rules_id)
 
 
-def _at_path(world, path):
+def _at_path(world, path, *, mutable_event_tail_only=False):
     if type(path) is not tuple:
         raise StoreFormatError('identity paths require tuples')
     value = world
@@ -700,23 +753,147 @@ def _at_path(world, path):
         if type(component) is not tuple or len(component) != 2:
             raise StoreFormatError('invalid identity path component')
         kind, key = component
-        if kind == 'field' and type(value) in RECORD_FIELDS and key in RECORD_FIELDS[type(value)]:
+
+        if isinstance(value, EventLog):
+            value._ensure_backend_readable()
+            if value._disk_prefix is not None and not mutable_event_tail_only:
+                raise StoreFormatError(
+                    'disk-backed EventLog identity traversal requires '
+                    'mutable_event_tail_only=True'
+                )
+            if mutable_event_tail_only:
+                if kind != 'index' or type(key) is not int or key < 0:
+                    raise StoreFormatError(
+                        'identity path does not address canonical mutable EventLog tail'
+                    )
+                first = (
+                    value._disk_count
+                    + len(value._chunks) * value.chunk_size
+                )
+                if key < first:
+                    raise StoreFormatError(
+                        'identity path addresses sealed EventLog history'
+                    )
+                offset = key - first
+                if offset < 0 or offset >= len(value._tail):
+                    raise StoreFormatError(
+                        'identity path does not address canonical state'
+                    )
+                event = value._tail[offset]
+                if event.__dict__.get('_sealed', False) is True:
+                    raise StoreFormatError(
+                        'identity path addresses sealed EventLog history'
+                    )
+                value = event
+                continue
+
+        if (
+            kind == 'field'
+            and type(value) in RECORD_FIELDS
+            and key in RECORD_FIELDS[type(value)]
+        ):
             value = getattr(value, key)
-        elif kind == 'key' and type(value) in (dict, RecordTable, FrozenDict) and key in value:
+        elif (
+            kind == 'key'
+            and type(value) in (dict, RecordTable, FrozenDict)
+            and key in value
+        ):
             value = value[key]
-        elif kind == 'index' and type(value) in (list, tuple, FrozenList, EventLog) and type(key) is int and 0 <= key < len(value):
-            value = value[key]
+        elif (
+            kind == 'index'
+            and type(value) in (list, tuple, FrozenList, EventLog)
+            and type(key) is int
+            and key >= 0
+        ):
+            if isinstance(value, EventLog):
+                if value._disk_prefix is not None:
+                    raise StoreFormatError(
+                        'disk-backed EventLog identity traversal requires '
+                        'mutable_event_tail_only=True'
+                    )
+                if key >= len(value):
+                    raise StoreFormatError(
+                        'identity path does not address canonical state'
+                    )
+                value = value[key]
+            elif key < len(value):
+                value = value[key]
+            else:
+                raise StoreFormatError(
+                    'identity path does not address canonical state'
+                )
         else:
-            raise StoreFormatError('identity path does not address canonical state')
+            raise StoreFormatError(
+                'identity path does not address canonical state'
+            )
+
+    if isinstance(value, EventLog):
+        value._ensure_backend_readable()
+        if value._disk_prefix is not None and not mutable_event_tail_only:
+            raise StoreFormatError(
+                'disk-backed EventLog identity traversal requires '
+                'mutable_event_tail_only=True'
+            )
     return value
 
 
-def _restore_identity(world, links):
+def _identity_assignment_boundary(
+    world, target, *, mutable_event_tail_only=False
+):
+    if not target:
+        raise StoreIntegrityError('duplicate/invalid identity target')
+    parent = _at_path(
+        world, target[:-1],
+        mutable_event_tail_only=mutable_event_tail_only,
+    )
+    component = target[-1]
+    if type(component) is not tuple or len(component) != 2:
+        raise StoreFormatError('invalid identity path component')
+    kind, key = component
+    if (
+        kind == 'field'
+        and type(parent) in RECORD_FIELDS
+        and key in RECORD_FIELDS[type(parent)]
+        and not type(parent).__dataclass_params__.frozen
+    ):
+        return 'field'
+    if (
+        kind == 'key'
+        and type(parent) in (dict, RecordTable)
+        and key in parent
+    ):
+        return 'key'
+    if (
+        kind == 'index'
+        and type(parent) is list
+        and type(key) is int
+        and key >= 0
+        and key < len(parent)
+    ):
+        return 'list'
+    if (
+        kind == 'index'
+        and isinstance(parent, EventLog)
+        and mutable_event_tail_only
+    ):
+        # _at_path validates absolute range, sealedness and lifetime.
+        _at_path(
+            world, target,
+            mutable_event_tail_only=True,
+        )
+        return 'eventlog'
+    raise StoreFormatError('unsupported mutable identity boundary')
+
+
+def _restore_identity(world, links, *, mutable_event_tail_only=False):
     if type(links) is not list:
         raise StoreFormatError('invalid identity links')
     comparisons = WorldCodec(identity_links_recorded=True)
     assignments = []
     targets = set()
+
+    # Validate the complete batch, including assignment boundaries and exact
+    # typed payload copies, before applying any relink.
     for link in links:
         if type(link) is not tuple or len(link) != 2:
             raise StoreFormatError('invalid identity link')
@@ -724,22 +901,67 @@ def _restore_identity(world, links):
         if not target or target == owner or target in targets:
             raise StoreIntegrityError('duplicate/invalid identity target')
         targets.add(target)
-        old, original = _at_path(world, target), _at_path(world, owner)
-        if type(old) is not type(original) or comparisons.encode(old) != comparisons.encode(original):
+
+        old = _at_path(
+            world, target,
+            mutable_event_tail_only=mutable_event_tail_only,
+        )
+        original = _at_path(
+            world, owner,
+            mutable_event_tail_only=mutable_event_tail_only,
+        )
+        boundary = _identity_assignment_boundary(
+            world, target,
+            mutable_event_tail_only=mutable_event_tail_only,
+        )
+
+        if isinstance(old, EventLog) or isinstance(original, EventLog):
+            if old is not original:
+                raise StoreIntegrityError(
+                    'distinct EventLog aliases cannot be restored by value'
+                )
+        elif (
+            type(old) is not type(original)
+            or comparisons.encode(old) != comparisons.encode(original)
+        ):
             raise StoreIntegrityError('aliased payload copies disagree')
-        assignments.append((target, owner))
-    # Compare every payload copy before relinking. Then restore ancestors before
-    # descendants and re-resolve each owner path after ancestor assignments.
-    assignments.sort(key=lambda pair: (max(len(pair[0]), len(pair[1])), comparisons.encode(pair)))
-    for target, owner in assignments:
-        original = _at_path(world, owner)
-        parent = _at_path(world, target[:-1])
+        assignments.append((target, owner, boundary))
+
+    # Restore ancestors before descendants and re-resolve every owner after
+    # earlier assignments. Validation above guarantees all boundaries/copies.
+    assignments.sort(
+        key=lambda item: (
+            max(len(item[0]), len(item[1])),
+            comparisons.encode((item[0], item[1])),
+        )
+    )
+    for target, owner, _boundary in assignments:
+        original = _at_path(
+            world, owner,
+            mutable_event_tail_only=mutable_event_tail_only,
+        )
+        parent = _at_path(
+            world, target[:-1],
+            mutable_event_tail_only=mutable_event_tail_only,
+        )
         kind, key = target[-1]
-        if kind == 'field' and type(parent) in RECORD_FIELDS and not type(parent).__dataclass_params__.frozen:
+        if (
+            kind == 'field'
+            and type(parent) in RECORD_FIELDS
+            and not type(parent).__dataclass_params__.frozen
+        ):
             object.__setattr__(parent, key, original)
         elif kind == 'key' and type(parent) in (dict, RecordTable):
             parent[key] = original
         elif kind == 'index' and type(parent) is list:
             parent[key] = original
+        elif (
+            kind == 'index'
+            and isinstance(parent, EventLog)
+            and mutable_event_tail_only
+        ):
+            parent._relink_mutable_tail(key, original)
         else:
+            # This is unreachable without concurrent mutation; fail closed.
             raise StoreFormatError('unsupported mutable identity boundary')
+
