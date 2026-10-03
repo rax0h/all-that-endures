@@ -1,6 +1,3 @@
-import pickle
-import zlib
-
 import pytest
 
 from ate_sim.core import Event, Layer, Ref
@@ -589,19 +586,22 @@ def test_adoption_rejects_divergent_same_store_values_before_retirement(
         commit_preparation(store, prepared)
         new_reader = SealedEventPrefix(store)
 
-        # Keep the committed replacement intact and perturb only the still-
-        # authoritative pending source. Adoption must compare the bounded
-        # transferred range before retiring it.
-        changed = event(CHUNK_SIZE + 18)
-        changed.data["n"] = -12345
-        changed.seal()
-        pending = list(pickle.loads(zlib.decompress(log._chunks[0])))
-        pending[17] = changed
-        log._chunks[0] = zlib.compress(
-            pickle.dumps(pending, protocol=5), level=1
-        )
+        original_read = new_reader._read_segment_from_store
 
+        def divergent_read(ordinal):
+            segment = original_read(ordinal)
+            if ordinal != 1:
+                return segment
+            changed = list(segment)
+            replacement = event(CHUNK_SIZE + 18)
+            replacement.data["n"] = -12345
+            replacement.seal()
+            changed[17] = replacement
+            return tuple(changed)
+
+        new_reader._read_segment_from_store = divergent_read
         pending_before = tuple(log._chunks)
+        cache_before = tuple((key, id(value)) for key, value in log._cache.items())
         years_before = tuple(log._years)
         offsets_before = tuple(log._offsets)
         tail_before = tuple(log._tail)
@@ -613,11 +613,12 @@ def test_adoption_rejects_divergent_same_store_values_before_retirement(
 
         assert log._disk_prefix is old_reader
         assert tuple(log._chunks) == pending_before
+        assert tuple((key, id(value)) for key, value in log._cache.items()) == cache_before
         assert tuple(log._years) == years_before
         assert tuple(log._offsets) == offsets_before
         assert tuple(log._tail) == tail_before
         assert log.pending_sealed_event_count == CHUNK_SIZE
-        assert log[CHUNK_SIZE + 17].data["n"] == -12345
+        assert log[CHUNK_SIZE + 17].data["n"] == CHUNK_SIZE + 18
     finally:
         if new_reader is not None:
             new_reader.close()
