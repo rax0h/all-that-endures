@@ -291,16 +291,50 @@ class SealedEventPrefix(Sequence):
     def __init__(self, store: TransactionalStore):
         if not isinstance(store, TransactionalStore):
             raise TypeError("store must be a TransactionalStore")
+        with store.read_transaction() as generation:
+            descriptor = _read_descriptor(store, allow_absent=False)
+        self._initialize(store, generation, descriptor)
+
+    @classmethod
+    def from_active_read_transaction(
+        cls, store: TransactionalStore
+    ) -> "SealedEventPrefix":
+        """Capture a prefix inside a caller-owned P1 read transaction.
+
+        The factory neither begins nor ends the transaction.  It exists so P3B
+        can capture the head and prefix descriptor from one SQLite snapshot
+        without nesting TransactionalStore.read_transaction().
+        """
+        if not isinstance(store, TransactionalStore):
+            raise TypeError("store must be a TransactionalStore")
+        if (
+            not getattr(store, "_active_read_transaction", False)
+            or not store.db.in_transaction
+        ):
+            raise StoreError(
+                "SealedEventPrefix.from_active_read_transaction requires "
+                "an active caller-owned read transaction"
+            )
+        generation = store.generation
+        descriptor = _read_descriptor(store, allow_absent=False)
+        self = cls.__new__(cls)
+        self._initialize(store, generation, descriptor)
+        return self
+
+    def _initialize(
+        self,
+        store: TransactionalStore,
+        generation: int,
+        descriptor: SealedPrefixDescriptor,
+    ) -> None:
         self._store = store
         self._store_identity = (id(store), id(store.db))
         self._closed = False
         self._cache: OrderedDict[int, tuple[Event, ...]] = OrderedDict()
         self._segment_reads = 0
         self._segment_read_bytes = 0
-        with store.read_transaction() as generation:
-            descriptor = _read_descriptor(store, allow_absent=False)
-            self._generation = generation
-            self._descriptor = descriptor
+        self._generation = generation
+        self._descriptor = descriptor
 
     @property
     def captured_generation(self) -> int:
@@ -310,6 +344,16 @@ class SealedEventPrefix(Sequence):
     def segment_count(self) -> int:
         self._ensure_readable()
         return self._descriptor.segment_count
+
+    @property
+    def event_count(self) -> int:
+        self._ensure_readable()
+        return self._descriptor.event_count
+
+    @property
+    def last_year(self) -> int | None:
+        self._ensure_readable()
+        return self._descriptor.last_year
 
     @property
     def resident_segments(self) -> int:
