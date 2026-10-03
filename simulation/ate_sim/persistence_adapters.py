@@ -182,8 +182,19 @@ def _audit(value, path, seen, active, links):
                 _audit(v, path + (('key', k),), seen, active, links)
         elif cls in (list, tuple, set, frozenset, FrozenList, EventLog):
             if cls is EventLog:
-                if set(vars(value)) != {'_chunks', '_tail', '_count', '_years', '_offsets', '_cache'}:
+                expected_state = {
+                    '_disk_prefix', '_disk_count', '_chunks', '_tail', '_count',
+                    '_years', '_offsets', '_cache', '_last_year',
+                }
+                if set(vars(value)) != expected_state:
                     raise CodecError('unclassified EventLog state')
+                # The existing P2 adapter remains an in-memory format. P3B disk
+                # EventLogs require the later cold-session APIs and must not be
+                # silently materialized through this legacy snapshot path.
+                if value._disk_prefix is not None or value._disk_count != 0:
+                    raise CodecError(
+                        'disk-backed EventLog requires cold-session persistence'
+                    )
                 items = _events(value)
             else:
                 items = value
@@ -199,8 +210,15 @@ def _audit(value, path, seen, active, links):
                         raise CodecError('unsealed cold event')
                     count += 1
                 _audit(v, path + (('index', i),), seen, active, links)
-            if cls is EventLog and (count != value._count or years != value._years or offsets != value._offsets):
-                raise CodecError('EventLog index disagrees with logical events')
+            if cls is EventLog:
+                last_year = years[-1] if years else None
+                if (
+                    count != value._count
+                    or years != value._years
+                    or offsets != value._offsets
+                    or value._last_year != last_year
+                ):
+                    raise CodecError('EventLog index disagrees with logical events')
         else:
             raise CodecError(f'unsupported type {cls!r} at {path}')
     finally:

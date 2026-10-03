@@ -525,6 +525,7 @@ class TransactionalStore:
         self._payload_read_bytes = 0
         self._payload_writes = 0
         self._payload_write_bytes = 0
+        self._active_read_transaction = False
         self._phase_hook = lambda phase: None
 
     @classmethod
@@ -707,11 +708,13 @@ class TransactionalStore:
         if self.db.in_transaction:
             raise StoreError("store already has an active transaction")
         self.db.execute("BEGIN")
+        self._active_read_transaction = True
         try:
             # The first read pins the snapshot in rollback-journal mode.
             generation = self.generation
             yield generation
         finally:
+            self._active_read_transaction = False
             if self.db.in_transaction:
                 self.db.rollback()
 
