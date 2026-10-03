@@ -150,7 +150,7 @@ def _events(log):
     yield from log._tail
 
 
-def _audit(value, path, seen, active, links):
+def _audit(value, path, seen, active, links, *, cold_event_identity=False):
     """Inventory mutable identity links; reject cycles and unclassified state.
 
     Keep references during this traversal so IDs of decoded cold events cannot
@@ -173,13 +173,23 @@ def _audit(value, path, seen, active, links):
         if record:
             _check_record(value)
             for name in RECORD_FIELDS[cls]:
-                _audit(getattr(value, name), path + (('field', name),), seen, active, links)
+                _audit(
+                    getattr(value, name), path + (('field', name),),
+                    seen, active, links,
+                    cold_event_identity=cold_event_identity,
+                )
         elif cls in (dict, FrozenDict, RecordTable):
             if cls is RecordTable and set(vars(value)) - {'_indexes'}:
                 raise CodecError(f'unclassified RecordTable state: {path}')
             for k, v in value.items():
-                _audit(k, path + (('map_key', k),), seen, active, links)
-                _audit(v, path + (('key', k),), seen, active, links)
+                _audit(
+                    k, path + (('map_key', k),), seen, active, links,
+                    cold_event_identity=cold_event_identity,
+                )
+                _audit(
+                    v, path + (('key', k),), seen, active, links,
+                    cold_event_identity=cold_event_identity,
+                )
         elif cls in (list, tuple, set, frozenset, FrozenList, EventLog):
             if cls is EventLog:
                 expected_state = {
@@ -188,6 +198,13 @@ def _audit(value, path, seen, active, links):
                 }
                 if set(vars(value)) != expected_state:
                     raise CodecError('unclassified EventLog state')
+                if cold_event_identity:
+                    for i, v in value._iter_mutable_identity_events():
+                        _audit(
+                            v, path + (('index', i),), seen, active, links,
+                            cold_event_identity=True,
+                        )
+                    return
                 # The existing P2 adapter remains an in-memory format. P3B disk
                 # EventLogs require the later cold-session APIs and must not be
                 # silently materialized through this legacy snapshot path.
@@ -209,7 +226,10 @@ def _audit(value, path, seen, active, links):
                     if i < len(value._chunks) * value.chunk_size and not vars(v).get('_sealed', False):
                         raise CodecError('unsealed cold event')
                     count += 1
-                _audit(v, path + (('index', i),), seen, active, links)
+                _audit(
+                    v, path + (('index', i),), seen, active, links,
+                    cold_event_identity=cold_event_identity,
+                )
             if cls is EventLog:
                 last_year = years[-1] if years else None
                 if (
@@ -449,7 +469,9 @@ def _fold_identity_deltas(base_links, rows, codec):
     return list(state.values())
 
 
-def _complete_identity_groups(value, path=(), groups=None, active=None):
+def _complete_identity_groups(
+    value, path=(), groups=None, active=None, *, cold_event_identity=False
+):
     """Expand every acyclic mutable occurrence, including below shared parents."""
     if groups is None:
         groups = {}
@@ -472,17 +494,30 @@ def _complete_identity_groups(value, path=(), groups=None, active=None):
         if record:
             for name in RECORD_FIELDS[cls]:
                 _complete_identity_groups(
-                    getattr(value, name), path + (('field', name),), groups, active
+                    getattr(value, name), path + (('field', name),), groups, active,
+                    cold_event_identity=cold_event_identity,
                 )
         elif cls in (dict, RecordTable, FrozenDict):
             for key, child in value.items():
                 _complete_identity_groups(
-                    child, path + (('key', key),), groups, active
+                    child, path + (('key', key),), groups, active,
+                    cold_event_identity=cold_event_identity,
                 )
-        elif cls in (list, tuple, FrozenList, EventLog):
+        elif cls is EventLog:
+            items = (
+                value._iter_mutable_identity_events()
+                if cold_event_identity else enumerate(value)
+            )
+            for i, child in items:
+                _complete_identity_groups(
+                    child, path + (('index', i),), groups, active,
+                    cold_event_identity=cold_event_identity,
+                )
+        elif cls in (list, tuple, FrozenList):
             for i, child in enumerate(value):
                 _complete_identity_groups(
-                    child, path + (('index', i),), groups, active
+                    child, path + (('index', i),), groups, active,
+                    cold_event_identity=cold_event_identity,
                 )
         elif cls in (set, frozenset):
             return groups
@@ -491,17 +526,22 @@ def _complete_identity_groups(value, path=(), groups=None, active=None):
     return groups
 
 
-def _verify_identity_graph(world, links):
+def _verify_identity_graph(world, links, *, cold_event_identity=False):
     """Verify every restored alias is explained by an explicit or ancestor link."""
     explicit = {}
     for target, owner in links:
         if target in explicit and explicit[target] != owner:
             raise StoreIntegrityError('conflicting identity targets')
         explicit[target] = owner
-        if _at_path(world, target) is not _at_path(world, owner):
+        if (
+            _at_path(world, target, cold_event_identity=cold_event_identity)
+            is not _at_path(world, owner, cold_event_identity=cold_event_identity)
+        ):
             raise StoreIntegrityError('identity link was not restored')
 
-    for paths in _complete_identity_groups(world).values():
+    for paths in _complete_identity_groups(
+        world, cold_event_identity=cold_event_identity
+    ).values():
         if len(paths) < 2:
             continue
         path_set = set(paths)
@@ -692,7 +732,7 @@ def convert_legacy_snapshot(source, destination, *, rules_id):
     return write_snapshot(world, destination, rules_id=rules_id)
 
 
-def _at_path(world, path):
+def _at_path(world, path, *, cold_event_identity=False):
     if type(path) is not tuple:
         raise StoreFormatError('identity paths require tuples')
     value = world
@@ -704,6 +744,16 @@ def _at_path(world, path):
             value = getattr(value, key)
         elif kind == 'key' and type(value) in (dict, RecordTable, FrozenDict) and key in value:
             value = value[key]
+        elif (
+            kind == 'index' and type(value) is EventLog
+            and cold_event_identity and type(key) is int
+        ):
+            try:
+                value = value._mutable_identity_event_at(key)
+            except IndexError as exc:
+                raise StoreFormatError(
+                    'identity path addresses sealed EventLog history'
+                ) from exc
         elif kind == 'index' and type(value) in (list, tuple, FrozenList, EventLog) and type(key) is int and 0 <= key < len(value):
             value = value[key]
         else:

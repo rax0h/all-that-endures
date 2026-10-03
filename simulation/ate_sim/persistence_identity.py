@@ -10,13 +10,17 @@ from .event_log import EventLog, FrozenDict, FrozenList
 
 
 class IdentityOccurrenceIndex:
-    def __init__(self, codec, record_fields):
+    def __init__(self, codec, record_fields, *, cold_event_identity=False):
         self.codec = codec
         self.record_fields = record_fields
+        self.cold_event_identity = bool(cold_event_identity)
         self.owner_occurrences = {}
         self.occurrences = {}
         self.links_by_ident = {}
         self.path_to_ident = {}
+        self.last_retirement_work = {
+            "owners": 0, "occurrences": 0, "identities": 0,
+        }
 
     @staticmethod
     def _mutable(value):
@@ -51,7 +55,14 @@ class IdentityOccurrenceIndex:
             elif isinstance(value, dict):
                 for key, child in value.items():
                     self._scan(child, path + (("key", key),), out, active)
-            elif isinstance(value, (list, tuple, EventLog)):
+            elif isinstance(value, EventLog):
+                items = (
+                    value._iter_mutable_identity_events()
+                    if self.cold_event_identity else enumerate(value)
+                )
+                for i, child in items:
+                    self._scan(child, path + (("index", i),), out, active)
+            elif isinstance(value, (list, tuple)):
                 for i, child in enumerate(value):
                     self._scan(child, path + (("index", i),), out, active)
             elif isinstance(value, (set, frozenset)):
@@ -127,6 +138,61 @@ class IdentityOccurrenceIndex:
             else:
                 self.links_by_ident.pop(ident, None)
         return removed, added
+
+    def retire_owners(self, owners):
+        """Retire owners as one identity transition and reanchor survivors once."""
+        owners = tuple(dict.fromkeys(owners))
+        affected = {}
+        removed_occurrences = 0
+        for owner in owners:
+            for ident, obj, path in self.owner_occurrences.pop(owner, ()):
+                removed_occurrences += 1
+                affected.setdefault(ident, obj)
+                entry = self.occurrences.get(ident)
+                if entry is None:
+                    continue
+                entry[1].discard(path)
+                if self.path_to_ident.get(path) == ident:
+                    self.path_to_ident.pop(path, None)
+                if not entry[1]:
+                    self.occurrences.pop(ident, None)
+
+        removed, added = [], []
+        for ident in affected:
+            before = tuple(self.links_by_ident.get(ident, ()))
+            entry = self.occurrences.get(ident)
+            after = () if entry is None else tuple(self._links_for(entry[1]))
+            if before != after:
+                before_tokens = {self.codec.encode(link): link for link in before}
+                after_tokens = {self.codec.encode(link): link for link in after}
+                removed.extend(
+                    before_tokens[token]
+                    for token in before_tokens.keys() - after_tokens.keys()
+                )
+                added.extend(
+                    after_tokens[token]
+                    for token in after_tokens.keys() - before_tokens.keys()
+                )
+            if after:
+                self.links_by_ident[ident] = after
+            else:
+                self.links_by_ident.pop(ident, None)
+
+        self.last_retirement_work = {
+            "owners": len(owners),
+            "occurrences": removed_occurrences,
+            "identities": len(affected),
+        }
+        return removed, added, affected
+
+    def diagnostics(self):
+        return {
+            "owners": len(self.owner_occurrences),
+            "occurrences": sum(len(rows) for rows in self.owner_occurrences.values()),
+            "identities": len(self.occurrences),
+            "links": sum(len(group) for group in self.links_by_ident.values()),
+            "last_retirement": dict(self.last_retirement_work),
+        }
 
     @staticmethod
     def _suffix(path, prefix):

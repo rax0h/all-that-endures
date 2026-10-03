@@ -144,6 +144,33 @@ class EventLog(Sequence):
         self._ensure_backend_readable()
         return len(self._tail)
 
+    def _mutable_identity_start(self):
+        """Absolute index of the resident live tail without touching cold payloads."""
+        self._ensure_backend_readable()
+        return self._disk_count+len(self._chunks)*self.chunk_size
+
+    def _iter_mutable_identity_events(self):
+        """Yield absolute-index mutable tail Events only; never decode sealed history."""
+        start=self._mutable_identity_start()
+        for local,event in enumerate(self._tail):
+            self._ensure_backend_readable()
+            if event.__dict__.get('_sealed') is not True:
+                yield start+local,event
+
+    def _mutable_identity_event_at(self,index):
+        """Resolve only a mutable tail identity path, without reading older ranges."""
+        self._ensure_backend_readable()
+        if type(index) is not int:
+            raise IndexError(index)
+        start=self._disk_count+len(self._chunks)*self.chunk_size
+        local=index-start
+        if local<0 or local>=len(self._tail):
+            raise IndexError(index)
+        event=self._tail[local]
+        if event.__dict__.get('_sealed') is True:
+            raise IndexError(index)
+        return event
+
     def append(self,event):
         self._ensure_backend_readable()
         if event.id!=self._count+1:raise ValueError('events require consecutive stable IDs')
