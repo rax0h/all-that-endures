@@ -611,7 +611,7 @@ def test_local_retirement_work_does_not_scale_with_unrelated_alias_groups(
         "occurrences": 2,
         "identities": 2,
     }
-    assert calls == 2
+    assert calls == 1
     assert all(
         id(idx.owner_occurrences[owner]) == row_ids[owner]
         for owner in unrelated_owners
