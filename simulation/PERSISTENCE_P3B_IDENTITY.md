@@ -1,7 +1,9 @@
 # P3B next bounded assignment: event identity scope and retirement primitives
 
-Status: implementation specification; stop for architect review when this slice
-is complete. This narrows execution of section 5 of `PERSISTENCE_P3B.md`; the
+Status: implemented and accepted at `b756023395a3acb2aa0bfae9326e76dc6f10cd4e`;
+see `PERSISTENCE_P3B_IDENTITY_REVIEW.md`. The next assignment is
+`PERSISTENCE_P3B_IDENTITY_RESTORE.md`. This specification narrows execution of
+section 5 of `PERSISTENCE_P3B.md`; the
 parent document remains the full architecture, not authorization to implement
 all remaining tasks in one turn. P1/P2/P3A and the reviewed composite EventLog
 remain accepted underneath this work. Stage 0.5 remains decision B, unmerged.

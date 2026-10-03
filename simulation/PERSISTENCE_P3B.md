@@ -17,9 +17,10 @@ paths distinct and supported. Python 3.12, SQLite and existing dependencies only
 
 **Execution:** This remains the full architecture. Work is now assigned in
 smaller reviewed slices: the composite EventLog is reviewed in
-`PERSISTENCE_P3B_EVENTLOG_REVIEW.md`; the next authorized Sol slice is ONLY
-`PERSISTENCE_P3B_IDENTITY.md`. Do not implement all remaining tasks below in one
-assignment. Test and commit the bounded slice, then stop for Astra review.
+`PERSISTENCE_P3B_EVENTLOG_REVIEW.md`, and the identity primitives are accepted in
+`PERSISTENCE_P3B_IDENTITY_REVIEW.md`. The next authorized Sol slice is ONLY
+`PERSISTENCE_P3B_IDENTITY_RESTORE.md`. Do not implement all remaining tasks below
+in one assignment. Test and commit the bounded slice, then stop for Astra review.
 
 ## 1. Scope and decisions
 
