@@ -220,6 +220,8 @@ class EventLog(Sequence):
         if transferred_events>pending:raise ValueError('transfer exceeds pending sealed history')
         if not self._disk_prefix._shares_store_authority(new_prefix):
             raise ValueError('replacement prefix belongs to an unrelated store')
+        if new_prefix.captured_generation<self._disk_prefix.captured_generation:
+            raise ValueError('replacement prefix generation moved backwards')
         new_count=self._checked_prefix_count(new_prefix)
         expected_count=self._disk_count+transferred_events
         if new_count!=expected_count:
@@ -239,10 +241,10 @@ class EventLog(Sequence):
                 replacement=new_prefix._read_segment_from_store(
                     first_ordinal+local_ordinal
                 )
-                if len(source)!=len(replacement) or any(
-                    type(a) is not type(b) or vars(a)!=vars(b)
-                    for a,b in zip(source,replacement)
-                ):
+                # Compare the accepted typed representation: Python equality
+                # conflates bool/int/float and signed zero, and rejects NaNs.
+                codec=new_prefix._store.codec
+                if codec.encode(tuple(source))!=codec.encode(tuple(replacement)):
                     raise ValueError(
                         'replacement prefix values disagree with pending source'
                     )

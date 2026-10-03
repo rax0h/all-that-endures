@@ -15,9 +15,11 @@ Extend EventLog with an opt-in disk backend and compose one save transaction in
 the existing session machinery. Keep detached/in-memory and legacy persistence
 paths distinct and supported. Python 3.12, SQLite and existing dependencies only.
 
-**Execution:** Sol implements the tasks below, tests and commits the bounded
-result, then stops for Astra review. This document is both the architecture and
-implementation specification; no second planning document is required.
+**Execution:** This remains the full architecture. Work is now assigned in
+smaller reviewed slices: the composite EventLog is reviewed in
+`PERSISTENCE_P3B_EVENTLOG_REVIEW.md`; the next authorized Sol slice is ONLY
+`PERSISTENCE_P3B_IDENTITY.md`. Do not implement all remaining tasks below in one
+assignment. Test and commit the bounded slice, then stop for Astra review.
 
 ## 1. Scope and decisions
 

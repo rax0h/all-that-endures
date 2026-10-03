@@ -1,4 +1,5 @@
 import pytest
+import struct
 
 from ate_sim.core import Event, Layer, Ref
 from ate_sim.event_log import EventLog, FrozenDict
@@ -625,3 +626,76 @@ def test_adoption_rejects_divergent_same_store_values_before_retirement(
         if old_reader is not None:
             old_reader.close()
         store.close()
+
+
+def test_adoption_preserves_nan_payload_bits(tmp_path):
+    with make_store(tmp_path / "nan.sqlite") as store:
+        initialize_empty_prefix(store)
+        old_reader = SealedEventPrefix(store)
+        source = events(1, CHUNK_SIZE)
+        value = struct.unpack(">d", bytes.fromhex("7ff8000000000001"))[0]
+        source[17].data["nested"] = [value, -0.0]
+        for item in source:
+            item.seal()
+        log = EventLog.from_disk_prefix(
+            old_reader, source, pending_sealed_events=CHUNK_SIZE
+        )
+        expected = store.codec.encode(source[17])
+        prepared = prepare_sealed_append(store, log[:CHUNK_SIZE])
+        commit_preparation(store, prepared)
+        new_reader = SealedEventPrefix(store)
+        log._adopt_committed_prefix(new_reader, transferred_events=CHUNK_SIZE)
+        assert store.codec.encode(log[17]) == expected
+        assert log.pending_sealed_event_count == 0
+        assert new_reader.diagnostics().segment_reads == 2  # checked adoption + point read
+        old_reader.close()
+        new_reader.close()
+
+
+@pytest.mark.parametrize("before,after", [(1, True), (1, 1.0), (0.0, -0.0)])
+def test_adoption_rejects_equal_but_differently_encoded_values(tmp_path, before, after):
+    with make_store(tmp_path / "typed-mismatch.sqlite") as store:
+        initialize_empty_prefix(store)
+        old_reader = SealedEventPrefix(store)
+        source = events(1, CHUNK_SIZE)
+        replacement = events(1, CHUNK_SIZE)
+        source[17].data["nested"] = [before]
+        replacement[17].data["nested"] = [after]
+        for item in source + replacement:
+            item.seal()
+        log = EventLog.from_disk_prefix(
+            old_reader, source, pending_sealed_events=CHUNK_SIZE
+        )
+        prepared = prepare_sealed_append(store, replacement)
+        commit_preparation(store, prepared)
+        new_reader = SealedEventPrefix(store)
+        chunks_before = tuple(log._chunks)
+        with pytest.raises(ValueError, match="values disagree"):
+            log._adopt_committed_prefix(new_reader, transferred_events=CHUNK_SIZE)
+        assert log._disk_prefix is old_reader
+        assert tuple(log._chunks) == chunks_before
+        assert log.pending_sealed_event_count == CHUNK_SIZE
+        assert store.codec.encode(log[17]) == store.codec.encode(source[17])
+        old_reader.close()
+        new_reader.close()
+
+
+def test_adoption_rejects_older_generation_on_same_store(tmp_path):
+    with make_store(tmp_path / "older-generation.sqlite") as store:
+        initialize_empty_prefix(store)
+        older = SealedEventPrefix(store)
+        store.commit(
+            store.generation,
+            [RecordChange(EVENT_STORAGE, "review-marker", 1)],
+            [], store.head_metadata(),
+        )
+        current = SealedEventPrefix(store)
+        assert current.captured_generation > older.captured_generation
+        log = EventLog.from_disk_prefix(current)
+        with pytest.raises(ValueError, match="generation"):
+            log._adopt_committed_prefix(older, transferred_events=0)
+        assert log._disk_prefix is current
+        assert current.diagnostics().segment_reads == 0
+        assert older.diagnostics().segment_reads == 0
+        current.close()
+        older.close()
