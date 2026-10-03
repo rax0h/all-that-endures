@@ -1,0 +1,20 @@
+name: p3b-identity-candidate
+
+on:
+  push:
+    branches: [sol/p3b-identity-candidate]
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: reviewed EventLog patch gate
+        run: python -m pytest -q simulation/tests/test_persistence_event_log.py
