@@ -153,6 +153,17 @@ def test_mutable_event_helper_equivalence_and_absolute_holes(tmp_path):
             (first + 2, tail[2]),
             (first + 3, tail[3]),
         ]
+        owner_rows = list(iter_mutable_event_owners(cold))
+        assert [owner for owner, _value, _path in owner_rows] == [
+            ("world.events", first),
+            ("world.events", first + 2),
+            ("world.events", first + 3),
+        ]
+        assert [path for _owner, _value, path in owner_rows] == [
+            (("field", "events"), ("index", first)),
+            (("field", "events"), ("index", first + 2)),
+            (("field", "events"), ("index", first + 3)),
+        ]
     finally:
         reader.close()
         store.close()
@@ -182,6 +193,8 @@ def test_real_cold_projection_reads_zero_history_and_has_fixed_counts(
         assert reader.diagnostics().segment_reads == 0
         assert reader.resident_segments == 0
         assert len(log._cache) == 0
+        assert stats["occurrences"] == 13
+        assert stats["paths"] == 13
 
         mutable_paths = [
             path
