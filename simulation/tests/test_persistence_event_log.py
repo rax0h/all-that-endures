@@ -1,3 +1,6 @@
+import pickle
+import zlib
+
 import pytest
 
 from ate_sim.core import Event, Layer, Ref
@@ -479,4 +482,145 @@ def test_storage_preparation_never_freezes_mutable_tail(tmp_path):
         source[0].data["still"] = "mutable"
         assert source[0].data["still"] == "mutable"
     finally:
+        store.close()
+
+
+
+@pytest.mark.parametrize("close_reader", [False, True])
+def test_pending_iterator_checks_borrowed_lifetime_before_every_yield(
+    tmp_path, close_reader
+):
+    store = make_store(tmp_path / f"iterator-close-{close_reader}.sqlite")
+    reader = None
+    try:
+        append_segments(store, 1)
+        reader = SealedEventPrefix(store)
+        suffix = events(CHUNK_SIZE + 1, CHUNK_SIZE, sealed=True)
+        log = EventLog.from_disk_prefix(
+            reader, suffix, pending_sealed_events=CHUNK_SIZE
+        )
+        iterator = iter(log)
+        for _ in range(CHUNK_SIZE):
+            next(iterator)
+        assert next(iterator).id == CHUNK_SIZE + 1
+
+        if close_reader:
+            reader.close()
+        else:
+            store.close()
+
+        with pytest.raises(StoreError):
+            next(iterator)
+    finally:
+        if reader is not None:
+            reader.close()
+        store.close()
+
+
+def test_adoption_rejects_unrelated_store_matching_boundary_and_values(
+    tmp_path,
+):
+    store = make_store(tmp_path / "authority-source.sqlite")
+    other = make_store(tmp_path / "authority-other.sqlite")
+    old_reader = other_reader = None
+    try:
+        append_segments(store, 1)
+        old_reader = SealedEventPrefix(store)
+        suffix = events(CHUNK_SIZE + 1, CHUNK_SIZE + 3)
+        for item in suffix[:CHUNK_SIZE]:
+            item.seal()
+        log = EventLog.from_disk_prefix(
+            old_reader, suffix, pending_sealed_events=CHUNK_SIZE
+        )
+
+        append_segments(other, 1)
+        divergent = events(CHUNK_SIZE + 1, CHUNK_SIZE)
+        divergent[17].data["n"] = -999
+        for item in divergent:
+            item.seal()
+        prepared = prepare_sealed_append(other, divergent)
+        commit_preparation(other, prepared)
+        other_reader = SealedEventPrefix(other)
+
+        pending_before = tuple(log._chunks)
+        cache_before = tuple(log._cache.items())
+        years_before = tuple(log._years)
+        offsets_before = tuple(log._offsets)
+        tail_before = tuple(log._tail)
+
+        with pytest.raises(ValueError, match="unrelated store"):
+            log._adopt_committed_prefix(
+                other_reader, transferred_events=CHUNK_SIZE
+            )
+
+        assert log._disk_prefix is old_reader
+        assert tuple(log._chunks) == pending_before
+        assert tuple(log._cache.items()) == cache_before
+        assert tuple(log._years) == years_before
+        assert tuple(log._offsets) == offsets_before
+        assert tuple(log._tail) == tail_before
+        assert log.pending_sealed_event_count == CHUNK_SIZE
+        assert log[CHUNK_SIZE + 17].data["n"] == CHUNK_SIZE + 18
+    finally:
+        if other_reader is not None:
+            other_reader.close()
+        if old_reader is not None:
+            old_reader.close()
+        store.close()
+        other.close()
+
+
+def test_adoption_rejects_divergent_same_store_values_before_retirement(
+    tmp_path,
+):
+    store = make_store(tmp_path / "value-mismatch.sqlite")
+    old_reader = new_reader = None
+    try:
+        append_segments(store, 1)
+        old_reader = SealedEventPrefix(store)
+        suffix = events(CHUNK_SIZE + 1, CHUNK_SIZE + 2)
+        for item in suffix[:CHUNK_SIZE]:
+            item.seal()
+        log = EventLog.from_disk_prefix(
+            old_reader, suffix, pending_sealed_events=CHUNK_SIZE
+        )
+        selected = log[CHUNK_SIZE : 2 * CHUNK_SIZE]
+        prepared = prepare_sealed_append(store, selected)
+        commit_preparation(store, prepared)
+        new_reader = SealedEventPrefix(store)
+
+        # Keep the committed replacement intact and perturb only the still-
+        # authoritative pending source. Adoption must compare the bounded
+        # transferred range before retiring it.
+        changed = event(CHUNK_SIZE + 18)
+        changed.data["n"] = -12345
+        changed.seal()
+        pending = list(pickle.loads(zlib.decompress(log._chunks[0])))
+        pending[17] = changed
+        log._chunks[0] = zlib.compress(
+            pickle.dumps(pending, protocol=5), level=1
+        )
+
+        pending_before = tuple(log._chunks)
+        years_before = tuple(log._years)
+        offsets_before = tuple(log._offsets)
+        tail_before = tuple(log._tail)
+
+        with pytest.raises(ValueError, match="values disagree"):
+            log._adopt_committed_prefix(
+                new_reader, transferred_events=CHUNK_SIZE
+            )
+
+        assert log._disk_prefix is old_reader
+        assert tuple(log._chunks) == pending_before
+        assert tuple(log._years) == years_before
+        assert tuple(log._offsets) == offsets_before
+        assert tuple(log._tail) == tail_before
+        assert log.pending_sealed_event_count == CHUNK_SIZE
+        assert log[CHUNK_SIZE + 17].data["n"] == -12345
+    finally:
+        if new_reader is not None:
+            new_reader.close()
+        if old_reader is not None:
+            old_reader.close()
         store.close()

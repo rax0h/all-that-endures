@@ -336,6 +336,17 @@ class SealedEventPrefix(Sequence):
         self._generation = generation
         self._descriptor = descriptor
 
+    def _shares_store_authority(self, other) -> bool:
+        """Whether another reader borrows this exact open P1 store authority."""
+        self._ensure_readable()
+        if not isinstance(other, SealedEventPrefix):
+            return False
+        other._ensure_readable()
+        return (
+            self._store is other._store
+            and self._store_identity == other._store_identity
+        )
+
     @property
     def captured_generation(self) -> int:
         return self._generation

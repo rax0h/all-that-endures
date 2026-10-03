@@ -150,8 +150,9 @@ class EventLog(Sequence):
         self._ensure_backend_readable()
         if self._disk_prefix is not None:yield from self._disk_prefix
         for number in range(len(self._chunks)):
-            self._ensure_backend_readable()
-            yield from self._chunk(number)
+            for event in self._chunk(number):
+                self._ensure_backend_readable()
+                yield event
         for event in self._tail:
             self._ensure_backend_readable()
             yield event
@@ -208,24 +209,45 @@ class EventLog(Sequence):
         reader remains caller-owned.
         """
         self._ensure_backend_readable()
+        if self._disk_prefix is None:
+            raise ValueError('prefix adoption requires an existing disk prefix')
         if type(transferred_events) is not int or transferred_events<0:
             raise ValueError('transferred_events must be a nonnegative int')
         if transferred_events%self.chunk_size:raise ValueError('transfers require complete chunks')
+        chunks=transferred_events//self.chunk_size
+        if chunks>4:raise ValueError('transfer exceeds bounded four-chunk adoption window')
         pending=len(self._chunks)*self.chunk_size
         if transferred_events>pending:raise ValueError('transfer exceeds pending sealed history')
+        if not self._disk_prefix._shares_store_authority(new_prefix):
+            raise ValueError('replacement prefix belongs to an unrelated store')
         new_count=self._checked_prefix_count(new_prefix)
         expected_count=self._disk_count+transferred_events
         if new_count!=expected_count:
             raise ValueError('replacement prefix boundary does not match transfer')
 
         if transferred_events:
-            first=self[self._disk_count];last=self[expected_count-1]
+            first_chunk=pickle.loads(zlib.decompress(self._chunks[0]))
+            last_chunk=pickle.loads(zlib.decompress(self._chunks[chunks-1]))
+            first=first_chunk[0];last=last_chunk[-1]
             if first.id!=self._disk_count+1 or last.id!=expected_count:
                 raise ValueError('pending source IDs disagree with replacement boundary')
             if new_prefix.last_year!=last.year:
                 raise ValueError('replacement prefix year disagrees with pending source')
+            first_ordinal=self._disk_count//self.chunk_size
+            for local_ordinal in range(chunks):
+                source=pickle.loads(zlib.decompress(self._chunks[local_ordinal]))
+                replacement=new_prefix._read_segment_from_store(
+                    first_ordinal+local_ordinal
+                )
+                if len(source)!=len(replacement) or any(
+                    type(a) is not type(b) or vars(a)!=vars(b)
+                    for a,b in zip(source,replacement)
+                ):
+                    raise ValueError(
+                        'replacement prefix values disagree with pending source'
+                    )
         else:
-            old_year=self._disk_prefix.last_year if self._disk_prefix is not None else None
+            old_year=self._disk_prefix.last_year
             if new_prefix.last_year!=old_year:
                 raise ValueError('replacement prefix changed without a transfer')
 
@@ -234,7 +256,6 @@ class EventLog(Sequence):
         years,offsets=self._pruned_suffix_year_index(new_count,first_remaining_year)
 
         old_prefix=self._disk_prefix
-        chunks=transferred_events//self.chunk_size
         self._disk_prefix=new_prefix;self._disk_count=new_count
         if chunks:
             del self._chunks[:chunks]
