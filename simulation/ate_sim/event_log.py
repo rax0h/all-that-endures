@@ -266,6 +266,28 @@ class EventLog(Sequence):
         if self._count==0:self._last_year=None
         return old_prefix
 
+    def _relink_mutable_tail(self,index,replacement):
+        """Restoration-only replacement of one mutable tail Event reference."""
+        self._ensure_backend_readable()
+        if type(index) is not int or index<0:
+            raise ValueError('EventLog relink requires a nonnegative absolute integer index')
+        first=self._disk_count+len(self._chunks)*self.chunk_size
+        offset=index-first
+        if offset<0 or offset>=len(self._tail):
+            raise ValueError('EventLog relink target is outside the mutable tail')
+        current=self._tail[offset]
+        from .core import Event
+        if type(current) is not Event or type(replacement) is not Event:
+            raise ValueError('EventLog relink requires exact Event values')
+        if current.__dict__.get('_sealed',False) or replacement.__dict__.get('_sealed',False):
+            raise ValueError('EventLog relink cannot assign a sealed Event')
+        expected=index+1
+        if current.id!=expected or replacement.id!=expected:
+            raise ValueError('EventLog relink would change stable event ID/order')
+        if replacement.year!=current.year:
+            raise ValueError('EventLog relink would change event year')
+        self._tail[offset]=replacement
+
     def __getstate__(self):
         return {k:v for k,v in self.__dict__.items() if k!='_cache'}
 
