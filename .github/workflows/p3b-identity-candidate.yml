@@ -5,9 +5,9 @@ on:
     branches: [sol/p3b-identity-candidate]
 
 jobs:
-  focused:
+  validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     env:
       PYTHONPATH: .:simulation
     steps:
@@ -25,3 +25,5 @@ jobs:
           simulation/tests/test_persistence_p2b_identity_review.py
           simulation/tests/test_persistence_p2b_review_regressions.py
           simulation/tests/test_persistence_p2c.py
+      - name: full simulation suite
+        run: python -m pytest -q simulation/tests
