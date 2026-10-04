@@ -707,9 +707,46 @@ def test_independent_unbound_continuation_matches_for_ten_years(tmp_path):
         store.close()
 
 
-def test_bootstrap_transfer_read_and_retention_bounds(tmp_path):
+def test_bootstrap_transfer_read_and_retention_bounds(
+    tmp_path, monkeypatch
+):
     measurements = []
+    original_commit = TransactionalStore.commit
+
     for segments in (4, 40, 400):
+        observed = {
+            "event_deletes": 0,
+            "segment_writes": 0,
+            "transfer_batches": [],
+        }
+
+        def observe_commit(
+            store, expected_generation, changes, new_segments, metadata
+        ):
+            changes = tuple(changes)
+            new_segments = tuple(new_segments)
+            event_deletes = sum(
+                1
+                for change in changes
+                if change.namespace == "world.events" and change.delete
+            )
+            segment_writes = sum(
+                1
+                for segment in new_segments
+                if segment.namespace == SEALED_EVENTS
+            )
+            observed["event_deletes"] += event_deletes
+            observed["segment_writes"] += segment_writes
+            if segment_writes:
+                observed["transfer_batches"].append(segment_writes)
+            return original_commit(
+                store,
+                expected_generation,
+                changes,
+                new_segments,
+                metadata,
+            )
+
         world = segmented_world(
             segments,
             tail_count=3,
@@ -722,9 +759,13 @@ def test_bootstrap_transfer_read_and_retention_bounds(tmp_path):
         gc.collect()
 
         destination = tmp_path / f"scale-{segments}.sqlite"
-        diagnostics = write_cold_snapshot(
-            world, destination, rules_id=RULES
-        )
+        with monkeypatch.context() as guarded:
+            guarded.setattr(
+                TransactionalStore, "commit", observe_commit
+            )
+            diagnostics = write_cold_snapshot(
+                world, destination, rules_id=RULES
+            )
         assert tuple(world.events._cache) == source_cache
 
         expected_events = segments * CHUNK_SIZE
@@ -738,6 +779,13 @@ def test_bootstrap_transfer_read_and_retention_bounds(tmp_path):
         assert diagnostics["transfer_io"]["payload_writes"] == (
             segments + math.ceil(segments / 4)
         )
+        assert observed["event_deletes"] == expected_events
+        assert observed["segment_writes"] == segments
+        assert len(observed["transfer_batches"]) == math.ceil(segments / 4)
+        assert all(
+            1 <= batch <= 4 for batch in observed["transfer_batches"]
+        )
+        assert sum(observed["transfer_batches"]) == segments
 
         store, capture = capture_cold(destination)
         try:
@@ -760,14 +808,6 @@ def test_bootstrap_transfer_read_and_retention_bounds(tmp_path):
             assert sorted(keys) == list(
                 range(expected_events, expected_events + 3)
             )
-            transfer_receipts = store.db.execute(
-                "SELECT COALESCE(SUM(record_deletes),0),"
-                "COALESCE(SUM(segment_writes),0) FROM save_receipts "
-                "WHERE generation>=2 AND generation<?",
-                (diagnostics["final_generation"],),
-            ).fetchone()
-            assert transfer_receipts[0] == expected_events
-            assert transfer_receipts[1] == segments
         finally:
             capture.prefix.close()
             store.close()
@@ -789,6 +829,8 @@ def test_bootstrap_transfer_read_and_retention_bounds(tmp_path):
             "final_file_bytes": diagnostics["final_file_bytes"],
             "transfer_commits": diagnostics["transfer_commits"],
             "largest_batch": diagnostics["largest_transfer_batch_chunks"],
+            "observed_event_deletes": observed["event_deletes"],
+            "observed_segment_writes": observed["segment_writes"],
             "reopen_segment_reads": reopen_reads,
             "tail_events": 3,
             "pending_cache": 0,
