@@ -622,20 +622,35 @@ def _capture_successor(session, plan, *, full_evidence):
                 return "foreign", head, None
             if head.parent_generation != plan.expected_generation:
                 return "foreign", head, None
-            expected_metadata = _head_metadata_tuple(
-                session.codec, plan.metadata
-            )
             if (
-                _head_metadata_tuple(session.codec, head.metadata)
-                    != expected_metadata
-                or _counts_tuple(session.codec, head.namespace_counts)
-                    != plan.expected_namespace_counts
-                or prefix != plan.after_prefix
-                or tail != plan.after_tail
-                or commit.captured_generation != plan.target_generation
+                commit.captured_generation != plan.target_generation
                 or commit.commit_token != plan.token
             ):
                 return "foreign", head, None
+
+            expected_metadata = _head_metadata_tuple(
+                session.codec, plan.metadata
+            )
+            actual_metadata = _head_metadata_tuple(
+                session.codec, head.metadata
+            )
+            actual_counts = _counts_tuple(
+                session.codec, head.namespace_counts
+            )
+            mismatches = []
+            if actual_metadata != expected_metadata:
+                mismatches.append("head metadata")
+            if actual_counts != plan.expected_namespace_counts:
+                mismatches.append("namespace counts")
+            if prefix != plan.after_prefix:
+                mismatches.append("prefix descriptor")
+            if tail != plan.after_tail:
+                mismatches.append("tail descriptor")
+            if mismatches:
+                raise StoreIntegrityError(
+                    "own-token cold save successor evidence mismatch: "
+                    + ", ".join(mismatches)
+                )
 
             if full_evidence:
                 _verify_successor_records(session, plan)
