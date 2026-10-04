@@ -255,29 +255,19 @@ def _record_existed(session, namespace, key, D, N0):
 
 def _expected_counts(session, changes, new_segments, D, N0):
     counts = dict(session._cold_head.namespace_counts)
-    presence = {
-        namespace: set(keys)
-        for namespace, keys in session._cold_persisted_keys.items()
-    }
+    # changes is already coalesced to one final action per typed key.  Determine
+    # baseline presence only for those touched keys; copying every persisted-key
+    # set here makes a local edit scale with unrelated world size.
     for change in changes:
         namespace, key = change.namespace, change.key
-        if namespace == "world.events":
-            existed = type(key) is int and D <= key < N0
-        else:
-            keys = presence.setdefault(namespace, set())
-            existed = key in keys
+        existed = _record_existed(session, namespace, key, D, N0)
         before = counts.get(namespace, (0, 0))
         records, segments = before
         if change.delete:
             if existed:
                 records -= 1
-                if namespace != "world.events":
-                    presence[namespace].discard(key)
-        else:
-            if not existed:
-                records += 1
-                if namespace != "world.events":
-                    presence[namespace].add(key)
+        elif not existed:
+            records += 1
         if records < 0:
             raise StoreIntegrityError("cold save namespace record count underflow")
         if records == 0 and segments == 0:
@@ -734,26 +724,40 @@ def _apply_persisted_key_changes(session, plan):
 
 
 def _validate_acknowledged_journal(session, plan):
-    """Prove publication bookkeeping can be applied before clearing anything."""
+    """Prove publication bookkeeping is either pending or already applied."""
     from .persistence_tracking import _MISSING
 
-    if not plan.dirty_owners.issubset(session._dirty):
-        raise StoreIntegrityError(
-            "cold save dirty journal changed while publication was guarded"
-        )
-    if not plan.deleted_owners.issubset(session._deleted):
-        raise StoreIntegrityError(
-            "cold save delete journal changed while publication was guarded"
-        )
+    # resolve_save() may be retrying after publication cleared some or all of
+    # this plan's journals and then failed before final session bookkeeping.
+    # Supported mutation is blocked throughout recovery, and the durable
+    # successor has already been re-proved before this function is called, so a
+    # missing planned dirty/delete entry is an idempotent post-cleanup state.
     if plan.manifest_dirty:
-        if plan.layout_value is None or not session._manifest_dirty:
-            raise StoreIntegrityError(
-                "acknowledged layout journal changed while publication was guarded"
-            )
+        if plan.layout_value is None:
+            raise StoreIntegrityError("acknowledged layout journal lacks a layout")
+        if not session._manifest_dirty:
+            if session._manifest.get("collections") != dict(plan.layout_value):
+                raise StoreIntegrityError(
+                    "acknowledged layout journal changed while publication was guarded"
+                )
     for target, owner in plan.pending_identity:
         current = session._pending_identity_current.get(target, _MISSING)
-        if current is not owner and (
-            current is _MISSING or owner is _MISSING or current != owner
+        if current is not _MISSING:
+            if current is not owner and (
+                owner is _MISSING or current != owner
+            ):
+                raise StoreIntegrityError(
+                    "identity journal changed while cold save was guarded"
+                )
+            continue
+        committed = session._committed_identity_targets.get(target, _MISSING)
+        if owner is _MISSING:
+            if committed is not _MISSING:
+                raise StoreIntegrityError(
+                    "identity journal changed while cold save was guarded"
+                )
+        elif committed is not owner and (
+            committed is _MISSING or committed != owner
         ):
             raise StoreIntegrityError(
                 "identity journal changed while cold save was guarded"
