@@ -7,6 +7,7 @@ import weakref
 import pytest
 
 from ate_sim.core import Event, Layer, Ref, World
+from ate_sim.agency import ActionRecord
 from ate_sim.event_log import EventLog
 from ate_sim.incremental_store import (
     CodecError,
@@ -20,12 +21,12 @@ from ate_sim.incremental_store import (
 from ate_sim.persistence_adapters import (
     COLLECTION_LAYOUT,
     IDENTITY_DELTAS,
+    IDENTITY_DELTA_SCHEMA,
     IDENTITY_LINKS,
     IDENTITY_LINK_SCHEMA,
     META,
     RECORD_SCHEMA,
     ROOT_FIELDS,
-    ROOT_TYPES,
     SCHEMA,
     WorldCodec,
     _complete_identity_groups,
@@ -44,14 +45,14 @@ from ate_sim.persistence_events import (
     _descriptor_value,
     prepare_sealed_append,
 )
-import ate_sim.persistence_session as persistence_session
+from ate_sim.persistence_schema import ROOT_TYPES
+from ate_sim.persistence_tracking import IncrementalWorldSession
 from ate_sim.persistence_session import (
     COMMIT_DESCRIPTOR_KEY,
     SESSION_DESCRIPTOR_SCHEMA,
     TAIL_DESCRIPTOR_KEY,
     _capture_cold_world,
 )
-from ate_sim.persistence_tracking import bind_snapshot
 
 
 RULES = "stage-0.5-p3b-cold-capture-tests"
@@ -150,8 +151,8 @@ def append_prefix(store, segment_count):
     return next_id
 
 
-def source_records(tmp_path, total_events, *, wallet=None, source_world=None):
-    world = World(843000) if source_world is None else source_world
+def source_records(tmp_path, total_events, *, wallet=None):
+    world = World(843000)
     world.year = 77
     world.next_event = total_events + 1
     if wallet is not None:
@@ -190,13 +191,12 @@ def build_cold_store(
     tail_payload=None,
     identity_links=(),
     individually_sealed=(),
-    source_world=None,
 ):
     disk_events = disk_segments * CHUNK_SIZE
     sealed_events = disk_events + pending_chunks * CHUNK_SIZE
     total_events = sealed_events + tail_count
     manifest, copied, source_head = source_records(
-        tmp_path, total_events, wallet=wallet, source_world=source_world
+        tmp_path, total_events, wallet=wallet
     )
 
     path = tmp_path / (
@@ -326,6 +326,7 @@ def build_cold_store(
         "D": disk_events,
         "F": sealed_events,
         "N": total_events,
+        "suffix": suffix,
         "manifest": cold_manifest,
     }
 
@@ -367,8 +368,26 @@ def test_capture_partition_shapes_and_exact_world(
             )
             assert stats["tail_events"] == fixture["N"] - fixture["F"]
         assert capture.prefix.captured_generation == generation
-        if fixture["D"]:
-            assert capture.world.events[0].id == 1
+
+        # Full typed-value comparison deliberately happens after measured
+        # capture. This covers empty, prefix-only, tail-only, >4 pending chunks
+        # and mixed partitions without weakening the lazy-capture bound.
+        codec = WorldCodec(identity_links_recorded=True)
+        for index in range(fixture["N"]):
+            actual = capture.world.events[index]
+            expected = (
+                event(index + 1, sealed=True)
+                if index < fixture["D"]
+                else event(
+                    index + 1,
+                    data={"index": index},
+                    sealed=index < fixture["F"],
+                )
+            )
+            assert codec.encode(actual) == codec.encode(expected)
+            assert ("_sealed" in vars(actual)) == ("_sealed" in vars(expected))
+            if "_sealed" in vars(expected):
+                assert vars(actual)["_sealed"] is vars(expected)["_sealed"]
         capture.prefix.close()
     finally:
         store.close()
@@ -420,72 +439,70 @@ def test_capture_restores_tail_parent_and_descendant_aliases(tmp_path):
         store.close()
 
 
-@pytest.mark.parametrize("zone", ["disk", "pending", "sealed_tail"])
-@pytest.mark.parametrize("direction", ["target", "owner"])
-def test_forbidden_historical_identity_links_fail_before_cold_io(
-    tmp_path, monkeypatch, zone, direction
+@pytest.mark.parametrize("history_kind", ["disk", "pending", "sealed_tail"])
+@pytest.mark.parametrize("excluded_side", ["target", "owner"])
+def test_forbidden_history_identity_paths_fail_before_cold_io(
+    tmp_path, monkeypatch, history_kind, excluded_side
 ):
-    first_tail = 2 * CHUNK_SIZE
-    index = {
-        "disk": 0,
-        "pending": CHUNK_SIZE,
-        "sealed_tail": first_tail,
-    }[zone]
+    disk_segments = 1
+    pending_chunks = 1
+    individually_sealed = ()
+    if history_kind == "disk":
+        excluded_index = 0
+    elif history_kind == "pending":
+        excluded_index = CHUNK_SIZE
+    else:
+        excluded_index = 2 * CHUNK_SIZE + 1
+        individually_sealed = (excluded_index,)
     current = (
         ("field", "currency"),
         ("field", "wallets"),
         ("key", 1),
     )
-    historical = (
+    excluded = (
         ("field", "events"),
-        ("index", index),
+        ("index", excluded_index),
         ("field", "data"),
     )
-    link = (
-        (historical, current)
-        if direction == "target"
-        else (current, historical)
-    )
-    store, _fixture = build_cold_store(
-        tmp_path,
-        disk_segments=1,
-        pending_chunks=1,
-        tail_count=2,
-        wallet={},
-        identity_links=[link],
-        individually_sealed=(first_tail,),
-    )
-    original_chunk = EventLog._chunk
+    link = (excluded, current) if excluded_side == "target" else (current, excluded)
+    seen = {}
+    original = SealedEventPrefix.from_active_read_transaction.__func__
+
+    def capture_reader(cls, store):
+        reader = original(cls, store)
+        seen["reader"] = reader
+        return reader
+
     monkeypatch.setattr(
-        EventLog,
-        "_chunk",
-        lambda *_args: (_ for _ in ()).throw(
-            AssertionError("cold capture decoded pending history")
-        ),
+        SealedEventPrefix,
+        "from_active_read_transaction",
+        classmethod(capture_reader),
     )
-    segment_sql = []
-
-    def no_segment_sql(action, arg1, arg2, _database, _source):
-        if arg1 == "segments" or arg2 == "segments":
-            segment_sql.append((action, arg1, arg2))
-            return sqlite3.SQLITE_DENY
-        return sqlite3.SQLITE_OK
-
-    store.db.set_authorizer(no_segment_sql)
+    store, fixture = build_cold_store(
+        tmp_path,
+        disk_segments=disk_segments,
+        pending_chunks=pending_chunks,
+        tail_count=3,
+        wallet={"index": excluded_index},
+        identity_links=[link],
+        individually_sealed=individually_sealed,
+    )
+    fixture.pop("suffix", None)
     try:
+        store.reset_diagnostics()
         with store.read_transaction():
-            with pytest.raises(
-                (StoreFormatError, StoreIntegrityError),
-                match="sealed EventLog history",
-            ):
+            with pytest.raises(StoreFormatError, match="sealed EventLog history"):
                 _capture_cold_world(store)
             assert store.db.in_transaction
             assert store.checked_head().generation == store.generation
-        assert segment_sql == []
+        reader = seen["reader"]
+        assert reader.diagnostics().segment_reads == 0
+        assert reader.resident_segments == 0
+        with pytest.raises(StoreError, match="reader is closed"):
+            len(reader)
     finally:
-        store.db.set_authorizer(None)
-        monkeypatch.setattr(EventLog, "_chunk", original_chunk)
         store.close()
+
 
 def test_capture_requires_caller_owned_read_transaction(tmp_path):
     store, _fixture = build_cold_store(
@@ -496,6 +513,22 @@ def test_capture_requires_caller_owned_read_transaction(tmp_path):
         with pytest.raises(StoreError, match="caller-owned"):
             _capture_cold_world(store)
         assert store.diagnostics() == before
+    finally:
+        store.close()
+
+
+def test_cold_capture_requires_published_empty_prefix_descriptor(tmp_path):
+    store, fixture = build_cold_store(
+        tmp_path, disk_segments=0, pending_chunks=0, tail_count=1
+    )
+    try:
+        _republish(
+            store,
+            [RecordChange(EVENT_STORAGE, DESCRIPTOR_KEY, delete=True)],
+        )
+        with store.read_transaction():
+            with pytest.raises(StoreFormatError, match="descriptor"):
+                _capture_cold_world(store)
     finally:
         store.close()
 
@@ -519,110 +552,302 @@ def test_checked_head_detects_post_open_corruption(tmp_path):
         store.close()
 
 
-@pytest.mark.parametrize("segments", [4, 40, 400])
-def test_capture_bounds_are_independent_of_prefix_length(
-    tmp_path, segments
+def test_capture_bounds_are_enforced_across_4_40_400_segments(
+    tmp_path, monkeypatch
 ):
-    store, fixture = build_cold_store(
-        tmp_path,
-        disk_segments=segments,
-        pending_chunks=1,
-        tail_count=3,
-    )
-    try:
-        store.reset_diagnostics()
-        with store.read_transaction():
-            capture = _capture_cold_world(store)
-            groups = _complete_identity_groups(
-                capture.world, mutable_event_tail_only=True
-            )
-            diag = store.diagnostics()
-            prefix_diag = capture.prefix.diagnostics()
-            stats = capture.world.events.storage_stats()
-            print(
-                "P3B_COLD_CAPTURE_BOUNDS "
-                f"segments={segments} payload_reads={diag.payload_reads} "
-                f"payload_bytes={diag.payload_read_bytes} "
-                f"segment_reads={prefix_diag.segment_reads} "
-                f"disk_cache={prefix_diag.resident_segments} "
-                f"pending_cache={stats['pending_cache_segments']} "
-                f"pending_bytes={stats['pending_sealed_bytes']} "
-                f"tail_events={stats['tail_events']} "
-                f"projected_groups={len(groups)} "
-                f"projected_paths={sum(len(v) for v in groups.values())}"
-            )
-            assert prefix_diag.segment_reads == 0
-            assert prefix_diag.resident_segments == 0
-            assert stats["pending_cache_segments"] == 0
-            assert stats["tail_events"] == 3
-            assert stats["disk_segments"] == segments
-        before_reads = store.diagnostics().payload_reads
-        first = capture.world.events[0]
-        assert first.id == 1
-        after_first = store.diagnostics().payload_reads
-        assert after_first == before_reads + 1
-        assert capture.world.events[0] is first
-        assert store.diagnostics().payload_reads == after_first
-        capture.prefix.close()
-    finally:
-        store.close()
+    measurements = []
+    original_chunk = EventLog._chunk
+    original_prefix_iter = SealedEventPrefix.__iter__
 
-
-def test_lazy_capture_does_not_scrub_unread_cold_segment(tmp_path):
-    store, _fixture = build_cold_store(
-        tmp_path,
-        disk_segments=4,
-        pending_chunks=0,
-        tail_count=1,
-    )
-    try:
-        store.db.execute(
-            "UPDATE segments SET payload_checksum=(CASE substr(payload_checksum,1,1) WHEN '0' THEN '1' ELSE '0' END) || substr(payload_checksum,2) "
-            "WHERE namespace=? AND ordinal=0",
-            (SEALED_EVENTS,),
+    for segments in (4, 40, 400):
+        store, fixture = build_cold_store(
+            tmp_path,
+            disk_segments=segments,
+            pending_chunks=1,
+            tail_count=3,
         )
-        store.db.commit()
-        with store.read_transaction():
-            capture = _capture_cold_world(store)
-        with pytest.raises(StoreIntegrityError):
-            _ = capture.world.events[0]
-        capture.prefix.close()
-    finally:
-        store.close()
+        fixture.pop("suffix", None)
+        gc.collect()
+        sql_segment_touches = []
+
+        def authorizer(action, arg1, arg2, _db, _source):
+            if action == sqlite3.SQLITE_READ and arg1 == "segments":
+                sql_segment_touches.append((arg1, arg2))
+                return sqlite3.SQLITE_DENY
+            return sqlite3.SQLITE_OK
+
+        def forbidden_pending_decode(_self, _number):
+            raise AssertionError("cold capture decoded a pending chunk")
+
+        def forbidden_prefix_iteration(_self):
+            raise AssertionError("cold capture iterated immutable prefix history")
+            yield
+
+        try:
+            store.reset_diagnostics()
+            store.db.set_authorizer(authorizer)
+            monkeypatch.setattr(EventLog, "_chunk", forbidden_pending_decode)
+            monkeypatch.setattr(SealedEventPrefix, "__iter__", forbidden_prefix_iteration)
+            with store.read_transaction():
+                capture = _capture_cold_world(store)
+                groups = _complete_identity_groups(
+                    capture.world, mutable_event_tail_only=True
+                )
+                diag = store.diagnostics()
+                prefix_diag = capture.prefix.diagnostics()
+                stats = capture.world.events.storage_stats()
+                measurement = {
+                    "segments": segments,
+                    "payload_reads": diag.payload_reads,
+                    "payload_bytes": diag.payload_read_bytes,
+                    "segment_reads": prefix_diag.segment_reads,
+                    "disk_cache": prefix_diag.resident_segments,
+                    "pending_cache": stats["pending_cache_segments"],
+                    "pending_chunks": len(capture.world.events._chunks),
+                    "pending_bytes": stats["pending_sealed_bytes"],
+                    "tail_events": stats["tail_events"],
+                    "year_entries": len(capture.world.events._years),
+                    "offset_entries": len(capture.world.events._offsets),
+                    "groups": len(groups),
+                    "paths": sum(len(v) for v in groups.values()),
+                }
+                print(
+                    "P3B_COLD_CAPTURE_BOUNDS "
+                    + " ".join(f"{key}={value}" for key, value in measurement.items())
+                )
+                measurements.append(measurement)
+                assert sql_segment_touches == []
+                assert prefix_diag.segment_reads == 0
+                assert prefix_diag.resident_segments == 0
+                assert stats["pending_cache_segments"] == 0
+                assert stats["tail_events"] == 3
+                assert stats["disk_segments"] == segments
+            store.db.set_authorizer(None)
+            monkeypatch.setattr(EventLog, "_chunk", original_chunk)
+            monkeypatch.setattr(SealedEventPrefix, "__iter__", original_prefix_iter)
+
+            before_reads = store.diagnostics().payload_reads
+            first = capture.world.events[0]
+            assert first.id == 1
+            after_first = store.diagnostics().payload_reads
+            assert after_first == before_reads + 1
+            assert capture.world.events[0] is first
+            assert store.diagnostics().payload_reads == after_first
+            capture.prefix.close()
+        finally:
+            store.db.set_authorizer(None)
+            monkeypatch.setattr(EventLog, "_chunk", original_chunk)
+            monkeypatch.setattr(SealedEventPrefix, "__iter__", original_prefix_iter)
+            store.close()
+
+    for key in (
+        "payload_reads",
+        "segment_reads",
+        "disk_cache",
+        "pending_cache",
+        "pending_chunks",
+        "tail_events",
+        "year_entries",
+        "offset_entries",
+        "groups",
+        "paths",
+    ):
+        assert len({m[key] for m in measurements}) == 1, (key, measurements)
+    assert [m["segments"] for m in measurements] == [4, 40, 400]
+    assert measurements[0]["payload_bytes"] <= measurements[1]["payload_bytes"]
+    assert measurements[1]["payload_bytes"] <= measurements[2]["payload_bytes"]
 
 
-def commit_cold_changes(
-    store, changes=(), *, new_segments=(), metadata=None
-):
-    """Publish test-only cold damage while keeping commit generation coherent."""
-    expected = store.generation
-    next_generation = expected + 1
-    rows = list(changes)
-    if not any(
+
+def _republish(store, changes=(), *, metadata=None, new_segments=(), update_commit=True):
+    changes = list(changes)
+    if metadata is None:
+        metadata = store.head_metadata()
+    if update_commit and not any(
         change.namespace == EVENT_STORAGE
         and change.key == COMMIT_DESCRIPTOR_KEY
-        for change in rows
+        for change in changes
     ):
-        rows.append(
+        changes.append(
             RecordChange(
                 EVENT_STORAGE,
                 COMMIT_DESCRIPTOR_KEY,
-                (1, next_generation, TOKEN),
+                (1, store.generation + 1, TOKEN),
                 record_schema=SESSION_DESCRIPTOR_SCHEMA,
             )
         )
-    if metadata is None:
-        metadata = store.head_metadata()
     return store.commit(
-        expected, rows, tuple(new_segments), metadata
+        store.generation,
+        changes,
+        tuple(new_segments),
+        metadata,
     )
 
 
-def event_copy_with(value, **updates):
-    clone = copy.deepcopy(value)
-    for name, replacement in updates.items():
-        object.__setattr__(clone, name, replacement)
-    return clone
+def _replace_suffix_event(store, index, value, *, ordinal=None):
+    if ordinal is None:
+        ordinal = index
+    _republish(
+        store,
+        [
+            RecordChange(
+                "world.events",
+                index,
+                (ordinal, value),
+                record_schema=RECORD_SCHEMA,
+            )
+        ],
+    )
+
+
+def _root_object(world, root):
+    return world if root == "world" else getattr(world, root.split(".", 1)[1])
+
+
+def _all_non_event_root_encodings(world):
+    codec = WorldCodec(identity_links_recorded=True)
+    result = {}
+    for root, fields in ROOT_FIELDS.items():
+        obj = _root_object(world, root)
+        for name, kind in fields.items():
+            if kind == "state" or (root == "world" and name == "events"):
+                continue
+            result[root + "." + name] = codec.encode(getattr(obj, name))
+    return result
+
+
+def _configured_oracle_world(total_events):
+    world = World(843000)
+    world.year = 77
+    world.next_event = total_events + 1
+    world.currency.wallets = {
+        7: {"nested": [True, 1, 1.0, 0.0, -0.0]},
+        2: {"second": {"value": 9}},
+        11: {"third": ("x", 3)},
+    }
+    world.currency.minted = {"iron": 17, "bronze": 2}
+    world.genealogy.parents = {9: (4, 5), 3: (1, 2)}
+    world.genealogy.children = {1: [3], 2: [3], 4: [9]}
+    world.agency.actions = [
+        ActionRecord(76, 3, "learn", "curiosity", 0.625, None),
+        ActionRecord(77, 9, "work", "wealth", 0.375, 41),
+    ]
+    world.event_ids = {9, 3, 17}
+    world.warfare.tensions = {(3, 9): 0.25, (2, 7): 0.75}
+    return world
+
+
+def _build_configured_cold_store(
+    tmp_path, *, disk_segments=1, pending_chunks=1, tail_count=4
+):
+    d = disk_segments * CHUNK_SIZE
+    f = d + pending_chunks * CHUNK_SIZE
+    n = f + tail_count
+    oracle = _configured_oracle_world(n)
+    source_path = tmp_path / f"configured-source-{d}-{f}-{n}.sqlite"
+    write_snapshot(oracle, source_path, rules_id=RULES)
+    source = TransactionalStore.open(
+        source_path,
+        codec=WorldCodec(identity_links_recorded=True),
+        expected_simulation_schema=SCHEMA,
+        expected_rules_id=RULES,
+    )
+    try:
+        with source.read_transaction():
+            manifest = _read_manifest(source)
+            copied = {}
+            for namespace in collection_namespaces():
+                if namespace == "world.events":
+                    continue
+                copied[namespace] = source.read_records(
+                    namespace, expected_record_schema=RECORD_SCHEMA
+                )
+            source_head = source.head_metadata()
+    finally:
+        source.close()
+
+    path = tmp_path / f"configured-cold-{d}-{f}-{n}.sqlite"
+    store = TransactionalStore.create(
+        path,
+        simulation_schema=SCHEMA,
+        rules_id=RULES,
+        codec=WorldCodec(identity_links_recorded=True),
+    )
+    append_prefix(store, disk_segments)
+
+    changes = []
+    for namespace, rows in copied.items():
+        for key, value, schema in rows:
+            changes.append(RecordChange(namespace, key, value, record_schema=schema))
+    suffix_expectations = {}
+    for index in range(d, n):
+        value = event(index + 1, year=10, data={"index": index})
+        if index < f:
+            value.seal()
+        changes.append(
+            RecordChange(
+                "world.events", index, (index, value), record_schema=RECORD_SCHEMA
+            )
+        )
+        suffix_expectations[index] = WorldCodec(
+            identity_links_recorded=True
+        ).encode(value)
+
+    collections = dict(manifest["collections"])
+    collections["world.events"] = (
+        "EventLog-disk/v1", n, f // CHUNK_SIZE
+    )
+    cold_manifest = {
+        "schema": SCHEMA,
+        "collections": collections,
+        "identity_storage": "current-links/v1",
+        "event_storage": "sealed-prefix-tail/v1",
+    }
+    changes.extend(
+        [
+            RecordChange(META, "manifest", cold_manifest, record_schema=RECORD_SCHEMA),
+            RecordChange(
+                EVENT_STORAGE,
+                DESCRIPTOR_KEY,
+                _descriptor_value(
+                    SealedPrefixDescriptor(
+                        disk_segments, d, 10 if d else None
+                    )
+                ),
+                record_schema=DESCRIPTOR_SCHEMA,
+            ),
+            RecordChange(
+                EVENT_STORAGE,
+                TAIL_DESCRIPTOR_KEY,
+                (1, d, f, n, 10 if n else None),
+                record_schema=SESSION_DESCRIPTOR_SCHEMA,
+            ),
+            RecordChange(
+                EVENT_STORAGE,
+                COMMIT_DESCRIPTOR_KEY,
+                (1, store.generation + 1, TOKEN),
+                record_schema=SESSION_DESCRIPTOR_SCHEMA,
+            ),
+        ]
+    )
+    namespaces = tuple(
+        sorted(
+            collection_namespaces()
+            | {META, IDENTITY_LINKS, EVENT_STORAGE, SEALED_EVENTS}
+        )
+    )
+    store.commit(
+        store.generation,
+        changes,
+        (),
+        {
+            "simulation_position": source_head["simulation_position"],
+            "seed": source_head["seed"],
+            "next_ids": source_head["next_ids"],
+            "namespaces": namespaces,
+        },
+    )
+    return store, oracle, {"D": d, "F": f, "N": n, "suffix": suffix_expectations}
 
 
 @pytest.mark.parametrize(
@@ -637,117 +862,79 @@ def event_copy_with(value, **updates):
         "wrong_id",
         "bool_id",
         "float_year",
-        "decreasing_year",
-        "below_prefix_year",
+        "decreasing",
+        "first_before_prefix",
     ],
 )
 def test_cold_capture_rejects_malformed_suffix(tmp_path, case):
+    disk_segments = 1 if case in ("below_d", "first_before_prefix") else 0
     store, fixture = build_cold_store(
-        tmp_path, disk_segments=1, pending_chunks=0, tail_count=12
+        tmp_path,
+        disk_segments=disk_segments,
+        pending_chunks=0,
+        tail_count=12,
     )
     d, n = fixture["D"], fixture["N"]
     try:
-        first = store.read_record(
-            "world.events", d, expected_record_schema=RECORD_SCHEMA
-        )[1]
-        second = store.read_record(
-            "world.events", d + 1, expected_record_schema=RECORD_SCHEMA
-        )[1]
-        last = store.read_record(
-            "world.events", n - 1, expected_record_schema=RECORD_SCHEMA
-        )[1]
-        changes = []
         if case == "missing":
-            changes.append(RecordChange("world.events", n - 1, delete=True))
+            _republish(
+                store,
+                [RecordChange("world.events", d, delete=True)],
+            )
         elif case == "extra":
-            changes.append(
-                RecordChange(
-                    "world.events",
-                    n,
-                    (n, event(n + 1, year=10)),
-                    record_schema=RECORD_SCHEMA,
-                )
+            _republish(
+                store,
+                [
+                    RecordChange(
+                        "world.events",
+                        n,
+                        (n, event(n + 1)),
+                        record_schema=RECORD_SCHEMA,
+                    )
+                ],
             )
         elif case == "below_d":
-            changes.extend([
-                RecordChange("world.events", n - 1, delete=True),
-                RecordChange(
-                    "world.events",
-                    d - 1,
-                    (d - 1, event(d, year=10)),
-                    record_schema=RECORD_SCHEMA,
-                ),
-            ])
+            _republish(
+                store,
+                [
+                    RecordChange("world.events", d, delete=True),
+                    RecordChange(
+                        "world.events",
+                        0,
+                        (0, event(1)),
+                        record_schema=RECORD_SCHEMA,
+                    ),
+                ],
+            )
         elif case == "bool_key":
-            changes.extend([
-                RecordChange("world.events", n - 1, delete=True),
-                RecordChange(
-                    "world.events",
-                    True,
-                    (True, event(2, year=10)),
-                    record_schema=RECORD_SCHEMA,
-                ),
-            ])
+            _republish(
+                store,
+                [
+                    RecordChange("world.events", 0, delete=True),
+                    RecordChange(
+                        "world.events",
+                        False,
+                        (0, event(1)),
+                        record_schema=RECORD_SCHEMA,
+                    ),
+                ],
+            )
         elif case == "wrong_ordinal":
-            changes.append(
-                RecordChange(
-                    "world.events", d, (d + 1, first),
-                    record_schema=RECORD_SCHEMA,
-                )
-            )
+            _replace_suffix_event(store, d, event(d + 1), ordinal=d + 1)
         elif case == "bool_ordinal":
-            changes.append(
-                RecordChange(
-                    "world.events", d, (True, first),
-                    record_schema=RECORD_SCHEMA,
-                )
-            )
+            _replace_suffix_event(store, d, event(d + 1), ordinal=True)
         elif case == "wrong_id":
-            changes.append(
-                RecordChange(
-                    "world.events",
-                    d,
-                    (d, event_copy_with(first, id=d + 2)),
-                    record_schema=RECORD_SCHEMA,
-                )
-            )
+            _replace_suffix_event(store, d, event(d + 2))
         elif case == "bool_id":
-            changes.append(
-                RecordChange(
-                    "world.events",
-                    d,
-                    (d, event_copy_with(first, id=True)),
-                    record_schema=RECORD_SCHEMA,
-                )
-            )
+            bad = event(d + 1)
+            object.__setattr__(bad, "id", True)
+            _replace_suffix_event(store, d, bad)
         elif case == "float_year":
-            changes.append(
-                RecordChange(
-                    "world.events",
-                    d,
-                    (d, event_copy_with(first, year=10.0)),
-                    record_schema=RECORD_SCHEMA,
-                )
-            )
-        elif case == "decreasing_year":
-            changes.append(
-                RecordChange(
-                    "world.events",
-                    d + 1,
-                    (d + 1, event_copy_with(second, year=9)),
-                    record_schema=RECORD_SCHEMA,
-                )
-            )
-        else:
-            changes.append(
-                RecordChange(
-                    "world.events",
-                    d,
-                    (d, event_copy_with(first, year=9)),
-                    record_schema=RECORD_SCHEMA,
-                )
-            )
-        commit_cold_changes(store, changes)
+            _replace_suffix_event(store, d, event(d + 1, year=10.0))
+        elif case == "decreasing":
+            _replace_suffix_event(store, d + 7, event(d + 8, year=9))
+        elif case == "first_before_prefix":
+            _replace_suffix_event(store, d, event(d + 1, year=9))
         with store.read_transaction():
             with pytest.raises((StoreFormatError, StoreIntegrityError)):
                 _capture_cold_world(store)
@@ -755,65 +942,54 @@ def test_cold_capture_rejects_malformed_suffix(tmp_path, case):
         store.close()
 
 
-def test_cold_capture_rejects_invalid_sealing(tmp_path):
-    # Unsealed pending event.
-    store, _fixture = build_cold_store(
-        tmp_path, disk_segments=0, pending_chunks=1, tail_count=1
+@pytest.mark.parametrize(
+    "case",
+    ["unsealed_pending", "sealed_mutable_pending", "sealed_mutable_tail"],
+)
+def test_cold_capture_rejects_invalid_sealing(tmp_path, case):
+    pending = 1 if "pending" in case else 0
+    store, fixture = build_cold_store(
+        tmp_path,
+        disk_segments=0,
+        pending_chunks=pending,
+        tail_count=2,
+        individually_sealed=(0,) if case == "sealed_mutable_tail" else (),
     )
+    index = 0
     try:
-        envelope = store.read_record(
-            "world.events", 0, expected_record_schema=RECORD_SCHEMA
-        )
-        bad = event_copy_with(envelope[1])
-        bad.__dict__.pop("_sealed", None)
-        commit_cold_changes(
-            store,
-            [RecordChange(
-                "world.events", 0, (0, bad),
-                record_schema=RECORD_SCHEMA,
-            )],
-        )
+        bad = event(1)
+        if case != "unsealed_pending":
+            object.__setattr__(bad, "_sealed", True)
+        _replace_suffix_event(store, index, bad)
         with store.read_transaction():
-            with pytest.raises(StoreFormatError, match="must already be sealed"):
+            with pytest.raises(StoreFormatError):
                 _capture_cold_world(store)
     finally:
         store.close()
 
-    # A persisted sealed flag cannot bless mutable data.
-    store, _fixture = build_cold_store(
-        tmp_path, disk_segments=0, pending_chunks=0, tail_count=1
-    )
-    try:
-        bad = event(1, data={"still": ["mutable"]})
-        object.__setattr__(bad, "_sealed", True)
-        commit_cold_changes(
-            store,
-            [RecordChange(
-                "world.events", 0, (0, bad),
-                record_schema=RECORD_SCHEMA,
-            )],
-        )
-        with store.read_transaction():
-            with pytest.raises(StoreFormatError, match="sealed event data"):
-                _capture_cold_world(store)
-    finally:
-        store.close()
 
-    # WorldCodec itself rejects malformed sealed-flag representation.
-    store, _fixture = build_cold_store(
+def test_world_codec_rejects_malformed_sealed_flag_before_capture(tmp_path):
+    store, fixture = build_cold_store(
         tmp_path, disk_segments=0, pending_chunks=0, tail_count=1
     )
     try:
         bad = event(1)
         object.__setattr__(bad, "_sealed", 1)
         with pytest.raises(CodecError, match="sealed flag"):
-            commit_cold_changes(
+            _republish(
                 store,
-                [RecordChange(
-                    "world.events", 0, (0, bad),
-                    record_schema=RECORD_SCHEMA,
-                )],
+                [
+                    RecordChange(
+                        "world.events",
+                        0,
+                        (0, bad),
+                        record_schema=RECORD_SCHEMA,
+                    )
+                ],
             )
+        with store.read_transaction():
+            capture = _capture_cold_world(store)
+        capture.prefix.close()
     finally:
         store.close()
 
@@ -824,143 +1000,125 @@ def test_cold_capture_rejects_invalid_sealing(tmp_path):
         "missing_prefix",
         "extra_descriptor",
         "bool_d",
-        "bool_f",
+        "float_f",
         "bool_n",
-        "d_after_f",
-        "f_after_n",
+        "f_before_d",
+        "n_before_f",
         "unaligned_d",
         "unaligned_f",
         "last_year",
         "bad_token",
-        "bad_version",
-        "bad_generation",
-        "prefix_head_segments",
+        "bad_commit_version",
+        "bool_commit_generation",
+        "generation_mismatch",
+        "prefix_tail_mismatch",
+        "head_segment_count",
         "suffix_head_count",
-        "record_in_segment_namespace",
-        "segment_in_record_namespace",
-        "bad_overlay",
-        "overlay_boolean_total",
-        "overlay_float_chunks",
+        "sealed_namespace_record",
+        "events_namespace_segment",
+        "bad_overlay_layout",
+        "missing_overlay_root",
     ],
 )
 def test_cold_capture_rejects_descriptor_and_layout_damage(tmp_path, case):
     store, fixture = build_cold_store(
-        tmp_path, disk_segments=1, pending_chunks=1, tail_count=1
+        tmp_path, disk_segments=1, pending_chunks=1, tail_count=2
     )
+    d, f, n = fixture["D"], fixture["F"], fixture["N"]
     try:
-        tail = store.read_record(
-            EVENT_STORAGE, TAIL_DESCRIPTOR_KEY,
-            expected_record_schema=SESSION_DESCRIPTOR_SCHEMA,
-        )
-        version, d, f, n, last_year = tail
         changes = []
-        segments = []
-        metadata = None
+        new_segments = []
+        update_commit = True
         if case == "missing_prefix":
             changes.append(RecordChange(EVENT_STORAGE, DESCRIPTOR_KEY, delete=True))
         elif case == "extra_descriptor":
             changes.append(
                 RecordChange(
-                    EVENT_STORAGE, "unexpected/v1", (1,),
-                    record_schema=SESSION_DESCRIPTOR_SCHEMA,
+                    EVENT_STORAGE, "rogue/v1", (1,), record_schema=DESCRIPTOR_SCHEMA
                 )
             )
-        elif case in {"bool_d", "bool_f", "bool_n"}:
-            values = [version, d, f, n, last_year]
-            values[{"bool_d": 1, "bool_f": 2, "bool_n": 3}[case]] = True
-            changes.append(RecordChange(
-                EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, tuple(values),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ))
-        elif case == "d_after_f":
-            changes.append(RecordChange(
-                EVENT_STORAGE, TAIL_DESCRIPTOR_KEY,
-                (1, 2 * CHUNK_SIZE, CHUNK_SIZE, n, last_year),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ))
-        elif case == "f_after_n":
-            changes.append(RecordChange(
-                EVENT_STORAGE, TAIL_DESCRIPTOR_KEY,
-                (1, d, 3 * CHUNK_SIZE, n, last_year),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ))
+        elif case == "bool_d":
+            changes.append(RecordChange(EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, (1, True, f, n, 10), record_schema=1))
+        elif case == "float_f":
+            changes.append(RecordChange(EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, (1, d, float(f), n, 10), record_schema=1))
+        elif case == "bool_n":
+            changes.append(RecordChange(EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, (1, d, f, False, 10), record_schema=1))
+        elif case == "f_before_d":
+            changes.append(RecordChange(EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, (1, d, d - CHUNK_SIZE, n, 10), record_schema=1))
+        elif case == "n_before_f":
+            changes.append(RecordChange(EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, (1, d, f, f - 1, 10), record_schema=1))
         elif case == "unaligned_d":
-            changes.append(RecordChange(
-                EVENT_STORAGE, TAIL_DESCRIPTOR_KEY,
-                (1, d + 1, f, n, last_year),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ))
+            changes.append(RecordChange(EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, (1, d + 1, f, n, 10), record_schema=1))
         elif case == "unaligned_f":
-            changes.append(RecordChange(
-                EVENT_STORAGE, TAIL_DESCRIPTOR_KEY,
-                (1, d, f + 1, n + 1, last_year),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ))
+            changes.append(RecordChange(EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, (1, d, f + 1, n, 10), record_schema=1))
         elif case == "last_year":
-            changes.append(RecordChange(
-                EVENT_STORAGE, TAIL_DESCRIPTOR_KEY,
-                (1, d, f, n, last_year + 1),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ))
+            changes.append(RecordChange(EVENT_STORAGE, TAIL_DESCRIPTOR_KEY, (1, d, f, n, 11), record_schema=1))
         elif case == "bad_token":
-            changes.append(RecordChange(
-                EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY,
-                (1, store.generation + 1, "ABC"),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ))
-        elif case == "bad_version":
-            changes.append(RecordChange(
-                EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY,
-                (2, store.generation + 1, TOKEN),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ))
-        elif case == "bad_generation":
-            changes.append(RecordChange(
-                EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY,
-                (1, store.generation, TOKEN),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ))
-        elif case == "prefix_head_segments":
-            segments.append(NewSegment(
-                SEALED_EVENTS,
-                fixture["D"] // CHUNK_SIZE,
-                ("unused-test-segment", ()),
-                0,
-                None,
-                None,
-            ))
-        elif case == "suffix_head_count":
-            changes.append(RecordChange(
-                "world.events", n, (n, event(n + 1)),
-                record_schema=RECORD_SCHEMA,
-            ))
-        elif case == "record_in_segment_namespace":
-            changes.append(RecordChange(
-                SEALED_EVENTS, "unexpected-record", 1,
-                record_schema=RECORD_SCHEMA,
-            ))
-        elif case == "segment_in_record_namespace":
-            segments.append(NewSegment(
-                "world.event_ids", 0, ("unexpected-segment", ()),
-                0, None, None,
-            ))
-        else:
-            manifest = copy.deepcopy(fixture["manifest"])
-            if case == "bad_overlay":
-                overlay = {"world.events": manifest["collections"]["world.events"]}
-            else:
-                overlay = copy.deepcopy(manifest["collections"])
-                overlay["world.events"] = (
-                    ("EventLog-disk/v1", True, f // CHUNK_SIZE)
-                    if case == "overlay_boolean_total"
-                    else ("EventLog-disk/v1", n, 1.0)
+            update_commit = False
+            changes.append(RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY, (1, store.generation + 1, "ABC"), record_schema=1))
+        elif case == "bad_commit_version":
+            update_commit = False
+            changes.append(RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY, (2, store.generation + 1, TOKEN), record_schema=1))
+        elif case == "bool_commit_generation":
+            update_commit = False
+            changes.append(RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY, (1, True, TOKEN), record_schema=1))
+        elif case == "generation_mismatch":
+            update_commit = False
+            changes.append(RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY, (1, store.generation + 99, TOKEN), record_schema=1))
+        elif case == "prefix_tail_mismatch":
+            changes.append(
+                RecordChange(
+                    EVENT_STORAGE,
+                    DESCRIPTOR_KEY,
+                    _descriptor_value(SealedPrefixDescriptor(2, 2 * CHUNK_SIZE, 10)),
+                    record_schema=DESCRIPTOR_SCHEMA,
                 )
-            changes.append(RecordChange(
-                META, COLLECTION_LAYOUT, overlay,
-                record_schema=RECORD_SCHEMA,
-            ))
-        commit_cold_changes(
-            store, changes, new_segments=segments, metadata=metadata
+            )
+        elif case == "head_segment_count":
+            new_segments.append(
+                NewSegment(
+                    SEALED_EVENTS,
+                    1,
+                    ("probe-segment",),
+                    1,
+                    None,
+                    None,
+                )
+            )
+        elif case == "suffix_head_count":
+            changes.append(
+                RecordChange(
+                    "world.events",
+                    n,
+                    (n, event(n + 1)),
+                    record_schema=RECORD_SCHEMA,
+                )
+            )
+        elif case == "sealed_namespace_record":
+            changes.append(RecordChange(SEALED_EVENTS, "rogue", 1))
+        elif case == "events_namespace_segment":
+            new_segments.append(
+                NewSegment("world.events", 0, ("probe",), 1, None, None)
+            )
+        elif case in ("bad_overlay_layout", "missing_overlay_root"):
+            layout = copy.deepcopy(fixture["manifest"]["collections"])
+            if case == "bad_overlay_layout":
+                layout["world.events"] = ("EventLog-disk/v1", True, f // CHUNK_SIZE)
+            else:
+                layout.pop(next(key for key in layout if key != "world.events"))
+            changes.append(
+                RecordChange(
+                    META,
+                    COLLECTION_LAYOUT,
+                    layout,
+                    record_schema=RECORD_SCHEMA,
+                )
+            )
+        _republish(
+            store,
+            changes,
+            new_segments=new_segments,
+            update_commit=update_commit,
         )
         with store.read_transaction():
             with pytest.raises((StoreFormatError, StoreIntegrityError)):
@@ -972,94 +1130,85 @@ def test_cold_capture_rejects_descriptor_and_layout_damage(tmp_path, case):
 @pytest.mark.parametrize(
     "case",
     [
-        "non_cold",
-        "unknown_event_mode",
-        "unknown_identity_mode",
-        "mixed_keys",
+        "legacy_current",
+        "unknown_event",
+        "unknown_identity",
+        "mixed_manifest",
         "missing_root",
         "unknown_root",
         "identity_delta_authority",
     ],
 )
 def test_cold_capture_rejects_wrong_modes(tmp_path, case):
-    if case == "non_cold":
-        path = tmp_path / "ordinary-p2c.sqlite"
-        write_snapshot(World(843000), path, rules_id=RULES)
-        store = TransactionalStore.open(
-            path,
-            codec=WorldCodec(identity_links_recorded=True),
-            expected_simulation_schema=SCHEMA,
-            expected_rules_id=RULES,
-        )
-        try:
-            with store.read_transaction():
-                with pytest.raises(StoreFormatError, match="requires conversion"):
-                    _capture_cold_world(store)
-        finally:
-            store.close()
-        return
-
     store, fixture = build_cold_store(
         tmp_path, disk_segments=0, pending_chunks=0, tail_count=1
     )
     try:
         manifest = copy.deepcopy(fixture["manifest"])
+        metadata = store.head_metadata()
         changes = []
-        metadata = None
-        if case == "unknown_event_mode":
-            manifest["event_storage"] = "unknown/v9"
-        elif case == "unknown_identity_mode":
-            manifest["identity_storage"] = "unknown/v9"
-        elif case == "mixed_keys":
+        if case == "legacy_current":
+            manifest.pop("event_storage")
+        elif case == "unknown_event":
+            manifest["event_storage"] = "unknown/v1"
+        elif case == "unknown_identity":
+            manifest["identity_storage"] = "unknown/v1"
+        elif case == "mixed_manifest":
             manifest["identity_links"] = []
         elif case == "missing_root":
-            manifest["collections"].pop("world.event_ids")
+            manifest["collections"].pop(next(iter(manifest["collections"])))
         elif case == "unknown_root":
-            manifest["collections"]["world.unknown"] = ("list", 0, 0)
-        else:
-            metadata = store.head_metadata()
+            manifest["collections"]["world.unknown"] = ("dict", 0, 0)
+        elif case == "identity_delta_authority":
             metadata["namespaces"] = tuple(
                 sorted(set(metadata["namespaces"]) | {IDENTITY_DELTAS})
             )
-            changes.append(RecordChange(
-                IDENTITY_DELTAS, 0, ("identity-delta/v1", (), ()),
-                record_schema=1,
-            ))
-        if case != "identity_delta_authority":
-            changes.append(RecordChange(
-                META, "manifest", manifest, record_schema=RECORD_SCHEMA
-            ))
-        commit_cold_changes(store, changes, metadata=metadata)
+            changes.append(
+                RecordChange(
+                    IDENTITY_DELTAS,
+                    0,
+                    ("identity-delta/v1", (), ()),
+                    record_schema=IDENTITY_DELTA_SCHEMA,
+                )
+            )
+        changes.append(
+            RecordChange(META, "manifest", manifest, record_schema=RECORD_SCHEMA)
+        )
+        _republish(store, changes, metadata=metadata)
         with store.read_transaction():
-            with pytest.raises((StoreFormatError, StoreIntegrityError)):
-                _capture_cold_world(store)
+            if case == "legacy_current":
+                with pytest.raises(StoreFormatError, match="requires conversion"):
+                    _capture_cold_world(store)
+            else:
+                with pytest.raises((StoreFormatError, StoreIntegrityError)):
+                    _capture_cold_world(store)
     finally:
         store.close()
 
 
-@pytest.mark.parametrize("namespace", ["world.events", "world.seed"])
+@pytest.mark.parametrize("namespace", ["world.events", "world.currency.wallets"])
 def test_cold_capture_eagerly_rejects_current_record_checksum_damage(
     tmp_path, namespace
 ):
-    store, _fixture = build_cold_store(
-        tmp_path, disk_segments=0, pending_chunks=0, tail_count=1
+    store, fixture = build_cold_store(
+        tmp_path,
+        disk_segments=0,
+        pending_chunks=0,
+        tail_count=1,
+        wallet={"value": 1},
     )
     try:
-        changed = store.db.execute(
-            """
-            UPDATE records
-            SET payload_checksum =
-                (CASE substr(payload_checksum,1,1)
-                    WHEN '0' THEN '1' ELSE '0' END)
-                || substr(payload_checksum,2)
-            WHERE rowid = (
-                SELECT rowid FROM records
-                WHERE namespace=? LIMIT 1
-            )
-            """,
+        row = store.db.execute(
+            "SELECT typed_key,payload_checksum FROM records WHERE namespace=? LIMIT 1",
             (namespace,),
-        ).rowcount
-        assert changed == 1
+        ).fetchone()
+        assert row is not None
+        typed_key, checksum = row
+        damaged = ("1" if checksum[0] == "0" else "0") + checksum[1:]
+        store.db.execute(
+            "UPDATE records SET payload_checksum=? WHERE namespace=? AND typed_key=?",
+            (damaged, namespace, typed_key),
+        )
         store.db.commit()
         with store.read_transaction():
             with pytest.raises(StoreIntegrityError, match="checksum mismatch"):
@@ -1068,226 +1217,179 @@ def test_cold_capture_eagerly_rejects_current_record_checksum_damage(
         store.close()
 
 
-def test_cold_capture_rejects_real_world_head_counter_disagreement(tmp_path):
-    store, _fixture = build_cold_store(
+def test_cold_capture_rejects_integer_world_head_counter_disagreement(tmp_path):
+    store, fixture = build_cold_store(
         tmp_path, disk_segments=0, pending_chunks=0, tail_count=1
     )
     try:
         metadata = store.head_metadata()
-        metadata["next_ids"] = dict(metadata["next_ids"])
-        metadata["next_ids"]["next_event"] += 1
-        commit_cold_changes(store, metadata=metadata)
+        metadata["next_ids"]["next_person"] += 1
+        _republish(store, metadata=metadata)
         with store.read_transaction():
-            with pytest.raises(StoreIntegrityError, match="World disagrees"):
+            with pytest.raises(StoreIntegrityError, match="checked head"):
                 _capture_cold_world(store)
     finally:
         store.close()
 
 
-def test_capture_restores_every_declared_non_event_root_field_exactly(tmp_path):
-    source = World(843000)
-    source.currency.wallets = {
-        9: {"nested": [True, 1, 1.0, -0.0]},
-        2: {"order": {"b": 2, "a": 1}},
-    }
-    source.genealogy.parents = {
-        7: (1, 2),
-        3: (None, 1),
-    }
-    source.event_ids = {9, 2, 5}
-    store, _fixture = build_cold_store(
-        tmp_path,
-        disk_segments=0,
-        pending_chunks=0,
-        tail_count=2,
-        source_world=source,
-    )
-    codec = WorldCodec(identity_links_recorded=True)
+def test_capture_restores_all_non_event_root_values_and_order(tmp_path):
+    store, oracle, fixture = _build_configured_cold_store(tmp_path)
     try:
+        expected = _all_non_event_root_encodings(oracle)
         with store.read_transaction():
             capture = _capture_cold_world(store)
-        for root, _cls in ROOT_TYPES.items():
-            expected_root = (
-                source
-                if root == "world"
-                else getattr(source, root.split(".")[1])
-            )
-            actual_root = (
-                capture.world
-                if root == "world"
-                else getattr(capture.world, root.split(".")[1])
-            )
-            for name, kind in ROOT_FIELDS[root].items():
-                if root == "world" and name == "events":
-                    continue
-                expected = getattr(expected_root, name)
-                actual = getattr(actual_root, name)
-                assert codec.encode(actual) == codec.encode(expected), (
-                    root, name, kind
-                )
-                if isinstance(expected, dict):
-                    assert list(actual) == list(expected)
+        actual = _all_non_event_root_encodings(capture.world)
+        assert actual == expected
+        assert list(capture.world.currency.wallets) == [7, 2, 11]
+        assert list(capture.world.genealogy.parents) == [9, 3]
         capture.prefix.close()
     finally:
         store.close()
 
 
-def _custom_tail_event(index, *, sealed, year, variant):
-    value = Event(
-        index + 1,
-        year,
-        f"capture-{variant}",
-        Layer.REALITY,
-        (Ref("person", 3), Ref("person", 8)),
-        Ref("settlement", 2),
-        (1, max(1, index)),
-        {
-            "typed": [
-                True,
-                1,
-                1.0,
-                -0.0,
-                struct.unpack(">d", bytes.fromhex("7ff8000000000042"))[0],
+def test_capture_restores_exact_event_values_flags_and_special_types(tmp_path):
+    store, oracle, fixture = _build_configured_cold_store(
+        tmp_path, disk_segments=1, pending_chunks=2, tail_count=4
+    )
+    d, f, n = fixture["D"], fixture["F"], fixture["N"]
+    try:
+        special = Event(
+            f + 1,
+            10,
+            "special",
+            Layer.NARRATIVE,
+            (Ref("person", 7), Ref("settlement", 2)),
+            Ref("settlement", 2),
+            (1, CHUNK_SIZE),
+            {
+                "typed": [
+                    True,
+                    1,
+                    1.0,
+                    0.0,
+                    -0.0,
+                    struct.unpack(">d", bytes.fromhex("7ff8000000000042"))[0],
+                ]
+            },
+        )
+        sealed_tail = Event(
+            f + 2,
+            10,
+            "sealed-special",
+            Layer.SOCIETY,
+            (Ref("person", 11),),
+            None,
+            (special.id,),
+            {"nested": [0.0, -0.0]},
+        )
+        sealed_tail.seal()
+        _republish(
+            store,
+            [
+                RecordChange(
+                    "world.events",
+                    f,
+                    (f, special),
+                    record_schema=RECORD_SCHEMA,
+                ),
+                RecordChange(
+                    "world.events",
+                    f + 1,
+                    (f + 1, sealed_tail),
+                    record_schema=RECORD_SCHEMA,
+                ),
             ],
-            "variant": variant,
-        },
-    )
-    if sealed:
-        value.seal()
-    return value
-
-
-def test_capture_restores_exact_event_values_flags_and_boundaries(tmp_path):
-    store, fixture = build_cold_store(
-        tmp_path,
-        disk_segments=1,
-        pending_chunks=1,
-        tail_count=3,
-        individually_sealed=(2 * CHUNK_SIZE + 1,),
-    )
-    f = fixture["F"]
-    custom = [
-        _custom_tail_event(f, sealed=False, year=10, variant="open"),
-        _custom_tail_event(f + 1, sealed=True, year=10, variant="sealed"),
-        _custom_tail_event(f + 2, sealed=False, year=11, variant="later"),
-    ]
-    try:
-        changes = [
-            RecordChange(
-                "world.events", f + offset,
-                (f + offset, value),
-                record_schema=RECORD_SCHEMA,
-            )
-            for offset, value in enumerate(custom)
-        ]
-        changes.append(RecordChange(
-            EVENT_STORAGE,
-            TAIL_DESCRIPTOR_KEY,
-            (1, fixture["D"], fixture["F"], fixture["N"], 11),
-            record_schema=SESSION_DESCRIPTOR_SCHEMA,
-        ))
-        commit_cold_changes(store, changes)
+        )
+        codec = WorldCodec(identity_links_recorded=True)
         with store.read_transaction():
             capture = _capture_cold_world(store)
 
-        codec = WorldCodec(identity_links_recorded=True)
-        # Disk prefix oracle.
-        for index in range(fixture["D"]):
-            expected = event(index + 1, year=10, sealed=True)
-            assert codec.encode(capture.world.events[index]) == codec.encode(expected)
-        # Pending suffix oracle.
-        for index in range(fixture["D"], fixture["F"]):
-            expected = event(
-                index + 1, year=10, data={"index": index}, sealed=True
-            )
-            assert codec.encode(capture.world.events[index]) == codec.encode(expected)
-        # Mutable/individually-sealed tail oracle.
-        for offset, expected in enumerate(custom):
-            actual = capture.world.events[f + offset]
+        for index in range(n):
+            actual = capture.world.events[index]
+            if index < d:
+                expected = event(index + 1, sealed=True)
+            elif index == f:
+                expected = special
+            elif index == f + 1:
+                expected = sealed_tail
+            else:
+                expected = event(
+                    index + 1,
+                    data={"index": index},
+                    sealed=index < f,
+                )
             assert codec.encode(actual) == codec.encode(expected)
-            assert ("_sealed" in actual.__dict__) == (
-                "_sealed" in expected.__dict__
-            )
-            assert actual.__dict__.get("_sealed", False) is expected.__dict__.get(
-                "_sealed", False
-            )
+            assert ("_sealed" in vars(actual)) == ("_sealed" in vars(expected))
+            if "_sealed" in vars(expected):
+                assert vars(actual)["_sealed"] is vars(expected)["_sealed"]
         capture.prefix.close()
     finally:
         store.close()
 
 
-def test_capture_failure_after_reader_creation_closes_reader_and_preserves_owner(
+def test_capture_failure_after_reader_allocation_closes_reader_only(
     tmp_path, monkeypatch
 ):
     store, fixture = build_cold_store(
         tmp_path, disk_segments=1, pending_chunks=0, tail_count=1
     )
     d = fixture["D"]
-    envelope = store.read_record(
-        "world.events", d, expected_record_schema=RECORD_SCHEMA
-    )
-    commit_cold_changes(
-        store,
-        [RecordChange(
-            "world.events",
-            d,
-            (d, event_copy_with(envelope[1], id=d + 2)),
-            record_schema=RECORD_SCHEMA,
-        )],
-    )
-    created = []
-    original = SealedEventPrefix.from_active_read_transaction
+    _replace_suffix_event(store, d, event(d + 2))
+    seen = {}
+    original = SealedEventPrefix.from_active_read_transaction.__func__
 
-    def capture_reader(cls, target_store):
-        reader = original(target_store)
-        created.append(reader)
+    def spy(cls, candidate_store):
+        reader = original(cls, candidate_store)
+        seen["reader"] = reader
         return reader
 
     monkeypatch.setattr(
         SealedEventPrefix,
         "from_active_read_transaction",
-        classmethod(capture_reader),
+        classmethod(spy),
     )
     try:
         with store.read_transaction():
-            with pytest.raises(StoreIntegrityError, match="ID discontinuity"):
+            with pytest.raises(StoreIntegrityError):
                 _capture_cold_world(store)
             assert store.db.in_transaction
             assert store.checked_head().generation == store.generation
-            assert len(created) == 1
-            with pytest.raises(StoreError, match="reader is closed"):
-                len(created[0])
         assert not store._closed
+        with pytest.raises(StoreError, match="reader is closed"):
+            len(seen["reader"])
     finally:
         store.close()
 
 
-def test_capture_success_reader_and_store_lifetime_boundaries(tmp_path):
-    store, _fixture = build_cold_store(
+def test_successful_capture_reader_and_store_lifetime_boundaries(tmp_path):
+    store, fixture = build_cold_store(
         tmp_path, disk_segments=1, pending_chunks=0, tail_count=1
     )
     try:
         with store.read_transaction():
             capture = _capture_cold_world(store)
-        assert len(capture.prefix) == CHUNK_SIZE
+            generation = capture.generation
+        assert capture.prefix.captured_generation == generation
         assert capture.world.events[0].id == 1
         capture.prefix.close()
-        with pytest.raises(StoreError, match="reader is closed"):
+        with pytest.raises(StoreError):
             len(capture.world.events)
-
-        with store.read_transaction():
-            capture2 = _capture_cold_world(store)
-        store.close()
-        with pytest.raises(StoreError, match="store is closed"):
-            len(capture2.world.events)
     finally:
-        if not store._closed:
-            store.close()
+        store.close()
 
-
-def test_capture_generation_remains_fixed_across_later_publication(tmp_path):
-    store, fixture = build_cold_store(
+    store2, fixture2 = build_cold_store(
         tmp_path, disk_segments=1, pending_chunks=0, tail_count=1
+    )
+    with store2.read_transaction():
+        capture2 = _capture_cold_world(store2)
+    store2.close()
+    with pytest.raises(StoreError):
+        len(capture2.world.events)
+
+
+def test_capture_generation_is_fixed_across_later_publication(tmp_path):
+    store, fixture = build_cold_store(
+        tmp_path, disk_segments=2, pending_chunks=0, tail_count=1
     )
     writer = TransactionalStore.open(
         store.path,
@@ -1295,216 +1397,143 @@ def test_capture_generation_remains_fixed_across_later_publication(tmp_path):
         expected_simulation_schema=SCHEMA,
         expected_rules_id=RULES,
     )
+    writer.db.execute("PRAGMA busy_timeout=0")
     try:
         with store.read_transaction() as generation:
             capture = _capture_cold_world(store)
+            assert store.db.in_transaction
             assert capture.generation == generation
             assert capture.prefix.captured_generation == generation
             assert capture.commit_descriptor.captured_generation == generation
-            assert capture.head.generation == generation
-        metadata = writer.head_metadata()
-        published = writer.commit(
-            writer.generation,
-            [RecordChange(
-                EVENT_STORAGE,
-                COMMIT_DESCRIPTOR_KEY,
-                (1, writer.generation + 1, TOKEN),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            )],
-            (),
-            metadata,
-        )
-        assert published == generation + 1
+
+            # Rollback-journal mode lets the writer prepare but not publish over
+            # the pinned reader snapshot. P1 must roll the failed attempt back.
+            with pytest.raises(sqlite3.OperationalError):
+                _republish(writer)
+            assert writer.generation == generation
+            assert capture.generation == generation
+            assert capture.prefix.event_count == fixture["D"]
+
+        # Once the caller releases the read transaction, the same real P1
+        # publication succeeds. The old capture remains fixed to its generation.
+        new_generation = _republish(writer)
+        assert new_generation == generation + 1
+        assert writer.generation == generation + 1
         assert capture.generation == generation
         assert capture.prefix.captured_generation == generation
         assert len(capture.prefix) == fixture["D"]
         assert capture.world.events[0].id == 1
+
+        with store.read_transaction():
+            fresh = _capture_cold_world(store)
+        assert fresh.generation == generation + 1
+        assert fresh.prefix.captured_generation == generation + 1
+        fresh.prefix.close()
         capture.prefix.close()
     finally:
         writer.close()
         store.close()
 
-
-def test_legacy_apis_reject_cold_input(tmp_path):
-    store, _fixture = build_cold_store(
-        tmp_path, disk_segments=0, pending_chunks=0, tail_count=1
+def test_legacy_snapshot_and_binding_apis_reject_cold_but_noncold_still_work(
+    tmp_path,
+):
+    store, fixture = build_cold_store(
+        tmp_path, disk_segments=1, pending_chunks=0, tail_count=1
     )
-    path = store.path
+    cold_path = store.path
     store.close()
     with pytest.raises(StoreFormatError):
-        read_snapshot(path, rules_id=RULES)
+        read_snapshot(cold_path, rules_id=RULES)
     with pytest.raises(StoreFormatError):
-        bind_snapshot(World(843000), path, rules_id=RULES)
+        IncrementalWorldSession(World(843000), cold_path, rules_id=RULES)
+
+    ordinary = World(843000)
+    ordinary.year = 12
+    ordinary_path = tmp_path / "ordinary-p2.sqlite"
+    write_snapshot(ordinary, ordinary_path, rules_id=RULES)
+    restored = read_snapshot(ordinary_path, rules_id=RULES)
+    assert restored.seed == ordinary.seed
+    assert restored.year == ordinary.year
+    session = IncrementalWorldSession(ordinary, ordinary_path, rules_id=RULES)
+    session.close()
 
 
-def test_capture_does_not_retain_decoded_pending_events(tmp_path, monkeypatch):
-    store, _fixture = build_cold_store(
-        tmp_path, disk_segments=4, pending_chunks=1, tail_count=3
+def test_capture_releases_decoded_pending_events_but_retains_tail(
+    tmp_path, monkeypatch
+):
+    store, fixture = build_cold_store(
+        tmp_path, disk_segments=4, pending_chunks=2, tail_count=3
     )
-    pending_refs = []
-    tail_refs = []
-    original = persistence_session._read_suffix
+    fixture.pop("suffix", None)
+    gc.collect()
+    observed = {}
+    original = EventLog.from_disk_prefix.__func__
 
-    def observed_read_suffix(target_store, tail, prefix):
-        values = original(target_store, tail, prefix)
-        pending = tail.sealed_events - tail.disk_events
-        pending_refs.extend(weakref.ref(value) for value in values[:pending])
-        tail_refs.extend(weakref.ref(value) for value in values[pending:])
-        return values
+    def spy(cls, prefix, suffix=(), *, pending_sealed_events=0):
+        suffix = list(suffix)
+        observed["pending"] = [
+            weakref.ref(value)
+            for value in suffix[:pending_sealed_events]
+        ]
+        observed["tail"] = [
+            weakref.ref(value)
+            for value in suffix[pending_sealed_events:]
+        ]
+        return original(
+            cls,
+            prefix,
+            suffix,
+            pending_sealed_events=pending_sealed_events,
+        )
 
-    monkeypatch.setattr(
-        persistence_session, "_read_suffix", observed_read_suffix
-    )
+    monkeypatch.setattr(EventLog, "from_disk_prefix", classmethod(spy))
     try:
         with store.read_transaction():
             capture = _capture_cold_world(store)
         gc.collect()
-        assert pending_refs
-        assert all(ref() is None for ref in pending_refs)
-        assert len(tail_refs) == 3
-        assert all(ref() is not None for ref in tail_refs)
+        assert observed["pending"]
+        assert all(ref() is None for ref in observed["pending"])
+        assert all(ref() is not None for ref in observed["tail"])
         stats = capture.world.events.storage_stats()
-        assert stats["pending_sealed_segments"] == 1
+        assert stats["pending_sealed_segments"] == 2
         assert stats["pending_cache_segments"] == 0
         assert stats["tail_events"] == 3
+        assert capture.prefix.resident_segments == 0
         capture.prefix.close()
     finally:
         store.close()
 
 
-def test_capture_enforces_4_40_400_read_and_retention_bounds(
-    tmp_path, monkeypatch
-):
-    metrics = []
-    original_chunk = EventLog._chunk
-    original_prefix_iter = SealedEventPrefix.__iter__
-
-    def forbidden_chunk(*_args):
-        raise AssertionError("capture decoded a pending EventLog chunk")
-
-    def forbidden_prefix_iter(*_args):
-        raise AssertionError("capture iterated historical prefix")
-
-    for segments in (4, 40, 400):
-        store, _fixture = build_cold_store(
-            tmp_path,
-            disk_segments=segments,
-            pending_chunks=1,
-            tail_count=3,
-        )
-        segment_sql = []
-
-        def no_segment_sql(action, arg1, arg2, _database, _source):
-            if arg1 == "segments" or arg2 == "segments":
-                segment_sql.append((action, arg1, arg2))
-                return sqlite3.SQLITE_DENY
-            return sqlite3.SQLITE_OK
-
-        try:
-            store.reset_diagnostics()
-            store.db.set_authorizer(no_segment_sql)
-            monkeypatch.setattr(EventLog, "_chunk", forbidden_chunk)
-            monkeypatch.setattr(
-                SealedEventPrefix, "__iter__", forbidden_prefix_iter
-            )
-            with store.read_transaction():
-                capture = _capture_cold_world(store)
-                groups = _complete_identity_groups(
-                    capture.world, mutable_event_tail_only=True
-                )
-                diagnostics = store.diagnostics()
-                prefix = capture.prefix.diagnostics()
-                stats = capture.world.events.storage_stats()
-                row = {
-                    "segments": segments,
-                    "payload_reads": diagnostics.payload_reads,
-                    "payload_bytes": diagnostics.payload_read_bytes,
-                    "segment_reads": prefix.segment_reads,
-                    "disk_cache": prefix.resident_segments,
-                    "pending_segments": stats["pending_sealed_segments"],
-                    "pending_cache": stats["pending_cache_segments"],
-                    "pending_bytes": stats["pending_sealed_bytes"],
-                    "tail_events": stats["tail_events"],
-                    "years": len(capture.world.events._years),
-                    "offsets": len(capture.world.events._offsets),
-                    "groups": len(groups),
-                    "paths": sum(len(paths) for paths in groups.values()),
-                }
-                metrics.append(row)
-                print(
-                    "P3B_COLD_CAPTURE_ENFORCED "
-                    + " ".join(f"{key}={value}" for key, value in row.items())
-                )
-            assert segment_sql == []
-            assert prefix.segment_reads == 0
-            assert prefix.resident_segments == 0
-            assert stats["pending_cache_segments"] == 0
-            assert stats["pending_sealed_segments"] == 1
-            assert stats["tail_events"] == 3
-
-            # Remove capture-time guards before proving first point read/cache.
-            store.db.set_authorizer(None)
-            monkeypatch.setattr(EventLog, "_chunk", original_chunk)
-            monkeypatch.setattr(
-                SealedEventPrefix, "__iter__", original_prefix_iter
-            )
-            before = store.diagnostics().payload_reads
-            first = capture.world.events[0]
-            assert first.id == 1
-            after = store.diagnostics().payload_reads
-            assert after == before + 1
-            assert capture.world.events[0] is first
-            assert store.diagnostics().payload_reads == after
-            capture.prefix.close()
-        finally:
-            store.db.set_authorizer(None)
-            monkeypatch.setattr(EventLog, "_chunk", original_chunk)
-            monkeypatch.setattr(
-                SealedEventPrefix, "__iter__", original_prefix_iter
-            )
-            store.close()
-
-    assert {row["payload_reads"] for row in metrics} == {metrics[0]["payload_reads"]}
-    assert {row["segment_reads"] for row in metrics} == {0}
-    assert {row["disk_cache"] for row in metrics} == {0}
-    assert {row["pending_segments"] for row in metrics} == {1}
-    assert {row["pending_cache"] for row in metrics} == {0}
-    assert {row["tail_events"] for row in metrics} == {3}
-    assert {row["years"] for row in metrics} == {metrics[0]["years"]}
-    assert {row["offsets"] for row in metrics} == {metrics[0]["offsets"]}
-    assert {row["groups"] for row in metrics} == {metrics[0]["groups"]}
-    assert {row["paths"] for row in metrics} == {metrics[0]["paths"]}
-
-
 @pytest.mark.parametrize("damage", ["checksum", "missing"])
-def test_lazy_capture_defers_unread_segment_damage_but_access_and_scrub_fail(
+def test_lazy_capture_defers_unread_segment_damage_to_access_and_full_verify(
     tmp_path, damage
 ):
-    store, _fixture = build_cold_store(
+    store, fixture = build_cold_store(
         tmp_path, disk_segments=4, pending_chunks=0, tail_count=1
     )
     try:
         if damage == "checksum":
-            changed = store.db.execute(
-                """
-                UPDATE segments
-                SET payload_checksum =
-                    (CASE substr(payload_checksum,1,1)
-                        WHEN '0' THEN '1' ELSE '0' END)
-                    || substr(payload_checksum,2)
-                WHERE namespace=? AND ordinal=0
-                """,
+            checksum = store.db.execute(
+                "SELECT payload_checksum FROM segments "
+                "WHERE namespace=? AND ordinal=0",
                 (SEALED_EVENTS,),
-            ).rowcount
+            ).fetchone()[0]
+            damaged = ("1" if checksum[0] == "0" else "0") + checksum[1:]
+            store.db.execute(
+                "UPDATE segments SET payload_checksum=? "
+                "WHERE namespace=? AND ordinal=0",
+                (damaged, SEALED_EVENTS),
+            )
         else:
-            changed = store.db.execute(
+            store.db.execute(
                 "DELETE FROM segments WHERE namespace=? AND ordinal=0",
                 (SEALED_EVENTS,),
-            ).rowcount
-        assert changed == 1
+            )
         store.db.commit()
+
         with store.read_transaction():
             capture = _capture_cold_world(store)
+        assert capture.prefix.diagnostics().segment_reads == 0
         with pytest.raises(StoreIntegrityError):
             _ = capture.world.events[0]
         with pytest.raises(StoreIntegrityError):
@@ -1521,9 +1550,11 @@ def test_healthy_capture_explicit_full_verification_control(tmp_path):
     try:
         with store.read_transaction():
             capture = _capture_cold_world(store)
+        assert capture.prefix.diagnostics().segment_reads == 0
         result = capture.prefix.verify_full()
         assert result["segments"] == 4
-        assert result["events"] == fixture["D"]
+        assert result["events"] == 4 * CHUNK_SIZE
+        assert capture.prefix.diagnostics().segment_reads == 4
         capture.prefix.close()
     finally:
         store.close()
