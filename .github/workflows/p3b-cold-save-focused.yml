@@ -1,4 +1,4 @@
-name: p3b-cold-save-focused-v4
+name: p3b-cold-save-focused-v5
 on:
   push:
     branches: [sol/p3b-cold-save-candidate]
@@ -15,4 +15,8 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install pytest
       - name: cold save focused
-        run: >-\n          python -m pytest -q -s\n          simulation/tests/test_persistence_cold_save.py\n          simulation/tests/test_persistence_cold_save_failures.py
+        run: >
+          python -m pytest -q -s
+          simulation/tests/test_persistence_cold_save.py
+          simulation/tests/test_persistence_cold_save_failures.py
+          simulation/tests/test_persistence_session_open.py
