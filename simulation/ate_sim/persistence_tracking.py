@@ -75,12 +75,24 @@ def _install_eventlog_hooks():
     _EVENTLOG_INSTALLED = True
     original_append = EventLog.append
     original_seal = EventLog.seal_before
+    original_event_seal = Event.seal
 
     def append(log, event):
-        original_append(log, event)
         bound = _binding(log)
         if bound is not None:
+            bound.event_append_preflight(log, event)
+        original_append(log, event)
+        if bound is not None:
             bound.event_appended(log, event)
+
+    def event_seal(event):
+        was_sealed = event.__dict__.get("_sealed") is True
+        original_event_seal(event)
+        if was_sealed:
+            return
+        bound = _binding(event)
+        if bound is not None:
+            bound.event_sealed(event)
 
     def seal_before(log, year):
         before = len(log._chunks)
@@ -101,6 +113,7 @@ def _install_eventlog_hooks():
             bound.event_chunks_changed(log, start, tuple(retired))
 
     EventLog.append = append
+    Event.seal = event_seal
     EventLog.seal_before = seal_before
 
 
@@ -146,8 +159,14 @@ class _ObjectBinding:
             self.session._detach(old, owners)
         self.session._mark_many(owners)
 
+    def event_append_preflight(self, log, event):
+        self.session._preflight_event_append(log, event)
+
     def event_appended(self, log, event):
         self.session._event_appended(log, event)
+
+    def event_sealed(self, event):
+        self.session._event_sealed(event)
 
     def event_chunks_changed(self, log, first_index, retired_events):
         self.session._event_chunks_changed(
