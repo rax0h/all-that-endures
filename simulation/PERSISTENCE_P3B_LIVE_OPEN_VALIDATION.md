@@ -1,6 +1,9 @@
 # P3B live cold open — validation
 
-Status: green candidate landed on PR #14 and ready for architect review, 2026-10-04 UTC.
+Status: green candidate reviewed; corrections required before architect acceptance,
+2026-10-04 UTC. See `PERSISTENCE_P3B_LIVE_OPEN_REVIEW.md` for six independently
+reproduced failing lifecycle probes at `d3017a8`. The completed CI evidence below
+remains valid but does not cover those failures.
 
 Green candidate head: `a5029ff7b5a60e7ab5cdfcdfe6914e17f74ec819`.
 Green isolated workflow: `37222438702`.

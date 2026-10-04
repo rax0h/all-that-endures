@@ -1,6 +1,8 @@
 # P3B — live cold session open/bind
 
-Status: next bounded Sol implementation assignment, 2026-10-04.
+Status: implementation reviewed; corrections required before acceptance, 2026-10-04.
+See `PERSISTENCE_P3B_LIVE_OPEN_REVIEW.md` for findings at `d3017a8` and the
+next bounded Sol assignment. This document remains the live-open contract.
 Baseline: PR #14, branch `sim/stage-0-5-stabilization`, accepted cold-bootstrap
 head `876d7fcd1300c5a7ab0de006bfd06c450f77d0e8`.
 
