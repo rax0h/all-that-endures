@@ -25,7 +25,11 @@ from .persistence_adapters import (
     COLLECTION_LAYOUT,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
-from .persistence_identity import IdentityOccurrenceIndex
+from .persistence_identity import (
+    IdentityOccurrenceIndex,
+    iter_mutable_event_items,
+    iter_mutable_event_owners,
+)
 
 
 _BINDINGS = {}
@@ -750,45 +754,19 @@ _MISSING = object()
 
 
 class IncrementalWorldSession:
-    """Bind one live World to one P2A snapshot and persist dirty owners only."""
+    """Bind one live World to one durable snapshot and track current mutation."""
 
     def __init__(self, world, path, *, rules_id):
         if type(world) is not World:
             raise TypeError("expected World")
-        _install_assignment_hooks()
-        _install_eventlog_hooks()
-        self.world = world
-        # Incremental records may legally contain repeated mutable descendants;
-        # the identity manifest remains the authority for reconstructing aliases.
-        self.codec = WorldCodec(identity_links_recorded=True)
-        self.store = TransactionalStore.open(
-            path, codec=self.codec, expected_simulation_schema=SCHEMA,
+        codec = WorldCodec(identity_links_recorded=True)
+        store = TransactionalStore.open(
+            path, codec=codec, expected_simulation_schema=SCHEMA,
             expected_rules_id=rules_id,
         )
-        self.generation = self.store.generation
-        self._dirty = set()
-        self._deleted = set()
-        self._manifest_dirty = False
-        self._active = True
-        self._suspended = 1
-        self._bound_ids = set()
-        self._memo = {}
-        self._root_containers = {}
-        self._scalar_fields = {}
-        self._baseline_ordinals = {}
-        self._identity_dirty = False
-        self._identity_dirty_owners = set()
-        self._identity_index = None
-        self._identity_mode = None
-        self._identity_delta_next = 0
-        self._pending_identity_patch = None
-        self._has_identity_deltas = False
-        self._committed_identity_targets = {}
-        self._live_identity_targets = {}
-        self._pending_identity_current = {}
-        self._changed_member_work = 0
-        self._bootstrap_originals = {}
-        self._bound_root_originals = {}
+        self._initialize_runtime(
+            world, store, codec=codec, cold_mode=False
+        )
         try:
             with self.store.read_transaction():
                 self.generation = self.store.generation
@@ -822,9 +800,84 @@ class IncrementalWorldSession:
             self._undo_bootstrap()
             self._clear_bindings()
             self.store.close()
+            self._active = False
             raise
         finally:
             self._suspended = 0
+
+    @classmethod
+    def _from_cold_capture(cls, store, capture, baseline_ordinals):
+        """Bind an already-validated cold capture without rereading history."""
+        if type(capture.world) is not World:
+            raise TypeError("cold capture did not restore a World")
+        if not isinstance(store.codec, WorldCodec):
+            raise StoreFormatError("cold session requires WorldCodec")
+        self = cls.__new__(cls)
+        self._initialize_runtime(
+            capture.world,
+            store,
+            codec=store.codec,
+            cold_mode=True,
+        )
+        try:
+            self.generation = capture.generation
+            self._manifest = capture.manifest
+            self._identity_mode = "current"
+            self._initial_links = list(capture.identity_links)
+            self._committed_identity_targets = dict(self._initial_links)
+            self._live_identity_targets = dict(self._initial_links)
+            self._baseline_ordinals = {
+                namespace: dict(ordinals)
+                for namespace, ordinals in baseline_ordinals.items()
+            }
+            self._normalize_bootstrap()
+            self._bind_roots()
+            self._bootstrap_identity_index()
+        except Exception:
+            self._undo_bound_roots()
+            self._undo_bootstrap()
+            self._clear_bindings()
+            capture.prefix.close()
+            self.store.close()
+            self._active = False
+            raise
+        finally:
+            self._suspended = 0
+        return self
+
+    def _initialize_runtime(self, world, store, *, codec, cold_mode):
+        _install_assignment_hooks()
+        _install_eventlog_hooks()
+        self.world = world
+        self.codec = codec
+        self.store = store
+        self.generation = store.generation
+        self._cold_mode = bool(cold_mode)
+        self._dirty = set()
+        self._deleted = set()
+        self._manifest_dirty = False
+        self._active = True
+        self._suspended = 1
+        self._bound_ids = set()
+        self._memo = {}
+        self._memo_reverse = {}
+        self._root_containers = {}
+        self._scalar_fields = {}
+        self._baseline_ordinals = {}
+        self._identity_dirty = False
+        self._identity_dirty_owners = set()
+        self._identity_index = None
+        self._identity_mode = None
+        self._identity_delta_next = 0
+        self._pending_identity_patch = None
+        self._has_identity_deltas = False
+        self._committed_identity_targets = {}
+        self._live_identity_targets = {}
+        self._pending_identity_current = {}
+        self._changed_member_work = 0
+        self._bootstrap_originals = {}
+        self._bound_root_originals = {}
+        self._initial_links = []
 
     def __enter__(self):
         return self
@@ -853,6 +906,7 @@ class IncrementalWorldSession:
             "dict-stable/v1": "dict",
             "RecordTable-stable/v1": "RecordTable",
             "set-stable/v1": "set",
+            "EventLog-disk/v1": "EventLog",
         }.get(kind, kind)
 
     def _validate_baseline(self):
