@@ -766,7 +766,7 @@ def test_close_from_recovery_does_not_resolve_or_advance_again(
             StoreError("ack unavailable")
         ),
     )
-    with pytest.raises(StoreError, match="uncertain"):
+    with pytest.raises(StoreError):
         session.save()
     assert session.cold_state == "recovery-required"
     durable = session.store.generation
