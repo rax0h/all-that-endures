@@ -1,11 +1,11 @@
-name: p3b-cold-save-focused-v7
+name: p3b-cold-save-focused-v8
 on:
   push:
     branches: [sol/p3b-cold-save-candidate]
 jobs:
   focused:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 50
     env:
       PYTHONPATH: .:simulation
     steps:
@@ -23,3 +23,9 @@ jobs:
           simulation/tests/test_persistence_session_open.py
           simulation/tests/test_persistence_event_log.py
           simulation/tests/test_persistence_event_identity.py
+          simulation/tests/test_persistence_events.py
+          simulation/tests/test_persistence_tracking.py
+          simulation/tests/test_persistence_p2b_followup.py
+          simulation/tests/test_persistence_p2b_identity_review.py
+          simulation/tests/test_persistence_p2b_review_regressions.py
+          simulation/tests/test_persistence_p2c.py
