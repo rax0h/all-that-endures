@@ -1,0 +1,17 @@
+name: p3b-cold-bootstrap-smoke
+on:
+  push:
+    branches: [sol/p3b-cold-bootstrap-smoke]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - run: python -m pytest -q -x simulation/tests/test_persistence_cold_bootstrap.py -k 'not transfer_read_and_retention_bounds'
