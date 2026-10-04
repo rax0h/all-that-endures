@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, is_dataclass
 from itertools import islice
 from pathlib import Path
 import os
@@ -564,6 +564,50 @@ def _validate_bootstrap_events(world):
     }
 
 
+def _reject_bound_bootstrap_graph(value, binding_lookup, active=None):
+    """Reject any live P2-owned object reachable from an unbound source World."""
+    if active is None:
+        active = set()
+    if binding_lookup(value) is not None:
+        raise StoreError(
+            "cold snapshot creation cannot borrow state bound to another "
+            "persistence session"
+        )
+    cls = type(value)
+    if value is None or cls in (bool, int, float, str, bytes) or cls is Layer:
+        return
+    ident = id(value)
+    if ident in active:
+        return
+    active.add(ident)
+    try:
+        if is_dataclass(value):
+            for name in RECORD_FIELDS.get(cls, ()):
+                _reject_bound_bootstrap_graph(
+                    getattr(value, name), binding_lookup, active
+                )
+        elif isinstance(value, EventLog):
+            for event in _events(value):
+                _reject_bound_bootstrap_graph(
+                    event, binding_lookup, active
+                )
+        elif isinstance(value, dict):
+            for key, child in value.items():
+                _reject_bound_bootstrap_graph(
+                    key, binding_lookup, active
+                )
+                _reject_bound_bootstrap_graph(
+                    child, binding_lookup, active
+                )
+        elif isinstance(value, (list, tuple, set, frozenset)):
+            for child in value:
+                _reject_bound_bootstrap_graph(
+                    child, binding_lookup, active
+                )
+    finally:
+        active.remove(ident)
+
+
 def _normalized_bootstrap_view(world):
     if type(world) is not World:
         raise CodecError("expected World from this package registry")
@@ -575,8 +619,7 @@ def _normalized_bootstrap_view(world):
 
     # Import lazily so the cold capture module does not own P2 tracking.
     from .persistence_tracking import _binding
-    if _binding(world) is not None or _binding(world.events) is not None:
-        raise StoreError("cold snapshot creation requires an unbound World")
+    _reject_bound_bootstrap_graph(world, _binding)
 
     source_links = []
     _audit(world, (), {}, set(), source_links)

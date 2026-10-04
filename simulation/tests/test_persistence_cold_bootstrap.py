@@ -11,7 +11,7 @@ import weakref
 import pytest
 
 from ate_sim import Simulation, generate_world
-from ate_sim.core import Event, Layer, Ref, World
+from ate_sim.core import Event, Layer, Person, Ref, World
 from ate_sim.event_log import EventLog, FrozenDict
 from ate_sim.incremental_store import (
     CodecError,
@@ -218,6 +218,33 @@ def test_write_cold_snapshot_basic_shapes_and_source_preservation(
         store.close()
 
 
+def test_list_normalization_preserves_current_mutable_child_alias(tmp_path):
+    world = list_world(count=2, seed=322)
+    shared = {"value": [1, 2, 3]}
+    world.events[0].data["shared-current"] = shared
+    world.currency.wallets[8] = {"same": shared}
+    before = source_log_state(world)
+
+    destination = tmp_path / "list-current-alias.sqlite"
+    write_cold_snapshot(world, destination, rules_id=RULES)
+    assert source_log_state(world) == before
+    assert type(world.events) is list
+
+    store, capture = capture_cold(destination)
+    try:
+        assert (
+            capture.world.events[0].data["shared-current"]
+            is capture.world.currency.wallets[8]["same"]
+        )
+        capture.world.currency.wallets[8]["same"]["value"].append(4)
+        assert capture.world.events[0].data["shared-current"]["value"] == [
+            1, 2, 3, 4
+        ]
+    finally:
+        capture.prefix.close()
+        store.close()
+
+
 def test_write_cold_snapshot_prefix_only_exact_partition(tmp_path):
     world = segmented_world(1, tail_count=0)
     before = source_log_state(world)
@@ -378,6 +405,25 @@ def test_write_cold_snapshot_rejects_bound_active_and_disk_backed_inputs(
     finally:
         capture.prefix.close()
         store.close()
+
+
+def test_write_cold_snapshot_rejects_foreign_bound_record(tmp_path):
+    foreign = World(790)
+    foreign.people[1] = Person(1, 0, 1, 1)
+    foreign_path = tmp_path / "foreign-source.sqlite"
+    write_snapshot(foreign, foreign_path, rules_id=RULES)
+
+    target = World(791)
+    target.currency.wallets[1] = {"foreign-person": foreign.people[1]}
+    destination = tmp_path / "foreign-bound.sqlite"
+
+    with bind_snapshot(foreign, foreign_path, rules_id=RULES):
+        with pytest.raises(StoreError, match="bound to another"):
+            write_cold_snapshot(
+                target, destination, rules_id=RULES
+            )
+        assert not destination.exists()
+        assert target.currency.wallets[1]["foreign-person"] is foreign.people[1]
 
 
 def test_write_cold_snapshot_rejects_invalid_exact_event_metadata(tmp_path):
