@@ -661,3 +661,188 @@ def test_legacy_session_save_regression(tmp_path):
         before = session.generation
         world.currency.wallets[1] = {"value": 2}
         assert session.save() == before + 1
+
+
+def test_review_newly_appended_full_chunk_retires_without_identity_refresh(
+    tmp_path,
+):
+    path, _expected = build_cold_path(
+        tmp_path, disk_segments=0, pending_chunks=0, tail_count=0
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        first = None
+        child = None
+        for index in range(CHUNK_SIZE):
+            value = event(index + 1, data={"child": []})
+            session.world.events.append(value)
+            if index == 0:
+                first = value
+                child = value.data["child"]
+        del value
+        first_ref = weakref.ref(first)
+        owner = ("world.events", 0)
+
+        session.world.events.seal_before(11)
+
+        assert _binding(first) is None
+        assert owner not in child._owners
+        del first
+        del child
+        gc.collect()
+        assert first_ref() is None
+    finally:
+        session.close()
+
+
+def test_review_replaced_tail_child_is_reclaimed_when_chunk_seals(tmp_path):
+    path, _expected = build_cold_path(
+        tmp_path,
+        disk_segments=0,
+        pending_chunks=0,
+        tail_count=CHUNK_SIZE,
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        first = session.world.events[0]
+        first.data = {"replacement": []}
+        child = first.data["replacement"]
+        child_ref = weakref.ref(child)
+
+        session.world.events.seal_before(11)
+
+        del child
+        gc.collect()
+        assert child_ref() is None
+    finally:
+        session.close()
+
+
+def test_review_individual_tail_seal_retires_log_identity(tmp_path):
+    path, _expected = build_cold_path(
+        tmp_path, disk_segments=0, pending_chunks=0, tail_count=1
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        first = session.world.events[0]
+        owner = ("world.events", 0)
+        first.seal()
+
+        assert _binding(first) is None
+        assert owner not in session._identity_index.owner_occurrences
+        stats = session.world.events.storage_stats()
+        assert stats["disk_events"] == 0
+        assert stats["pending_sealed_events"] == 0
+        assert len(session.world.events._chunks) == 0
+    finally:
+        session.close()
+
+
+def test_review_tracked_set_is_reclaimed_when_sole_log_owner_retires(tmp_path):
+    path, _expected = build_cold_path(
+        tmp_path,
+        disk_segments=0,
+        pending_chunks=0,
+        tail_count=CHUNK_SIZE,
+        tail_payload={"items": {1, 2}},
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        first = session.world.events[0]
+        items = first.data["items"]
+        items_ref = weakref.ref(items)
+        owner = ("world.events", 0)
+
+        session.world.events.seal_before(11)
+
+        assert owner not in items._owners
+        del items
+        gc.collect()
+        assert items_ref() is None
+    finally:
+        session.close()
+
+
+def test_review_append_already_sealed_event_has_no_log_identity(tmp_path):
+    path, _expected = build_cold_path(
+        tmp_path, disk_segments=0, pending_chunks=0, tail_count=0
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        value = event(1, sealed=True)
+        owner = ("world.events", 0)
+
+        session.world.events.append(value)
+
+        assert len(session.world.events) == 1
+        assert session.world.events[0] is value
+        assert value.__dict__["_sealed"] is True
+        assert _binding(value) is None
+        assert owner not in session._identity_index.owner_occurrences
+        assert owner in session.dirty
+    finally:
+        session.close()
+
+
+def test_review_foreign_append_rejection_is_atomic(tmp_path):
+    left_path, _left_expected = build_cold_path(
+        tmp_path, disk_segments=0, pending_chunks=0, tail_count=0
+    )
+    right_path, _right_expected = build_cold_path(
+        tmp_path,
+        disk_segments=0,
+        pending_chunks=0,
+        tail_count=1,
+        wallets={1: {"child": []}},
+    )
+    left = open_world_session(left_path, rules_id=RULES)
+    right = open_world_session(right_path, rules_id=RULES)
+    try:
+        foreign_event = right.world.events[0]
+        foreign_child = right.world.currency.wallets[1]["child"]
+        right_event_count = len(right.world.events)
+        right_dirty = right.dirty
+        left_before = (
+            len(left.world.events),
+            left.dirty,
+            frozenset(left._identity_dirty_owners),
+            left._manifest_dirty,
+            tuple(left.world.events._years),
+            tuple(left.world.events._offsets),
+            left.world.events._last_year,
+        )
+
+        with pytest.raises(StoreError, match="cross-session"):
+            left.world.events.append(foreign_event)
+        assert (
+            len(left.world.events),
+            left.dirty,
+            frozenset(left._identity_dirty_owners),
+            left._manifest_dirty,
+            tuple(left.world.events._years),
+            tuple(left.world.events._offsets),
+            left.world.events._last_year,
+        ) == left_before
+        assert len(right.world.events) == right_event_count
+        assert right.dirty == right_dirty
+
+        fresh = event(1, data={"foreign": foreign_child})
+        with pytest.raises(StoreError, match="cross-session"):
+            left.world.events.append(fresh)
+        assert (
+            len(left.world.events),
+            left.dirty,
+            frozenset(left._identity_dirty_owners),
+            left._manifest_dirty,
+            tuple(left.world.events._years),
+            tuple(left.world.events._offsets),
+            left.world.events._last_year,
+        ) == left_before
+
+        left.close()
+        foreign_child.append(9)
+        assert ("world.currency.wallets", 1) in right.dirty
+        assert len(right.world.events) == right_event_count
+    finally:
+        left.close()
+        right.close()
