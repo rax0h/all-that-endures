@@ -1320,7 +1320,7 @@ class IncrementalWorldSession:
         if cls is set:
             wrapped = TrackedSet(value)
             wrapped._setup(self, owners)
-            self._memo[id(value)] = (value, wrapped)
+            self._remember_memo(value, wrapped)
             return wrapped
         return value
 
@@ -1496,6 +1496,18 @@ class IncrementalWorldSession:
         try:
             if kind in ("dict", "RecordTable"):
                 return container[key]
+            if kind == "EventLog" and self._cold_mode:
+                first = (
+                    container._disk_count
+                    + len(container._chunks) * container.chunk_size
+                )
+                local = key - first
+                if local < 0 or local >= len(container._tail):
+                    return None
+                event = container._tail[local]
+                if event.__dict__.get("_sealed") is True:
+                    return None
+                return event
             if kind in ("list", "EventLog"):
                 return container[key]
             if kind == "set":
@@ -1517,16 +1529,10 @@ class IncrementalWorldSession:
         current = self._owner_value(owner)
         if current is not None and self._contains_identity(current, value):
             return
-        changed = False
-        bound = _binding(value)
-        if bound is not None and bound.session is self and owner in bound.owners:
-            bound.owners.discard(owner)
-            changed = True
-        if isinstance(value, _NestedMixin) and owner in value._owners:
-            value._owners.discard(owner)
-            changed = True
         # Owner tags are live tracking metadata. Persisted identity is repaired
-        # from this owner's occurrence index at save time.
+        # from this owner's occurrence index at save time. Descendants are
+        # released before their parent so memo pairs cannot retain a detached
+        # mutable graph after its last owner disappears.
         if is_dataclass(value):
             for name in RECORD_FIELDS.get(cls, ()):
                 self._remove_owner_recursive(getattr(value, name), owner, seen)
@@ -1545,6 +1551,7 @@ class IncrementalWorldSession:
         elif isinstance(value, (list, tuple, set, frozenset)):
             for child in value:
                 self._remove_owner_recursive(child, owner, seen)
+        self._discard_owner_binding(value, owner)
 
     def _detach(self, value, owners):
         if self._suspended or not self._is_mutable(value):
