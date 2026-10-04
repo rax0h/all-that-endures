@@ -19,10 +19,14 @@ from .society_accountability import accountability_step
 from .threat_ecology import threat_ecology_step
 class Simulation:
  def __init__(self,world):
+  marker=world.__dict__.get('_ate_persistence_lifetime')
+  if marker is not None:marker.ensure_simulation('constructor')
   self.w=world; self.rng=RNG(world.seed)
   if not isinstance(world.events,EventLog):world.events=EventLog(world.events)
   world.events.seal_before(world.year-2)
  def run(self,years):
+  marker=self.w.__dict__.get('_ate_persistence_lifetime')
+  if marker is not None:marker.ensure_simulation('run')
   # Reference counting remains active. Bound cyclic garbage, but avoid repeated
   # full scans of the growing live archive at Python's allocation-driven cadence.
   import gc
@@ -42,9 +46,14 @@ class Simulation:
   return self.w
 
  def step(self):
-  with self.w.current_people_scope(),self.w.advancement.rank_scope():
-   self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
-  self.w.events.seal_before(self.w.year-2)
+  marker=self.w.__dict__.get('_ate_persistence_lifetime')
+  if marker is not None:marker.begin_step()
+  try:
+   with self.w.current_people_scope(),self.w.advancement.rank_scope():
+    self.w.year+=1; self._weather(); self._production(); self._people(); household_step(self.w,self.rng); self._demography(); self._pressure(); ambient_magic_step(self.w,self.rng); divine_step(self.w,self.rng); magic_ecology_step(self.w,self.rng); threat_ecology_step(self.w,self.rng); agency_step(self.w,self.rng); material_economy_step(self.w,self.rng); cultural_step(self.w,self.w.culture,self.rng); civilization_step(self.w,self.rng); development_step(self.w,self.rng); institution_step(self.w,self.rng); society_career_step(self.w,self.rng); warfare_step(self.w,self.rng); accountability_step(self.w,self.rng); magical_civilization_step(self.w,self.rng); craft_career_step(self.w,self.rng); self._memory()
+   self.w.events.seal_before(self.w.year-2)
+  finally:
+   if marker is not None:marker.end_step()
  def _weather(self):
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("weather",self.w.year,sid);q=self.w.local[sid];q.rain=max(0,min(1,c.moisture+r.uniform(-.38,.38)));q.drought=max(0,.35-q.rain);q.flood=max(0,q.rain-.82)
