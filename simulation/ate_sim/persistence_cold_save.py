@@ -705,16 +705,23 @@ def _apply_persisted_key_changes(session, plan):
     session._cold_committed_n = plan.after_tail.total_events
 
 
-def _apply_acknowledged_journal(session, plan):
+def _validate_acknowledged_journal(session, plan):
+    """Prove publication bookkeeping can be applied before clearing anything."""
     from .persistence_tracking import _MISSING
 
-    session._dirty.difference_update(plan.dirty_owners)
-    session._deleted.difference_update(plan.deleted_owners)
+    if not plan.dirty_owners.issubset(session._dirty):
+        raise StoreIntegrityError(
+            "cold save dirty journal changed while publication was guarded"
+        )
+    if not plan.deleted_owners.issubset(session._deleted):
+        raise StoreIntegrityError(
+            "cold save delete journal changed while publication was guarded"
+        )
     if plan.manifest_dirty:
-        if plan.layout_value is None:
-            raise StoreIntegrityError("acknowledged layout journal lost its value")
-        session._manifest["collections"] = dict(plan.layout_value)
-        session._manifest_dirty = False
+        if plan.layout_value is None or not session._manifest_dirty:
+            raise StoreIntegrityError(
+                "acknowledged layout journal changed while publication was guarded"
+            )
     for target, owner in plan.pending_identity:
         current = session._pending_identity_current.get(target, _MISSING)
         if current is not owner and (
@@ -723,6 +730,17 @@ def _apply_acknowledged_journal(session, plan):
             raise StoreIntegrityError(
                 "identity journal changed while cold save was guarded"
             )
+
+
+def _apply_acknowledged_journal(session, plan):
+    from .persistence_tracking import _MISSING
+
+    session._dirty.difference_update(plan.dirty_owners)
+    session._deleted.difference_update(plan.deleted_owners)
+    if plan.manifest_dirty:
+        session._manifest["collections"] = dict(plan.layout_value)
+        session._manifest_dirty = False
+    for target, owner in plan.pending_identity:
         if owner is _MISSING:
             session._committed_identity_targets.pop(target, None)
         else:
@@ -777,6 +795,7 @@ def publish_cold_save(session, plan, prefix):
             )
 
     _cold_save_phase("before_bookkeeping", session, plan)
+    _validate_acknowledged_journal(session, plan)
     _apply_acknowledged_journal(session, plan)
     _apply_persisted_key_changes(session, plan)
 
@@ -814,6 +833,8 @@ def _resolve_cold_save_once(session, plan, *, full_evidence):
 
     if status == "foreign":
         session._cold_state = "stale"
+        session._cold_plan = None
+        session._cold_publication_phase = None
         if prefix is not None:
             prefix.close()
         raise StoreConflictError(
@@ -861,7 +882,13 @@ def save_cold(session):
 
         session._cold_plan = plan
         session._cold_publication_phase = "prepared"
-        _cold_save_phase("before_commit_call", session, plan)
+        try:
+            _cold_save_phase("before_commit_call", session, plan)
+        except Exception:
+            session._cold_plan = None
+            session._cold_publication_phase = None
+            session._cold_state = "active"
+            raise
         try:
             generation = session.store.commit(
                 plan.expected_generation,
@@ -942,7 +969,11 @@ def resolve_cold_save(session):
                 raise StoreError(
                     f"cold session has no resolvable plan while {session._cold_state}"
                 )
-            _check_captured_store_baseline(session)
+            try:
+                _check_captured_store_baseline(session)
+            except StoreConflictError:
+                session._cold_state = "stale"
+                raise
             return session.generation
 
         if session._cold_state not in ("recovery-required", "preparing"):
