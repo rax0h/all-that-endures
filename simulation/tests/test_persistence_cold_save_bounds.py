@@ -132,6 +132,21 @@ def test_cold_save_history_bounds_are_independent_of_old_prefix(
             1 for change in plan4.changes
             if change.namespace == "world.events" and change.delete
         )
+        upserts4 = sum(
+            1 for change in plan4.changes
+            if not change.delete
+        )
+        plan_events4 = sum(
+            segment.element_count for segment in plan4.new_segments
+        )
+        plan_segment_bytes4 = sum(
+            len(evidence.value_bytes)
+            for evidence in plan4.segment_evidence
+        )
+        plan_record_bytes4 = sum(
+            len(evidence.value_bytes or b"")
+            for evidence in plan4.record_evidence
+        )
         del plan4
         gc.collect()
 
@@ -155,6 +170,21 @@ def test_cold_save_history_bounds_are_independent_of_old_prefix(
         deletes1 = sum(
             1 for change in plan1.changes
             if change.namespace == "world.events" and change.delete
+        )
+        upserts1 = sum(
+            1 for change in plan1.changes
+            if not change.delete
+        )
+        plan_events1 = sum(
+            segment.element_count for segment in plan1.new_segments
+        )
+        plan_segment_bytes1 = sum(
+            len(evidence.value_bytes)
+            for evidence in plan1.segment_evidence
+        )
+        plan_record_bytes1 = sum(
+            len(evidence.value_bytes or b"")
+            for evidence in plan1.record_evidence
         )
         del plan1
         gc.collect()
@@ -220,11 +250,21 @@ def test_cold_save_history_bounds_are_independent_of_old_prefix(
             f"four_payload_writes={io4.payload_writes} "
             f"four_write_bytes={io4.payload_write_bytes} "
             f"four_deletes={deletes4} "
+            f"four_upserts={upserts4} "
+            f"four_plan_events={plan_events4} "
+            f"four_plan_segment_bytes={plan_segment_bytes4} "
+            f"four_plan_record_bytes={plan_record_bytes4} "
+            f"four_cache={stats4['disk_cache_segments']} "
             f"one_segment_reads={stats1['disk_segment_reads']} "
             f"one_payload_reads={io1.payload_reads} "
             f"one_payload_writes={io1.payload_writes} "
             f"one_write_bytes={io1.payload_write_bytes} "
             f"one_deletes={deletes1} "
+            f"one_upserts={upserts1} "
+            f"one_plan_events={plan_events1} "
+            f"one_plan_segment_bytes={plan_segment_bytes1} "
+            f"one_plan_record_bytes={plan_record_bytes1} "
+            f"one_cache={stats1['disk_cache_segments']} "
             f"noop_payload_reads={noop_io.payload_reads} "
             f"noop_payload_writes={noop_io.payload_writes} "
             f"local_payload_reads={local_io.payload_reads} "
