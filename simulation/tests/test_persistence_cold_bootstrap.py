@@ -6,6 +6,7 @@ from pathlib import Path
 import signal
 import subprocess
 import sys
+import weakref
 
 import pytest
 
@@ -217,8 +218,30 @@ def test_write_cold_snapshot_basic_shapes_and_source_preservation(
         store.close()
 
 
+def test_write_cold_snapshot_prefix_only_exact_partition(tmp_path):
+    world = segmented_world(1, tail_count=0)
+    before = source_log_state(world)
+    destination = tmp_path / "prefix-only.sqlite"
+    diagnostics = write_cold_snapshot(world, destination, rules_id=RULES)
+    assert source_log_state(world) == before
+    assert diagnostics["disk_segments"] == 1
+    assert diagnostics["disk_events"] == CHUNK_SIZE
+    assert diagnostics["remaining_suffix_records"] == 0
+    store, capture = capture_cold(destination)
+    try:
+        assert len(capture.world.events) == CHUNK_SIZE
+        assert capture.world.events.storage_stats()["tail_events"] == 0
+        assert capture.world.events.storage_stats()["pending_sealed_events"] == 0
+        assert capture.prefix.diagnostics().segment_reads == 0
+        assert capture.world.events[0].id == 1
+        assert capture.world.events[-1].id == CHUNK_SIZE
+    finally:
+        capture.prefix.close()
+        store.close()
+
+
 def test_write_cold_snapshot_transfers_six_chunks_and_preserves_aliases_flags_cache(
-    tmp_path,
+    tmp_path, monkeypatch
 ):
     world = segmented_world(
         6,
@@ -230,8 +253,20 @@ def test_write_cold_snapshot_transfers_six_chunks_and_preserves_aliases_flags_ca
     assert warmed[0].id == 1
     before = source_log_state(world)
     destination = tmp_path / "six.sqlite"
+    transfer_refs = []
+    original_prepare = persistence_session.prepare_sealed_append
 
+    def observe_prepare(store, events, **kwargs):
+        if events:
+            transfer_refs.append(weakref.ref(events[0]))
+        return original_prepare(store, events, **kwargs)
+
+    monkeypatch.setattr(
+        persistence_session, "prepare_sealed_append", observe_prepare
+    )
     diagnostics = write_cold_snapshot(world, destination, rules_id=RULES)
+    gc.collect()
+    assert transfer_refs and all(ref() is None for ref in transfer_refs)
     assert source_log_state(world) == before
     assert diagnostics["disk_segments"] == 6
     assert diagnostics["disk_events"] == 6 * CHUNK_SIZE
@@ -364,6 +399,24 @@ def test_convert_current_p2c_preserves_source_bytes_and_exact_state(tmp_path):
             capture.world.currency.wallets[1]["left"]
             is capture.world.currency.wallets[1]["right"]
         )
+    finally:
+        capture.prefix.close()
+        store.close()
+
+
+def test_convert_genuine_legacy_p2a_without_deltas(tmp_path):
+    world = list_world(count=3, seed=901)
+    source = tmp_path / "legacy-p2a.sqlite"
+    destination = tmp_path / "legacy-p2a-cold.sqlite"
+    _write_legacy_snapshot(world, source, rules_id=RULES)
+    before = source.read_bytes()
+    convert_event_storage(source, destination, rules_id=RULES)
+    assert source.read_bytes() == before
+    original = read_snapshot(source, rules_id=RULES)
+    store, capture = capture_cold(destination)
+    try:
+        assert original.digest() == capture.world.digest()
+        assert capture.prefix.segment_count == 0
     finally:
         capture.prefix.close()
         store.close()
@@ -538,6 +591,34 @@ def test_destination_created_after_preflight_is_never_overwritten(
     assert destination.read_text() == "competitor"
 
 
+def test_publication_fsync_failure_leaves_complete_destination(
+    tmp_path, monkeypatch
+):
+    world = segmented_world(1, tail_count=1)
+    destination = tmp_path / "fsync-uncertain.sqlite"
+
+    def fail_fsync(_path):
+        raise OSError("injected publication fsync failure")
+
+    monkeypatch.setattr(
+        persistence_session, "_fsync_publication_dir", fail_fsync
+    )
+    with pytest.raises(OSError, match="fsync"):
+        write_cold_snapshot(world, destination, rules_id=RULES)
+    assert destination.exists()
+
+    store, capture = capture_cold(destination)
+    try:
+        store.verify_all()
+        capture.prefix.verify_full()
+    finally:
+        capture.prefix.close()
+        store.close()
+
+    with pytest.raises(FileExistsError):
+        write_cold_snapshot(world, destination, rules_id=RULES)
+
+
 def _death_script():
     return r"""
 import os, signal, sys
@@ -626,84 +707,118 @@ def test_independent_unbound_continuation_matches_for_ten_years(tmp_path):
         store.close()
 
 
-@pytest.mark.parametrize("segments", [4, 40, 400])
-def test_bootstrap_transfer_read_and_retention_bounds(
-    tmp_path, segments
-):
-    world = segmented_world(
-        segments,
-        tail_count=3,
-        seed=7000 + segments,
-        current_alias=True,
-    )
-    assert world.events.storage_stats()["pending_cache_segments"] == 0
-    source_cache = tuple(world.events._cache)
-    source_compressed = sum(len(chunk) for chunk in world.events._chunks)
-    gc.collect()
-
-    destination = tmp_path / f"scale-{segments}.sqlite"
-    diagnostics = write_cold_snapshot(
-        world, destination, rules_id=RULES
-    )
-    assert tuple(world.events._cache) == source_cache
-
-    expected_events = segments * CHUNK_SIZE
-    assert diagnostics["disk_segments"] == segments
-    assert diagnostics["disk_events"] == expected_events
-    assert diagnostics["transferred_events"] == expected_events
-    assert diagnostics["deleted_event_rows"] == expected_events
-    assert diagnostics["transfer_commits"] == math.ceil(segments / 4)
-    assert diagnostics["largest_transfer_batch_chunks"] <= 4
-    assert diagnostics["remaining_suffix_records"] == 3
-
-    store, capture = capture_cold(destination)
-    try:
-        assert capture.prefix.diagnostics().segment_reads == 0
-        stats = capture.world.events.storage_stats()
-        assert stats["disk_segments"] == segments
-        assert stats["pending_sealed_segments"] == 0
-        assert stats["pending_cache_segments"] == 0
-        assert stats["tail_events"] == 3
-        assert len(capture.world.events._years) == 1
-        assert len(capture.world.events._offsets) == 1
-
-        keys = [
-            key
-            for key, _value, _schema in store.read_records(
-                "world.events", expected_record_schema=RECORD_SCHEMA
-            )
-        ]
-        assert sorted(keys) == list(
-            range(expected_events, expected_events + 3)
+def test_bootstrap_transfer_read_and_retention_bounds(tmp_path):
+    measurements = []
+    for segments in (4, 40, 400):
+        world = segmented_world(
+            segments,
+            tail_count=3,
+            seed=7000,
+            current_alias=True,
         )
-        receipts = store.db.execute(
-            "SELECT COALESCE(SUM(record_deletes),0),"
-            "COALESCE(SUM(segment_writes),0) FROM save_receipts"
-        ).fetchone()
-        assert receipts[0] == expected_events
-        assert receipts[1] == segments
-    finally:
-        capture.prefix.close()
-        store.close()
+        assert world.events.storage_stats()["pending_cache_segments"] == 0
+        source_cache = tuple(world.events._cache)
+        source_compressed = sum(len(chunk) for chunk in world.events._chunks)
+        gc.collect()
 
-    row = {
-        "segments": segments,
-        "source_compressed_bytes": source_compressed,
-        "staging_writes": diagnostics["staging_io"]["payload_writes"],
-        "staging_bytes": diagnostics["staging_io"]["payload_write_bytes"],
-        "transfer_reads": diagnostics["transfer_io"]["payload_reads"],
-        "transfer_writes": diagnostics["transfer_io"]["payload_writes"],
-        "transfer_bytes": diagnostics["transfer_io"]["payload_write_bytes"],
-        "validation_reads": diagnostics["validation_io"]["payload_reads"],
-        "validation_bytes": diagnostics["validation_io"]["payload_read_bytes"],
-        "final_file_bytes": diagnostics["final_file_bytes"],
-        "transfer_commits": diagnostics["transfer_commits"],
-        "largest_batch": diagnostics["largest_transfer_batch_chunks"],
-        "reopen_segment_reads": 0,
-        "tail_events": 3,
-        "pending_cache": 0,
-    }
-    print(
-        "P3B_COLD_BOOTSTRAP_BOUNDS "
-        + " ".join(f"{key}={value}" for key, value in row.items())
-    )
+        destination = tmp_path / f"scale-{segments}.sqlite"
+        diagnostics = write_cold_snapshot(
+            world, destination, rules_id=RULES
+        )
+        assert tuple(world.events._cache) == source_cache
+
+        expected_events = segments * CHUNK_SIZE
+        assert diagnostics["disk_segments"] == segments
+        assert diagnostics["disk_events"] == expected_events
+        assert diagnostics["transferred_events"] == expected_events
+        assert diagnostics["deleted_event_rows"] == expected_events
+        assert diagnostics["transfer_commits"] == math.ceil(segments / 4)
+        assert diagnostics["largest_transfer_batch_chunks"] <= 4
+        assert diagnostics["remaining_suffix_records"] == 3
+        assert diagnostics["transfer_io"]["payload_writes"] == (
+            segments + math.ceil(segments / 4)
+        )
+
+        store, capture = capture_cold(destination)
+        try:
+            reopen_reads = capture.prefix.diagnostics().segment_reads
+            assert reopen_reads == 0
+            stats = capture.world.events.storage_stats()
+            assert stats["disk_segments"] == segments
+            assert stats["pending_sealed_segments"] == 0
+            assert stats["pending_cache_segments"] == 0
+            assert stats["tail_events"] == 3
+            assert len(capture.world.events._years) == 1
+            assert len(capture.world.events._offsets) == 1
+
+            keys = [
+                key
+                for key, _value, _schema in store.read_records(
+                    "world.events", expected_record_schema=RECORD_SCHEMA
+                )
+            ]
+            assert sorted(keys) == list(
+                range(expected_events, expected_events + 3)
+            )
+            receipts = store.db.execute(
+                "SELECT COALESCE(SUM(record_deletes),0),"
+                "COALESCE(SUM(segment_writes),0) FROM save_receipts"
+            ).fetchone()
+            assert receipts[0] == expected_events
+            assert receipts[1] == segments
+        finally:
+            capture.prefix.close()
+            store.close()
+
+        row = {
+            "segments": segments,
+            "source_compressed_bytes": source_compressed,
+            "staging_writes": diagnostics["staging_io"]["payload_writes"],
+            "staging_bytes": diagnostics["staging_io"]["payload_write_bytes"],
+            "staging_fixed_overhead": (
+                diagnostics["staging_io"]["payload_writes"]
+                - diagnostics["event_count"]
+            ),
+            "transfer_reads": diagnostics["transfer_io"]["payload_reads"],
+            "transfer_writes": diagnostics["transfer_io"]["payload_writes"],
+            "transfer_bytes": diagnostics["transfer_io"]["payload_write_bytes"],
+            "validation_reads": diagnostics["validation_io"]["payload_reads"],
+            "validation_bytes": diagnostics["validation_io"]["payload_read_bytes"],
+            "final_file_bytes": diagnostics["final_file_bytes"],
+            "transfer_commits": diagnostics["transfer_commits"],
+            "largest_batch": diagnostics["largest_transfer_batch_chunks"],
+            "reopen_segment_reads": reopen_reads,
+            "tail_events": 3,
+            "pending_cache": 0,
+        }
+        measurements.append(row)
+        print(
+            "P3B_COLD_BOOTSTRAP_BOUNDS "
+            + " ".join(f"{key}={value}" for key, value in row.items())
+        )
+        del capture, store, world
+        gc.collect()
+
+    assert [m["segments"] for m in measurements] == [4, 40, 400]
+    assert len({m["staging_fixed_overhead"] for m in measurements}) == 1
+    assert len({m["largest_batch"] for m in measurements}) == 1
+    assert {m["largest_batch"] for m in measurements} == {4}
+    assert all(m["reopen_segment_reads"] == 0 for m in measurements)
+    assert all(m["pending_cache"] == 0 for m in measurements)
+    assert all(m["tail_events"] == 3 for m in measurements)
+
+    # Tenfold history growth from 40 -> 400 must stay within a small constant
+    # factor of ten for every history-sensitive checked-I/O/file metric.
+    forty, four_hundred = measurements[1], measurements[2]
+    for key in (
+        "staging_writes",
+        "staging_bytes",
+        "transfer_writes",
+        "transfer_bytes",
+        "validation_reads",
+        "validation_bytes",
+        "final_file_bytes",
+    ):
+        assert four_hundred[key] <= forty[key] * 12, (
+            key, measurements
+        )

@@ -847,10 +847,14 @@ def _validate_private_cold_store(
     return scrub
 
 
+def _fsync_publication_dir(path):
+    TransactionalStore._fsync_dir(path)
+
+
 def _publish_private_cold_file(private_path, destination):
     os.link(private_path, destination)
     _bootstrap_phase("after_publication_link")
-    TransactionalStore._fsync_dir(destination.parent)
+    _fsync_publication_dir(destination.parent)
     _bootstrap_phase("after_publication_fsync")
 
 
