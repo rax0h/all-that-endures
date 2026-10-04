@@ -399,3 +399,47 @@ def test_invalid_dirty_event_rejects_before_commit_and_keeps_retry_state(
         assert session.save() == before_generation + 1
     finally:
         session.close()
+
+
+def test_shared_replaced_payload_sealed_before_first_save_reanchors_current_state(
+    tmp_path,
+):
+    shared = {"child": [1, 2]}
+    world = world_with_events(CHUNK_SIZE, seed=24)
+    world.currency.wallets[1] = {
+        "left": shared,
+        "right": shared,
+    }
+    path = tmp_path / "sealed-shared.sqlite"
+    write_cold_snapshot(world, path, rules_id=RULES)
+
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        first = session.world.events[0]
+        wallet = session.world.currency.wallets[1]
+        current = wallet["left"]
+        replacement = []
+        first.data["shared"] = current
+        first.data["replacement"] = replacement
+        assert wallet["left"] is wallet["right"]
+        assert first.data["shared"] is current
+
+        session.world.events.seal_before(11)
+
+        assert wallet["left"] is wallet["right"]
+        assert current["child"] == [1, 2]
+        assert ("world.events", 0) not in session._identity_index.owner_occurrences
+        assert session.save() == session.generation
+    finally:
+        session.close()
+
+    restored = open_world_session(path, rules_id=RULES)
+    try:
+        wallet = restored.world.currency.wallets[1]
+        historical = restored.world.events[0]
+        assert wallet["left"] is wallet["right"]
+        assert historical.data["shared"]["child"] == wallet["left"]["child"]
+        assert historical.data["shared"] is not wallet["left"]
+        assert historical.data["replacement"] == ()
+    finally:
+        restored.close()
