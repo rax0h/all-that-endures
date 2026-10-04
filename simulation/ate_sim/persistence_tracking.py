@@ -84,10 +84,21 @@ def _install_eventlog_hooks():
 
     def seal_before(log, year):
         before = len(log._chunks)
+        retired = []
+        cursor = 0
+        while (
+            len(log._tail) - cursor >= log.chunk_size
+            and log._tail[cursor + log.chunk_size - 1].year < year
+        ):
+            retired.extend(
+                log._tail[cursor:cursor + log.chunk_size]
+            )
+            cursor += log.chunk_size
         original_seal(log, year)
         bound = _binding(log)
         if bound is not None and len(log._chunks) != before:
-            bound.event_chunks_changed(log)
+            start = log._disk_count + before * log.chunk_size
+            bound.event_chunks_changed(log, start, tuple(retired))
 
     EventLog.append = append
     EventLog.seal_before = seal_before
@@ -138,8 +149,10 @@ class _ObjectBinding:
     def event_appended(self, log, event):
         self.session._event_appended(log, event)
 
-    def event_chunks_changed(self, log):
-        self.session._event_chunks_changed(log)
+    def event_chunks_changed(self, log, first_index, retired_events):
+        self.session._event_chunks_changed(
+            log, first_index, retired_events
+        )
 
 
 class _NestedMixin:
