@@ -121,12 +121,18 @@ def test_unreadable_ack_blocks_mutation_emit_step_and_log_until_resolve(
 ):
     path = tmp_path / "blocked.sqlite"
     world = World(3)
-    world.currency.wallets[1] = {"values": [1]}
+    world.currency.wallets[1] = {
+        "values": [1],
+        "mapping": {"a": 1},
+        "items": {1, 2},
+    }
     write_cold_snapshot(world, path, rules_id=RULES)
     session = open_world_session(path, rules_id=RULES)
     sim = Simulation(session.world)
     try:
         alias = session.world.currency.wallets[1]["values"]
+        mapping = session.world.currency.wallets[1]["mapping"]
+        items = session.world.currency.wallets[1]["items"]
         alias.append(2)
         before_generation = session.generation
         before_year = session.world.year
@@ -148,9 +154,19 @@ def test_unreadable_ack_blocks_mutation_emit_step_and_log_until_resolve(
         assert session.generation == before_generation
 
         alias_before = list(alias)
+        mapping_before = dict(mapping)
+        items_before = set(items)
         with pytest.raises(StoreError):
             alias.append(3)
+        with pytest.raises(StoreError):
+            alias.pop()
+        with pytest.raises(StoreError):
+            mapping.clear()
+        with pytest.raises(StoreError):
+            items.discard(1)
         assert list(alias) == alias_before
+        assert dict(mapping) == mapping_before
+        assert set(items) == items_before
 
         with pytest.raises(StoreError):
             session.world.emit("blocked", Layer.REALITY)
@@ -159,6 +175,10 @@ def test_unreadable_ack_blocks_mutation_emit_step_and_log_until_resolve(
 
         with pytest.raises(StoreError):
             sim.step()
+        with pytest.raises(StoreError):
+            sim.run(1)
+        with pytest.raises(StoreError):
+            Simulation(session.world)
         assert session.world.year == before_year
 
         with pytest.raises(StoreError):
@@ -420,83 +440,6 @@ def test_save_inside_current_people_scope_fails_before_preparation(tmp_path):
     finally:
         session.close()
 
-
-
-def _writer_death_script():
-    return r'''
-import os, signal, sys
-from ate_sim.persistence_session import open_world_session
-path, rules, phase = sys.argv[1], sys.argv[2], sys.argv[3]
-session = open_world_session(path, rules_id=rules)
-shared = session.world.currency.wallets[1]["left"]
-shared["value"] = 2
-session.world.events.seal_before(11)
-session.store._phase_hook = (
-    lambda p: os.kill(os.getpid(), signal.SIGKILL)
-    if p == phase else None
-)
-session.save()
-'''
-
-
-@pytest.mark.parametrize(
-    "phase,published",
-    [
-        ("during_writes", False),
-        ("before_commit", False),
-        ("after_commit", True),
-    ],
-)
-def test_writer_process_death_reopens_exact_old_or_new_partition(
-    tmp_path, phase, published
-):
-    world = world_with_events(CHUNK_SIZE, seed=55)
-    shared = {"value": 1}
-    world.currency.wallets[1] = {"left": shared, "right": shared}
-    path = tmp_path / f"death-{phase}.sqlite"
-    write_cold_snapshot(world, path, rules_id=RULES)
-
-    baseline = open_world_session(path, rules_id=RULES)
-    start_generation = baseline.generation
-    baseline.close()
-
-    env = dict(os.environ)
-    root = Path(__file__).parents[2]
-    env["PYTHONPATH"] = (
-        str(root) + os.pathsep + str(root / "simulation")
-        + os.pathsep + env.get("PYTHONPATH", "")
-    )
-    proc = subprocess.run(
-        [
-            sys.executable,
-            "-c",
-            _writer_death_script(),
-            str(path),
-            RULES,
-            phase,
-        ],
-        env=env,
-    )
-    assert proc.returncode != 0
-
-    restored = open_world_session(path, rules_id=RULES)
-    try:
-        assert restored.generation == start_generation + int(published)
-        wallet = restored.world.currency.wallets[1]
-        assert wallet["left"] is wallet["right"]
-        assert wallet["left"]["value"] == (2 if published else 1)
-
-        stats = restored.world.events.storage_stats()
-        assert stats["disk_events"] == (
-            CHUNK_SIZE if published else 0
-        )
-        rows = restored.store.read_records(
-            "world.events", expected_record_schema=1
-        )
-        assert len(rows) == (0 if published else CHUNK_SIZE)
-        assert len(restored.world.events) == CHUNK_SIZE
-    finally:
-        restored.close()
 
 
 def test_corrupt_new_segment_during_lost_ack_never_trims_runtime(
@@ -882,7 +825,11 @@ session.save()
 
 @pytest.mark.parametrize(
     "phase,new_state",
-    [("during_writes", False), ("after_commit", True)],
+    [
+        ("during_writes", False),
+        ("before_commit", False),
+        ("after_commit", True),
+    ],
 )
 def test_subprocess_writer_death_reopens_complete_old_or_new_partition(
     tmp_path, phase, new_state
