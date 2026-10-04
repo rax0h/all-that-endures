@@ -1634,15 +1634,80 @@ class IncrementalWorldSession:
         self._deleted.add(owner)
         self._identity_dirty_owners.add(owner)
 
+    def _mark_storage_only(self, owner):
+        """Journal a persisted value without granting mutable identity authority."""
+        self._ensure_active()
+        self._deleted.discard(owner)
+        self._dirty.add(owner)
+        self._identity_dirty_owners.discard(owner)
+
+    def _preflight_event_append(self, log, event):
+        """Reject invalid/foreign appends before EventLog mutates."""
+        self._ensure_active()
+        log._ensure_backend_readable()
+        if event.id != log._count + 1:
+            raise ValueError("events require consecutive stable IDs")
+        if log._last_year is not None and event.year < log._last_year:
+            raise ValueError("event time cannot run backwards")
+        owner = ("world.events", log._count)
+        self._validate_incoming(
+            event, {owner}, allow_existing=True
+        )
+
     def _event_appended(self, log, event):
         namespace = "world.events"
         index = len(log) - 1
-        self._bind_nested(
-            event, {(namespace, index)}, initial=False, allow_existing=True
-        )
+        owner = (namespace, index)
+        sealed = event.__dict__.get("_sealed") is True
+        if not (self._cold_mode and sealed):
+            self._bind_nested(
+                event, {owner}, initial=False, allow_existing=True
+            )
+            self._mark(owner)
+        else:
+            self._mark_storage_only(owner)
         self._changed_member_work += 1
-        self._mark((namespace, index))
         self._manifest_dirty = True
+
+    def _retire_log_owners(self, owner_events):
+        """Retire exact LOG owners from current and stale tracked graphs."""
+        pairs = tuple(owner_events)
+        if not pairs:
+            return
+        owners = tuple(owner for owner, _event in pairs)
+        stale = {
+            owner: tuple(
+                row[1]
+                for row in self._identity_index.owner_occurrences.get(
+                    owner, ()
+                )
+            )
+            for owner in owners
+        }
+
+        self._identity_dirty_owners.difference_update(owners)
+        removed, added = self._identity_index.retire_owners(owners)
+        self._merge_identity_patch(removed, added)
+
+        for owner, event in pairs:
+            seen = set()
+            self._remove_owner_recursive(event, owner, seen)
+            for value in stale[owner]:
+                self._remove_owner_recursive(value, owner, seen)
+
+    def _event_sealed(self, event):
+        if not self._cold_mode:
+            return
+        bound = _binding(event)
+        if bound is None or bound.session is not self:
+            return
+        owners = tuple(
+            owner for owner in bound.owners
+            if owner[0] == "world.events"
+        )
+        self._retire_log_owners(
+            (owner, event) for owner in owners
+        )
 
     def _event_chunks_changed(self, log, first_index, retired_events):
         self._manifest_dirty = True
@@ -1655,35 +1720,15 @@ class IncrementalWorldSession:
             or len(retired_events) % log.chunk_size
         ):
             raise StoreIntegrityError("invalid cold sealing retirement boundary")
-        owners = []
-        objects_by_owner = {}
+        pairs = []
         for offset, event in enumerate(retired_events):
             index = first_index + offset
             if event.id != index + 1 or event.__dict__.get("_sealed") is not True:
                 raise StoreIntegrityError(
                     "sealed EventLog retirement disagrees with stable history"
                 )
-            owner = ("world.events", index)
-            owners.append(owner)
-            objects_by_owner[owner] = tuple(
-                row[1]
-                for row in self._identity_index.owner_occurrences.get(
-                    owner, ()
-                )
-            )
-
-        self._identity_dirty_owners.difference_update(owners)
-        removed, added = self._identity_index.retire_owners(owners)
-        self._merge_identity_patch(removed, added)
-
-        for owner in owners:
-            seen = set()
-            for value in objects_by_owner[owner]:
-                ident = id(value)
-                if ident in seen:
-                    continue
-                seen.add(ident)
-                self._discard_owner_binding(value, owner)
+            pairs.append((("world.events", index), event))
+        self._retire_log_owners(pairs)
 
     def _validate_bound_identity(self):
         if self._identity_mode == "current" or self._has_identity_deltas:
