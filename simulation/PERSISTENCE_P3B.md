@@ -15,15 +15,17 @@ Extend EventLog with an opt-in disk backend and compose one save transaction in
 the existing session machinery. Keep detached/in-memory and legacy persistence
 paths distinct and supported. Python 3.12, SQLite and existing dependencies only.
 
-**Execution:** This remains the full architecture. Work is now assigned in
+**Execution:** This remains the full architecture. Work is assigned in
 smaller reviewed slices: the composite EventLog is reviewed in
-`PERSISTENCE_P3B_EVENTLOG_REVIEW.md`, and the identity primitives are accepted in
-`PERSISTENCE_P3B_IDENTITY_REVIEW.md`. Cold identity restoration is reviewed in
-`PERSISTENCE_P3B_IDENTITY_RESTORE_REVIEW.md`. Cold World capture is accepted in
-`PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md`. The next authorized Sol slice is ONLY
-`PERSISTENCE_P3B_COLD_BOOTSTRAP.md`: explicit cold creation/conversion. Do not
-implement later live session/save tasks below in this assignment. Test and commit
-the bounded slice, then stop for Astra review.
+`PERSISTENCE_P3B_EVENTLOG_REVIEW.md`; identity primitives are accepted in
+`PERSISTENCE_P3B_IDENTITY_REVIEW.md`; cold identity restoration is accepted in
+`PERSISTENCE_P3B_IDENTITY_RESTORE_REVIEW.md`; cold World capture is accepted in
+`PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md`; and explicit cold bootstrap/conversion
+is accepted in `PERSISTENCE_P3B_COLD_BOOTSTRAP_VALIDATION.md`. The next
+authorized Sol slice is ONLY `PERSISTENCE_P3B_LIVE_OPEN.md`: live cold
+open/bind/close plus in-memory sealing-owner retirement, with cold save explicitly
+blocked. Do not implement atomic cold save/recovery or later lifecycle work in
+that assignment. Test and commit the bounded slice, then stop for Astra review.
 
 ## 1. Scope and decisions
 
