@@ -1,5 +1,10 @@
 # P3B cold World capture validation
 
+Architect review update: this document records the submitted implementation's
+evidence, not final acceptance. See `PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md` for
+two corrected typed-validation defects and outstanding evidence, and
+`PERSISTENCE_P3B_COLD_CAPTURE_FOLLOWUP.md` for the bounded next assignment.
+
 Status: implementation evidence for `PERSISTENCE_P3B_COLD_CAPTURE.md`,
 2026-10-03.
 

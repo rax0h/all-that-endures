@@ -7,6 +7,7 @@ from ate_sim.incremental_store import (
     NewSegment,
     RecordChange,
     StoreError,
+    StoreFormatError,
     StoreIntegrityError,
     TransactionalStore,
 )
@@ -43,6 +44,46 @@ from ate_sim.persistence_session import (
 
 RULES = "stage-0.5-p3b-cold-capture-tests"
 TOKEN = "0123456789abcdef0123456789abcdef"
+
+
+@pytest.mark.parametrize('case', [
+    'boolean_total', 'boolean_chunks', 'float_total', 'float_chunks',
+    'float_head_year', 'boolean_head_next_person',
+])
+def test_cold_capture_rejects_typed_metadata_mismatch(tmp_path, case):
+    store, fixture = build_cold_store(
+        tmp_path, disk_segments=0, pending_chunks=0, tail_count=1,
+    )
+    try:
+        metadata = store.head_metadata()
+        changes = []
+        if case.startswith(('boolean_total', 'boolean_chunks', 'float_total', 'float_chunks')):
+            manifest = copy.deepcopy(fixture['manifest'])
+            descriptions = {
+                'boolean_total': ('EventLog-disk/v1', True, 0),
+                'boolean_chunks': ('EventLog-disk/v1', 1, False),
+                'float_total': ('EventLog-disk/v1', 1.0, 0),
+                'float_chunks': ('EventLog-disk/v1', 1, 0.0),
+            }
+            manifest['collections']['world.events'] = descriptions[case]
+            changes.append(RecordChange(META, 'manifest', manifest, record_schema=RECORD_SCHEMA))
+        elif case == 'float_head_year':
+            metadata['simulation_position'] = float(metadata['simulation_position'])
+        else:
+            assert metadata['next_ids']['next_person'] == 1
+            metadata['next_ids']['next_person'] = True
+        changes.append(RecordChange(
+            EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY,
+            (1, store.generation + 1, TOKEN), record_schema=1,
+        ))
+        store.commit(store.generation, changes, (), metadata)
+        with store.read_transaction():
+            with pytest.raises((StoreFormatError, StoreIntegrityError)):
+                result = _capture_cold_world(store)
+                result.prefix.close()
+    finally:
+        store.close()
+
 
 
 def event(event_id, *, year=10, data=None, sealed=False):

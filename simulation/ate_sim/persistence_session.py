@@ -338,7 +338,13 @@ def _capture_cold_world(store):
             tail_descriptor.total_events,
             tail_descriptor.sealed_events // CHUNK_SIZE,
         )
-        if description != expected_event_description:
+        if (
+            type(description) is not tuple
+            or len(description) != 3
+            or type(description[1]) is not int
+            or type(description[2]) is not int
+            or description != expected_event_description
+        ):
             raise StoreIntegrityError(
                 "cold EventLog collection description disagrees with descriptors"
             )
@@ -395,8 +401,12 @@ def _capture_cold_world(store):
                 "next_event",
             )
         }
+        head_next = head.metadata["next_ids"]
         if (
-            world.seed != head.metadata["seed"]
+            type(head.metadata["simulation_position"]) is not int
+            or type(head_next) is not dict
+            or any(type(value) is not int for value in head_next.values())
+            or world.seed != head.metadata["seed"]
             or world.year != head.metadata["simulation_position"]
             or head.metadata["next_ids"] != expected_next
         ):
