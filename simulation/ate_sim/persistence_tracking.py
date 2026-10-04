@@ -924,6 +924,11 @@ class IncrementalWorldSession:
             self._bind_roots()
             self._bootstrap_identity_index()
             self._initialize_cold_persisted_keys()
+            self._cold_lifetime = _ColdLifetime(self)
+            object.__setattr__(
+                self.world, "_ate_persistence_lifetime", self._cold_lifetime
+            )
+            self.world.events._ate_persistence_lifetime = self._cold_lifetime
         except Exception:
             self._undo_bound_roots()
             self._undo_bootstrap()
@@ -981,6 +986,7 @@ class IncrementalWorldSession:
         self._cold_tail_descriptor = None
         self._cold_commit_descriptor = None
         self._cold_committed_n = 0
+        self._cold_lifetime = None
 
     def __enter__(self):
         return self
@@ -2191,7 +2197,11 @@ class IncrementalWorldSession:
             # P2A restores dataclasses from declared fields only. Mirror that
             # state on detach so stale query caches cannot affect continuation.
             for name in tuple(getattr(value, "__dict__", ())):
-                if name not in declared and not (cls is Event and name == "_sealed"):
+                if (
+                    name not in declared
+                    and not (cls is Event and name == "_sealed")
+                    and name != "_ate_persistence_lifetime"
+                ):
                     value.__dict__.pop(name, None)
             return value
         if isinstance(value, EventLog):
