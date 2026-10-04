@@ -820,114 +820,127 @@ def _resolve_cold_save_once(session, plan, *, full_evidence):
 def save_cold(session):
     """Prepare and publish one atomic cold save generation."""
     session._ensure_cold_operation("save")
-    if session._cold_state != "active":
-        raise StoreError(
-            f"cold session cannot save while {session._cold_state}"
-        )
-    if session._cold_step_depth:
-        raise StoreError("cold save requires a completed simulation step")
-    if session.world.__dict__.get("_index_current_people"):
-        raise StoreError("cold save cannot run inside current_people_scope")
-
-    session._cold_state = "preparing"
-    plan = None
+    session._cold_operation_depth += 1
     try:
-        plan = prepare_cold_save(session)
-    except StoreConflictError:
-        session._cold_state = "stale"
-        raise
-    except Exception:
-        session._cold_state = "active"
-        raise
-
-    if plan is None:
-        session._cold_state = "active"
-        return session.generation
-
-    session._cold_plan = plan
-    session._cold_publication_phase = "prepared"
-    _cold_save_phase("before_commit_call", session, plan)
-    try:
-        generation = session.store.commit(
-            plan.expected_generation,
-            plan.changes,
-            plan.new_segments,
-            plan.metadata,
-        )
-    except StoreConflictError:
-        session._cold_state = "stale"
-        raise
-    except Exception as original:
-        session._cold_state = "recovery-required"
-        try:
-            status, generation = _resolve_cold_save_once(
-                session, plan, full_evidence=True
+        if session._cold_state != "active":
+            raise StoreError(
+                f"cold session cannot save while {session._cold_state}"
             )
-        except Exception as resolution:
-            if session._cold_state == "recovery-required":
-                raise StoreError(
-                    "cold save outcome is uncertain; resolve_save is required"
-                ) from resolution
+        if session._cold_step_depth:
+            raise StoreError("cold save requires a completed simulation step")
+        if session.world.__dict__.get("_index_current_people"):
+            raise StoreError("cold save cannot run inside current_people_scope")
+
+        session._cold_state = "preparing"
+        plan = None
+        try:
+            plan = prepare_cold_save(session)
+        except StoreConflictError:
+            session._cold_state = "stale"
             raise
-        if status == "old":
-            raise original
-        return generation
+        except Exception:
+            session._cold_state = "active"
+            raise
 
-    if generation != plan.target_generation:
-        session._cold_state = "recovery-required"
-        raise StoreIntegrityError(
-            "cold store returned an unexpected committed generation"
-        )
+        if plan is None:
+            session._cold_state = "active"
+            return session.generation
 
-    # A normal acknowledgement still pins head/descriptors/replacement prefix
-    # from one checked successor snapshot.  Segment value equality is checked
-    # during EventLog adoption, so the normal path does not duplicate those
-    # reads here.
-    try:
-        status, head, prefix = _capture_successor(
-            session, plan, full_evidence=False
-        )
-        if status != "ours":
-            if prefix is not None:
-                prefix.close()
-            if status == "foreign":
-                session._cold_state = "stale"
-                raise StoreConflictError(
-                    "cold save successor was replaced by another writer"
+        session._cold_plan = plan
+        session._cold_publication_phase = "prepared"
+        _cold_save_phase("before_commit_call", session, plan)
+        try:
+            generation = session.store.commit(
+                plan.expected_generation,
+                plan.changes,
+                plan.new_segments,
+                plan.metadata,
+            )
+        except StoreConflictError:
+            session._cold_state = "stale"
+            session._cold_plan = None
+            session._cold_publication_phase = None
+            raise
+        except Exception as original:
+            session._cold_state = "recovery-required"
+            try:
+                status, generation = _resolve_cold_save_once(
+                    session, plan, full_evidence=True
                 )
-            session._cold_state = "recovery-required"
-            raise StoreIntegrityError("committed cold successor was not visible")
-        session._cold_head = head
-        session._cold_state = "recovery-required"
-        return publish_cold_save(session, plan, prefix)
-    except Exception:
-        if session._cold_state != "stale":
-            session._cold_state = "recovery-required"
-        raise
+            except Exception as resolution:
+                if session._cold_state == "recovery-required":
+                    raise StoreError(
+                        "cold save outcome is uncertain; resolve_save is required"
+                    ) from resolution
+                raise
+            if status == "old":
+                raise original
+            return generation
 
+        if generation != plan.target_generation:
+            session._cold_state = "recovery-required"
+            raise StoreIntegrityError(
+                "cold store returned an unexpected committed generation"
+            )
+
+        # A normal acknowledgement pins the successor head/descriptors and the
+        # replacement prefix in one checked read snapshot.  EventLog adoption
+        # then checks every newly transferred segment value before trimming.
+        try:
+            status, head, prefix = _capture_successor(
+                session, plan, full_evidence=False
+            )
+            if status != "ours":
+                if prefix is not None:
+                    prefix.close()
+                if status == "foreign":
+                    session._cold_state = "stale"
+                    session._cold_plan = None
+                    session._cold_publication_phase = None
+                    raise StoreConflictError(
+                        "cold save successor was replaced by another writer"
+                    )
+                session._cold_state = "recovery-required"
+                raise StoreIntegrityError(
+                    "committed cold successor was not visible"
+                )
+            session._cold_head = head
+            session._cold_state = "recovery-required"
+            return publish_cold_save(session, plan, prefix)
+        except Exception:
+            if session._cold_state != "stale":
+                session._cold_state = "recovery-required"
+            raise
+    finally:
+        session._cold_operation_depth -= 1
 
 def resolve_cold_save(session):
     """Resolve one retained uncertain save plan without committing."""
     session._ensure_cold_operation("resolve")
-    if session._cold_state == "stale":
-        raise StoreConflictError("cold session is stale")
-    if session._cold_state == "closed":
-        raise StoreError("cold session is closed")
-    plan = session._cold_plan
-    if plan is None:
-        if session._cold_state != "active":
-            raise StoreError(
-                f"cold session has no resolvable plan while {session._cold_state}"
-            )
-        _check_captured_store_baseline(session)
-        return session.generation
+    session._cold_operation_depth += 1
+    try:
+        if session._cold_state == "stale":
+            raise StoreConflictError("cold session is stale")
+        if session._cold_state == "closed":
+            raise StoreError("cold session is closed")
+        plan = session._cold_plan
+        if plan is None:
+            if session._cold_state != "active":
+                raise StoreError(
+                    f"cold session has no resolvable plan while {session._cold_state}"
+                )
+            _check_captured_store_baseline(session)
+            return session.generation
 
-    if session._cold_state not in ("recovery-required", "preparing"):
-        raise StoreError(
-            f"cold save cannot resolve while {session._cold_state}"
+        if session._cold_state not in ("recovery-required", "preparing"):
+            raise StoreError(
+                f"cold save cannot resolve while {session._cold_state}"
+            )
+        session._cold_state = "recovery-required"
+        _status, generation = _resolve_cold_save_once(
+            session, plan, full_evidence=True
         )
-    session._cold_state = "recovery-required"
-    status, generation = _resolve_cold_save_once(
-        session, plan, full_evidence=True
-    )
-    return generation
+        return generation
+    finally:
+        session._cold_operation_depth -= 1
+
