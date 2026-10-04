@@ -1,6 +1,34 @@
 # P3B live cold open — architect review and bounded corrections
 
-Status: **changes required; live open/bind/close is not yet accepted**.
+Status: **live open/bind/close and semantic sealing retirement accepted** at
+`2819391359fa3e2e16f9c8e3151e99ce06d8a373`, 2026-10-04.
+
+## Acceptance of the correction
+
+The six original review failures are corrected. Retirement handles newly appended
+Events, replaced children, individual sealing and tracked sets without stale LOG
+ownership or memo retention. Append preflight rejects foreign bindings before
+changing the destination log. Current non-log owners remain authoritative.
+
+Completed CI workflow `37225707267`, job `111504795251`, at candidate
+`b07146803f27a1ae33be58c448d068d37e651ae2` was independently checked:
+297 focused passed in 188.93 s; 394 affected passed in 394.17 s;
+561 full-suite passed in 577.05 s. All simulation Python blobs match the accepted
+head. Independent review also ran the original six probes and Sol's 17 new cases:
+**23 passed, 19 deselected in 25.49 s**. Local reviewed Python sources were checked
+against the live tree (allowing only a fetch-added terminal newline).
+
+No additional blocker was found in this correction scope. P3A and all earlier
+accepted slices remain accepted. No long test run was started or polled in this
+review. The next assignment is `PERSISTENCE_P3B_COLD_SAVE.md`; no detach/export
+work, checkpoint-default replacement or merge is authorized by this acceptance.
+
+## Historical review and correction assignment (completed)
+
+The findings and assignment below describe the pre-correction state and are
+retained as evidence. Their not-accepted status and cold-save block are superseded
+by the acceptance above and the new cold-save assignment; do not repeat them.
+
 Reviewed PR #14 head: `d3017a8394ceb8b47e7b8daa62cb527850ecca4a`.
 Date: 2026-10-04. Branch: `sim/stage-0-5-stabilization`.
 

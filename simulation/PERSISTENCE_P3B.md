@@ -22,12 +22,12 @@ smaller reviewed slices: the composite EventLog is reviewed in
 `PERSISTENCE_P3B_IDENTITY_RESTORE_REVIEW.md`; cold World capture is accepted in
 `PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md`; and explicit cold bootstrap/conversion
 is accepted in `PERSISTENCE_P3B_COLD_BOOTSTRAP_VALIDATION.md`. Live cold
-open/bind/close is implemented but requires corrections before acceptance; see
-`PERSISTENCE_P3B_LIVE_OPEN_REVIEW.md` for the review of `d3017a8` and the ONLY
-next authorized Sol assignment. `PERSISTENCE_P3B_LIVE_OPEN.md` remains its
-underlying contract. Cold save is explicitly blocked. Do not implement atomic
-cold save/recovery or later lifecycle work in this correction pass. Test and
-commit the bounded corrections, then stop for Astra review.
+open/bind/close and semantic sealing-owner retirement are accepted at
+`2819391359fa3e2e16f9c8e3151e99ce06d8a373`; see
+`PERSISTENCE_P3B_LIVE_OPEN_REVIEW.md`. The ONLY next authorized Sol slice is
+`PERSISTENCE_P3B_COLD_SAVE.md`: atomic cold save/recovery and the mutation guards
+needed for its failure states. Detach/export/checkpoint integration remains
+separate. Test and commit that bounded slice, then stop for Astra review.
 
 ## 1. Scope and decisions
 

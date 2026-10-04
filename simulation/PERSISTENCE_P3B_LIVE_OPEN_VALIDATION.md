@@ -1,10 +1,10 @@
 # P3B live cold open — validation
 
-Status: bounded live-open review corrections implemented and green; ready for
-architect review, 2026-10-04 UTC. The original live-open evidence remains below
-as historical evidence. The six blocking lifecycle/atomicity findings from
-`PERSISTENCE_P3B_LIVE_OPEN_REVIEW.md` were reproduced before the fix and are
-covered by the correction validation recorded later in this document.
+Status: architect-accepted at `2819391359fa3e2e16f9c8e3151e99ce06d8a373`,
+2026-10-04 UTC. See `PERSISTENCE_P3B_LIVE_OPEN_REVIEW.md` for independent
+verification of the 561-test correction candidate and 23 passing review probes.
+Earlier candidate results below are historical; the correction results are the
+accepted evidence. Next assignment: `PERSISTENCE_P3B_COLD_SAVE.md`.
 
 Green candidate head: `a5029ff7b5a60e7ab5cdfcdfe6914e17f74ec819`.
 Green isolated workflow: `37222438702`.
