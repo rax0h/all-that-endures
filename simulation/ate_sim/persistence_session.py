@@ -525,6 +525,7 @@ def _validate_bootstrap_events(world):
         raise CodecError("world.events must be list or in-memory EventLog")
 
     previous_year = None
+    disk_last_year = None
     count = 0
     for index, event in enumerate(iterable):
         if type(event) is not Event:
@@ -542,6 +543,8 @@ def _validate_bootstrap_events(world):
             raise CodecError("EventLog sealed chunk contains unsealed Event")
         if sealed:
             _validate_sealed_event(event)
+        if index + 1 == disk_events:
+            disk_last_year = event.year
         previous_year = event.year
         count += 1
     if count != total_events:
@@ -556,6 +559,7 @@ def _validate_bootstrap_events(world):
     return {
         "disk_events": disk_events,
         "total_events": total_events,
+        "disk_last_year": disk_last_year,
         "last_year": previous_year,
     }
 
@@ -727,7 +731,8 @@ def _projected_link_changes(store, projected_links):
 
 
 def _finalize_cold_store(
-    store, *, event_count, disk_events, last_year, projected_links
+    store, *, event_count, disk_events, disk_last_year, last_year,
+    projected_links
 ):
     manifest = _read_manifest(store)
     collections = dict(manifest["collections"])
@@ -747,7 +752,7 @@ def _finalize_cold_store(
     descriptor = SealedPrefixDescriptor(
         disk_events // CHUNK_SIZE,
         disk_events,
-        last_year if disk_events else None,
+        disk_last_year if disk_events else None,
     )
 
     changes = _projected_link_changes(store, projected_links)
@@ -898,6 +903,7 @@ def write_cold_snapshot(world, destination, *, rules_id):
                 store,
                 event_count=info["total_events"],
                 disk_events=info["disk_events"],
+                disk_last_year=info["disk_last_year"],
                 last_year=info["last_year"],
                 projected_links=projected_links,
             )

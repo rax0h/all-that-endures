@@ -240,6 +240,35 @@ def test_write_cold_snapshot_prefix_only_exact_partition(tmp_path):
         store.close()
 
 
+def test_prefix_descriptor_uses_disk_last_year_not_overall_tail_year(
+    tmp_path,
+):
+    world = segmented_world(1, tail_count=1, seed=843001)
+    tail = world.events._tail[0]
+    object.__setattr__(tail, "year", 4)
+    world.events._years.append(4)
+    world.events._offsets.append(CHUNK_SIZE)
+    world.events._last_year = 4
+
+    destination = tmp_path / "split-years.sqlite"
+    diagnostics = write_cold_snapshot(
+        world, destination, rules_id=RULES
+    )
+    assert diagnostics["disk_events"] == CHUNK_SIZE
+
+    store, capture = capture_cold(destination)
+    try:
+        assert capture.prefix_descriptor.last_year == 0
+        assert capture.tail_descriptor.last_event_year == 4
+        assert capture.world.events[0].year == 0
+        assert capture.world.events[CHUNK_SIZE].year == 4
+        verified = capture.prefix.verify_full()
+        assert verified["last_year"] == 0
+    finally:
+        capture.prefix.close()
+        store.close()
+
+
 def test_write_cold_snapshot_transfers_six_chunks_and_preserves_aliases_flags_cache(
     tmp_path, monkeypatch
 ):
