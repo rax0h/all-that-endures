@@ -872,3 +872,26 @@ def test_subprocess_writer_death_reopens_complete_old_or_new_partition(
         assert reopened.world.events[-1].id == CHUNK_SIZE
     finally:
         reopened.close()
+
+
+def test_closed_cold_world_values_remain_inspectable_but_simulation_stays_blocked(
+    tmp_path,
+):
+    path = tmp_path / "closed-world.sqlite"
+    world = World(13)
+    world.currency.wallets[1] = {"values": [1, 2]}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    loaded = session.world
+    alias = loaded.currency.wallets[1]["values"]
+
+    session.close()
+
+    assert loaded.currency.wallets[1]["values"] == [1, 2]
+    assert list(alias) == [1, 2]
+    with pytest.raises(StoreError):
+        alias.append(3)
+    with pytest.raises(StoreError):
+        loaded.emit("closed", Layer.REALITY)
+    with pytest.raises(StoreError):
+        Simulation(loaded)
