@@ -856,6 +856,8 @@ def test_subprocess_writer_death_reopens_complete_old_or_new_partition(
 
     reopened = open_world_session(path, rules_id=RULES)
     try:
+        verified = reopened.store.verify_all()
+        assert verified["generation"] == reopened.generation
         row = reopened.world.currency.wallets[1]
         assert row["left"] is row["right"]
         assert row["left"]["value"] == (2 if new_state else 1)
