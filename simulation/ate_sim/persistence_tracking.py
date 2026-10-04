@@ -2256,6 +2256,13 @@ class IncrementalWorldSession:
         error = None
         try:
             self._unbind_world()
+        except StoreError as exc:
+            # A caller may have directly closed the owned store.  Cold close
+            # must still be an idempotent resource-release operation; the
+            # earlier mutation/read attempt already surfaced the closed-store
+            # error, so teardown does not re-raise it.
+            if not (self._cold_mode and getattr(self.store, "_closed", False)):
+                error = exc
         except Exception as exc:
             error = exc
         finally:
