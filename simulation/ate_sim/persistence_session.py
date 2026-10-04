@@ -1025,10 +1025,11 @@ def _capture_cold_baseline_ordinals(store, manifest):
 
 
 def open_world_session(path, *, rules_id):
-    """Open one cold-format World as an owned live tracked session.
+    """Open one cold-format World as an owned durable tracked session.
 
-    This is deliberately an open/bind foundation only. Cold save/recovery is a
-    later P3B slice, so IncrementalWorldSession.save() refuses cold mode.
+    The returned IncrementalWorldSession owns the captured P1 store and supports
+    bounded atomic cold save/resolve semantics. Detached/export integration
+    remains a separate P3B slice.
     """
     path = Path(path)
     store = TransactionalStore.open(
