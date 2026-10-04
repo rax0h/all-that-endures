@@ -1,4 +1,9 @@
+import os
+from pathlib import Path
+import signal
 import sqlite3
+import subprocess
+import sys
 
 import pytest
 
@@ -361,3 +366,388 @@ def test_corrupt_new_segment_during_lost_ack_never_trims_runtime(
         assert len(log._chunks) == before_pending
     finally:
         session.close()
+
+
+def test_before_commit_failure_proves_old_and_retry_is_single_generation(
+    tmp_path,
+):
+    path = tmp_path / "before-commit.sqlite"
+    world = World(8)
+    world.currency.wallets[1] = {"value": 1}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        session.world.currency.wallets[1]["value"] = 2
+        before = session.generation
+
+        def fail(phase):
+            if phase == "before_commit":
+                raise RuntimeError("injected before commit")
+
+        session.store._phase_hook = fail
+        with pytest.raises(RuntimeError, match="before commit"):
+            session.save()
+        assert session.cold_state == "active"
+        assert session.generation == before
+        assert session.store.generation == before
+        assert session.world.currency.wallets[1]["value"] == 2
+        assert session.dirty == frozenset(
+            {("world.currency.wallets", 1)}
+        )
+
+        session.store._phase_hook = lambda _phase: None
+        assert session.save() == before + 1
+        assert session.store.generation == before + 1
+    finally:
+        session.close()
+
+
+def test_unreadable_ack_of_proven_rollback_blocks_then_resolves_old(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "rollback-unreadable.sqlite"
+    world = World(9)
+    world.currency.wallets[1] = {"values": [1]}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        alias = session.world.currency.wallets[1]["values"]
+        alias.append(2)
+        before = session.generation
+        original_capture = cold_save._capture_successor
+
+        def fail_write(phase):
+            if phase == "during_writes":
+                raise RuntimeError("rolled back write")
+
+        session.store._phase_hook = fail_write
+        monkeypatch.setattr(
+            cold_save,
+            "_capture_successor",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                StoreError("ack read unavailable")
+            ),
+        )
+        with pytest.raises(StoreError, match="uncertain"):
+            session.save()
+        assert session.cold_state == "recovery-required"
+        assert session.store.generation == before
+
+        with pytest.raises(StoreError):
+            alias.append(3)
+        assert alias == [1, 2]
+
+        session.store._phase_hook = lambda _phase: None
+        monkeypatch.setattr(cold_save, "_capture_successor", original_capture)
+        assert session.resolve_save() == before
+        assert session.cold_state == "active"
+        assert session.dirty == frozenset(
+            {("world.currency.wallets", 1)}
+        )
+        assert alias == [1, 2]
+
+        assert session.save() == before + 1
+    finally:
+        session.close()
+
+
+def test_publication_failure_before_adoption_resolves_without_early_trim(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "before-adoption.sqlite"
+    write_cold_snapshot(
+        world_with_events(CHUNK_SIZE), path, rules_id=RULES
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        log = session.world.events
+        log.seal_before(11)
+        before = session.generation
+        before_chunks = tuple(log._chunks)
+        fired = {"value": False}
+
+        def fail_before_adoption(phase, _session, _plan):
+            if phase == "before_adoption" and not fired["value"]:
+                fired["value"] = True
+                raise RuntimeError("before adoption")
+
+        monkeypatch.setattr(
+            cold_save, "_cold_save_phase", fail_before_adoption
+        )
+        with pytest.raises(RuntimeError, match="before adoption"):
+            session.save()
+
+        assert session.cold_state == "recovery-required"
+        assert session._cold_publication_phase == "prepared"
+        assert session.generation == before
+        assert session.store.generation == before + 1
+        assert log._disk_count == 0
+        assert tuple(log._chunks) == before_chunks
+
+        monkeypatch.setattr(
+            cold_save, "_cold_save_phase",
+            lambda _phase, _session, _plan: None,
+        )
+        assert session.resolve_save() == before + 1
+        assert session.cold_state == "active"
+        assert log._disk_count == CHUNK_SIZE
+        assert len(log._chunks) == 0
+    finally:
+        session.close()
+
+
+def test_equal_value_competitor_token_is_not_mistaken_for_our_ack(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "foreign-token.sqlite"
+    world = World(10)
+    world.currency.wallets[1] = {"value": 0}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    winner = open_world_session(path, rules_id=RULES)
+    loser = open_world_session(path, rules_id=RULES)
+    try:
+        winner.world.currency.wallets[1]["value"] = 1
+        loser.world.currency.wallets[1]["value"] = 1
+        before = loser.generation
+        original_commit = loser.store.commit
+        fired = {"value": False}
+
+        def competitor_then_ambiguous(
+            expected_generation, changes, new_segments, metadata
+        ):
+            if not fired["value"]:
+                fired["value"] = True
+                assert winner.save() == before + 1
+                raise RuntimeError("local acknowledgement lost")
+            return original_commit(
+                expected_generation, changes, new_segments, metadata
+            )
+
+        monkeypatch.setattr(loser.store, "commit", competitor_then_ambiguous)
+        with pytest.raises(StoreConflictError):
+            loser.save()
+
+        assert loser.cold_state == "stale"
+        assert loser.generation == before
+        assert winner.generation == before + 1
+        assert winner.world.currency.wallets[1]["value"] == (
+            loser.world.currency.wallets[1]["value"]
+        )
+        with pytest.raises(StoreError):
+            loser.world.currency.wallets[1]["value"] = 2
+    finally:
+        winner.close()
+        loser.close()
+
+
+def test_recovery_checks_changed_record_evidence_not_just_token(
+    tmp_path,
+):
+    path = tmp_path / "corrupt-record.sqlite"
+    world = World(11)
+    world.currency.wallets[1] = {"value": 1}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        session.world.currency.wallets[1]["value"] = 2
+        before = session.generation
+
+        def corrupt_then_lose(phase):
+            if phase != "after_commit":
+                return
+            # Damage the exact changed record while preserving the save head and
+            # commit token. Resolution must require checked record evidence.
+            typed_key = session.codec.encode(1)
+            session.store.db.execute(
+                "UPDATE records SET payload_checksum='bad' "
+                "WHERE namespace=? AND typed_key=?",
+                ("world.currency.wallets", typed_key),
+            )
+            session.store.db.commit()
+            raise RuntimeError("lost ack after record corruption")
+
+        session.store._phase_hook = corrupt_then_lose
+        with pytest.raises(StoreError, match="uncertain"):
+            session.save()
+        assert session.cold_state == "recovery-required"
+        assert session.generation == before
+        assert session.store.generation == before + 1
+        with pytest.raises(StoreError):
+            session.resolve_save()
+        assert session.generation == before
+    finally:
+        session.close()
+
+
+def test_warmed_new_segment_cache_cannot_hide_corruption_on_resolution(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "warmed-corrupt.sqlite"
+    write_cold_snapshot(
+        world_with_events(CHUNK_SIZE), path, rules_id=RULES
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        log = session.world.events
+        log.seal_before(11)
+        before = session.generation
+        fired = {"value": False}
+
+        def fail_after_adoption(phase, _session, _plan):
+            if phase != "after_adoption" or fired["value"]:
+                return
+            fired["value"] = True
+            # Warm the replacement reader's decoded cache, then corrupt the
+            # underlying committed segment. resolve_save must bypass that cache
+            # through checked P1 evidence.
+            assert log._disk_prefix[0].id == 1
+            assert log._disk_prefix.resident_segments == 1
+            session.store.db.execute(
+                "UPDATE segments SET payload=? "
+                "WHERE namespace=? AND ordinal=?",
+                (b"corrupt", SEALED_EVENTS, 0),
+            )
+            session.store.db.commit()
+            raise RuntimeError("after adoption corruption")
+
+        monkeypatch.setattr(
+            cold_save, "_cold_save_phase", fail_after_adoption
+        )
+        with pytest.raises(RuntimeError, match="after adoption corruption"):
+            session.save()
+        assert session.cold_state == "recovery-required"
+        assert session.store.generation == before + 1
+
+        monkeypatch.setattr(
+            cold_save, "_cold_save_phase",
+            lambda _phase, _session, _plan: None,
+        )
+        with pytest.raises(StoreError):
+            session.resolve_save()
+        assert session.cold_state == "recovery-required"
+        assert session.generation == before
+    finally:
+        session.close()
+
+
+def test_close_from_recovery_does_not_resolve_or_advance_again(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "close-recovery.sqlite"
+    world = World(12)
+    world.currency.wallets[1] = {"value": 1}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    session.world.currency.wallets[1]["value"] = 2
+    before = session.generation
+    original_capture = cold_save._capture_successor
+
+    monkeypatch.setattr(
+        cold_save,
+        "_capture_successor",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            StoreError("ack unavailable")
+        ),
+    )
+    with pytest.raises(StoreError, match="uncertain"):
+        session.save()
+    assert session.cold_state == "recovery-required"
+    durable = session.store.generation
+    assert durable == before + 1
+
+    # close is teardown only: no save, no resolve, no generation change.
+    session.close()
+    assert session.cold_state == "closed"
+
+    monkeypatch.setattr(cold_save, "_capture_successor", original_capture)
+    reopened = open_world_session(path, rules_id=RULES)
+    try:
+        assert reopened.generation == durable
+        assert reopened.world.currency.wallets[1]["value"] == 2
+    finally:
+        reopened.close()
+
+
+def _writer_death_script():
+    return r"""
+import os, signal, sys
+from ate_sim.core import Event, Layer, World
+from ate_sim.event_log import EventLog
+from ate_sim.persistence_events import CHUNK_SIZE
+from ate_sim.persistence_session import open_world_session, write_cold_snapshot
+
+path, rules, phase = sys.argv[1:4]
+world = World(99041)
+world.year = 10
+shared = {"value": 1}
+world.currency.wallets[1] = {"left": shared, "right": shared}
+log = EventLog()
+for event_id in range(1, CHUNK_SIZE + 1):
+    value = Event(
+        event_id, 10, "death", Layer.REALITY, (), None, (),
+        {"index": event_id},
+    )
+    log.append(value)
+    world.event_ids.add(event_id)
+world.events = log
+world.next_event = CHUNK_SIZE + 1
+write_cold_snapshot(world, path, rules_id=rules)
+
+session = open_world_session(path, rules_id=rules)
+session.world.currency.wallets[1]["left"]["value"] = 2
+session.world.events.seal_before(11)
+
+def kill(current):
+    if current == phase:
+        os.kill(os.getpid(), signal.SIGKILL)
+
+session.store._phase_hook = kill
+session.save()
+"""
+
+
+@pytest.mark.parametrize(
+    "phase,new_state",
+    [("during_writes", False), ("after_commit", True)],
+)
+def test_subprocess_writer_death_reopens_complete_old_or_new_partition(
+    tmp_path, phase, new_state
+):
+    path = tmp_path / f"death-{phase}.sqlite"
+    env = dict(os.environ)
+    root = Path(__file__).parents[2]
+    env["PYTHONPATH"] = (
+        str(root) + os.pathsep + str(root / "simulation")
+        + os.pathsep + env.get("PYTHONPATH", "")
+    )
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            _writer_death_script(),
+            str(path),
+            RULES,
+            phase,
+        ],
+        env=env,
+    )
+    assert proc.returncode != 0
+
+    reopened = open_world_session(path, rules_id=RULES)
+    try:
+        row = reopened.world.currency.wallets[1]
+        assert row["left"] is row["right"]
+        assert row["left"]["value"] == (2 if new_state else 1)
+        stats = reopened.world.events.storage_stats()
+        assert stats["disk_events"] == (
+            CHUNK_SIZE if new_state else 0
+        )
+        assert stats["pending_sealed_events"] == 0
+        assert stats["tail_events"] == (
+            0 if new_state else CHUNK_SIZE
+        )
+        assert len(reopened.world.events) == CHUNK_SIZE
+        assert reopened.world.events[0].id == 1
+        assert reopened.world.events[-1].id == CHUNK_SIZE
+    finally:
+        reopened.close()
