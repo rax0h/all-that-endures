@@ -1,0 +1,36 @@
+name: p3b-live-open-candidate
+on:
+  push:
+    branches: [sol/p3b-live-open-candidate]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: focused live open
+        run: >-
+          python -m pytest -q -s
+          simulation/tests/test_persistence_session_open.py
+          simulation/tests/test_persistence_cold_capture.py
+          simulation/tests/test_persistence_cold_identity_restore.py
+          simulation/tests/test_persistence_identity.py
+          simulation/tests/test_persistence_event_identity.py
+          simulation/tests/test_persistence_event_log.py
+      - name: affected persistence
+        run: >-
+          python -m pytest -q
+          simulation/tests/test_incremental_store.py
+          simulation/tests/test_persistence*.py
+          simulation/tests/test_cold_history.py
+          simulation/tests/test_event_year_queries.py
+          simulation/tests/test_canonical_digest.py
+          simulation/tests/test_history_archive.py
+      - name: full simulation suite
+        run: python -m pytest -q simulation/tests
