@@ -1,6 +1,8 @@
 # P3B next bounded assignment: cold-safe identity restoration
 
-Status: implementation specification, following accepted identity primitives at
+Status: implemented; see `PERSISTENCE_P3B_IDENTITY_RESTORE_REVIEW.md` for the
+review correction and acceptance. Next assignment: `PERSISTENCE_P3B_COLD_CAPTURE.md`.
+This specification follows accepted identity primitives at
 `b756023395a3acb2aa0bfae9326e76dc6f10cd4e`. Read
 `PERSISTENCE_P3B_IDENTITY_REVIEW.md` and section 5 of `PERSISTENCE_P3B.md`.
 Verify the live PR/head before editing; the acceptance/specification commit is

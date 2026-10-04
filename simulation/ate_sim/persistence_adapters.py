@@ -925,6 +925,13 @@ def _restore_identity(world, links, *, mutable_event_tail_only=False):
             or comparisons.encode(old) != comparisons.encode(original)
         ):
             raise StoreIntegrityError('aliased payload copies disagree')
+        if boundary == 'eventlog':
+            parent = _at_path(
+                world, target[:-1], mutable_event_tail_only=True,
+            )
+            # Equal copies can still share an invalid ID for this position.
+            # All tail-specific checks must precede every batch assignment.
+            parent._validate_mutable_tail_relink(target[-1][1], original)
         assignments.append((target, owner, boundary))
 
     # Restore ancestors before descendants and re-resolve every owner after

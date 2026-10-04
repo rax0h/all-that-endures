@@ -266,8 +266,8 @@ class EventLog(Sequence):
         if self._count==0:self._last_year=None
         return old_prefix
 
-    def _relink_mutable_tail(self,index,replacement):
-        """Restoration-only replacement of one mutable tail Event reference."""
+    def _validate_mutable_tail_relink(self,index,replacement):
+        """Validate a restore target without mutating the log; return its offset."""
         self._ensure_backend_readable()
         if type(index) is not int or index<0:
             raise ValueError('EventLog relink requires a nonnegative absolute integer index')
@@ -286,6 +286,11 @@ class EventLog(Sequence):
             raise ValueError('EventLog relink would change stable event ID/order')
         if replacement.year!=current.year:
             raise ValueError('EventLog relink would change event year')
+        return offset
+
+    def _relink_mutable_tail(self,index,replacement):
+        """Restoration-only replacement of one mutable tail Event reference."""
+        offset=self._validate_mutable_tail_relink(index,replacement)
         self._tail[offset]=replacement
 
     def __getstate__(self):

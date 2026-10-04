@@ -18,8 +18,9 @@ paths distinct and supported. Python 3.12, SQLite and existing dependencies only
 **Execution:** This remains the full architecture. Work is now assigned in
 smaller reviewed slices: the composite EventLog is reviewed in
 `PERSISTENCE_P3B_EVENTLOG_REVIEW.md`, and the identity primitives are accepted in
-`PERSISTENCE_P3B_IDENTITY_REVIEW.md`. The next authorized Sol slice is ONLY
-`PERSISTENCE_P3B_IDENTITY_RESTORE.md`. Do not implement all remaining tasks below
+`PERSISTENCE_P3B_IDENTITY_REVIEW.md`. Cold identity restoration is reviewed in
+`PERSISTENCE_P3B_IDENTITY_RESTORE_REVIEW.md`. The next authorized Sol slice is
+ONLY `PERSISTENCE_P3B_COLD_CAPTURE.md`. Do not implement all remaining tasks below
 in one assignment. Test and commit the bounded slice, then stop for Astra review.
 
 ## 1. Scope and decisions
@@ -99,7 +100,9 @@ to its existing `world_event_storage` namespace:
 * `session-tail/v1`: typed tuple `(1, D, F, N, last_event_year)`, where the year
   is None iff N is zero. No event objects or per-year arrays in this record.
 * `session-commit/v1`: typed tuple `(1, target_generation, commit_token)` for
-  acknowledgement identity. Use a fresh opaque token from outside simulation
+  acknowledgement identity. Its concrete representation is a 32-character
+  lowercase hexadecimal string, as specified by `PERSISTENCE_P3B_COLD_CAPTURE.md`.
+  Use a fresh opaque token from outside simulation
   RNG for each prepared transaction; retries of that frozen transaction retain
   its token. Never use only equal values/counters as proof of writer identity.
 

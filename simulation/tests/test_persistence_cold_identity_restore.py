@@ -513,6 +513,45 @@ def test_complete_restore_batch_validates_before_any_relink(late_failure):
     assert root["right"] is not root["left"]
 
 
+@pytest.mark.parametrize("disk_backed", [False, True])
+def test_late_tail_id_validation_precedes_every_relink(tmp_path, disk_backed):
+    store = make_store(tmp_path / "preflight-id.sqlite")
+    reader = None
+    try:
+        original = event(1, year=0)
+        if disk_backed:
+            initialize_empty_prefix(store)
+            reader = SealedEventPrefix(store)
+            log = EventLog.from_disk_prefix(reader, [original])
+        else:
+            log = EventLog([original])
+        # Simulate a malformed loaded graph. Equal payload copies alone do
+        # not prove an Event's ID agrees with its absolute tail position.
+        original.id = 7
+        replacement = copy.deepcopy(original)
+        left, right = {"v": []}, {"v": []}
+        root = {"left": left, "right": right, "events": log,
+                "replacement": replacement}
+        before = frozen_identity_state(log)
+        links = [
+            (path(("key", "right")), path(("key", "left"))),
+            (path(("key", "events"), ("index", 0)),
+             path(("key", "replacement"))),
+        ]
+        with pytest.raises(ValueError, match="stable event ID"):
+            _restore_identity(root, links, mutable_event_tail_only=True)
+        assert root["right"] is right
+        assert root["right"] is not left
+        assert log._tail[0] is original
+        assert frozen_identity_state(log) == before
+        if reader is not None:
+            assert reader.diagnostics().segment_reads == 0
+    finally:
+        if reader is not None:
+            reader.close()
+        store.close()
+
+
 def test_projected_verifier_preserves_conflict_cycle_and_unexplained_rejection():
     shared = {}
     root = {"a": shared, "b": shared, "c": shared}
