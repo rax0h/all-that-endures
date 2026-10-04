@@ -237,8 +237,11 @@ class _NestedMixin:
     def _add_owners(self, owners):
         self._owners.update(owners)
 
+    def _guard(self):
+        self._session._ensure_mutation_allowed()
+
     def _touch(self):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         if not self._session._suspended:
             self._session._mark_many(self._owners)
 
@@ -266,6 +269,7 @@ class TrackedDict(_NestedMixin, dict):
         self._touch()
 
     def __delitem__(self, key):
+        self._guard()
         old = self[key]
         dict.__delitem__(self, key)
         self._detach_value(old)
@@ -296,6 +300,7 @@ class TrackedDict(_NestedMixin, dict):
         return key, self.pop(key)
 
     def clear(self):
+        self._guard()
         old = list(self.values())
         dict.clear(self)
         for value in old:
@@ -328,6 +333,7 @@ class TrackedList(_NestedMixin, list):
         self._touch()
 
     def __delitem__(self, index):
+        self._guard()
         old = self[index]
         list.__delitem__(self, index)
         if isinstance(index, slice):
@@ -350,6 +356,7 @@ class TrackedList(_NestedMixin, list):
         self._touch()
 
     def pop(self, index=-1):
+        self._guard()
         value = self[index]
         result = list.pop(self, index)
         self._detach_value(value)
@@ -361,6 +368,7 @@ class TrackedList(_NestedMixin, list):
         self.pop(index)
 
     def clear(self):
+        self._guard()
         old = list(self)
         list.clear(self)
         for value in old:
@@ -368,10 +376,12 @@ class TrackedList(_NestedMixin, list):
         self._touch()
 
     def sort(self, *args, **kwargs):
+        self._guard()
         list.sort(self, *args, **kwargs)
         self._touch()
 
     def reverse(self):
+        self._guard()
         list.reverse(self)
         self._touch()
 
@@ -380,6 +390,7 @@ class TrackedList(_NestedMixin, list):
         return self
 
     def __imul__(self, n):
+        self._guard()
         # Repetition aliases existing mutable children. P2B forbids creating
         # new shared-mutable topology through a container operator.
         if n > 1 and any(self._session._is_mutable(v) for v in self):
@@ -393,50 +404,59 @@ class TrackedSet(_NestedMixin, set):
     _ate_tracked_kind = "set"
 
     def add(self, value):
+        self._guard()
         before = len(self)
         set.add(self, value)
         if len(self) != before:
             self._touch()
 
     def discard(self, value):
+        self._guard()
         before = len(self)
         set.discard(self, value)
         if len(self) != before:
             self._touch()
 
     def remove(self, value):
+        self._guard()
         set.remove(self, value)
         self._touch()
 
     def pop(self):
+        self._guard()
         value = set.pop(self)
         self._touch()
         return value
 
     def clear(self):
+        self._guard()
         if self:
             set.clear(self)
             self._touch()
 
     def update(self, *others):
+        self._guard()
         before = set(self)
         set.update(self, *others)
         if self != before:
             self._touch()
 
     def intersection_update(self, *others):
+        self._guard()
         before = set(self)
         set.intersection_update(self, *others)
         if self != before:
             self._touch()
 
     def difference_update(self, *others):
+        self._guard()
         before = set(self)
         set.difference_update(self, *others)
         if self != before:
             self._touch()
 
     def symmetric_difference_update(self, other):
+        self._guard()
         before = set(self)
         set.symmetric_difference_update(self, other)
         if self != before:
@@ -478,7 +498,7 @@ class _RootDict(dict):
         self._session._manifest_dirty = True
 
     def __setitem__(self, key, value):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         owner = (self._namespace, key)
         exists = key in self
         old = self.get(key, _MISSING)
@@ -494,7 +514,7 @@ class _RootDict(dict):
         self._session._mark(owner)
 
     def __delitem__(self, key):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         owner = (self._namespace, key)
         old = self[key]
         dict.__delitem__(self, key)
@@ -556,7 +576,7 @@ class _RootRecordTable(RecordTable):
         self._session._manifest_dirty = True
 
     def __setitem__(self, key, record):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         owner = (self._namespace, key)
         exists = key in self
         old = self.get(key, _MISSING)
@@ -576,7 +596,7 @@ class _RootRecordTable(RecordTable):
         self._session._mark(owner)
 
     def __delitem__(self, key):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         owner = (self._namespace, key)
         old = self[key]
         dict.__delitem__(self, key)
@@ -706,7 +726,7 @@ class _RootList(list):
         return self
 
     def _replace_from(self, raw):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         old = list(self)
         prepared = [
             self._session._prepare_nested(value, {(self._namespace, i)}, allow_existing=True)
@@ -751,7 +771,7 @@ class _RootSet(set):
         self._session._manifest_dirty = True
 
     def add(self, value):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         self._session._changed_member_work += 1
         if value in self:
             return
@@ -771,20 +791,20 @@ class _RootSet(set):
         self._stable()
 
     def discard(self, value):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         self._session._changed_member_work += 1
         if value in self:
             self._discard_existing(value)
 
     def remove(self, value):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         self._session._changed_member_work += 1
         if value not in self:
             raise KeyError(value)
         self._discard_existing(value)
 
     def pop(self):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         if not self:
             raise KeyError("pop from an empty set")
         value = next(iter(self))
