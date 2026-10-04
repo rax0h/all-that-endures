@@ -2228,12 +2228,17 @@ class IncrementalWorldSession:
             return value
         if isinstance(value, EventLog):
             memo[ident] = value
-            items = (
-                iter_mutable_event_items(value)
-                if self._cold_mode
-                else enumerate(value)
-            )
-            for _index, event in items:
+            if self._cold_mode:
+                # Close teardown owns only the resident mutable tail.  Do not
+                # consult the disk prefix here: direct store.close(), stale and
+                # recovery-required sessions must still release bindings.
+                events = (
+                    event for event in value._tail
+                    if event.__dict__.get("_sealed", False) is not True
+                )
+            else:
+                events = iter(value)
+            for event in events:
                 self._unwrap_value(event, memo)
             return value
         return value
