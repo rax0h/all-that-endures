@@ -1,11 +1,11 @@
-name: p3b-cold-save-focused-v8
+name: p3b-cold-save-final-validation
 on:
   push:
     branches: [sol/p3b-cold-save-candidate]
 jobs:
-  focused:
+  validation:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 75
     env:
       PYTHONPATH: .:simulation
     steps:
@@ -14,18 +14,14 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest
-      - name: cold save focused
+      - name: affected persistence
         run: >
-          python -m pytest -q -s
-          simulation/tests/test_persistence_cold_save.py
-          simulation/tests/test_persistence_cold_save_failures.py
-          simulation/tests/test_persistence_cold_save_bounds.py
-          simulation/tests/test_persistence_session_open.py
-          simulation/tests/test_persistence_event_log.py
-          simulation/tests/test_persistence_event_identity.py
-          simulation/tests/test_persistence_events.py
-          simulation/tests/test_persistence_tracking.py
-          simulation/tests/test_persistence_p2b_followup.py
-          simulation/tests/test_persistence_p2b_identity_review.py
-          simulation/tests/test_persistence_p2b_review_regressions.py
-          simulation/tests/test_persistence_p2c.py
+          python -m pytest -q
+          simulation/tests/test_incremental_store.py
+          simulation/tests/test_persistence*.py
+          simulation/tests/test_cold_history.py
+          simulation/tests/test_event_year_queries.py
+          simulation/tests/test_canonical_digest.py
+          simulation/tests/test_history_archive.py
+      - name: full simulation tests
+        run: python -m pytest -q simulation/tests
