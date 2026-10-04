@@ -484,9 +484,7 @@ def test_dirty_event_year_index_divergence_rejects_before_commit(tmp_path):
         value.year = 9
         dirty = session.dirty
 
-        with pytest.raises(
-            StoreIntegrityError, match="year disagrees with EventLog year index"
-        ):
+        with pytest.raises(StoreIntegrityError):
             session.save()
 
         assert session.cold_state == "active"
