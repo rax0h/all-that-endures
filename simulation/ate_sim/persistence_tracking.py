@@ -37,6 +37,52 @@ _ORIGINAL_SETATTR = {}
 _EVENTLOG_INSTALLED = False
 
 
+class _ColdLifetime:
+    """Tiny runtime-only guard retained by a cold World after session close."""
+
+    def __init__(self, session):
+        self._session_ref = weakref.ref(session)
+        self.closed = False
+
+    def _session(self):
+        session = self._session_ref()
+        if self.closed or session is None or not session._active:
+            raise StoreError("cold World session is closed")
+        return session
+
+    def ensure_mutation(self, _operation="mutation"):
+        self._session()._ensure_mutation_allowed()
+
+    def ensure_simulation(self, _operation="simulation"):
+        self._session()._ensure_mutation_allowed()
+
+    def begin_step(self):
+        session = self._session()
+        session._ensure_mutation_allowed()
+        if session._cold_step_depth:
+            raise StoreError("reentrant cold simulation step is not allowed")
+        session._cold_step_depth += 1
+
+    def end_step(self):
+        session = self._session_ref()
+        if session is not None and session._cold_step_depth:
+            session._cold_step_depth -= 1
+
+    def ensure_eventlog_read(self):
+        session = self._session()
+        if (
+            session._cold_state == "recovery-required"
+            and session._cold_publication_phase is not None
+        ):
+            raise StoreError(
+                "cold EventLog is unavailable until save acknowledgement resolves"
+            )
+
+    def close(self):
+        self.closed = True
+        self._session_ref = lambda: None
+
+
 def _binding(value):
     return _BINDINGS.get(id(value))
 
@@ -58,6 +104,8 @@ def _install_assignment_hooks():
             token = None
             assigned = value
             if bound is not None:
+                if not bound.session._suspended:
+                    bound.session._ensure_mutation_allowed()
                 token = bound.before_assignment(self, name, value)
                 if token is not None and token[0] in ("owned", "root_collection", "root_collection_normalize"):
                     assigned = token[-1]
@@ -80,6 +128,7 @@ def _install_eventlog_hooks():
     def append(log, event):
         bound = _binding(log)
         if bound is not None:
+            bound.session._ensure_mutation_allowed()
             bound.event_append_preflight(log, event)
         original_append(log, event)
         if bound is not None:
@@ -87,14 +136,19 @@ def _install_eventlog_hooks():
 
     def event_seal(event):
         was_sealed = event.__dict__.get("_sealed") is True
+        bound = _binding(event)
+        if bound is not None:
+            bound.session._ensure_mutation_allowed()
         original_event_seal(event)
         if was_sealed:
             return
-        bound = _binding(event)
         if bound is not None:
             bound.event_sealed(event)
 
     def seal_before(log, year):
+        bound = _binding(log)
+        if bound is not None:
+            bound.session._ensure_mutation_allowed()
         before = len(log._chunks)
         retired = []
         cursor = 0
@@ -107,7 +161,6 @@ def _install_eventlog_hooks():
             )
             cursor += log.chunk_size
         original_seal(log, year)
-        bound = _binding(log)
         if bound is not None and len(log._chunks) != before:
             start = log._disk_count + before * log.chunk_size
             bound.event_chunks_changed(log, start, tuple(retired))
@@ -1264,6 +1317,7 @@ class IncrementalWorldSession:
             active.remove(ident)
 
     def _prepare_nested(self, value, owners, *, allow_existing=False):
+        self._ensure_mutation_allowed()
         self._validate_incoming(value, owners, allow_existing=allow_existing)
         return self._bind_nested(
             value, owners, initial=False, allow_existing=allow_existing
