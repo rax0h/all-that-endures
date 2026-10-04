@@ -292,29 +292,26 @@ def test_failure_after_journal_cleanup_resolves_idempotently(
     try:
         session.world.currency.wallets[1]["value"] = 2
         before = session.generation
-        original_apply = cold_save._apply_persisted_key_changes
         fired = {"value": False}
 
-        def fail_after_journal_cleanup(_session, _plan):
-            if not fired["value"]:
+        def fail_after_cleanup(phase, _session, _plan):
+            if phase == "after_journal_cleanup" and not fired["value"]:
                 fired["value"] = True
                 raise RuntimeError("after journal cleanup")
-            return original_apply(_session, _plan)
 
-        monkeypatch.setattr(
-            cold_save, "_apply_persisted_key_changes",
-            fail_after_journal_cleanup,
-        )
+        monkeypatch.setattr(cold_save, "_cold_save_phase", fail_after_cleanup)
         with pytest.raises(RuntimeError, match="after journal cleanup"):
             session.save()
 
         assert session.cold_state == "recovery-required"
+        assert session._cold_publication_phase == "bookkeeping"
         assert session.store.generation == before + 1
         assert session.generation == before
         assert session.dirty == frozenset()
 
         monkeypatch.setattr(
-            cold_save, "_apply_persisted_key_changes", original_apply
+            cold_save, "_cold_save_phase",
+            lambda _phase, _session, _plan: None,
         )
         assert session.resolve_save() == before + 1
         assert session.cold_state == "active"
@@ -329,7 +326,6 @@ def test_failure_after_journal_cleanup_resolves_idempotently(
         assert session.generation == before + 1
     finally:
         session.close()
-
 
 def test_publication_failure_after_adoption_resolves_idempotently(
     tmp_path, monkeypatch
