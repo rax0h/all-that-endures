@@ -742,7 +742,11 @@ def _validate_acknowledged_journal(session, plan, *, allow_applied=False):
                     "acknowledged layout journal changed while publication was guarded"
                 )
         for target, owner in plan.pending_identity:
-            current = session._pending_identity_current.get(target, _MISSING)
+            if target not in session._pending_identity_current:
+                raise StoreIntegrityError(
+                    "identity journal changed while cold save was guarded"
+                )
+            current = session._pending_identity_current[target]
             if current is not owner and (
                 current is _MISSING or owner is _MISSING or current != owner
             ):
@@ -763,10 +767,10 @@ def _validate_acknowledged_journal(session, plan, *, allow_applied=False):
                     "acknowledged layout journal changed while publication was guarded"
                 )
     for target, owner in plan.pending_identity:
-        current = session._pending_identity_current.get(target, _MISSING)
-        if current is not _MISSING:
+        if target in session._pending_identity_current:
+            current = session._pending_identity_current[target]
             if current is not owner and (
-                owner is _MISSING or current != owner
+                current is _MISSING or owner is _MISSING or current != owner
             ):
                 raise StoreIntegrityError(
                     "identity journal changed while cold save was guarded"
