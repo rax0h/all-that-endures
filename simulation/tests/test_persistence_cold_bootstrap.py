@@ -319,11 +319,11 @@ def test_write_cold_snapshot_rejects_bound_active_and_disk_backed_inputs(
 def test_write_cold_snapshot_rejects_invalid_exact_event_metadata(tmp_path):
     cases = []
     wrong_id = list_world(count=2)
-    wrong_id.events[1].id = True
+    object.__setattr__(wrong_id.events[1], "id", True)
     cases.append(wrong_id)
 
     wrong_year = list_world(count=2)
-    wrong_year.events[1].year = 4.0
+    object.__setattr__(wrong_year.events[1], "year", 4.0)
     cases.append(wrong_year)
 
     wrong_next = list_world(count=2)
@@ -331,7 +331,7 @@ def test_write_cold_snapshot_rejects_invalid_exact_event_metadata(tmp_path):
     cases.append(wrong_next)
 
     backwards = list_world(count=2)
-    backwards.events[1].year = 1
+    object.__setattr__(backwards.events[1], "year", 1)
     cases.append(backwards)
 
     for i, world in enumerate(cases):
