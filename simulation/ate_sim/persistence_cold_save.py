@@ -641,7 +641,14 @@ def _capture_successor(session, plan, *, full_evidence):
             if actual_metadata != expected_metadata:
                 mismatches.append("head metadata")
             if actual_counts != plan.expected_namespace_counts:
-                mismatches.append("namespace counts")
+                expected_counts = session.codec.decode(
+                    plan.expected_namespace_counts
+                )
+                mismatches.append(
+                    "namespace counts "
+                    f"expected={expected_counts!r} "
+                    f"actual={head.namespace_counts!r}"
+                )
             if prefix != plan.after_prefix:
                 mismatches.append("prefix descriptor")
             if tail != plan.after_tail:
