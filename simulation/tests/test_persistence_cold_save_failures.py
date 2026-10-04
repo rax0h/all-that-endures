@@ -48,10 +48,17 @@ def world_with_events(count, *, seed=74001):
     return world
 
 
-def test_failure_before_commit_proves_old_and_preserves_retry(tmp_path):
+@pytest.mark.parametrize("failure_phase", ["during_writes", "before_commit"])
+def test_failure_before_commit_proves_old_and_preserves_retry(
+    tmp_path, failure_phase
+):
     path = tmp_path / "rollback.sqlite"
     world = World(1)
-    world.currency.wallets[1] = {"values": [1]}
+    world.currency.wallets[1] = {
+        "values": [1],
+        "mapping": {"a": 1},
+        "items": {1, 2},
+    }
     write_cold_snapshot(world, path, rules_id=RULES)
     session = open_world_session(path, rules_id=RULES)
     try:
@@ -61,7 +68,7 @@ def test_failure_before_commit_proves_old_and_preserves_retry(tmp_path):
         dirty = session.dirty
 
         def fail(phase):
-            if phase == "during_writes":
+            if phase == failure_phase:
                 raise RuntimeError("injected rollback")
 
         session.store._phase_hook = fail
@@ -161,6 +168,95 @@ def test_unreadable_ack_blocks_mutation_emit_step_and_log_until_resolve(
         assert session.resolve_save() == before_generation + 1
         assert session.cold_state == "active"
         assert alias == [1, 2]
+    finally:
+        session.close()
+
+
+def test_unreadable_initial_ack_can_resolve_proven_durable_old(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "durable-old.sqlite"
+    world = World(31)
+    world.currency.wallets[1] = {"values": [1]}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        alias = session.world.currency.wallets[1]["values"]
+        alias.append(2)
+        before = session.generation
+        original_capture = cold_save._capture_successor
+
+        session.store._phase_hook = (
+            lambda phase: (_ for _ in ()).throw(
+                RuntimeError("commit never started")
+            )
+            if phase == "before_transaction" else None
+        )
+        monkeypatch.setattr(
+            cold_save,
+            "_capture_successor",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                StoreError("ack unreadable")
+            ),
+        )
+        with pytest.raises(StoreError, match="uncertain"):
+            session.save()
+
+        assert session.cold_state == "recovery-required"
+        assert session.generation == before
+        assert session.store.generation == before
+        frozen = list(alias)
+        with pytest.raises(StoreError):
+            alias.pop()
+        assert list(alias) == frozen
+
+        session.store._phase_hook = lambda _phase: None
+        monkeypatch.setattr(cold_save, "_capture_successor", original_capture)
+        assert session.resolve_save() == before
+        assert session.cold_state == "active"
+        assert session.dirty
+        assert session.save() == before + 1
+    finally:
+        session.close()
+
+
+def test_publication_failure_before_adoption_resolves_once(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "before-adoption.sqlite"
+    write_cold_snapshot(
+        world_with_events(CHUNK_SIZE), path, rules_id=RULES
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        log = session.world.events
+        tail_identity = id(log._tail)
+        log.seal_before(11)
+        before = session.generation
+
+        def fail_before_adoption(phase, _session, _plan):
+            if phase == "before_adoption":
+                raise RuntimeError("before adoption")
+
+        monkeypatch.setattr(
+            cold_save, "_cold_save_phase", fail_before_adoption
+        )
+        with pytest.raises(RuntimeError, match="before adoption"):
+            session.save()
+
+        assert session.cold_state == "recovery-required"
+        assert session._cold_publication_phase == "prepared"
+        assert log._disk_count == 0
+        assert id(log._tail) == tail_identity
+
+        monkeypatch.setattr(
+            cold_save, "_cold_save_phase",
+            lambda _phase, _session, _plan: None,
+        )
+        assert session.resolve_save() == before + 1
+        assert session.resolve_save() == before + 1
+        assert log._disk_count == CHUNK_SIZE
+        assert id(log._tail) == tail_identity
     finally:
         session.close()
 
@@ -323,6 +419,84 @@ def test_save_inside_current_people_scope_fails_before_preparation(tmp_path):
         assert session.cold_state == "active"
     finally:
         session.close()
+
+
+
+def _writer_death_script():
+    return r'''
+import os, signal, sys
+from ate_sim.persistence_session import open_world_session
+path, rules, phase = sys.argv[1], sys.argv[2], sys.argv[3]
+session = open_world_session(path, rules_id=rules)
+shared = session.world.currency.wallets[1]["left"]
+shared["value"] = 2
+session.world.events.seal_before(11)
+session.store._phase_hook = (
+    lambda p: os.kill(os.getpid(), signal.SIGKILL)
+    if p == phase else None
+)
+session.save()
+'''
+
+
+@pytest.mark.parametrize(
+    "phase,published",
+    [
+        ("during_writes", False),
+        ("before_commit", False),
+        ("after_commit", True),
+    ],
+)
+def test_writer_process_death_reopens_exact_old_or_new_partition(
+    tmp_path, phase, published
+):
+    world = world_with_events(CHUNK_SIZE, seed=55)
+    shared = {"value": 1}
+    world.currency.wallets[1] = {"left": shared, "right": shared}
+    path = tmp_path / f"death-{phase}.sqlite"
+    write_cold_snapshot(world, path, rules_id=RULES)
+
+    baseline = open_world_session(path, rules_id=RULES)
+    start_generation = baseline.generation
+    baseline.close()
+
+    env = dict(os.environ)
+    root = Path(__file__).parents[2]
+    env["PYTHONPATH"] = (
+        str(root) + os.pathsep + str(root / "simulation")
+        + os.pathsep + env.get("PYTHONPATH", "")
+    )
+    proc = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            _writer_death_script(),
+            str(path),
+            RULES,
+            phase,
+        ],
+        env=env,
+    )
+    assert proc.returncode != 0
+
+    restored = open_world_session(path, rules_id=RULES)
+    try:
+        assert restored.generation == start_generation + int(published)
+        wallet = restored.world.currency.wallets[1]
+        assert wallet["left"] is wallet["right"]
+        assert wallet["left"]["value"] == (2 if published else 1)
+
+        stats = restored.world.events.storage_stats()
+        assert stats["disk_events"] == (
+            CHUNK_SIZE if published else 0
+        )
+        rows = restored.store.read_records(
+            "world.events", expected_record_schema=1
+        )
+        assert len(rows) == (0 if published else CHUNK_SIZE)
+        assert len(restored.world.events) == CHUNK_SIZE
+    finally:
+        restored.close()
 
 
 def test_corrupt_new_segment_during_lost_ack_never_trims_runtime(
