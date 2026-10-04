@@ -126,7 +126,13 @@ def _head_metadata_tuple(codec, metadata):
 
 
 def _counts_tuple(codec, counts):
-    return codec.encode(dict(counts))
+    # P1 publishes namespace_counts in sorted namespace order.  TypedCodec
+    # preserves dict insertion order, so acknowledgement evidence must use the
+    # same canonical order rather than rejecting an equal mapping.
+    return codec.encode({
+        namespace: counts[namespace]
+        for namespace in sorted(counts)
+    })
 
 
 def _event_chunk(log, number):
@@ -654,20 +660,9 @@ def _capture_successor(session, plan, *, full_evidence):
             if tail != plan.after_tail:
                 mismatches.append("tail descriptor")
             if mismatches:
-                details = []
-                if "namespace counts" in mismatches:
-                    details.append(
-                        "expected_counts="
-                        + repr(session.codec.decode(plan.expected_namespace_counts))
-                    )
-                    details.append(
-                        "actual_counts="
-                        + repr(session.codec.decode(actual_counts))
-                    )
-                suffix = ("; " + "; ".join(details)) if details else ""
                 raise StoreIntegrityError(
                     "own-token cold save successor evidence mismatch: "
-                    + ", ".join(mismatches) + suffix
+                    + ", ".join(mismatches)
                 )
 
             if full_evidence:
