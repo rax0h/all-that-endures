@@ -429,7 +429,8 @@ def test_shared_replaced_payload_sealed_before_first_save_reanchors_current_stat
         assert wallet["left"] is wallet["right"]
         assert current["child"] == [1, 2]
         assert ("world.events", 0) not in session._identity_index.owner_occurrences
-        assert session.save() == session.generation
+        before = session.generation
+        assert session.save() == before + 1
     finally:
         session.close()
 
@@ -440,6 +441,6 @@ def test_shared_replaced_payload_sealed_before_first_save_reanchors_current_stat
         assert wallet["left"] is wallet["right"]
         assert historical.data["shared"]["child"] == wallet["left"]["child"]
         assert historical.data["shared"] is not wallet["left"]
-        assert historical.data["replacement"] == ()
+        assert historical.data["replacement"] == []
     finally:
         restored.close()
