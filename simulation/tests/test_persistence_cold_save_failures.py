@@ -281,6 +281,56 @@ def test_publication_failure_before_adoption_resolves_once(
         session.close()
 
 
+def test_failure_after_journal_cleanup_resolves_idempotently(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "after-journal-cleanup.sqlite"
+    world = World(4401)
+    world.currency.wallets[1] = {"value": 1}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        session.world.currency.wallets[1]["value"] = 2
+        before = session.generation
+        original_apply = cold_save._apply_persisted_key_changes
+        fired = {"value": False}
+
+        def fail_after_journal_cleanup(_session, _plan):
+            if not fired["value"]:
+                fired["value"] = True
+                raise RuntimeError("after journal cleanup")
+            return original_apply(_session, _plan)
+
+        monkeypatch.setattr(
+            cold_save, "_apply_persisted_key_changes",
+            fail_after_journal_cleanup,
+        )
+        with pytest.raises(RuntimeError, match="after journal cleanup"):
+            session.save()
+
+        assert session.cold_state == "recovery-required"
+        assert session.store.generation == before + 1
+        assert session.generation == before
+        assert session.dirty == frozenset()
+
+        monkeypatch.setattr(
+            cold_save, "_apply_persisted_key_changes", original_apply
+        )
+        assert session.resolve_save() == before + 1
+        assert session.cold_state == "active"
+        assert session.generation == before + 1
+        assert session.dirty == frozenset()
+        assert session.world.currency.wallets[1]["value"] == 2
+        assert session.resolve_save() == before + 1
+
+        session.close()
+        session = open_world_session(path, rules_id=RULES)
+        assert session.world.currency.wallets[1]["value"] == 2
+        assert session.generation == before + 1
+    finally:
+        session.close()
+
+
 def test_publication_failure_after_adoption_resolves_idempotently(
     tmp_path, monkeypatch
 ):
