@@ -20,7 +20,7 @@ jobs:
           simulation/tests/test_persistence_session_open.py
           simulation/tests/test_persistence_cold_capture.py
           simulation/tests/test_persistence_cold_identity_restore.py
-          simulation/tests/test_persistence_identity.py
+          simulation/tests/test_persistence_p2b_identity_review.py
           simulation/tests/test_persistence_event_identity.py
           simulation/tests/test_persistence_event_log.py
       - name: affected persistence
