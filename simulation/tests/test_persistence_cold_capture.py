@@ -368,8 +368,26 @@ def test_capture_partition_shapes_and_exact_world(
             )
             assert stats["tail_events"] == fixture["N"] - fixture["F"]
         assert capture.prefix.captured_generation == generation
-        if fixture["D"]:
-            assert capture.world.events[0].id == 1
+
+        # Full typed-value comparison deliberately happens after measured
+        # capture. This covers empty, prefix-only, tail-only, >4 pending chunks
+        # and mixed partitions without weakening the lazy-capture bound.
+        codec = WorldCodec(identity_links_recorded=True)
+        for index in range(fixture["N"]):
+            actual = capture.world.events[index]
+            expected = (
+                event(index + 1, sealed=True)
+                if index < fixture["D"]
+                else event(
+                    index + 1,
+                    data={"index": index},
+                    sealed=index < fixture["F"],
+                )
+            )
+            assert codec.encode(actual) == codec.encode(expected)
+            assert ("_sealed" in vars(actual)) == ("_sealed" in vars(expected))
+            if "_sealed" in vars(expected):
+                assert vars(actual)["_sealed"] is vars(expected)["_sealed"]
         capture.prefix.close()
     finally:
         store.close()
@@ -495,6 +513,22 @@ def test_capture_requires_caller_owned_read_transaction(tmp_path):
         with pytest.raises(StoreError, match="caller-owned"):
             _capture_cold_world(store)
         assert store.diagnostics() == before
+    finally:
+        store.close()
+
+
+def test_cold_capture_requires_published_empty_prefix_descriptor(tmp_path):
+    store, fixture = build_cold_store(
+        tmp_path, disk_segments=0, pending_chunks=0, tail_count=1
+    )
+    try:
+        _republish(
+            store,
+            [RecordChange(EVENT_STORAGE, DESCRIPTOR_KEY, delete=True)],
+        )
+        with store.read_transaction():
+            with pytest.raises(StoreFormatError, match="descriptor"):
+                _capture_cold_world(store)
     finally:
         store.close()
 
@@ -1357,34 +1391,33 @@ def test_capture_generation_is_fixed_across_later_publication(tmp_path):
     store, fixture = build_cold_store(
         tmp_path, disk_segments=2, pending_chunks=0, tail_count=1
     )
-    writer = None
+    writer = TransactionalStore.open(
+        store.path,
+        codec=WorldCodec(identity_links_recorded=True),
+        expected_simulation_schema=SCHEMA,
+        expected_rules_id=RULES,
+    )
+    writer.db.execute("PRAGMA busy_timeout=0")
     try:
         with store.read_transaction() as generation:
             capture = _capture_cold_world(store)
+            assert store.db.in_transaction
             assert capture.generation == generation
             assert capture.prefix.captured_generation == generation
             assert capture.commit_descriptor.captured_generation == generation
 
-        writer = TransactionalStore.open(
-            store.path,
-            codec=WorldCodec(identity_links_recorded=True),
-            expected_simulation_schema=SCHEMA,
-            expected_rules_id=RULES,
-        )
-        metadata = writer.head_metadata()
-        writer.commit(
-            writer.generation,
-            [
-                RecordChange(
-                    EVENT_STORAGE,
-                    COMMIT_DESCRIPTOR_KEY,
-                    (1, writer.generation + 1, "fedcba9876543210fedcba9876543210"),
-                    record_schema=SESSION_DESCRIPTOR_SCHEMA,
-                )
-            ],
-            (),
-            metadata,
-        )
+            # Rollback-journal mode lets the writer prepare but not publish over
+            # the pinned reader snapshot. P1 must roll the failed attempt back.
+            with pytest.raises(sqlite3.OperationalError):
+                _republish(writer)
+            assert writer.generation == generation
+            assert capture.generation == generation
+            assert capture.prefix.event_count == fixture["D"]
+
+        # Once the caller releases the read transaction, the same real P1
+        # publication succeeds. The old capture remains fixed to its generation.
+        new_generation = _republish(writer)
+        assert new_generation == generation + 1
         assert writer.generation == generation + 1
         assert capture.generation == generation
         assert capture.prefix.captured_generation == generation
@@ -1398,10 +1431,8 @@ def test_capture_generation_is_fixed_across_later_publication(tmp_path):
         fresh.prefix.close()
         capture.prefix.close()
     finally:
-        if writer is not None:
-            writer.close()
+        writer.close()
         store.close()
-
 
 def test_legacy_snapshot_and_binding_apis_reject_cold_but_noncold_still_work(
     tmp_path,
