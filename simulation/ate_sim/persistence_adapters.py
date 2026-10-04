@@ -627,6 +627,55 @@ def _read_manifest(store):
     return manifest
 
 
+def _read_cold_manifest(store):
+    """Read the exact P3B cold manifest plus accepted collections overlay."""
+    metadata = {
+        key: value
+        for key, value, _ in store.read_records(
+            META, expected_record_schema=RECORD_SCHEMA
+        )
+    }
+    if set(metadata) not in ({'manifest'}, {'manifest', COLLECTION_LAYOUT}):
+        raise StoreFormatError('unexpected snapshot metadata')
+    manifest = metadata['manifest']
+    if type(manifest) is not dict or manifest.get('schema') != SCHEMA:
+        raise StoreFormatError('unsupported World adapter schema')
+    keys = set(manifest)
+    cold_keys = {
+        'schema', 'collections', 'identity_storage', 'event_storage'
+    }
+    if keys != cold_keys:
+        legacy_current = {
+            'schema', 'collections', 'identity_storage'
+        }
+        legacy_links = {'schema', 'collections', 'identity_links'}
+        if keys in (legacy_current, legacy_links):
+            raise StoreFormatError(
+                'cold capture requires conversion to sealed-prefix-tail/v1'
+            )
+        raise StoreFormatError('mixed/unsupported cold World manifest')
+    if manifest['identity_storage'] != IDENTITY_STORAGE_CURRENT:
+        raise StoreFormatError('unknown identity storage mode')
+    if manifest['event_storage'] != 'sealed-prefix-tail/v1':
+        raise StoreFormatError('unknown cold event storage mode')
+
+    expected_paths = {
+        root + '.' + name
+        for root, names in ROOT_FIELDS.items()
+        for name, kind in names.items()
+        if kind != 'state'
+    }
+    collections = manifest['collections']
+    if type(collections) is not dict or set(collections) != expected_paths:
+        raise StoreFormatError('missing/unknown canonical collection roots')
+    if COLLECTION_LAYOUT in metadata:
+        layout = metadata[COLLECTION_LAYOUT]
+        if type(layout) is not dict or set(layout) != expected_paths:
+            raise StoreFormatError('missing/unknown canonical collection roots')
+        manifest = dict(manifest, collections=layout)
+    return manifest
+
+
 def _validate_identity_link(target, owner):
     if type(target) is not tuple or type(owner) is not tuple:
         raise StoreFormatError('identity paths require tuples')
@@ -641,6 +690,21 @@ def _validate_identity_link(target, owner):
                 raise StoreFormatError('invalid identity path component')
 
 
+def _read_current_identity_links(store):
+    rows = store.read_records(
+        IDENTITY_LINKS, expected_record_schema=IDENTITY_LINK_SCHEMA
+    )
+    links = []
+    seen = set()
+    for target, owner, _schema in rows:
+        _validate_identity_link(target, owner)
+        if target in seen:
+            raise StoreIntegrityError('duplicate identity target')
+        seen.add(target)
+        links.append((target, owner))
+    return links
+
+
 def _read_identity_links(store, manifest, namespaces):
     mode = _identity_mode(manifest)
     expected_paths = {
@@ -653,18 +717,7 @@ def _read_identity_links(store, manifest, namespaces):
     if mode == 'current':
         if namespaces != base | {IDENTITY_LINKS}:
             raise StoreFormatError('wrong namespace inventory for current identity storage')
-        rows = store.read_records(
-            IDENTITY_LINKS, expected_record_schema=IDENTITY_LINK_SCHEMA
-        )
-        links = []
-        seen = set()
-        for target, owner, _schema in rows:
-            _validate_identity_link(target, owner)
-            if target in seen:
-                raise StoreIntegrityError('duplicate identity target')
-            seen.add(target)
-            links.append((target, owner))
-        return mode, links
+        return mode, _read_current_identity_links(store)
     if IDENTITY_LINKS in namespaces or namespaces not in (
         base, base | {IDENTITY_DELTAS}
     ):

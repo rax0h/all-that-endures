@@ -77,6 +77,16 @@ class StoreDiagnostics:
 
 
 @dataclass(frozen=True)
+class CheckedHead:
+    """Checksum-validated bounded save-head snapshot from one row."""
+
+    generation: int
+    parent_generation: int | None
+    metadata: dict[str, Any]
+    namespace_counts: dict[str, tuple[int, int]]
+
+
+@dataclass(frozen=True)
 class CheckedSegment:
     """Decoded immutable segment plus checksum-protected storage metadata."""
 
@@ -694,6 +704,63 @@ class TransactionalStore:
             "next_ids": self.codec.decode(row[2]),
             "namespaces": self.codec.decode(row[3]),
         }
+
+    def checked_head(self) -> CheckedHead:
+        """Return one checksum-validated decoded head row without scanning payloads."""
+        self._ensure_open()
+        row = self.db.execute(
+            "SELECT generation,parent_generation,simulation_position,seed,next_ids,"
+            "namespace_inventory,namespace_counts,head_checksum "
+            "FROM save_head WHERE singleton=1"
+        ).fetchone()
+        if row is None:
+            raise StoreIntegrityError("missing save head")
+        if _head_checksum(*row[:-1]) != row[-1]:
+            raise StoreIntegrityError("save head checksum mismatch")
+
+        generation, parent = row[0], row[1]
+        if type(generation) is not int or generation < 0:
+            raise StoreIntegrityError("invalid save head generation")
+        if parent is not None and (type(parent) is not int or parent < 0):
+            raise StoreIntegrityError("invalid save head parent generation")
+        if generation == 0:
+            if parent is not None:
+                raise StoreIntegrityError("initial save head has a parent generation")
+        elif parent is None or parent >= generation:
+            raise StoreIntegrityError("invalid save head generation lineage")
+
+        metadata = {
+            "simulation_position": self.codec.decode(row[2]),
+            "seed": row[3],
+            "next_ids": self.codec.decode(row[4]),
+            "namespaces": self.codec.decode(row[5]),
+        }
+        try:
+            position, seed, next_ids, namespaces = _head_values(
+                self.codec, metadata
+            )
+        except (TypeError, ValueError) as exc:
+            raise StoreIntegrityError("invalid save head metadata") from exc
+        if (
+            position != row[2]
+            or seed != row[3]
+            or next_ids != row[4]
+            or namespaces != row[5]
+        ):
+            raise StoreIntegrityError("noncanonical save head metadata")
+
+        counts = _namespace_counts(self.codec, row[6])
+        inventory = set(metadata["namespaces"])
+        if not set(counts).issubset(inventory):
+            raise StoreIntegrityError(
+                "namespace counts are outside head inventory"
+            )
+        return CheckedHead(
+            generation=generation,
+            parent_generation=parent,
+            metadata=metadata,
+            namespace_counts=counts,
+        )
 
     def diagnostics(self) -> StoreDiagnostics:
         return StoreDiagnostics(self._payload_reads, self._payload_read_bytes, self._payload_writes, self._payload_write_bytes)
