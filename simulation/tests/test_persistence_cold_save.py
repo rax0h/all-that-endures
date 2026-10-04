@@ -2,7 +2,7 @@ import pytest
 
 from ate_sim.core import Event, Layer, World
 from ate_sim.event_log import EventLog
-from ate_sim.incremental_store import TransactionalStore
+from ate_sim.incremental_store import StoreIntegrityError, TransactionalStore
 from ate_sim.persistence_adapters import RECORD_SCHEMA, SCHEMA, WorldCodec
 from ate_sim.persistence_cold_save import prepare_cold_save
 from ate_sim.persistence_events import CHUNK_SIZE, SealedEventPrefix
@@ -385,7 +385,7 @@ def test_invalid_dirty_event_rejects_before_commit_and_keeps_retry_state(
         before_dirty = session.dirty
 
         object.__setattr__(value, "id", 99)
-        with pytest.raises(Exception):
+        with pytest.raises(StoreIntegrityError, match="ID discontinuity"):
             session.save()
 
         assert session.cold_state == "active"
