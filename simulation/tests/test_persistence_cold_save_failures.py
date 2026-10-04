@@ -895,3 +895,35 @@ def test_closed_cold_world_values_remain_inspectable_but_simulation_stays_blocke
         loaded.emit("closed", Layer.REALITY)
     with pytest.raises(StoreError):
         Simulation(loaded)
+
+
+def test_save_called_from_inside_simulation_step_is_rejected_before_prepare(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "inside-step.sqlite"
+    write_cold_snapshot(World(14), path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    sim = Simulation(session.world)
+    observed = {}
+    original_weather = sim._weather
+    try:
+        def probe_weather():
+            before_generation = session.generation
+            before_state = session.cold_state
+            with pytest.raises(StoreError, match="completed simulation step"):
+                session.save()
+            observed["generation"] = session.generation
+            observed["state"] = session.cold_state
+            assert session.generation == before_generation
+            assert session.cold_state == before_state
+            return original_weather()
+
+        monkeypatch.setattr(sim, "_weather", probe_weather)
+        sim.step()
+        assert observed == {
+            "generation": session.generation,
+            "state": "active",
+        }
+        assert session._cold_step_depth == 0
+    finally:
+        session.close()
