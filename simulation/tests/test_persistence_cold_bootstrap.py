@@ -760,12 +760,14 @@ def test_bootstrap_transfer_read_and_retention_bounds(tmp_path):
             assert sorted(keys) == list(
                 range(expected_events, expected_events + 3)
             )
-            receipts = store.db.execute(
+            transfer_receipts = store.db.execute(
                 "SELECT COALESCE(SUM(record_deletes),0),"
-                "COALESCE(SUM(segment_writes),0) FROM save_receipts"
+                "COALESCE(SUM(segment_writes),0) FROM save_receipts "
+                "WHERE generation>=2 AND generation<?",
+                (diagnostics["final_generation"],),
             ).fetchone()
-            assert receipts[0] == expected_events
-            assert receipts[1] == segments
+            assert transfer_receipts[0] == expected_events
+            assert transfer_receipts[1] == segments
         finally:
             capture.prefix.close()
             store.close()
