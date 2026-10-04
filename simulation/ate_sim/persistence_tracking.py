@@ -37,6 +37,54 @@ _ORIGINAL_SETATTR = {}
 _EVENTLOG_INSTALLED = False
 
 
+class _ColdLifetime:
+    """Tiny runtime-only guard retained by a cold World after session close."""
+
+    def __init__(self, session):
+        self._session_ref = weakref.ref(session)
+        self.closed = False
+
+    def _session(self):
+        session = self._session_ref()
+        if self.closed or session is None or not session._active:
+            raise StoreError("cold World session is closed")
+        return session
+
+    def ensure_mutation(self, _operation="mutation"):
+        self._session()._ensure_mutation_allowed()
+
+    def ensure_simulation(self, _operation="simulation"):
+        self._session()._ensure_mutation_allowed()
+
+    def begin_step(self):
+        session = self._session()
+        session._ensure_mutation_allowed()
+        if session._cold_step_depth:
+            raise StoreError("reentrant cold simulation step is not allowed")
+        session._cold_step_depth += 1
+
+    def end_step(self):
+        session = self._session_ref()
+        if session is not None and session._cold_step_depth:
+            session._cold_step_depth -= 1
+
+    def ensure_eventlog_read(self):
+        session = self._session()
+        if session._suspended:
+            return
+        if (
+            session._cold_state == "recovery-required"
+            and session._cold_publication_phase is not None
+        ):
+            raise StoreError(
+                "cold EventLog is unavailable until save acknowledgement resolves"
+            )
+
+    def close(self):
+        self.closed = True
+        self._session_ref = lambda: None
+
+
 def _binding(value):
     return _BINDINGS.get(id(value))
 
@@ -58,6 +106,8 @@ def _install_assignment_hooks():
             token = None
             assigned = value
             if bound is not None:
+                if not bound.session._suspended:
+                    bound.session._ensure_mutation_allowed()
                 token = bound.before_assignment(self, name, value)
                 if token is not None and token[0] in ("owned", "root_collection", "root_collection_normalize"):
                     assigned = token[-1]
@@ -80,6 +130,7 @@ def _install_eventlog_hooks():
     def append(log, event):
         bound = _binding(log)
         if bound is not None:
+            bound.session._ensure_mutation_allowed()
             bound.event_append_preflight(log, event)
         original_append(log, event)
         if bound is not None:
@@ -87,14 +138,19 @@ def _install_eventlog_hooks():
 
     def event_seal(event):
         was_sealed = event.__dict__.get("_sealed") is True
+        bound = _binding(event)
+        if bound is not None:
+            bound.session._ensure_mutation_allowed()
         original_event_seal(event)
         if was_sealed:
             return
-        bound = _binding(event)
         if bound is not None:
             bound.event_sealed(event)
 
     def seal_before(log, year):
+        bound = _binding(log)
+        if bound is not None:
+            bound.session._ensure_mutation_allowed()
         before = len(log._chunks)
         retired = []
         cursor = 0
@@ -107,7 +163,6 @@ def _install_eventlog_hooks():
             )
             cursor += log.chunk_size
         original_seal(log, year)
-        bound = _binding(log)
         if bound is not None and len(log._chunks) != before:
             start = log._disk_count + before * log.chunk_size
             bound.event_chunks_changed(log, start, tuple(retired))
@@ -184,8 +239,11 @@ class _NestedMixin:
     def _add_owners(self, owners):
         self._owners.update(owners)
 
+    def _guard(self):
+        self._session._ensure_mutation_allowed()
+
     def _touch(self):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         if not self._session._suspended:
             self._session._mark_many(self._owners)
 
@@ -213,6 +271,7 @@ class TrackedDict(_NestedMixin, dict):
         self._touch()
 
     def __delitem__(self, key):
+        self._guard()
         old = self[key]
         dict.__delitem__(self, key)
         self._detach_value(old)
@@ -243,6 +302,7 @@ class TrackedDict(_NestedMixin, dict):
         return key, self.pop(key)
 
     def clear(self):
+        self._guard()
         old = list(self.values())
         dict.clear(self)
         for value in old:
@@ -275,6 +335,7 @@ class TrackedList(_NestedMixin, list):
         self._touch()
 
     def __delitem__(self, index):
+        self._guard()
         old = self[index]
         list.__delitem__(self, index)
         if isinstance(index, slice):
@@ -297,6 +358,7 @@ class TrackedList(_NestedMixin, list):
         self._touch()
 
     def pop(self, index=-1):
+        self._guard()
         value = self[index]
         result = list.pop(self, index)
         self._detach_value(value)
@@ -308,6 +370,7 @@ class TrackedList(_NestedMixin, list):
         self.pop(index)
 
     def clear(self):
+        self._guard()
         old = list(self)
         list.clear(self)
         for value in old:
@@ -315,10 +378,12 @@ class TrackedList(_NestedMixin, list):
         self._touch()
 
     def sort(self, *args, **kwargs):
+        self._guard()
         list.sort(self, *args, **kwargs)
         self._touch()
 
     def reverse(self):
+        self._guard()
         list.reverse(self)
         self._touch()
 
@@ -327,6 +392,7 @@ class TrackedList(_NestedMixin, list):
         return self
 
     def __imul__(self, n):
+        self._guard()
         # Repetition aliases existing mutable children. P2B forbids creating
         # new shared-mutable topology through a container operator.
         if n > 1 and any(self._session._is_mutable(v) for v in self):
@@ -340,50 +406,59 @@ class TrackedSet(_NestedMixin, set):
     _ate_tracked_kind = "set"
 
     def add(self, value):
+        self._guard()
         before = len(self)
         set.add(self, value)
         if len(self) != before:
             self._touch()
 
     def discard(self, value):
+        self._guard()
         before = len(self)
         set.discard(self, value)
         if len(self) != before:
             self._touch()
 
     def remove(self, value):
+        self._guard()
         set.remove(self, value)
         self._touch()
 
     def pop(self):
+        self._guard()
         value = set.pop(self)
         self._touch()
         return value
 
     def clear(self):
+        self._guard()
         if self:
             set.clear(self)
             self._touch()
 
     def update(self, *others):
+        self._guard()
         before = set(self)
         set.update(self, *others)
         if self != before:
             self._touch()
 
     def intersection_update(self, *others):
+        self._guard()
         before = set(self)
         set.intersection_update(self, *others)
         if self != before:
             self._touch()
 
     def difference_update(self, *others):
+        self._guard()
         before = set(self)
         set.difference_update(self, *others)
         if self != before:
             self._touch()
 
     def symmetric_difference_update(self, other):
+        self._guard()
         before = set(self)
         set.symmetric_difference_update(self, other)
         if self != before:
@@ -425,7 +500,7 @@ class _RootDict(dict):
         self._session._manifest_dirty = True
 
     def __setitem__(self, key, value):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         owner = (self._namespace, key)
         exists = key in self
         old = self.get(key, _MISSING)
@@ -441,7 +516,7 @@ class _RootDict(dict):
         self._session._mark(owner)
 
     def __delitem__(self, key):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         owner = (self._namespace, key)
         old = self[key]
         dict.__delitem__(self, key)
@@ -503,7 +578,7 @@ class _RootRecordTable(RecordTable):
         self._session._manifest_dirty = True
 
     def __setitem__(self, key, record):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         owner = (self._namespace, key)
         exists = key in self
         old = self.get(key, _MISSING)
@@ -523,7 +598,7 @@ class _RootRecordTable(RecordTable):
         self._session._mark(owner)
 
     def __delitem__(self, key):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         owner = (self._namespace, key)
         old = self[key]
         dict.__delitem__(self, key)
@@ -653,7 +728,7 @@ class _RootList(list):
         return self
 
     def _replace_from(self, raw):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         old = list(self)
         prepared = [
             self._session._prepare_nested(value, {(self._namespace, i)}, allow_existing=True)
@@ -698,7 +773,7 @@ class _RootSet(set):
         self._session._manifest_dirty = True
 
     def add(self, value):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         self._session._changed_member_work += 1
         if value in self:
             return
@@ -718,20 +793,20 @@ class _RootSet(set):
         self._stable()
 
     def discard(self, value):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         self._session._changed_member_work += 1
         if value in self:
             self._discard_existing(value)
 
     def remove(self, value):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         self._session._changed_member_work += 1
         if value not in self:
             raise KeyError(value)
         self._discard_existing(value)
 
     def pop(self):
-        self._session._ensure_active()
+        self._session._ensure_mutation_allowed()
         if not self:
             raise KeyError("pop from an empty set")
         value = next(iter(self))
@@ -862,9 +937,20 @@ class IncrementalWorldSession:
                 namespace: dict(ordinals)
                 for namespace, ordinals in baseline_ordinals.items()
             }
+            self._cold_head = capture.head
+            self._cold_prefix_descriptor = capture.prefix_descriptor
+            self._cold_tail_descriptor = capture.tail_descriptor
+            self._cold_commit_descriptor = capture.commit_descriptor
+            self._cold_committed_n = capture.tail_descriptor.total_events
             self._normalize_bootstrap()
             self._bind_roots()
             self._bootstrap_identity_index()
+            self._initialize_cold_persisted_keys()
+            self._cold_lifetime = _ColdLifetime(self)
+            object.__setattr__(
+                self.world, "_ate_persistence_lifetime", self._cold_lifetime
+            )
+            self.world.events._ate_persistence_lifetime = self._cold_lifetime
         except Exception:
             self._undo_bound_roots()
             self._undo_bootstrap()
@@ -910,6 +996,19 @@ class IncrementalWorldSession:
         self._bootstrap_originals = {}
         self._bound_root_originals = {}
         self._initial_links = []
+        self._cold_state = "active" if self._cold_mode else None
+        self._cold_plan = None
+        self._cold_publication_phase = None
+        self._cold_old_prefix_pending = None
+        self._cold_persisted_keys = {}
+        self._cold_step_depth = 0
+        self._cold_operation_depth = 0
+        self._cold_head = None
+        self._cold_prefix_descriptor = None
+        self._cold_tail_descriptor = None
+        self._cold_commit_descriptor = None
+        self._cold_committed_n = 0
+        self._cold_lifetime = None
 
     def __enter__(self):
         return self
@@ -920,6 +1019,56 @@ class IncrementalWorldSession:
     def _ensure_active(self):
         if not self._active:
             raise StoreError("incremental World session is closed")
+        if self._cold_mode:
+            self.store._ensure_open()
+
+    def _ensure_cold_operation(self, operation):
+        self._ensure_active()
+        if not self._cold_mode:
+            raise StoreError(f"{operation} is only available for cold World sessions")
+        if self._cold_operation_depth:
+            raise StoreError(f"reentrant cold session {operation} is not allowed")
+
+    def _ensure_mutation_allowed(self):
+        self._ensure_active()
+        if self._cold_mode and self._cold_state != "active":
+            raise StoreError(
+                f"cold World session mutation is blocked while {self._cold_state}"
+            )
+
+    def _initialize_cold_persisted_keys(self):
+        if not self._cold_mode:
+            return
+        from .persistence_events import (
+            DESCRIPTOR_KEY, EVENT_STORAGE
+        )
+        from .persistence_session import (
+            COMMIT_DESCRIPTOR_KEY, TAIL_DESCRIPTOR_KEY
+        )
+        keys = {
+            META: {"manifest"},
+            IDENTITY_LINKS: set(self._committed_identity_targets),
+            EVENT_STORAGE: {
+                DESCRIPTOR_KEY,
+                TAIL_DESCRIPTOR_KEY,
+                COMMIT_DESCRIPTOR_KEY,
+            },
+        }
+        if self._cold_head.namespace_counts.get(META, (0, 0))[0] == 2:
+            keys[META].add(COLLECTION_LAYOUT)
+        for namespace, (_obj, _name) in self._scalar_fields.items():
+            keys[namespace] = {0}
+        for namespace, container in self._root_containers.items():
+            if namespace == "world.events":
+                continue
+            kind = self._base_kind(self._description(namespace)[0])
+            if kind in ("dict", "RecordTable"):
+                keys[namespace] = set(container)
+            elif kind == "list":
+                keys[namespace] = set(range(len(container)))
+            elif kind == "set":
+                keys[namespace] = set(container._by_ordinal)
+        self._cold_persisted_keys = keys
 
     def _is_mutable(self, value):
         return isinstance(value, _NestedMixin) or type(value) in (dict, list, set, RecordTable, EventLog) or _mutable_record(value)
@@ -1196,6 +1345,7 @@ class IncrementalWorldSession:
             active.remove(ident)
 
     def _prepare_nested(self, value, owners, *, allow_existing=False):
+        self._ensure_mutation_allowed()
         self._validate_incoming(value, owners, allow_existing=allow_existing)
         return self._bind_nested(
             value, owners, initial=False, allow_existing=allow_existing
@@ -1705,6 +1855,10 @@ class IncrementalWorldSession:
             owner for owner in bound.owners
             if owner[0] == "world.events"
         )
+        for owner in owners:
+            # Sealing changes the row value even though the Event immediately
+            # stops being mutable LOG identity.
+            self._mark_storage_only(owner)
         self._retire_log_owners(
             (owner, event) for owner in owners
         )
@@ -1939,13 +2093,11 @@ class IncrementalWorldSession:
         return True
 
     def save(self):
-        """Commit only journaled owners. Dirty state clears after confirmed commit."""
+        """Commit one legacy incremental save or one atomic cold generation."""
         self._ensure_active()
         if self._cold_mode:
-            raise StoreError(
-                "cold World session save is not implemented; "
-                "close/reopen or continue without saving"
-            )
+            from .persistence_cold_save import save_cold
+            return save_cold(self)
         if not self._dirty and not self._deleted and not self._manifest_dirty:
             return self.generation
         changes = self._changes()
@@ -1980,6 +2132,16 @@ class IncrementalWorldSession:
         self._identity_dirty = False
         self._identity_dirty_owners.clear()
         return generation
+
+    def resolve_save(self):
+        if not self._cold_mode:
+            raise StoreError("resolve_save is only available for cold World sessions")
+        from .persistence_cold_save import resolve_cold_save
+        return resolve_cold_save(self)
+
+    @property
+    def cold_state(self):
+        return self._cold_state
 
     def diagnostics(self):
         return self.store.diagnostics()
@@ -2057,17 +2219,26 @@ class IncrementalWorldSession:
             # P2A restores dataclasses from declared fields only. Mirror that
             # state on detach so stale query caches cannot affect continuation.
             for name in tuple(getattr(value, "__dict__", ())):
-                if name not in declared and not (cls is Event and name == "_sealed"):
+                if (
+                    name not in declared
+                    and not (cls is Event and name == "_sealed")
+                    and name != "_ate_persistence_lifetime"
+                ):
                     value.__dict__.pop(name, None)
             return value
         if isinstance(value, EventLog):
             memo[ident] = value
-            items = (
-                iter_mutable_event_items(value)
-                if self._cold_mode
-                else enumerate(value)
-            )
-            for _index, event in items:
+            if self._cold_mode:
+                # Close teardown owns only the resident mutable tail.  Do not
+                # consult the disk prefix here: direct store.close(), stale and
+                # recovery-required sessions must still release bindings.
+                events = (
+                    event for event in value._tail
+                    if event.__dict__.get("_sealed", False) is not True
+                )
+            else:
+                events = iter(value)
+            for event in events:
                 self._unwrap_value(event, memo)
             return value
         return value
@@ -2085,22 +2256,46 @@ class IncrementalWorldSession:
     def close(self):
         if not self._active:
             return
+        if self._cold_mode and self._cold_operation_depth:
+            raise StoreError("cannot close during an active cold session operation")
         error = None
         try:
             self._unbind_world()
+        except StoreError as exc:
+            # A caller may have directly closed the owned store.  Cold close
+            # must still be an idempotent resource-release operation; the
+            # earlier mutation/read attempt already surfaced the closed-store
+            # error, so teardown does not re-raise it.
+            if not (self._cold_mode and getattr(self.store, "_closed", False)):
+                error = exc
         except Exception as exc:
             error = exc
         finally:
             self._active = False
-            self._clear_bindings()
-            prefix = (
+            current_prefix = (
                 self.world.events._disk_prefix
                 if self._cold_mode
                 and isinstance(self.world.events, EventLog)
                 else None
             )
-            if prefix is not None:
-                prefix.close()
+            pending_old_prefix = (
+                self._cold_old_prefix_pending if self._cold_mode else None
+            )
+            self._clear_bindings()
+            if current_prefix is not None:
+                current_prefix.close()
+            if (
+                pending_old_prefix is not None
+                and pending_old_prefix is not current_prefix
+            ):
+                pending_old_prefix.close()
+            self._cold_old_prefix_pending = None
+            self._cold_plan = None
+            self._cold_publication_phase = None
+            if self._cold_mode:
+                self._cold_state = "closed"
+                if self._cold_lifetime is not None:
+                    self._cold_lifetime.close()
             self._memo.clear()
             self._memo_reverse.clear()
             self._bound_root_originals.clear()

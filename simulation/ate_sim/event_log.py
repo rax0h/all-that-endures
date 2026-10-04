@@ -83,7 +83,10 @@ class EventLog(Sequence):
             raise ValueError('non-empty disk prefix requires an integer last year')
         return count
 
-    def _ensure_backend_readable(self):
+    def _ensure_backend_readable(self,*,internal=False):
+        marker=self.__dict__.get('_ate_persistence_lifetime')
+        if marker is not None and not internal:
+            marker.ensure_eventlog_read()
         if self._disk_prefix is not None:
             count=len(self._disk_prefix)
             if count!=self._disk_count:
@@ -208,7 +211,7 @@ class EventLog(Sequence):
         validation finishes before pending chunks are discarded. The returned old
         reader remains caller-owned.
         """
-        self._ensure_backend_readable()
+        self._ensure_backend_readable(internal=True)
         if self._disk_prefix is None:
             raise ValueError('prefix adoption requires an existing disk prefix')
         if type(transferred_events) is not int or transferred_events<0:
@@ -254,7 +257,18 @@ class EventLog(Sequence):
                 raise ValueError('replacement prefix changed without a transfer')
 
         remaining=self._count-new_count
-        first_remaining_year=self[new_count].year if remaining else None
+        first_remaining_year=None
+        if remaining:
+            local=new_count-self._disk_count
+            pending=len(self._chunks)*self.chunk_size
+            if local<pending:
+                number,offset=divmod(local,self.chunk_size)
+                first_remaining_year=self._chunk(number)[offset].year
+            else:
+                offset=local-pending
+                if offset<0 or offset>=len(self._tail):
+                    raise ValueError('replacement prefix leaves invalid suffix boundary')
+                first_remaining_year=self._tail[offset].year
         years,offsets=self._pruned_suffix_year_index(new_count,first_remaining_year)
 
         old_prefix=self._disk_prefix

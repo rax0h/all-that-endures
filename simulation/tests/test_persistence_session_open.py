@@ -326,10 +326,8 @@ def test_open_world_session_partition_shapes_are_clean_and_lazy(
         assert stats["disk_segment_reads"] == 0
         assert stats["disk_cache_segments"] == 0
 
-        generation = session.generation
-        with pytest.raises(StoreError, match="cold World session save"):
-            session.save()
-        assert session.generation == generation
+        assert session.cold_state == "active"
+        assert session.generation == expected["generation"]
         assert session.dirty == frozenset()
     finally:
         session.close()
@@ -549,9 +547,9 @@ def test_direct_store_close_invalidates_disk_history(tmp_path):
     session.store.close()
     with pytest.raises(StoreError):
         _ = session.world.events[0]
-    with pytest.raises(StoreError):
-        session.close()
+    session.close()
     assert not session._active
+    assert session.cold_state == "closed"
 
 
 def test_open_failure_after_partial_binding_leaks_no_global_bindings(
