@@ -862,9 +862,15 @@ class IncrementalWorldSession:
                 namespace: dict(ordinals)
                 for namespace, ordinals in baseline_ordinals.items()
             }
+            self._cold_head = capture.head
+            self._cold_prefix_descriptor = capture.prefix_descriptor
+            self._cold_tail_descriptor = capture.tail_descriptor
+            self._cold_commit_descriptor = capture.commit_descriptor
+            self._cold_committed_n = capture.tail_descriptor.total_events
             self._normalize_bootstrap()
             self._bind_roots()
             self._bootstrap_identity_index()
+            self._initialize_cold_persisted_keys()
         except Exception:
             self._undo_bound_roots()
             self._undo_bootstrap()
@@ -910,6 +916,18 @@ class IncrementalWorldSession:
         self._bootstrap_originals = {}
         self._bound_root_originals = {}
         self._initial_links = []
+        self._cold_state = "active" if self._cold_mode else None
+        self._cold_plan = None
+        self._cold_publication_phase = None
+        self._cold_old_prefix_pending = None
+        self._cold_persisted_keys = {}
+        self._cold_step_depth = 0
+        self._cold_operation_depth = 0
+        self._cold_head = None
+        self._cold_prefix_descriptor = None
+        self._cold_tail_descriptor = None
+        self._cold_commit_descriptor = None
+        self._cold_committed_n = 0
 
     def __enter__(self):
         return self
@@ -920,6 +938,56 @@ class IncrementalWorldSession:
     def _ensure_active(self):
         if not self._active:
             raise StoreError("incremental World session is closed")
+        if self._cold_mode:
+            self.store._ensure_open()
+
+    def _ensure_cold_operation(self, operation):
+        self._ensure_active()
+        if not self._cold_mode:
+            raise StoreError(f"{operation} is only available for cold World sessions")
+        if self._cold_operation_depth:
+            raise StoreError(f"reentrant cold session {operation} is not allowed")
+
+    def _ensure_mutation_allowed(self):
+        self._ensure_active()
+        if self._cold_mode and self._cold_state != "active":
+            raise StoreError(
+                f"cold World session mutation is blocked while {self._cold_state}"
+            )
+
+    def _initialize_cold_persisted_keys(self):
+        if not self._cold_mode:
+            return
+        from .persistence_events import (
+            DESCRIPTOR_KEY, EVENT_STORAGE
+        )
+        from .persistence_session import (
+            COMMIT_DESCRIPTOR_KEY, TAIL_DESCRIPTOR_KEY
+        )
+        keys = {
+            META: {"manifest"},
+            IDENTITY_LINKS: set(self._committed_identity_targets),
+            EVENT_STORAGE: {
+                DESCRIPTOR_KEY,
+                TAIL_DESCRIPTOR_KEY,
+                COMMIT_DESCRIPTOR_KEY,
+            },
+        }
+        if self._cold_head.namespace_counts.get(META, (0, 0))[0] == 2:
+            keys[META].add(COLLECTION_LAYOUT)
+        for namespace, (_obj, _name) in self._scalar_fields.items():
+            keys[namespace] = {0}
+        for namespace, container in self._root_containers.items():
+            if namespace == "world.events":
+                continue
+            kind = self._base_kind(self._description(namespace)[0])
+            if kind in ("dict", "RecordTable"):
+                keys[namespace] = set(container)
+            elif kind == "list":
+                keys[namespace] = set(range(len(container)))
+            elif kind == "set":
+                keys[namespace] = set(container._by_ordinal)
+        self._cold_persisted_keys = keys
 
     def _is_mutable(self, value):
         return isinstance(value, _NestedMixin) or type(value) in (dict, list, set, RecordTable, EventLog) or _mutable_record(value)
@@ -1939,13 +2007,11 @@ class IncrementalWorldSession:
         return True
 
     def save(self):
-        """Commit only journaled owners. Dirty state clears after confirmed commit."""
+        """Commit one legacy incremental save or one atomic cold generation."""
         self._ensure_active()
         if self._cold_mode:
-            raise StoreError(
-                "cold World session save is not implemented; "
-                "close/reopen or continue without saving"
-            )
+            from .persistence_cold_save import save_cold
+            return save_cold(self)
         if not self._dirty and not self._deleted and not self._manifest_dirty:
             return self.generation
         changes = self._changes()
@@ -1980,6 +2046,16 @@ class IncrementalWorldSession:
         self._identity_dirty = False
         self._identity_dirty_owners.clear()
         return generation
+
+    def resolve_save(self):
+        if not self._cold_mode:
+            raise StoreError("resolve_save is only available for cold World sessions")
+        from .persistence_cold_save import resolve_cold_save
+        return resolve_cold_save(self)
+
+    @property
+    def cold_state(self):
+        return self._cold_state
 
     def diagnostics(self):
         return self.store.diagnostics()
