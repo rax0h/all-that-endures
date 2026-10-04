@@ -472,3 +472,29 @@ def test_planner_encoding_failure_keeps_active_dirty_retry_state(tmp_path):
         assert session.save() == before + 1
     finally:
         session.close()
+
+
+def test_dirty_event_year_index_divergence_rejects_before_commit(tmp_path):
+    path = tmp_path / "invalid-year.sqlite"
+    write_cold_snapshot(world_with_events(2, seed=26), path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        value = session.world.events[1]
+        before = session.generation
+        value.year = 9
+        dirty = session.dirty
+
+        with pytest.raises(
+            StoreIntegrityError, match="year disagrees with EventLog year index"
+        ):
+            session.save()
+
+        assert session.cold_state == "active"
+        assert session.generation == before
+        assert session.store.generation == before
+        assert session.dirty == dirty
+
+        value.year = 10
+        assert session.save() == before + 1
+    finally:
+        session.close()
