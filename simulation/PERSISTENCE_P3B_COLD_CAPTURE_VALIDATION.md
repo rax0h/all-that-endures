@@ -1,89 +1,33 @@
-# P3B cold World capture validation
+# P3B cold World capture — completed acceptance-gate validation
 
-Architect review update: this document records the submitted implementation's
-evidence, not final acceptance. See `PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md` for
-two corrected typed-validation defects and outstanding evidence, and
-`PERSISTENCE_P3B_COLD_CAPTURE_FOLLOWUP.md` for the bounded next assignment.
+Status: bounded follow-up evidence for
+`PERSISTENCE_P3B_COLD_CAPTURE_FOLLOWUP.md`, 2026-10-04 UTC.
 
-Status: implementation evidence for `PERSISTENCE_P3B_COLD_CAPTURE.md`,
-2026-10-03.
+Accepted review/fix baseline:
+`af85515f71ae54860b15fade27861b3dcb0330e5`.
 
-Accepted starting head:
-`21a1bc217d7e73e03c4ce55e1daa47220bf017a4`.
+Fully tested follow-up candidate:
+`4707d008e36331593b815087f9583db7589a41c1`.
 
-Fully tested candidate:
-`bbbd1d727ca95918d51c35c3bc1219fde01d9569`.
+The candidate preserves the six typed-metadata regression fixes already landed
+by the architect review. The expanded acceptance suite demonstrated **no
+additional product defect**, so no product Python file changed in this follow-up.
+The only tested repository content change is
+`simulation/tests/test_persistence_cold_capture.py`. The pre-existing isolated
+candidate workflow was reused unchanged and is not part of the PR landing.
 
-This slice captures one complete **unbound** World from the specified P3B cold
-format while borrowing an already-open `TransactionalStore` and one
-caller-owned read transaction. It does not expose a public session API and does
-not implement binding, save/recovery, conversion, detach or checkpoint
-integration.
+## Final test results
 
-## Implemented boundary
+Isolated candidate workflow run: `37177047684`  
+Job: `111361740420`
 
-### Checked bounded head access
-
-`TransactionalStore.checked_head()` reads one save-head row and verifies its
-existing checksum before returning:
-
-- generation and parent generation;
-- decoded head metadata;
-- committed namespace record/segment counts.
-
-It validates canonical decoded metadata and that all nonzero namespace counts
-belong to the published inventory. It does not enumerate records or segments,
-run `integrity_check`, scrub payloads or open/close a transaction.
-
-### Cold-format capture
-
-New internal `ate_sim.persistence_session._capture_cold_world(store)`:
-
-- requires an active caller-owned `read_transaction()`;
-- accepts only the explicit cold manifest mode with
-  `identity_storage="current-links/v1"` and
-  `event_storage="sealed-prefix-tail/v1"`;
-- validates canonical namespace inventory, committed counts, effective
-  collections layout, P3A descriptor, `session-tail/v1` and
-  `session-commit/v1`;
-- requires a 32-character lowercase hexadecimal commit token;
-- captures the P3A reader with
-  `SealedEventPrefix.from_active_read_transaction(store)`;
-- requires reader/head/commit generation agreement;
-- restores all non-event canonical collections through the accepted checked
-  adapter paths;
-- reads only `world.events` rows in the resident suffix `[D,N)`, orders them
-  numerically by absolute index and validates exact keys, ordinals, IDs,
-  chronology, sealed flags and frozen sealed values;
-- constructs the accepted composite `EventLog` with the immutable disk prefix
-  left lazy and exactly `F-D` persisted sealed events packed into pending
-  chunks;
-- validates World seed/year/next-ID counters, including
-  `next_event == N + 1`;
-- restores P2C current identity links using the accepted cold preflight/relink
-  helpers and verifies the projected current graph before returning.
-
-The returned internal `ColdWorldCapture` contains the reconstructed World,
-borrowed prefix reader, captured generation, checked head, effective manifest,
-current identity links and validated prefix/tail/commit descriptors. It does
-not retain raw suffix rows or expanded pending-event rows separately.
-
-On failure, any created prefix reader is closed while the caller-owned store and
-read transaction remain untouched. On success, the caller owns the returned
-reader lifetime.
-
-## Validation
-
-Isolated candidate workflow run: `37168195017`  
-Job: `111335498658`
-
-| Gate | Result |
+| Gate | Actual result |
 | --- | --- |
-| focused cold capture + accepted P3B identity/EventLog | **76 passed in 75.17s** |
-| affected persistence/EventLog | **264 passed in 227.16s** |
-| full `simulation/tests` | **431 passed in 472.06s** |
+| focused cold capture + accepted identity/EventLog suites | **140 passed in 128.46s** |
+| affected persistence/EventLog suite | **328 passed in 287.84s** |
+| full `simulation/tests` suite | **495 passed in 538.72s** |
 
-Commands:
+Commands were the unchanged bounded candidate commands:
 
 ```sh
 PYTHONPATH=.:simulation python -m pytest -q -s \
@@ -103,64 +47,231 @@ PYTHONPATH=.:simulation python -m pytest -q \
 PYTHONPATH=.:simulation python -m pytest -q simulation/tests
 ```
 
-## 4 / 40 / 400-segment bounds
+No millennium/endurance, calibration, gameplay, balance, Stage 1 or checkpoint
+workflow was invoked.
 
-Each fixture has the same current World shape, one resident pending sealed
-chunk and three resident tail Events. Capture is measured before any cold point
-access.
+## Enforced 4 / 40 / 400 bounds
 
-| Disk segments | Checked payload reads | Checked payload bytes | Segment payload reads | Disk cache | Pending cache | Pending bytes | Tail events | Projected groups | Projected paths |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 4 | 2,084 | 704,473 | **0** | **0** | **0** | 10,410 | 3 | 87 | 87 |
-| 40 | 2,084 | 709,904 | **0** | **0** | **0** | 10,707 | 3 | 87 | 87 |
-| 400 | 2,084 | 716,070 | **0** | **0** | **0** | 10,707 | 3 | 87 | 87 |
+The follow-up converts the earlier printed observations into assertions. Each
+real P1/P3A fixture has the same current World, exactly one compressed pending
+chunk and three resident mutable-tail Events. The test fixture no longer returns
+or retains its expanded decoded suffix.
 
-The checked record-read count, tail size and projected identity size are
-identical as immutable prefix history grows from 4 to 400 segments. The small
-payload-byte increase is attributable to larger descriptor/index integer text,
-not history payload reads. Capture performs zero P3A segment payload reads and
-starts with an empty disk cache and pending decode cache.
+During **capture only**:
 
-After capture, first point access to an old event reads exactly one cold
-segment; repeated access to the same event uses the accepted bounded prefix
-cache without another checked segment read.
+* SQLite authorizer access to the `segments` table is denied. Any segment
+  payload/header/count enumeration would make the test fail.
+* `EventLog._chunk` is replaced with a failing guard, so pending decode during
+  capture would fail.
+* `SealedEventPrefix.__iter__` is replaced with a failing guard, so historical
+  prefix iteration would fail.
+* cold point access is performed only after those guards are removed.
 
-A fixture with an unread cold segment checksum corrupted after publication
-still captures successfully, demonstrating the deliberately lazy guarantee;
-the first checked access to that segment then raises integrity failure. Current
-suffix/record corruption remains eager because those records are read during
-capture.
+Actual enforced measurements:
 
-## Behavioral evidence
+| Disk segments | Checked record reads | Checked bytes | Segment reads | Disk cache | Pending segments | Pending cache | Pending compressed bytes | Tail Events | Year entries | Offset entries | Projected groups | Projected paths |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 4 | 2,084 | 704,473 | **0** | **0** | 1 | **0** | 10,410 | 3 | 1 | 1 | 87 | 87 |
+| 40 | 2,084 | 709,904 | **0** | **0** | 1 | **0** | 10,707 | 3 | 1 | 1 | 87 | 87 |
+| 400 | 2,084 | 716,070 | **0** | **0** | 1 | **0** | 10,707 | 3 | 1 | 1 | 87 | 87 |
 
-Focused coverage establishes:
+Assertions require equal checked-record read count, pending/tail cardinalities,
+resident year/index cardinalities and projected identity graph size across all
+three prefix lengths. The byte count is deliberately not required to be equal:
+absolute IDs/indices and descriptor integer text grow with history size.
 
-- empty, prefix-only, tail-only, >4 pending-chunk and mixed partition capture;
-- exact World seed/year/next-ID restoration and composite EventLog boundaries;
-- current tail parent/descendant identity relinking across independently
-  persisted payload copies;
-- an identity endpoint into excluded pending history fails without reading a
-  cold segment;
-- use outside a caller-owned read transaction fails before capture work;
-- a save-head corrupted after opening the connection is caught by the new
-  checked-head checksum accessor;
-- successful capture preserves a reader that remains usable after the caller
-  exits the capture transaction while the store stays open;
-- failed capture leaves the borrowed store and outer read transaction under
-  caller control;
-- first cold access is lazy and then obeys accepted cache behavior.
+After capture, first access to event 0 reads exactly one checked disk segment.
+Repeating the same access reuses the accepted bounded cache without another
+payload read.
 
-The accepted P2/P3A/P3B persistence suites remain green in the affected and full
-suite runs.
+## Retention evidence
+
+`test_capture_does_not_retain_decoded_pending_events` intercepts the independently
+decoded suffix at the loader boundary and keeps **only weak references** to its
+Events. After `_capture_cold_world` returns and collection runs:
+
+* every decoded Event belonging to the pending sealed range is unreachable;
+* all three mutable-tail Events remain reachable through the returned World;
+* the EventLog retains one compressed pending segment, zero decoded pending
+  cache segments and three tail Events.
+
+The fixture itself no longer returns its expanded suffix, so source fixture
+Events are not a hidden retention root during the measurement. This proves the
+specified resident suffix boundary; it does not claim O(1) memory for the entire
+World or for an arbitrarily large unsaved pending backlog.
+
+## Completed malformed-input matrix
+
+The follow-up publishes valid-checksum damage with real P1 commits and advances
+`session-commit/v1` unless commit-descriptor corruption is the subject under
+test.
+
+`test_cold_capture_rejects_malformed_suffix` covers:
+
+* missing and extra suffix rows;
+* a below-D row while keeping record cardinality stable;
+* boolean typed key;
+* wrong and boolean envelope ordinals;
+* wrong and boolean Event IDs;
+* non-integer Event year;
+* decreasing suffix chronology;
+* first suffix year below the captured prefix boundary;
+* a twelve-position suffix so numeric ordering is exercised independently of
+  encoded/SQLite lexical key order.
+
+`test_cold_capture_rejects_invalid_sealing` covers:
+
+* an unsealed Event in `[D,F)`;
+* an Event claiming sealed state while retaining mutable data;
+* malformed sealed-flag representation rejected by WorldCodec before
+  publication.
+
+`test_cold_capture_rejects_descriptor_and_layout_damage` covers:
+
+* missing empty/required prefix descriptor and an extra descriptor;
+* boolean D/F/N values;
+* D > F, F > N and non-chunk-aligned D/F;
+* last-year mismatch;
+* invalid commit token, descriptor version and captured generation;
+* prefix/head segment-count mismatch;
+* suffix/head record-count mismatch;
+* records in the segment namespace and segments in a record-only namespace;
+* malformed `collections/v1` overlay;
+* typed boolean/float EventLog description damage through the effective overlay.
+
+The six architect-added typed metadata/layout regressions remain present:
+boolean/float EventLog totals/chunk counts plus float head year and boolean
+head next-person counter.
+
+`test_cold_capture_rejects_wrong_modes` covers:
+
+* supported non-cold P2C input with explicit conversion-required failure;
+* unknown event-storage and identity-storage modes;
+* mixed manifest authority;
+* missing and unknown canonical roots;
+* legacy identity-delta namespace authority.
+
+`test_cold_capture_eagerly_rejects_current_record_checksum_damage` proves
+checksum corruption in both the resident event suffix and an ordinary current
+World record is eager. The checksum mutation always changes a hex character.
+
+`test_cold_capture_rejects_real_world_head_counter_disagreement` separately
+proves a correctly typed, correctly checksummed but semantically wrong head
+counter fails against the reconstructed World.
+
+## Exact values and identity
+
+`test_capture_restores_every_declared_non_event_root_field_exactly` compares
+**every declared non-event root field** from an independent source World to the
+captured World through `WorldCodec(identity_links_recorded=True).encode`.
+Representative nested wallet/genealogy values and nontrivial dictionary/set
+order are included; dictionary insertion order is asserted directly.
+
+`test_capture_restores_exact_event_values_flags_and_boundaries` independently
+constructs expected disk, pending and tail Events and compares their accepted
+typed representation after capture. It covers exact:
+
+* IDs and order;
+* equal-year partition boundaries plus a later tail year;
+* kind/layer;
+* actors and location Refs;
+* causes;
+* nested typed data including bool/int/float distinction, signed zero and a
+  fixed NaN bit pattern;
+* sealed-flag presence/value, including an individually sealed tail Event.
+
+The existing parent/descendant alias test remains green and verifies current
+tail identity restoration with Python `is`.
+
+The historical-link test is now parameterized over disk prefix, pending history
+and an individually sealed tail occurrence, in both target and owner directions.
+It requires a specific format/integrity failure while the SQL segment guard is
+active; no cold segment access is permitted.
+
+## Reader, transaction and generation ownership
+
+`test_capture_failure_after_reader_creation_closes_reader_and_preserves_owner`
+forces suffix failure **after** prefix-reader allocation. It observes the exact
+reader created by the loader and proves:
+
+* the reader is closed on failure;
+* the caller's read transaction remains active and checked-head access works;
+* the borrowed store remains open.
+
+`test_capture_success_reader_and_store_lifetime_boundaries` proves:
+
+* after the caller exits its successful capture transaction, the reader and
+  disk EventLog remain usable while the store is open;
+* explicit reader close produces the accepted reader-closed failure;
+* store close produces the accepted borrowed-store-closed failure.
+
+`test_capture_generation_remains_fixed_across_later_publication` uses two
+real store connections. All captured components agree on one generation inside
+the caller transaction. After that transaction exits, the second connection
+publishes a new P1 generation. The prior capture retains its original
+generation, prefix descriptor/length and readable old prefix.
+
+`test_legacy_apis_reject_cold_input` confirms legacy detached snapshot reading
+and incremental binding still reject cold-format input; their ordinary modes
+remain covered by the existing P2 full suite.
+
+## Lazy-corruption boundary
+
+The unread-segment damage tests are deterministic:
+
+* one case always changes the stored checksum;
+* one case physically removes an unread segment.
+
+In both cases capture succeeds because normal capture is intentionally lazy.
+The first checked point access fails, and explicit `verify_full()` also fails.
+A separate healthy control captures the same four-segment shape and
+`verify_full()` succeeds with the expected segment/event counts.
+
+## Capture-spec requirement map
+
+1. **Complete exact World / partition shapes** —  
+   `test_capture_partition_shapes_and_exact_world`,
+   `test_capture_restores_every_declared_non_event_root_field_exactly`,
+   `test_capture_restores_exact_event_values_flags_and_boundaries`.
+2. **Current aliases + forbidden sealed LOG paths** —  
+   `test_capture_restores_tail_parent_and_descendant_aliases`,
+   `test_forbidden_historical_identity_links_fail_before_cold_io`.
+3. **Malformed suffix/descriptors/modes/counts/head** —  
+   `test_cold_capture_rejects_malformed_suffix`,
+   `test_cold_capture_rejects_invalid_sealing`,
+   `test_cold_capture_rejects_descriptor_and_layout_damage`,
+   `test_cold_capture_rejects_wrong_modes`,
+   `test_cold_capture_eagerly_rejects_current_record_checksum_damage`,
+   typed-metadata regressions and checked-head corruption tests.
+4. **One caller transaction / failure and generation ownership** —  
+   `test_capture_requires_caller_owned_read_transaction`,
+   `test_capture_failure_after_reader_creation_closes_reader_and_preserves_owner`,
+   `test_capture_success_reader_and_store_lifetime_boundaries`,
+   `test_capture_generation_remains_fixed_across_later_publication`.
+5. **4/40/400 lazy bounded capture + retention** —  
+   `test_capture_enforces_4_40_400_read_and_retention_bounds`,
+   `test_capture_does_not_retain_decoded_pending_events`.
+6. **First cold read/cache + lazy corruption/full scrub** —  
+   the enforced-bounds point-read assertions,
+   `test_lazy_capture_defers_unread_segment_damage_but_access_and_scrub_fail`,
+   `test_healthy_capture_explicit_full_verification_control`.
+7. **Legacy/current P2 + accepted P3A/P3B regressions** —  
+   `test_legacy_apis_reject_cold_input` plus the 328-test affected and
+   495-test full-suite passes.
 
 ## Remaining boundary
 
-This is an internal, unbound capture helper only. It does not create a public
-World/session API, bind tracking hooks, publish saves, recover acknowledgements,
-retire tracking/binding ownership, detach Worlds, convert formats, integrate
-checkpoints/exports or prove independent resumed simulation. The returned
-EventLog continues to borrow the caller-owned store through the P3A prefix
-reader.
+This completes evidence for the internal **unbound cold capture** slice only.
+It does not implement or prove:
 
-No millennium/endurance run, balance or magic-progression change, Stage 1 work,
-normal checkpoint replacement, workflow change or PR merge was performed.
+* a public owned World/session API;
+* tracking/binding of the captured World;
+* atomic incremental cold save/publication or acknowledgement recovery;
+* ownership retirement, detach or public close guards;
+* checkpoint/export integration or conversion;
+* independent resumed simulation equivalence;
+* a bound on total current-World memory or arbitrary unsaved backlog.
+
+No public/session/save integration, EventLog/P3A redesign, persistence format
+change, workflow landing, millennium/endurance run, balance change, Stage 1,
+checkpoint replacement or merge was performed.
