@@ -1,6 +1,11 @@
 # P3B cold-save validation evidence
 
-**Status:** implementation complete; stop for Astra review.  
+**Status:** reviewed; corrections required before architect acceptance.
+See `PERSISTENCE_P3B_COLD_SAVE_REVIEW.md` for the original findings, candidate
+fixes at `cff9d58`, the remaining R2.1 identity-deletion recovery case, and
+missing retained/peak allocation evidence. The candidate has 9 targeted passes;
+it is not landed or architect-accepted, and needs affected/full validation. The completed CI results below
+remain valid historical evidence for the tested cases.  
 **Scope:** `simulation/PERSISTENCE_P3B_COLD_SAVE.md` only.  
 **PR branch baseline:** `19fe6c90bced632ac57e83d60822212a0b554491`.  
 **Final tested candidate:** `b46a77da020752c6e346e4ab17691f6b4aacf3b1`.
@@ -68,7 +73,9 @@ python -m pytest -q simulation/tests
 
 ## Contract proved by the focused and affected tests
 
-The implementation proves the requested cold-session save boundary:
+The existing tests exercise the following cold-session paths. The review finds
+that global key-copy work and interrupted journal cleanup are not covered; the
+claims of bounded total preparation work and complete idempotence remain pending:
 
 - exact D/F/N event authority partition and exact reopen coverage;
 - at most four leading resident sealed chunks transferred per save;
@@ -104,3 +111,4 @@ The candidate-only workflow `.github/workflows/p3b-cold-save-focused.yml` is val
 ## Scope exclusions preserved
 
 No detach/export expansion, checkpoint-default replacement, millennium/endurance run, balance change, Stage 1 work, unrelated feature work or merge is included in this slice.
+

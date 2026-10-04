@@ -25,9 +25,11 @@ is accepted in `PERSISTENCE_P3B_COLD_BOOTSTRAP_VALIDATION.md`. Live cold
 open/bind/close and semantic sealing-owner retirement are accepted at
 `2819391359fa3e2e16f9c8e3151e99ce06d8a373`; see
 `PERSISTENCE_P3B_LIVE_OPEN_REVIEW.md`. The ONLY next authorized Sol slice is
-`PERSISTENCE_P3B_COLD_SAVE.md`: atomic cold save/recovery and the mutation guards
-needed for its failure states. Detach/export/checkpoint integration remains
-separate. Test and commit that bounded slice, then stop for Astra review.
+`PERSISTENCE_P3B_COLD_SAVE_REVIEW.md`: bounded corrections to atomic cold
+save/recovery reviewed at `0bbc797`, including candidate follow-up at `cff9d58`. `PERSISTENCE_P3B_COLD_SAVE.md` remains the
+underlying contract. Cold save is implemented but not yet architect-accepted.
+Detach/export/checkpoint integration remains separate. Test and commit only the
+review corrections, then stop for Astra review.
 
 ## 1. Scope and decisions
 
@@ -574,3 +576,4 @@ exact tested source, commands/results, measured read/write/deletion/memory table
 failure matrix, compatibility behavior and remaining limitations. Stop for
 Astra review. P3B acceptance, P4, default checkpoint changes, long-horizon runs,
 calibration, Stage 1 and PR merge require later instructions.
+
