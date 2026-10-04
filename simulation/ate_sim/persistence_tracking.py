@@ -1773,6 +1773,10 @@ class IncrementalWorldSession:
             owner for owner in bound.owners
             if owner[0] == "world.events"
         )
+        for owner in owners:
+            # Sealing changes the row value even though the Event immediately
+            # stops being mutable LOG identity.
+            self._mark_storage_only(owner)
         self._retire_log_owners(
             (owner, event) for owner in owners
         )
