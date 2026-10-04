@@ -2249,6 +2249,8 @@ class IncrementalWorldSession:
     def close(self):
         if not self._active:
             return
+        if self._cold_mode and self._cold_operation_depth:
+            raise StoreError("cannot close during an active cold session operation")
         error = None
         try:
             self._unbind_world()
@@ -2256,15 +2258,30 @@ class IncrementalWorldSession:
             error = exc
         finally:
             self._active = False
-            self._clear_bindings()
-            prefix = (
+            current_prefix = (
                 self.world.events._disk_prefix
                 if self._cold_mode
                 and isinstance(self.world.events, EventLog)
                 else None
             )
-            if prefix is not None:
-                prefix.close()
+            pending_old_prefix = (
+                self._cold_old_prefix_pending if self._cold_mode else None
+            )
+            self._clear_bindings()
+            if current_prefix is not None:
+                current_prefix.close()
+            if (
+                pending_old_prefix is not None
+                and pending_old_prefix is not current_prefix
+            ):
+                pending_old_prefix.close()
+            self._cold_old_prefix_pending = None
+            self._cold_plan = None
+            self._cold_publication_phase = None
+            if self._cold_mode:
+                self._cold_state = "closed"
+                if self._cold_lifetime is not None:
+                    self._cold_lifetime.close()
             self._memo.clear()
             self._memo_reverse.clear()
             self._bound_root_originals.clear()
