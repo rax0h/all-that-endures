@@ -846,3 +846,304 @@ def test_review_foreign_append_rejection_is_atomic(tmp_path):
     finally:
         left.close()
         right.close()
+
+
+def _three_way_tail_alias_fixture(tmp_path, name):
+    shared = {"child": [1, 2, 3]}
+    wallets = {1: {"left": copy.deepcopy(shared), "right": copy.deepcopy(shared)}}
+    first_tail = 0
+    event_shared = (
+        ("field", "events"),
+        ("index", first_tail),
+        ("field", "data"),
+        ("key", "shared"),
+    )
+    wallet_left = (
+        ("field", "currency"),
+        ("field", "wallets"),
+        ("key", 1),
+        ("key", "left"),
+    )
+    wallet_right = (
+        ("field", "currency"),
+        ("field", "wallets"),
+        ("key", 1),
+        ("key", "right"),
+    )
+    wallet_left_child = wallet_left + (("key", "child"),)
+    wallet_right_child = wallet_right + (("key", "child"),)
+    event_child = event_shared + (("key", "child"),)
+    path, _expected = build_cold_path(
+        tmp_path / name,
+        disk_segments=0,
+        pending_chunks=0,
+        tail_count=CHUNK_SIZE,
+        wallets=wallets,
+        tail_payload={"shared": copy.deepcopy(shared)},
+        identity_links=[
+            (event_shared, wallet_left),
+            (wallet_right, wallet_left),
+            (event_child, wallet_left_child),
+            (wallet_right_child, wallet_left_child),
+        ],
+    )
+    return path
+
+
+def test_review_retirement_matches_with_or_without_prior_identity_refresh(
+    tmp_path,
+):
+    outcomes = []
+    for refresh_first in (False, True):
+        path = _three_way_tail_alias_fixture(
+            tmp_path, f"refresh-{refresh_first}"
+        )
+        session = open_world_session(path, rules_id=RULES)
+        try:
+            left = session.world.currency.wallets[1]["left"]
+            right = session.world.currency.wallets[1]["right"]
+            tail = session.world.events[0]
+            assert left is right
+            assert tail.data["shared"] is left
+            if refresh_first:
+                session._identity_dirty_owners.add(("world.events", 0))
+                session._refresh_identity_index()
+
+            session.world.events.seal_before(11)
+
+            assert left is right
+            assert all(
+                ("field", "events") not in target
+                and ("field", "events") not in owner
+                for target, owner in session._live_identity_targets.items()
+            )
+            assert any(
+                ("field", "wallets") in target
+                and ("field", "wallets") in owner
+                for target, owner in session._live_identity_targets.items()
+            )
+            left["child"].append(4)
+            assert ("world.currency.wallets", 1) in session.dirty
+            outcomes.append((
+                dict(session._live_identity_targets),
+                dict(session._pending_identity_current),
+            ))
+        finally:
+            session.close()
+    assert outcomes[0] == outcomes[1]
+
+
+def test_review_individual_seal_then_chunk_retirement_is_idempotent(
+    tmp_path,
+):
+    wallet_event = event(1, data={"value": 1})
+    event_path = (("field", "events"), ("index", 0))
+    wallet_path = (
+        ("field", "currency"),
+        ("field", "wallets"),
+        ("key", 1),
+        ("key", "event"),
+    )
+    path, _expected = build_cold_path(
+        tmp_path,
+        disk_segments=0,
+        pending_chunks=0,
+        tail_count=CHUNK_SIZE,
+        wallets={1: {"event": wallet_event}},
+        tail_payload={"value": 1},
+        identity_links=[(event_path, wallet_path)],
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        first = session.world.events[0]
+        wallet_owner = ("world.currency.wallets", 1)
+        log_owner = ("world.events", 0)
+        assert session.world.currency.wallets[1]["event"] is first
+
+        first.seal()
+        binding = _binding(first)
+        assert binding is not None
+        assert binding.owners == {wallet_owner}
+        assert log_owner not in session._identity_index.owner_occurrences
+
+        session.world.events.seal_before(11)
+        binding = _binding(first)
+        assert binding is not None
+        assert binding.owners == {wallet_owner}
+        assert session.world.currency.wallets[1]["event"] is first
+        assert log_owner not in session._identity_index.owner_occurrences
+        assert session.world.events.storage_stats()["disk_segment_reads"] == 0
+    finally:
+        session.close()
+
+
+def test_review_detached_former_payload_cannot_resurrect_log_owner(tmp_path):
+    path, _expected = build_cold_path(
+        tmp_path,
+        disk_segments=0,
+        pending_chunks=0,
+        tail_count=1,
+        tail_payload={"old": []},
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        first = session.world.events[0]
+        owner = ("world.events", 0)
+        old_child = first.data["old"]
+        first.data = {"replacement": []}
+        assert owner not in old_child._owners
+
+        dirty_before = session.dirty
+        old_child.append(9)
+        assert session.dirty == dirty_before
+
+        first.seal()
+        session._refresh_identity_index()
+        session._refresh_identity_index()
+        assert owner not in session._identity_index.owner_occurrences
+        assert owner not in session._identity_dirty_owners
+    finally:
+        session.close()
+
+
+def test_review_invalid_id_and_year_append_reject_without_partial_tracking(
+    tmp_path,
+):
+    path, _expected = build_cold_path(
+        tmp_path, disk_segments=0, pending_chunks=0, tail_count=0
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        baseline = (
+            len(session.world.events),
+            session.dirty,
+            frozenset(session._identity_dirty_owners),
+            session._manifest_dirty,
+        )
+        with pytest.raises(ValueError, match="consecutive stable IDs"):
+            session.world.events.append(event(2))
+        assert (
+            len(session.world.events),
+            session.dirty,
+            frozenset(session._identity_dirty_owners),
+            session._manifest_dirty,
+        ) == baseline
+
+        session.world.events.append(event(1, year=10))
+        after_valid = (
+            len(session.world.events),
+            session.dirty,
+            frozenset(session._identity_dirty_owners),
+            session._manifest_dirty,
+            tuple(session.world.events._years),
+            tuple(session.world.events._offsets),
+            session.world.events._last_year,
+        )
+        with pytest.raises(ValueError, match="time cannot run backwards"):
+            session.world.events.append(event(2, year=9))
+        assert (
+            len(session.world.events),
+            session.dirty,
+            frozenset(session._identity_dirty_owners),
+            session._manifest_dirty,
+            tuple(session.world.events._years),
+            tuple(session.world.events._offsets),
+            session.world.events._last_year,
+        ) == after_valid
+    finally:
+        session.close()
+
+
+@pytest.mark.parametrize("segments", [4, 40, 400])
+def test_review_append_seal_close_never_reads_cold_segments(
+    tmp_path, segments
+):
+    path, expected = build_cold_path(
+        tmp_path,
+        disk_segments=segments,
+        pending_chunks=0,
+        tail_count=0,
+    )
+    session = open_world_session(path, rules_id=RULES)
+    reader = session.world.events._disk_prefix
+    try:
+        for offset in range(CHUNK_SIZE):
+            session.world.events.append(
+                event(expected["D"] + offset + 1)
+            )
+        session.world.events.seal_before(11)
+        assert reader.diagnostics().segment_reads == 0
+        assert reader.resident_segments == 0
+    finally:
+        session.close()
+    assert reader.diagnostics().segment_reads == 0
+    assert reader.resident_segments == 0
+
+
+@pytest.mark.parametrize("groups", [100, 300, 1000])
+def test_review_retirement_work_ignores_unrelated_alias_groups(
+    tmp_path, groups
+):
+    world = World(88100 + groups)
+    for index in range(groups):
+        shared = {"values": [index]}
+        world.currency.wallets[index] = {
+            "left": shared,
+            "right": shared,
+        }
+    event_shared = world.currency.wallets[0]["left"]
+    world.events = [
+        event(1, data={"shared": event_shared})
+    ]
+    world.event_ids = {1}
+    world.next_event = 2
+    path = tmp_path / f"retirement-scale-{groups}.sqlite"
+    write_cold_snapshot(world, path, rules_id=RULES)
+
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        session.world.events[0].seal()
+        work = dict(session._identity_index.last_retirement_work)
+        assert work["owners_requested"] == 1
+        assert work["owners_removed"] == 1
+        assert work["occurrences_removed"] < 10
+        assert work["affected_groups"] < 10
+        print(
+            "P3B_LIVE_OPEN_RETIRE_SCALE "
+            f"groups={groups} "
+            f"owners={work['owners_requested']} "
+            f"occurrences={work['occurrences_removed']} "
+            f"affected={work['affected_groups']}"
+        )
+    finally:
+        session.close()
+
+
+def test_review_repeated_append_seal_releases_identity_retention(tmp_path):
+    path, _expected = build_cold_path(
+        tmp_path, disk_segments=0, pending_chunks=0, tail_count=0
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        baseline_memo = len(session._memo)
+        baseline_bound = len(session._bound_ids)
+        next_id = 1
+        for _batch in range(2):
+            for _offset in range(CHUNK_SIZE):
+                value = event(next_id, data={"child": []})
+                session.world.events.append(value)
+                next_id += 1
+            del value
+            session.world.events.seal_before(11)
+            gc.collect()
+            assert len(session._memo) == baseline_memo
+            assert len(session._bound_ids) == baseline_bound
+            assert not any(
+                owner[0] == "world.events"
+                for bound in _BINDINGS.values()
+                if bound.session is session
+                for owner in bound.owners
+            )
+            assert session.world.events.storage_stats()["disk_segment_reads"] == 0
+    finally:
+        session.close()
