@@ -2,7 +2,7 @@ import pytest
 
 from ate_sim.core import Event, Layer, World
 from ate_sim.event_log import EventLog
-from ate_sim.incremental_store import StoreIntegrityError, TransactionalStore
+from ate_sim.incremental_store import CodecError, StoreIntegrityError, TransactionalStore
 from ate_sim.persistence_adapters import RECORD_SCHEMA, SCHEMA, WorldCodec
 from ate_sim.persistence_cold_save import prepare_cold_save
 from ate_sim.persistence_events import CHUNK_SIZE, SealedEventPrefix
@@ -444,3 +444,31 @@ def test_shared_replaced_payload_sealed_before_first_save_reanchors_current_stat
         assert historical.data["replacement"] == []
     finally:
         restored.close()
+
+
+def test_planner_encoding_failure_keeps_active_dirty_retry_state(tmp_path):
+    path = tmp_path / "encode-failure.sqlite"
+    world = World(25)
+    world.currency.wallets[1] = {"ok": 1}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        wallet = session.world.currency.wallets[1]
+        wallet["bad"] = object()
+        before = session.generation
+        dirty = session.dirty
+
+        with pytest.raises(CodecError, match="unsupported typed value"):
+            session.save()
+
+        assert session.cold_state == "active"
+        assert session.generation == before
+        assert session.store.generation == before
+        assert session.dirty == dirty
+        assert "bad" in wallet
+
+        del wallet["bad"]
+        wallet["ok"] = 2
+        assert session.save() == before + 1
+    finally:
+        session.close()
