@@ -21,11 +21,14 @@ from simulation.tests.test_persistence_session_open import (
 RULES = "stage-0.5-p3b-cold-save-bounds-tests"
 
 
-def _typed_events_equal(left, right):
+def _typed_events_equal(session, right):
     codec = WorldCodec(identity_links_recorded=True)
+    left = session.world
     assert len(left.events) == len(right.events)
     for a, b in zip(left.events, right.events):
-        assert codec.encode(a) == codec.encode(b)
+        # Bound mutable payload containers are tracker subclasses.  Compare the
+        # exact persisted typed Event values, not tracker implementation types.
+        assert codec.encode(session._plain(a)) == codec.encode(b)
 
 
 def _session_binding_count(session):
@@ -74,7 +77,7 @@ def test_independent_control_matches_through_save_reopen_cycles(tmp_path):
             Simulation(control).run(2)
             Simulation(session.world).run(2)
             assert session.world.digest() == control.digest()
-            _typed_events_equal(session.world, control)
+            _typed_events_equal(session, control)
 
             before = session.generation
             generation = session.save()
@@ -88,13 +91,13 @@ def test_independent_control_matches_through_save_reopen_cycles(tmp_path):
             assert session.world.currency.wallets[-700]["left"] is (
                 session.world.currency.wallets[-700]["right"]
             )
-            _typed_events_equal(session.world, control)
+            _typed_events_equal(session, control)
 
         # Subsequent simulation after the final restore remains deterministic.
         Simulation(control).run(3)
         Simulation(session.world).run(3)
         assert session.world.digest() == control.digest()
-        _typed_events_equal(session.world, control)
+        _typed_events_equal(session, control)
     finally:
         session.close()
 
@@ -188,14 +191,19 @@ def test_cold_save_history_bounds_are_independent_of_old_prefix(
         del local_plan
         gc.collect()
 
-        local_reads_before = log._disk_prefix.diagnostics().segment_reads
+        prefix_before_local = log._disk_prefix
+        local_reads_before = prefix_before_local.diagnostics().segment_reads
         session.reset_diagnostics()
         assert session.save() == generation + 3
         local_io = session.diagnostics()
+        # q=0 still installs a generation-pinned replacement reader.  The old
+        # reader must not be touched, and the new reader starts with no segment
+        # payload reads.
         assert (
-            log._disk_prefix.diagnostics().segment_reads
+            prefix_before_local.diagnostics().segment_reads
             == local_reads_before
         )
+        assert log._disk_prefix.diagnostics().segment_reads == 0
 
         after = log.storage_stats()
         assert after["pending_sealed_bytes"] < before_pending_bytes
