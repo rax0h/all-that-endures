@@ -281,6 +281,61 @@ def test_cold_save_history_bounds_are_independent_of_old_prefix(
         session.close()
 
 
+class _CountingPersistedKeys:
+    def __init__(self, values, counter):
+        self._values = set(values)
+        self._counter = counter
+
+    def __contains__(self, value):
+        return value in self._values
+
+    def __iter__(self):
+        for value in self._values:
+            self._counter[0] += 1
+            yield value
+
+    def __len__(self):
+        return len(self._values)
+
+    def add(self, value):
+        self._values.add(value)
+
+    def discard(self, value):
+        self._values.discard(value)
+
+
+@pytest.mark.parametrize("groups", [100, 300, 1000])
+def test_local_edit_does_not_copy_unrelated_persisted_keys(tmp_path, groups):
+    world = World(87000 + groups)
+    for index in range(groups):
+        shared = {"values": [index]}
+        world.currency.wallets[index] = {
+            "left": shared,
+            "right": shared,
+        }
+
+    path = tmp_path / f"persisted-key-copy-{groups}.sqlite"
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        copied = [0]
+        session._cold_persisted_keys = {
+            namespace: _CountingPersistedKeys(keys, copied)
+            for namespace, keys in session._cold_persisted_keys.items()
+        }
+        session.world.currency.wallets[0]["left"]["values"].append(-1)
+        plan = prepare_cold_save(session)
+        assert plan is not None
+        assert plan.transfer_chunks == 0
+        assert copied[0] <= 4
+        print(
+            "P3B_COLD_SAVE_PERSISTED_KEY_COPIES "
+            f"groups={groups} copied={copied[0]}"
+        )
+    finally:
+        session.close()
+
+
 @pytest.mark.parametrize("groups", [100, 300, 1000])
 def test_cold_save_local_alias_work_is_affected_owner_bounded(
     tmp_path, groups
