@@ -913,6 +913,25 @@ class IncrementalWorldSession:
         _BINDINGS[ident] = binding
         self._bound_ids.add(ident)
 
+    def _remember_memo(self, source, replacement):
+        self._memo[id(source)] = (source, replacement)
+        self._memo_reverse[id(replacement)] = id(source)
+
+    def _drop_memo_if_unowned(self, value):
+        bound = _binding(value)
+        if bound is not None and bound.session is self and bound.owners:
+            return
+        if isinstance(value, _NestedMixin) and value._owners:
+            return
+        source_id = self._memo_reverse.get(id(value))
+        if source_id is None:
+            return
+        pair = self._memo.get(source_id)
+        if pair is None or pair[1] is not value:
+            return
+        self._memo_reverse.pop(id(value), None)
+        self._memo.pop(source_id, None)
+
     @staticmethod
     def _base_kind(kind):
         return {
@@ -1167,7 +1186,15 @@ class IncrementalWorldSession:
             for key, child in value.items():
                 self._propagate_owners(key, owners, seen)
                 self._propagate_owners(child, owners, seen)
-        elif isinstance(value, (list, tuple, EventLog, set, frozenset)):
+        elif isinstance(value, EventLog):
+            items = (
+                iter_mutable_event_items(value)
+                if self._cold_mode
+                else enumerate(value)
+            )
+            for _index, child in items:
+                self._propagate_owners(child, owners, seen)
+        elif isinstance(value, (list, tuple, set, frozenset)):
             for child in value:
                 self._propagate_owners(child, owners, seen)
 
@@ -1224,7 +1251,7 @@ class IncrementalWorldSession:
         if _mutable_record(value):
             bound = _ObjectBinding(self, owners)
             self._register_binding(value, bound)
-            self._memo[id(value)] = (value, value)
+            self._remember_memo(value, value)
             for name in RECORD_FIELDS[type(value)]:
                 child = getattr(value, name)
                 replacement = self._bind_nested(
@@ -1236,7 +1263,7 @@ class IncrementalWorldSession:
         if cls in (dict, RecordTable):
             wrapped = TrackedDict()
             wrapped._setup(self, owners)
-            self._memo[id(value)] = (value, wrapped)
+            self._remember_memo(value, wrapped)
             for key, child in value.items():
                 dict.__setitem__(
                     wrapped, key,
@@ -1246,7 +1273,7 @@ class IncrementalWorldSession:
         if cls is list:
             wrapped = TrackedList()
             wrapped._setup(self, owners)
-            self._memo[id(value)] = (value, wrapped)
+            self._remember_memo(value, wrapped)
             for child in value:
                 list.append(
                     wrapped,
@@ -1283,8 +1310,21 @@ class IncrementalWorldSession:
                 or self._contains_identity(child, target, seen)
                 for key, child in value.items()
             )
-        if isinstance(value, (list, tuple, EventLog, set, frozenset)):
-            return any(self._contains_identity(child, target, seen) for child in value)
+        if isinstance(value, EventLog):
+            items = (
+                iter_mutable_event_items(value)
+                if self._cold_mode
+                else enumerate(value)
+            )
+            return any(
+                self._contains_identity(child, target, seen)
+                for _index, child in items
+            )
+        if isinstance(value, (list, tuple, set, frozenset)):
+            return any(
+                self._contains_identity(child, target, seen)
+                for child in value
+            )
         return False
 
     @staticmethod
@@ -1447,7 +1487,15 @@ class IncrementalWorldSession:
             for key, child in value.items():
                 self._remove_owner_recursive(key, owner, seen)
                 self._remove_owner_recursive(child, owner, seen)
-        elif isinstance(value, (list, tuple, EventLog, set, frozenset)):
+        elif isinstance(value, EventLog):
+            items = (
+                iter_mutable_event_items(value)
+                if self._cold_mode
+                else enumerate(value)
+            )
+            for _index, child in items:
+                self._remove_owner_recursive(child, owner, seen)
+        elif isinstance(value, (list, tuple, set, frozenset)):
             for child in value:
                 self._remove_owner_recursive(child, owner, seen)
 
