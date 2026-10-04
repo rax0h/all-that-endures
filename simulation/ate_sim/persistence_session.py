@@ -985,6 +985,97 @@ def write_cold_snapshot(world, destination, *, rules_id):
     }
 
 
+def _capture_cold_baseline_ordinals(store, manifest):
+    """Capture stable root ordinals from the same pinned cold generation."""
+    result = {}
+    for namespace, description in manifest["collections"].items():
+        if type(description) is not tuple or len(description) != 3:
+            raise StoreFormatError(
+                f"invalid collection description: {namespace}"
+            )
+        kind = {
+            "dict-stable/v1": "dict",
+            "RecordTable-stable/v1": "RecordTable",
+            "set-stable/v1": "set",
+        }.get(description[0], description[0])
+        if kind not in ("dict", "RecordTable", "set"):
+            continue
+        rows = store.read_records(
+            namespace, expected_record_schema=RECORD_SCHEMA
+        )
+        ordinals = {}
+        seen = set()
+        for key, envelope, _schema in rows:
+            if type(envelope) is not tuple or len(envelope) != 2:
+                raise StoreFormatError("invalid entry envelope")
+            ordinal, value = envelope
+            if type(ordinal) is not int or ordinal < 0 or ordinal in seen:
+                raise StoreIntegrityError(
+                    f"invalid persisted ordinal: {namespace}"
+                )
+            seen.add(ordinal)
+            identity = value if kind == "set" else key
+            if identity in ordinals:
+                raise StoreIntegrityError(
+                    f"duplicate persisted collection member: {namespace}"
+                )
+            ordinals[identity] = ordinal
+        result[namespace] = ordinals
+    return result
+
+
+def open_world_session(path, *, rules_id):
+    """Open one cold-format World as an owned live tracked session.
+
+    This is deliberately an open/bind foundation only. Cold save/recovery is a
+    later P3B slice, so IncrementalWorldSession.save() refuses cold mode.
+    """
+    path = Path(path)
+    store = TransactionalStore.open(
+        path,
+        codec=WorldCodec(identity_links_recorded=True),
+        expected_simulation_schema=SCHEMA,
+        expected_rules_id=rules_id,
+    )
+    capture = None
+    try:
+        with store.read_transaction():
+            try:
+                raw_manifest = store.read_record(
+                    META, "manifest", expected_record_schema=RECORD_SCHEMA
+                )
+            except KeyError as exc:
+                raise StoreFormatError(
+                    "cold World session is missing its manifest"
+                ) from exc
+            if type(raw_manifest) is not dict:
+                raise StoreFormatError("invalid cold World manifest")
+            mode = raw_manifest.get("event_storage")
+            if mode is None:
+                raise StoreFormatError(
+                    "open_world_session requires cold event storage; "
+                    "run convert_event_storage first"
+                )
+            if mode != COLD_EVENT_STORAGE:
+                raise StoreFormatError(
+                    f"unsupported cold event storage mode: {mode!r}"
+                )
+            capture = _capture_cold_world(store)
+            baseline_ordinals = _capture_cold_baseline_ordinals(
+                store, capture.manifest
+            )
+    except Exception:
+        if capture is not None:
+            capture.prefix.close()
+        store.close()
+        raise
+
+    from .persistence_tracking import IncrementalWorldSession
+    return IncrementalWorldSession._from_cold_capture(
+        store, capture, baseline_ordinals
+    )
+
+
 def convert_event_storage(source, destination, *, rules_id):
     """Explicit full-cost P2-to-cold conversion with no source mutation.
 
