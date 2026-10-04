@@ -723,15 +723,37 @@ def _apply_persisted_key_changes(session, plan):
     session._cold_committed_n = plan.after_tail.total_events
 
 
-def _validate_acknowledged_journal(session, plan):
-    """Prove publication bookkeeping is either pending or already applied."""
+def _validate_acknowledged_journal(session, plan, *, allow_applied=False):
+    """Prove publication bookkeeping is pending or, on retry, already applied."""
     from .persistence_tracking import _MISSING
 
-    # resolve_save() may be retrying after publication cleared some or all of
-    # this plan's journals and then failed before final session bookkeeping.
-    # Supported mutation is blocked throughout recovery, and the durable
-    # successor has already been re-proved before this function is called, so a
-    # missing planned dirty/delete entry is an idempotent post-cleanup state.
+    if not allow_applied:
+        if not plan.dirty_owners.issubset(session._dirty):
+            raise StoreIntegrityError(
+                "cold save dirty journal changed while publication was guarded"
+            )
+        if not plan.deleted_owners.issubset(session._deleted):
+            raise StoreIntegrityError(
+                "cold save delete journal changed while publication was guarded"
+            )
+        if plan.manifest_dirty:
+            if plan.layout_value is None or not session._manifest_dirty:
+                raise StoreIntegrityError(
+                    "acknowledged layout journal changed while publication was guarded"
+                )
+        for target, owner in plan.pending_identity:
+            current = session._pending_identity_current.get(target, _MISSING)
+            if current is not owner and (
+                current is _MISSING or owner is _MISSING or current != owner
+            ):
+                raise StoreIntegrityError(
+                    "identity journal changed while cold save was guarded"
+                )
+        return
+
+    # Once publication enters bookkeeping, a retry may observe any prefix of
+    # our own idempotent cleanup. Supported mutation remains blocked, and the
+    # durable successor is re-proved before publication resumes.
     if plan.manifest_dirty:
         if plan.layout_value is None:
             raise StoreIntegrityError("acknowledged layout journal lacks a layout")
@@ -763,7 +785,6 @@ def _validate_acknowledged_journal(session, plan):
                 "identity journal changed while cold save was guarded"
             )
 
-
 def _apply_acknowledged_journal(session, plan):
     from .persistence_tracking import _MISSING
 
@@ -793,7 +814,7 @@ def publish_cold_save(session, plan, prefix):
 
     log = session.world.events
     phase = session._cold_publication_phase
-    if phase not in ("prepared", "adopted"):
+    if phase not in ("prepared", "adopted", "bookkeeping"):
         if prefix is not None:
             prefix.close()
         raise StoreIntegrityError("invalid cold save publication phase")
@@ -811,6 +832,7 @@ def publish_cold_save(session, plan, prefix):
             raise
         session._cold_publication_phase = "adopted"
         session._cold_old_prefix_pending = old_prefix
+        phase = "adopted"
         _cold_save_phase("after_adoption", session, plan)
     else:
         if prefix is not None:
@@ -826,9 +848,18 @@ def publish_cold_save(session, plan, prefix):
                 "partially published runtime prefix disagrees with save plan"
             )
 
-    _cold_save_phase("before_bookkeeping", session, plan)
-    _validate_acknowledged_journal(session, plan)
+    if phase == "adopted":
+        _cold_save_phase("before_bookkeeping", session, plan)
+        _validate_acknowledged_journal(session, plan)
+        # Mark the retry boundary before destructive cleanup. A failure anywhere
+        # after this point can safely resume idempotently from mixed pre/post
+        # journal state without weakening first-pass validation.
+        session._cold_publication_phase = "bookkeeping"
+    else:
+        _validate_acknowledged_journal(session, plan, allow_applied=True)
+
     _apply_acknowledged_journal(session, plan)
+    _cold_save_phase("after_journal_cleanup", session, plan)
     _apply_persisted_key_changes(session, plan)
 
     session.generation = plan.target_generation
