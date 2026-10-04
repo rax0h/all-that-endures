@@ -1,9 +1,9 @@
 # P3B next bounded assignment: capture a cold-format World
 
-Review update: implementation at `77c6ccd` was reviewed; two narrow typed checks
-were corrected, but this slice is not yet fully accepted. See
+Review update: this internal capture slice is fully accepted at `c5d827fe` after
+the typed-check correction and evidence follow-up. See
 `PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md`. The next authorized assignment is
-`PERSISTENCE_P3B_COLD_CAPTURE_FOLLOWUP.md`, completing this contract's evidence.
+`PERSISTENCE_P3B_COLD_BOOTSTRAP.md`; this specification is now the accepted contract.
 
 Status: architecture/implementation specification following the cold identity
 restore review. Read `PERSISTENCE_P3B_IDENTITY_RESTORE_REVIEW.md` and the parent

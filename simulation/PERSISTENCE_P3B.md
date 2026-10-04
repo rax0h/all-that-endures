@@ -19,11 +19,11 @@ paths distinct and supported. Python 3.12, SQLite and existing dependencies only
 smaller reviewed slices: the composite EventLog is reviewed in
 `PERSISTENCE_P3B_EVENTLOG_REVIEW.md`, and the identity primitives are accepted in
 `PERSISTENCE_P3B_IDENTITY_REVIEW.md`. Cold identity restoration is reviewed in
-`PERSISTENCE_P3B_IDENTITY_RESTORE_REVIEW.md`. The next authorized Sol slice is
-ONLY `PERSISTENCE_P3B_COLD_CAPTURE_FOLLOWUP.md`: finish the existing cold-capture
-acceptance gate after `PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md`. Cold capture is
-not yet fully accepted. Do not implement later session/save tasks below in this
-assignment. Test and commit the bounded follow-up, then stop for Astra review.
+`PERSISTENCE_P3B_IDENTITY_RESTORE_REVIEW.md`. Cold World capture is accepted in
+`PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md`. The next authorized Sol slice is ONLY
+`PERSISTENCE_P3B_COLD_BOOTSTRAP.md`: explicit cold creation/conversion. Do not
+implement later live session/save tasks below in this assignment. Test and commit
+the bounded slice, then stop for Astra review.
 
 ## 1. Scope and decisions
 

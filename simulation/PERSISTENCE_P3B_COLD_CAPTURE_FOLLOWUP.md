@@ -1,5 +1,9 @@
 # P3B cold capture acceptance-gate implementation plan
 
+Status: completed and accepted at `c5d827fe` on 2026-10-04 UTC. See
+`PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md`. This plan is historical; the next
+authorized assignment is `PERSISTENCE_P3B_COLD_BOOTSTRAP.md`.
+
 > **For agentic workers:** Use superpowers:executing-plans to implement this
 > bounded plan task-by-task. This is the next manual Sol handoff, not authority
 > to implement later P3B slices or dispatch a large implementation team.

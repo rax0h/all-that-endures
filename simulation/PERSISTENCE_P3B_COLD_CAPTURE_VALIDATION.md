@@ -1,5 +1,9 @@
 # P3B cold World capture — completed follow-up validation
 
+Architect acceptance: complete within the internal unbound-capture scope at
+`c5d827fe248f88b4825d9b51fe2ed9d65495be85`. See
+`PERSISTENCE_P3B_COLD_CAPTURE_REVIEW.md` for verified evidence and the next slice.
+
 Status: bounded acceptance evidence for
 `PERSISTENCE_P3B_COLD_CAPTURE_FOLLOWUP.md`, 2026-10-04 UTC
 (2026-10-03 America/Chicago).

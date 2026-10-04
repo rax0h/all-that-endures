@@ -1,5 +1,50 @@
 # P3B cold World capture — architect review
 
+## Final acceptance — 2026-10-04 UTC
+
+**Accepted in its complete internal, unbound capture scope** at live PR #14 head
+`c5d827fe248f88b4825d9b51fe2ed9d65495be85`. This decision supersedes the earlier
+pending decision below. No further product correction was needed in this review.
+The six typed-validation regressions and every previously accepted layer remain
+preserved. Stage 0.5 is still decision B and is not ready to merge.
+
+The branch advanced during review from intermediate evidence commit `4fa8e02a`
+to final evidence commit `c5d827fe`; both change only capture tests and validation
+notes relative to `af85515`. Final acceptance is for the latter exact head.
+
+Verified CI run `37178295840`, job `111365447482`, candidate
+`f87d18c23a78f39a635b9b91e06db964b5bd84a9`: actual logs show **141 focused tests
+passed in 74.44s**, **329 affected tests passed in 178.52s**, and **496 full-suite
+tests passed in 313.43s**. Every simulation Python product/test blob at the final
+live head matches that candidate exactly. Temporary candidate workflows were not
+landed. Independent local revalidation of the final head: **78 capture tests
+passed in 35.57s**, exit 0, using
+`PYTHONPATH=/tmp/ate-followup-deps:simulation python -m pytest -q simulation/tests/test_persistence_cold_capture.py`.
+
+The follow-up closes the prior gates: checked malformed-input cases, typed exact
+values across partition shapes, excluded identity paths, reader cleanup and
+borrowed-store lifetime, blocked writer/retry across a pinned read snapshot,
+deterministic unread corruption/deletion plus explicit full verification, and
+legacy/current compatibility. The existing P1 pinned-generation regression was
+also rerun independently: **1 passed in 0.09s**.
+
+At real 4/40/400-segment stores, capture performs **2,084 checked record reads**,
+**zero segment reads**, **zero pending decodes**, retains **three tail Events**,
+**one compressed pending chunk**, **one year/offset entry** and **87 projected
+groups/paths** at every size. SQL guards forbid segment-header/count scans.
+Checked bytes are 704,473 / 709,904 / 716,070, reflecting absolute integer digit
+growth; compressed pending bytes are 10,410 / 10,707 / 10,707. Weak-reference tests
+prove decoded pending Events are released after capture. These are event-backend
+and current-projection bounds, not a bound on total World or unsaved backlog.
+
+The next authorized Sol slice is **`PERSISTENCE_P3B_COLD_BOOTSTRAP.md`**: explicit
+cold snapshot creation/conversion through private full-state staging, bounded
+segment transfers and no-overwrite publication. Public live sessions, binding,
+incremental saves/recovery, detach/close guards and bound-session continuation
+remain later gates. This acceptance/design commit changes documentation only.
+
+## Historical first review (superseded by final acceptance above)
+
 Review date: 2026-10-04 UTC (2026-10-03 America/Chicago).
 Reviewed live PR #14 head: `77c6ccd4ca8b7344e60d4e0ca78168bd45faf619`.
 PR remains open, draft and unmerged.
