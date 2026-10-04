@@ -1,4 +1,4 @@
-name: p3b-cold-save-review-fixes-v2
+name: p3b-cold-save-r21-targeted
 on:
   push:
     branches: [sol/p3b-cold-save-review-fixes]
@@ -14,11 +14,13 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest
-      - name: review blocker reproductions
+      - name: R1 R2 R2.1 targeted regressions
         run: >
           python -m pytest -q -s
           simulation/tests/test_persistence_cold_save_bounds.py::test_local_edit_does_not_copy_unrelated_persisted_keys
           simulation/tests/test_persistence_cold_save_bounds.py::test_cold_save_local_alias_work_is_affected_owner_bounded
+          simulation/tests/test_persistence_cold_save_failures.py::test_pending_identity_deletion_before_apply_resolves_and_reopens
+          simulation/tests/test_persistence_cold_save_failures.py::test_mixed_identity_cleanup_partial_action_resolves_and_saves
           simulation/tests/test_persistence_cold_save_failures.py::test_failure_after_journal_cleanup_resolves_idempotently
           simulation/tests/test_persistence_cold_save_failures.py::test_publication_failure_before_adoption_resolves_once
           simulation/tests/test_persistence_cold_save_failures.py::test_publication_failure_after_adoption_resolves_idempotently
