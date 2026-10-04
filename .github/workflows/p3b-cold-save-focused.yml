@@ -19,4 +19,5 @@ jobs:
           python -m pytest -q -s
           simulation/tests/test_persistence_cold_save.py
           simulation/tests/test_persistence_cold_save_failures.py
+          simulation/tests/test_persistence_cold_save_bounds.py
           simulation/tests/test_persistence_session_open.py
