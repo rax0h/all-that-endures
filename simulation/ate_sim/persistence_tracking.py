@@ -70,6 +70,8 @@ class _ColdLifetime:
 
     def ensure_eventlog_read(self):
         session = self._session()
+        if session._suspended:
+            return
         if (
             session._cold_state == "recovery-required"
             and session._cold_publication_phase is not None
