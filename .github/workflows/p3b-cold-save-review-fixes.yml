@@ -1,4 +1,4 @@
-name: p3b-cold-save-review-fixes
+name: p3b-cold-save-review-fixes-v2
 on:
   push:
     branches: [sol/p3b-cold-save-review-fixes]
