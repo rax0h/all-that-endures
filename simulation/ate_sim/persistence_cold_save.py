@@ -647,9 +647,20 @@ def _capture_successor(session, plan, *, full_evidence):
             if tail != plan.after_tail:
                 mismatches.append("tail descriptor")
             if mismatches:
+                details = []
+                if "namespace counts" in mismatches:
+                    details.append(
+                        "expected_counts="
+                        + repr(session.codec.decode(plan.expected_namespace_counts))
+                    )
+                    details.append(
+                        "actual_counts="
+                        + repr(session.codec.decode(actual_counts))
+                    )
+                suffix = ("; " + "; ".join(details)) if details else ""
                 raise StoreIntegrityError(
                     "own-token cold save successor evidence mismatch: "
-                    + ", ".join(mismatches)
+                    + ", ".join(mismatches) + suffix
                 )
 
             if full_evidence:
