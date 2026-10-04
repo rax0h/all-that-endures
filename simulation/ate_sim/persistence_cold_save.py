@@ -7,6 +7,7 @@ tracking or detached/export behavior.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from bisect import bisect_right
 import pickle
 import re
 import uuid
@@ -166,6 +167,16 @@ def _storage_event(log, index, decoded):
     return log._tail[offset]
 
 
+def _indexed_suffix_year(log, index):
+    """Return EventLog's resident indexed year for one absolute suffix index."""
+    if index < log._disk_count or index >= log._count:
+        raise StoreIntegrityError("cold EventLog year lookup is outside suffix")
+    position = bisect_right(log._offsets, index) - 1
+    if position < 0 or position >= len(log._years):
+        raise StoreIntegrityError("cold EventLog year index misses resident suffix")
+    return log._years[position]
+
+
 def _validate_live_partition(session):
     log = session.world.events
     before_tail = session._cold_tail_descriptor
@@ -197,6 +208,19 @@ def _validate_live_partition(session):
     last_year = log._last_year
     if (N == 0 and last_year is not None) or (N and type(last_year) is not int):
         raise StoreIntegrityError("runtime cold EventLog last year is invalid")
+    if N:
+        if N == D:
+            actual_last_year = before_prefix.last_year
+        elif log._tail:
+            actual_last_year = log._tail[-1].year
+        else:
+            actual_last_year = _event_chunk(
+                log, len(log._chunks) - 1
+            )[-1].year
+        if actual_last_year != last_year:
+            raise StoreIntegrityError(
+                "runtime cold EventLog last year disagrees with resident state"
+            )
     return log, D, F, N, last_year
 
 
@@ -426,6 +450,10 @@ def prepare_cold_save(session):
             continue
         event = _storage_event(log, key, decoded_chunks)
         _validate_suffix_event(event, key)
+        if event.year != _indexed_suffix_year(log, key):
+            raise StoreIntegrityError(
+                "dirty cold Event year disagrees with EventLog year index"
+            )
         detached = session._plain(event)
         detached, _bytes = _encoded_copy(session.codec, detached)
         _put_change(
