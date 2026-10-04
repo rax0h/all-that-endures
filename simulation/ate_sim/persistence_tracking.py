@@ -932,6 +932,17 @@ class IncrementalWorldSession:
         self._memo_reverse.pop(id(value), None)
         self._memo.pop(source_id, None)
 
+    def _discard_owner_binding(self, value, owner):
+        bound = _binding(value)
+        if bound is not None and bound.session is self:
+            bound.owners.discard(owner)
+            if not bound.owners and bound.root_fields is None:
+                _BINDINGS.pop(id(value), None)
+                self._bound_ids.discard(id(value))
+        if isinstance(value, _NestedMixin):
+            value._owners.discard(owner)
+        self._drop_memo_if_unowned(value)
+
     @staticmethod
     def _base_kind(kind):
         return {
@@ -1097,8 +1108,15 @@ class IncrementalWorldSession:
                 if binding is None:
                     binding = _ObjectBinding(self)
                     self._register_binding(value, binding)
-                for i, event in enumerate(value):
-                    self._bind_nested(event, {(namespace, i)}, initial=True)
+                items = (
+                    iter_mutable_event_items(value)
+                    if self._cold_mode
+                    else enumerate(value)
+                )
+                for i, event in items:
+                    self._bind_nested(
+                        event, {(namespace, i)}, initial=True
+                    )
                 self._root_containers[namespace] = value
                 return value
             wrapped = _RootList()
@@ -1356,14 +1374,24 @@ class IncrementalWorldSession:
                 if expected == "dict":
                     for key, child in value.items():
                         yield (namespace, key), child, self._owner_path((namespace, key))
+                elif expected == "events" and self._cold_mode:
+                    yield from iter_mutable_event_owners(value)
                 elif expected in ("list", "events"):
                     for i, child in enumerate(value):
-                        yield (namespace, i), child, self._owner_path((namespace, i))
+                        yield (
+                            (namespace, i),
+                            child,
+                            self._owner_path((namespace, i)),
+                        )
                 elif expected == "set":
                     continue
 
     def _bootstrap_identity_index(self):
-        self._identity_index = IdentityOccurrenceIndex(self.codec, RECORD_FIELDS)
+        self._identity_index = IdentityOccurrenceIndex(
+            self.codec,
+            RECORD_FIELDS,
+            mutable_event_tail_only=self._cold_mode,
+        )
         self._identity_index.bootstrap(self._iter_identity_owners())
         self._identity_index.seed_explicit_links(self._initial_links)
 
@@ -1590,8 +1618,46 @@ class IncrementalWorldSession:
         self._mark((namespace, index))
         self._manifest_dirty = True
 
-    def _event_chunks_changed(self, log):
+    def _event_chunks_changed(self, log, first_index, retired_events):
         self._manifest_dirty = True
+        if not self._cold_mode:
+            return
+        if not retired_events:
+            return
+        if (
+            type(first_index) is not int
+            or len(retired_events) % log.chunk_size
+        ):
+            raise StoreIntegrityError("invalid cold sealing retirement boundary")
+        owners = []
+        objects_by_owner = {}
+        for offset, event in enumerate(retired_events):
+            index = first_index + offset
+            if event.id != index + 1 or event.__dict__.get("_sealed") is not True:
+                raise StoreIntegrityError(
+                    "sealed EventLog retirement disagrees with stable history"
+                )
+            owner = ("world.events", index)
+            owners.append(owner)
+            objects_by_owner[owner] = tuple(
+                row[1]
+                for row in self._identity_index.owner_occurrences.get(
+                    owner, ()
+                )
+            )
+
+        self._identity_dirty_owners.difference_update(owners)
+        removed, added = self._identity_index.retire_owners(owners)
+        self._merge_identity_patch(removed, added)
+
+        for owner in owners:
+            seen = set()
+            for value in objects_by_owner[owner]:
+                ident = id(value)
+                if ident in seen:
+                    continue
+                seen.add(ident)
+                self._discard_owner_binding(value, owner)
 
     def _validate_bound_identity(self):
         if self._identity_mode == "current" or self._has_identity_deltas:
@@ -1632,7 +1698,15 @@ class IncrementalWorldSession:
                     for key, child in value.items():
                         walk(key, path + (("map_key", key),))
                         walk(child, path + (("key", key),))
-                elif isinstance(value, (list, tuple, EventLog)):
+                elif isinstance(value, EventLog):
+                    items = (
+                        iter_mutable_event_items(value)
+                        if self._cold_mode
+                        else enumerate(value)
+                    )
+                    for i, child in items:
+                        walk(child, path + (("index", i),))
+                elif isinstance(value, (list, tuple)):
                     for i, child in enumerate(value):
                         walk(child, path + (("index", i),))
                 elif isinstance(value, (set, frozenset)):
@@ -1650,6 +1724,13 @@ class IncrementalWorldSession:
         if value is None:
             return current
         if type(value) is EventLog:
+            if self._cold_mode:
+                sealed = value._disk_count + len(value._chunks) * value.chunk_size
+                return (
+                    "EventLog-disk/v1",
+                    len(value),
+                    sealed // value.chunk_size,
+                )
             return ("EventLog", len(value), len(value._chunks))
         kind = getattr(value, "_kind", current[0])
         return (kind, len(value), 0)
@@ -1789,6 +1870,11 @@ class IncrementalWorldSession:
     def save(self):
         """Commit only journaled owners. Dirty state clears after confirmed commit."""
         self._ensure_active()
+        if self._cold_mode:
+            raise StoreError(
+                "cold World session save is not implemented; "
+                "close/reopen or continue without saving"
+            )
         if not self._dirty and not self._deleted and not self._manifest_dirty:
             return self.generation
         changes = self._changes()
@@ -1905,7 +1991,12 @@ class IncrementalWorldSession:
             return value
         if isinstance(value, EventLog):
             memo[ident] = value
-            for event in value:
+            items = (
+                iter_mutable_event_items(value)
+                if self._cold_mode
+                else enumerate(value)
+            )
+            for _index, event in items:
                 self._unwrap_value(event, memo)
             return value
         return value
@@ -1923,10 +2014,29 @@ class IncrementalWorldSession:
     def close(self):
         if not self._active:
             return
-        self._unbind_world()
-        self._active = False
-        self._clear_bindings()
-        self.store.close()
+        error = None
+        try:
+            self._unbind_world()
+        except Exception as exc:
+            error = exc
+        finally:
+            self._active = False
+            self._clear_bindings()
+            prefix = (
+                self.world.events._disk_prefix
+                if self._cold_mode
+                and isinstance(self.world.events, EventLog)
+                else None
+            )
+            if prefix is not None:
+                prefix.close()
+            self._memo.clear()
+            self._memo_reverse.clear()
+            self._bound_root_originals.clear()
+            self._bootstrap_originals.clear()
+            self.store.close()
+        if error is not None:
+            raise error
 
 
 def bind_snapshot(world, path, *, rules_id):
