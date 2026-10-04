@@ -21,3 +21,5 @@ jobs:
           simulation/tests/test_persistence_cold_save_failures.py
           simulation/tests/test_persistence_cold_save_bounds.py
           simulation/tests/test_persistence_session_open.py
+          simulation/tests/test_persistence_event_log.py
+          simulation/tests/test_persistence_event_identity.py
