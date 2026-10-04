@@ -1,9 +1,10 @@
 # P3B live cold open — validation
 
-Status: green candidate reviewed; corrections required before architect acceptance,
-2026-10-04 UTC. See `PERSISTENCE_P3B_LIVE_OPEN_REVIEW.md` for six independently
-reproduced failing lifecycle probes at `d3017a8`. The completed CI evidence below
-remains valid but does not cover those failures.
+Status: bounded live-open review corrections implemented and green; ready for
+architect review, 2026-10-04 UTC. The original live-open evidence remains below
+as historical evidence. The six blocking lifecycle/atomicity findings from
+`PERSISTENCE_P3B_LIVE_OPEN_REVIEW.md` were reproduced before the fix and are
+covered by the correction validation recorded later in this document.
 
 Green candidate head: `a5029ff7b5a60e7ab5cdfcdfe6914e17f74ec819`.
 Green isolated workflow: `37222438702`.
@@ -121,6 +122,136 @@ exactly one persistence owner in every case:
 
 This preserves the affected-owner scaling requirement instead of rescanning
 unrelated aliases.
+
+## Review-correction reproduction and validation
+
+Architect review at live head
+`964d63ba2cab3e1cc2448969d54d5bdac30dce9b` required bounded corrections for
+LOG-owner retirement, memo cleanup and rejected-append atomicity.
+
+The six exact review seeds were first added as permanent tests and run before
+the corrections. Isolated reproduction workflow `37225428737` failed all six
+at their stated behavioral assertions:
+
+1. newly appended full chunk retained its first Event binding;
+2. replaced child remained retained after sealing;
+3. individually sealed tail Event retained LOG identity;
+4. tracked set remained retained after its LOG owner disappeared;
+5. already-sealed append incorrectly gained LOG identity;
+6. rejected cross-session append had already increased the destination log.
+
+That run is preserved as failure-reproduction evidence rather than a green
+validation result.
+
+After the bounded corrections, focused review workflow `37225613443` ran the
+review-only cases:
+
+- **17 passed, 19 deselected in 24.50 s**.
+
+The final tested correction candidate was
+`b07146803f27a1ae33be58c448d068d37e651ae2`.
+Final isolated workflow: `37225707267`.
+
+Commands:
+
+```text
+python -m pytest -q -s   simulation/tests/test_persistence_session_open.py   simulation/tests/test_persistence_tracking.py   simulation/tests/test_persistence_p2b_followup.py   simulation/tests/test_persistence_p2b_identity_review.py   simulation/tests/test_persistence_p2b_review_regressions.py   simulation/tests/test_persistence_p2c.py   simulation/tests/test_persistence_event_identity.py   simulation/tests/test_persistence_event_log.py   simulation/tests/test_persistence_events.py   simulation/tests/test_persistence_cold_capture.py   simulation/tests/test_persistence_cold_identity_restore.py
+
+python -m pytest -q   simulation/tests/test_incremental_store.py   simulation/tests/test_persistence*.py   simulation/tests/test_cold_history.py   simulation/tests/test_event_year_queries.py   simulation/tests/test_canonical_digest.py   simulation/tests/test_history_archive.py
+
+python -m pytest -q simulation/tests
+```
+
+Results:
+
+- expanded live-open / tracking / EventLog / identity set:
+  **297 passed in 188.93 s**
+- affected persistence set:
+  **394 passed in 394.17 s**
+- full unit/integration `simulation/tests` suite:
+  **561 passed in 577.05 s**
+
+No millennium/endurance workflow was run.
+
+### Correction behavior covered
+
+The permanent regressions now prove:
+
+- sealing retires the actual current mutable LOG graph even when the occurrence
+  index is stale from a just-appended Event or replaced nested payload;
+- no-refresh and already-refreshed retirement converge to the same current-link
+  result and surviving non-LOG aliases remain usable;
+- individual `Event.seal()` immediately retires mutable LOG authority without
+  changing D or F;
+- a later full-chunk seal retires an individually sealed tail Event
+  idempotently while preserving surviving current-state ownership;
+- appending an already sealed Event records its value/layout as dirty for future
+  persistence but grants no mutable LOG ownership;
+- tracked sets use reverse memo registration and retired raw/wrapper pairs are
+  reclaimable;
+- detached former payload mutation cannot dirty or resurrect a retired LOG
+  owner, including across repeated identity refresh;
+- cross-session Event and foreign-descendant appends are rejected before
+  authoritative EventLog or tracking mutation;
+- invalid ID/year append rejection leaves tracking and authoritative log state
+  unchanged;
+- closing the rejected destination session does not disturb the source session;
+- repeated append/seal batches release retired Events/wrappers instead of
+  growing session memo/global-binding retention;
+- cold `save()` remains explicitly blocked.
+
+### Measured correction bounds
+
+The original 4/40/400 open/close measurements remain unchanged in the final
+candidate:
+
+| metric | 4 | 40 | 400 |
+| --- | ---: | ---: | ---: |
+| cold segment reads | 0 | 0 | 0 |
+| resident disk cache | 0 | 0 | 0 |
+| mutable LOG owners | 3 | 3 | 3 |
+| mutable LOG occurrences | 6 | 6 | 6 |
+| pending sealed events | 2,048 | 2,048 | 2,048 |
+| mutable tail events | 3 | 3 | 3 |
+
+Appending/sealing/retiring/closing over 4, 40 and 400 committed cold segments
+also performs **0 cold segment payload reads**.
+
+Unrelated alias mutation remains affected-owner bounded:
+
+| unrelated alias groups | dirty owners |
+| --- | ---: |
+| 100 | 1 |
+| 300 | 1 |
+| 1,000 | 1 |
+
+Retiring one LOG owner remains independent of 100/300/1,000 unrelated alias
+groups:
+
+| unrelated alias groups | owners requested | occurrences removed | affected groups |
+| --- | ---: | ---: | ---: |
+| 100 | 1 | 4 | 4 |
+| 300 | 1 | 4 | 4 |
+| 1,000 | 1 | 4 | 4 |
+
+Thus retirement work is tied to the retiring/touched owner graph rather than
+historical segment count or unrelated alias population.
+
+### Correction candidate/landing identity
+
+The final correction product/test bytes landed on
+`sim/stage-0-5-stabilization` are the exact bytes exercised by workflow
+`37225707267`:
+
+- `simulation/ate_sim/persistence_tracking.py`
+  - candidate blob: `4883050743032e0ed79082df5453995b60887d51`
+  - landed blob: `4883050743032e0ed79082df5453995b60887d51`
+- `simulation/tests/test_persistence_session_open.py`
+  - candidate blob: `11b8115980b42e22e687456129fa70487f3637a3`
+  - landed blob: `11b8115980b42e22e687456129fa70487f3637a3`
+
+The temporary isolated validation workflow is intentionally not landed on
+PR #14.
 
 ## Remaining boundary
 
