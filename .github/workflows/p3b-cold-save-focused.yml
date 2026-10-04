@@ -1,4 +1,4 @@
-name: p3b-cold-save-focused-v5
+name: p3b-cold-save-focused-v6
 on:
   push:
     branches: [sol/p3b-cold-save-candidate]
