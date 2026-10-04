@@ -570,8 +570,8 @@ def _reject_bound_bootstrap_graph(value, binding_lookup, active=None):
         active = set()
     if binding_lookup(value) is not None:
         raise StoreError(
-            "cold snapshot creation cannot borrow state bound to another "
-            "persistence session"
+            "cold snapshot creation requires an unbound World and cannot borrow "
+            "state bound to another persistence session"
         )
     cls = type(value)
     if value is None or cls in (bool, int, float, str, bytes) or cls is Layer:
