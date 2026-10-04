@@ -323,3 +323,79 @@ def test_independent_prefix_reader_keeps_its_captured_generation_until_close(
     finally:
         caller_reader.close()
         session.close()
+
+
+def test_q0_scalar_metadata_and_deleted_alias_reanchor_persist_together(
+    tmp_path,
+):
+    shared = {"child": [1, 2]}
+    world = World(22)
+    world.currency.wallets[1] = {
+        "a": shared,
+        "b": shared,
+        "c": shared,
+    }
+    path = tmp_path / "reanchor.sqlite"
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        wallet = session.world.currency.wallets[1]
+        assert wallet["a"] is wallet["b"] is wallet["c"]
+        session.world.year = 7
+        del wallet["a"]
+
+        plan = prepare_cold_save(session)
+        assert plan is not None
+        assert plan.transfer_chunks == 0
+        typed_actions = {
+            (change.namespace, session.codec.encode(change.key))
+            for change in plan.changes
+        }
+        assert len(typed_actions) == len(plan.changes)
+
+        before = session.generation
+        assert session.save() == before + 1
+        assert wallet["b"] is wallet["c"]
+    finally:
+        session.close()
+
+    restored = open_world_session(path, rules_id=RULES)
+    try:
+        wallet = restored.world.currency.wallets[1]
+        assert restored.world.year == 7
+        assert "a" not in wallet
+        assert wallet["b"] is wallet["c"]
+        assert wallet["b"]["child"] == [1, 2]
+    finally:
+        restored.close()
+
+
+def test_invalid_dirty_event_rejects_before_commit_and_keeps_retry_state(
+    tmp_path,
+):
+    path = tmp_path / "invalid-event.sqlite"
+    write_cold_snapshot(world_with_events(2, seed=23), path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        value = session.world.events[1]
+        value.data["edited"] = True
+        before_generation = session.generation
+        before_disk = session.world.events._disk_count
+        before_chunks = tuple(session.world.events._chunks)
+        before_dirty = session.dirty
+
+        object.__setattr__(value, "id", 99)
+        with pytest.raises(Exception):
+            session.save()
+
+        assert session.cold_state == "active"
+        assert session.generation == before_generation
+        assert session.store.generation == before_generation
+        assert session.world.events._disk_count == before_disk
+        assert tuple(session.world.events._chunks) == before_chunks
+        assert session.dirty == before_dirty
+
+        object.__setattr__(value, "id", 2)
+        assert session.save() == before_generation + 1
+    finally:
+        session.close()
