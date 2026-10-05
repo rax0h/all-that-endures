@@ -4,6 +4,8 @@ import pytest
 
 from ate_sim import checkpoint
 from ate_sim.core import Layer, World
+from ate_sim.engine import Simulation
+from ate_sim.worldgen import generate_world
 from ate_sim.incremental_store import (
     StoreConflictError,
     StoreError,
@@ -287,5 +289,199 @@ def test_legacy_p2_entrypoints_reject_cold_before_scrub_or_audit(
         with pytest.raises(StoreFormatError, match="detach"):
             write_snapshot(session.world, target, rules_id=RULES)
         assert not target.exists()
+    finally:
+        session.close()
+
+
+@pytest.mark.parametrize(
+    "disk_segments,pending_chunks,tail_count,individually_sealed",
+    [
+        (0, 0, 0, ()),
+        (0, 0, 3, ()),
+        (1, 0, 0, ()),
+        (1, 1, 3, ()),
+        (1, 0, 2, (CHUNK_SIZE,)),
+    ],
+)
+def test_detach_partition_shapes_preserve_exact_boundary_and_tail_flags(
+    tmp_path,
+    disk_segments,
+    pending_chunks,
+    tail_count,
+    individually_sealed,
+):
+    path, expected = build_cold_path(
+        tmp_path,
+        disk_segments=disk_segments,
+        pending_chunks=pending_chunks,
+        tail_count=tail_count,
+        individually_sealed=individually_sealed,
+    )
+    session = open_world_session(path, rules_id=RULES)
+    old_tail = tuple(session.world.events._tail)
+    detached = session.detach(materialize_history=True)
+
+    stats = detached.events.storage_stats()
+    assert stats["disk_events"] == 0
+    assert stats["pending_sealed_events"] == expected["F"]
+    assert stats["tail_events"] == expected["N"] - expected["F"]
+    assert tuple(detached.events._tail) == old_tail
+    assert all(
+        detached.events._tail[index] is old_tail[index]
+        for index in range(len(old_tail))
+    )
+    for absolute in individually_sealed:
+        offset = absolute - expected["F"]
+        assert detached.events._tail[offset].__dict__.get("_sealed") is True
+    session.close()
+
+
+def test_lifecycle_state_guards_fail_before_work_and_release(tmp_path):
+    path, _ = build_cold_path(
+        tmp_path, disk_segments=1, pending_chunks=0, tail_count=1
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        prefix = session.world.events._disk_prefix
+        baseline_reads = prefix.diagnostics().segment_reads
+
+        with session.world.current_people_scope():
+            with pytest.raises(StoreError, match="current_people_scope"):
+                session.verify_history()
+            assert prefix.diagnostics().segment_reads == baseline_reads
+
+        session._cold_step_depth = 1
+        try:
+            with pytest.raises(StoreError, match="completed simulation step"):
+                session.verify_history()
+        finally:
+            session._cold_step_depth = 0
+
+        marker = session.world.__dict__["_ate_persistence_lifetime"]
+        marker.begin_operation("outer")
+        try:
+            with pytest.raises(StoreError, match="reentrant"):
+                session.verify_history()
+            with pytest.raises(StoreError):
+                session.save()
+            with pytest.raises(StoreError):
+                session.close()
+        finally:
+            marker.end_operation("outer")
+
+        session._cold_state = "recovery-required"
+        with pytest.raises(StoreError, match="recovery-required"):
+            session.verify_history()
+        with pytest.raises(StoreError, match="recovery-required"):
+            session.detach(materialize_history=True)
+        session._cold_state = "active"
+
+        session.store.close()
+        with pytest.raises(StoreError):
+            session.verify_history()
+        with pytest.raises(StoreError):
+            session.detach(materialize_history=True)
+    finally:
+        session.close()
+
+
+def test_detach_mid_prefix_failure_is_reversible(tmp_path, monkeypatch):
+    path, _ = build_cold_path(
+        tmp_path, disk_segments=3, pending_chunks=1, tail_count=2,
+        wallets={1: {"values": [1]}},
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        world = session.world
+        log = world.events
+        wallet = world.currency.wallets[1]
+        before_generation = session.generation
+        fired = {"count": 0}
+
+        def fail(phase, _session):
+            if phase == "after_disk_chunk":
+                fired["count"] += 1
+                if fired["count"] == 2:
+                    raise RuntimeError("mid-prefix detach fault")
+
+        monkeypatch.setattr(lifecycle, "_lifecycle_phase", fail)
+        with pytest.raises(RuntimeError, match="mid-prefix detach fault"):
+            session.detach(materialize_history=True)
+
+        assert session.cold_state == "active"
+        assert session.generation == before_generation
+        assert session.world is world
+        assert session.world.events is log
+        assert session.world.currency.wallets[1] is wallet
+        assert not session.store._closed
+
+        wallet["values"].append(2)
+        assert ("world.currency.wallets", 1) in session.dirty
+    finally:
+        session.close()
+
+
+def test_short_lifecycle_integration_matches_independent_control(tmp_path):
+    seed = 99401
+    source = Simulation(generate_world(seed, mature=False)).run(2)
+    control = Simulation(generate_world(seed, mature=False)).run(2)
+    assert source.digest() == control.digest()
+
+    source_shared = {"values": [7, 8]}
+    control_shared = {"values": [7, 8]}
+    source.currency.wallets[-901] = {
+        "left": source_shared,
+        "right": source_shared,
+    }
+    control.currency.wallets[-901] = {
+        "left": control_shared,
+        "right": control_shared,
+    }
+    assert source.digest() == control.digest()
+
+    path = tmp_path / "lifecycle-integration.sqlite"
+    write_cold_snapshot(source, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        assert session.world.digest() == control.digest()
+        Simulation(session.world).run(1)
+        Simulation(control).run(1)
+        assert session.world.digest() == control.digest()
+
+        before = session.generation
+        assert session.save() in (before, before + 1)
+        session.close()
+        session = open_world_session(path, rules_id=RULES)
+        assert session.world.digest() == control.digest()
+
+        verified = session.verify_history()
+        assert verified["disk_events"] == session.world.events.disk_event_count
+        archive = tmp_path / "lifecycle-integration-archive.sqlite"
+        export_result = __import__(
+            "ate_sim.history_archive", fromlist=["export_archive"]
+        ).export_archive(session.world, archive)
+        assert export_result["logical_sha256"]
+
+        session.world.currency.wallets[-901]["left"]["values"].append(9)
+        control.currency.wallets[-901]["left"]["values"].append(9)
+        assert session.world.currency.wallets[-901]["left"] is (
+            session.world.currency.wallets[-901]["right"]
+        )
+        assert control.currency.wallets[-901]["left"] is (
+            control.currency.wallets[-901]["right"]
+        )
+        assert session.world.digest() == control.digest()
+
+        detached = session.detach(materialize_history=True)
+        assert detached.digest() == control.digest()
+        restored = checkpoint.loads(checkpoint.dumps(detached))
+        assert restored.digest() == control.digest()
+        assert restored.currency.wallets[-901]["left"] is (
+            restored.currency.wallets[-901]["right"]
+        )
+
+        Simulation(restored).run(1)
+        Simulation(control).run(1)
+        assert restored.digest() == control.digest()
     finally:
         session.close()
