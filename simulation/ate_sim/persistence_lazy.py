@@ -2835,6 +2835,176 @@ class LazyWorldSession:
         return result
 
 
+    def _resource_occurrence(self, key, path=()):
+        return Occurrence(RESOURCE_NAMESPACE, key, tuple(path))
+
+    def _live_resource_for_key(self, key):
+        incarnation = self._registry.incarnation_for_occurrence(
+            self._resource_occurrence(key)
+        )
+        if incarnation is None:
+            return None
+        value = self._registry.object_for_incarnation(incarnation)
+        return value if isinstance(value, MagicResource) else None
+
+    def _bind_resource_transfers(
+        self, key, transfers, *, incarnation=None
+    ):
+        occurrence = self._resource_occurrence(
+            key, LazyResourceTable._transfer_path
+        )
+        if incarnation is not None:
+            live = self._registry.object_for_incarnation(incarnation)
+            if live is not None:
+                if not isinstance(live, LazyTrackedList):
+                    raise StoreError(
+                        "cross-boundary resource transfer-list sharing "
+                        "requires an explicit lazy-list authority"
+                    )
+                live._attach(self.resources, key)
+                self._registry.attach_existing(incarnation, occurrence)
+                return live
+
+        if isinstance(transfers, LazyTrackedList):
+            wrapper = transfers
+            wrapper._attach(self.resources, key)
+        else:
+            wrapper = LazyTrackedList(transfers, self.resources, key)
+
+        existing = self._registry.incarnation_for_object(wrapper)
+        if incarnation is not None:
+            if existing is None:
+                self._registry.bind(
+                    wrapper, occurrence, incarnation=incarnation
+                )
+            elif existing != incarnation:
+                raise StoreIntegrityError(
+                    "resource transfers bound to wrong incarnation"
+                )
+            self._registry.attach_existing(incarnation, occurrence)
+        else:
+            self._registry.bind(wrapper, occurrence)
+        return wrapper
+
+    def _resource_incarnation_labels(self, key, resource):
+        top = self._registry.incarnation_for_object(resource)
+        transfers = self._registry.incarnation_for_object(
+            resource.transfers
+        )
+        if top is None or transfers is None:
+            raise StoreIntegrityError(
+                "lazy resource has incomplete runtime incarnation labels"
+            )
+        return {
+            (): top.value,
+            LazyResourceTable._transfer_path: transfers.value,
+        }
+
+    def _bind_assigned_resource(self, key, resource):
+        top_occurrence = self._resource_occurrence(key)
+        existing = self._registry.incarnation_for_object(resource)
+        if existing is None:
+            existing = self._registry.bind(resource)
+        self._registry.attach_occurrence(resource, top_occurrence)
+
+        transfers = self._bind_resource_transfers(
+            key, resource.transfers
+        )
+        if transfers is not resource.transfers:
+            object.__setattr__(resource, "transfers", transfers)
+        return resource
+
+    def _detach_assigned_resource(self, key, resource):
+        labels = self._resource_incarnation_labels(key, resource)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            self._registry.detach_occurrence(
+                self._resource_occurrence(key, path),
+                expected=incarnation,
+            )
+        if isinstance(resource.transfers, LazyTrackedList):
+            resource.transfers._detach()
+
+    def _detach_unloaded_resource(self, key):
+        labels = self.resources._baseline_labels(key)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            occurrence = self._resource_occurrence(key, path)
+            self._registry.attach_existing(incarnation, occurrence)
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
+
+    def _replace_resource_transfers(
+        self, key, resource, old, new
+    ):
+        occurrence = self._resource_occurrence(
+            key, LazyResourceTable._transfer_path
+        )
+        old_incarnation = self._registry.incarnation_for_object(old)
+        if old_incarnation is not None:
+            self._registry.detach_occurrence(
+                occurrence, expected=old_incarnation
+            )
+        if isinstance(old, LazyTrackedList):
+            old._detach()
+        replacement = self._bind_resource_transfers(key, new)
+        object.__setattr__(resource, "transfers", replacement)
+
+    def _bind_loaded_resource(self, key, resource):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, RESOURCE_NAMESPACE, key
+            )
+        )
+        expected_paths = {
+            (), LazyResourceTable._transfer_path
+        }
+        if set(labels) != expected_paths:
+            raise StoreIntegrityError(
+                "lazy resource occurrence labels are incomplete or extra"
+            )
+
+        top_incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(top_incarnation)
+        if live is not None:
+            if not isinstance(live, MagicResource):
+                raise StoreIntegrityError(
+                    "resource incarnation is bound to wrong type"
+                )
+            result = live
+        else:
+            result = resource
+            self._registry.bind(
+                result,
+                self._resource_occurrence(key),
+                incarnation=top_incarnation,
+            )
+        self._registry.attach_existing(
+            top_incarnation, self._resource_occurrence(key)
+        )
+
+        transfer_incarnation = IncarnationId(
+            self.store.store_identity,
+            labels[LazyResourceTable._transfer_path],
+        )
+        transfers = self._bind_resource_transfers(
+            key,
+            result.transfers,
+            incarnation=transfer_incarnation,
+        )
+        if transfers is not result.transfers:
+            object.__setattr__(result, "transfers", transfers)
+        self.resources._baseline_identity_labels[key] = labels
+        return result
+
+
     def _bind_assigned_person(self, key, person):
         existing = self._registry.incarnation_for_object(person)
         if existing is None:
