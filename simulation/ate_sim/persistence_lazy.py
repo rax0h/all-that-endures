@@ -375,7 +375,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
 
                     for row in source_store.db.execute(
                         "SELECT namespace,index_name,index_value,record_key,"
-                        "ordinal,last_changed_generation FROM query_membership"
+                        "ordinal,generation FROM query_membership"
                     ):
                         if row[0] != PEOPLE_NAMESPACE:
                             target.db.execute(
