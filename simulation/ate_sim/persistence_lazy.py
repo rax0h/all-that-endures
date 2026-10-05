@@ -1924,6 +1924,11 @@ def open_lazy_world_session(path, *, rules_id):
                     "cold commit generation disagrees with lazy head"
                 )
             links = _read_current_identity_links(store)
+            baseline_ordinals = _capture_cold_baseline_ordinals(
+                store,
+                manifest,
+                excluded_namespaces={PEOPLE_NAMESPACE},
+            )
             _validate_head_inventory(
                 head,
                 manifest,
@@ -2029,6 +2034,11 @@ def open_lazy_world_session(path, *, rules_id):
                 prefix,
                 next_incarnation,
                 head,
+                baseline_ordinals=baseline_ordinals,
+                resident_links=resident_links,
+                prefix_descriptor=prefix_descriptor,
+                tail_descriptor=tail_descriptor,
+                commit_descriptor=commit_descriptor,
             )
             prefix = None
             pin = None
