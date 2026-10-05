@@ -3950,7 +3950,9 @@ def open_lazy_world_session(path, *, rules_id):
                 store,
                 manifest,
                 excluded_namespaces={
-                    PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                    PEOPLE_NAMESPACE,
+                    ASPIRATION_NAMESPACE,
+                    RESOURCE_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -3998,7 +4000,9 @@ def open_lazy_world_session(path, *, rules_id):
                     if kind == "state":
                         value = objects[namespace]
                     elif namespace in (
-                        PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                        PEOPLE_NAMESPACE,
+                        ASPIRATION_NAMESPACE,
+                        RESOURCE_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
