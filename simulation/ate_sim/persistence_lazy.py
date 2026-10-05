@@ -1928,13 +1928,12 @@ def open_lazy_world_session(path, *, rules_id):
             )
 
         try:
-            manifest = store.read_record(
-                META, "manifest", expected_record_schema=RECORD_SCHEMA
-            )
-            if (
-                type(manifest) is not dict
-                or manifest.get("event_storage") != COLD_EVENT_STORAGE
-            ):
+            # Use the accepted cold manifest reader so a structurally
+            # updated collections/v1 overlay is authority for current
+            # collection sizes. Reading only the fixed base manifest here
+            # makes a valid post-save successor appear corrupt on reopen.
+            manifest = _read_cold_manifest(store)
+            if manifest.get("event_storage") != COLD_EVENT_STORAGE:
                 raise StoreFormatError(
                     "open_lazy_world_session requires converted cold P4 storage"
                 )
