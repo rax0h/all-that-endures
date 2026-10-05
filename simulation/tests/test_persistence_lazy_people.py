@@ -483,6 +483,103 @@ def test_hybrid_lazy_session_runs_one_real_step_and_reopens_equal_to_eager_contr
         assert reopened.world.digest() == expected_digest
 
 
+def test_hybrid_lazy_session_continues_two_real_steps_across_reopen(tmp_path):
+    seed = 918273
+    control = generate_world(
+        seed, width=8, height=6, settlements=1
+    )
+    source_world = generate_world(
+        seed, width=8, height=6, settlements=1
+    )
+    # Preserve the existing generated-world fixture normalization used by the
+    # one-step hybrid proof; do not hide any P4 continuation difference.
+    control.event_ids = {event.id for event in control.events}
+    source_world.event_ids = {
+        event.id for event in source_world.events
+    }
+
+    source = tmp_path / "hybrid-two-step-cold.sqlite"
+    destination = tmp_path / "hybrid-two-step-lazy.sqlite"
+    write_cold_snapshot(source_world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    Simulation(control).step()
+    first_digest = control.digest()
+    first_events = tuple(control.events)
+    first_event_ids = set(control.event_ids)
+    first_people_order = tuple(control.people)
+    first_next_ids = (
+        control.next_person,
+        control.next_household,
+        control.next_settlement,
+        control.next_event,
+    )
+
+    Simulation(control).step()
+    second_digest = control.digest()
+    second_events = tuple(control.events)
+    second_event_ids = set(control.event_ids)
+    second_people_order = tuple(control.people)
+    second_next_ids = (
+        control.next_person,
+        control.next_household,
+        control.next_settlement,
+        control.next_event,
+    )
+
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        assert session.world.people.diagnostics()["person_payload_loads"] == 0
+        Simulation(session.world).step()
+        assert session.world.digest() == first_digest
+        assert tuple(session.world.events) == first_events
+        assert set(session.world.event_ids) == first_event_ids
+        assert tuple(session.world.people) == first_people_order
+        assert (
+            session.world.next_person,
+            session.world.next_household,
+            session.world.next_settlement,
+            session.world.next_event,
+        ) == first_next_ids
+        session.save()
+
+    with open_lazy_world_session(destination, rules_id=RULES) as reopened:
+        assert reopened.world.digest() == first_digest
+        assert tuple(reopened.world.events) == first_events
+        assert set(reopened.world.event_ids) == first_event_ids
+        assert tuple(reopened.world.people) == first_people_order
+        assert (
+            reopened.world.next_person,
+            reopened.world.next_household,
+            reopened.world.next_settlement,
+            reopened.world.next_event,
+        ) == first_next_ids
+
+        Simulation(reopened.world).step()
+        assert reopened.world.digest() == second_digest
+        assert tuple(reopened.world.events) == second_events
+        assert set(reopened.world.event_ids) == second_event_ids
+        assert tuple(reopened.world.people) == second_people_order
+        assert (
+            reopened.world.next_person,
+            reopened.world.next_household,
+            reopened.world.next_settlement,
+            reopened.world.next_event,
+        ) == second_next_ids
+        reopened.save()
+
+    with open_lazy_world_session(destination, rules_id=RULES) as final:
+        assert final.world.digest() == second_digest
+        assert tuple(final.world.events) == second_events
+        assert set(final.world.event_ids) == second_event_ids
+        assert tuple(final.world.people) == second_people_order
+        assert (
+            final.world.next_person,
+            final.world.next_household,
+            final.world.next_settlement,
+            final.world.next_event,
+        ) == second_next_ids
+
+
 def test_cross_boundary_person_alias_restores_lazily_and_eager_mutation_fails_closed(tmp_path):
     world = people_world(4, active=4)
     shared_person = world.people[1]
