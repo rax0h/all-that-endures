@@ -2417,10 +2417,16 @@ class LazyWorldSession:
         expected_counts = self.store.codec.decode(
             cold_plan.expected_namespace_counts
         )
-        expected_counts[PEOPLE_NAMESPACE] = (len(self.people), 0)
-        expected_counts[ASPIRATION_NAMESPACE] = (
-            len(self.aspirations), 0
-        )
+        if len(self.people):
+            expected_counts[PEOPLE_NAMESPACE] = (len(self.people), 0)
+        else:
+            expected_counts.pop(PEOPLE_NAMESPACE, None)
+        if len(self.aspirations):
+            expected_counts[ASPIRATION_NAMESPACE] = (
+                len(self.aspirations), 0
+            )
+        else:
+            expected_counts.pop(ASPIRATION_NAMESPACE, None)
         cold_plan = replace(
             cold_plan,
             expected_namespace_counts=_counts_tuple(
