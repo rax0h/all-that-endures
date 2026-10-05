@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "tranche": "P4.1",
+  "baseline_head": "953240816b6d332aa95e65a26b463b10a4b58ef4",
+  "stable_code_candidate": "c3f3525d7ddf3b2afdf39946a6fa9add9dd98225",
+  "focused": {
+    "workflow_run_id": 37307695625,
+    "result": "success",
+    "passed": 56,
+    "seconds": 5.10,
+    "includes": [
+      "simulation/tests/test_persistence_lazy_store.py",
+      "simulation/tests/test_persistence_lazy_store_failures.py",
+      "simulation/tests/test_incremental_store.py"
+    ]
+  },
+  "full_suite": {
+    "workflow_run_id": 37307789377,
+    "tested_sha": "c3f3525d7ddf3b2afdf39946a6fa9add9dd98225",
+    "scope": "pytest -vv --durations=20 simulation/tests",
+    "result": "pending"
+  },
+  "bounds": {
+    "max_registered_pins": 64,
+    "max_iteration_page_size": 128,
+    "retained_visible_snapshots": 2,
+    "latest_receipts_per_pin": 1,
+    "successive_single_writer_saves_tested": 100,
+    "query_scaling_irrelevant_owner_counts": [1000, 10000],
+    "hot_query_rows_at_each_scale": 1,
+    "hot_query_payload_reads": 0,
+    "zero_result_query_rows": 0
+  },
+  "contracts": {
+    "format_version": 3,
+    "legacy_format_2_unchanged": true,
+    "atomic_pin_capture": true,
+    "atomic_writer_pin_advance": true,
+    "combined_p1_segment_lazy_publication": true,
+    "explicit_lost_ack_resolution": true,
+    "source_preserving_current_head_copy": true,
+    "exact_backup_preserves_operational_metadata": true,
+    "timeout_or_pid_pin_reaping": false
+  },
+  "p4_2_addendum": {
+    "status": "design_only",
+    "authoritative_identity": "stable object incarnation scoped by store/world identity",
+    "owner_key_is_identity": false,
+    "sharing_group_is_identity": false,
+    "identity_links_authority": "versioned P2C current links",
+    "sharing_groups": "checked rebuildable projection",
+    "required_future_proofs": [
+      "replace/delete/reinsert with retained old alias",
+      "retained nested child after parent eviction then mutation/save/reload",
+      "weak binding cleanup without Python id reuse bugs",
+      "group merge/split without incarnation rewrite",
+      "group size and retained byte bounds",
+      "no hidden whole-archive load through compatibility APIs"
+    ]
+  },
+  "excluded": [
+    "World integration",
+    "eviction",
+    "millennium/endurance",
+    "balance changes",
+    "checkpoint-default replacement",
+    "Stage 1",
+    "merge"
+  ]
+}
