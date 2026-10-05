@@ -7,12 +7,13 @@ from .currency import denomination_for_rank,can_pay_tier
 from math import ceil
 from heapq import heappush, heappop, heapify
 from .selection_pool import SelectionPool
+from .record_index import IndexedRecord
 RARITIES=('common','uncommon','rare','epic','legendary','mythic','transcendent')
 @dataclass
-class MaterialLot:
+class MaterialLot(IndexedRecord):
  id:int;kind:str;quantity:float;quality:float;settlement:int;producer:int;created_year:int;origin_event:int;owner_kind:str;owner_id:int;magical_properties:tuple[str,...]=();consumed:float=0.;transfers:list[int]=field(default_factory=list);material_rank:int=0
 @dataclass
-class CraftedItem:
+class CraftedItem(IndexedRecord):
  id:int;kind:str;quality:float;rarity:str;settlement:int;craftsperson:int;created_year:int;origin_event:int;materials:tuple[int,...];magical_properties:tuple[str,...]=();owner_kind:str='person';owner_id:int|None=None;item_rank:int=0;magical:bool=False
 @dataclass
 class MaterialEconomy:
@@ -45,7 +46,9 @@ class MaterialEconomy:
   self.__dict__.pop('_selection_index',None)
   self.__dict__.pop('_whole_units',None)
   self.__dict__.pop('_selection_ids',None)
-  self.active_lot_index={}
+  # Preserve a persistence-aware mapping facade when an explicit rebuild is
+  # requested; eager dictionaries retain identical clear-and-repopulate behavior.
+  self.active_lot_index.clear()
   for sid,ids in self.lot_index.items():
    active={i for i in ids if i in self.lots and self.lots[i].quantity-self.lots[i].consumed>.01}
    if active:self.active_lot_index[sid]=active
