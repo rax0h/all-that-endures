@@ -158,12 +158,16 @@ def test_resource_materializing_detach_is_portable(tmp_path):
     session = open_lazy_world_session(destination, rules_id=RULES)
     retained = session.world.magic_resources.resources[1]
     transfers = retained.transfers
-    transfers.append(7001)
     for key in range(2, 301):
         session.world.magic_resources.resources[key]
     assert not dict.__contains__(
         session.world.magic_resources.resources, 1
     )
+    transfers.append(7001)
+    assert dict.__contains__(
+        session.world.magic_resources.resources, 1
+    )
+    assert session.world.magic_resources.resources[1] is retained
 
     detached = session.detach(materialize_history=True)
     resources = detached.magic_resources.resources
