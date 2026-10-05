@@ -5,8 +5,10 @@ from ate_sim import checkpoint
 from ate_sim.core import World
 from ate_sim.magic_resources import MagicResource
 from ate_sim.persistence_lazy import (
+    LazyOwnerIndexTable,
     LazyResourceTable,
     LazyTrackedList,
+    LazyTrackedSet,
     convert_cold_to_lazy,
     open_lazy_world_session,
 )
@@ -149,8 +151,11 @@ def test_resource_open_cost_does_not_decode_resource_history(tmp_path, count):
     destination = converted(tmp_path, count, f"scale-{count}")
     with open_lazy_world_session(destination, rules_id=RULES) as session:
         table = session.world.magic_resources.resources
+        owners = session.world.magic_resources.owner_index
         assert len(table) == count
+        assert len(owners) == count
         assert table.diagnostics()["resource_payload_loads"] == 0
+        assert owners.diagnostics()["owner_bucket_payload_loads"] == 0
 
 
 def test_resource_materializing_detach_is_portable(tmp_path):
@@ -171,13 +176,69 @@ def test_resource_materializing_detach_is_portable(tmp_path):
 
     detached = session.detach(materialize_history=True)
     resources = detached.magic_resources.resources
+    owners = detached.magic_resources.owner_index
     assert type(resources) is dict
+    assert type(owners) is dict
     assert len(resources) == 300
     assert resources[1] is retained
     assert type(resources[1].transfers) is list
     assert resources[1].transfers == [7001]
+    assert type(owners[("person", 1)]) is set
+    assert owners[("person", 1)] == {1}
 
     data = checkpoint.dumps(detached)
     restored = checkpoint.loads(data)
     assert restored.digest() == detached.digest()
     assert type(restored.magic_resources.resources[1].transfers) is list
+    assert type(restored.magic_resources.owner_index[("person", 1)]) is set
+
+
+def test_owner_index_open_zero_payloads_and_matches_resource_memberships(tmp_path):
+    destination = converted(tmp_path, 400, "owner-index-open")
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        state = session.world.magic_resources
+        owners = state.owner_index
+        resources = state.resources
+        assert isinstance(owners, LazyOwnerIndexTable)
+        assert owners.diagnostics()["owner_bucket_payload_loads"] == 0
+        assert len(owners) == 400
+
+        assert resources.owner_ids("person", 300) == (300,)
+        assert owners.diagnostics()["owner_bucket_payload_loads"] == 0
+
+        bucket = owners[("person", 300)]
+        assert isinstance(bucket, LazyTrackedSet)
+        assert bucket == {300}
+        assert owners.diagnostics()["owner_bucket_payload_loads"] == 1
+
+        for owner in (
+            ("person", 1),
+            ("person", 17),
+            ("person", 299),
+            ("person", 400),
+        ):
+            assert set(resources.owner_ids(*owner)) == set(owners[owner])
+
+
+def test_retained_owner_bucket_rehydrates_during_real_transfer(tmp_path):
+    destination = converted(tmp_path, 400, "owner-index-retained")
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        state = session.world.magic_resources
+        owners = state.owner_index
+        retained = owners[("person", 1)]
+        for rid in range(2, 401):
+            owners[("person", rid)]
+        assert not dict.__contains__(owners, ("person", 1))
+
+        state.transfer(1, "person", 2, 8001)
+        assert retained == set()
+        assert ("person", 1) not in owners
+        assert owners[("person", 2)] == {1, 2}
+        assert set(state.resources.owner_ids("person", 2)) == {1, 2}
+        session.save()
+
+    with open_lazy_world_session(destination, rules_id=RULES) as reopened:
+        state = reopened.world.magic_resources
+        assert ("person", 1) not in state.owner_index
+        assert state.owner_index[("person", 2)] == {1, 2}
+        assert set(state.resources.owner_ids("person", 2)) == {1, 2}
