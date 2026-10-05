@@ -1,0 +1,21 @@
+name: P4 resource order diagnostic
+
+on:
+  push:
+    branches:
+      - sol-p4-resource-order-diagnostic
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - name: Isolated detach
+        run: PYTHONPATH=simulation:. python -m pytest -q simulation/tests/test_persistence_lazy_resources.py::test_resource_materializing_detach_is_portable
+      - name: Full resource file
+        run: PYTHONPATH=simulation:. python -m pytest -q simulation/tests/test_persistence_lazy_resources.py
