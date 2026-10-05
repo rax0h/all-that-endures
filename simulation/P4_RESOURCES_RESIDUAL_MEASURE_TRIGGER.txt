@@ -1,0 +1,1 @@
+Trigger P4 resources residual measurement.
