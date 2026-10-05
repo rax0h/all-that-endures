@@ -1,0 +1,50 @@
+name: P4.1 apply gate
+
+on:
+  push:
+    branches: [sol/p4-1-apply]
+    paths: [.github/workflows/p4-1-apply.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: sol/p4-1-apply
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: Decode staged P4.1 files
+        run: |
+          base64 -d .p4tmp/persistence_lazy_store.py.gz.b64 | gzip -d > /tmp/persistence_lazy_store.py
+          base64 -d .p4tmp/test_persistence_lazy_store.py.gz.b64 | gzip -d > /tmp/test_persistence_lazy_store.py
+          base64 -d .p4tmp/test_persistence_lazy_store_failures.py.gz.b64 | gzip -d > /tmp/test_persistence_lazy_store_failures.py
+      - name: Build candidate on target branch
+        run: |
+          git checkout sim/stage-0-5-stabilization
+          cp /tmp/persistence_lazy_store.py simulation/ate_sim/persistence_lazy_store.py
+          cp /tmp/test_persistence_lazy_store.py simulation/tests/test_persistence_lazy_store.py
+          cp /tmp/test_persistence_lazy_store_failures.py simulation/tests/test_persistence_lazy_store_failures.py
+          python -m py_compile simulation/ate_sim/persistence_lazy_store.py simulation/tests/test_persistence_lazy_store.py simulation/tests/test_persistence_lazy_store_failures.py
+      - name: Focused P4.1 plus P1 regression gate
+        run: |
+          pytest -vv --durations=20 \
+            simulation/tests/test_persistence_lazy_store.py \
+            simulation/tests/test_persistence_lazy_store_failures.py \
+            simulation/tests/test_incremental_store.py
+      - name: Commit stable candidate
+        run: |
+          git config user.name "openai-sol"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add simulation/ate_sim/persistence_lazy_store.py simulation/tests/test_persistence_lazy_store.py simulation/tests/test_persistence_lazy_store_failures.py
+          git commit -m "Implement P4.1 versioned lazy storage [skip ci]"
+          git push origin HEAD:sim/stage-0-5-stabilization
