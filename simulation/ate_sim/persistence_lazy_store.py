@@ -947,21 +947,20 @@ class LazyRecordStore:
                                 "SELECT typed_key,ordinal,valid_from,valid_to,row_checksum "
                                 "FROM lazy_order_versions INDEXED BY lazy_order_current "
                                 "WHERE namespace=? AND valid_to IS NULL "
-                                "AND (ordinal>? OR (ordinal=? AND typed_key>?)) "
+                                "AND (ordinal,typed_key) > (?,?) "
                                 "ORDER BY ordinal,typed_key LIMIT ?",
-                                (namespace, last_ordinal, last_ordinal, last_key, page_size),
+                                (namespace, last_ordinal, last_key, page_size),
                             ).fetchall()
                         else:
                             open_rows = self.db.execute(
                                 "SELECT typed_key,ordinal,valid_from,valid_to,row_checksum "
                                 "FROM lazy_order_versions INDEXED BY lazy_order_current "
                                 "WHERE namespace=? AND valid_to IS NULL AND valid_from<=? "
-                                "AND (ordinal>? OR (ordinal=? AND typed_key>?)) "
+                                "AND (ordinal,typed_key) > (?,?) "
                                 "ORDER BY ordinal,typed_key LIMIT ?",
                                 (
                                     namespace,
                                     generation,
-                                    last_ordinal,
                                     last_ordinal,
                                     last_key,
                                     page_size,
@@ -971,12 +970,11 @@ class LazyRecordStore:
                                 "SELECT typed_key,ordinal,valid_from,valid_to,row_checksum "
                                 "FROM lazy_order_versions INDEXED BY lazy_order_closed_generation "
                                 "WHERE namespace=? AND valid_to=? "
-                                "AND (ordinal>? OR (ordinal=? AND typed_key>?)) "
+                                "AND (ordinal,typed_key) > (?,?) "
                                 "ORDER BY ordinal,typed_key LIMIT ?",
                                 (
                                     namespace,
                                     generation + 1,
-                                    last_ordinal,
                                     last_ordinal,
                                     last_key,
                                     page_size,
