@@ -1044,6 +1044,9 @@ class IncrementalWorldSession:
 
     def _ensure_mutation_allowed(self):
         self._ensure_active()
+        external_guard = getattr(self, "_external_mutation_guard", None)
+        if external_guard is not None:
+            external_guard()
         if self._cold_mode and self._cold_state != "active":
             raise StoreError(
                 f"cold World session mutation is blocked while {self._cold_state}"
