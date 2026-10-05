@@ -1,0 +1,25 @@
+name: p3b-lifecycle-focused
+on:
+  push:
+    branches: [sol/p3b-lifecycle-candidate]
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: lifecycle focused without 400-segment measurement
+        run: >
+          python -m pytest -q -s
+          simulation/tests/test_persistence_lifecycle.py
+          simulation/tests/test_persistence_history_operations.py
+          -k "not streaming_history_bounds_and_detach_cost_are_measured"
+          simulation/tests/test_checkpoint.py
+          simulation/tests/test_persistence_session_open.py
+          simulation/tests/test_persistence_event_log.py
