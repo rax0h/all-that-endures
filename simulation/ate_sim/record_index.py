@@ -8,11 +8,17 @@ import weakref
 
 class IndexedRecord:
     def __setattr__(self, name, value):
-        object.__setattr__(self, name, value)
+        table = None
         if not name.startswith('_index_'):
             ref = self.__dict__.get('_index_table')
             table = None if ref is None else ref()
-            if table is not None: table.changed(self._index_key, name)
+            if table is not None:
+                preflight = getattr(table, "preflight_change", None)
+                if preflight is not None:
+                    preflight(self._index_key, name)
+        object.__setattr__(self, name, value)
+        if table is not None:
+            table.changed(self._index_key, name)
 
     def __getstate__(self):
         return {k:v for k,v in self.__dict__.items() if not k.startswith('_index_')}
