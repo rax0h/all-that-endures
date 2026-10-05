@@ -13,6 +13,7 @@ from simulation.ate_sim.incremental_store import Membership, NewSegment, RecordC
 from simulation.ate_sim.persistence_lazy_store import (
     GenerationPin,
     GenerationPressureError,
+    IdentityOccurrenceChange,
     LazyRecordStore,
     VersionChange,
 )
@@ -686,3 +687,88 @@ def test_verify_all_reuses_owned_snapshot_and_standalone_leaves_no_transaction(t
         assert store.db.in_transaction
         store.db.rollback()
         assert not store.db.in_transaction
+
+
+
+def test_identity_write_failure_rolls_back_owner_identity_state_and_head(tmp_path):
+    path = tmp_path / "identity-rollback.sqlite"
+    with make_store(path) as store:
+        pin = store.capture_pin()
+        store._phase_hook = lambda phase: (
+            (_ for _ in ()).throw(OSError("identity failure"))
+            if phase == "during_identity_writes"
+            else None
+        )
+        with pytest.raises(OSError, match="identity failure"):
+            store.commit(
+                pin,
+                commit_token="identity-fail",
+                version_changes=(VersionChange("people", 1, "owner"),),
+                identity_changes=(
+                    IdentityOccurrenceChange(
+                        "people",
+                        1,
+                        (("field", "child"),),
+                        incarnation_id=1,
+                    ),
+                ),
+                next_incarnation_id=2,
+                changes=(),
+                new_segments=(),
+                metadata=metadata(1, ("people",)),
+            )
+        store._phase_hook = lambda phase: None
+        assert store.generation == 0
+        assert store.db.execute(
+            "SELECT COUNT(*) FROM lazy_record_versions"
+        ).fetchone() == (0,)
+        assert store.db.execute(
+            "SELECT COUNT(*) FROM lazy_identity_occurrence_versions"
+        ).fetchone() == (0,)
+        assert store.read_identity_state(pin) == 1
+        resolved = store.resolve_commit(pin, "identity-fail")
+        assert resolved.outcome == "not_committed"
+        store.verify_all()
+
+
+def test_lost_ack_with_owner_and_identity_resolves_complete_new_generation(tmp_path):
+    path = tmp_path / "identity-lost-ack.sqlite"
+    store = make_store(path)
+    pin = store.capture_pin()
+    store._phase_hook = lambda phase: (
+        (_ for _ in ()).throw(OSError("identity ack lost"))
+        if phase == "after_commit"
+        else None
+    )
+    with pytest.raises(OSError, match="identity ack lost"):
+        store.commit(
+            pin,
+            commit_token="identity-commit",
+            version_changes=(VersionChange("people", 1, "owner"),),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people",
+                    1,
+                    (("field", "child"),),
+                    incarnation_id=1,
+                ),
+            ),
+            next_incarnation_id=2,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(1, ("people",)),
+        )
+    store.close()
+
+    with open_store(path) as recovered:
+        result = recovered.resolve_commit(pin, "identity-commit")
+        assert result.outcome == "committed"
+        assert result.generation == 1
+        assert recovered.read_version(
+            result.pin, "people", 1, expected_record_schema=1
+        ).value == "owner"
+        assert recovered.read_identity_occurrence(
+            result.pin, "people", 1, (("field", "child"),)
+        ).incarnation_id == 1
+        assert recovered.read_identity_state(result.pin) == 2
+        recovered.verify_all()
