@@ -1770,6 +1770,45 @@ class LazyRecordStore:
             self._metadata_rows += 1
 
 
+
+    def _identity_changes_would_change(
+        self,
+        prepared: tuple[dict[str, Any], ...],
+        generation: int,
+        requested_next_incarnation_id: int | None,
+    ) -> bool:
+        current_next = self._identity_state_at(generation)[0]
+        maximum_seen = current_next - 1
+        for item in prepared:
+            change: IdentityOccurrenceChange = item["change"]
+            existing = self._visible_identity_occurrence(
+                generation,
+                item["owner_namespace"],
+                item["owner_key"],
+                item["occurrence_path"],
+            )
+            if change.delete:
+                if existing is not None:
+                    return True
+                continue
+            incarnation_id = int(change.incarnation_id)
+            maximum_seen = max(maximum_seen, incarnation_id)
+            if existing is None or existing[0] != incarnation_id:
+                return True
+        derived_next = max(current_next, maximum_seen + 1)
+        if requested_next_incarnation_id is None:
+            return derived_next != current_next
+        if (
+            type(requested_next_incarnation_id) is not int
+            or requested_next_incarnation_id <= 0
+        ):
+            raise ValueError("next_incarnation_id must be a positive int")
+        if requested_next_incarnation_id < derived_next:
+            raise ValueError(
+                "next_incarnation_id cannot move behind observed incarnations"
+            )
+        return requested_next_incarnation_id != current_next
+
     def _write_identity_changes(
         self,
         prepared: tuple[dict[str, Any], ...],
@@ -2078,15 +2117,14 @@ class LazyRecordStore:
             return CommitResult("conflict", current_generation, pin, stale=True)
         if registered_generation != current_generation:
             return CommitResult("conflict", current_generation, pin, stale=True)
-        current_identity_next = self._identity_state_at(current_generation)[0]
-        identity_counter_change = (
-            next_incarnation_id is not None
-            and next_incarnation_id != current_identity_next
+        identity_effective = self._identity_changes_would_change(
+            identity_prepared,
+            current_generation,
+            next_incarnation_id,
         )
         if (
             not version_prepared
-            and not identity_prepared
-            and not identity_counter_change
+            and not identity_effective
             and not ordinary_prepared
             and not segment_prepared
             and current[2:6]
