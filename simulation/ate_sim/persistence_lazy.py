@@ -1559,12 +1559,13 @@ class LazyWorldSession:
                 tuple(add_map[token] for token in sorted(add_map)),
             )
 
+        desired_cross_map = {
+            self.store.codec.encode(link): link
+            for link in desired_cross
+        }
         self._cross_boundary_links = tuple(
-            desired_cross[token]
-            for token in sorted({
-                self.store.codec.encode(link): link
-                for link in desired_cross
-            })
+            desired_cross_map[token]
+            for token in sorted(desired_cross_map)
         )
 
     def _top_occurrence(self, key):
