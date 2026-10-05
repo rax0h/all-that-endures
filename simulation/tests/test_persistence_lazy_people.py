@@ -734,7 +734,9 @@ def test_lazy_detach_preserves_cross_boundary_person_alias(tmp_path):
     assert restored.people[1] is restored.currency.wallets[99]["person"]
 
 
-def test_cross_boundary_person_alias_restores_lazily_and_eager_mutation_fails_closed(tmp_path):
+def test_cross_boundary_person_field_edit_saves_both_authorities_and_topology_stays_guarded(
+    tmp_path,
+):
     world = people_world(4, active=4)
     shared_person = world.people[1]
     world.currency.wallets[99] = {"person": shared_person}
@@ -750,6 +752,23 @@ def test_cross_boundary_person_alias_restores_lazily_and_eager_mutation_fails_cl
         loaded = session.world.people[1]
         assert loaded is eager_alias
         before = loaded.wealth
+        start = session.pin.captured_head
+
+        loaded.wealth += 1.0
+        assert eager_alias.wealth == before + 1.0
+        diag = session.diagnostics()
+        assert diag["people"]["dirty_people"] == 1
+        assert diag["eager_dirty_owners"] >= 1
+
+        replacement = session.world.people[2]
         with pytest.raises(StoreError, match="crosses world.people"):
-            loaded.wealth += 1.0
-        assert loaded.wealth == before
+            session.world.currency.wallets[99]["person"] = replacement
+        assert session.world.currency.wallets[99]["person"] is loaded
+
+        assert session.save() == start + 1
+
+    with open_lazy_world_session(destination, rules_id=RULES) as reopened:
+        eager_alias = reopened.world.currency.wallets[99]["person"]
+        loaded = reopened.world.people[1]
+        assert loaded is eager_alias
+        assert loaded.wealth == before + 1.0
