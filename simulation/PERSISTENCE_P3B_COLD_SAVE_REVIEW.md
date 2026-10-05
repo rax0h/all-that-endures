@@ -1,4 +1,51 @@
-# P3B cold save — architect review and bounded corrections
+# P3B cold save — acceptance and historical review
+
+**Status: atomic cold save/recovery accepted** at
+`2fe72cb7b84a487b3c5adc0c8475be614e616816`.
+Date: 2026-10-04 America/Chicago (2026-10-05 UTC).
+
+## Acceptance
+
+R1 now checks only affected persisted keys. R2 resumes acknowledged bookkeeping
+idempotently. R2.1 distinguishes a present pending deletion from an absent,
+already-applied entry, including mixed current-link cleanup.
+
+Completed final workflow `37247381494`, job `111567835172`, at candidate
+`a93907ecfe7bc49176c04b0d5b1d19597cc6c413` was independently verified:
+
+- **448 affected passed in 819.25 s**;
+- **615 full-suite passed in 1081.89 s**.
+
+All simulation Python blobs match the accepted head. The review's original
+five cases also independently pass: **5 passed in 1.25 s**. The local review
+snapshot was compared with the live Python tree, allowing only a fetch-added
+terminal newline.
+
+Focused correction workflow `37245662547`, job `111562944039`, records
+**54 passes in 143.67 s** and the allocation tables. Those log measurements
+were checked: at 100/300/1,000 unrelated groups, local preparation/save each
+uses zero persisted-key iterations and three membership probes; local allocation
+peak is 50,885 / 50,885 / 50,893 bytes. For fixed four-chunk transfers across
+4/40/400 historical segments, preparation peak is 20,703,021 / 20,710,254 /
+20,747,300 bytes and released-plan retention is 1,436 / 1,436 / 1,390 bytes.
+Reader cache is accounted separately. These are event-save working-allocation
+measurements, not a claim of bounded total World memory.
+
+No remaining blocker was found in this correction scope. All earlier accepted
+persistence layers remain accepted. No long test run was started or polled
+during this review.
+
+The next bounded assignment is `PERSISTENCE_P3B_LIFECYCLE.md`.
+Detach, explicit history operations and deliberate legacy compatibility still
+require implementation/integration review. P3B is not yet declared complete,
+and Stage 0.5 is not ready to merge.
+
+## Historical findings (completed)
+
+Everything below records the earlier reviewed heads and assignments. Their
+not-accepted status, unlanded-candidate statements and correction instructions
+are superseded by the acceptance above; do not repeat completed work.
+
 
 **Status: changes required; atomic cold save/recovery is not yet accepted.**
 Reviewed PR #14 head: `0bbc7976904cad46a081a13d4e119238f52d37e7`.

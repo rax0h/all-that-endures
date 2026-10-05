@@ -4,10 +4,11 @@
 > The user hands this assignment to Sol for native implementation; Astra reviews
 > the result. No additional agents or architectural restart are required.
 
-**Status:** implemented and reviewed at `0bbc7976904cad46a081a13d4e119238f52d37e7`;
-corrections required before acceptance, 2026-10-04. The next Sol assignment is
-ONLY `PERSISTENCE_P3B_COLD_SAVE_REVIEW.md`. This document remains the underlying
-cold-save contract; do not restart its completed implementation tasks.
+**Status:** architect-accepted at
+`2fe72cb7b84a487b3c5adc0c8475be614e616816`, 2026-10-04 America/Chicago.
+R1/R2/R2.1 corrections and their evidence are accepted in
+`PERSISTENCE_P3B_COLD_SAVE_REVIEW.md`. This remains the completed save/recovery
+contract. Next bounded assignment: `PERSISTENCE_P3B_LIFECYCLE.md`.
 **Baseline:** PR #14, `sim/stage-0-5-stabilization`,
 `2819391359fa3e2e16f9c8e3151e99ce06d8a373` (live open accepted).
 Verify the live head; this design commit continues that baseline.

@@ -1,6 +1,9 @@
 # P3B cold-save validation evidence
 
-**Status:** correction candidate validated and landed; stop for Astra review.  
+**Status:** architect-accepted at `2fe72cb7b84a487b3c5adc0c8475be614e616816`.
+See `PERSISTENCE_P3B_COLD_SAVE_REVIEW.md` for independent CI/blob verification,
+five passing review probes and acceptance boundaries. Next assignment:
+`PERSISTENCE_P3B_LIFECYCLE.md`.  
 **Scope:** `simulation/PERSISTENCE_P3B_COLD_SAVE.md` plus bounded corrections R1/R2/R2.1 in `PERSISTENCE_P3B_COLD_SAVE_REVIEW.md`.  
 **PR documentation head before landing:** `eaafbfe234603b6d678df9d40e11076e6f075049`.  
 **Final validated correction candidate:** `a93907ecfe7bc49176c04b0d5b1d19597cc6c413`.
@@ -118,4 +121,5 @@ All other product/test files remain the accepted PR versions. The candidate-only
 
 ## Scope exclusions preserved
 
-No architecture restart, detach/export expansion, checkpoint-default replacement, millennium/endurance run, balance change, Stage 1 work, unrelated feature work or merge is included. Stage 0.5 remains unmerged pending Astra review.
+No architecture restart, detach/export expansion, checkpoint-default replacement, millennium/endurance run, balance change, Stage 1 work, unrelated feature work or merge is included. Cold save/recovery is accepted. Lifecycle completion and P3B integration review
+remain pending; Stage 0.5 stays unmerged.
