@@ -308,6 +308,12 @@ class EventLog(Sequence):
         self._tail[offset]=replacement
 
     def __getstate__(self):
+        if self._disk_prefix is not None:
+            from .incremental_store import StoreError
+            raise StoreError(
+                "disk-backed EventLog is not portable; use "
+                "session.detach(materialize_history=True) first"
+            )
         return {k:v for k,v in self.__dict__.items() if k!='_cache'}
 
     def __setstate__(self,state):
