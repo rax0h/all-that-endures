@@ -231,6 +231,64 @@ def _identity_labels(world, manifest, links, codec):
     return rows, len(incarnation_for_ident) + 1
 
 
+def _insert_lazy_plain_record(
+    destination: LazyRecordStore,
+    *,
+    namespace: str,
+    generation: int,
+    typed_key: bytes,
+    ordinal: int,
+    value: Any,
+    record_schema: int,
+) -> None:
+    codec = destination.codec
+    payload = codec.encode(value)
+    memberships_blob = codec.encode(())
+    payload_checksum = __import__(
+        "ate_sim.incremental_store", fromlist=["_framed_sha"]
+    )._framed_sha(b"lazy-payload-v1", payload)
+    destination.db.execute(
+        "INSERT INTO lazy_record_versions("
+        "namespace,typed_key,valid_from,valid_to,payload,payload_checksum,"
+        "codec_version,record_schema,memberships,row_checksum"
+        ") VALUES (?,?,?,NULL,?,?,?,?,?,?)",
+        (
+            namespace,
+            typed_key,
+            generation,
+            payload,
+            payload_checksum,
+            codec.version,
+            record_schema,
+            memberships_blob,
+            _version_checksum(
+                namespace,
+                typed_key,
+                record_schema,
+                codec.version,
+                generation,
+                None,
+                memberships_blob,
+                payload,
+            ),
+        ),
+    )
+    destination.db.execute(
+        "INSERT INTO lazy_order_versions("
+        "namespace,typed_key,ordinal,valid_from,valid_to,row_checksum"
+        ") VALUES (?,?,?,?,NULL,?)",
+        (
+            namespace,
+            typed_key,
+            ordinal,
+            generation,
+            _order_checksum(
+                namespace, typed_key, ordinal, generation, None
+            ),
+        ),
+    )
+
+
 def _insert_lazy_person(
     destination: LazyRecordStore,
     *,
@@ -374,6 +432,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
 
                     people_count = 0
                     next_ordinal = 0
+                    aspiration_count = 0
+                    aspiration_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -388,7 +448,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             record_schema,
                             changed_generation,
                         ) = row
-                        if namespace != PEOPLE_NAMESPACE:
+                        if namespace not in (
+                            PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                        ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
                                 row,
@@ -401,28 +463,52 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             or len(envelope) != 2
                             or type(envelope[0]) is not int
                             or envelope[0] < 0
-                            or not isinstance(envelope[1], Person)
                         ):
                             raise StoreFormatError(
-                                "invalid world.people source envelope"
+                                f"invalid lazy source envelope: {namespace}"
                             )
-                        ordinal, person = envelope
-                        _insert_lazy_person(
-                            target,
-                            generation=generation,
-                            typed_key=typed_key,
-                            key=key,
-                            ordinal=ordinal,
-                            person=person,
-                        )
-                        people_count += 1
-                        next_ordinal = max(next_ordinal, ordinal + 1)
+                        ordinal, value = envelope
+                        if namespace == PEOPLE_NAMESPACE:
+                            if not isinstance(value, Person):
+                                raise StoreFormatError(
+                                    "invalid world.people source envelope"
+                                )
+                            _insert_lazy_person(
+                                target,
+                                generation=generation,
+                                typed_key=typed_key,
+                                key=key,
+                                ordinal=ordinal,
+                                person=value,
+                            )
+                            people_count += 1
+                            next_ordinal = max(next_ordinal, ordinal + 1)
+                        else:
+                            if not isinstance(value, MagicAspiration):
+                                raise StoreFormatError(
+                                    "invalid aspirations source envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=ASPIRATION_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_ASPIRATION_SCHEMA,
+                            )
+                            aspiration_count += 1
+                            aspiration_next_ordinal = max(
+                                aspiration_next_ordinal, ordinal + 1
+                            )
 
                     for row in source_store.db.execute(
                         "SELECT namespace,index_name,index_value,record_key,"
                         "ordinal,generation FROM query_membership"
                     ):
-                        if row[0] != PEOPLE_NAMESPACE:
+                        if row[0] not in (
+                            PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                        ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
                                 row,
@@ -454,6 +540,26 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                                 PEOPLE_NAMESPACE,
                                 people_count,
                                 next_ordinal,
+                                generation,
+                                None,
+                            ),
+                        ),
+                    )
+
+                    target.db.execute(
+                        "INSERT INTO lazy_namespace_state("
+                        "namespace,valid_from,valid_to,member_count,"
+                        "next_ordinal,row_checksum"
+                        ") VALUES (?,?,NULL,?,?,?)",
+                        (
+                            ASPIRATION_NAMESPACE,
+                            generation,
+                            aspiration_count,
+                            aspiration_next_ordinal,
+                            _namespace_checksum(
+                                ASPIRATION_NAMESPACE,
+                                aspiration_count,
+                                aspiration_next_ordinal,
                                 generation,
                                 None,
                             ),
@@ -518,6 +624,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "destination_format": 3,
                 "generation": summary["generation"],
                 "people": people_count,
+                "aspirations": aspiration_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
