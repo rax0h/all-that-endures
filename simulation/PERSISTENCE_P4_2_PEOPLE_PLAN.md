@@ -295,3 +295,25 @@ Detach staging requirements:
 
 Focused proofs cover >256 people, retained aliases, unsaved people/eager edits,
 cross-boundary sharing, staging failure, stale-local detach and portability.
+
+
+## Cross-boundary shared-Person field-edit subgate
+
+Before owner-transfer topology is enabled, permit the narrower sound case where
+one Person incarnation is shared between `world.people` and an eager owner and
+only a declared immutable-valued Person field is edited.
+
+Requirements:
+- the eager owner binding and LazyRecordTable both observe the same live Person;
+- one field edit journals both authorities and publishes them in one hybrid
+  generation;
+- reopen restores the exact cross-boundary alias and edited value;
+- declared Person fields may pass only when the assigned value is recursively
+  immutable, so this subgate cannot introduce new mutable identity topology;
+- eager container replacement/removal/reparenting remains fail-closed until the
+  separate owner-transfer proof lands;
+- ordinary non-cross-boundary behavior is unchanged.
+
+Focused proof edits the shared Person through the lazy/eager alias, verifies
+both journals, rejects an attempted eager-container alias move before mutation,
+saves, closes/reopens and checks identity plus value equality.
