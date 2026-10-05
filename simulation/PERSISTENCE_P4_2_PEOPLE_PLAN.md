@@ -388,3 +388,31 @@ After this pilot is green, migrate `magic_resources.resources` and replace the
 redundant eager `owner_index` with checked lazy owner memberships/query
 adapters while preserving exact inventory ordering and transfer/consume
 behavior.
+
+
+## Measured family expansion — magic resources subgate
+
+After the aspiration pilot gate passes, migrate
+`world.magic_resources.resources` into the same versioned lazy store.
+
+Resource-specific contract:
+- `MagicResource` remains live/mutable and index-notifiable only while bound;
+- the nested `transfers` list remains arbitrarily mutable through a bounded
+  notifying list adapter; retained child aliases after parent cache eviction
+  must still dirty/reload the canonical resource;
+- conversion preserves top-level and nested transfer-list incarnation labels;
+- lazy memberships index only currently available ownership:
+  `owner=(owner_kind, owner_id)` and `owner_kind=owner_kind`;
+- point reads decode one requested resource/group; clean cache B=256;
+- transfer/consume/create preserve exact values, ordering and owner-query results;
+- unsaved owner/consumption changes are reflected in query overlays;
+- save publishes resource payload, memberships, nested incarnation labels,
+  aspirations, people, eager roots, EventLog and head atomically;
+- no-op resource saves write no resource payload;
+- explicit detach materializes all resources and plain transfer lists while
+  preserving supported current sharing.
+
+The existing canonical `owner_index` remains exact during this subgate. Once
+resource membership/query behavior is green, replace its eager open cost with a
+checked lazy adapter and prove differential equality before removing eager
+materialization.
