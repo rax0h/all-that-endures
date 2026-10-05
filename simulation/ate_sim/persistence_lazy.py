@@ -73,6 +73,7 @@ from .persistence_lazy_store import (
     _version_checksum,
 )
 from .record_index import IndexedRecord, RecordTable
+from .persistence_schema import RECORD_FIELDS
 from .persistence_session import (
     COLD_EVENT_KIND,
     COLD_EVENT_STORAGE,
@@ -93,6 +94,25 @@ from .persistence_tracking import IncrementalWorldSession
 PEOPLE_NAMESPACE = "world.people"
 LAZY_PERSON_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
+
+
+def _cross_boundary_field_value_is_immutable(value) -> bool:
+    cls = type(value)
+    if value is None or cls in (
+        bool, int, float, str, bytes, FrozenDict, FrozenList
+    ):
+        return True
+    if cls is tuple:
+        return all(
+            _cross_boundary_field_value_is_immutable(item)
+            for item in value
+        )
+    if cls is frozenset:
+        return all(
+            _cross_boundary_field_value_is_immutable(item)
+            for item in value
+        )
+    return False
 
 
 def _base_kind(kind: str) -> str:
@@ -1358,14 +1378,26 @@ class LazyWorldSession:
             raise StoreError("lazy lifecycle operation guard changed")
         self._lifecycle_operation = None
 
-    def _ensure_hybrid_mutation_allowed(self):
+    def _ensure_hybrid_mutation_allowed(
+        self, *, subject=None, field=None, value=None
+    ):
         self._ensure_people_mutation_allowed()
-        if self._cross_boundary_links:
-            raise StoreError(
-                "mutation of the eager graph is blocked while a persisted "
-                "identity group crosses world.people; cross-boundary owner "
-                "transfer requires the next identity integration proof"
-            )
+        if not self._cross_boundary_links:
+            return
+        if (
+            isinstance(subject, Person)
+            and field in RECORD_FIELDS.get(Person, ())
+            and _cross_boundary_field_value_is_immutable(value)
+        ):
+            # A shared Person field edit changes value state, not identity
+            # topology. The eager owner binding and LazyRecordTable notification
+            # will both journal the same live object for one atomic save.
+            return
+        raise StoreError(
+            "mutation of the eager graph is blocked while a persisted "
+            "identity group crosses world.people; cross-boundary owner "
+            "transfer requires the next identity integration proof"
+        )
 
     def _top_occurrence(self, key):
         return Occurrence(PEOPLE_NAMESPACE, key, ())
