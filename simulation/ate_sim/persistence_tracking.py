@@ -1414,7 +1414,7 @@ class IncrementalWorldSession:
         self, value, owners, *, allow_existing=False, preflight=True
     ):
         if preflight:
-            self._ensure_mutation_allowed()
+            self._ensure_mutation_allowed(value=value)
         self._validate_incoming(value, owners, allow_existing=allow_existing)
         return self._bind_nested(
             value, owners, initial=False, allow_existing=allow_existing
