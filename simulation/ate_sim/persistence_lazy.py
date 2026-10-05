@@ -3001,7 +3001,7 @@ def _begin_matching_snapshot(store, pin):
 
 
 def open_lazy_world_session(path, *, rules_id):
-    """Open P4 people pilot without decoding world.people at ordinary open."""
+    """Open P4 lazy World without decoding migrated record families."""
     path = Path(path)
     store = LazyRecordStore.open(
         path,
@@ -3052,7 +3052,9 @@ def open_lazy_world_session(path, *, rules_id):
             baseline_ordinals = _capture_cold_baseline_ordinals(
                 store,
                 manifest,
-                excluded_namespaces={PEOPLE_NAMESPACE},
+                excluded_namespaces={
+                    PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                },
             )
             _validate_head_inventory(
                 head,
@@ -3098,7 +3100,9 @@ def open_lazy_world_session(path, *, rules_id):
                     namespace = root + "." + name
                     if kind == "state":
                         value = objects[namespace]
-                    elif namespace == PEOPLE_NAMESPACE:
+                    elif namespace in (
+                        PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                    ):
                         value = None
                     elif namespace == "world.events":
                         value = log
@@ -3116,8 +3120,8 @@ def open_lazy_world_session(path, *, rules_id):
             resident_links = [
                 link
                 for link in links
-                if not _path_under_people(link[0])
-                and not _path_under_people(link[1])
+                if not _path_under_lazy(link[0])
+                and not _path_under_lazy(link[1])
             ]
             _restore_identity(
                 world,
