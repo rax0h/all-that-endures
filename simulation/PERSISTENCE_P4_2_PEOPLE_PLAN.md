@@ -242,3 +242,27 @@ Focused proofs:
   old-or-new atomicity across both authorities;
 - ordinary open remains zero-Person-payload and clean people cache remains <=256;
 - existing P3B/P4.1/P4.2 focused regressions stay green.
+
+
+## Post-hybrid continuation subgate
+
+After the hybrid affected gate passes, prove that the accepted composition is not
+only reopenable but can continue independently across a save/close/reopen
+boundary before moving on to owner-transfer and detach work.
+
+Focused proof:
+- create independent eager control and source worlds from the same seed;
+- normalize only the already-documented generated-world event_ids fixture;
+- advance eager control two real Simulation steps;
+- advance lazy session one real step, save, close and reopen;
+- require the reopened first-step digest, IDs, people order and event sequence to
+  match the eager control at the same point;
+- advance the reopened lazy session a second real step, require exact digest and
+  event identity/order/year/cause/value equality with the two-step eager control,
+  save, close and reopen again;
+- ordinary reopen remains bounded and does not silently replace the lazy people
+  authority with an eager materialization.
+
+This is a lifecycle proof only. Do not add gameplay/balance changes or broaden
+the persistence authority model. Once green, proceed to the remaining
+owner-transfer/provenance/invalidation and explicit materializing-detach work.
