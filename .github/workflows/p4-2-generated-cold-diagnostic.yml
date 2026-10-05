@@ -21,17 +21,32 @@ jobs:
           from ate_sim import generate_world
           from ate_sim.persistence_adapters import write_snapshot, WorldCodec, SCHEMA, _read_manifest
           from ate_sim.incremental_store import TransactionalStore
+          from ate_sim.persistence_session import (
+              _normalized_bootstrap_view,
+              _transfer_sealed_prefix,
+              _finalize_cold_store,
+          )
 
           w=generate_world(918273,width=8,height=6,settlements=1)
           w.event_ids={event.id for event in w.events}
+          view, source_log, info, projected_links = _normalized_bootstrap_view(w)
           with tempfile.TemporaryDirectory() as d:
               p=Path(d)/"world.sqlite"
-              write_snapshot(w,p,rules_id="diag")
+              write_snapshot(view,p,rules_id="diag")
               with TransactionalStore.open(
                   p,codec=WorldCodec(identity_links_recorded=True),
                   expected_simulation_schema=SCHEMA,
                   expected_rules_id="diag"
               ) as s:
+                  _transfer_sealed_prefix(s, source_log, info["disk_events"])
+                  gen,token=_finalize_cold_store(
+                      s,
+                      event_count=info["total_events"],
+                      disk_events=info["disk_events"],
+                      disk_last_year=info["disk_last_year"],
+                      last_year=info["last_year"],
+                      projected_links=projected_links,
+                  )
                   with s.read_transaction():
                       m=_read_manifest(s)
                       h=s.checked_head()
@@ -42,9 +57,14 @@ jobs:
                           ).fetchone()[0]
                           head=h.namespace_counts.get(ns,(0,0))[0]
                           size=desc[1]
+                          if ns=="world.events":
+                              continue
                           if actual!=size or head!=size:
                               mismatches.append((ns,size,actual,head))
-                      print("MISMATCHES",mismatches)
-                      print("LINEAGE_LEN",len(w.lineage.nodes))
-                      print("LINEAGE_KEYS",list(w.lineage.nodes)[:20])
+                      print("POST_FINAL_MISMATCHES",mismatches)
+                      for ns in ["world.event_ids","world.lineage.nodes","world.lineage.children"]:
+                          print("ROW",ns,
+                            "manifest",m["collections"][ns][1],
+                            "actual",s.db.execute("SELECT COUNT(*) FROM records WHERE namespace=?",(ns,)).fetchone()[0],
+                            "head",h.namespace_counts.get(ns))
           PY
