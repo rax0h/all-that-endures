@@ -734,7 +734,7 @@ def test_lazy_detach_preserves_cross_boundary_person_alias(tmp_path):
     assert restored.people[1] is restored.currency.wallets[99]["person"]
 
 
-def test_cross_boundary_person_field_edit_saves_both_authorities_and_topology_stays_guarded(
+def test_cross_boundary_person_field_edit_and_owner_replacement_publish_atomically(
     tmp_path,
 ):
     world = people_world(4, active=4)
@@ -749,26 +749,71 @@ def test_cross_boundary_person_field_edit_saves_both_authorities_and_topology_st
         assert session.world.people.diagnostics()["person_payload_loads"] == 0
         eager_alias = session.world.currency.wallets[99]["person"]
         assert session.diagnostics()["cross_boundary_identity_links"] >= 1
-        loaded = session.world.people[1]
-        assert loaded is eager_alias
-        before = loaded.wealth
-        start = session.pin.captured_head
+        first = session.world.people[1]
+        second = session.world.people[2]
+        assert first is eager_alias
+        before = first.wealth
+        start_generation = session.pin.captured_head
 
-        loaded.wealth += 1.0
+        first.wealth += 1.0
         assert eager_alias.wealth == before + 1.0
-        diag = session.diagnostics()
-        assert diag["people"]["dirty_people"] == 1
-        assert diag["eager_dirty_owners"] >= 1
 
-        replacement = session.world.people[2]
-        with pytest.raises(StoreError, match="crosses world.people"):
-            session.world.currency.wallets[99]["person"] = replacement
-        assert session.world.currency.wallets[99]["person"] is loaded
+        session.world.currency.wallets[99]["person"] = second
+        assert session.world.currency.wallets[99]["person"] is second
+        assert session.world.people[1] is first
 
-        assert session.save() == start + 1
+        assert session.save() == start_generation + 1
 
     with open_lazy_world_session(destination, rules_id=RULES) as reopened:
-        eager_alias = reopened.world.currency.wallets[99]["person"]
-        loaded = reopened.world.people[1]
-        assert loaded is eager_alias
-        assert loaded.wealth == before + 1.0
+        first = reopened.world.people[1]
+        second = reopened.world.people[2]
+        assert first.wealth == before + 1.0
+        assert reopened.world.currency.wallets[99]["person"] is second
+        assert reopened.world.currency.wallets[99]["person"] is not first
+
+
+def test_new_cross_boundary_person_alias_creation_persists_identity(tmp_path):
+    world = people_world(4, active=4)
+    source = tmp_path / "cross-create-cold.sqlite"
+    destination = tmp_path / "cross-create-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        person = session.world.people[1]
+        start_generation = session.pin.captured_head
+        session.world.currency.wallets[99] = {"person": person}
+        assert session.world.currency.wallets[99]["person"] is person
+        assert session.save() == start_generation + 1
+
+    with open_lazy_world_session(destination, rules_id=RULES) as reopened:
+        assert reopened.world.currency.wallets[99]["person"] is (
+            reopened.world.people[1]
+        )
+        assert reopened.diagnostics()["cross_boundary_identity_links"] >= 1
+
+
+def test_cross_boundary_person_alias_moves_between_eager_owners(tmp_path):
+    world = people_world(4, active=4)
+    shared_person = world.people[1]
+    world.currency.wallets[99] = {"person": shared_person}
+    source = tmp_path / "cross-move-cold.sqlite"
+    destination = tmp_path / "cross-move-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        person = session.world.currency.wallets[99].pop("person")
+        assert person is session.world.people[1]
+        session.world.currency.wallets[100] = {"person": person}
+        assert session.world.currency.wallets[100]["person"] is person
+        start_generation = session.pin.captured_head
+        assert session.save() == start_generation + 1
+
+    with open_lazy_world_session(destination, rules_id=RULES) as reopened:
+        assert "person" not in reopened.world.currency.wallets[99]
+        assert reopened.world.currency.wallets[100]["person"] is (
+            reopened.world.people[1]
+        )
+
+
