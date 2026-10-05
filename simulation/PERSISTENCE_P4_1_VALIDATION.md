@@ -1,5 +1,12 @@
 # P4.1 validation and P4.2 identity-design addendum
 
+> **Architect review, 2026-10-05: not accepted yet.** The green results below
+> are verified but miss four reproduced failures: eager key iteration,
+> historical same-value query scans, pin-release/scrub inconsistency and
+> resolution of a failed later attempt with an older receipt present.
+> Follow [STAGE_0_5_SOL_EXECUTION_HANDOFF.md](STAGE_0_5_SOL_EXECUTION_HANDOFF.md)
+> for exact repairs and the remaining autonomous Sol assignment.
+
 **Implementation baseline:** `953240816b6d332aa95e65a26b463b10a4b58ef4`  
 **Stable P4.1 code candidate:** `c3f3525d7ddf3b2afdf39946a6fa9add9dd98225`  
 **Focused gate:** Actions run `37307695625` — **56 passed in 5.10 s**.  

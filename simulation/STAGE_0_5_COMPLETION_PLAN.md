@@ -1,5 +1,13 @@
 # Stage 0.5 completion plan and consolidated Sol handoff
 
+> **Current execution authority (2026-10-05):** follow
+> [STAGE_0_5_SOL_EXECUTION_HANDOFF.md](STAGE_0_5_SOL_EXECUTION_HANDOFF.md).
+> P4.1 at 006e2bb is not accepted: four review regressions require repair.
+> The owner authorizes Sol to continue through the remaining in-scope gates
+> without routine Astra sign-offs. Earlier stop-for-Astra instructions below
+> are historical where the new handoff supersedes them. Long-run and merge
+> restrictions remain in force.
+
 **Architect:** Astra. **Date:** 2026-10-05.
 **Repository:** `rax0h/all-that-endures`; PR #14;
 `sim/stage-0-5-stabilization`.
