@@ -188,3 +188,57 @@ Focused proofs:
 
 Only after this subgate passes do EventLog/non-people tracking and
 materializing detach become eligible.
+
+
+## Hybrid non-people/EventLog integration subgate
+
+After the green people-write gate, the next slice reuses the accepted P3B
+tracking/cold-save machinery for every still-eager root while explicitly
+excluding `world.people` from its root/memo/identity bootstrap.
+
+Narrow supporting changes:
+- `persistence_tracking.IncrementalWorldSession` gains an internal
+  `_excluded_namespaces` set honored by root binding, identity-owner bootstrap
+  and persisted-key capture. Default is empty, so ordinary P2/P3 behavior is
+  unchanged.
+- `persistence_session._capture_cold_baseline_ordinals` accepts an optional
+  excluded set; default behavior is unchanged.
+- `persistence_events.prepare_sealed_append` accepts the same checked-store
+  interface already accepted by `SealedEventPrefix`.
+- `persistence_cold_save.prepare_cold_save` accepts optional `force` and
+  explicit `token`; defaults preserve P3B behavior. Forced planning is used
+  when the only effective mutation is in lazy people.
+
+One hybrid generation:
+1. freeze the lazy people overlay into `VersionChange` and
+   `IdentityOccurrenceChange`;
+2. freeze the P3B eager/EventLog journal with the same target generation/token;
+3. merge structural `world.people` layout into the cold plan when necessary;
+4. adjust the cold plan's expected namespace counts for lazy people;
+5. publish lazy versions, occurrence labels, ordinary P3B records, event
+   descriptors/segments and the head in one `LazyRecordStore.commit`;
+6. validate lazy touched-owner evidence plus the existing cold successor
+   evidence;
+7. run the accepted cold runtime prefix/journal publisher, then accept the lazy
+   people overlay and moved GenerationPin.
+
+Cross-boundary identity:
+- people-only shared incarnations are restored lazily by persisted incarnation
+  labels;
+- a P2C link crossing `world.people` and an eager owner seeds the lazy
+  incarnation registry from the already-resident eager object without decoding
+  the Person row;
+- until owner-transfer mutation across that boundary has its own proof, a
+  mutation that would rewrite a cross-boundary identity group fails closed
+  rather than silently splitting or rebinding it.
+
+Focused proofs:
+- one short `Simulation.step()` can mutate people, eager roots and EventLog and
+  save/reopen to the same canonical digest as an independent eager control;
+- D/F/N transfer remains at most four sealed chunks and disk history is not
+  materialized;
+- people-only and eager-only saves share the same commit/recovery machinery;
+- lost acknowledgement, precommit failure and stale competitor preserve
+  old-or-new atomicity across both authorities;
+- ordinary open remains zero-Person-payload and clean people cache remains <=256;
+- existing P3B/P4.1/P4.2 focused regressions stay green.
