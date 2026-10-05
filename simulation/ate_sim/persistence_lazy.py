@@ -3290,11 +3290,12 @@ class LazyWorldSession:
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
-        if (
+        structural_dirty = bool(
             structural_keys
             or aspiration_structural_keys
             or resource_structural_keys
-        ):
+        )
+        if structural_dirty:
             self._eager_tracker._manifest_dirty = True
 
         self._refresh_cross_boundary_identity()
@@ -3307,11 +3308,7 @@ class LazyWorldSession:
                 token=token,
             )
         except Exception:
-            if (
-                structural_keys
-                or aspiration_structural_keys
-                or resource_structural_keys
-            ):
+            if structural_dirty:
                 self._eager_tracker._manifest_dirty = prior_manifest_dirty
             raise
 
@@ -3338,22 +3335,15 @@ class LazyWorldSession:
         expected_counts = self.store.codec.decode(
             cold_plan.expected_namespace_counts
         )
-        if len(self.people):
-            expected_counts[PEOPLE_NAMESPACE] = (len(self.people), 0)
-        else:
-            expected_counts.pop(PEOPLE_NAMESPACE, None)
-        if len(self.aspirations):
-            expected_counts[ASPIRATION_NAMESPACE] = (
-                len(self.aspirations), 0
-            )
-        else:
-            expected_counts.pop(ASPIRATION_NAMESPACE, None)
-        if len(self.resources):
-            expected_counts[RESOURCE_NAMESPACE] = (
-                len(self.resources), 0
-            )
-        else:
-            expected_counts.pop(RESOURCE_NAMESPACE, None)
+        for namespace, size in (
+            (PEOPLE_NAMESPACE, len(self.people)),
+            (ASPIRATION_NAMESPACE, len(self.aspirations)),
+            (RESOURCE_NAMESPACE, len(self.resources)),
+        ):
+            if size:
+                expected_counts[namespace] = (size, 0)
+            else:
+                expected_counts.pop(namespace, None)
         cold_plan = replace(
             cold_plan,
             expected_namespace_counts=_counts_tuple(
@@ -3593,12 +3583,16 @@ class LazyWorldSession:
         self.people._pin = result.pin
         self.aspirations._pin = result.pin
         self.resources._pin = result.pin
+        self.resources._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
             plan, result.generation
         )
         self._validate_aspiration_successor(
+            plan, result.generation
+        )
+        self._validate_resource_successor(
             plan, result.generation
         )
         self._validate_resource_successor(
@@ -3625,6 +3619,7 @@ class LazyWorldSession:
         )
         self.people.accept_save(plan, result.pin)
         self.aspirations.accept_save(plan, result.pin)
+        self.resources.accept_save(plan, result.pin)
         self.resources.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
@@ -3817,12 +3812,40 @@ class LazyWorldSession:
             )
         return detached
 
+    def _stage_detached_resources(self):
+        expected = len(self.resources)
+        detached = {}
+        transfer_replacements = {}
+        transfer_assignments = []
+        for key in self.resources:
+            resource = self.resources[key]
+            if not isinstance(resource, MagicResource):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-resource value"
+                )
+            transfers = resource.transfers
+            if isinstance(transfers, LazyTrackedList):
+                replacement = transfer_replacements.get(id(transfers))
+                if replacement is None:
+                    replacement = list(transfers)
+                    transfer_replacements[id(transfers)] = replacement
+                transfer_assignments.append(
+                    (resource, "transfers", replacement)
+                )
+            detached[key] = resource
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach resource materialization count mismatch"
+            )
+        return detached, transfer_replacements, transfer_assignments
+
     def _publish_materialized_detach(
         self,
         old_log,
         new_log,
         detached_people,
         detached_aspirations,
+        detached_resources,
         assignments,
         cache_removals,
         index_rebindings,
@@ -3840,6 +3863,7 @@ class LazyWorldSession:
             for record, table, key in index_rebindings
         ]
         aspiration_records = tuple(detached_aspirations.values())
+        resource_records = tuple(detached_resources.values())
 
         # This is the final fallible storage operation.  If release/cleanup
         # fails, no staged graph replacement has been published and the session
@@ -3857,6 +3881,9 @@ class LazyWorldSession:
                 object.__setattr__(record, "_index_table", table_ref)
                 object.__setattr__(record, "_index_key", key)
             for record in aspiration_records:
+                object.__setattr__(record, "_index_table", None)
+                object.__setattr__(record, "_index_key", None)
+            for record in resource_records:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
@@ -3895,6 +3922,7 @@ class LazyWorldSession:
         self._registry.close()
         self.people = detached_people
         self.aspirations = detached_aspirations
+        self.resources = detached_resources
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -3921,6 +3949,11 @@ class LazyWorldSession:
 
             detached_people = self._stage_detached_people()
             detached_aspirations = self._stage_detached_aspirations()
+            (
+                detached_resources,
+                transfer_replacements,
+                transfer_assignments,
+            ) = self._stage_detached_resources()
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -3929,9 +3962,12 @@ class LazyWorldSession:
                     replacements={
                         id(self.people): detached_people,
                         id(self.aspirations): detached_aspirations,
+                        id(self.resources): detached_resources,
+                        **transfer_replacements,
                     },
                 )
             )
+            assignments.extend(transfer_assignments)
             for key, person in dict.items(detached_people):
                 if isinstance(person, IndexedRecord):
                     index_rebindings.append(
@@ -3944,6 +3980,7 @@ class LazyWorldSession:
                 new_log,
                 detached_people,
                 detached_aspirations,
+                detached_resources,
                 assignments,
                 cache_removals,
                 index_rebindings,
@@ -3961,6 +3998,7 @@ class LazyWorldSession:
             "state": self._state,
             "people": self.people.diagnostics(),
             "aspirations": self.aspirations.diagnostics(),
+            "resources": self.resources.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
