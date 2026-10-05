@@ -118,7 +118,9 @@ def _install_assignment_hooks():
             assigned = value
             if bound is not None:
                 if not bound.session._suspended:
-                    bound.session._ensure_mutation_allowed()
+                    bound.session._ensure_mutation_allowed(
+                        subject=self, field=name, value=value
+                    )
                 token = bound.before_assignment(self, name, value)
                 if token is not None and token[0] in ("owned", "root_collection", "root_collection_normalize"):
                     assigned = token[-1]
@@ -206,7 +208,9 @@ class _ObjectBinding:
                 return ("root_scalar", namespace, getattr(obj, name))
             return self.session._prepare_root_assignment(namespace, getattr(obj, name), value, kind)
         owners = frozenset(self.owners)
-        wrapped = self.session._prepare_nested(value, owners)
+        wrapped = self.session._prepare_nested(
+            value, owners, preflight=False
+        )
         return ("owned", getattr(obj, name), owners, wrapped)
 
     def after_assignment(self, obj, name, value, token):
@@ -1042,11 +1046,13 @@ class IncrementalWorldSession:
         if self._cold_operation_depth:
             raise StoreError(f"reentrant cold session {operation} is not allowed")
 
-    def _ensure_mutation_allowed(self):
+    def _ensure_mutation_allowed(
+        self, *, subject=None, field=None, value=_MISSING
+    ):
         self._ensure_active()
         external_guard = getattr(self, "_external_mutation_guard", None)
         if external_guard is not None:
-            external_guard()
+            external_guard(subject=subject, field=field, value=value)
         if self._cold_mode and self._cold_state != "active":
             raise StoreError(
                 f"cold World session mutation is blocked while {self._cold_state}"
@@ -1404,8 +1410,11 @@ class IncrementalWorldSession:
         finally:
             active.remove(ident)
 
-    def _prepare_nested(self, value, owners, *, allow_existing=False):
-        self._ensure_mutation_allowed()
+    def _prepare_nested(
+        self, value, owners, *, allow_existing=False, preflight=True
+    ):
+        if preflight:
+            self._ensure_mutation_allowed()
         self._validate_incoming(value, owners, allow_existing=allow_existing)
         return self._bind_nested(
             value, owners, initial=False, allow_existing=allow_existing
