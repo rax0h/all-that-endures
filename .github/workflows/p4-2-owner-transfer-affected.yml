@@ -1,0 +1,19 @@
+name: P4.2 owner-transfer affected gate
+
+on:
+  push:
+    branches:
+      - sol-p4-2-owner-transfer-affected
+
+jobs:
+  affected:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python -m pytest -q             simulation/tests/test_persistence_lazy_identity.py             simulation/tests/test_persistence_lazy_people.py             simulation/tests/test_persistence_tracking.py             simulation/tests/test_persistence_cold_save.py             simulation/tests/test_persistence_cold_identity_restore.py
