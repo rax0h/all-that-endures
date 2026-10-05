@@ -30,6 +30,7 @@ from .incremental_store import (
 )
 from .persistence_adapters import (
     COLLECTION_LAYOUT,
+    IDENTITY_LINKS,
     META,
     RECORD_SCHEMA,
     ROOT_FIELDS,
@@ -1326,6 +1327,7 @@ class LazyWorldSession:
             tail_descriptor=tail_descriptor,
             commit_descriptor=commit_descriptor,
         )
+        self._install_cross_boundary_tracker_baseline()
 
         self._lifetime = _LazyLifetime(self)
         object.__setattr__(world, "_ate_persistence_lifetime", self._lifetime)
@@ -1378,43 +1380,6 @@ class LazyWorldSession:
             raise StoreError("lazy lifecycle operation guard changed")
         self._lifecycle_operation = None
 
-    def _incoming_contains_lazy_person(self, value, seen=None):
-        if seen is None:
-            seen = set()
-        cls = type(value)
-        if value is None or cls in (
-            bool, int, float, str, bytes, FrozenDict, FrozenList
-        ):
-            return False
-        if isinstance(value, Person):
-            return self._registry.incarnation_for_object(value) is not None
-        ident = id(value)
-        if ident in seen:
-            return False
-        seen.add(ident)
-        try:
-            if is_dataclass(value):
-                return any(
-                    self._incoming_contains_lazy_person(
-                        getattr(value, name), seen
-                    )
-                    for name in RECORD_FIELDS.get(type(value), ())
-                )
-            if isinstance(value, dict):
-                return any(
-                    self._incoming_contains_lazy_person(key, seen)
-                    or self._incoming_contains_lazy_person(child, seen)
-                    for key, child in value.items()
-                )
-            if isinstance(value, (list, tuple, set, frozenset)):
-                return any(
-                    self._incoming_contains_lazy_person(child, seen)
-                    for child in value
-                )
-            return False
-        finally:
-            seen.discard(ident)
-
     def _ensure_hybrid_mutation_allowed(
         self, *, subject=None, field=None, value=None
     ):
@@ -1422,24 +1387,185 @@ class LazyWorldSession:
         if (
             isinstance(subject, Person)
             and field in RECORD_FIELDS.get(Person, ())
-            and _cross_boundary_field_value_is_immutable(value)
+            and not _cross_boundary_field_value_is_immutable(value)
         ):
-            # A shared Person field edit changes value state, not identity
-            # topology. The eager owner binding and LazyRecordTable notification
-            # will both journal the same live object for one atomic save.
-            return
-        if self._cross_boundary_links:
             raise StoreError(
-                "mutation of the eager graph is blocked while a persisted "
-                "identity group crosses world.people; cross-boundary owner "
-                "transfer requires the next identity integration proof"
+                "cross-boundary Person field edits require immutable values"
             )
-        if self._incoming_contains_lazy_person(value):
-            raise StoreError(
-                "mutation would create an identity group that crosses "
-                "world.people; cross-boundary owner transfer requires the "
-                "next identity integration proof"
+
+    def _install_cross_boundary_tracker_baseline(self):
+        tracker = self._eager_tracker
+        persisted = tracker._cold_persisted_keys.setdefault(
+            IDENTITY_LINKS, set()
+        )
+        for target, owner in self._cross_boundary_links:
+            existing = tracker._committed_identity_targets.get(target)
+            if existing is not None and existing != owner:
+                raise StoreIntegrityError(
+                    "cross-boundary identity target conflicts with eager link"
+                )
+            tracker._committed_identity_targets[target] = owner
+            tracker._live_identity_targets[target] = owner
+            persisted.add(target)
+
+    def _cross_links_from_tracker(self):
+        return tuple(
+            sorted(
+                (
+                    (target, owner)
+                    for target, owner
+                    in self._eager_tracker._live_identity_targets.items()
+                    if _path_under_people(target)
+                    != _path_under_people(owner)
+                ),
+                key=self.store.codec.encode,
             )
+        )
+
+    def _absolute_people_occurrence_path(self, occurrence):
+        return (
+            _owner_path(self.manifest, occurrence.owner)
+            + tuple(occurrence.path)
+        )
+
+    def _refresh_cross_boundary_identity(self):
+        tracker = self._eager_tracker
+
+        # First let the accepted eager identity index reach the current live
+        # graph for only owners actually dirtied by mutation.
+        tracker._refresh_identity_index()
+
+        old_by_incarnation = {}
+        orphaned_old = []
+        for link in tuple(self._cross_boundary_links):
+            target, owner = link
+            people_side = (
+                _people_occurrence_from_path(target)
+                or _people_occurrence_from_path(owner)
+            )
+            if people_side is None:
+                raise StoreIntegrityError(
+                    "recorded cross-boundary link lacks people occurrence"
+                )
+            key, relative = people_side
+            incarnation = self._registry.incarnation_for_occurrence(
+                Occurrence(PEOPLE_NAMESPACE, key, relative)
+            )
+            if incarnation is None:
+                orphaned_old.append(link)
+            else:
+                old_by_incarnation.setdefault(
+                    incarnation, []
+                ).append(link)
+
+        live_people = {}
+        for incarnation, obj in self._registry.live_bindings():
+            if isinstance(obj, Person):
+                live_people[incarnation] = obj
+
+        removes = list(orphaned_old)
+        adds = []
+        desired_cross = []
+        incarnations = set(old_by_incarnation) | set(live_people)
+
+        for incarnation in sorted(incarnations):
+            people_occurrences = tuple(
+                occurrence
+                for occurrence
+                in self._registry.occurrences_for_incarnation(incarnation)
+                if occurrence.owner_namespace == PEOPLE_NAMESPACE
+            )
+            people_paths = {
+                self._absolute_people_occurrence_path(occurrence)
+                for occurrence in people_occurrences
+            }
+
+            eager_paths = set()
+            obj = live_people.get(incarnation)
+            eager_ident = None
+            if obj is not None:
+                eager_ident = id(obj)
+                entry = tracker._identity_index.occurrences.get(
+                    eager_ident
+                )
+                if entry is not None:
+                    if entry[0] is not obj:
+                        raise StoreIntegrityError(
+                            "eager identity address reused for another object"
+                        )
+                    eager_paths.update(entry[1])
+
+            old_links = tuple(old_by_incarnation.get(incarnation, ()))
+            historical_paths = {
+                path
+                for link in old_links
+                for path in link
+            }
+            group_paths = people_paths | eager_paths | historical_paths
+
+            desired_all = ()
+            if people_paths and eager_paths:
+                desired_all = tuple(
+                    tracker._identity_index._links_for(
+                        people_paths | eager_paths
+                    )
+                )
+            desired_tokens = {
+                self.store.codec.encode(link): link
+                for link in desired_all
+            }
+
+            current_all = tuple(
+                (target, owner)
+                for target, owner
+                in tracker._live_identity_targets.items()
+                if target in group_paths or owner in group_paths
+            )
+            current_tokens = {
+                self.store.codec.encode(link): link
+                for link in current_all
+            }
+
+            removes.extend(
+                current_tokens[token]
+                for token in current_tokens.keys()
+                - desired_tokens.keys()
+            )
+            adds.extend(
+                desired_tokens[token]
+                for token in desired_tokens.keys()
+                - current_tokens.keys()
+            )
+            desired_cross.extend(
+                link for link in desired_all
+                if _path_under_people(link[0])
+                != _path_under_people(link[1])
+            )
+
+        remove_map = {
+            self.store.codec.encode(link): link for link in removes
+        }
+        add_map = {
+            self.store.codec.encode(link): link for link in adds
+        }
+        overlap = remove_map.keys() & add_map.keys()
+        for token in tuple(overlap):
+            remove_map.pop(token, None)
+            add_map.pop(token, None)
+
+        if remove_map or add_map:
+            tracker._merge_current_identity_patch(
+                tuple(remove_map[token] for token in sorted(remove_map)),
+                tuple(add_map[token] for token in sorted(add_map)),
+            )
+
+        self._cross_boundary_links = tuple(
+            desired_cross[token]
+            for token in sorted({
+                self.store.codec.encode(link): link
+                for link in desired_cross
+            })
+        )
 
     def _top_occurrence(self, key):
         return Occurrence(PEOPLE_NAMESPACE, key, ())
@@ -1617,6 +1743,8 @@ class LazyWorldSession:
             # publication is pending before it freezes acknowledgement state.
             self._eager_tracker._manifest_dirty = True
 
+        self._refresh_cross_boundary_identity()
+
         token = uuid.uuid4().hex
         try:
             cold_plan = prepare_cold_save(
@@ -1786,7 +1914,12 @@ class LazyWorldSession:
                 self._eager_tracker._committed_identity_targets.items(),
                 key=lambda item: self.store.codec.encode(item[0]),
             )
-        ) + tuple(self._cross_boundary_links)
+        )
+        self._cross_boundary_links = tuple(
+            link for link in self.identity_links
+            if _path_under_people(link[0])
+            != _path_under_people(link[1])
+        )
         self._pending_save = None
         self._state = "active"
         return result.generation
