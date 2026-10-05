@@ -639,6 +639,39 @@ def _path_under_people(path) -> bool:
     return bool(path) and path[0] == ("field", "people")
 
 
+def _aspiration_occurrence_from_path(path):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "magic_resources")
+        and path[1] == ("field", "aspirations")
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
+
+
+def _lazy_occurrence_from_path(path):
+    people = _people_occurrence_from_path(path)
+    if people is not None:
+        return PEOPLE_NAMESPACE, people[0], people[1], Person
+    aspiration = _aspiration_occurrence_from_path(path)
+    if aspiration is not None:
+        return (
+            ASPIRATION_NAMESPACE,
+            aspiration[0],
+            aspiration[1],
+            MagicAspiration,
+        )
+    return None
+
+
+def _path_under_lazy(path) -> bool:
+    return _lazy_occurrence_from_path(path) is not None
+
+
 def _relative_get(root, path):
     value = root
     for kind, key in path:
@@ -686,38 +719,38 @@ def _people_occurrence_from_path(path):
     return None
 
 
-def _seed_cross_boundary_people_identity(session, links):
+def _seed_cross_boundary_lazy_identity(session, links):
     cross = []
     generation = session.pin.captured_head
     for target, owner in links:
-        target_people = _people_occurrence_from_path(target)
-        owner_people = _people_occurrence_from_path(owner)
-        if (target_people is None) == (owner_people is None):
+        target_lazy = _lazy_occurrence_from_path(target)
+        owner_lazy = _lazy_occurrence_from_path(owner)
+        if (target_lazy is None) == (owner_lazy is None):
             continue
-        people_key, relative = (
-            target_people if target_people is not None else owner_people
+        namespace, key, relative, expected_type = (
+            target_lazy if target_lazy is not None else owner_lazy
         )
-        eager_path = owner if target_people is not None else target
-        encoded_key = session.store.codec.encode(people_key)
+        eager_path = owner if target_lazy is not None else target
+        encoded_key = session.store.codec.encode(key)
         encoded_path = session.store.codec.encode(relative)
         row = session.store._visible_identity_occurrence(
             generation,
-            PEOPLE_NAMESPACE,
+            namespace,
             encoded_key,
             encoded_path,
         )
         if row is None:
             raise StoreIntegrityError(
-                "cross-boundary people identity lacks incarnation label"
+                "cross-boundary lazy identity lacks incarnation label"
             )
         eager_object = _at_path(
             session.world,
             eager_path,
             mutable_event_tail_only=True,
         )
-        if not isinstance(eager_object, Person):
+        if not isinstance(eager_object, expected_type):
             raise StoreIntegrityError(
-                "cross-boundary people identity does not resolve to Person"
+                "cross-boundary lazy identity resolves to wrong type"
             )
         incarnation = IncarnationId(
             session.store.store_identity, int(row[0])
@@ -733,14 +766,18 @@ def _seed_cross_boundary_people_identity(session, links):
             )
         session._registry.attach_existing(
             incarnation,
-            Occurrence(
-                PEOPLE_NAMESPACE,
-                people_key,
-                relative,
-            ),
+            Occurrence(namespace, key, relative),
         )
         cross.append((target, owner))
     return tuple(cross)
+
+
+def _seed_cross_boundary_people_identity(session, links):
+    # Compatibility alias retained for the existing people-focused tests.
+    return tuple(
+        link for link in _seed_cross_boundary_lazy_identity(session, links)
+        if _path_under_people(link[0]) != _path_under_people(link[1])
+    )
 
 
 def _initialize_eager_tracker(
@@ -759,7 +796,9 @@ def _initialize_eager_tracker(
         codec=session.store.codec,
         cold_mode=True,
     )
-    tracker._excluded_namespaces = {PEOPLE_NAMESPACE}
+    tracker._excluded_namespaces = {
+        PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+    }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
         tracker.generation = session.pin.captured_head
