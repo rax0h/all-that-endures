@@ -2300,6 +2300,55 @@ class LazyWorldSession:
             layout_value=layout_value,
         ), layout_value
 
+    def _merge_aspiration_layout(self, cold_plan, structural_keys):
+        layout_value = cold_plan.layout_value
+        if not structural_keys:
+            return cold_plan, layout_value
+
+        if layout_value is None:
+            layout_value = dict(self.manifest["collections"])
+        else:
+            layout_value = dict(layout_value)
+        current = layout_value[ASPIRATION_NAMESPACE]
+        if type(current) is not tuple or len(current) != 3:
+            raise StoreFormatError(
+                "invalid aspiration collection description"
+            )
+        layout_value[ASPIRATION_NAMESPACE] = (
+            current[0],
+            len(self.aspirations),
+            current[2],
+        )
+
+        change_map = {
+            (change.namespace, self.store.codec.encode(change.key)): change
+            for change in cold_plan.changes
+        }
+        layout_change = RecordChange(
+            META,
+            COLLECTION_LAYOUT,
+            layout_value,
+            record_schema=RECORD_SCHEMA,
+        )
+        change_map[
+            (META, self.store.codec.encode(COLLECTION_LAYOUT))
+        ] = layout_change
+        changes = tuple(
+            change_map[key]
+            for key in sorted(change_map, key=lambda item: (item[0], item[1]))
+        )
+        self._eager_tracker._manifest_dirty = True
+        return replace(
+            cold_plan,
+            changes=changes,
+            record_evidence=_change_evidence(
+                self.store.codec, changes
+            ),
+            manifest_dirty=True,
+            layout_value=layout_value,
+        ), layout_value
+
+
     def _prepare_hybrid_save(self):
         (
             version_changes,
@@ -2307,12 +2356,21 @@ class LazyWorldSession:
             touched_keys,
             structural_keys,
         ) = self.people.prepare_save_changes()
-        people_effective = bool(version_changes or identity_changes)
+        (
+            aspiration_version_changes,
+            aspiration_identity_changes,
+            aspiration_touched_keys,
+            aspiration_structural_keys,
+        ) = self.aspirations.prepare_save_changes()
+        lazy_effective = bool(
+            version_changes
+            or identity_changes
+            or aspiration_version_changes
+            or aspiration_identity_changes
+        )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
-        if structural_keys:
-            # Make the shared cold journal aware that collection-layout
-            # publication is pending before it freezes acknowledgement state.
+        if structural_keys or aspiration_structural_keys:
             self._eager_tracker._manifest_dirty = True
 
         self._refresh_cross_boundary_identity()
@@ -2321,12 +2379,11 @@ class LazyWorldSession:
         try:
             cold_plan = prepare_cold_save(
                 self._eager_tracker,
-                force=people_effective,
+                force=lazy_effective,
                 token=token,
             )
         except Exception:
-            if structural_keys:
-                # Restore any pre-existing eager structural journal exactly.
+            if structural_keys or aspiration_structural_keys:
                 self._eager_tracker._manifest_dirty = prior_manifest_dirty
             raise
 
@@ -2344,10 +2401,16 @@ class LazyWorldSession:
         cold_plan, layout_value = self._merge_people_layout(
             cold_plan, structural_keys
         )
+        cold_plan, layout_value = self._merge_aspiration_layout(
+            cold_plan, aspiration_structural_keys
+        )
         expected_counts = self.store.codec.decode(
             cold_plan.expected_namespace_counts
         )
         expected_counts[PEOPLE_NAMESPACE] = (len(self.people), 0)
+        expected_counts[ASPIRATION_NAMESPACE] = (
+            len(self.aspirations), 0
+        )
         cold_plan = replace(
             cold_plan,
             expected_namespace_counts=_counts_tuple(
@@ -2359,11 +2422,16 @@ class LazyWorldSession:
             target_generation=cold_plan.target_generation,
             version_changes=version_changes,
             identity_changes=identity_changes,
+            aspiration_version_changes=aspiration_version_changes,
+            aspiration_identity_changes=aspiration_identity_changes,
             cold_plan=cold_plan,
             touched_keys=touched_keys,
             structural_keys=structural_keys,
+            aspiration_touched_keys=aspiration_touched_keys,
+            aspiration_structural_keys=aspiration_structural_keys,
             layout_value=layout_value,
         )
+
 
     def _validate_people_successor(self, plan, generation):
         for change in plan.version_changes:
@@ -2437,6 +2505,65 @@ class LazyWorldSession:
                 "saved incarnation allocator state mismatch"
             )
 
+    def _validate_aspiration_successor(self, plan, generation):
+        for change in plan.aspiration_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, ASPIRATION_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted aspiration remains visible after save"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved aspiration is absent after save"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                ASPIRATION_NAMESPACE,
+                typed_key,
+                row,
+                decode=False,
+            )
+            if (
+                schema != LAZY_ASPIRATION_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved aspiration payload evidence mismatch"
+                )
+
+        for change in plan.aspiration_identity_changes:
+            encoded_key = self.store.codec.encode(change.owner_key)
+            encoded_path = self.store.codec.encode(
+                change.occurrence_path
+            )
+            row = self.store._visible_identity_occurrence(
+                generation,
+                change.owner_namespace,
+                encoded_key,
+                encoded_path,
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted aspiration incarnation remains visible"
+                    )
+            elif row is None or row[0] != change.incarnation_id:
+                raise StoreIntegrityError(
+                    "saved aspiration incarnation evidence mismatch"
+                )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -2454,9 +2581,13 @@ class LazyWorldSession:
         # correct generation even if later publication checks fail.
         self.pin = result.pin
         self.people._pin = result.pin
+        self.aspirations._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
+            plan, result.generation
+        )
+        self._validate_aspiration_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -2479,6 +2610,7 @@ class LazyWorldSession:
             tracker, plan.cold_plan, replacement_prefix
         )
         self.people.accept_save(plan, result.pin)
+        self.aspirations.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -2535,8 +2667,14 @@ class LazyWorldSession:
             result = self.store.commit(
                 self.pin,
                 commit_token=plan.token,
-                version_changes=plan.version_changes,
-                identity_changes=plan.identity_changes,
+                version_changes=(
+                    plan.version_changes
+                    + plan.aspiration_version_changes
+                ),
+                identity_changes=(
+                    plan.identity_changes
+                    + plan.aspiration_identity_changes
+                ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
                 new_segments=plan.cold_plan.new_segments,
