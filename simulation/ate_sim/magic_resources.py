@@ -7,11 +7,12 @@ from .magic_progression import record_body_transition
 from .currency import can_pay_tier
 from math import ceil
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
+from .record_index import IndexedRecord
 
 RESOURCE_DISCOVERY_RATE=.45
 
 @dataclass
-class MagicAspiration:
+class MagicAspiration(IndexedRecord):
  drive:float;desired_base_essences:int;desired_abilities:int;reason:str;formed_year:int;preparation:float=0.;search_years:int=0;completion_goal:bool=False;urgency:float=.0;compromise_tolerance:float=.5;stone_selectiveness:float=.5;risk_tolerance:float=.5;adventurer_aspiration:bool=False
 @dataclass
 class MagicResource:
