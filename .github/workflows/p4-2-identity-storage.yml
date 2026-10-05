@@ -1,4 +1,5 @@
 name: P4.2 identity storage gate
+# Exact product base 654cd7883f917e970f4dc9f63ab19929c36bcec9
 
 on:
   push:
