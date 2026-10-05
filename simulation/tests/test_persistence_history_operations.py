@@ -188,7 +188,14 @@ def test_streaming_history_bounds_and_detach_cost_are_measured(
         tracemalloc.stop()
         archive_reads = prefix.diagnostics().segment_reads
         # Archive makes two streaming event passes: nodes then causal edges.
-        assert archive_reads == segments * 2
+        # A four-segment prefix is fully warm from the preceding digest and
+        # therefore needs no additional checked store reads. Larger prefixes
+        # exceed the four-segment reader cache and are reread once per pass.
+        expected_archive_reads = (
+            0 if segments <= prefix._cache.maxlen
+            else segments * 2
+        )
+        assert archive_reads == expected_archive_reads
         assert prefix.resident_segments <= 4
 
         tracemalloc.start()
