@@ -2,7 +2,7 @@ import hashlib
 
 import pytest
 
-from ate_sim import Simulation, generate_world
+from ate_sim import Simulation, checkpoint, generate_world
 from ate_sim.core import Person, World
 from ate_sim.incremental_store import (
     StoreConflictError,
@@ -12,11 +12,14 @@ from ate_sim.incremental_store import (
 from ate_sim.persistence_adapters import SCHEMA, WorldCodec
 from ate_sim.persistence_lazy import (
     PEOPLE_NAMESPACE,
+    LazyRecordTable,
     convert_cold_to_lazy,
     open_lazy_world_session,
 )
 from ate_sim.persistence_lazy_store import LazyRecordStore
 from ate_sim.persistence_session import write_cold_snapshot
+from ate_sim.record_index import RecordTable
+import ate_sim.persistence_lifecycle as lifecycle
 
 
 RULES = "stage-0.5-p4-lazy-people-tests"
@@ -578,6 +581,157 @@ def test_hybrid_lazy_session_continues_two_real_steps_across_reopen(tmp_path):
             final.world.next_settlement,
             final.world.next_event,
         ) == second_next_ids
+
+
+def test_lazy_detach_requires_explicit_materialization_without_side_effect(tmp_path):
+    world = people_world(12, active=4)
+    source = tmp_path / "detach-requires-cold.sqlite"
+    destination = tmp_path / "detach-requires-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    session = open_lazy_world_session(destination, rules_id=RULES)
+    try:
+        old_people = session.world.people
+        old_log = session.world.events
+        generation = session.pin.captured_head
+        with pytest.raises(StoreError, match="materialize_history=True"):
+            session.detach()
+        assert session.diagnostics()["state"] == "active"
+        assert session.pin.captured_head == generation
+        assert session.world.people is old_people
+        assert session.world.events is old_log
+        assert not session.store._closed
+    finally:
+        session.close()
+
+
+def test_lazy_materializing_detach_preserves_all_people_edits_alias_and_portability(
+    tmp_path,
+):
+    world = people_world(400, active=8)
+    source = tmp_path / "detach-all-cold.sqlite"
+    destination = tmp_path / "detach-all-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    session = open_lazy_world_session(destination, rules_id=RULES)
+    old_people = session.world.people
+    retained = old_people[1]
+    retained.wealth += 17.0
+    session.world.currency.wallets[77] = {"value": 9}
+    detached = session.detach(materialize_history=True)
+
+    assert detached is session.world
+    assert session._state == "closed"
+    assert isinstance(detached.people, RecordTable)
+    assert not isinstance(detached.people, LazyRecordTable)
+    assert len(detached.people) == 400
+    assert tuple(detached.people) == tuple(range(1, 401))
+    assert detached.people[1] is retained
+    assert detached.people[1].wealth == 18.0
+    assert detached.currency.wallets[77]["value"] == 9
+    assert detached.events._disk_prefix is None
+    assert "_ate_persistence_lifetime" not in detached.__dict__
+    assert "_ate_persistence_lifetime" not in detached.events.__dict__
+
+    with pytest.raises(StoreError):
+        len(old_people)
+
+    restored = checkpoint.loads(checkpoint.dumps(detached))
+    assert restored.digest() == detached.digest()
+    assert len(restored.people) == 400
+
+    detached.people[1].wealth += 1.0
+    assert detached.people[1].wealth == 19.0
+    session.close()
+
+
+def test_lazy_detach_staging_failure_leaves_session_usable(tmp_path, monkeypatch):
+    world = people_world(20, active=5)
+    source = tmp_path / "detach-fail-cold.sqlite"
+    destination = tmp_path / "detach-fail-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    session = open_lazy_world_session(destination, rules_id=RULES)
+    try:
+        old_people = session.world.people
+        old_log = session.world.events
+        before = session.pin.captured_head
+
+        def fail(phase, _session):
+            if phase == "before_publish":
+                raise RuntimeError("lazy detach staging fault")
+
+        monkeypatch.setattr(lifecycle, "_lifecycle_phase", fail)
+        with pytest.raises(RuntimeError, match="lazy detach staging fault"):
+            session.detach(materialize_history=True)
+
+        assert session.diagnostics()["state"] == "active"
+        assert session.pin.captured_head == before
+        assert session.world.people is old_people
+        assert session.world.events is old_log
+        assert not session.store._closed
+        session.world.people[1].wealth += 3.0
+        assert session.world.people[1].wealth == 4.0
+        assert session.save() == before + 1
+    finally:
+        session.close()
+
+
+def test_lazy_stale_detach_materializes_local_people_branch_without_touching_winner(
+    tmp_path,
+):
+    world = people_world(4, active=4)
+    source = tmp_path / "detach-stale-cold.sqlite"
+    destination = tmp_path / "detach-stale-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    winner = open_lazy_world_session(destination, rules_id=RULES)
+    loser = open_lazy_world_session(destination, rules_id=RULES)
+    try:
+        start = winner.pin.captured_head
+        winner.world.people[1].wealth = 10.0
+        loser.world.people[1].wealth = 20.0
+        assert winner.save() == start + 1
+        with pytest.raises(StoreConflictError):
+            loser.save()
+        assert loser.diagnostics()["state"] == "stale"
+
+        local = loser.detach(materialize_history=True)
+        assert local.people[1].wealth == 20.0
+        local.people[1].wealth = 21.0
+
+        winner.close()
+        winner = open_lazy_world_session(destination, rules_id=RULES)
+        assert winner.world.people[1].wealth == 10.0
+        assert winner.pin.captured_head == start + 1
+    finally:
+        winner.close()
+        loser.close()
+
+
+def test_lazy_detach_preserves_cross_boundary_person_alias(tmp_path):
+    world = people_world(4, active=4)
+    shared_person = world.people[1]
+    world.currency.wallets[99] = {"person": shared_person}
+    source = tmp_path / "detach-cross-cold.sqlite"
+    destination = tmp_path / "detach-cross-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    session = open_lazy_world_session(destination, rules_id=RULES)
+    eager_alias = session.world.currency.wallets[99]["person"]
+    assert session.world.people[1] is eager_alias
+
+    detached = session.detach(materialize_history=True)
+    assert detached.people[1] is eager_alias
+    assert detached.currency.wallets[99]["person"] is eager_alias
+
+    restored = checkpoint.loads(checkpoint.dumps(detached))
+    assert restored.people[1] is restored.currency.wallets[99]["person"]
 
 
 def test_cross_boundary_person_alias_restores_lazily_and_eager_mutation_fails_closed(tmp_path):
