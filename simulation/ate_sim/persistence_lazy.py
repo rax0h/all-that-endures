@@ -37,6 +37,7 @@ from .persistence_adapters import (
     SCHEMA,
     WorldCodec,
     _at_path,
+    _read_cold_manifest,
     _read_current_identity_links,
     _restore_collection,
     _restore_identity,
