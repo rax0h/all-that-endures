@@ -1,5 +1,7 @@
 import pytest
 
+from ate_sim import checkpoint
+
 from ate_sim.core import World
 from ate_sim.magic_resources import MagicResource
 from ate_sim.persistence_lazy import (
@@ -149,3 +151,29 @@ def test_resource_open_cost_does_not_decode_resource_history(tmp_path, count):
         table = session.world.magic_resources.resources
         assert len(table) == count
         assert table.diagnostics()["resource_payload_loads"] == 0
+
+
+def test_resource_materializing_detach_is_portable(tmp_path):
+    destination = converted(tmp_path, 300, "detach")
+    session = open_lazy_world_session(destination, rules_id=RULES)
+    retained = session.world.magic_resources.resources[1]
+    transfers = retained.transfers
+    transfers.append(7001)
+    for key in range(2, 301):
+        session.world.magic_resources.resources[key]
+    assert not dict.__contains__(
+        session.world.magic_resources.resources, 1
+    )
+
+    detached = session.detach(materialize_history=True)
+    resources = detached.magic_resources.resources
+    assert type(resources) is dict
+    assert len(resources) == 300
+    assert resources[1] is retained
+    assert type(resources[1].transfers) is list
+    assert resources[1].transfers == [7001]
+
+    data = checkpoint.dumps(detached)
+    restored = checkpoint.loads(data)
+    assert restored.digest() == detached.digest()
+    assert type(restored.magic_resources.resources[1].transfers) is list
