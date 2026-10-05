@@ -1201,26 +1201,43 @@ class _LazyLifetime:
         return session
 
     def ensure_mutation(self, _operation="mutation"):
-        # World/EventLog mutation is not yet part of the people-only write gate.
-        session = self._session()
-        session._ensure_people_mutation_allowed()
-        raise StoreError(
-            "non-people lazy World mutation is not enabled yet"
-        )
+        self._session()._ensure_hybrid_mutation_allowed()
 
     def ensure_simulation(self, _operation="simulation"):
-        self._session()
-        raise StoreError(
-            "lazy World simulation is not enabled until non-people/EventLog integration"
-        )
+        self._session()._ensure_hybrid_mutation_allowed()
+
+    def begin_step(self):
+        session = self._session()
+        session._ensure_hybrid_mutation_allowed()
+        tracker = session._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError("reentrant lazy simulation step is not allowed")
+        tracker._cold_step_depth += 1
+
+    def end_step(self):
+        session = self._session_ref()
+        if (
+            session is not None
+            and session._active
+            and session._eager_tracker._cold_step_depth
+        ):
+            session._eager_tracker._cold_step_depth -= 1
 
     def ensure_eventlog_read(self):
-        self._session()
+        session = self._session()
+        if session._state == "recovery-required":
+            raise StoreError(
+                "lazy EventLog is unavailable until save acknowledgement resolves"
+            )
 
     def begin_operation(self, operation, *, allow_stale=False):
         session = self._session()
         if session._state == "stale" and not allow_stale:
             raise StoreConflictError("lazy World session is stale")
+        if session._state not in ("active", "stale"):
+            raise StoreError(
+                f"lazy World cannot {operation} while {session._state}"
+            )
 
     def end_operation(self, operation):
         self._session()
@@ -1241,6 +1258,12 @@ class LazyWorldSession:
         prefix,
         next_incarnation,
         head,
+        *,
+        baseline_ordinals,
+        resident_links,
+        prefix_descriptor,
+        tail_descriptor,
+        commit_descriptor,
     ):
         self.store = store
         self.pin = pin
@@ -1258,6 +1281,19 @@ class LazyWorldSession:
         )
         self.people = LazyRecordTable(self)
         object.__setattr__(world, "people", self.people)
+
+        self._cross_boundary_links = _seed_cross_boundary_people_identity(
+            self, links
+        )
+        self._eager_tracker = _initialize_eager_tracker(
+            self,
+            baseline_ordinals=baseline_ordinals,
+            resident_links=resident_links,
+            prefix_descriptor=prefix_descriptor,
+            tail_descriptor=tail_descriptor,
+            commit_descriptor=commit_descriptor,
+        )
+
         self._lifetime = _LazyLifetime(self)
         object.__setattr__(world, "_ate_persistence_lifetime", self._lifetime)
         world.events._ate_persistence_lifetime = self._lifetime
@@ -1275,6 +1311,15 @@ class LazyWorldSession:
                 f"lazy World mutation is unavailable while {self._state}"
             )
 
+    def _ensure_hybrid_mutation_allowed(self):
+        self._ensure_people_mutation_allowed()
+        if self._cross_boundary_links:
+            raise StoreError(
+                "mutation of the eager graph is blocked while a persisted "
+                "identity group crosses world.people; cross-boundary owner "
+                "transfer requires the next identity integration proof"
+            )
+
     def _top_occurrence(self, key):
         return Occurrence(PEOPLE_NAMESPACE, key, ())
 
@@ -1289,7 +1334,7 @@ class LazyWorldSession:
         ]
         if foreign:
             raise StoreError(
-                "one Person incarnation cannot be current at multiple people keys"
+                "one Person incarnation cannot be newly assigned to multiple people keys"
             )
         self._registry.attach_occurrence(
             person, self._top_occurrence(key)
@@ -1388,123 +1433,263 @@ class LazyWorldSession:
             )
         return result
 
-    def _validate_people_only_head_changes(self, structural_keys):
-        expected = self._head.metadata
-        if self.world.seed != expected["seed"]:
-            raise StoreError("people-only lazy save cannot change World seed")
-        if self.world.year != expected["simulation_position"]:
-            raise StoreError("people-only lazy save cannot advance simulation year")
-        current_next = {
-            key: getattr(self.world, key)
-            for key in (
-                "next_person",
-                "next_household",
-                "next_settlement",
-                "next_event",
-            )
-        }
-        baseline_next = expected["next_ids"]
-        for key in ("next_household", "next_settlement", "next_event"):
-            if current_next[key] != baseline_next[key]:
-                raise StoreError(
-                    f"people-only lazy save cannot change {key}"
-                )
-        if (
-            current_next["next_person"] != baseline_next["next_person"]
-            and not structural_keys
-        ):
-            raise StoreError(
-                "next_person changed without a people structural edit"
-            )
-        return {
-            "simulation_position": self.world.year,
-            "seed": self.world.seed,
-            "next_ids": current_next,
-            "namespaces": expected["namespaces"],
-        }
+    def _merge_people_layout(self, cold_plan, structural_keys):
+        layout_value = cold_plan.layout_value
+        if not structural_keys:
+            return cold_plan, layout_value
 
-    def _prepare_people_save(self):
+        if layout_value is None:
+            layout_value = dict(self.manifest["collections"])
+        else:
+            layout_value = dict(layout_value)
+        current = layout_value[PEOPLE_NAMESPACE]
+        if type(current) is not tuple or len(current) != 3:
+            raise StoreFormatError(
+                "invalid world.people collection description"
+            )
+        layout_value[PEOPLE_NAMESPACE] = (
+            current[0],
+            len(self.people),
+            current[2],
+        )
+
+        change_map = {
+            (change.namespace, self.store.codec.encode(change.key)): change
+            for change in cold_plan.changes
+        }
+        layout_change = RecordChange(
+            META,
+            COLLECTION_LAYOUT,
+            layout_value,
+            record_schema=RECORD_SCHEMA,
+        )
+        change_map[
+            (META, self.store.codec.encode(COLLECTION_LAYOUT))
+        ] = layout_change
+        changes = tuple(
+            change_map[key]
+            for key in sorted(change_map, key=lambda item: (item[0], item[1]))
+        )
+        self._eager_tracker._manifest_dirty = True
+        return replace(
+            cold_plan,
+            changes=changes,
+            record_evidence=_change_evidence(
+                self.store.codec, changes
+            ),
+            manifest_dirty=True,
+            layout_value=layout_value,
+        ), layout_value
+
+    def _prepare_hybrid_save(self):
         (
             version_changes,
             identity_changes,
             touched_keys,
             structural_keys,
         ) = self.people.prepare_save_changes()
-        metadata = self._validate_people_only_head_changes(structural_keys)
-        if (
-            not version_changes
-            and not identity_changes
-            and metadata["next_ids"] == self._head.metadata["next_ids"]
-        ):
-            return None
-        token = uuid.uuid4().hex
-        target = self.pin.captured_head + 1
-        ordinary_list = [
-            RecordChange(
-                EVENT_STORAGE,
-                COMMIT_DESCRIPTOR_KEY,
-                (1, target, token),
-                record_schema=SESSION_DESCRIPTOR_SCHEMA,
-            ),
-        ]
-        layout_value = None
+        people_effective = bool(version_changes or identity_changes)
+
         if structural_keys:
-            layout_value = dict(self.manifest["collections"])
-            current = layout_value[PEOPLE_NAMESPACE]
-            if type(current) is not tuple or len(current) != 3:
-                raise StoreFormatError(
-                    "invalid world.people collection description"
-                )
-            layout_value[PEOPLE_NAMESPACE] = (
-                current[0],
-                len(self.people),
-                current[2],
+            # Make the shared cold journal aware that collection-layout
+            # publication is pending before it freezes acknowledgement state.
+            self._eager_tracker._manifest_dirty = True
+
+        token = uuid.uuid4().hex
+        try:
+            cold_plan = prepare_cold_save(
+                self._eager_tracker,
+                force=people_effective,
+                token=token,
             )
-            ordinary_list.append(
-                RecordChange(
-                    META,
-                    COLLECTION_LAYOUT,
-                    layout_value,
-                    record_schema=RECORD_SCHEMA,
-                )
+        except Exception:
+            if structural_keys:
+                # The people overlay remains pending; the next prepare will set
+                # this flag again. Do not leave a half-prepared cold operation.
+                self._eager_tracker._manifest_dirty = False
+            raise
+
+        if cold_plan is None:
+            return None
+        if (
+            cold_plan.expected_generation != self.pin.captured_head
+            or cold_plan.target_generation != self.pin.captured_head + 1
+            or cold_plan.token != token
+        ):
+            raise StoreIntegrityError(
+                "hybrid cold plan generation/token mismatch"
             )
-            ordinary_list.append(
-                RecordChange(
-                    "world.next_person",
-                    0,
-                    (0, self.world.next_person),
-                    record_schema=RECORD_SCHEMA,
-                )
-            )
-        ordinary = tuple(ordinary_list)
+
+        cold_plan, layout_value = self._merge_people_layout(
+            cold_plan, structural_keys
+        )
+        expected_counts = self.store.codec.decode(
+            cold_plan.expected_namespace_counts
+        )
+        expected_counts[PEOPLE_NAMESPACE] = (len(self.people), 0)
+        cold_plan = replace(
+            cold_plan,
+            expected_namespace_counts=_counts_tuple(
+                self.store.codec, expected_counts
+            ),
+        )
         return LazyPeopleSavePlan(
             token=token,
-            target_generation=target,
+            target_generation=cold_plan.target_generation,
             version_changes=version_changes,
             identity_changes=identity_changes,
-            ordinary_changes=ordinary,
-            metadata=metadata,
+            cold_plan=cold_plan,
             touched_keys=touched_keys,
             structural_keys=structural_keys,
             layout_value=layout_value,
         )
 
-    def _accept_people_save(self, plan, result):
+    def _validate_people_successor(self, plan, generation):
+        for change in plan.version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, PEOPLE_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted lazy Person remains visible after save"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved lazy Person is absent after save"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                PEOPLE_NAMESPACE, typed_key, row, decode=False
+            )
+            if (
+                schema != LAZY_PERSON_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+            ):
+                raise StoreIntegrityError(
+                    "saved lazy Person payload evidence mismatch"
+                )
+            expected_memberships = tuple(
+                (
+                    member.index_name,
+                    member.value,
+                    member.ordinal,
+                )
+                for member in change.memberships
+            )
+            if memberships != expected_memberships:
+                raise StoreIntegrityError(
+                    "saved lazy Person membership evidence mismatch"
+                )
+
+        for change in plan.identity_changes:
+            encoded_key = self.store.codec.encode(change.owner_key)
+            encoded_path = self.store.codec.encode(change.occurrence_path)
+            row = self.store._visible_identity_occurrence(
+                generation,
+                change.owner_namespace,
+                encoded_key,
+                encoded_path,
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted Person incarnation remains visible"
+                    )
+            elif row is None or row[0] != change.incarnation_id:
+                raise StoreIntegrityError(
+                    "saved Person incarnation evidence mismatch"
+                )
+
+        if (
+            self.store._identity_state_at(generation)[0]
+            != self._registry.next_incarnation
+        ):
+            raise StoreIntegrityError(
+                "saved incarnation allocator state mismatch"
+            )
+
+    def _arm_cold_publication(self, plan):
+        tracker = self._eager_tracker
+        if tracker._cold_plan is None:
+            tracker._cold_plan = plan.cold_plan
+            tracker._cold_publication_phase = "prepared"
+        elif tracker._cold_plan is not plan.cold_plan:
+            raise StoreIntegrityError(
+                "hybrid cold publication plan changed"
+            )
+        tracker._cold_state = "recovery-required"
+
+    def _publish_committed_hybrid(self, plan, result):
+        self._arm_cold_publication(plan)
+        tracker = self._eager_tracker
+        self._validate_people_successor(
+            plan, result.generation
+        )
+        status, head, replacement_prefix = _capture_successor(
+            tracker, plan.cold_plan, full_evidence=False
+        )
+        if status != "ours":
+            if replacement_prefix is not None:
+                replacement_prefix.close()
+            if status == "foreign":
+                self._state = "stale"
+                tracker._cold_state = "stale"
+                raise StoreConflictError(
+                    "hybrid successor was replaced by another writer"
+                )
+            raise StoreIntegrityError(
+                "committed hybrid successor was not visible"
+            )
+        tracker._cold_head = head
+        publish_cold_save(
+            tracker, plan.cold_plan, replacement_prefix
+        )
         self.pin = result.pin
         self.people.accept_save(plan, result.pin)
-        self._head = self.store.checked_head()
-        if plan.layout_value is not None:
-            self.manifest["collections"] = plan.layout_value
+        self.prefix = self.world.events._disk_prefix
+        self._head = head
+        self._pending_save = None
+        self._state = "active"
+        return result.generation
+
+    def _reset_uncommitted_plan(self):
+        tracker = self._eager_tracker
+        tracker._cold_plan = None
+        tracker._cold_publication_phase = None
+        tracker._cold_old_prefix_pending = None
+        tracker._cold_state = "active"
         self._pending_save = None
         self._state = "active"
 
     def save(self):
         self._ensure_people_mutation_allowed()
-        plan = self._prepare_people_save()
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                "lazy save requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy save cannot run inside current_people_scope"
+            )
+
+        plan = self._prepare_hybrid_save()
         if plan is None:
             return self.pin.captured_head
+
         self._pending_save = plan
         self._state = "saving"
+        tracker._cold_plan = plan.cold_plan
+        tracker._cold_publication_phase = "prepared"
+        tracker._cold_state = "preparing"
         try:
             result = self.store.commit(
                 self.pin,
@@ -1512,15 +1697,17 @@ class LazyWorldSession:
                 version_changes=plan.version_changes,
                 identity_changes=plan.identity_changes,
                 next_incarnation_id=self._registry.next_incarnation,
-                changes=plan.ordinary_changes,
-                new_segments=(),
-                metadata=plan.metadata,
+                changes=plan.cold_plan.changes,
+                new_segments=plan.cold_plan.new_segments,
+                metadata=plan.cold_plan.metadata,
             )
         except GenerationPressureError:
-            self._pending_save = None
-            self._state = "active"
+            self._reset_uncommitted_plan()
             raise
         except StoreConflictError:
+            tracker._cold_state = "stale"
+            tracker._cold_plan = None
+            tracker._cold_publication_phase = None
             self._pending_save = None
             self._state = "stale"
             raise
@@ -1533,24 +1720,39 @@ class LazyWorldSession:
                 and attempt[2] in {"pending", "committed"}
             ):
                 self._state = "recovery-required"
+                tracker._cold_state = "recovery-required"
             else:
-                self._pending_save = None
-                self._state = "active"
+                self._reset_uncommitted_plan()
             raise
+
         if result.outcome == "conflict":
-            self._state = "stale"
-            raise StoreConflictError("lazy World save lost the generation race")
-        if result.outcome == "not_committed":
+            tracker._cold_state = "stale"
+            tracker._cold_plan = None
+            tracker._cold_publication_phase = None
             self._pending_save = None
-            self._state = "active"
+            self._state = "stale"
+            raise StoreConflictError(
+                "lazy World save lost the generation race"
+            )
+        if result.outcome == "not_committed":
+            self._reset_uncommitted_plan()
             return result.generation
         if result.outcome != "committed":
             self._state = "recovery-required"
+            tracker._cold_state = "recovery-required"
             raise StoreIntegrityError(
                 f"unexpected lazy save outcome: {result.outcome}"
             )
-        self._accept_people_save(plan, result)
-        return result.generation
+
+        # Keep the original pin object until all runtime publication succeeds;
+        # resolve_commit can reconcile it by token if acknowledgement is lost.
+        try:
+            return self._publish_committed_hybrid(plan, result)
+        except Exception:
+            if self._state != "stale":
+                self._state = "recovery-required"
+                tracker._cold_state = "recovery-required"
+            raise
 
     def resolve_save(self):
         self._ensure_active()
@@ -1567,25 +1769,62 @@ class LazyWorldSession:
             raise StoreError(
                 f"lazy save cannot resolve while {self._state}"
             )
-        result = self.store.resolve_commit(self.pin, plan.token)
+
+        result = self.store.resolve_commit(
+            self.pin, plan.token
+        )
         if result.outcome == "committed":
-            self._accept_people_save(plan, result)
-            return result.generation
+            return self._publish_committed_hybrid(plan, result)
         if result.outcome == "not_committed":
-            self._pending_save = None
-            self._state = "active"
+            self._reset_uncommitted_plan()
             return result.generation
+        self._eager_tracker._cold_state = "stale"
         self._state = "stale"
-        raise StoreConflictError("lazy World save resolved as stale/conflict")
+        raise StoreConflictError(
+            "lazy World save resolved as stale/conflict"
+        )
 
     def diagnostics(self):
         self._ensure_active()
+        tracker = self._eager_tracker
         return {
             "state": self._state,
             "people": self.people.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
+            "eager_dirty_owners": len(tracker._dirty),
+            "eager_deleted_owners": len(tracker._deleted),
+            "eager_bound_objects": len(tracker._bound_ids),
+            "cross_boundary_identity_links": len(
+                self._cross_boundary_links
+            ),
+            "event_disk_events": self.world.events._disk_count,
+            "event_pending_chunks": len(self.world.events._chunks),
+            "event_tail_events": len(self.world.events._tail),
         }
+
+    def _teardown_eager_tracker(self):
+        tracker = self._eager_tracker
+        if not tracker._active:
+            return
+        error = None
+        try:
+            tracker._unbind_world()
+        except Exception as exc:
+            error = exc
+        finally:
+            tracker._active = False
+            tracker._clear_bindings()
+            tracker._memo.clear()
+            tracker._memo_reverse.clear()
+            tracker._bound_root_originals.clear()
+            tracker._bootstrap_originals.clear()
+            tracker._cold_plan = None
+            tracker._cold_publication_phase = None
+            tracker._cold_old_prefix_pending = None
+            tracker._cold_state = "closed"
+        if error is not None:
+            raise error
 
     def close(self):
         if not self._active:
@@ -1595,7 +1834,18 @@ class LazyWorldSession:
                 "resolve uncertain lazy save before closing the session"
             )
         self._lifetime.close()
-        self.prefix.close()
+        teardown_error = None
+        try:
+            self._teardown_eager_tracker()
+        except Exception as exc:
+            teardown_error = exc
+        current_prefix = (
+            self.world.events._disk_prefix
+            if isinstance(self.world.events, EventLog)
+            else None
+        )
+        if current_prefix is not None:
+            current_prefix.close()
         try:
             self.store.release_pin(self.pin)
         finally:
@@ -1603,6 +1853,8 @@ class LazyWorldSession:
             self.store.close()
             self._active = False
             self._state = "closed"
+        if teardown_error is not None:
+            raise teardown_error
 
     def __enter__(self):
         self._ensure_active()
