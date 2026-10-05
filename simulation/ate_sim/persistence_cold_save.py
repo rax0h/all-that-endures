@@ -343,8 +343,18 @@ def _segment_evidence(codec, segments):
     return tuple(out)
 
 
-def prepare_cold_save(session):
-    """Freeze one bounded cold save plan without persistent mutation."""
+def prepare_cold_save(session, *, force=False, token=None):
+    """Freeze one bounded cold save plan without persistent mutation.
+
+    force/token are internal P4 composition seams. Defaults preserve the
+    accepted P3B behavior.
+    """
+    if type(force) is not bool:
+        raise TypeError("force must be bool")
+    if token is not None and (
+        type(token) is not str or _TOKEN.fullmatch(token) is None
+    ):
+        raise ValueError("explicit cold save token is invalid")
     session.store._ensure_open()
     _check_captured_store_baseline(session)
     log, D, F, N, last_year = _validate_live_partition(session)
@@ -361,7 +371,7 @@ def prepare_cold_save(session):
         and not session._manifest_dirty
         and not session._pending_identity_current
     )
-    if q == 0 and no_journal:
+    if q == 0 and no_journal and not force:
         return None
 
     selected = ()
@@ -489,9 +499,10 @@ def prepare_cold_save(session):
 
     after_tail = ColdTailDescriptor(D1, F, N, last_year)
     target = session.generation + 1
-    token = uuid.uuid4().hex
-    if _TOKEN.fullmatch(token) is None:
-        raise StoreIntegrityError("generated invalid cold save token")
+    if token is None:
+        token = uuid.uuid4().hex
+        if _TOKEN.fullmatch(token) is None:
+            raise StoreIntegrityError("generated invalid cold save token")
 
     if append is not None:
         for change in append.record_changes:
