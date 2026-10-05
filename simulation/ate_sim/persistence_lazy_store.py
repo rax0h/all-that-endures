@@ -5,6 +5,7 @@ import sqlite3
 import tempfile
 import time
 import uuid
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
@@ -12,6 +13,8 @@ from typing import Any, Iterable, Iterator, Mapping
 from .incremental_store import (
     CODEC_VERSION,
     DDL as P1_DDL,
+    CheckedHead,
+    CheckedSegment,
     Membership,
     NewSegment,
     RecordChange,
@@ -453,6 +456,7 @@ class LazyRecordStore:
         self._closed = False
         self._phase_hook = lambda phase: None
         self._recovery_required: dict[str, bytes] = {}
+        self._active_read_transaction = False
         self.reset_diagnostics()
 
     @classmethod
@@ -854,6 +858,225 @@ class LazyRecordStore:
             if self.db.in_transaction:
                 self.db.rollback()
             raise
+
+
+    def checked_head(self) -> CheckedHead:
+        self._ensure_open()
+        row = self._checked_head_row()
+        return CheckedHead(
+            generation=int(row[0]),
+            parent_generation=row[1],
+            metadata={
+                "simulation_position": self.codec.decode(row[2]),
+                "seed": row[3],
+                "next_ids": self.codec.decode(row[4]),
+                "namespaces": self.codec.decode(row[5]),
+            },
+            namespace_counts=_namespace_counts(self.codec, row[6]),
+        )
+
+    @contextmanager
+    def read_transaction(self):
+        self._ensure_open()
+        if self.db.in_transaction:
+            raise StoreError("store already has an active transaction")
+        self.db.execute("BEGIN")
+        self._active_read_transaction = True
+        try:
+            generation = self.generation
+            yield generation
+        finally:
+            self._active_read_transaction = False
+            if self.db.in_transaction:
+                self.db.rollback()
+
+    def _ordinary_namespace_is_lazy(self, namespace: str) -> bool:
+        return self.db.execute(
+            "SELECT 1 FROM lazy_namespace_state WHERE namespace=? LIMIT 1",
+            (namespace,),
+        ).fetchone() is not None
+
+    def read_record(
+        self,
+        namespace: str,
+        key: Any,
+        *,
+        expected_record_schema: int | None = None,
+    ) -> Any:
+        self._ensure_open()
+        namespace = _validate_namespace(namespace)
+        if self._ordinary_namespace_is_lazy(namespace):
+            raise StoreError(
+                f"{namespace!r} is lazy authority; use read_version"
+            )
+        typed_key = self.codec.encode(key)
+        row = self.db.execute(
+            "SELECT payload,payload_checksum,codec_version,record_schema,"
+            "last_changed_generation FROM records "
+            "WHERE namespace=? AND typed_key=?",
+            (namespace, typed_key),
+        ).fetchone()
+        if row is None:
+            raise KeyError((namespace, key))
+        payload, checksum, codec_version, record_schema, generation = row
+        if (
+            expected_record_schema is not None
+            and record_schema != expected_record_schema
+        ):
+            raise StoreFormatError(
+                f"record schema mismatch for {(namespace, key)!r}: "
+                f"expected {expected_record_schema}, found {record_schema}"
+            )
+        expected = _record_checksum(
+            namespace,
+            typed_key,
+            record_schema,
+            codec_version,
+            generation,
+            payload,
+        )
+        self._payload_check_reads += 1
+        self._payload_check_bytes += len(payload)
+        if checksum != expected or codec_version != self.codec.version:
+            raise StoreIntegrityError("ordinary record checksum mismatch")
+        self._payload_reads += 1
+        self._payload_read_bytes += len(payload)
+        return self.codec.decode(payload)
+
+    def read_records(
+        self,
+        namespace: str,
+        *,
+        expected_record_schema: int | None = None,
+    ) -> tuple[tuple[Any, Any, int], ...]:
+        self._ensure_open()
+        namespace = _validate_namespace(namespace)
+        if self._ordinary_namespace_is_lazy(namespace):
+            raise StoreError(
+                f"{namespace!r} is lazy authority; use iter_keys/read_version"
+            )
+        out = []
+        for typed_key, payload, checksum, codec_version, record_schema, generation in self.db.execute(
+            "SELECT typed_key,payload,payload_checksum,codec_version,"
+            "record_schema,last_changed_generation FROM records "
+            "WHERE namespace=?",
+            (namespace,),
+        ):
+            if (
+                expected_record_schema is not None
+                and record_schema != expected_record_schema
+            ):
+                raise StoreFormatError(
+                    f"record schema mismatch in {namespace!r}: "
+                    f"expected {expected_record_schema}, found {record_schema}"
+                )
+            expected = _record_checksum(
+                namespace,
+                typed_key,
+                record_schema,
+                codec_version,
+                generation,
+                payload,
+            )
+            self._payload_check_reads += 1
+            self._payload_check_bytes += len(payload)
+            if checksum != expected or codec_version != self.codec.version:
+                raise StoreIntegrityError("ordinary record checksum mismatch")
+            self._payload_reads += 1
+            self._payload_read_bytes += len(payload)
+            out.append(
+                (
+                    self.codec.decode(typed_key),
+                    self.codec.decode(payload),
+                    record_schema,
+                )
+            )
+        return tuple(out)
+
+    def read_segment_checked(
+        self, namespace: str, ordinal: int
+    ) -> CheckedSegment:
+        self._ensure_open()
+        namespace = _validate_namespace(namespace)
+        if type(ordinal) is not int or ordinal < 0:
+            raise ValueError("segment ordinal must be a nonnegative int")
+        row = self.db.execute(
+            "SELECT payload,payload_checksum,codec_version,element_count,"
+            "first_id,last_id,created_generation FROM segments "
+            "WHERE namespace=? AND ordinal=?",
+            (namespace, ordinal),
+        ).fetchone()
+        if row is None:
+            raise KeyError((namespace, ordinal))
+        (
+            payload,
+            checksum,
+            codec_version,
+            element_count,
+            first_id,
+            last_id,
+            generation,
+        ) = row
+        expected = _segment_checksum(
+            namespace,
+            ordinal,
+            first_id,
+            last_id,
+            element_count,
+            codec_version,
+            generation,
+            payload,
+        )
+        self._payload_check_reads += 1
+        self._payload_check_bytes += len(payload)
+        if checksum != expected or codec_version != self.codec.version:
+            raise StoreIntegrityError("segment checksum mismatch")
+        self._payload_reads += 1
+        self._payload_read_bytes += len(payload)
+        return CheckedSegment(
+            value=self.codec.decode(payload),
+            element_count=element_count,
+            first_id=self.codec.decode(first_id),
+            last_id=self.codec.decode(last_id),
+            created_generation=generation,
+            payload_bytes=len(payload),
+        )
+
+    def read_segment(self, namespace: str, ordinal: int) -> Any:
+        return self.read_segment_checked(namespace, ordinal).value
+
+    def namespace_size(
+        self, pin: GenerationPin, namespace: str
+    ) -> int:
+        self._ensure_open()
+        namespace = _validate_namespace(namespace)
+        generation = self._read_snapshot_start(pin)
+        try:
+            state = self._namespace_state_at(namespace, generation)
+            return 0 if state is None else int(state[0])
+        finally:
+            self._read_snapshot_end()
+
+    def contains_lazy_key(
+        self, pin: GenerationPin, namespace: str, key: Any
+    ) -> bool:
+        self._ensure_open()
+        namespace = _validate_namespace(namespace)
+        typed_key = self.codec.encode(key)
+        generation = self._read_snapshot_start(pin)
+        try:
+            order = self._visible_order(namespace, typed_key, generation)
+            if order is None:
+                return False
+            if self._visible_record_row(
+                generation, namespace, typed_key
+            ) is None:
+                raise StoreIntegrityError(
+                    "collection order points to an absent lazy record"
+                )
+            return True
+        finally:
+            self._read_snapshot_end()
 
     def capture_pin(self) -> GenerationPin:
         self._ensure_open()
