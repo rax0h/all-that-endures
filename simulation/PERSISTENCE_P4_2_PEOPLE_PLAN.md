@@ -16,6 +16,10 @@ New:
 - `simulation/tests/test_persistence_lazy_conversion.py`
 
 Narrow supporting edits:
+- `simulation/ate_sim/record_index.py`: one inert optional preflight callback
+  before an `IndexedRecord` assignment; ordinary `RecordTable` behavior is
+  unchanged when the callback is absent. This is required so stale lazy-session
+  mutation rejects before changing a Person.
 - `simulation/ate_sim/persistence_lazy_store.py`:
   checked ordinary-record compatibility reads, checked head object access and
   namespace-size/key-existence primitives only.
