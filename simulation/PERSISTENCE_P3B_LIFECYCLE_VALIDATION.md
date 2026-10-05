@@ -1,6 +1,52 @@
 # P3B lifecycle — validation evidence
 
-**Status:** implementation review input; not architect acceptance.
+**Status:** accepted by Astra at the implementation SHA recorded below.
+
+## Architect acceptance — 2026-10-05
+
+**Accepted implementation:** `3365f3753e6a271b9c3051da969aa8d26b3e2609`.
+Astra reviewed the live PR #14 implementation and found no blocking defect in
+this lifecycle slice. No product changes were necessary.
+
+**P3B is accepted in its complete current scope**, including the previously
+accepted composite EventLog, current identity integration, cold capture/restore,
+bootstrap/conversion, live session, atomic save/recovery and now lifecycle/
+history operations. P3A, including its warmed-cache verification correction,
+remains accepted. This does not accept P4, Stage 0.5 freeze, a checkpoint-default
+replacement, long runs or merge.
+
+Review evidence:
+
+- Retrieved the completed final full-suite job: **640 passed in 2287.60 s**,
+  [run 37261495839](https://github.com/rax0h/all-that-endures/actions/runs/37261495839),
+  candidate `1b836fe16a5ffe0a375fa4599f61b1976c404d0d`.
+- Compared every simulation Python source/test blob in that candidate with the
+  accepted live head: no differences.
+- Retrieved the completed final measurement job and checked its 4/40/400 output
+  against the table below:
+  [run 37264362976](https://github.com/rax0h/all-that-endures/actions/runs/37264362976).
+  Its simulation Python blobs also match the live head.
+- Independent local review: **22 passed, 3 deselected in 6.05 s**:
+  `PYTHONPATH=/tmp/ate-life-deps:simulation:. python -m pytest -q simulation/tests/test_persistence_lifecycle.py simulation/tests/test_persistence_history_operations.py -k 'not streaming_history_bounds'`.
+  All 137 simulation Python files in the local review snapshot matched live
+  source, allowing only an extra terminal newline from file transfer.
+- Reviewed staged detach and deferred RecordTable rebinding, tail/current alias
+  preservation, operation guards, checked prefix verification, streaming export
+  and early legacy refusal. Failure paths retain the usable pre-publication
+  graph; explicit successful detach preserves the same World and tail Events.
+- No long test, millennium, endurance, gameplay/calibration change or workflow
+  change was launched during this review.
+
+The measurements establish bounded decoded **event-history** working state,
+not bounded total World residency. Explicit detach still materializes compressed
+history and legacy indexes. Current non-event records and their identity/index
+structures remain the P4 boundary.
+
+Next authoritative handoff:
+[Stage 0.5 completion plan](STAGE_0_5_COMPLETION_PLAN.md).
+The implementation report below is retained as the evidence record.
+
+
 **Scope:** `simulation/PERSISTENCE_P3B_LIFECYCLE.md`.
 **PR branch before landing:** `sim/stage-0-5-stabilization` at `d3dfe02728d38902e73cd7740fbbdebf32981aa9`.
 **Final tested product/test bytes:** represented by candidate heads
@@ -225,7 +271,8 @@ validation scaffolding and must not be landed.
 
 ## Remaining boundary
 
-This file is an Astra review input, not self-acceptance. It does not declare P3B
-or Stage 0.5 complete. P3B acceptance, later persistence work, checkpoint-default
-changes, long-horizon simulation, Stage 1 and PR merge require subsequent review
-and instruction.
+The original implementation report was a review input. The architect acceptance
+at the top of this file now accepts complete current P3B. It does not declare
+Stage 0.5 complete. P4, final release validation, checkpoint-default changes,
+long-horizon simulation, Stage 1 and PR merge remain outside this acceptance;
+follow STAGE_0_5_COMPLETION_PLAN.md for the next authorized work.

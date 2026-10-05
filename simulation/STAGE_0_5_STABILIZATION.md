@@ -1,4 +1,27 @@
-# Current status: continued-world architecture (2026-09-27)
+# Current status: P3B accepted; P4 and P5 remain (2026-10-05)
+
+Astra accepted the complete current P3B scope at
+`3365f3753e6a271b9c3051da969aa8d26b3e2609`: durable cold-event World sessions,
+atomic incremental save/recovery, exact continuation, explicit detach and
+streaming history operations. P1/P2/P3A remain accepted. Final lifecycle evidence:
+640 full-suite passes on matching Python blobs, verified completed 4/40/400
+measurements, and 22 independent focused review passes. See
+[P3B lifecycle acceptance](PERSISTENCE_P3B_LIFECYCLE_VALIDATION.md).
+
+**Stage 0.5 is not yet complete. Decision B remains in force.** P4 must address
+non-event resident records/indexes and identity-safe lazy loading; P5 must
+validate the integrated result. Event-cache bounds do not prove total World
+memory bounds. Follow the consolidated
+[completion plan and next Sol assignment](STAGE_0_5_COMPLETION_PLAN.md).
+
+No millennium/endurance, balance/magic changes, Stage 1, automatic checkpoint
+replacement or PR #14 merge is authorized. Use `[skip ci]` commits: the ordinary
+PR workflow includes a millennium. Preserve current simulation rules and the
+owner's 120-second optimization-goal decision; do not restore obsolete numeric
+rank targets or weaken correctness checks. Earlier measurements and assignments
+below are historical, not current readiness claims.
+
+# Historical status: continued-world architecture (2026-09-27)
 
 Latest continuation: Sol's bounded Society offer-index implementation is
 validated at `596c59cbb66f766c336c1e10e5e8fc6ee072b1b0` (184 tests, green CI,
