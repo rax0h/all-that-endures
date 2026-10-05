@@ -96,9 +96,11 @@ from .persistence_tracking import IncrementalWorldSession
 PEOPLE_NAMESPACE = "world.people"
 ASPIRATION_NAMESPACE = "world.magic_resources.aspirations"
 RESOURCE_NAMESPACE = "world.magic_resources.resources"
+OWNER_INDEX_NAMESPACE = "world.magic_resources.owner_index"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
+LAZY_OWNER_INDEX_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
@@ -542,6 +544,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     aspiration_next_ordinal = 0
                     resource_count = 0
                     resource_next_ordinal = 0
+                    owner_index_count = 0
+                    owner_index_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -560,6 +564,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             PEOPLE_NAMESPACE,
                             ASPIRATION_NAMESPACE,
                             RESOURCE_NAMESPACE,
+                            OWNER_INDEX_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -611,7 +616,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             aspiration_next_ordinal = max(
                                 aspiration_next_ordinal, ordinal + 1
                             )
-                        else:
+                        elif namespace == RESOURCE_NAMESPACE:
                             if not isinstance(value, MagicResource):
                                 raise StoreFormatError(
                                     "invalid resources source envelope"
@@ -627,6 +632,26 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             resource_next_ordinal = max(
                                 resource_next_ordinal, ordinal + 1
                             )
+                        else:
+                            if type(value) is not set or any(
+                                type(item) is not int for item in value
+                            ):
+                                raise StoreFormatError(
+                                    "invalid owner-index source envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=OWNER_INDEX_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_OWNER_INDEX_SCHEMA,
+                            )
+                            owner_index_count += 1
+                            owner_index_next_ordinal = max(
+                                owner_index_next_ordinal, ordinal + 1
+                            )
 
                     for row in source_store.db.execute(
                         "SELECT namespace,index_name,index_value,record_key,"
@@ -636,6 +661,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             PEOPLE_NAMESPACE,
                             ASPIRATION_NAMESPACE,
                             RESOURCE_NAMESPACE,
+                            OWNER_INDEX_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -714,6 +740,26 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                         ),
                     )
 
+                    target.db.execute(
+                        "INSERT INTO lazy_namespace_state("
+                        "namespace,valid_from,valid_to,member_count,"
+                        "next_ordinal,row_checksum"
+                        ") VALUES (?,?,NULL,?,?,?)",
+                        (
+                            OWNER_INDEX_NAMESPACE,
+                            generation,
+                            owner_index_count,
+                            owner_index_next_ordinal,
+                            _namespace_checksum(
+                                OWNER_INDEX_NAMESPACE,
+                                owner_index_count,
+                                owner_index_next_ordinal,
+                                generation,
+                                None,
+                            ),
+                        ),
+                    )
+
                     target.db.execute("DELETE FROM lazy_identity_state")
                     for namespace, key, path, incarnation_id in identity_rows:
                         encoded_key = codec.encode(key)
@@ -774,6 +820,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "people": people_count,
                 "aspirations": aspiration_count,
                 "resources": resource_count,
+                "owner_index": owner_index_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
