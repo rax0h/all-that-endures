@@ -1465,7 +1465,7 @@ class LazyWorldSession:
         self.people = LazyRecordTable(self)
         object.__setattr__(world, "people", self.people)
 
-        self._cross_boundary_links = _seed_cross_boundary_people_identity(
+        self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
         )
         self._eager_tracker = _initialize_eager_tracker(
@@ -1534,12 +1534,12 @@ class LazyWorldSession:
     ):
         self._ensure_people_mutation_allowed()
         if (
-            isinstance(subject, Person)
-            and field in RECORD_FIELDS.get(Person, ())
+            isinstance(subject, (Person, MagicAspiration))
+            and field in RECORD_FIELDS.get(type(subject), ())
             and not _cross_boundary_field_value_is_immutable(value)
         ):
             raise StoreError(
-                "cross-boundary Person field edits require immutable values"
+                "cross-boundary lazy record field edits require immutable values"
             )
 
     def _install_cross_boundary_tracker_baseline(self):
@@ -1564,18 +1564,21 @@ class LazyWorldSession:
                     (target, owner)
                     for target, owner
                     in self._eager_tracker._live_identity_targets.items()
-                    if _path_under_people(target)
-                    != _path_under_people(owner)
+                    if _path_under_lazy(target)
+                    != _path_under_lazy(owner)
                 ),
                 key=self.store.codec.encode,
             )
         )
 
-    def _absolute_people_occurrence_path(self, occurrence):
+    def _absolute_lazy_occurrence_path(self, occurrence):
         return (
             _owner_path(self.manifest, occurrence.owner)
             + tuple(occurrence.path)
         )
+
+    def _absolute_people_occurrence_path(self, occurrence):
+        return self._absolute_lazy_occurrence_path(occurrence)
 
     def _refresh_cross_boundary_identity(self):
         tracker = self._eager_tracker
@@ -1588,17 +1591,17 @@ class LazyWorldSession:
         orphaned_old = []
         for link in tuple(self._cross_boundary_links):
             target, owner = link
-            people_side = (
-                _people_occurrence_from_path(target)
-                or _people_occurrence_from_path(owner)
+            lazy_side = (
+                _lazy_occurrence_from_path(target)
+                or _lazy_occurrence_from_path(owner)
             )
-            if people_side is None:
+            if lazy_side is None:
                 raise StoreIntegrityError(
-                    "recorded cross-boundary link lacks people occurrence"
+                    "recorded cross-boundary link lacks lazy occurrence"
                 )
-            key, relative = people_side
+            namespace, key, relative, _expected_type = lazy_side
             incarnation = self._registry.incarnation_for_occurrence(
-                Occurrence(PEOPLE_NAMESPACE, key, relative)
+                Occurrence(namespace, key, relative)
             )
             if incarnation is None:
                 orphaned_old.append(link)
@@ -1607,36 +1610,48 @@ class LazyWorldSession:
                     incarnation, []
                 ).append(link)
 
-        live_people = {}
-        for incarnation, obj in self._registry.live_bindings():
-            if isinstance(obj, Person):
-                live_people[incarnation] = obj
+        live_by_incarnation = {
+            incarnation: obj
+            for incarnation, obj in self._registry.live_bindings()
+        }
+
+        lazy_incarnations = {
+            incarnation
+            for incarnation in live_by_incarnation
+            if any(
+                occurrence.owner_namespace in {
+                    PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                }
+                for occurrence in
+                self._registry.occurrences_for_incarnation(incarnation)
+            )
+        }
 
         removes = list(orphaned_old)
         adds = []
         desired_cross = []
-        incarnations = set(old_by_incarnation) | set(live_people)
+        incarnations = (
+            set(old_by_incarnation) | lazy_incarnations
+        )
 
         for incarnation in sorted(incarnations):
-            people_occurrences = tuple(
+            lazy_occurrences = tuple(
                 occurrence
                 for occurrence
                 in self._registry.occurrences_for_incarnation(incarnation)
-                if occurrence.owner_namespace == PEOPLE_NAMESPACE
+                if occurrence.owner_namespace in {
+                    PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                }
             )
-            people_paths = {
-                self._absolute_people_occurrence_path(occurrence)
-                for occurrence in people_occurrences
+            lazy_paths = {
+                self._absolute_lazy_occurrence_path(occurrence)
+                for occurrence in lazy_occurrences
             }
 
             eager_paths = set()
-            obj = live_people.get(incarnation)
-            eager_ident = None
+            obj = live_by_incarnation.get(incarnation)
             if obj is not None:
-                eager_ident = id(obj)
-                entry = tracker._identity_index.occurrences.get(
-                    eager_ident
-                )
+                entry = tracker._identity_index.occurrences.get(id(obj))
                 if entry is not None:
                     if entry[0] is not obj:
                         raise StoreIntegrityError(
@@ -1650,13 +1665,13 @@ class LazyWorldSession:
                 for link in old_links
                 for path in link
             }
-            group_paths = people_paths | eager_paths | historical_paths
+            group_paths = lazy_paths | eager_paths | historical_paths
 
             desired_all = ()
-            if people_paths and eager_paths:
+            if lazy_paths and eager_paths:
                 desired_all = tuple(
                     tracker._identity_index._links_for(
-                        people_paths | eager_paths
+                        lazy_paths | eager_paths
                     )
                 )
             desired_tokens = {
@@ -1687,8 +1702,8 @@ class LazyWorldSession:
             )
             desired_cross.extend(
                 link for link in desired_all
-                if _path_under_people(link[0])
-                != _path_under_people(link[1])
+                if _path_under_lazy(link[0])
+                != _path_under_lazy(link[1])
             )
 
         remove_map = {
@@ -2067,8 +2082,8 @@ class LazyWorldSession:
         )
         self._cross_boundary_links = tuple(
             link for link in self.identity_links
-            if _path_under_people(link[0])
-            != _path_under_people(link[1])
+            if _path_under_lazy(link[0])
+            != _path_under_lazy(link[1])
         )
         self._pending_save = None
         self._state = "active"
