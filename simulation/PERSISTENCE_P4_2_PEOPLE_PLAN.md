@@ -317,3 +317,35 @@ Requirements:
 Focused proof edits the shared Person through the lazy/eager alias, verifies
 both journals, rejects an attempted eager-container alias move before mutation,
 saves, closes/reopens and checks identity plus value equality.
+
+
+## Cross-boundary owner-transfer subgate
+
+This supersedes the earlier temporary fail-closed topology restriction after the
+shared-Person field-edit proof is green.
+
+Implementation contract:
+- seed persisted cross-boundary current links into the hybrid eager tracker's
+  current-link baseline without adding people owners to its eager occurrence
+  index;
+- after only dirtied eager owners are refreshed, reconcile each live/previously
+  shared Person group from the lazy people occurrence(s) plus the eager
+  occurrence index's current paths;
+- generate the same canonical anchor/link form as P2C over the combined group;
+- reconcile only affected/live groups and prior cross links, never scan cold
+  people history;
+- current link additions/removals ride the existing cold current-link journal
+  and therefore publish atomically with lazy Person versions, eager owners,
+  EventLog state, counters and head;
+- alias deletion, creation, replacement and remove-then-add owner transfer must
+  preserve one live Person instance and exact reopen topology;
+- existing eager sharing restrictions still reject unsupported simultaneous
+  ownership patterns/cycles rather than weakening P2C rules;
+- Person field values shared across the boundary remain restricted to declared
+  recursively immutable assignments until nested-Person identity versioning has
+  its own proof.
+
+Focused proofs: create a new cross-boundary alias from a loaded lazy Person;
+replace one eager owner's shared Person with another Person; move the same Person
+between eager owners; edit the old Person in the same generation; save/reopen
+and verify exact object identity/value topology.
