@@ -3591,16 +3591,12 @@ class LazyWorldSession:
         self.people._pin = result.pin
         self.aspirations._pin = result.pin
         self.resources._pin = result.pin
-        self.resources._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
             plan, result.generation
         )
         self._validate_aspiration_successor(
-            plan, result.generation
-        )
-        self._validate_resource_successor(
             plan, result.generation
         )
         self._validate_resource_successor(
@@ -3627,7 +3623,6 @@ class LazyWorldSession:
         )
         self.people.accept_save(plan, result.pin)
         self.aspirations.accept_save(plan, result.pin)
-        self.resources.accept_save(plan, result.pin)
         self.resources.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
