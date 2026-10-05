@@ -349,3 +349,42 @@ Focused proofs: create a new cross-boundary alias from a loaded lazy Person;
 replace one eager owner's shared Person with another Person; move the same Person
 between eager owners; edit the old Person in the same generation; save/reopen
 and verify exact object identity/value topology.
+
+
+## Measured family expansion — magic aspirations pilot
+
+Residual measurement on product head `008d5ebf2af1e1ff1fd0929b506df2c260ef3218`
+(run 37386442258) proved ordinary lazy-world open still scales directly with
+magic-resource history:
+- 1,000 resources + aspirations + owner-index rows: 6,033 payload reads,
+  2,155,371 payload bytes;
+- 10,000 rows in each family: 60,033 payload reads, 21,523,384 bytes;
+- Person payload loads remained zero.
+
+The first bounded migration within this measured family is
+`world.magic_resources.aspirations` because each `MagicAspiration` is a
+scalar-only mutable record. This establishes a second lazy namespace without
+introducing resource transfer-list or owner-index semantics in the same step.
+
+Contract:
+- conversion moves aspiration rows from ordinary P1 records into versioned lazy
+  rows with exact stable dict order and existing incarnation labels;
+- ordinary open materializes zero aspiration payloads;
+- point read materializes exactly one aspiration and binds its persisted
+  incarnation;
+- clean cache is bounded at 256; retained aliases survive eviction;
+- scalar field mutation, insert/delete/replacement and delete/reinsert use the
+  same generation/pin/atomic-save machinery as people;
+- no-op save writes no aspiration payload;
+- eager P3B tracker excludes this namespace entirely;
+- collection layout and head counts publish atomically with people/eager state;
+- explicit detach materializes the complete aspiration mapping into a normal
+  dictionary before teardown;
+- current cross-boundary identity machinery is generalized from a people-only
+  boundary to the declared lazy namespaces so aspiration sharing, if present,
+  is restored/reconciled rather than silently dropped.
+
+After this pilot is green, migrate `magic_resources.resources` and replace the
+redundant eager `owner_index` with checked lazy owner memberships/query
+adapters while preserving exact inventory ordering and transfer/consume
+behavior.
