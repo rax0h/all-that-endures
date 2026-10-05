@@ -1,6 +1,9 @@
 # P4 — generation-safe lazy current records and bounded resident state
 
-**Status:** architecture proposal for Astra review. **Do not implement production P4 until this proposal is accepted.**
+**Status:** preparation reviewed at 4a6e23f. P4.1 storage direction approved with
+binding corrections in [PERSISTENCE_P4_REVIEW.md](PERSISTENCE_P4_REVIEW.md).
+Implement only [PERSISTENCE_P4_1.md](PERSISTENCE_P4_1.md). The remaining proposal,
+including the weak identity registry, is not production implementation authority.
 
 **Prepared against live PR head:** `62f3ec5e71242c7373d343fd121baaf0afaea842`.
 

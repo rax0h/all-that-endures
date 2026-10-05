@@ -8,6 +8,16 @@
 Verify the actual live PR/head before working; later documentation commits are
 expected. Do not overwrite newer Sol work or silently work from an older head.
 
+## Current handoff — 2026-10-05 P4 preparation review
+
+P4 preparation at `4a6e23feb52894b1298a5cc09914e77156446f12` is accepted.
+The next authorized assignment is **P4.1 only**:
+[PERSISTENCE_P4_1.md](PERSISTENCE_P4_1.md), with the binding decisions in
+[PERSISTENCE_P4_REVIEW.md](PERSISTENCE_P4_REVIEW.md).
+Do not repeat section 3 preparation or use section 8's historical prompt as the
+next assignment. The broader completion gates below remain in force. P4.2
+World/identity integration still needs the specified decision/proof addendum.
+
 ## 1. Decision and authorization
 
 P1, P2A/B/C, P3A and **complete current P3B are accepted**.
