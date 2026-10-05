@@ -52,6 +52,7 @@ from .persistence_lazy_identity import (
     Occurrence,
 )
 from .persistence_lazy_store import (
+    GenerationPressureError,
     IdentityOccurrenceChange,
     LazyRecordStore,
     VersionChange,
@@ -539,6 +540,7 @@ class LazyPeopleSavePlan:
     metadata: dict[str, Any]
     touched_keys: tuple[Any, ...]
     structural_keys: tuple[Any, ...]
+    layout_value: dict[str, Any] | None
 
 
 class LazyRecordTable(RecordTable):
@@ -758,10 +760,26 @@ class LazyRecordTable(RecordTable):
         if key in self.__dict__.get("_loading_keys", ()):
             return
         self._ensure_mutation()
-        if not self._visible(key) or not dict.__contains__(self, key):
+        if not self._visible(key):
             raise StoreIntegrityError(
                 "mutation notification has no current lazy Person"
             )
+        if not dict.__contains__(self, key):
+            incarnation = self._session._registry.incarnation_for_occurrence(
+                self._session._top_occurrence(key)
+            )
+            live = (
+                None
+                if incarnation is None
+                else self._session._registry.object_for_incarnation(incarnation)
+            )
+            if live is None or not isinstance(live, Person):
+                raise StoreIntegrityError(
+                    "evicted current Person lost its live incarnation"
+                )
+            dict.__setitem__(self, key, live)
+            object.__setattr__(live, "_index_table", weakref.ref(self))
+            object.__setattr__(live, "_index_key", key)
         self._dirty.add(key)
         self._lru.pop(key, None)
         if field == "alive":
@@ -1284,14 +1302,36 @@ class LazyWorldSession:
             return None
         token = uuid.uuid4().hex
         target = self.pin.captured_head + 1
-        ordinary = (
+        ordinary_list = [
             RecordChange(
                 EVENT_STORAGE,
                 COMMIT_DESCRIPTOR_KEY,
                 (1, target, token),
                 record_schema=SESSION_DESCRIPTOR_SCHEMA,
             ),
-        )
+        ]
+        layout_value = None
+        if structural_keys:
+            layout_value = dict(self.manifest["collections"])
+            current = layout_value[PEOPLE_NAMESPACE]
+            if type(current) is not tuple or len(current) != 3:
+                raise StoreFormatError(
+                    "invalid world.people collection description"
+                )
+            layout_value[PEOPLE_NAMESPACE] = (
+                current[0],
+                len(self.people),
+                current[2],
+            )
+            ordinary_list.append(
+                RecordChange(
+                    META,
+                    COLLECTION_LAYOUT,
+                    layout_value,
+                    record_schema=RECORD_SCHEMA,
+                )
+            )
+        ordinary = tuple(ordinary_list)
         return LazyPeopleSavePlan(
             token=token,
             target_generation=target,
@@ -1301,12 +1341,15 @@ class LazyWorldSession:
             metadata=metadata,
             touched_keys=touched_keys,
             structural_keys=structural_keys,
+            layout_value=layout_value,
         )
 
     def _accept_people_save(self, plan, result):
         self.pin = result.pin
         self.people.accept_save(plan, result.pin)
         self._head = self.store.checked_head()
+        if plan.layout_value is not None:
+            self.manifest["collections"] = plan.layout_value
         self._pending_save = None
         self._state = "active"
 
@@ -1328,8 +1371,26 @@ class LazyWorldSession:
                 new_segments=(),
                 metadata=plan.metadata,
             )
+        except GenerationPressureError:
+            self._pending_save = None
+            self._state = "active"
+            raise
+        except StoreConflictError:
+            self._pending_save = None
+            self._state = "stale"
+            raise
         except Exception:
-            self._state = "recovery-required"
+            encoded = self.store.codec.encode(plan.token)
+            attempt = self.store._attempt_row(self.pin.token)
+            if (
+                attempt is not None
+                and attempt[0] == encoded
+                and attempt[2] in {"pending", "committed"}
+            ):
+                self._state = "recovery-required"
+            else:
+                self._pending_save = None
+                self._state = "active"
             raise
         if result.outcome == "conflict":
             self._state = "stale"
