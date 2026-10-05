@@ -2375,4 +2375,25 @@ class IncrementalWorldSession:
 
 def bind_snapshot(world, path, *, rules_id):
     """Bind a live World to an existing exact P2A snapshot."""
+    probe = TransactionalStore.open(
+        path,
+        codec=WorldCodec(),
+        expected_simulation_schema=SCHEMA,
+        expected_rules_id=rules_id,
+    )
+    try:
+        with probe.read_transaction():
+            manifest = probe.read_record(
+                META, "manifest", expected_record_schema=RECORD_SCHEMA
+            )
+            if (
+                type(manifest) is dict
+                and manifest.get("event_storage") is not None
+            ):
+                raise StoreFormatError(
+                    "bind_snapshot does not accept cold event storage; "
+                    "use open_world_session"
+                )
+    finally:
+        probe.close()
     return IncrementalWorldSession(world, path, rules_id=rules_id)
