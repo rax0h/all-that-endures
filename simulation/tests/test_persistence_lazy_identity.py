@@ -192,7 +192,8 @@ def test_foreign_incarnation_and_duplicate_live_instance_are_rejected():
     with pytest.raises(IdentityRegistryError, match="another store"):
         registry.bind(Box(), incarnation=IncarnationId("store-b", 1))
 
-    identity = registry.bind(Box("one"))
+    first = Box("one")
+    identity = registry.bind(first)
     with pytest.raises(IdentityRegistryError, match="different live"):
         registry.bind(Box("two"), incarnation=identity)
 
