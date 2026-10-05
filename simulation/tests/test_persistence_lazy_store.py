@@ -1,4 +1,5 @@
 import sqlite3
+from itertools import islice
 from pathlib import Path
 
 import pytest
@@ -7,6 +8,7 @@ from simulation.ate_sim.incremental_store import (
     Membership,
     NewSegment,
     RecordChange,
+    StoreConflictError,
     StoreFormatError,
     StoreIntegrityError,
     TypedCodec,
@@ -120,8 +122,8 @@ def test_versioned_read_query_order_previous_snapshot_and_reinsertion(tmp_path):
         writer = second.pin
         assert store.read_version(previous, "people", "a", expected_record_schema=1).value == {"name": "Ada"}
         assert store.read_version(writer, "people", "a", expected_record_schema=1).value == {"name": "Ada II"}
-        assert store.iter_keys(previous, "people") == ("a", "b")
-        assert store.iter_keys(writer, "people") == ("b", "a")
+        assert tuple(store.iter_keys(previous, "people")) == ("a", "b")
+        assert tuple(store.iter_keys(writer, "people")) == ("b", "a")
         assert store.query_keys(previous, "people", "city", "north") == ("a", "b")
         assert store.query_keys(writer, "people", "city", "north") == ("b",)
         assert store.query_keys(writer, "people", "city", "south") == ("a",)
@@ -165,7 +167,7 @@ def test_delete_absence_empty_namespace_and_generic_identity_link_records(tmp_pa
         pin = result.pin
         with pytest.raises(KeyError):
             store.read_version(pin, "people", 1, expected_record_schema=1)
-        assert store.iter_keys(pin, "people") == ()
+        assert tuple(store.iter_keys(pin, "people")) == ()
         state = store._namespace_state_at("people", pin.captured_head)
         assert state is not None and state[0] == 0
         assert store.verify_all()["lazy_records"] == 1
@@ -233,8 +235,8 @@ def test_keyset_iteration_obeys_128_cap_and_preserves_typed_order(tmp_path):
         pin = store.capture_pin()
         changes = tuple(VersionChange("people", i, {"i": i}) for i in range(300))
         pin = commit(store, pin, "bulk", changes).pin
-        assert store.iter_keys(pin, "people", page_size=128) == tuple(range(300))
-        assert store.iter_keys(pin, "people", page_size=17) == tuple(range(300))
+        assert tuple(store.iter_keys(pin, "people", page_size=128)) == tuple(range(300))
+        assert tuple(store.iter_keys(pin, "people", page_size=17)) == tuple(range(300))
         with pytest.raises(ValueError):
             store.iter_keys(pin, "people", page_size=129)
         with pytest.raises(ValueError):
@@ -256,6 +258,7 @@ def test_noop_does_not_advance_or_replace_receipt(tmp_path):
         assert result.outcome == "not_committed"
         assert result.generation == 0
         assert store.db.execute("SELECT COUNT(*) FROM pin_receipts").fetchone()[0] == 0
+        assert store.db.execute("SELECT COUNT(*) FROM pin_attempts").fetchone()[0] == 0
         assert store.diagnostics().payload_writes == 0
 
 
@@ -279,6 +282,7 @@ def test_single_writer_100_saves_is_bounded_and_never_self_blocks(tmp_path):
         assert metrics["lazy_namespace_versions"] == 1
         assert metrics["pins"] == 1
         assert metrics["receipts"] == 1
+        assert metrics["attempts"] == 1
         assert store.read_version(pin, "people", 1, expected_record_schema=1).value == 99
         store.verify_all()
 
@@ -324,13 +328,15 @@ def test_fixed_query_work_does_not_decode_or_return_irrelevant_history(tmp_path,
             assert store.query_keys(pin, "people", "bucket", "hot") == ("target",)
             diag = store.diagnostics()
             assert diag.payload_reads == 0
+            assert diag.payload_check_reads == 1
+            assert diag.payload_check_bytes > 0
             assert diag.query_rows == 1
             assert store.read_version(pin, "people", "target", expected_record_schema=1).value == expected
         store.reset_diagnostics()
         assert store.query_keys(writer, "people", "bucket", "missing") == ()
         assert store.diagnostics().query_rows == 0
         plan = " ".join(store.query_plan(writer, "people", "bucket", "hot"))
-        assert "lazy_query_visible" in plan
+        assert "lazy_query_current" in plan
         assert store.storage_metrics()["lazy_record_versions"] == n + 2
         store.verify_all()
 
@@ -356,3 +362,189 @@ def test_full_scrub_rejects_duplicate_visible_ordinal_and_wrong_head_counts(tmp_
         store.db.commit()
         with pytest.raises(StoreIntegrityError):
             store.verify_all()
+
+
+
+def _sqlite_work(store, fn):
+    callbacks = 0
+
+    def progress():
+        nonlocal callbacks
+        callbacks += 1
+        return 0
+
+    store.db.set_progress_handler(progress, 10)
+    try:
+        result = fn()
+    finally:
+        store.db.set_progress_handler(None, 0)
+    return callbacks * 10, result
+
+
+def test_iter_keys_is_page_lazy_closes_snapshot_before_yield_and_detects_pin_move(tmp_path):
+    with make_store(tmp_path / "lazy-iter.sqlite") as store:
+        pin = store.capture_pin()
+        pin = commit(
+            store,
+            pin,
+            "bulk",
+            tuple(
+                VersionChange("people", i, {"i": i, "body": "x" * 256})
+                for i in range(1000)
+            ),
+        ).pin
+
+        store.reset_diagnostics()
+        iterator = store.iter_keys(pin, "people")
+        assert list(islice(iterator, 1)) == [0]
+        diag = store.diagnostics()
+        assert diag.query_rows <= 128
+        assert diag.temporary_keys_peak <= 128
+        assert diag.payload_check_reads <= 128
+        assert diag.payload_check_bytes > 0
+        assert not store.db.in_transaction
+
+        moved = commit(
+            store,
+            pin,
+            "move-pin",
+            (VersionChange("people", 0, {"i": 0, "body": "changed"}),),
+            position=2,
+        )
+        with pytest.raises(StoreConflictError, match="pin moved"):
+            next(iterator)
+        assert not store.db.in_transaction
+
+        replacement = store.iter_keys(moved.pin, "people", page_size=17)
+        assert next(replacement) == 0
+        assert not store.db.in_transaction
+        replacement.close()
+        assert not store.db.in_transaction
+        assert tuple(store.iter_keys(moved.pin, "people", page_size=17)) == tuple(range(1000))
+
+
+@pytest.mark.parametrize("n", [1000, 10000])
+def test_generation_specific_query_paths_bound_history_and_measure_actual_body_checks(tmp_path, n):
+    with make_store(tmp_path / f"query-history-{n}.sqlite") as store:
+        writer = store.capture_pin()
+        writer = commit(
+            store,
+            writer,
+            "initial-hot",
+            tuple(
+                VersionChange(
+                    "people",
+                    i,
+                    {"i": i, "body": "x" * 64},
+                    memberships=(Membership("bucket", "hot", i),),
+                )
+                for i in range(n)
+            ),
+            position=1,
+        ).pin
+        previous = store.capture_pin()
+
+        order_steps, ordered = _sqlite_work(
+            store, lambda: tuple(store.iter_keys(writer, "people", page_size=128))
+        )
+        assert ordered == tuple(range(n))
+
+        writer = commit(
+            store,
+            writer,
+            "mostly-cold",
+            tuple(
+                VersionChange(
+                    "people",
+                    i,
+                    {"i": i, "body": "y" * 64},
+                    memberships=(Membership("bucket", "cold", i),),
+                )
+                for i in range(1, n)
+            ),
+            position=2,
+        ).pin
+
+        store.reset_diagnostics()
+        hot_steps, hot = _sqlite_work(
+            store, lambda: store.query_keys(writer, "people", "bucket", "hot")
+        )
+        assert hot == (0,)
+        diag = store.diagnostics()
+        assert diag.query_rows == 1
+        assert diag.payload_reads == 0
+        assert diag.payload_check_reads == 1
+        assert diag.payload_check_bytes > 0
+        assert len(store.query_keys(previous, "people", "bucket", "hot")) == n
+        previous_plan = " ".join(store.query_plan(previous, "people", "bucket", "hot"))
+        assert "lazy_query_open_generation" in previous_plan
+        assert "lazy_query_closed_generation" in previous_plan
+
+        store.release_pin(previous)
+        previous = store.capture_pin()
+        writer = commit(
+            store,
+            writer,
+            "newer-only",
+            tuple(
+                VersionChange(
+                    "people",
+                    n + i,
+                    {"i": n + i},
+                    memberships=(Membership("newer", True, i),),
+                )
+                for i in range(n)
+            ),
+            position=3,
+        ).pin
+        zero_steps, zero = _sqlite_work(
+            store, lambda: store.query_keys(previous, "people", "newer", True)
+        )
+        assert zero == ()
+        assert len(store.query_keys(writer, "people", "newer", True)) == n
+
+        # The exact limits are deliberately loose across SQLite patch releases;
+        # scaling must remain indexed rather than proportional to hidden history.
+        if n == 1000:
+            test_generation_specific_query_paths_bound_history_and_measure_actual_body_checks.small = (
+                hot_steps,
+                zero_steps,
+                order_steps,
+            )
+        else:
+            small_hot, small_zero, small_order = (
+                test_generation_specific_query_paths_bound_history_and_measure_actual_body_checks.small
+            )
+            assert hot_steps <= small_hot * 4 + 500
+            assert zero_steps <= small_zero * 4 + 500
+            assert order_steps <= small_order * 15 + 5000
+
+
+def test_checked_iteration_delete_and_reinsert_preserve_both_visible_orders(tmp_path):
+    with make_store(tmp_path / "order-versions.sqlite") as store:
+        writer = store.capture_pin()
+        writer = commit(
+            store,
+            writer,
+            "g1",
+            tuple(VersionChange("people", i, i) for i in range(260)),
+            position=1,
+        ).pin
+        previous = store.capture_pin()
+        writer = commit(
+            store,
+            writer,
+            "g2",
+            (
+                VersionChange("people", 10, delete=True),
+                VersionChange("people", 20, 20, reinsertion=True),
+                VersionChange("people", 260, 260),
+            ),
+            position=2,
+        ).pin
+        old = tuple(store.iter_keys(previous, "people", page_size=64))
+        new = tuple(store.iter_keys(writer, "people", page_size=64))
+        assert old == tuple(range(260))
+        assert 10 not in new
+        assert new[-2:] == (20, 260)
+        assert len(new) == 260
