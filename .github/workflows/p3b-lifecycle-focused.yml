@@ -1,4 +1,4 @@
-name: p3b-lifecycle-focused
+name: p3b-lifecycle-focused-v2
 on:
   push:
     branches: [sol/p3b-lifecycle-candidate]
