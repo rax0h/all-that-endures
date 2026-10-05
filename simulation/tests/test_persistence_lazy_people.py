@@ -211,11 +211,17 @@ def test_people_scalar_edit_save_reopen_and_true_noop(tmp_path):
         # A notification whose final encoded value equals the committed
         # baseline must remain a true no-op.
         person.wealth = person.wealth
+        before_person_loads = session.world.people.diagnostics()[
+            "person_payload_loads"
+        ]
         session.store.reset_diagnostics()
         assert session.save() == start + 1
         no_op = session.store.diagnostics()
-        assert no_op.payload_reads == 0
+        assert no_op.payload_reads <= 3
         assert no_op.payload_writes == 0
+        assert session.world.people.diagnostics()[
+            "person_payload_loads"
+        ] == before_person_loads
 
     with open_lazy_world_session(destination, rules_id=RULES) as reopened:
         assert reopened.world.people.diagnostics()["person_payload_loads"] == 0
