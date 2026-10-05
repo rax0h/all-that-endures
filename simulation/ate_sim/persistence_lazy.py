@@ -667,8 +667,7 @@ class LazyPeopleSavePlan:
     target_generation: int
     version_changes: tuple[VersionChange, ...]
     identity_changes: tuple[IdentityOccurrenceChange, ...]
-    ordinary_changes: tuple[RecordChange, ...]
-    metadata: dict[str, Any]
+    cold_plan: Any
     touched_keys: tuple[Any, ...]
     structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
