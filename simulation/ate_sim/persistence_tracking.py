@@ -1021,6 +1021,7 @@ class IncrementalWorldSession:
         self._cold_commit_descriptor = None
         self._cold_committed_n = 0
         self._cold_lifetime = None
+        self._excluded_namespaces = set()
 
     def __enter__(self):
         return self
@@ -1113,7 +1114,7 @@ class IncrementalWorldSession:
         for namespace, (_obj, _name) in self._scalar_fields.items():
             keys[namespace] = {0}
         for namespace, container in self._root_containers.items():
-            if namespace == "world.events":
+            if namespace == "world.events" or namespace in self._excluded_namespaces:
                 continue
             kind = self._base_kind(self._description(namespace)[0])
             if kind in ("dict", "RecordTable"):
@@ -1259,6 +1260,8 @@ class IncrementalWorldSession:
             field_specs = {}
             for name, kind in ROOT_FIELDS[root].items():
                 namespace = root + "." + name
+                if namespace in self._excluded_namespaces:
+                    continue
                 field_specs[name] = (namespace, kind)
                 if kind == "state":
                     continue
@@ -1593,6 +1596,8 @@ class IncrementalWorldSession:
                 if expected in ("state", "int"):
                     continue
                 namespace = root + "." + name
+                if namespace in self._excluded_namespaces:
+                    continue
                 value = getattr(obj, name)
                 if expected == "dict":
                     for key, child in value.items():
