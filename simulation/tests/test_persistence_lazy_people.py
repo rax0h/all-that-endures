@@ -347,6 +347,36 @@ def test_evicted_external_current_person_mutation_rehydrates_owner_and_saves(tmp
         )
 
 
+def test_evicted_inactive_person_reactivation_invalidates_alive_query_and_reopens(
+    tmp_path,
+):
+    destination = converted_people_store(
+        tmp_path, 400, active=8, name="reactivation-pressure"
+    )
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        retained = session.world.people[300]
+        assert retained.alive is False
+        for key in range(1, 400):
+            if key != 300:
+                session.world.people[key]
+        assert not dict.__contains__(session.world.people, 300)
+        assert 300 not in session.world.people.ids("alive", True)
+
+        retained.alive = True
+        assert dict.__contains__(session.world.people, 300)
+        assert session.world.people.ids("alive", True) == (
+            1, 2, 3, 4, 5, 6, 7, 8, 300
+        )
+        assert 300 not in session.world.people.ids("alive", False)
+        session.save()
+
+    with open_lazy_world_session(destination, rules_id=RULES) as reopened:
+        assert reopened.world.people[300].alive is True
+        assert reopened.world.people.ids("alive", True) == (
+            1, 2, 3, 4, 5, 6, 7, 8, 300
+        )
+
+
 @pytest.mark.parametrize("count", [1000, 10000])
 def test_one_people_edit_write_work_does_not_follow_historical_population(tmp_path, count):
     destination = converted_people_store(
