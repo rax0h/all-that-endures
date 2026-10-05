@@ -1937,6 +1937,419 @@ class LazyAspirationTable(LazyRecordTable):
         }
 
 
+class LazyTrackedSet(set):
+    """Weakly bound integer set whose mutations dirty one lazy owner bucket."""
+
+    def __init__(self, values, table, key):
+        values = self._validate(values)
+        set.__init__(self, values)
+        self._table_ref = weakref.ref(table)
+        self._key = key
+
+    @staticmethod
+    def _validate(values):
+        values = set(values)
+        if any(type(value) is not int for value in values):
+            raise TypeError("magic resource owner index requires integer IDs")
+        return values
+
+    def _table(self):
+        return None if self._table_ref is None else self._table_ref()
+
+    def _guard(self):
+        table = self._table()
+        if table is not None:
+            table._ensure_mutation()
+        return table
+
+    def _touch(self, table):
+        if table is not None:
+            table.changed(self._key)
+
+    def _attach(self, table, key):
+        self._table_ref = weakref.ref(table)
+        self._key = key
+
+    def _detach(self):
+        self._table_ref = None
+        self._key = None
+
+    def add(self, value):
+        table = self._guard()
+        self._validate((value,))
+        before = len(self)
+        set.add(self, value)
+        if len(self) != before:
+            self._touch(table)
+
+    def discard(self, value):
+        table = self._guard()
+        before = len(self)
+        set.discard(self, value)
+        if len(self) != before:
+            self._touch(table)
+
+    def remove(self, value):
+        table = self._guard()
+        set.remove(self, value)
+        self._touch(table)
+
+    def pop(self):
+        table = self._guard()
+        value = set.pop(self)
+        self._touch(table)
+        return value
+
+    def clear(self):
+        table = self._guard()
+        if self:
+            set.clear(self)
+            self._touch(table)
+
+    def update(self, *others):
+        values = []
+        for other in others:
+            values.extend(other)
+        self._validate(values)
+        table = self._guard()
+        before = set(self)
+        set.update(self, *others)
+        if self != before:
+            self._touch(table)
+
+    def intersection_update(self, *others):
+        table = self._guard()
+        before = set(self)
+        set.intersection_update(self, *others)
+        if self != before:
+            self._touch(table)
+
+    def difference_update(self, *others):
+        table = self._guard()
+        before = set(self)
+        set.difference_update(self, *others)
+        if self != before:
+            self._touch(table)
+
+    def symmetric_difference_update(self, other):
+        self._validate(other)
+        table = self._guard()
+        before = set(self)
+        set.symmetric_difference_update(self, other)
+        if self != before:
+            self._touch(table)
+
+    def __ior__(self, other):
+        self.update(other)
+        return self
+
+    def __iand__(self, other):
+        self.intersection_update(other)
+        return self
+
+    def __isub__(self, other):
+        self.difference_update(other)
+        return self
+
+    def __ixor__(self, other):
+        self.symmetric_difference_update(other)
+        return self
+
+
+class LazyOwnerIndexTable(LazyRecordTable):
+    """Bounded lazy owner -> resource-ID set mapping."""
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        dict.__init__(self)
+        self._session = session
+        self._store = session.store
+        self._pin = session.pin
+        self._namespace = OWNER_INDEX_NAMESPACE
+        self._clean_limit = clean_limit
+        self._lru = OrderedDict()
+        self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence = {}
+        self._baseline_payload = {}
+        self._baseline_incarnation = {}
+        self._baseline_ordinal = {}
+        self._dirty = set()
+        self._removed = set()
+        self._new_keys = set()
+        self._reinserted = set()
+        self._overlay_ordinals = {}
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=LAZY_OWNER_INDEX_SCHEMA,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def __getitem__(self, key):
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        if dict.__contains__(self, key):
+            self._lru.pop(key, None)
+            if key not in self._dirty:
+                self._lru[key] = None
+            return dict.__getitem__(self, key)
+        checked = self._store.read_version(
+            self._pin,
+            self._namespace,
+            key,
+            expected_record_schema=LAZY_OWNER_INDEX_SCHEMA,
+        )
+        if type(checked.value) is not set or any(
+            type(item) is not int for item in checked.value
+        ):
+            raise StoreFormatError(
+                "lazy owner-index payload is not an integer set"
+            )
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(checked.value)
+        )
+        self._baseline_presence.setdefault(key, True)
+        bucket = self._session._bind_loaded_owner_bucket(
+            key, checked.value
+        )
+        dict.__setitem__(self, key, bucket)
+        self._loads += 1
+        if key not in self._dirty:
+            self._lru[key] = None
+        self._evict_clean()
+        return bucket
+
+    def changed(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current owner-index bucket"
+            )
+        if not dict.__contains__(self, key):
+            self[key]
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __setitem__(self, key, value):
+        self._ensure_mutation()
+        if not isinstance(value, (set, LazyTrackedSet)):
+            raise TypeError("owner-index values must be sets")
+        baseline_exists = self._baseline_exists(key)
+        currently_visible = self._visible(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is value and currently_visible:
+            return
+        was_removed = key in self._removed
+        if old is not None and old is not value:
+            self._session._detach_assigned_owner_bucket(key, old)
+        bucket = self._session._bind_assigned_owner_bucket(key, value)
+        dict.__setitem__(self, key, bucket)
+
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __delitem__(self, key):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is not None:
+            self._session._detach_assigned_owner_bucket(key, old)
+            dict.__delitem__(self, key)
+        else:
+            self._session._detach_unloaded_owner_bucket(key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        structural_ordinals = self._planned_structural_ordinals()
+        version_changes = []
+        identity_changes = []
+        effective_keys = []
+        structural_keys = []
+
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            baseline_incarnation = (
+                self._baseline_incarnation_id(key)
+                if baseline_exists else None
+            )
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=LAZY_OWNER_INDEX_SCHEMA,
+                        )
+                    )
+                    identity_changes.append(
+                        IdentityOccurrenceChange(
+                            self._namespace, key, (), delete=True
+                        )
+                    )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+
+            bucket = dict.__getitem__(self, key)
+            stored_value = set(bucket)
+            payload = self._store.codec.encode(stored_value)
+            incarnation = self._session._registry.incarnation_for_object(
+                bucket
+            )
+            if incarnation is None:
+                raise StoreIntegrityError(
+                    "current owner-index bucket has no runtime incarnation"
+                )
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new
+                or reinsertion
+                or payload != self._baseline_bytes(key)
+            )
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        stored_value,
+                        record_schema=LAZY_OWNER_INDEX_SCHEMA,
+                        reinsertion=reinsertion,
+                    )
+                )
+            if baseline_incarnation != incarnation.value:
+                identity_changes.append(
+                    IdentityOccurrenceChange(
+                        self._namespace,
+                        key,
+                        (),
+                        incarnation_id=incarnation.value,
+                    )
+                )
+            if value_changed or baseline_incarnation != incarnation.value:
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+
+        return (
+            tuple(version_changes),
+            tuple(identity_changes),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in plan.owner_index_touched_keys:
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                bucket = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(
+                    set(bucket)
+                )
+                incarnation = self._session._registry.incarnation_for_object(
+                    bucket
+                )
+                self._baseline_incarnation[key] = (
+                    None if incarnation is None else incarnation.value
+                )
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        "committed owner-index bucket lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_incarnation[key] = None
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
+
+    def diagnostics(self):
+        return {
+            "logical_owner_buckets": (
+                self._baseline_count
+                - len(self._removed)
+                + len(self._new_keys)
+            ),
+            "resident_owner_buckets": dict.__len__(self),
+            "clean_cache_entries": len(self._lru),
+            "clean_cache_limit": self._clean_limit,
+            "owner_bucket_payload_loads": self._loads,
+            "dirty_owner_buckets": len(self._dirty),
+            "removed_owner_buckets": len(self._removed),
+            "new_owner_buckets": len(self._new_keys),
+            "reinserted_owner_buckets": len(self._reinserted),
+        }
+
+
 class LazyTrackedList(list):
     """Weakly bound list whose supported mutations dirty one lazy owner."""
 
