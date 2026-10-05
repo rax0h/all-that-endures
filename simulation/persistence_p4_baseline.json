@@ -1,0 +1,4863 @@
+{
+  "fixtures": {
+    "independent_control": {
+      "seed": 991337,
+      "worldgen": {
+        "height": 6,
+        "mature": false,
+        "settlements": 2,
+        "width": 8
+      }
+    },
+    "offers": {
+      "active_people": 8,
+      "growth_axis": "consumed MagicResource records absent from owner_index",
+      "public_offer_ids": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "sizes": [
+        1000,
+        10000
+      ]
+    },
+    "people": {
+      "active_people": 32,
+      "fixed_alias": "wallet ids -1/-2 share one mutable dict",
+      "fixed_edit": "reactivate person id 33",
+      "growth_axis": "inactive but still mutable Person records",
+      "sizes": [
+        1000,
+        10000
+      ]
+    }
+  },
+  "independent_control": {
+    "after_one_digest": "193e2ccaab16a7204f396e6b4de6d1d4e2cfec4da459a21be32c23ee5aac5494",
+    "continued_after_reopen": 1,
+    "continued_before_save": 1,
+    "event_count": 100,
+    "final_digest": "70ad8a91e29e3df58172e9ecf73be1486042e85f9e17872bb0dc2b41d2ff637e",
+    "initial_digest": "8303186ec6d3ec4296b45a8f9c08df491602cf1efefee75916bf44fd1fb6a3f1",
+    "initial_years": 2,
+    "namespace_stats": {
+      "collections": {
+        "world.advancement.paths": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 7,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 7856,
+          "record_rows": 7,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.agency.actions": {
+          "kind": "list",
+          "logical_chunks": 0,
+          "logical_count": 70,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 15978,
+          "record_rows": 70,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.agency.motives": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 36,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 14642,
+          "record_rows": 36,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.ambient_magic.fields": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 2,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 502,
+          "record_rows": 2,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.cells": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 48,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 14659,
+          "record_rows": 48,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.communities.communities": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 2,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 499,
+          "record_rows": 2,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.communities.memberships": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 54,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 2960,
+          "record_rows": 54,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.communities.next_community": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.culture.adoption": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 10,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 540,
+          "record_rows": 10,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.culture.institutions": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.culture.laws": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.culture.next_institution": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.culture.next_law": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.culture.next_practice": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 36,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.culture.practices": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 10,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 5659,
+          "record_rows": 10,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.currency.consumed": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.currency.minted": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.currency.treasuries": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.currency.wallets": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.divinity.churches": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.divinity.gods": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 17,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 5122,
+          "record_rows": 17,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.divinity.great_astral_beings": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 3,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 1016,
+          "record_rows": 3,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.divinity.next_church": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.economy.next_property": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 36,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.economy.property": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 16,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 6269,
+          "record_rows": 16,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.event_ids": {
+          "kind": "set",
+          "logical_chunks": 0,
+          "logical_count": 58,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 2127,
+          "record_rows": 58,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.events": {
+          "kind": "EventLog-disk/v1",
+          "logical_chunks": 0,
+          "logical_count": 58,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 34024,
+          "record_rows": 58,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.genealogy.children": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 8,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 402,
+          "record_rows": 8,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.genealogy.parents": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 5,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 305,
+          "record_rows": 5,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.households": {
+          "kind": "RecordTable",
+          "logical_chunks": 0,
+          "logical_count": 16,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 5670,
+          "record_rows": 16,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.infrastructure.assets": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 2,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 678,
+          "record_rows": 2,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.infrastructure.next_id": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.applications": {
+          "kind": "RecordTable",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.branches": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 4,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 1240,
+          "record_rows": 4,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.institutions": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 2,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 570,
+          "record_rows": 2,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.magic_records": {
+          "kind": "RecordTable",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.next_application": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.next_branch": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.next_institution": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.next_notice": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.next_record": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.institutions.notices": {
+          "kind": "RecordTable",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.knowledge.beliefs": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.knowledge.claim_index": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.knowledge.claims": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.knowledge.next_claim": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.lineage.children": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 30,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 5375,
+          "record_rows": 30,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.lineage.nodes": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 108,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 25134,
+          "record_rows": 108,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.local": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 2,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 355,
+          "record_rows": 2,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.magic_resources.aspirations": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 36,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 21691,
+          "record_rows": 36,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.magic_resources.next_id": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.magic_resources.owner_index": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 45,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.magic_resources.resources": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 8,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 3407,
+          "record_rows": 8,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.materials.active_lot_index": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 2,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 187,
+          "record_rows": 2,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.materials.items": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.materials.lot_index": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 2,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 189,
+          "record_rows": 2,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.materials.lots": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 10,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 4807,
+          "record_rows": 10,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.materials.next_item": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.materials.next_lot": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 36,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.metaphysics.next_token": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.metaphysics.resurrection_tokens": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.metaphysics.souls": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 54,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 20771,
+          "record_rows": 54,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.next_event": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 36,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.next_household": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 36,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.next_person": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 36,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.next_settlement": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.people": {
+          "kind": "RecordTable",
+          "logical_chunks": 0,
+          "logical_count": 54,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35259,
+          "record_rows": 54,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.seed": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 40,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.settlements": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 2,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 965,
+          "record_rows": 2,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.skills.skills": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 110,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 28647,
+          "record_rows": 110,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.social.adjacency": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 54,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 4944,
+          "record_rows": 54,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.social.edges": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 121,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 49376,
+          "record_rows": 121,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.social.partnerships": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 7,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 252,
+          "record_rows": 7,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.society_accountability.inquiries": {
+          "kind": "RecordTable",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.society_accountability.next_inquiry": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.threat_ecology.next_id": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.threat_ecology.resolutions": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.threat_ecology.threats": {
+          "kind": "RecordTable",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.trade_routes": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 189,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.transmission.next_id": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.transmission.records": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 5,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 2215,
+          "record_rows": 5,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.warfare.conflicts": {
+          "kind": "RecordTable",
+          "logical_chunks": 0,
+          "logical_count": 0,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 0,
+          "record_rows": 0,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.warfare.next_conflict": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.warfare.tensions": {
+          "kind": "dict",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 54,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        },
+        "world.year": {
+          "kind": "int",
+          "logical_chunks": 0,
+          "logical_count": 1,
+          "query_membership_key_bytes": 0,
+          "query_membership_rows": 0,
+          "record_payload_bytes": 35,
+          "record_rows": 1,
+          "segment_payload_bytes": 0,
+          "segment_rows": 0
+        }
+      },
+      "file_bytes": 638976,
+      "identity_link_rows": 0
+    },
+    "next_event": 101,
+    "seed": 991337
+  },
+  "measurement_method": {
+    "allocation": "tracemalloc incremental peak/retained bytes; gc.collect before each window",
+    "fixture_setup": "outside tracemalloc operation windows",
+    "io": "TransactionalStore checked payload read/write counters; SQL namespace row/byte counts are diagnostic only",
+    "wall_time": "time.perf_counter diagnostic, not an acceptance bound"
+  },
+  "offer_cases": {
+    "1000": {
+      "first_query": {
+        "allocation": {
+          "peak_bytes": 12184,
+          "retained_bytes": 11048,
+          "seconds": 0.0006837659999945345
+        },
+        "cache": {
+          "inventory_cache_keys": 1,
+          "offer_members": 4,
+          "offer_rows": 4,
+          "offer_settlements": 1,
+          "owner_index_buckets": 1,
+          "owner_index_ids": 4,
+          "resources_resident": 1004,
+          "selection_cache_keys": 0
+        },
+        "inventory_work": {
+          "calls": 9,
+          "candidate_ids": 4
+        },
+        "offer_ids": {
+          "awakening_stone": [
+            3,
+            4
+          ],
+          "essence": [
+            1,
+            2
+          ]
+        }
+      },
+      "fixture": {
+        "active_people": 8,
+        "irrelevant_consumed_resources": 1000,
+        "public_offer_ids": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "repeat_query": {
+        "allocation": {
+          "peak_bytes": 1880,
+          "retained_bytes": 968,
+          "seconds": 0.00005299900000466096
+        },
+        "cache": {
+          "inventory_cache_keys": 1,
+          "offer_members": 4,
+          "offer_rows": 4,
+          "offer_settlements": 1,
+          "owner_index_buckets": 1,
+          "owner_index_ids": 4,
+          "resources_resident": 1004,
+          "selection_cache_keys": 0
+        },
+        "inventory_work": {
+          "calls": 0,
+          "candidate_ids": 0
+        },
+        "offer_ids": {
+          "awakening_stone": [
+            3,
+            4
+          ],
+          "essence": [
+            1,
+            2
+          ]
+        }
+      }
+    },
+    "10000": {
+      "first_query": {
+        "allocation": {
+          "peak_bytes": 11504,
+          "retained_bytes": 10368,
+          "seconds": 0.0005898379999962344
+        },
+        "cache": {
+          "inventory_cache_keys": 1,
+          "offer_members": 4,
+          "offer_rows": 4,
+          "offer_settlements": 1,
+          "owner_index_buckets": 1,
+          "owner_index_ids": 4,
+          "resources_resident": 10004,
+          "selection_cache_keys": 0
+        },
+        "inventory_work": {
+          "calls": 9,
+          "candidate_ids": 4
+        },
+        "offer_ids": {
+          "awakening_stone": [
+            3,
+            4
+          ],
+          "essence": [
+            1,
+            2
+          ]
+        }
+      },
+      "fixture": {
+        "active_people": 8,
+        "irrelevant_consumed_resources": 10000,
+        "public_offer_ids": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "repeat_query": {
+        "allocation": {
+          "peak_bytes": 1784,
+          "retained_bytes": 968,
+          "seconds": 0.000043254999994246646
+        },
+        "cache": {
+          "inventory_cache_keys": 1,
+          "offer_members": 4,
+          "offer_rows": 4,
+          "offer_settlements": 1,
+          "owner_index_buckets": 1,
+          "owner_index_ids": 4,
+          "resources_resident": 10004,
+          "selection_cache_keys": 0
+        },
+        "inventory_work": {
+          "calls": 0,
+          "candidate_ids": 0
+        },
+        "offer_ids": {
+          "awakening_stone": [
+            3,
+            4
+          ],
+          "essence": [
+            1,
+            2
+          ]
+        }
+      }
+    }
+  },
+  "people_cases": {
+    "1000": {
+      "checked_store_point_access": {
+        "allocation": {
+          "peak_bytes": 11368,
+          "retained_bytes": 4700,
+          "seconds": 0.0003728939999945169
+        },
+        "io": {
+          "payload_read_bytes": 654,
+          "payload_reads": 1,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "value": 1032
+      },
+      "close": {
+        "allocation": {
+          "peak_bytes": 489288,
+          "retained_bytes": 413656,
+          "seconds": 0.061884687000002714
+        },
+        "session_active": false,
+        "store_closed": true
+      },
+      "explicit_archive": {
+        "allocation": {
+          "peak_bytes": 1172674,
+          "retained_bytes": 1088045,
+          "seconds": 0.6677078569999964
+        },
+        "archive_bytes": 1691648,
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "logical_sha256": "6c174b652444d38c11a7f59817fa9f1be914c3afbd5583dd3fa4c2e89065a722",
+        "value": {
+          "archive_bytes": 1691648,
+          "archive_seconds": 0.6675672960000014,
+          "logical_sha256": "6c174b652444d38c11a7f59817fa9f1be914c3afbd5583dd3fa4c2e89065a722",
+          "path": "/tmp/ate-p4-probe-6190gc5m/people-1000-archive.sqlite",
+          "record": "archive"
+        }
+      },
+      "explicit_full_audit": {
+        "allocation": {
+          "peak_bytes": 502670,
+          "retained_bytes": 385624,
+          "seconds": 0.18597394900000097
+        },
+        "io": {
+          "payload_read_bytes": 681827,
+          "payload_reads": 1066,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "value": {
+          "generation": 3,
+          "records": 1066,
+          "segments": 0
+        }
+      },
+      "first_current_query": {
+        "allocation": {
+          "peak_bytes": 158056,
+          "retained_bytes": 123384,
+          "seconds": 0.0041199980000072856
+        },
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "source_rows_required_by_current_RecordTable": 1032,
+        "state_after": {
+          "baseline_ordinal_entries": 1034,
+          "bound_ids": 1056,
+          "cache_occupancy": {
+            "advancement_rank": 0,
+            "community_membership": 0,
+            "material_rank_heaps": 0,
+            "material_selection": 0,
+            "material_selection_ids": 0,
+            "resource_inventory": 0,
+            "resource_offer_books": 0,
+            "resource_selection": 0,
+            "social_partnership_index": 0,
+            "social_relationships": 0,
+            "world_living": 0
+          },
+          "cold_persisted_key_entries": 1066,
+          "committed_identity_targets": 1,
+          "identity_index": {
+            "identities": 1033,
+            "last_retirement": {
+              "added_links": 0,
+              "affected_groups": 0,
+              "occurrences_removed": 0,
+              "owners_removed": 0,
+              "owners_requested": 0,
+              "removed_links": 0,
+              "surviving_paths_examined": 0
+            },
+            "links": 1,
+            "occurrences": 1034,
+            "owners": 1034,
+            "paths": 1034
+          },
+          "initial_identity_links": 1,
+          "live_identity_targets": 1,
+          "memo_entries": 1033,
+          "memo_reverse_entries": 1033,
+          "people_container_type": "_RootRecordTable",
+          "people_indexes": {
+            "alive": {
+              "bucket_count": 2,
+              "bucket_members": 1032,
+              "dirty_entries": 0,
+              "previous_entries": 1032
+            }
+          },
+          "people_resident": 1032,
+          "root_sizes": {
+            "world.advancement.paths": 0,
+            "world.agency.actions": 0,
+            "world.agency.motives": 0,
+            "world.ambient_magic.fields": 0,
+            "world.cells": 0,
+            "world.communities.communities": 0,
+            "world.communities.memberships": 0,
+            "world.culture.adoption": 0,
+            "world.culture.institutions": 0,
+            "world.culture.laws": 0,
+            "world.culture.practices": 0,
+            "world.currency.consumed": 0,
+            "world.currency.minted": 0,
+            "world.currency.treasuries": 0,
+            "world.currency.wallets": 2,
+            "world.divinity.churches": 0,
+            "world.divinity.gods": 0,
+            "world.divinity.great_astral_beings": 0,
+            "world.economy.property": 0,
+            "world.event_ids": 0,
+            "world.events": 0,
+            "world.genealogy.children": 0,
+            "world.genealogy.parents": 0,
+            "world.households": 0,
+            "world.infrastructure.assets": 0,
+            "world.institutions.applications": 0,
+            "world.institutions.branches": 0,
+            "world.institutions.institutions": 0,
+            "world.institutions.magic_records": 0,
+            "world.institutions.notices": 0,
+            "world.knowledge.beliefs": 0,
+            "world.knowledge.claim_index": 0,
+            "world.knowledge.claims": 0,
+            "world.lineage.children": 0,
+            "world.lineage.nodes": 0,
+            "world.local": 0,
+            "world.magic_resources.aspirations": 0,
+            "world.magic_resources.owner_index": 0,
+            "world.magic_resources.resources": 0,
+            "world.materials.active_lot_index": 0,
+            "world.materials.items": 0,
+            "world.materials.lot_index": 0,
+            "world.materials.lots": 0,
+            "world.metaphysics.resurrection_tokens": 0,
+            "world.metaphysics.souls": 0,
+            "world.people": 1032,
+            "world.settlements": 0,
+            "world.skills.skills": 0,
+            "world.social.adjacency": 0,
+            "world.social.edges": 0,
+            "world.social.partnerships": 0,
+            "world.society_accountability.inquiries": 0,
+            "world.threat_ecology.resolutions": 0,
+            "world.threat_ecology.threats": 0,
+            "world.trade_routes": 0,
+            "world.transmission.records": 0,
+            "world.warfare.conflicts": 0,
+            "world.warfare.tensions": 0
+          }
+        },
+        "value": {
+          "ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32
+          ],
+          "living_cache_entries": 32
+        }
+      },
+      "fixture": {
+        "active_people": 32,
+        "events": 0,
+        "fixed_wallet_aliases": [
+          -1,
+          -2
+        ],
+        "inactive_people": 1000,
+        "total_people": 1032
+      },
+      "import": {
+        "allocation": {
+          "peak_bytes": 2025584,
+          "retained_bytes": 996302,
+          "seconds": 0.9641136230000029
+        },
+        "namespace_stats": {
+          "collections": {
+            "world.advancement.paths": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.agency.actions": {
+              "kind": "list",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.agency.motives": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.ambient_magic.fields": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.cells": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.communities.communities": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.communities.memberships": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.communities.next_community": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.adoption": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.institutions": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.laws": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.next_institution": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.next_law": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.next_practice": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.practices": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.currency.consumed": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.currency.minted": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.currency.treasuries": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.currency.wallets": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 2,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 126,
+              "record_rows": 2,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.divinity.churches": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.divinity.gods": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.divinity.great_astral_beings": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.divinity.next_church": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.economy.next_property": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.economy.property": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.event_ids": {
+              "kind": "set",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.events": {
+              "kind": "EventLog-disk/v1",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.genealogy.children": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.genealogy.parents": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.households": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.infrastructure.assets": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.infrastructure.next_id": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.applications": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.branches": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.institutions": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.magic_records": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_application": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_branch": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_institution": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_notice": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_record": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.notices": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.knowledge.beliefs": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.knowledge.claim_index": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.knowledge.claims": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.knowledge.next_claim": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.lineage.children": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.lineage.nodes": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.local": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.magic_resources.aspirations": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.magic_resources.next_id": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.magic_resources.owner_index": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.magic_resources.resources": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.active_lot_index": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.items": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.lot_index": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.lots": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.next_item": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.next_lot": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.metaphysics.next_token": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.metaphysics.resurrection_tokens": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.metaphysics.souls": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.next_event": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.next_household": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.next_person": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 38,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.next_settlement": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.people": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 1032,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 672679,
+              "record_rows": 1032,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.seed": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 40,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.settlements": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.skills.skills": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.social.adjacency": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.social.edges": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.social.partnerships": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.society_accountability.inquiries": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.society_accountability.next_inquiry": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.threat_ecology.next_id": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.threat_ecology.resolutions": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.threat_ecology.threats": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.trade_routes": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.transmission.next_id": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.transmission.records": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.warfare.conflicts": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.warfare.next_conflict": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.warfare.tensions": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.year": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            }
+          },
+          "file_bytes": 966656,
+          "identity_link_rows": 1
+        },
+        "reported": {
+          "commit_token": "dd5ad83c8bb24d3ebd201ef04f3bf556",
+          "deleted_event_rows": 0,
+          "disk_events": 0,
+          "disk_segments": 0,
+          "event_count": 0,
+          "final_file_bytes": 966656,
+          "final_generation": 2,
+          "finalize_io": {
+            "payload_read_bytes": 7787,
+            "payload_reads": 2,
+            "payload_write_bytes": 8070,
+            "payload_writes": 5
+          },
+          "largest_transfer_batch_chunks": 0,
+          "remaining_suffix_records": 0,
+          "staging_io": {
+            "payload_read_bytes": 0,
+            "payload_reads": 0,
+            "payload_write_bytes": 681545,
+            "payload_writes": 1063
+          },
+          "transfer_commits": 0,
+          "transfer_io": {
+            "payload_read_bytes": 0,
+            "payload_reads": 0,
+            "payload_write_bytes": 0,
+            "payload_writes": 0
+          },
+          "transferred_events": 0,
+          "validation_io": {
+            "payload_read_bytes": 1371437,
+            "payload_reads": 2134,
+            "payload_write_bytes": 0,
+            "payload_writes": 0
+          }
+        }
+      },
+      "no_op_save": {
+        "allocation": {
+          "peak_bytes": 330795,
+          "retained_bytes": 140599,
+          "seconds": 0.015211569000001646
+        },
+        "generation_after": 2,
+        "generation_before": 2,
+        "io": {
+          "payload_read_bytes": 217,
+          "payload_reads": 3,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "value": 2
+      },
+      "one_local_edit_save": {
+        "allocation": {
+          "peak_bytes": 95074,
+          "retained_bytes": 33289,
+          "seconds": 0.016597977999992963
+        },
+        "dirty_after": [],
+        "generation_after": 3,
+        "generation_before": 2,
+        "io": {
+          "payload_read_bytes": 505,
+          "payload_reads": 7,
+          "payload_write_bytes": 795,
+          "payload_writes": 3
+        },
+        "state_after": {
+          "baseline_ordinal_entries": 1034,
+          "bound_ids": 1056,
+          "cache_occupancy": {
+            "advancement_rank": 0,
+            "community_membership": 0,
+            "material_rank_heaps": 0,
+            "material_selection": 0,
+            "material_selection_ids": 0,
+            "resource_inventory": 0,
+            "resource_offer_books": 0,
+            "resource_selection": 0,
+            "social_partnership_index": 0,
+            "social_relationships": 0,
+            "world_living": 0
+          },
+          "cold_persisted_key_entries": 1066,
+          "committed_identity_targets": 1,
+          "identity_index": {
+            "identities": 1033,
+            "last_retirement": {
+              "added_links": 0,
+              "affected_groups": 0,
+              "occurrences_removed": 0,
+              "owners_removed": 0,
+              "owners_requested": 0,
+              "removed_links": 0,
+              "surviving_paths_examined": 0
+            },
+            "links": 1,
+            "occurrences": 1034,
+            "owners": 1034,
+            "paths": 1034
+          },
+          "initial_identity_links": 1,
+          "live_identity_targets": 1,
+          "memo_entries": 1033,
+          "memo_reverse_entries": 1033,
+          "people_container_type": "_RootRecordTable",
+          "people_indexes": {
+            "alive": {
+              "bucket_count": 2,
+              "bucket_members": 1032,
+              "dirty_entries": 0,
+              "previous_entries": 1032
+            }
+          },
+          "people_resident": 1032,
+          "root_sizes": {
+            "world.advancement.paths": 0,
+            "world.agency.actions": 0,
+            "world.agency.motives": 0,
+            "world.ambient_magic.fields": 0,
+            "world.cells": 0,
+            "world.communities.communities": 0,
+            "world.communities.memberships": 0,
+            "world.culture.adoption": 0,
+            "world.culture.institutions": 0,
+            "world.culture.laws": 0,
+            "world.culture.practices": 0,
+            "world.currency.consumed": 0,
+            "world.currency.minted": 0,
+            "world.currency.treasuries": 0,
+            "world.currency.wallets": 2,
+            "world.divinity.churches": 0,
+            "world.divinity.gods": 0,
+            "world.divinity.great_astral_beings": 0,
+            "world.economy.property": 0,
+            "world.event_ids": 0,
+            "world.events": 0,
+            "world.genealogy.children": 0,
+            "world.genealogy.parents": 0,
+            "world.households": 0,
+            "world.infrastructure.assets": 0,
+            "world.institutions.applications": 0,
+            "world.institutions.branches": 0,
+            "world.institutions.institutions": 0,
+            "world.institutions.magic_records": 0,
+            "world.institutions.notices": 0,
+            "world.knowledge.beliefs": 0,
+            "world.knowledge.claim_index": 0,
+            "world.knowledge.claims": 0,
+            "world.lineage.children": 0,
+            "world.lineage.nodes": 0,
+            "world.local": 0,
+            "world.magic_resources.aspirations": 0,
+            "world.magic_resources.owner_index": 0,
+            "world.magic_resources.resources": 0,
+            "world.materials.active_lot_index": 0,
+            "world.materials.items": 0,
+            "world.materials.lot_index": 0,
+            "world.materials.lots": 0,
+            "world.metaphysics.resurrection_tokens": 0,
+            "world.metaphysics.souls": 0,
+            "world.people": 1032,
+            "world.settlements": 0,
+            "world.skills.skills": 0,
+            "world.social.adjacency": 0,
+            "world.social.edges": 0,
+            "world.social.partnerships": 0,
+            "world.society_accountability.inquiries": 0,
+            "world.threat_ecology.resolutions": 0,
+            "world.threat_ecology.threats": 0,
+            "world.trade_routes": 0,
+            "world.transmission.records": 0,
+            "world.warfare.conflicts": 0,
+            "world.warfare.tensions": 0
+          }
+        },
+        "value": 3
+      },
+      "open": {
+        "allocation": {
+          "peak_bytes": 3821388,
+          "retained_bytes": 3770106,
+          "seconds": 0.5692936319999973
+        },
+        "io": {
+          "payload_read_bytes": 1370124,
+          "payload_reads": 2103,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "state": {
+          "baseline_ordinal_entries": 1034,
+          "bound_ids": 1056,
+          "cache_occupancy": {
+            "advancement_rank": 0,
+            "community_membership": 0,
+            "material_rank_heaps": 0,
+            "material_selection": 0,
+            "material_selection_ids": 0,
+            "resource_inventory": 0,
+            "resource_offer_books": 0,
+            "resource_selection": 0,
+            "social_partnership_index": 0,
+            "social_relationships": 0,
+            "world_living": 0
+          },
+          "cold_persisted_key_entries": 1066,
+          "committed_identity_targets": 1,
+          "identity_index": {
+            "identities": 1033,
+            "last_retirement": {
+              "added_links": 0,
+              "affected_groups": 0,
+              "occurrences_removed": 0,
+              "owners_removed": 0,
+              "owners_requested": 0,
+              "removed_links": 0,
+              "surviving_paths_examined": 0
+            },
+            "links": 1,
+            "occurrences": 1034,
+            "owners": 1034,
+            "paths": 1034
+          },
+          "initial_identity_links": 1,
+          "live_identity_targets": 1,
+          "memo_entries": 1033,
+          "memo_reverse_entries": 1033,
+          "people_container_type": "_RootRecordTable",
+          "people_indexes": {},
+          "people_resident": 1032,
+          "root_sizes": {
+            "world.advancement.paths": 0,
+            "world.agency.actions": 0,
+            "world.agency.motives": 0,
+            "world.ambient_magic.fields": 0,
+            "world.cells": 0,
+            "world.communities.communities": 0,
+            "world.communities.memberships": 0,
+            "world.culture.adoption": 0,
+            "world.culture.institutions": 0,
+            "world.culture.laws": 0,
+            "world.culture.practices": 0,
+            "world.currency.consumed": 0,
+            "world.currency.minted": 0,
+            "world.currency.treasuries": 0,
+            "world.currency.wallets": 2,
+            "world.divinity.churches": 0,
+            "world.divinity.gods": 0,
+            "world.divinity.great_astral_beings": 0,
+            "world.economy.property": 0,
+            "world.event_ids": 0,
+            "world.events": 0,
+            "world.genealogy.children": 0,
+            "world.genealogy.parents": 0,
+            "world.households": 0,
+            "world.infrastructure.assets": 0,
+            "world.institutions.applications": 0,
+            "world.institutions.branches": 0,
+            "world.institutions.institutions": 0,
+            "world.institutions.magic_records": 0,
+            "world.institutions.notices": 0,
+            "world.knowledge.beliefs": 0,
+            "world.knowledge.claim_index": 0,
+            "world.knowledge.claims": 0,
+            "world.lineage.children": 0,
+            "world.lineage.nodes": 0,
+            "world.local": 0,
+            "world.magic_resources.aspirations": 0,
+            "world.magic_resources.owner_index": 0,
+            "world.magic_resources.resources": 0,
+            "world.materials.active_lot_index": 0,
+            "world.materials.items": 0,
+            "world.materials.lot_index": 0,
+            "world.materials.lots": 0,
+            "world.metaphysics.resurrection_tokens": 0,
+            "world.metaphysics.souls": 0,
+            "world.people": 1032,
+            "world.settlements": 0,
+            "world.skills.skills": 0,
+            "world.social.adjacency": 0,
+            "world.social.edges": 0,
+            "world.social.partnerships": 0,
+            "world.society_accountability.inquiries": 0,
+            "world.threat_ecology.resolutions": 0,
+            "world.threat_ecology.threats": 0,
+            "world.trade_routes": 0,
+            "world.transmission.records": 0,
+            "world.warfare.conflicts": 0,
+            "world.warfare.tensions": 0
+          }
+        }
+      },
+      "pre_close_state": {
+        "baseline_ordinal_entries": 1034,
+        "bound_ids": 1056,
+        "cache_occupancy": {
+          "advancement_rank": 0,
+          "community_membership": 0,
+          "material_rank_heaps": 0,
+          "material_selection": 0,
+          "material_selection_ids": 0,
+          "resource_inventory": 0,
+          "resource_offer_books": 0,
+          "resource_selection": 0,
+          "social_partnership_index": 0,
+          "social_relationships": 0,
+          "world_living": 0
+        },
+        "cold_persisted_key_entries": 1066,
+        "committed_identity_targets": 1,
+        "identity_index": {
+          "identities": 1033,
+          "last_retirement": {
+            "added_links": 0,
+            "affected_groups": 0,
+            "occurrences_removed": 0,
+            "owners_removed": 0,
+            "owners_requested": 0,
+            "removed_links": 0,
+            "surviving_paths_examined": 0
+          },
+          "links": 1,
+          "occurrences": 1034,
+          "owners": 1034,
+          "paths": 1034
+        },
+        "initial_identity_links": 1,
+        "live_identity_targets": 1,
+        "memo_entries": 1033,
+        "memo_reverse_entries": 1033,
+        "people_container_type": "_RootRecordTable",
+        "people_indexes": {
+          "alive": {
+            "bucket_count": 2,
+            "bucket_members": 1032,
+            "dirty_entries": 0,
+            "previous_entries": 1032
+          }
+        },
+        "people_resident": 1032,
+        "root_sizes": {
+          "world.advancement.paths": 0,
+          "world.agency.actions": 0,
+          "world.agency.motives": 0,
+          "world.ambient_magic.fields": 0,
+          "world.cells": 0,
+          "world.communities.communities": 0,
+          "world.communities.memberships": 0,
+          "world.culture.adoption": 0,
+          "world.culture.institutions": 0,
+          "world.culture.laws": 0,
+          "world.culture.practices": 0,
+          "world.currency.consumed": 0,
+          "world.currency.minted": 0,
+          "world.currency.treasuries": 0,
+          "world.currency.wallets": 2,
+          "world.divinity.churches": 0,
+          "world.divinity.gods": 0,
+          "world.divinity.great_astral_beings": 0,
+          "world.economy.property": 0,
+          "world.event_ids": 0,
+          "world.events": 0,
+          "world.genealogy.children": 0,
+          "world.genealogy.parents": 0,
+          "world.households": 0,
+          "world.infrastructure.assets": 0,
+          "world.institutions.applications": 0,
+          "world.institutions.branches": 0,
+          "world.institutions.institutions": 0,
+          "world.institutions.magic_records": 0,
+          "world.institutions.notices": 0,
+          "world.knowledge.beliefs": 0,
+          "world.knowledge.claim_index": 0,
+          "world.knowledge.claims": 0,
+          "world.lineage.children": 0,
+          "world.lineage.nodes": 0,
+          "world.local": 0,
+          "world.magic_resources.aspirations": 0,
+          "world.magic_resources.owner_index": 0,
+          "world.magic_resources.resources": 0,
+          "world.materials.active_lot_index": 0,
+          "world.materials.items": 0,
+          "world.materials.lot_index": 0,
+          "world.materials.lots": 0,
+          "world.metaphysics.resurrection_tokens": 0,
+          "world.metaphysics.souls": 0,
+          "world.people": 1032,
+          "world.settlements": 0,
+          "world.skills.skills": 0,
+          "world.social.adjacency": 0,
+          "world.social.edges": 0,
+          "world.social.partnerships": 0,
+          "world.society_accountability.inquiries": 0,
+          "world.threat_ecology.resolutions": 0,
+          "world.threat_ecology.threats": 0,
+          "world.trade_routes": 0,
+          "world.transmission.records": 0,
+          "world.warfare.conflicts": 0,
+          "world.warfare.tensions": 0
+        }
+      },
+      "reactivation_query": {
+        "allocation": {
+          "peak_bytes": 1056,
+          "retained_bytes": 728,
+          "seconds": 0.00005826800000363619
+        },
+        "changed_member_work": 0,
+        "index_before_query": {
+          "alive": {
+            "bucket_count": 2,
+            "bucket_members": 1032,
+            "dirty_entries": 1,
+            "previous_entries": 1032
+          }
+        },
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "reactivated_id": 33,
+        "state_after": {
+          "baseline_ordinal_entries": 1034,
+          "bound_ids": 1056,
+          "cache_occupancy": {
+            "advancement_rank": 0,
+            "community_membership": 0,
+            "material_rank_heaps": 0,
+            "material_selection": 0,
+            "material_selection_ids": 0,
+            "resource_inventory": 0,
+            "resource_offer_books": 0,
+            "resource_selection": 0,
+            "social_partnership_index": 0,
+            "social_relationships": 0,
+            "world_living": 0
+          },
+          "cold_persisted_key_entries": 1066,
+          "committed_identity_targets": 1,
+          "identity_index": {
+            "identities": 1033,
+            "last_retirement": {
+              "added_links": 0,
+              "affected_groups": 0,
+              "occurrences_removed": 0,
+              "owners_removed": 0,
+              "owners_requested": 0,
+              "removed_links": 0,
+              "surviving_paths_examined": 0
+            },
+            "links": 1,
+            "occurrences": 1034,
+            "owners": 1034,
+            "paths": 1034
+          },
+          "initial_identity_links": 1,
+          "live_identity_targets": 1,
+          "memo_entries": 1033,
+          "memo_reverse_entries": 1033,
+          "people_container_type": "_RootRecordTable",
+          "people_indexes": {
+            "alive": {
+              "bucket_count": 2,
+              "bucket_members": 1032,
+              "dirty_entries": 0,
+              "previous_entries": 1032
+            }
+          },
+          "people_resident": 1032,
+          "root_sizes": {
+            "world.advancement.paths": 0,
+            "world.agency.actions": 0,
+            "world.agency.motives": 0,
+            "world.ambient_magic.fields": 0,
+            "world.cells": 0,
+            "world.communities.communities": 0,
+            "world.communities.memberships": 0,
+            "world.culture.adoption": 0,
+            "world.culture.institutions": 0,
+            "world.culture.laws": 0,
+            "world.culture.practices": 0,
+            "world.currency.consumed": 0,
+            "world.currency.minted": 0,
+            "world.currency.treasuries": 0,
+            "world.currency.wallets": 2,
+            "world.divinity.churches": 0,
+            "world.divinity.gods": 0,
+            "world.divinity.great_astral_beings": 0,
+            "world.economy.property": 0,
+            "world.event_ids": 0,
+            "world.events": 0,
+            "world.genealogy.children": 0,
+            "world.genealogy.parents": 0,
+            "world.households": 0,
+            "world.infrastructure.assets": 0,
+            "world.institutions.applications": 0,
+            "world.institutions.branches": 0,
+            "world.institutions.institutions": 0,
+            "world.institutions.magic_records": 0,
+            "world.institutions.notices": 0,
+            "world.knowledge.beliefs": 0,
+            "world.knowledge.claim_index": 0,
+            "world.knowledge.claims": 0,
+            "world.lineage.children": 0,
+            "world.lineage.nodes": 0,
+            "world.local": 0,
+            "world.magic_resources.aspirations": 0,
+            "world.magic_resources.owner_index": 0,
+            "world.magic_resources.resources": 0,
+            "world.materials.active_lot_index": 0,
+            "world.materials.items": 0,
+            "world.materials.lot_index": 0,
+            "world.materials.lots": 0,
+            "world.metaphysics.resurrection_tokens": 0,
+            "world.metaphysics.souls": 0,
+            "world.people": 1032,
+            "world.settlements": 0,
+            "world.skills.skills": 0,
+            "world.social.adjacency": 0,
+            "world.social.edges": 0,
+            "world.social.partnerships": 0,
+            "world.society_accountability.inquiries": 0,
+            "world.threat_ecology.resolutions": 0,
+            "world.threat_ecology.threats": 0,
+            "world.trade_routes": 0,
+            "world.transmission.records": 0,
+            "world.warfare.conflicts": 0,
+            "world.warfare.tensions": 0
+          }
+        },
+        "value": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33
+        ]
+      },
+      "repeat_current_query": {
+        "allocation": {
+          "peak_bytes": 936,
+          "retained_bytes": 616,
+          "seconds": 0.00003459100000213766
+        },
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "people_index_before": {
+          "alive": {
+            "bucket_count": 2,
+            "bucket_members": 1032,
+            "dirty_entries": 0,
+            "previous_entries": 1032
+          }
+        },
+        "value": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ]
+      },
+      "resident_point_access": {
+        "allocation": {
+          "peak_bytes": 104,
+          "retained_bytes": 104,
+          "seconds": 0.000003969000005099588
+        },
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "value": 1032
+      }
+    },
+    "10000": {
+      "checked_store_point_access": {
+        "allocation": {
+          "peak_bytes": 11373,
+          "retained_bytes": 4700,
+          "seconds": 0.000493098000006853
+        },
+        "io": {
+          "payload_read_bytes": 656,
+          "payload_reads": 1,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "value": 10032
+      },
+      "close": {
+        "allocation": {
+          "peak_bytes": 1293368,
+          "retained_bytes": 671696,
+          "seconds": 0.6082956380000013
+        },
+        "session_active": false,
+        "store_closed": true
+      },
+      "explicit_archive": {
+        "allocation": {
+          "peak_bytes": 1888500,
+          "retained_bytes": 1223190,
+          "seconds": 6.313168148000003
+        },
+        "archive_bytes": 16113664,
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "logical_sha256": "f20bba5f48d7b6c600352574a67791168ca28a033c1f7994db8072ac6ba9422f",
+        "value": {
+          "archive_bytes": 16113664,
+          "archive_seconds": 6.313030260000005,
+          "logical_sha256": "f20bba5f48d7b6c600352574a67791168ca28a033c1f7994db8072ac6ba9422f",
+          "path": "/tmp/ate-p4-probe-6190gc5m/people-10000-archive.sqlite",
+          "record": "archive"
+        }
+      },
+      "explicit_full_audit": {
+        "allocation": {
+          "peak_bytes": 502675,
+          "retained_bytes": 385624,
+          "seconds": 1.7596942969999958
+        },
+        "io": {
+          "payload_read_bytes": 6567894,
+          "payload_reads": 10066,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "value": {
+          "generation": 3,
+          "records": 10066,
+          "segments": 0
+        }
+      },
+      "first_current_query": {
+        "allocation": {
+          "peak_bytes": 1829880,
+          "retained_bytes": 1304944,
+          "seconds": 0.038253943000000845
+        },
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "source_rows_required_by_current_RecordTable": 10032,
+        "state_after": {
+          "baseline_ordinal_entries": 10034,
+          "bound_ids": 10056,
+          "cache_occupancy": {
+            "advancement_rank": 0,
+            "community_membership": 0,
+            "material_rank_heaps": 0,
+            "material_selection": 0,
+            "material_selection_ids": 0,
+            "resource_inventory": 0,
+            "resource_offer_books": 0,
+            "resource_selection": 0,
+            "social_partnership_index": 0,
+            "social_relationships": 0,
+            "world_living": 0
+          },
+          "cold_persisted_key_entries": 10066,
+          "committed_identity_targets": 1,
+          "identity_index": {
+            "identities": 10033,
+            "last_retirement": {
+              "added_links": 0,
+              "affected_groups": 0,
+              "occurrences_removed": 0,
+              "owners_removed": 0,
+              "owners_requested": 0,
+              "removed_links": 0,
+              "surviving_paths_examined": 0
+            },
+            "links": 1,
+            "occurrences": 10034,
+            "owners": 10034,
+            "paths": 10034
+          },
+          "initial_identity_links": 1,
+          "live_identity_targets": 1,
+          "memo_entries": 10033,
+          "memo_reverse_entries": 10033,
+          "people_container_type": "_RootRecordTable",
+          "people_indexes": {
+            "alive": {
+              "bucket_count": 2,
+              "bucket_members": 10032,
+              "dirty_entries": 0,
+              "previous_entries": 10032
+            }
+          },
+          "people_resident": 10032,
+          "root_sizes": {
+            "world.advancement.paths": 0,
+            "world.agency.actions": 0,
+            "world.agency.motives": 0,
+            "world.ambient_magic.fields": 0,
+            "world.cells": 0,
+            "world.communities.communities": 0,
+            "world.communities.memberships": 0,
+            "world.culture.adoption": 0,
+            "world.culture.institutions": 0,
+            "world.culture.laws": 0,
+            "world.culture.practices": 0,
+            "world.currency.consumed": 0,
+            "world.currency.minted": 0,
+            "world.currency.treasuries": 0,
+            "world.currency.wallets": 2,
+            "world.divinity.churches": 0,
+            "world.divinity.gods": 0,
+            "world.divinity.great_astral_beings": 0,
+            "world.economy.property": 0,
+            "world.event_ids": 0,
+            "world.events": 0,
+            "world.genealogy.children": 0,
+            "world.genealogy.parents": 0,
+            "world.households": 0,
+            "world.infrastructure.assets": 0,
+            "world.institutions.applications": 0,
+            "world.institutions.branches": 0,
+            "world.institutions.institutions": 0,
+            "world.institutions.magic_records": 0,
+            "world.institutions.notices": 0,
+            "world.knowledge.beliefs": 0,
+            "world.knowledge.claim_index": 0,
+            "world.knowledge.claims": 0,
+            "world.lineage.children": 0,
+            "world.lineage.nodes": 0,
+            "world.local": 0,
+            "world.magic_resources.aspirations": 0,
+            "world.magic_resources.owner_index": 0,
+            "world.magic_resources.resources": 0,
+            "world.materials.active_lot_index": 0,
+            "world.materials.items": 0,
+            "world.materials.lot_index": 0,
+            "world.materials.lots": 0,
+            "world.metaphysics.resurrection_tokens": 0,
+            "world.metaphysics.souls": 0,
+            "world.people": 10032,
+            "world.settlements": 0,
+            "world.skills.skills": 0,
+            "world.social.adjacency": 0,
+            "world.social.edges": 0,
+            "world.social.partnerships": 0,
+            "world.society_accountability.inquiries": 0,
+            "world.threat_ecology.resolutions": 0,
+            "world.threat_ecology.threats": 0,
+            "world.trade_routes": 0,
+            "world.transmission.records": 0,
+            "world.warfare.conflicts": 0,
+            "world.warfare.tensions": 0
+          }
+        },
+        "value": {
+          "ids": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32
+          ],
+          "living_cache_entries": 32
+        }
+      },
+      "fixture": {
+        "active_people": 32,
+        "events": 0,
+        "fixed_wallet_aliases": [
+          -1,
+          -2
+        ],
+        "inactive_people": 10000,
+        "total_people": 10032
+      },
+      "import": {
+        "allocation": {
+          "peak_bytes": 12603974,
+          "retained_bytes": 637406,
+          "seconds": 8.885197452
+        },
+        "namespace_stats": {
+          "collections": {
+            "world.advancement.paths": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.agency.actions": {
+              "kind": "list",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.agency.motives": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.ambient_magic.fields": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.cells": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.communities.communities": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.communities.memberships": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.communities.next_community": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.adoption": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.institutions": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.laws": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.next_institution": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.next_law": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.next_practice": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.culture.practices": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.currency.consumed": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.currency.minted": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.currency.treasuries": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.currency.wallets": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 2,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 126,
+              "record_rows": 2,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.divinity.churches": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.divinity.gods": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.divinity.great_astral_beings": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.divinity.next_church": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.economy.next_property": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.economy.property": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.event_ids": {
+              "kind": "set",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.events": {
+              "kind": "EventLog-disk/v1",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.genealogy.children": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.genealogy.parents": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.households": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.infrastructure.assets": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.infrastructure.next_id": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.applications": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.branches": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.institutions": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.magic_records": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_application": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_branch": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_institution": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_notice": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.next_record": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.institutions.notices": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.knowledge.beliefs": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.knowledge.claim_index": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.knowledge.claims": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.knowledge.next_claim": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.lineage.children": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.lineage.nodes": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.local": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.magic_resources.aspirations": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.magic_resources.next_id": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.magic_resources.owner_index": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.magic_resources.resources": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.active_lot_index": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.items": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.lot_index": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.lots": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.next_item": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.materials.next_lot": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.metaphysics.next_token": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.metaphysics.resurrection_tokens": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.metaphysics.souls": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.next_event": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.next_household": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.next_person": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 39,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.next_settlement": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.people": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 10032,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 6558744,
+              "record_rows": 10032,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.seed": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 40,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.settlements": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.skills.skills": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.social.adjacency": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.social.edges": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.social.partnerships": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.society_accountability.inquiries": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.society_accountability.next_inquiry": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.threat_ecology.next_id": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.threat_ecology.resolutions": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.threat_ecology.threats": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.trade_routes": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.transmission.next_id": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.transmission.records": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.warfare.conflicts": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.warfare.next_conflict": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.warfare.tensions": {
+              "kind": "dict",
+              "logical_chunks": 0,
+              "logical_count": 0,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 0,
+              "record_rows": 0,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            },
+            "world.year": {
+              "kind": "int",
+              "logical_chunks": 0,
+              "logical_count": 1,
+              "query_membership_key_bytes": 0,
+              "query_membership_rows": 0,
+              "record_payload_bytes": 35,
+              "record_rows": 1,
+              "segment_payload_bytes": 0,
+              "segment_rows": 0
+            }
+          },
+          "file_bytes": 8699904,
+          "identity_link_rows": 1
+        },
+        "reported": {
+          "commit_token": "700e98c4fdde47029e10b2999f7c8758",
+          "deleted_event_rows": 0,
+          "disk_events": 0,
+          "disk_segments": 0,
+          "event_count": 0,
+          "final_file_bytes": 8699904,
+          "final_generation": 2,
+          "finalize_io": {
+            "payload_read_bytes": 7788,
+            "payload_reads": 2,
+            "payload_write_bytes": 8071,
+            "payload_writes": 5
+          },
+          "largest_transfer_batch_chunks": 0,
+          "remaining_suffix_records": 0,
+          "staging_io": {
+            "payload_read_bytes": 0,
+            "payload_reads": 0,
+            "payload_write_bytes": 6567612,
+            "payload_writes": 10063
+          },
+          "transfer_commits": 0,
+          "transfer_io": {
+            "payload_read_bytes": 0,
+            "payload_reads": 0,
+            "payload_write_bytes": 0,
+            "payload_writes": 0
+          },
+          "transferred_events": 0,
+          "validation_io": {
+            "payload_read_bytes": 13143572,
+            "payload_reads": 20134,
+            "payload_write_bytes": 0,
+            "payload_writes": 0
+          }
+        }
+      },
+      "no_op_save": {
+        "allocation": {
+          "peak_bytes": 47789,
+          "retained_bytes": 9664,
+          "seconds": 0.004565112999998178
+        },
+        "generation_after": 2,
+        "generation_before": 2,
+        "io": {
+          "payload_read_bytes": 217,
+          "payload_reads": 3,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "value": 2
+      },
+      "one_local_edit_save": {
+        "allocation": {
+          "peak_bytes": 94949,
+          "retained_bytes": 33025,
+          "seconds": 0.01765336500000103
+        },
+        "dirty_after": [],
+        "generation_after": 3,
+        "generation_before": 2,
+        "io": {
+          "payload_read_bytes": 505,
+          "payload_reads": 7,
+          "payload_write_bytes": 795,
+          "payload_writes": 3
+        },
+        "state_after": {
+          "baseline_ordinal_entries": 10034,
+          "bound_ids": 10056,
+          "cache_occupancy": {
+            "advancement_rank": 0,
+            "community_membership": 0,
+            "material_rank_heaps": 0,
+            "material_selection": 0,
+            "material_selection_ids": 0,
+            "resource_inventory": 0,
+            "resource_offer_books": 0,
+            "resource_selection": 0,
+            "social_partnership_index": 0,
+            "social_relationships": 0,
+            "world_living": 0
+          },
+          "cold_persisted_key_entries": 10066,
+          "committed_identity_targets": 1,
+          "identity_index": {
+            "identities": 10033,
+            "last_retirement": {
+              "added_links": 0,
+              "affected_groups": 0,
+              "occurrences_removed": 0,
+              "owners_removed": 0,
+              "owners_requested": 0,
+              "removed_links": 0,
+              "surviving_paths_examined": 0
+            },
+            "links": 1,
+            "occurrences": 10034,
+            "owners": 10034,
+            "paths": 10034
+          },
+          "initial_identity_links": 1,
+          "live_identity_targets": 1,
+          "memo_entries": 10033,
+          "memo_reverse_entries": 10033,
+          "people_container_type": "_RootRecordTable",
+          "people_indexes": {
+            "alive": {
+              "bucket_count": 2,
+              "bucket_members": 10032,
+              "dirty_entries": 0,
+              "previous_entries": 10032
+            }
+          },
+          "people_resident": 10032,
+          "root_sizes": {
+            "world.advancement.paths": 0,
+            "world.agency.actions": 0,
+            "world.agency.motives": 0,
+            "world.ambient_magic.fields": 0,
+            "world.cells": 0,
+            "world.communities.communities": 0,
+            "world.communities.memberships": 0,
+            "world.culture.adoption": 0,
+            "world.culture.institutions": 0,
+            "world.culture.laws": 0,
+            "world.culture.practices": 0,
+            "world.currency.consumed": 0,
+            "world.currency.minted": 0,
+            "world.currency.treasuries": 0,
+            "world.currency.wallets": 2,
+            "world.divinity.churches": 0,
+            "world.divinity.gods": 0,
+            "world.divinity.great_astral_beings": 0,
+            "world.economy.property": 0,
+            "world.event_ids": 0,
+            "world.events": 0,
+            "world.genealogy.children": 0,
+            "world.genealogy.parents": 0,
+            "world.households": 0,
+            "world.infrastructure.assets": 0,
+            "world.institutions.applications": 0,
+            "world.institutions.branches": 0,
+            "world.institutions.institutions": 0,
+            "world.institutions.magic_records": 0,
+            "world.institutions.notices": 0,
+            "world.knowledge.beliefs": 0,
+            "world.knowledge.claim_index": 0,
+            "world.knowledge.claims": 0,
+            "world.lineage.children": 0,
+            "world.lineage.nodes": 0,
+            "world.local": 0,
+            "world.magic_resources.aspirations": 0,
+            "world.magic_resources.owner_index": 0,
+            "world.magic_resources.resources": 0,
+            "world.materials.active_lot_index": 0,
+            "world.materials.items": 0,
+            "world.materials.lot_index": 0,
+            "world.materials.lots": 0,
+            "world.metaphysics.resurrection_tokens": 0,
+            "world.metaphysics.souls": 0,
+            "world.people": 10032,
+            "world.settlements": 0,
+            "world.skills.skills": 0,
+            "world.social.adjacency": 0,
+            "world.social.edges": 0,
+            "world.social.partnerships": 0,
+            "world.society_accountability.inquiries": 0,
+            "world.threat_ecology.resolutions": 0,
+            "world.threat_ecology.threats": 0,
+            "world.trade_routes": 0,
+            "world.transmission.records": 0,
+            "world.warfare.conflicts": 0,
+            "world.warfare.tensions": 0
+          }
+        },
+        "value": 3
+      },
+      "open": {
+        "allocation": {
+          "peak_bytes": 30963854,
+          "retained_bytes": 30539100,
+          "seconds": 5.483298340000005
+        },
+        "io": {
+          "payload_read_bytes": 13142258,
+          "payload_reads": 20103,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "state": {
+          "baseline_ordinal_entries": 10034,
+          "bound_ids": 10056,
+          "cache_occupancy": {
+            "advancement_rank": 0,
+            "community_membership": 0,
+            "material_rank_heaps": 0,
+            "material_selection": 0,
+            "material_selection_ids": 0,
+            "resource_inventory": 0,
+            "resource_offer_books": 0,
+            "resource_selection": 0,
+            "social_partnership_index": 0,
+            "social_relationships": 0,
+            "world_living": 0
+          },
+          "cold_persisted_key_entries": 10066,
+          "committed_identity_targets": 1,
+          "identity_index": {
+            "identities": 10033,
+            "last_retirement": {
+              "added_links": 0,
+              "affected_groups": 0,
+              "occurrences_removed": 0,
+              "owners_removed": 0,
+              "owners_requested": 0,
+              "removed_links": 0,
+              "surviving_paths_examined": 0
+            },
+            "links": 1,
+            "occurrences": 10034,
+            "owners": 10034,
+            "paths": 10034
+          },
+          "initial_identity_links": 1,
+          "live_identity_targets": 1,
+          "memo_entries": 10033,
+          "memo_reverse_entries": 10033,
+          "people_container_type": "_RootRecordTable",
+          "people_indexes": {},
+          "people_resident": 10032,
+          "root_sizes": {
+            "world.advancement.paths": 0,
+            "world.agency.actions": 0,
+            "world.agency.motives": 0,
+            "world.ambient_magic.fields": 0,
+            "world.cells": 0,
+            "world.communities.communities": 0,
+            "world.communities.memberships": 0,
+            "world.culture.adoption": 0,
+            "world.culture.institutions": 0,
+            "world.culture.laws": 0,
+            "world.culture.practices": 0,
+            "world.currency.consumed": 0,
+            "world.currency.minted": 0,
+            "world.currency.treasuries": 0,
+            "world.currency.wallets": 2,
+            "world.divinity.churches": 0,
+            "world.divinity.gods": 0,
+            "world.divinity.great_astral_beings": 0,
+            "world.economy.property": 0,
+            "world.event_ids": 0,
+            "world.events": 0,
+            "world.genealogy.children": 0,
+            "world.genealogy.parents": 0,
+            "world.households": 0,
+            "world.infrastructure.assets": 0,
+            "world.institutions.applications": 0,
+            "world.institutions.branches": 0,
+            "world.institutions.institutions": 0,
+            "world.institutions.magic_records": 0,
+            "world.institutions.notices": 0,
+            "world.knowledge.beliefs": 0,
+            "world.knowledge.claim_index": 0,
+            "world.knowledge.claims": 0,
+            "world.lineage.children": 0,
+            "world.lineage.nodes": 0,
+            "world.local": 0,
+            "world.magic_resources.aspirations": 0,
+            "world.magic_resources.owner_index": 0,
+            "world.magic_resources.resources": 0,
+            "world.materials.active_lot_index": 0,
+            "world.materials.items": 0,
+            "world.materials.lot_index": 0,
+            "world.materials.lots": 0,
+            "world.metaphysics.resurrection_tokens": 0,
+            "world.metaphysics.souls": 0,
+            "world.people": 10032,
+            "world.settlements": 0,
+            "world.skills.skills": 0,
+            "world.social.adjacency": 0,
+            "world.social.edges": 0,
+            "world.social.partnerships": 0,
+            "world.society_accountability.inquiries": 0,
+            "world.threat_ecology.resolutions": 0,
+            "world.threat_ecology.threats": 0,
+            "world.trade_routes": 0,
+            "world.transmission.records": 0,
+            "world.warfare.conflicts": 0,
+            "world.warfare.tensions": 0
+          }
+        }
+      },
+      "pre_close_state": {
+        "baseline_ordinal_entries": 10034,
+        "bound_ids": 10056,
+        "cache_occupancy": {
+          "advancement_rank": 0,
+          "community_membership": 0,
+          "material_rank_heaps": 0,
+          "material_selection": 0,
+          "material_selection_ids": 0,
+          "resource_inventory": 0,
+          "resource_offer_books": 0,
+          "resource_selection": 0,
+          "social_partnership_index": 0,
+          "social_relationships": 0,
+          "world_living": 0
+        },
+        "cold_persisted_key_entries": 10066,
+        "committed_identity_targets": 1,
+        "identity_index": {
+          "identities": 10033,
+          "last_retirement": {
+            "added_links": 0,
+            "affected_groups": 0,
+            "occurrences_removed": 0,
+            "owners_removed": 0,
+            "owners_requested": 0,
+            "removed_links": 0,
+            "surviving_paths_examined": 0
+          },
+          "links": 1,
+          "occurrences": 10034,
+          "owners": 10034,
+          "paths": 10034
+        },
+        "initial_identity_links": 1,
+        "live_identity_targets": 1,
+        "memo_entries": 10033,
+        "memo_reverse_entries": 10033,
+        "people_container_type": "_RootRecordTable",
+        "people_indexes": {
+          "alive": {
+            "bucket_count": 2,
+            "bucket_members": 10032,
+            "dirty_entries": 0,
+            "previous_entries": 10032
+          }
+        },
+        "people_resident": 10032,
+        "root_sizes": {
+          "world.advancement.paths": 0,
+          "world.agency.actions": 0,
+          "world.agency.motives": 0,
+          "world.ambient_magic.fields": 0,
+          "world.cells": 0,
+          "world.communities.communities": 0,
+          "world.communities.memberships": 0,
+          "world.culture.adoption": 0,
+          "world.culture.institutions": 0,
+          "world.culture.laws": 0,
+          "world.culture.practices": 0,
+          "world.currency.consumed": 0,
+          "world.currency.minted": 0,
+          "world.currency.treasuries": 0,
+          "world.currency.wallets": 2,
+          "world.divinity.churches": 0,
+          "world.divinity.gods": 0,
+          "world.divinity.great_astral_beings": 0,
+          "world.economy.property": 0,
+          "world.event_ids": 0,
+          "world.events": 0,
+          "world.genealogy.children": 0,
+          "world.genealogy.parents": 0,
+          "world.households": 0,
+          "world.infrastructure.assets": 0,
+          "world.institutions.applications": 0,
+          "world.institutions.branches": 0,
+          "world.institutions.institutions": 0,
+          "world.institutions.magic_records": 0,
+          "world.institutions.notices": 0,
+          "world.knowledge.beliefs": 0,
+          "world.knowledge.claim_index": 0,
+          "world.knowledge.claims": 0,
+          "world.lineage.children": 0,
+          "world.lineage.nodes": 0,
+          "world.local": 0,
+          "world.magic_resources.aspirations": 0,
+          "world.magic_resources.owner_index": 0,
+          "world.magic_resources.resources": 0,
+          "world.materials.active_lot_index": 0,
+          "world.materials.items": 0,
+          "world.materials.lot_index": 0,
+          "world.materials.lots": 0,
+          "world.metaphysics.resurrection_tokens": 0,
+          "world.metaphysics.souls": 0,
+          "world.people": 10032,
+          "world.settlements": 0,
+          "world.skills.skills": 0,
+          "world.social.adjacency": 0,
+          "world.social.edges": 0,
+          "world.social.partnerships": 0,
+          "world.society_accountability.inquiries": 0,
+          "world.threat_ecology.resolutions": 0,
+          "world.threat_ecology.threats": 0,
+          "world.trade_routes": 0,
+          "world.transmission.records": 0,
+          "world.warfare.conflicts": 0,
+          "world.warfare.tensions": 0
+        }
+      },
+      "reactivation_query": {
+        "allocation": {
+          "peak_bytes": 1056,
+          "retained_bytes": 728,
+          "seconds": 0.00005434499999523723
+        },
+        "changed_member_work": 0,
+        "index_before_query": {
+          "alive": {
+            "bucket_count": 2,
+            "bucket_members": 10032,
+            "dirty_entries": 1,
+            "previous_entries": 10032
+          }
+        },
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "reactivated_id": 33,
+        "state_after": {
+          "baseline_ordinal_entries": 10034,
+          "bound_ids": 10056,
+          "cache_occupancy": {
+            "advancement_rank": 0,
+            "community_membership": 0,
+            "material_rank_heaps": 0,
+            "material_selection": 0,
+            "material_selection_ids": 0,
+            "resource_inventory": 0,
+            "resource_offer_books": 0,
+            "resource_selection": 0,
+            "social_partnership_index": 0,
+            "social_relationships": 0,
+            "world_living": 0
+          },
+          "cold_persisted_key_entries": 10066,
+          "committed_identity_targets": 1,
+          "identity_index": {
+            "identities": 10033,
+            "last_retirement": {
+              "added_links": 0,
+              "affected_groups": 0,
+              "occurrences_removed": 0,
+              "owners_removed": 0,
+              "owners_requested": 0,
+              "removed_links": 0,
+              "surviving_paths_examined": 0
+            },
+            "links": 1,
+            "occurrences": 10034,
+            "owners": 10034,
+            "paths": 10034
+          },
+          "initial_identity_links": 1,
+          "live_identity_targets": 1,
+          "memo_entries": 10033,
+          "memo_reverse_entries": 10033,
+          "people_container_type": "_RootRecordTable",
+          "people_indexes": {
+            "alive": {
+              "bucket_count": 2,
+              "bucket_members": 10032,
+              "dirty_entries": 0,
+              "previous_entries": 10032
+            }
+          },
+          "people_resident": 10032,
+          "root_sizes": {
+            "world.advancement.paths": 0,
+            "world.agency.actions": 0,
+            "world.agency.motives": 0,
+            "world.ambient_magic.fields": 0,
+            "world.cells": 0,
+            "world.communities.communities": 0,
+            "world.communities.memberships": 0,
+            "world.culture.adoption": 0,
+            "world.culture.institutions": 0,
+            "world.culture.laws": 0,
+            "world.culture.practices": 0,
+            "world.currency.consumed": 0,
+            "world.currency.minted": 0,
+            "world.currency.treasuries": 0,
+            "world.currency.wallets": 2,
+            "world.divinity.churches": 0,
+            "world.divinity.gods": 0,
+            "world.divinity.great_astral_beings": 0,
+            "world.economy.property": 0,
+            "world.event_ids": 0,
+            "world.events": 0,
+            "world.genealogy.children": 0,
+            "world.genealogy.parents": 0,
+            "world.households": 0,
+            "world.infrastructure.assets": 0,
+            "world.institutions.applications": 0,
+            "world.institutions.branches": 0,
+            "world.institutions.institutions": 0,
+            "world.institutions.magic_records": 0,
+            "world.institutions.notices": 0,
+            "world.knowledge.beliefs": 0,
+            "world.knowledge.claim_index": 0,
+            "world.knowledge.claims": 0,
+            "world.lineage.children": 0,
+            "world.lineage.nodes": 0,
+            "world.local": 0,
+            "world.magic_resources.aspirations": 0,
+            "world.magic_resources.owner_index": 0,
+            "world.magic_resources.resources": 0,
+            "world.materials.active_lot_index": 0,
+            "world.materials.items": 0,
+            "world.materials.lot_index": 0,
+            "world.materials.lots": 0,
+            "world.metaphysics.resurrection_tokens": 0,
+            "world.metaphysics.souls": 0,
+            "world.people": 10032,
+            "world.settlements": 0,
+            "world.skills.skills": 0,
+            "world.social.adjacency": 0,
+            "world.social.edges": 0,
+            "world.social.partnerships": 0,
+            "world.society_accountability.inquiries": 0,
+            "world.threat_ecology.resolutions": 0,
+            "world.threat_ecology.threats": 0,
+            "world.trade_routes": 0,
+            "world.transmission.records": 0,
+            "world.warfare.conflicts": 0,
+            "world.warfare.tensions": 0
+          }
+        },
+        "value": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33
+        ]
+      },
+      "repeat_current_query": {
+        "allocation": {
+          "peak_bytes": 936,
+          "retained_bytes": 616,
+          "seconds": 0.00004085999999858814
+        },
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "people_index_before": {
+          "alive": {
+            "bucket_count": 2,
+            "bucket_members": 10032,
+            "dirty_entries": 0,
+            "previous_entries": 10032
+          }
+        },
+        "value": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ]
+      },
+      "resident_point_access": {
+        "allocation": {
+          "peak_bytes": 104,
+          "retained_bytes": 104,
+          "seconds": 0.0000068690000034621335
+        },
+        "io": {
+          "payload_read_bytes": 0,
+          "payload_reads": 0,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        },
+        "value": 10032
+      }
+    }
+  },
+  "runtime": {
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "sqlite": "3.45.1"
+  },
+  "schema": 1,
+  "source_sha": "5e91bebe5719ff674ca56edc62275a2749f7843c",
+  "provenance": {
+    "live_pr_head_before_preparation": "62f3ec5e71242c7373d343fd121baaf0afaea842",
+    "probe_candidate_sha": "5e91bebe5719ff674ca56edc62275a2749f7843c",
+    "workflow_run_id": 37269630276,
+    "workflow_url": "https://github.com/rax0h/all-that-endures/actions/runs/37269630276",
+    "proof_tests": {
+      "passed": 5,
+      "seconds": 1.16
+    },
+    "commands": [
+      "PYTHONPATH=.:simulation python -m pytest -q simulation/tests/test_persistence_p4_probe.py",
+      "PYTHONPATH=.:simulation python simulation/persistence_p4_probe.py --sizes 1000 10000 --source-sha $GITHUB_SHA"
+    ],
+    "late_world_fixture_search": {
+      "status": "unavailable",
+      "repository_note": "LONG_HISTORY_VALIDATION.md says the year-2000/year-3010 checkpoints were lost in a workspace reset",
+      "checked_action_runs": [
+        36278414000,
+        36261595896,
+        35529400618
+      ],
+      "retained_artifacts": 0,
+      "policy": "do not regenerate; durable representative late-world fixture remains a P5 prerequisite"
+    }
+  },
+  "measured_observations": {
+    "people_growth_axis": "fixed 32 active people; inactive Person records grow 1000 -> 10000",
+    "people_open_payload_reads": [
+      2103,
+      20103
+    ],
+    "people_open_peak_bytes": [
+      3821388,
+      30963854
+    ],
+    "people_memo_entries": [
+      1033,
+      10033
+    ],
+    "people_identity_entries": [
+      1033,
+      10033
+    ],
+    "people_first_query_rows": [
+      1032,
+      10032
+    ],
+    "people_point_checked_reads": [
+      1,
+      1
+    ],
+    "people_edit_save_writes": [
+      3,
+      3
+    ],
+    "offer_first_candidate_ids": [
+      4,
+      4
+    ],
+    "offer_repeat_candidate_ids": [
+      0,
+      0
+    ]
+  },
+  "proposed_targets": null
+}
