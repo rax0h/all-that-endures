@@ -2,6 +2,8 @@ from __future__ import annotations
 import hashlib,pickle
 from dataclasses import dataclass
 
+from .incremental_store import StoreError
+
 # Legacy worlds contain impossible magical histories; do not silently migrate
 # their rank snapshots into the corrected progression model.
 CHECKPOINT_SCHEMA=8  # persistent Society trainee places; legacy checkpoint digests differ
@@ -13,7 +15,19 @@ class Checkpoint:
     digest:str
     world:object
 
+def _reject_cold(world):
+    events=getattr(world,'events',None)
+    if (
+        getattr(world,'__dict__',{}).get('_ate_persistence_lifetime') is not None
+        or getattr(events,'_disk_prefix',None) is not None
+    ):
+        raise StoreError(
+            'cold World checkpointing requires session.save() or '
+            'session.detach(materialize_history=True) first'
+        )
+
 def dumps(world)->bytes:
+    _reject_cold(world)
     cp=Checkpoint(CHECKPOINT_SCHEMA,world.year,world.seed,world.digest(),world)
     return pickle.dumps(cp,protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -26,6 +40,7 @@ def loads(data:bytes):
     return cp.world
 
 def save(world,path):
+    _reject_cold(world)
     data=dumps(world);open(path,'wb').write(data);return hashlib.sha256(data).hexdigest()
 
 def load(path):
