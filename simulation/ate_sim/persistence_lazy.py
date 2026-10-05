@@ -373,6 +373,103 @@ def _insert_lazy_person(
     )
 
 
+
+def _resource_memberships(resource, ordinal):
+    rows = []
+    if (
+        resource.consumed_year is None
+        and resource.owner_kind is not None
+        and resource.owner_id is not None
+    ):
+        rows.append(
+            ("owner", (resource.owner_kind, resource.owner_id), ordinal)
+        )
+        rows.append(("owner_kind", resource.owner_kind, ordinal))
+    return tuple(rows)
+
+
+def _insert_lazy_resource(
+    destination: LazyRecordStore,
+    *,
+    generation: int,
+    typed_key: bytes,
+    ordinal: int,
+    resource: MagicResource,
+) -> None:
+    codec = destination.codec
+    payload = codec.encode(resource)
+    memberships = _resource_memberships(resource, ordinal)
+    memberships_blob = codec.encode(memberships)
+    payload_checksum = __import__(
+        "ate_sim.incremental_store", fromlist=["_framed_sha"]
+    )._framed_sha(b"lazy-payload-v1", payload)
+    destination.db.execute(
+        "INSERT INTO lazy_record_versions("
+        "namespace,typed_key,valid_from,valid_to,payload,payload_checksum,"
+        "codec_version,record_schema,memberships,row_checksum"
+        ") VALUES (?,?,?,NULL,?,?,?,?,?,?)",
+        (
+            RESOURCE_NAMESPACE,
+            typed_key,
+            generation,
+            payload,
+            payload_checksum,
+            codec.version,
+            LAZY_RESOURCE_SCHEMA,
+            memberships_blob,
+            _version_checksum(
+                RESOURCE_NAMESPACE,
+                typed_key,
+                LAZY_RESOURCE_SCHEMA,
+                codec.version,
+                generation,
+                None,
+                memberships_blob,
+                payload,
+            ),
+        ),
+    )
+    destination.db.execute(
+        "INSERT INTO lazy_order_versions("
+        "namespace,typed_key,ordinal,valid_from,valid_to,row_checksum"
+        ") VALUES (?,?,?,?,NULL,?)",
+        (
+            RESOURCE_NAMESPACE,
+            typed_key,
+            ordinal,
+            generation,
+            _order_checksum(
+                RESOURCE_NAMESPACE, typed_key, ordinal, generation, None
+            ),
+        ),
+    )
+    for index_name, index_value, member_ordinal in memberships:
+        encoded_value = codec.encode(index_value)
+        destination.db.execute(
+            "INSERT INTO lazy_query_versions("
+            "namespace,index_name,index_value,record_key,ordinal,"
+            "valid_from,valid_to,row_checksum"
+            ") VALUES (?,?,?,?,?,?,NULL,?)",
+            (
+                RESOURCE_NAMESPACE,
+                index_name,
+                encoded_value,
+                typed_key,
+                member_ordinal,
+                generation,
+                _query_checksum(
+                    RESOURCE_NAMESPACE,
+                    index_name,
+                    encoded_value,
+                    typed_key,
+                    member_ordinal,
+                    generation,
+                    None,
+                ),
+            ),
+        )
+
+
 def convert_cold_to_lazy(source, destination, *, rules_id):
     """Explicit checked P3B cold -> P4 conversion into a new destination."""
     source, destination = _preflight_conversion_paths(source, destination)
@@ -436,6 +533,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     next_ordinal = 0
                     aspiration_count = 0
                     aspiration_next_ordinal = 0
+                    resource_count = 0
+                    resource_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -451,7 +550,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             changed_generation,
                         ) = row
                         if namespace not in (
-                            PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                            PEOPLE_NAMESPACE,
+                            ASPIRATION_NAMESPACE,
+                            RESOURCE_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -485,7 +586,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             )
                             people_count += 1
                             next_ordinal = max(next_ordinal, ordinal + 1)
-                        else:
+                        elif namespace == ASPIRATION_NAMESPACE:
                             if not isinstance(value, MagicAspiration):
                                 raise StoreFormatError(
                                     "invalid aspirations source envelope"
@@ -503,13 +604,31 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             aspiration_next_ordinal = max(
                                 aspiration_next_ordinal, ordinal + 1
                             )
+                        else:
+                            if not isinstance(value, MagicResource):
+                                raise StoreFormatError(
+                                    "invalid resources source envelope"
+                                )
+                            _insert_lazy_resource(
+                                target,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                resource=value,
+                            )
+                            resource_count += 1
+                            resource_next_ordinal = max(
+                                resource_next_ordinal, ordinal + 1
+                            )
 
                     for row in source_store.db.execute(
                         "SELECT namespace,index_name,index_value,record_key,"
                         "ordinal,generation FROM query_membership"
                     ):
                         if row[0] not in (
-                            PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                            PEOPLE_NAMESPACE,
+                            ASPIRATION_NAMESPACE,
+                            RESOURCE_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -562,6 +681,26 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                                 ASPIRATION_NAMESPACE,
                                 aspiration_count,
                                 aspiration_next_ordinal,
+                                generation,
+                                None,
+                            ),
+                        ),
+                    )
+
+                    target.db.execute(
+                        "INSERT INTO lazy_namespace_state("
+                        "namespace,valid_from,valid_to,member_count,"
+                        "next_ordinal,row_checksum"
+                        ") VALUES (?,?,NULL,?,?,?)",
+                        (
+                            RESOURCE_NAMESPACE,
+                            generation,
+                            resource_count,
+                            resource_next_ordinal,
+                            _namespace_checksum(
+                                RESOURCE_NAMESPACE,
+                                resource_count,
+                                resource_next_ordinal,
                                 generation,
                                 None,
                             ),
@@ -627,6 +766,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "generation": summary["generation"],
                 "people": people_count,
                 "aspirations": aspiration_count,
+                "resources": resource_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
