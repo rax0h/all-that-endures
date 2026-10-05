@@ -1,16 +1,17 @@
 # P4.1 validation and P4.2 identity-design addendum
 
-> **Architect review, 2026-10-05: not accepted yet.** The green results below
-> are verified but miss four reproduced failures: eager key iteration,
-> historical same-value query scans, pin-release/scrub inconsistency and
-> resolution of a failed later attempt with an older receipt present.
-> Follow [STAGE_0_5_SOL_EXECUTION_HANDOFF.md](STAGE_0_5_SOL_EXECUTION_HANDOFF.md)
-> for exact repairs and the remaining autonomous Sol assignment.
+> **Post-review repair gate passed, 2026-10-05.** The four reproduced P4.1
+> blockers and the additional foundation audit required by
+> [STAGE_0_5_SOL_EXECUTION_HANDOFF.md](STAGE_0_5_SOL_EXECUTION_HANDOFF.md)
+> are repaired on stable product head
+> `4fc8cf187aeac82970fc80e5666ce824c33dce1d`. This is an implementation
+> gate result, not a claim of a later Astra acceptance.
 
 **Implementation baseline:** `953240816b6d332aa95e65a26b463b10a4b58ef4`  
-**Stable P4.1 code candidate:** `c3f3525d7ddf3b2afdf39946a6fa9add9dd98225`  
-**Focused gate:** Actions run `37307695625` — **56 passed in 5.10 s**.  
-**Full simulation/tests gate:** Actions run `37307789377` — **674 passed in 1737.93 s (28:57)** against the exact stable code candidate above.
+**Original P4.1 code candidate:** `c3f3525d7ddf3b2afdf39946a6fa9add9dd98225`  
+**Post-review repaired product head:** `4fc8cf187aeac82970fc80e5666ce824c33dce1d`  
+**Corrected focused gate:** Actions run `37314495881` — **68 passed in 7.12 s**.  
+**Corrected full simulation/tests gate:** Actions run `37326902078` — **686 passed in 2034.19 s (33:54)**. The helper head differed from the product head only by its workflow file.
 
 ## Scope landed
 
@@ -51,8 +52,10 @@ when every remaining row still has a valid checksum.
 
 Collection assignment preserves ordinal. Deletion closes membership. Explicit
 reinsertion receives a new ordinal. Empty namespaces remain distinguishable
-from missing required owners. Key iteration uses bounded keyset pages capped at
-128, never repeated OFFSET traversal.
+from missing required owners. Key iteration is now a genuine lazy iterator:
+it checks and buffers at most one page capped at 128 keys, closes its SQLite
+read transaction before yielding caller-visible values, and uses row-value
+keyset seeks rather than repeated historical scans.
 
 Before update/delete, the current owner projection is checked against its
 stored complete membership declaration. A write cannot silently heal a damaged
@@ -78,13 +81,14 @@ write lock and advances exactly one generation. The same transaction publishes:
 There is no second transaction required to make the writer safe. A true no-op
 does not advance the generation and writes no receipt/payload.
 
-If an exception is injected after SQLite commit, the facade enters explicit
-recovery-required state. Subsequent write/release is blocked until
-`resolve_commit` establishes the outcome. The retained per-pin latest receipt
-can resolve a committed G+1 after another writer has advanced to G+2; the
-resolved result is marked stale and the old durable pin prevents G+3 until it is
-explicitly released. Older commit tokens fall outside the one-receipt contract
-after a later acknowledged commit.
+Every non-no-op attempt first records one bounded checked most-recent attempt
+slot for its pin and expected parent generation. If an attempt rolls back, that
+slot distinguishes it from an older successful receipt. If SQLite commit returns
+an ambiguous error, recovery checks the durable attempt, receipt, head and pin
+rather than guessing. Subsequent write/release is blocked only while an attempt
+is unresolved. A committed G+1 can still resolve after another writer advances
+to G+2; a rolled-back later attempt resolves as not-committed or conflict without
+being confused with the older receipt. There is no lifetime token log.
 
 Process-death tests cover before-transaction, during-publication and after-commit
 states and recover only a complete old or complete new generation.
@@ -97,9 +101,11 @@ snapshot. Releasing it permits the next advance.
 
 The retention floor is the oldest required pin, or the head when there is no
 older pin. Only rows whose `valid_to <= floor` are obsolete; unchanged rows are
-never reclaimed merely because their creation generation is old. Cleanup is
-driven by expiry indexes inside successful publication, not by scanning world
-history on no-op saves.
+never reclaimed merely because their creation generation is old. Pin/receipt/
+attempt checksums are validated before their generations can control reclamation.
+Release transactionally reclaims newly obsolete versions, so a healthy
+release->verify/copy/backup/reopen sequence never manufactures corruption.
+No-op saves still perform no archive maintenance.
 
 Focused proof: **100 successive single-writer saves** completed without
 self-blocking and ended with one live record version, one order version, one
@@ -110,14 +116,18 @@ namespace-state version, one pin and one receipt.
 Focused tests populated 1,000 and 10,000 irrelevant owners plus one requested
 owner, then queried both current and retained-previous generations.
 
-For the requested `bucket=hot` lookup at both scales:
+Post-review scaling adds the adversarial same-value-history case: 1,000 and
+10,000 owners begin in the same `bucket=hot` value, all but one move to
+`bucket=cold`, and the current hot query still returns only owner 0.
+Generation-specific partial/composite indexes separate current open rows from
+the exact closing generation needed by the previous snapshot. Query-plan and
+SQLite progress-handler evidence now measure actual selected work, not only
+returned rows. The zero-result/newer-only case and full order traversal are
+measured too.
 
-- exactly one query-membership row was consumed;
-- zero payloads were decoded by `query_keys`;
-- the returned key set contained only the requested owner;
-- a zero-result lookup consumed zero query rows;
-- query-plan evidence used the indexed `lazy_query_visible` lookup;
-- point `read_version` decoded only the requested payload.
+Query diagnostics also distinguish decoded payload reads from payload bodies
+fetched and hashed for compact owner-projection checks; zero decoded payloads
+is no longer reported as zero payload-byte work.
 
 The number of retained owner versions after the one local edit was N+2, as
 expected for current plus previous visibility of the changed owner; unrelated
@@ -182,11 +192,12 @@ that object is currently reachable; it is not the object's identity. A sharing
 group ID is derived metadata/projection, never the authoritative incarnation
 identity.
 
-Replacing an object at owner key K creates a new incarnation even when K is
-unchanged. Delete followed by reinsertion at K likewise creates a new
-incarnation. A retained alias to the old object therefore continues to name the
-old incarnation and must never be rebound to the replacement merely because the
-owner key was reused.
+Replacing an object at owner key K with an equal-but-distinct Python object
+creates a new incarnation even when K is unchanged. Moving an object, or
+removing and reinserting the **same** Python object, preserves its incarnation;
+removing and later inserting a different object creates a new incarnation.
+A retained obsolete alias must never be rebound to a replacement merely because
+the owner key was reused.
 
 ### 2. Nested retained aliases survive parent eviction without retaining archives
 
@@ -274,9 +285,14 @@ Not implemented or run in P4.1:
 - Stage 1;
 - merge.
 
-The required implementation validation is complete: focused run `37307695625`
-passed **56/56 in 5.10 s**, and full `simulation/tests` run `37307789377`
-passed **674/674 in 1737.93 s (28:57)** against stable code candidate
-`c3f3525d7ddf3b2afdf39946a6fa9add9dd98225`. P4.1 now stops for architect
-review; this validation record does not authorize P4.2 implementation or any
-excluded work listed above.
+The post-review P4.1 implementation gate is complete: focused run
+`37314495881` passed **68/68 in 7.12 s**, and corrected full
+`simulation/tests` run `37326902078` passed **686/686 in 2034.19 s
+(33:54)**. The tested helper head contains the exact product tree from
+`4fc8cf187aeac82970fc80e5666ce824c33dce1d` plus only
+`.github/workflows/p4-1-foundation-full.yml`. Earlier helper run
+`37314644932` failed during collection because the workflow used the wrong
+PYTHONPATH; no product test executed in that run. Under the autonomous handoff,
+the P4.1 gate now permits progression to the P4 identity proof slice. The
+millennium/endurance, balance, checkpoint-default, Stage 1 and merge boundaries
+remain unchanged.
