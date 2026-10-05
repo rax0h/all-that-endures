@@ -1338,6 +1338,14 @@ class LazyWorldSession:
                     record_schema=RECORD_SCHEMA,
                 )
             )
+            ordinary_list.append(
+                RecordChange(
+                    "world.next_person",
+                    0,
+                    (0, self.world.next_person),
+                    record_schema=RECORD_SCHEMA,
+                )
+            )
         ordinary = tuple(ordinary_list)
         return LazyPeopleSavePlan(
             token=token,
