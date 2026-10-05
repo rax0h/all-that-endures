@@ -795,6 +795,20 @@ def _aspiration_occurrence_from_path(path):
     return None
 
 
+def _resource_occurrence_from_path(path):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "magic_resources")
+        and path[1] == ("field", "resources")
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
+
+
 def _lazy_occurrence_from_path(path):
     people = _people_occurrence_from_path(path)
     if people is not None:
@@ -806,6 +820,20 @@ def _lazy_occurrence_from_path(path):
             aspiration[0],
             aspiration[1],
             MagicAspiration,
+        )
+    resource = _resource_occurrence_from_path(path)
+    if resource is not None:
+        relative = resource[1]
+        expected_type = (
+            list
+            if relative == LazyResourceTable._transfer_path
+            else MagicResource
+        )
+        return (
+            RESOURCE_NAMESPACE,
+            resource[0],
+            relative,
+            expected_type,
         )
     return None
 
@@ -914,7 +942,11 @@ def _seed_cross_boundary_lazy_identity(session, links):
             table = (
                 session.people
                 if namespace == PEOPLE_NAMESPACE
-                else session.aspirations
+                else (
+                    session.aspirations
+                    if namespace == ASPIRATION_NAMESPACE
+                    else session.resources
+                )
             )
             object.__setattr__(
                 eager_object, "_index_table", weakref.ref(table)
@@ -949,7 +981,7 @@ def _initialize_eager_tracker(
         cold_mode=True,
     )
     tracker._excluded_namespaces = {
-        PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+        PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE, RESOURCE_NAMESPACE
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -2445,6 +2477,10 @@ class LazyWorldSession:
         object.__setattr__(
             world.magic_resources, "aspirations", self.aspirations
         )
+        self.resources = LazyResourceTable(self)
+        object.__setattr__(
+            world.magic_resources, "resources", self.resources
+        )
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
@@ -2515,7 +2551,7 @@ class LazyWorldSession:
     ):
         self._ensure_people_mutation_allowed()
         if (
-            isinstance(subject, (Person, MagicAspiration))
+            isinstance(subject, (Person, MagicAspiration, MagicResource))
             and field in RECORD_FIELDS.get(type(subject), ())
             and not _cross_boundary_field_value_is_immutable(value)
         ):
@@ -2601,7 +2637,9 @@ class LazyWorldSession:
             for incarnation in live_by_incarnation
             if any(
                 occurrence.owner_namespace in {
-                    PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                    PEOPLE_NAMESPACE,
+                    ASPIRATION_NAMESPACE,
+                    RESOURCE_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
@@ -2621,7 +2659,9 @@ class LazyWorldSession:
                 for occurrence
                 in self._registry.occurrences_for_incarnation(incarnation)
                 if occurrence.owner_namespace in {
-                    PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE
+                    PEOPLE_NAMESPACE,
+                    ASPIRATION_NAMESPACE,
+                    RESOURCE_NAMESPACE,
                 }
             )
             lazy_paths = {
