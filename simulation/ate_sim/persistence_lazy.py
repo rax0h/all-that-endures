@@ -1378,12 +1378,47 @@ class LazyWorldSession:
             raise StoreError("lazy lifecycle operation guard changed")
         self._lifecycle_operation = None
 
+    def _incoming_contains_lazy_person(self, value, seen=None):
+        if seen is None:
+            seen = set()
+        cls = type(value)
+        if value is None or cls in (
+            bool, int, float, str, bytes, FrozenDict, FrozenList
+        ):
+            return False
+        if isinstance(value, Person):
+            return self._registry.incarnation_for_object(value) is not None
+        ident = id(value)
+        if ident in seen:
+            return False
+        seen.add(ident)
+        try:
+            if is_dataclass(value):
+                return any(
+                    self._incoming_contains_lazy_person(
+                        getattr(value, name), seen
+                    )
+                    for name in RECORD_FIELDS.get(type(value), ())
+                )
+            if isinstance(value, dict):
+                return any(
+                    self._incoming_contains_lazy_person(key, seen)
+                    or self._incoming_contains_lazy_person(child, seen)
+                    for key, child in value.items()
+                )
+            if isinstance(value, (list, tuple, set, frozenset)):
+                return any(
+                    self._incoming_contains_lazy_person(child, seen)
+                    for child in value
+                )
+            return False
+        finally:
+            seen.discard(ident)
+
     def _ensure_hybrid_mutation_allowed(
         self, *, subject=None, field=None, value=None
     ):
         self._ensure_people_mutation_allowed()
-        if not self._cross_boundary_links:
-            return
         if (
             isinstance(subject, Person)
             and field in RECORD_FIELDS.get(Person, ())
@@ -1393,11 +1428,18 @@ class LazyWorldSession:
             # topology. The eager owner binding and LazyRecordTable notification
             # will both journal the same live object for one atomic save.
             return
-        raise StoreError(
-            "mutation of the eager graph is blocked while a persisted "
-            "identity group crosses world.people; cross-boundary owner "
-            "transfer requires the next identity integration proof"
-        )
+        if self._cross_boundary_links:
+            raise StoreError(
+                "mutation of the eager graph is blocked while a persisted "
+                "identity group crosses world.people; cross-boundary owner "
+                "transfer requires the next identity integration proof"
+            )
+        if self._incoming_contains_lazy_person(value):
+            raise StoreError(
+                "mutation would create an identity group that crosses "
+                "world.people; cross-boundary owner transfer requires the "
+                "next identity integration proof"
+            )
 
     def _top_occurrence(self, key):
         return Occurrence(PEOPLE_NAMESPACE, key, ())
