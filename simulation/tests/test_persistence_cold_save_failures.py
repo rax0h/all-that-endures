@@ -16,6 +16,7 @@ from ate_sim.incremental_store import (
 )
 from ate_sim.persistence_events import CHUNK_SIZE, SEALED_EVENTS
 from ate_sim.persistence_session import open_world_session, write_cold_snapshot
+from ate_sim.persistence_tracking import _MISSING
 import ate_sim.persistence_cold_save as cold_save
 
 
@@ -280,6 +281,216 @@ def test_publication_failure_before_adoption_resolves_once(
     finally:
         session.close()
 
+
+def test_pending_identity_deletion_before_apply_resolves_and_reopens(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "pending-identity-delete.sqlite"
+    shared = {"values": [1]}
+    world = World(4400)
+    world.currency.wallets[1] = {"left": shared, "right": shared}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        session.world.currency.wallets[1]["right"] = {"values": [2]}
+        before = session.generation
+        original_apply = cold_save._apply_acknowledged_journal
+        fired = {"value": False}
+
+        def fail_before_identity_apply(_session, _plan):
+            if not fired["value"]:
+                fired["value"] = True
+                assert any(
+                    owner is _MISSING
+                    for _target, owner in _plan.pending_identity
+                )
+                raise RuntimeError("before identity deletion apply")
+            return original_apply(_session, _plan)
+
+        monkeypatch.setattr(
+            cold_save, "_apply_acknowledged_journal",
+            fail_before_identity_apply,
+        )
+        with pytest.raises(RuntimeError, match="before identity deletion apply"):
+            session.save()
+
+        assert session.cold_state == "recovery-required"
+        assert session._cold_publication_phase == "bookkeeping"
+        assert session.store.generation == before + 1
+        assert session.generation == before
+
+        monkeypatch.setattr(
+            cold_save, "_apply_acknowledged_journal", original_apply
+        )
+        assert session.resolve_save() == before + 1
+        assert session.resolve_save() == before + 1
+        assert session.cold_state == "active"
+        assert session.world.currency.wallets[1]["left"]["values"] == [1]
+        assert session.world.currency.wallets[1]["right"]["values"] == [2]
+        assert session.world.currency.wallets[1]["left"] is not (
+            session.world.currency.wallets[1]["right"]
+        )
+
+        session.world.currency.wallets[1]["right"]["values"].append(3)
+        assert session.save() == before + 2
+        session.close()
+        session = open_world_session(path, rules_id=RULES)
+        assert session.generation == before + 2
+        assert session.world.currency.wallets[1]["left"]["values"] == [1]
+        assert session.world.currency.wallets[1]["right"]["values"] == [2, 3]
+        assert session.world.currency.wallets[1]["left"] is not (
+            session.world.currency.wallets[1]["right"]
+        )
+    finally:
+        session.close()
+
+
+def test_mixed_identity_cleanup_partial_action_resolves_and_saves(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "mixed-identity-cleanup.sqlite"
+    shared_remove = {"values": [1]}
+    left_insert = {"values": [10]}
+    world = World(4402)
+    world.currency.wallets[1] = {
+        "left": shared_remove,
+        "right": shared_remove,
+    }
+    world.currency.wallets[2] = {
+        "left": left_insert,
+        "right": {"values": [20]},
+    }
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        # One owner stops sharing (deletion) while another starts sharing
+        # (insertion), producing a mixed current-link batch.
+        session.world.currency.wallets[1]["right"] = {"values": [2]}
+        session.world.currency.wallets[2]["right"] = (
+            session.world.currency.wallets[2]["left"]
+        )
+        before = session.generation
+        original_apply = cold_save._apply_acknowledged_journal
+        fired = {"value": False}
+
+        def apply_one_insert_then_fail(_session, _plan):
+            if fired["value"]:
+                return original_apply(_session, _plan)
+            fired["value"] = True
+            pending = list(_plan.pending_identity)
+            deletion = [item for item in pending if item[1] is _MISSING]
+            insertion = [item for item in pending if item[1] is not _MISSING]
+            assert deletion and insertion
+            target, owner = insertion[0]
+            _session._committed_identity_targets[target] = owner
+            _session._pending_identity_current.pop(target)
+            _session._identity_dirty = bool(
+                _session._pending_identity_current
+            )
+            raise RuntimeError("mixed identity cleanup interrupted")
+
+        monkeypatch.setattr(
+            cold_save, "_apply_acknowledged_journal",
+            apply_one_insert_then_fail,
+        )
+        with pytest.raises(
+            RuntimeError, match="mixed identity cleanup interrupted"
+        ):
+            session.save()
+
+        assert session.cold_state == "recovery-required"
+        assert session._cold_publication_phase == "bookkeeping"
+        assert session.store.generation == before + 1
+        plan = session._cold_plan
+        assert plan is not None
+        assert any(
+            owner is _MISSING
+            and target in session._pending_identity_current
+            for target, owner in plan.pending_identity
+        )
+        assert any(
+            owner is not _MISSING
+            and target not in session._pending_identity_current
+            for target, owner in plan.pending_identity
+        )
+
+        monkeypatch.setattr(
+            cold_save, "_apply_acknowledged_journal", original_apply
+        )
+        assert session.resolve_save() == before + 1
+        assert session.resolve_save() == before + 1
+        assert session.cold_state == "active"
+
+        wallet1 = session.world.currency.wallets[1]
+        wallet2 = session.world.currency.wallets[2]
+        assert wallet1["left"]["values"] == [1]
+        assert wallet1["right"]["values"] == [2]
+        assert wallet1["left"] is not wallet1["right"]
+        assert wallet2["left"] is wallet2["right"]
+        assert wallet2["left"]["values"] == [10]
+
+        wallet1["right"]["values"].append(3)
+        wallet2["left"]["values"].append(11)
+        assert session.save() == before + 2
+        session.close()
+        session = open_world_session(path, rules_id=RULES)
+        assert session.generation == before + 2
+        wallet1 = session.world.currency.wallets[1]
+        wallet2 = session.world.currency.wallets[2]
+        assert wallet1["left"]["values"] == [1]
+        assert wallet1["right"]["values"] == [2, 3]
+        assert wallet1["left"] is not wallet1["right"]
+        assert wallet2["left"] is wallet2["right"]
+        assert wallet2["left"]["values"] == [10, 11]
+    finally:
+        session.close()
+
+
+def test_failure_after_journal_cleanup_resolves_idempotently(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "after-journal-cleanup.sqlite"
+    world = World(4401)
+    world.currency.wallets[1] = {"value": 1}
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        session.world.currency.wallets[1]["value"] = 2
+        before = session.generation
+        fired = {"value": False}
+
+        def fail_after_cleanup(phase, _session, _plan):
+            if phase == "after_journal_cleanup" and not fired["value"]:
+                fired["value"] = True
+                raise RuntimeError("after journal cleanup")
+
+        monkeypatch.setattr(cold_save, "_cold_save_phase", fail_after_cleanup)
+        with pytest.raises(RuntimeError, match="after journal cleanup"):
+            session.save()
+
+        assert session.cold_state == "recovery-required"
+        assert session._cold_publication_phase == "bookkeeping"
+        assert session.store.generation == before + 1
+        assert session.generation == before
+        assert session.dirty == frozenset()
+
+        monkeypatch.setattr(
+            cold_save, "_cold_save_phase",
+            lambda _phase, _session, _plan: None,
+        )
+        assert session.resolve_save() == before + 1
+        assert session.cold_state == "active"
+        assert session.generation == before + 1
+        assert session.dirty == frozenset()
+        assert session.world.currency.wallets[1]["value"] == 2
+        assert session.resolve_save() == before + 1
+
+        session.close()
+        session = open_world_session(path, rules_id=RULES)
+        assert session.world.currency.wallets[1]["value"] == 2
+        assert session.generation == before + 1
+    finally:
+        session.close()
 
 def test_publication_failure_after_adoption_resolves_idempotently(
     tmp_path, monkeypatch

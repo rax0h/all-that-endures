@@ -1,69 +1,81 @@
 # P3B cold-save validation evidence
 
-**Status:** reviewed; corrections required before architect acceptance.
-See `PERSISTENCE_P3B_COLD_SAVE_REVIEW.md` for the original findings, candidate
-fixes at `cff9d58`, the remaining R2.1 identity-deletion recovery case, and
-missing retained/peak allocation evidence. The candidate has 9 targeted passes;
-it is not landed or architect-accepted, and needs affected/full validation. The completed CI results below
-remain valid historical evidence for the tested cases.  
-**Scope:** `simulation/PERSISTENCE_P3B_COLD_SAVE.md` only.  
-**PR branch baseline:** `19fe6c90bced632ac57e83d60822212a0b554491`.  
-**Final tested candidate:** `b46a77da020752c6e346e4ab17691f6b4aacf3b1`.
+**Status:** correction candidate validated and landed; stop for Astra review.  
+**Scope:** `simulation/PERSISTENCE_P3B_COLD_SAVE.md` plus bounded corrections R1/R2/R2.1 in `PERSISTENCE_P3B_COLD_SAVE_REVIEW.md`.  
+**PR documentation head before landing:** `eaafbfe234603b6d678df9d40e11076e6f075049`.  
+**Final validated correction candidate:** `a93907ecfe7bc49176c04b0d5b1d19597cc6c413`.
 
-## Validation
+## Correction validation
 
-### Focused cold-save proof set
+### R2.1 targeted gate
 
-GitHub Actions run: 37230204473  
-Candidate: `6d052cfc9ffc9d4ec43931c0a637bbe63b6df7b3`
+GitHub Actions run: 37245584222  
+Candidate: `a2faa25777f615382b4e5f6e56dd4571c3cbdd75`
 
-- **237 passed in 308.04s (0:05:08)**
-- No product-source changes were made after this run. Later candidate changes only corrected brittle test assertions and replaced the temporary validation workflow.
+- **11 passed in 4.66s**
+- Covers pending identity deletion before apply, mixed insert/update/delete identity cleanup, repeated `resolve_save()`, subsequent real save and reopen, and preservation of earlier R1/R2 regressions.
 
-Measured bounded-save evidence:
+### Focused cold-save correction gate
 
-| Old sealed segments | 4-chunk segment reads | 4-chunk payload reads | 4-chunk payload writes | 1-chunk segment reads | 1-chunk payload reads | 1-chunk payload writes | no-op writes |
-| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 4 | 4 | 12 | 7 | 1 | 9 | 4 | 0 |
-| 40 | 4 | 12 | 7 | 1 | 9 | 4 | 0 |
-| 400 | 4 | 12 | 7 | 1 | 9 | 4 | 0 |
+GitHub Actions run: 37245662547  
+Candidate: `63fff49780137aa42eebf8362f759cfce7dd3429`
 
-Four-chunk transfer sizes were 8,192 events. One-chunk transfer sizes were 2,048 events. The plan never transferred more than four sealed chunks per save.
+- **54 passed in 143.67s (0:02:23)**
 
-Local q=0 mutation stayed bounded at 7 payload reads / 3 payload writes / 3 record actions for 4, 40 and 400 old segments.
+Persisted-key work for a fixed local wallet edit:
 
-Alias scaling stayed flat:
-
-| Unrelated alias groups | record actions | changed-member work | payload reads | payload writes |
+| Unrelated alias groups | prep key iterations | prep membership probes | save key iterations | save membership probes |
 | ---: | ---: | ---: | ---: | ---: |
-| 100 | 3 | 0 | 7 | 3 |
-| 300 | 3 | 0 | 7 | 3 |
-| 1000 | 3 | 0 | 7 | 3 |
+| 100 | 0 | 3 | 0 | 3 |
+| 300 | 0 | 3 | 0 | 3 |
+| 1,000 | 0 | 3 | 0 | 3 |
 
-Repeated append/seal/save reclamation returned to:
+This directly closes R1's whole-population key-copy failure. Work is bounded by changed keys rather than unrelated persisted population.
 
-- batch 1: disk segments 1, memo 0, bindings 24, LOG occurrences 0
-- batch 2: disk segments 2, memo 0, bindings 24, LOG occurrences 0
-- batch 3: disk segments 3, memo 0, bindings 24, LOG occurrences 0
+Allocation measurements use `tracemalloc` started/reset after fixture creation and cold open. They therefore measure save preparation/publication work rather than total World construction memory.
 
-### Final affected persistence gate
+| Old sealed segments | selected encoded bytes | prep peak bytes | prep retained bytes | released-plan retained bytes | publication peak bytes | publication retained bytes | reader cache segments/events |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 4 | 2,560,922 | 20,703,021 | 10,550,535 | 1,436 | 13,587,148 | 326,253 | 0 / 0 |
+| 40 | 2,564,539 | 20,710,254 | 10,555,962 | 1,436 | 13,587,148 | 326,253 | 0 / 0 |
+| 400 | 2,580,929 | 20,747,300 | 10,580,661 | 1,390 | 13,595,314 | 326,069 | 0 / 0 |
 
-GitHub Actions run: 37232510632  
-Final candidate: `b46a77da020752c6e346e4ab17691f6b4aacf3b1`
+The selected transfer remains four chunks. Prep peak changes by only 44,279 bytes from 4 to 400 old segments, publication peak by 8,166 bytes, and released-plan retention remains about 1.4 KiB. Reader cache remains separately reported at zero resident segments/events after publication measurement.
 
-- **440 passed in 727.40s (0:12:07)**
+Local-key allocation after the R1 correction:
+
+| Alias groups | key iterations | membership probes | record actions | peak bytes | retained bytes | released-plan retained bytes |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 100 | 0 | 3 | 3 | 50,885 | 30,249 | 2,393 |
+| 300 | 0 | 3 | 3 | 50,885 | 30,249 | 2,393 |
+| 1,000 | 0 | 3 | 3 | 50,893 | 30,253 | 2,393 |
+
+The 100-to-1,000-group peak changes by 8 bytes.
+
+### Final affected gate
+
+GitHub Actions run: 37247381494  
+Final candidate: `a93907ecfe7bc49176c04b0d5b1d19597cc6c413`
+
+- **448 passed in 819.25s (0:13:39)**
 
 Command:
 
 ```text
-python -m pytest -q   simulation/tests/test_incremental_store.py   simulation/tests/test_persistence*.py   simulation/tests/test_cold_history.py   simulation/tests/test_event_year_queries.py   simulation/tests/test_canonical_digest.py   simulation/tests/test_history_archive.py
+python -m pytest -q
+  simulation/tests/test_incremental_store.py
+  simulation/tests/test_persistence*.py
+  simulation/tests/test_cold_history.py
+  simulation/tests/test_event_year_queries.py
+  simulation/tests/test_canonical_digest.py
+  simulation/tests/test_history_archive.py
 ```
 
 ### Final full simulation suite
 
-Same run and same final candidate:
+Same run and candidate:
 
-- **607 passed in 974.21s (0:16:14)**
+- **615 passed in 1081.89s (0:18:01)**
 
 Command:
 
@@ -71,44 +83,39 @@ Command:
 python -m pytest -q simulation/tests
 ```
 
-## Contract proved by the focused and affected tests
+## Corrected contracts
 
-The existing tests exercise the following cold-session paths. The review finds
-that global key-copy work and interrupted journal cleanup are not covered; the
-claims of bounded total preparation work and complete idempotence remain pending:
+The validated correction preserves the accepted cold-save architecture and closes the review blockers:
 
-- exact D/F/N event authority partition and exact reopen coverage;
-- at most four leading resident sealed chunks transferred per save;
-- one P1 transaction for the successor generation;
-- checked acknowledgement by generation, token, descriptors, counts, changed records and new segments;
-- ambiguous/lost acknowledgement recovery without a second commit;
-- foreign-writer/stale detection without rebasing;
-- fail-before-mutation guards for supported World, tracked-container, EventLog, emit and simulation operations;
-- idempotent recovery across runtime publication phases;
-- independent restored continuation;
-- no whole-history payload reads during ordinary save preparation/publication;
-- bounded work independent of 4/40/400 old sealed segments;
-- bounded local alias work independent of 100/300/1000 unrelated alias groups;
-- reclamation of transferred LOG occurrences and save-plan/session retention.
+- R1: namespace-count preparation performs membership checks only for final changed typed keys; it does not clone or iterate unrelated persisted-key populations.
+- R2: publication records a bounded `bookkeeping` phase before destructive journal cleanup so recovery can resume idempotently after partial cleanup.
+- R2.1: pending identity deletion is distinguished from an absent pending entry by dictionary membership, so the stored `_MISSING` deletion marker cannot be mistaken for already-applied cleanup.
+- Initial publication validation remains strict.
+- Retry validation allows only states consistent with a prefix of this acknowledged plan's own idempotent cleanup after durable successor evidence is re-proved.
+- Mixed current-link insertion/update/deletion cleanup can be interrupted after an early action and later resolved repeatedly.
+- A subsequent real save and reopen preserve exact alias topology and values.
+- Existing foreign-token, changed-record/new-segment corruption, mutation guards, exact event partitioning, bounded transfer, stale-writer handling and checked acknowledgement behavior remain covered by the affected/full gates.
 
-## Landed product and test blobs
+## Historical pre-correction validation
 
-The PR branch should contain these exact blobs from the final tested candidate:
+The original cold-save candidate `b46a77da020752c6e346e4ab17691f6b4aacf3b1` previously passed:
 
-- `simulation/ate_sim/core.py` — `8aea2f2159c24c9397520ca905ff4544a9cd85c9`
-- `simulation/ate_sim/engine.py` — `de927139a2fde8aacae5e9f15009378c73909250`
-- `simulation/ate_sim/event_log.py` — `af7c4e4ab5afb3689419ede63e413383da6cad2d`
-- `simulation/ate_sim/persistence_cold_save.py` — `d7055e48d0ceb8e45564aa58500c6f6aa381b02d`
-- `simulation/ate_sim/persistence_session.py` — `87ba68fe924adfafb7014d3bf59eb27b0a91a110`
-- `simulation/ate_sim/persistence_tracking.py` — `1d66cc568ce41d804d25e75556713e5c289f1bf8`
-- `simulation/tests/test_persistence_cold_save.py` — `bc0e23d15fff3a157d1635aeb91d260800c7e3da`
-- `simulation/tests/test_persistence_cold_save_bounds.py` — `c059ae63260346f149d201a746f4a5133a3bb64f`
-- `simulation/tests/test_persistence_cold_save_failures.py` — `d35d298df58c79f8808d1968ad091979d9700545`
-- `simulation/tests/test_persistence_session_open.py` — `62d9d75f26b4ed17304b5873f0b718e29fbe38c9`
+- focused proof run 37230204473: **237 passed in 308.04s**;
+- affected run 37232510632: **440 passed in 727.40s**;
+- full simulation suite in the same run: **607 passed in 974.21s**.
 
-The candidate-only workflow `.github/workflows/p3b-cold-save-focused.yml` is validation scaffolding and must not be landed.
+Those results remain historical evidence for their tested source. The corrected source is validated by the new 448/615 gates above.
+
+## Corrected product/test blobs
+
+The final tested correction candidate supplies these exact changed blobs:
+
+- `simulation/ate_sim/persistence_cold_save.py` — `37843b508d4554d1296ea97b20594cdc0e3c5e96`
+- `simulation/tests/test_persistence_cold_save_bounds.py` — `d3bd4a32feb8bf9e7879fa1ee05d82c8ba523dbe`
+- `simulation/tests/test_persistence_cold_save_failures.py` — `fc985217bb0c9ceaecc8797b159d71ac5f87fbfa`
+
+All other product/test files remain the accepted PR versions. The candidate-only workflow `.github/workflows/p3b-cold-save-review-fixes.yml` is validation scaffolding and must not be landed.
 
 ## Scope exclusions preserved
 
-No detach/export expansion, checkpoint-default replacement, millennium/endurance run, balance change, Stage 1 work, unrelated feature work or merge is included in this slice.
-
+No architecture restart, detach/export expansion, checkpoint-default replacement, millennium/endurance run, balance change, Stage 1 work, unrelated feature work or merge is included. Stage 0.5 remains unmerged pending Astra review.

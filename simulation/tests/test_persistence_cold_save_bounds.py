@@ -1,4 +1,5 @@
 import gc
+import tracemalloc
 import weakref
 
 import pytest
@@ -8,6 +9,7 @@ from ate_sim.core import Layer, World
 from ate_sim.incremental_store import TransactionalStore
 from ate_sim.persistence_adapters import SCHEMA, WorldCodec
 from ate_sim.persistence_cold_save import prepare_cold_save
+import ate_sim.persistence_cold_save as cold_save
 from ate_sim.persistence_events import CHUNK_SIZE
 from ate_sim.persistence_session import open_world_session, write_cold_snapshot
 from ate_sim.persistence_tracking import _BINDINGS
@@ -279,6 +281,248 @@ def test_cold_save_history_bounds_are_independent_of_old_prefix(
         )
     finally:
         session.close()
+
+
+class _CountingPersistedKeys:
+    def __init__(self, values, counters):
+        self._values = set(values)
+        self._counters = counters
+
+    def __contains__(self, value):
+        self._counters["membership"] += 1
+        return value in self._values
+
+    def __iter__(self):
+        for value in self._values:
+            self._counters["iterated"] += 1
+            yield value
+
+    def __len__(self):
+        return len(self._values)
+
+    def add(self, value):
+        self._values.add(value)
+
+    def discard(self, value):
+        self._values.discard(value)
+
+
+@pytest.mark.parametrize("groups", [100, 300, 1000])
+def test_local_edit_does_not_copy_unrelated_persisted_keys(tmp_path, groups):
+    world = World(87000 + groups)
+    for index in range(groups):
+        shared = {"values": [index]}
+        world.currency.wallets[index] = {
+            "left": shared,
+            "right": shared,
+        }
+
+    path = tmp_path / f"persisted-key-copy-{groups}.sqlite"
+    write_cold_snapshot(world, path, rules_id=RULES)
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        counters = {"iterated": 0, "membership": 0}
+        session._cold_persisted_keys = {
+            namespace: _CountingPersistedKeys(keys, counters)
+            for namespace, keys in session._cold_persisted_keys.items()
+        }
+        session.world.currency.wallets[0]["left"]["values"].append(-1)
+
+        plan = prepare_cold_save(session)
+        assert plan is not None
+        assert plan.transfer_chunks == 0
+        prep_iterated = counters["iterated"]
+        prep_membership = counters["membership"]
+        assert prep_iterated == 0
+        assert prep_membership <= 4
+        del plan
+
+        counters["iterated"] = 0
+        counters["membership"] = 0
+        session.save()
+        save_iterated = counters["iterated"]
+        save_membership = counters["membership"]
+        assert save_iterated == 0
+        assert save_membership <= 4
+
+        print(
+            "P3B_COLD_SAVE_PERSISTED_KEY_WORK "
+            f"groups={groups} "
+            f"prep_iterated={prep_iterated} "
+            f"prep_membership={prep_membership} "
+            f"save_iterated={save_iterated} "
+            f"save_membership={save_membership}"
+        )
+    finally:
+        session.close()
+
+
+def test_cold_save_allocation_bounds_exclude_fixture_and_reader_cache(
+    tmp_path, monkeypatch
+):
+    rows = []
+    for segments in (4, 40, 400):
+        path, _expected = build_cold_path(
+            tmp_path / f"alloc-{segments}",
+            disk_segments=segments,
+            pending_chunks=5,
+            tail_count=3,
+            wallets={1: {"values": [1]}},
+        )
+        session = open_world_session(path, rules_id=STRUCTURAL_RULES)
+        try:
+            gc.collect()
+            tracemalloc.start()
+            tracemalloc.reset_peak()
+            prep_base, _ = tracemalloc.get_traced_memory()
+            plan = prepare_cold_save(session)
+            prep_current, prep_peak_abs = tracemalloc.get_traced_memory()
+            selected_bytes = (
+                sum(len(item.value_bytes) for item in plan.segment_evidence)
+                + sum(
+                    len(item.value_bytes or b"")
+                    for item in plan.record_evidence
+                )
+            )
+            prep_peak = max(0, prep_peak_abs - prep_base)
+            prep_retained = max(0, prep_current - prep_base)
+            del plan
+            gc.collect()
+            released_current, _ = tracemalloc.get_traced_memory()
+            released_plan_retained = max(0, released_current - prep_base)
+            tracemalloc.stop()
+
+            adoption = {}
+
+            def measure_publication(phase, _session, _plan):
+                if phase == "before_adoption":
+                    gc.collect()
+                    tracemalloc.start()
+                    tracemalloc.reset_peak()
+                    adoption["base"] = tracemalloc.get_traced_memory()[0]
+
+            monkeypatch.setattr(
+                cold_save, "_cold_save_phase", measure_publication
+            )
+            session.save()
+            publication_current, publication_peak_abs = (
+                tracemalloc.get_traced_memory()
+            )
+            publication_base = adoption["base"]
+            publication_peak = max(
+                0, publication_peak_abs - publication_base
+            )
+            publication_retained = max(
+                0, publication_current - publication_base
+            )
+            tracemalloc.stop()
+            monkeypatch.setattr(
+                cold_save, "_cold_save_phase",
+                lambda _phase, _session, _plan: None,
+            )
+
+            stats = session.world.events.storage_stats()
+            row = {
+                "segments": segments,
+                "selected_bytes": selected_bytes,
+                "prep_peak": prep_peak,
+                "prep_retained": prep_retained,
+                "released_plan_retained": released_plan_retained,
+                "publication_peak": publication_peak,
+                "publication_retained": publication_retained,
+                "reader_cache_segments": stats["disk_cache_segments"],
+                "reader_cache_events": stats["decoded_cache_events"],
+            }
+            rows.append(row)
+            print(
+                "P3B_COLD_SAVE_ALLOC "
+                + " ".join(f"{key}={value}" for key, value in row.items())
+            )
+        finally:
+            if tracemalloc.is_tracing():
+                tracemalloc.stop()
+            session.close()
+            gc.collect()
+
+    # The selected batch is fixed at four chunks. Old-history scale must not
+    # create allocation growth proportional to 4/40/400 sealed segments.
+    assert max(row["reader_cache_segments"] for row in rows) <= 4
+    assert (
+        max(row["selected_bytes"] for row in rows)
+        - min(row["selected_bytes"] for row in rows)
+        < 256 * 1024
+    )
+    assert (
+        max(row["prep_peak"] for row in rows)
+        - min(row["prep_peak"] for row in rows)
+        < 8 * 1024 * 1024
+    )
+    assert (
+        max(row["publication_peak"] for row in rows)
+        - min(row["publication_peak"] for row in rows)
+        < 8 * 1024 * 1024
+    )
+    assert max(row["released_plan_retained"] for row in rows) < 2 * 1024 * 1024
+
+
+def test_local_key_allocation_stays_flat_across_alias_population(tmp_path):
+    rows = []
+    for groups in (100, 300, 1000):
+        world = World(86000 + groups)
+        for index in range(groups):
+            shared = {"values": [index]}
+            world.currency.wallets[index] = {
+                "left": shared,
+                "right": shared,
+            }
+        path = tmp_path / f"local-alloc-{groups}.sqlite"
+        write_cold_snapshot(world, path, rules_id=RULES)
+        session = open_world_session(path, rules_id=RULES)
+        try:
+            counters = {"iterated": 0, "membership": 0}
+            session._cold_persisted_keys = {
+                namespace: _CountingPersistedKeys(keys, counters)
+                for namespace, keys in session._cold_persisted_keys.items()
+            }
+            session.world.currency.wallets[0]["left"]["values"].append(-1)
+
+            gc.collect()
+            tracemalloc.start()
+            tracemalloc.reset_peak()
+            base, _ = tracemalloc.get_traced_memory()
+            plan = prepare_cold_save(session)
+            current, peak_abs = tracemalloc.get_traced_memory()
+            row = {
+                "groups": groups,
+                "iterated": counters["iterated"],
+                "membership": counters["membership"],
+                "peak": max(0, peak_abs - base),
+                "retained": max(0, current - base),
+                "record_actions": len(plan.record_evidence),
+            }
+            del plan
+            gc.collect()
+            released, _ = tracemalloc.get_traced_memory()
+            row["released_plan_retained"] = max(0, released - base)
+            tracemalloc.stop()
+            rows.append(row)
+            print(
+                "P3B_COLD_SAVE_LOCAL_ALLOC "
+                + " ".join(f"{key}={value}" for key, value in row.items())
+            )
+        finally:
+            if tracemalloc.is_tracing():
+                tracemalloc.stop()
+            session.close()
+            gc.collect()
+
+    assert all(row["iterated"] == 0 for row in rows)
+    assert all(row["membership"] <= 4 for row in rows)
+    assert all(row["record_actions"] <= 4 for row in rows)
+    assert max(row["peak"] for row in rows) - min(
+        row["peak"] for row in rows
+    ) < 1024 * 1024
+    assert max(row["released_plan_retained"] for row in rows) < 256 * 1024
 
 
 @pytest.mark.parametrize("groups", [100, 300, 1000])
