@@ -17,6 +17,7 @@ from simulation.ate_sim.incremental_store import (
 )
 from simulation.ate_sim.persistence_lazy_store import (
     GenerationPressureError,
+    IdentityOccurrenceChange,
     LazyRecordStore,
     VersionChange,
 )
@@ -552,3 +553,297 @@ def test_checked_iteration_delete_and_reinsert_preserve_both_visible_orders(tmp_
         assert 10 not in new
         assert new[-2:] == (20, 260)
         assert len(new) == 260
+
+
+
+def test_identity_occurrences_publish_atomically_with_owner_and_preserve_previous_generation(tmp_path):
+    path = tmp_path / "identity-atomic.sqlite"
+    with make_store(path) as store:
+        writer = store.capture_pin()
+        first = store.commit(
+            writer,
+            commit_token="g1",
+            version_changes=(
+                VersionChange("people", 1, {"name": "Ada"}),
+            ),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people",
+                    1,
+                    (("field", "wallet"),),
+                    incarnation_id=1,
+                ),
+            ),
+            next_incarnation_id=2,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(1, ("people",)),
+        )
+        writer = first.pin
+        previous = store.capture_pin()
+
+        assert store.read_identity_state(previous) == 2
+        old_identity = store.read_identity_occurrence(
+            previous, "people", 1, (("field", "wallet"),)
+        )
+        assert old_identity.incarnation_id == 1
+        assert store.read_version(
+            previous, "people", 1, expected_record_schema=1
+        ).value == {"name": "Ada"}
+
+        second = store.commit(
+            writer,
+            commit_token="g2",
+            version_changes=(
+                VersionChange("people", 1, {"name": "Ada II"}),
+            ),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people",
+                    1,
+                    (("field", "wallet"),),
+                    incarnation_id=2,
+                ),
+                IdentityOccurrenceChange(
+                    "people",
+                    1,
+                    (("field", "profile"),),
+                    incarnation_id=3,
+                ),
+            ),
+            next_incarnation_id=4,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(2, ("people",)),
+        )
+        writer = second.pin
+
+        assert store.read_identity_occurrence(
+            previous, "people", 1, (("field", "wallet"),)
+        ).incarnation_id == 1
+        assert store.read_identity_occurrence(
+            writer, "people", 1, (("field", "wallet"),)
+        ).incarnation_id == 2
+        assert store.read_identity_occurrence(
+            writer, "people", 1, (("field", "profile"),)
+        ).incarnation_id == 3
+        assert store.read_identity_state(writer) == 4
+        assert store.identity_occurrences_for_owner(
+            writer, "people", 1
+        ) == (
+            ((("field", "profile"),), 3),
+            ((("field", "wallet"),), 2),
+        )
+        assert store.verify_all()["identity_occurrences"] == 2
+
+
+def test_identity_delete_and_reinsert_same_or_new_incarnation_is_explicit(tmp_path):
+    with make_store(tmp_path / "identity-delete.sqlite") as store:
+        pin = store.capture_pin()
+        pin = store.commit(
+            pin,
+            commit_token="g1",
+            version_changes=(VersionChange("people", 1, "owner"),),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people", 1, (("field", "child"),), incarnation_id=1
+                ),
+            ),
+            next_incarnation_id=2,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(1, ("people",)),
+        ).pin
+        pin = store.commit(
+            pin,
+            commit_token="g2",
+            version_changes=(),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people", 1, (("field", "child"),), delete=True
+                ),
+            ),
+            changes=(),
+            new_segments=(),
+            metadata=metadata(2, ("people",)),
+        ).pin
+        with pytest.raises(KeyError):
+            store.read_identity_occurrence(
+                pin, "people", 1, (("field", "child"),)
+            )
+
+        pin = store.commit(
+            pin,
+            commit_token="g3",
+            version_changes=(),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people", 1, (("field", "child"),), incarnation_id=1
+                ),
+            ),
+            changes=(),
+            new_segments=(),
+            metadata=metadata(3, ("people",)),
+        ).pin
+        assert store.read_identity_occurrence(
+            pin, "people", 1, (("field", "child"),)
+        ).incarnation_id == 1
+
+        pin = store.commit(
+            pin,
+            commit_token="g4",
+            version_changes=(),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people", 1, (("field", "child"),), incarnation_id=2
+                ),
+            ),
+            next_incarnation_id=3,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(4, ("people",)),
+        ).pin
+        assert store.read_identity_occurrence(
+            pin, "people", 1, (("field", "child"),)
+        ).incarnation_id == 2
+        assert store.read_identity_state(pin) == 3
+
+
+def test_identity_redundant_upsert_is_true_noop(tmp_path):
+    with make_store(tmp_path / "identity-noop.sqlite") as store:
+        pin = store.capture_pin()
+        pin = store.commit(
+            pin,
+            commit_token="g1",
+            version_changes=(VersionChange("people", 1, "owner"),),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people", 1, (("field", "child"),), incarnation_id=1
+                ),
+            ),
+            next_incarnation_id=2,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(1, ("people",)),
+        ).pin
+        before = store.storage_metrics()
+        result = store.commit(
+            pin,
+            commit_token="noop-identity",
+            version_changes=(),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people", 1, (("field", "child"),), incarnation_id=1
+                ),
+            ),
+            next_incarnation_id=2,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(1, ("people",)),
+        )
+        after = store.storage_metrics()
+        assert result.outcome == "not_committed"
+        assert result.generation == 1
+        assert after["identity_occurrence_versions"] == before[
+            "identity_occurrence_versions"
+        ]
+        assert after["identity_state_versions"] == before[
+            "identity_state_versions"
+        ]
+        assert after["receipts"] == before["receipts"]
+        assert after["attempts"] == before["attempts"]
+
+
+def test_identity_retention_cleanup_backup_and_current_head_copy(tmp_path):
+    source = tmp_path / "identity-source.sqlite"
+    backup = tmp_path / "identity-backup.sqlite"
+    copied = tmp_path / "identity-copy.sqlite"
+    with make_store(source) as store:
+        writer = store.capture_pin()
+        writer = store.commit(
+            writer,
+            commit_token="g1",
+            version_changes=(VersionChange("people", 1, "owner"),),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people", 1, (("field", "child"),), incarnation_id=1
+                ),
+            ),
+            next_incarnation_id=2,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(1, ("people",)),
+        ).pin
+        old = store.capture_pin()
+        writer = store.commit(
+            writer,
+            commit_token="g2",
+            version_changes=(),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people", 1, (("field", "child"),), incarnation_id=2
+                ),
+            ),
+            next_incarnation_id=3,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(2, ("people",)),
+        ).pin
+        assert store.storage_metrics()["identity_occurrence_versions"] == 2
+        assert store.storage_metrics()["identity_state_versions"] == 2
+
+        store.backup(backup)
+        LazyRecordStore.copy_current_head(
+            source,
+            copied,
+            codec=codec(),
+            expected_simulation_schema="8",
+            expected_rules_id="stage-0.5",
+        )
+        store.release_pin(old)
+        assert store.storage_metrics()["identity_occurrence_versions"] == 1
+        assert store.storage_metrics()["identity_state_versions"] == 1
+        store.verify_all()
+
+    with open_store(backup) as exact:
+        assert exact.storage_metrics()["identity_occurrence_versions"] == 2
+        assert exact.storage_metrics()["identity_state_versions"] == 2
+        exact.verify_all()
+    with open_store(copied) as current:
+        pin = current.capture_pin()
+        assert current.read_identity_occurrence(
+            pin, "people", 1, (("field", "child"),)
+        ).incarnation_id == 2
+        assert current.read_identity_state(pin) == 3
+        assert current.storage_metrics()["identity_occurrence_versions"] == 1
+        assert current.storage_metrics()["identity_state_versions"] == 1
+        current.verify_all()
+
+
+def test_identity_corruption_is_checked(tmp_path):
+    with make_store(tmp_path / "identity-corrupt.sqlite") as store:
+        pin = store.capture_pin()
+        pin = store.commit(
+            pin,
+            commit_token="g1",
+            version_changes=(VersionChange("people", 1, "owner"),),
+            identity_changes=(
+                IdentityOccurrenceChange(
+                    "people", 1, (("field", "child"),), incarnation_id=1
+                ),
+            ),
+            next_incarnation_id=2,
+            changes=(),
+            new_segments=(),
+            metadata=metadata(1, ("people",)),
+        ).pin
+        store.db.execute(
+            "UPDATE lazy_identity_occurrence_versions SET incarnation_id=99"
+        )
+        store.db.commit()
+        with pytest.raises(StoreIntegrityError, match="identity occurrence"):
+            store.read_identity_occurrence(
+                pin, "people", 1, (("field", "child"),)
+            )
+        with pytest.raises(StoreIntegrityError):
+            store.verify_all()
