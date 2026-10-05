@@ -20,6 +20,7 @@ jobs:
           simulation/tests/test_persistence_lifecycle.py
           simulation/tests/test_persistence_history_operations.py
           -k "not streaming_history_bounds_and_detach_cost_are_measured"
-          simulation/tests/test_checkpoint.py
           simulation/tests/test_persistence_session_open.py
           simulation/tests/test_persistence_event_log.py
+          simulation/tests/test_canonical_digest.py
+          simulation/tests/test_history_archive.py
