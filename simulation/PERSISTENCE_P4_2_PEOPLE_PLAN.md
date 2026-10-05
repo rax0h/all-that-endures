@@ -266,3 +266,32 @@ Focused proof:
 This is a lifecycle proof only. Do not add gameplay/balance changes or broaden
 the persistence authority model. Once green, proceed to the remaining
 owner-transfer/provenance/invalidation and explicit materializing-detach work.
+
+
+## Materializing lazy detach subgate
+
+Implement explicit `LazyWorldSession.detach(materialize_history=True)` only.
+The default/no-argument call must fail without side effects. Detach is an
+explicit O(total) portability operation and therefore may materialize all
+current people and all cold EventLog history; ordinary open/save/gameplay must
+remain bounded.
+
+Detach staging requirements:
+- materialize the complete logical `world.people` mapping from the captured
+  generation plus local overlays, not merely the resident cache;
+- preserve exact people order, current live Person objects/incarnations and
+  any already-restored cross-boundary aliases;
+- reuse the accepted cold EventLog materialization and eager-wrapper staging;
+- stage every replacement before publication;
+- a staging failure leaves the lazy session usable and its pin intact;
+- active or stale sessions may detach local current state, but
+  recovery-required sessions may not guess;
+- stale detach never publishes local state to the winner's store;
+- publish removes persistence lifetime/binding machinery, releases the
+  GenerationPin, closes the backing store and returns the same World object as
+  a portable in-memory graph;
+- detached people use a normal `RecordTable` and detached history has no disk
+  prefix; checkpoint roundtrip and further standalone mutation must work.
+
+Focused proofs cover >256 people, retained aliases, unsaved people/eager edits,
+cross-boundary sharing, staging failure, stale-local detach and portability.
