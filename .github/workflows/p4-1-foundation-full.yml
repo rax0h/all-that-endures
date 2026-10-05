@@ -19,4 +19,4 @@ jobs:
       - name: Verify exact repaired source compiles
         run: python -m py_compile simulation/ate_sim/persistence_lazy_store.py
       - name: Full simulation test suite
-        run: PYTHONPATH=. python -m pytest -vv --durations=20 simulation/tests
+        run: PYTHONPATH=simulation:. python -m pytest -vv --durations=20 simulation/tests
