@@ -178,7 +178,9 @@ def _standalone_log(old_log, session):
     return new_log
 
 
-def _stage_plain_graph(session, old_log, new_log):
+def _stage_plain_graph(
+    session, old_log, new_log, *, replacements=None
+):
     """Stage wrapper removal/current-graph rewiring without source mutation."""
     from .persistence_tracking import (
         TrackedDict, TrackedList, TrackedSet,
@@ -186,6 +188,8 @@ def _stage_plain_graph(session, old_log, new_log):
     )
 
     memo = {id(old_log): new_log}
+    if replacements:
+        memo.update(replacements)
     assignments = []
     cache_removals = []
     index_rebindings = []
