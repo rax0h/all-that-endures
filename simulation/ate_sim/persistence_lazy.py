@@ -1180,153 +1180,6 @@ class LazyRecordTable(RecordTable):
             self._lru[key] = None
         self._evict_clean()
 
-    def _stage_detached_people(self):
-        """Materialize the complete logical people table without publishing it."""
-        expected = len(self.people)
-        detached = RecordTable()
-        count = 0
-        for key in self.people:
-            person = self.people[key]
-            if not isinstance(person, Person):
-                raise StoreIntegrityError(
-                    "lazy detach encountered a non-Person people value"
-                )
-            # Do not call RecordTable.__setitem__ while staging: that would
-            # rebind live records before detach publication is known to succeed.
-            dict.__setitem__(detached, key, person)
-            count += 1
-        if count != expected or dict.__len__(detached) != expected:
-            raise StoreIntegrityError(
-                "lazy detach people materialization count mismatch"
-            )
-        return detached
-
-    def _publish_materialized_detach(
-        self,
-        old_log,
-        new_log,
-        detached_people,
-        assignments,
-        cache_removals,
-        index_rebindings,
-    ):
-        """Publish a fully staged portable graph; remaining work is teardown."""
-        tracker = self._eager_tracker
-        old_prefix = old_log._disk_prefix
-        pending_old_prefix = tracker._cold_old_prefix_pending
-
-        # Weak references can theoretically fail for unsupported table types.
-        # Precompute them before the durable pin is released so every remaining
-        # publication step is deterministic in-memory teardown.
-        prepared_rebindings = [
-            (record, weakref.ref(table), key)
-            for record, table, key in index_rebindings
-        ]
-
-        # This is the final fallible storage operation.  If release/cleanup
-        # fails, no staged graph replacement has been published and the session
-        # remains usable.
-        self.store.release_pin(self.pin)
-
-        tracker._suspended += 1
-        try:
-            for obj, name, replacement in assignments:
-                object.__setattr__(obj, name, replacement)
-            for obj, names in cache_removals:
-                for name in names:
-                    obj.__dict__.pop(name, None)
-            for record, table_ref, key in prepared_rebindings:
-                object.__setattr__(record, "_index_table", table_ref)
-                object.__setattr__(record, "_index_key", key)
-            self.world.__dict__.pop("_ate_persistence_lifetime", None)
-            new_log.__dict__.pop("_ate_persistence_lifetime", None)
-        finally:
-            tracker._suspended -= 1
-
-        tracker._clear_bindings()
-        tracker._active = False
-        tracker._cold_state = "closed"
-        tracker._cold_plan = None
-        tracker._cold_publication_phase = None
-        tracker._cold_old_prefix_pending = None
-        tracker._memo.clear()
-        tracker._memo_reverse.clear()
-        tracker._bound_root_originals.clear()
-        tracker._bootstrap_originals.clear()
-        tracker._root_containers.clear()
-        tracker._scalar_fields.clear()
-        tracker._cold_persisted_keys.clear()
-        tracker._identity_dirty_owners.clear()
-        tracker._identity_index = None
-        tracker._committed_identity_targets.clear()
-        tracker._live_identity_targets.clear()
-        tracker._pending_identity_current.clear()
-
-        self._lifetime.close()
-        if old_prefix is not None:
-            old_prefix.close()
-        if (
-            pending_old_prefix is not None
-            and pending_old_prefix is not old_prefix
-        ):
-            pending_old_prefix.close()
-
-        self._registry.close()
-        self.people = detached_people
-        self._cross_boundary_links = ()
-        self.identity_links = ()
-        self.store.close()
-        self._active = False
-        self._state = "closed"
-        self._lifecycle_operation = None
-        return self.world
-
-    def detach(self, *, materialize_history=False):
-        """Detach the lazy session into one portable in-memory World."""
-        self._begin_lifecycle_operation("detach", allow_stale=True)
-        published = False
-        try:
-            if not materialize_history:
-                raise StoreError(
-                    "lazy history requires detach(materialize_history=True)"
-                )
-            from . import persistence_lifecycle as lifecycle
-
-            old_log = self.world.events
-            lifecycle._lifecycle_phase("before_history", self)
-            new_log = lifecycle._standalone_log(old_log, self)
-            lifecycle._lifecycle_phase("after_history", self)
-
-            detached_people = self._stage_detached_people()
-            assignments, cache_removals, index_rebindings = (
-                lifecycle._stage_plain_graph(
-                    self._eager_tracker,
-                    old_log,
-                    new_log,
-                    replacements={id(self.people): detached_people},
-                )
-            )
-            for key, person in dict.items(detached_people):
-                if isinstance(person, IndexedRecord):
-                    index_rebindings.append(
-                        (person, detached_people, key)
-                    )
-
-            lifecycle._lifecycle_phase("before_publish", self)
-            world = self._publish_materialized_detach(
-                old_log,
-                new_log,
-                detached_people,
-                assignments,
-                cache_removals,
-                index_rebindings,
-            )
-            published = True
-            return world
-        finally:
-            if not published and self._active:
-                self._end_lifecycle_operation("detach")
-
     def diagnostics(self):
         # Diagnostics remain readable while save acknowledgement is uncertain;
         # do not route through guarded mapping reads here.
@@ -1992,6 +1845,153 @@ class LazyWorldSession:
         raise StoreConflictError(
             "lazy World save resolved as stale/conflict"
         )
+
+    def _stage_detached_people(self):
+        """Materialize the complete logical people table without publishing it."""
+        expected = len(self.people)
+        detached = RecordTable()
+        count = 0
+        for key in self.people:
+            person = self.people[key]
+            if not isinstance(person, Person):
+                raise StoreIntegrityError(
+                    "lazy detach encountered a non-Person people value"
+                )
+            # Do not call RecordTable.__setitem__ while staging: that would
+            # rebind live records before detach publication is known to succeed.
+            dict.__setitem__(detached, key, person)
+            count += 1
+        if count != expected or dict.__len__(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach people materialization count mismatch"
+            )
+        return detached
+
+    def _publish_materialized_detach(
+        self,
+        old_log,
+        new_log,
+        detached_people,
+        assignments,
+        cache_removals,
+        index_rebindings,
+    ):
+        """Publish a fully staged portable graph; remaining work is teardown."""
+        tracker = self._eager_tracker
+        old_prefix = old_log._disk_prefix
+        pending_old_prefix = tracker._cold_old_prefix_pending
+
+        # Weak references can theoretically fail for unsupported table types.
+        # Precompute them before the durable pin is released so every remaining
+        # publication step is deterministic in-memory teardown.
+        prepared_rebindings = [
+            (record, weakref.ref(table), key)
+            for record, table, key in index_rebindings
+        ]
+
+        # This is the final fallible storage operation.  If release/cleanup
+        # fails, no staged graph replacement has been published and the session
+        # remains usable.
+        self.store.release_pin(self.pin)
+
+        tracker._suspended += 1
+        try:
+            for obj, name, replacement in assignments:
+                object.__setattr__(obj, name, replacement)
+            for obj, names in cache_removals:
+                for name in names:
+                    obj.__dict__.pop(name, None)
+            for record, table_ref, key in prepared_rebindings:
+                object.__setattr__(record, "_index_table", table_ref)
+                object.__setattr__(record, "_index_key", key)
+            self.world.__dict__.pop("_ate_persistence_lifetime", None)
+            new_log.__dict__.pop("_ate_persistence_lifetime", None)
+        finally:
+            tracker._suspended -= 1
+
+        tracker._clear_bindings()
+        tracker._active = False
+        tracker._cold_state = "closed"
+        tracker._cold_plan = None
+        tracker._cold_publication_phase = None
+        tracker._cold_old_prefix_pending = None
+        tracker._memo.clear()
+        tracker._memo_reverse.clear()
+        tracker._bound_root_originals.clear()
+        tracker._bootstrap_originals.clear()
+        tracker._root_containers.clear()
+        tracker._scalar_fields.clear()
+        tracker._cold_persisted_keys.clear()
+        tracker._identity_dirty_owners.clear()
+        tracker._identity_index = None
+        tracker._committed_identity_targets.clear()
+        tracker._live_identity_targets.clear()
+        tracker._pending_identity_current.clear()
+
+        self._lifetime.close()
+        if old_prefix is not None:
+            old_prefix.close()
+        if (
+            pending_old_prefix is not None
+            and pending_old_prefix is not old_prefix
+        ):
+            pending_old_prefix.close()
+
+        self._registry.close()
+        self.people = detached_people
+        self._cross_boundary_links = ()
+        self.identity_links = ()
+        self.store.close()
+        self._active = False
+        self._state = "closed"
+        self._lifecycle_operation = None
+        return self.world
+
+    def detach(self, *, materialize_history=False):
+        """Detach the lazy session into one portable in-memory World."""
+        self._begin_lifecycle_operation("detach", allow_stale=True)
+        published = False
+        try:
+            if not materialize_history:
+                raise StoreError(
+                    "lazy history requires detach(materialize_history=True)"
+                )
+            from . import persistence_lifecycle as lifecycle
+
+            old_log = self.world.events
+            lifecycle._lifecycle_phase("before_history", self)
+            new_log = lifecycle._standalone_log(old_log, self)
+            lifecycle._lifecycle_phase("after_history", self)
+
+            detached_people = self._stage_detached_people()
+            assignments, cache_removals, index_rebindings = (
+                lifecycle._stage_plain_graph(
+                    self._eager_tracker,
+                    old_log,
+                    new_log,
+                    replacements={id(self.people): detached_people},
+                )
+            )
+            for key, person in dict.items(detached_people):
+                if isinstance(person, IndexedRecord):
+                    index_rebindings.append(
+                        (person, detached_people, key)
+                    )
+
+            lifecycle._lifecycle_phase("before_publish", self)
+            world = self._publish_materialized_detach(
+                old_log,
+                new_log,
+                detached_people,
+                assignments,
+                cache_removals,
+                index_rebindings,
+            )
+            published = True
+            return world
+        finally:
+            if not published and self._active:
+                self._end_lifecycle_operation("detach")
 
     def diagnostics(self):
         self._ensure_active()
