@@ -374,6 +374,13 @@ def _insert_lazy_person(
 
 
 
+def _plain_resource_value(resource):
+    """Storage value for a live lazy resource without runtime wrappers."""
+    if not isinstance(resource, MagicResource):
+        raise TypeError("expected MagicResource")
+    return replace(resource, transfers=list(resource.transfers))
+
+
 def _resource_memberships(resource, ordinal):
     rows = []
     if (
@@ -1834,7 +1841,7 @@ class LazyAspirationTable(LazyRecordTable):
             if visible:
                 record = dict.__getitem__(self, key)
                 self._baseline_payload[key] = self._store.codec.encode(
-                    record
+                    _plain_resource_value(record)
                 )
                 incarnation = self._session._registry.incarnation_for_object(
                     record
@@ -2258,7 +2265,8 @@ class LazyResourceTable(LazyRecordTable):
                 continue
 
             record = dict.__getitem__(self, key)
-            payload = self._store.codec.encode(record)
+            stored_record = _plain_resource_value(record)
+            payload = self._store.codec.encode(stored_record)
             reinsertion = key in self._reinserted
             is_new = not baseline_exists
             value_changed = (
@@ -2276,7 +2284,7 @@ class LazyResourceTable(LazyRecordTable):
                     VersionChange(
                         self._namespace,
                         key,
-                        record,
+                        stored_record,
                         record_schema=LAZY_RESOURCE_SCHEMA,
                         memberships=self._overlay_memberships(
                             record, ordinal
