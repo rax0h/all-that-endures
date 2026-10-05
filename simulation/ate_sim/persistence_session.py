@@ -985,10 +985,15 @@ def write_cold_snapshot(world, destination, *, rules_id):
     }
 
 
-def _capture_cold_baseline_ordinals(store, manifest):
+def _capture_cold_baseline_ordinals(
+    store, manifest, *, excluded_namespaces=()
+):
     """Capture stable root ordinals from the same pinned cold generation."""
+    excluded_namespaces = set(excluded_namespaces)
     result = {}
     for namespace, description in manifest["collections"].items():
+        if namespace in excluded_namespaces:
+            continue
         if type(description) is not tuple or len(description) != 3:
             raise StoreFormatError(
                 f"invalid collection description: {namespace}"
