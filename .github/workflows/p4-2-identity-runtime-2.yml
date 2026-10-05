@@ -1,0 +1,19 @@
+name: P4.2 identity runtime gate 2
+
+on:
+  push:
+    branches:
+      - sol/p4-2-identity-runtime-gate-2
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: python -m py_compile simulation/ate_sim/persistence_lazy_identity.py simulation/tests/test_persistence_lazy_identity.py
+      - run: PYTHONPATH=simulation:. python -m pytest -q simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_persistence_lazy_store.py simulation/tests/test_persistence_lazy_store_failures.py simulation/tests/test_incremental_store.py
