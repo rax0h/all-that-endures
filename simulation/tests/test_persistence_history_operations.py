@@ -232,3 +232,68 @@ def test_streaming_history_bounds_and_detach_cost_are_measured(
         if tracemalloc.is_tracing():
             tracemalloc.stop()
         session.close()
+
+
+def test_verify_history_missing_warm_segment_fails_without_mutation(tmp_path):
+    path, _ = build_cold_path(
+        tmp_path, disk_segments=2, pending_chunks=0, tail_count=1
+    )
+    session = open_world_session(path, rules_id=RULES)
+    try:
+        log = session.world.events
+        assert log[0].id == 1
+        before_generation = session.generation
+        before_dirty = session.dirty
+        session.store.db.execute(
+            "DELETE FROM segments WHERE namespace=? AND ordinal=?",
+            (SEALED_EVENTS, 0),
+        )
+        session.store.db.commit()
+
+        with pytest.raises(StoreIntegrityError):
+            session.verify_history()
+
+        assert session.cold_state == "active"
+        assert session.generation == before_generation
+        assert session.dirty == before_dirty
+        assert log._disk_prefix.resident_segments <= 4
+    finally:
+        session.close()
+
+
+def test_archive_mid_encoding_failure_leaves_no_final_and_session_usable(
+    tmp_path, monkeypatch
+):
+    path, _ = build_cold_path(
+        tmp_path,
+        disk_segments=2,
+        pending_chunks=0,
+        tail_count=2,
+        wallets={1: {"values": [1]}},
+    )
+    session = open_world_session(path, rules_id=RULES)
+    target = tmp_path / "failed-cold-archive.sqlite"
+    try:
+        before_generation = session.generation
+        before_dirty = session.dirty
+        original = history_archive.encode
+        calls = {"count": 0}
+
+        def fail_encode(value):
+            calls["count"] += 1
+            if calls["count"] == 12:
+                raise RuntimeError("archive encoding fault")
+            return original(value)
+
+        monkeypatch.setattr(history_archive, "encode", fail_encode)
+        with pytest.raises(RuntimeError, match="archive encoding fault"):
+            export_archive(session.world, target)
+
+        assert not target.exists()
+        assert session.cold_state == "active"
+        assert session.generation == before_generation
+        assert session.dirty == before_dirty
+        session.world.currency.wallets[1]["values"].append(2)
+        assert session.world.currency.wallets[1]["values"] == [1, 2]
+    finally:
+        session.close()
