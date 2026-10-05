@@ -404,6 +404,10 @@ def test_iter_keys_is_page_lazy_closes_snapshot_before_yield_and_detects_pin_mov
         assert diag.payload_check_bytes > 0
         assert not store.db.in_transaction
 
+        iterator.close()
+        boundary = store.iter_keys(pin, "people", page_size=1)
+        assert next(boundary) == 0
+        assert not store.db.in_transaction
         moved = commit(
             store,
             pin,
@@ -412,7 +416,7 @@ def test_iter_keys_is_page_lazy_closes_snapshot_before_yield_and_detects_pin_mov
             position=2,
         )
         with pytest.raises(StoreConflictError, match="pin moved"):
-            next(iterator)
+            next(boundary)
         assert not store.db.in_transaction
 
         replacement = store.iter_keys(moved.pin, "people", page_size=17)
