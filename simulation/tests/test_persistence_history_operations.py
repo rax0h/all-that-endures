@@ -192,7 +192,7 @@ def test_streaming_history_bounds_and_detach_cost_are_measured(
         # therefore needs no additional checked store reads. Larger prefixes
         # exceed the four-segment reader cache and are reread once per pass.
         expected_archive_reads = (
-            0 if segments <= prefix._cache.maxlen
+            0 if segments <= session.world.events.cache_size
             else segments * 2
         )
         assert archive_reads == expected_archive_reads
