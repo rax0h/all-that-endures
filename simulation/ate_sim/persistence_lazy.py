@@ -540,6 +540,127 @@ def _relative_set(root, path, value):
     return root
 
 
+
+def _people_occurrence_from_path(path):
+    if (
+        type(path) is tuple
+        and len(path) >= 2
+        and path[0] == ("field", "people")
+        and type(path[1]) is tuple
+        and len(path[1]) == 2
+        and path[1][0] == "key"
+    ):
+        return path[1][1], tuple(path[2:])
+    return None
+
+
+def _seed_cross_boundary_people_identity(session, links):
+    cross = []
+    generation = session.pin.captured_head
+    for target, owner in links:
+        target_people = _people_occurrence_from_path(target)
+        owner_people = _people_occurrence_from_path(owner)
+        if (target_people is None) == (owner_people is None):
+            continue
+        people_key, relative = (
+            target_people if target_people is not None else owner_people
+        )
+        eager_path = owner if target_people is not None else target
+        encoded_key = session.store.codec.encode(people_key)
+        encoded_path = session.store.codec.encode(relative)
+        row = session.store._visible_identity_occurrence(
+            generation,
+            PEOPLE_NAMESPACE,
+            encoded_key,
+            encoded_path,
+        )
+        if row is None:
+            raise StoreIntegrityError(
+                "cross-boundary people identity lacks incarnation label"
+            )
+        eager_object = _at_path(
+            session.world,
+            eager_path,
+            mutable_event_tail_only=True,
+        )
+        if not isinstance(eager_object, Person):
+            raise StoreIntegrityError(
+                "cross-boundary people identity does not resolve to Person"
+            )
+        incarnation = IncarnationId(
+            session.store.store_identity, int(row[0])
+        )
+        live = session._registry.object_for_incarnation(incarnation)
+        if live is not None and live is not eager_object:
+            raise StoreIntegrityError(
+                "cross-boundary incarnation has two live objects"
+            )
+        if live is None:
+            session._registry.bind(
+                eager_object, incarnation=incarnation
+            )
+        session._registry.attach_existing(
+            incarnation,
+            Occurrence(
+                PEOPLE_NAMESPACE,
+                people_key,
+                relative,
+            ),
+        )
+        cross.append((target, owner))
+    return tuple(cross)
+
+
+def _initialize_eager_tracker(
+    session,
+    *,
+    baseline_ordinals,
+    resident_links,
+    prefix_descriptor,
+    tail_descriptor,
+    commit_descriptor,
+):
+    tracker = IncrementalWorldSession.__new__(IncrementalWorldSession)
+    tracker._initialize_runtime(
+        session.world,
+        session.store,
+        codec=session.store.codec,
+        cold_mode=True,
+    )
+    tracker._excluded_namespaces = {PEOPLE_NAMESPACE}
+    tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
+    try:
+        tracker.generation = session.pin.captured_head
+        tracker._manifest = session.manifest
+        tracker._identity_mode = "current"
+        tracker._initial_links = list(resident_links)
+        tracker._committed_identity_targets = dict(tracker._initial_links)
+        tracker._live_identity_targets = dict(tracker._initial_links)
+        tracker._baseline_ordinals = {
+            namespace: dict(ordinals)
+            for namespace, ordinals in baseline_ordinals.items()
+        }
+        tracker._cold_head = session._head
+        tracker._cold_prefix_descriptor = prefix_descriptor
+        tracker._cold_tail_descriptor = tail_descriptor
+        tracker._cold_commit_descriptor = commit_descriptor
+        tracker._cold_committed_n = tail_descriptor.total_events
+        tracker._normalize_bootstrap()
+        tracker._bind_roots()
+        tracker._bootstrap_identity_index()
+        tracker._initialize_cold_persisted_keys()
+    except Exception:
+        try:
+            tracker._undo_bound_roots()
+            tracker._undo_bootstrap()
+        finally:
+            tracker._clear_bindings()
+            tracker._active = False
+        raise
+    finally:
+        tracker._suspended = 0
+    return tracker
+
 @dataclass(frozen=True)
 class LazyPeopleSavePlan:
     token: str
