@@ -1,11 +1,11 @@
-name: p3b-cold-save-review-focused
+name: p3b-cold-save-review-final-validation
 on:
   push:
     branches: [sol/p3b-cold-save-review-fixes]
 jobs:
-  focused:
+  validation:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 75
     env:
       PYTHONPATH: .:simulation
     steps:
@@ -14,9 +14,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest
-      - name: focused cold-save correction suite
+      - name: affected persistence identity eventlog lifecycle
         run: >
-          python -m pytest -q -s
-          simulation/tests/test_persistence_cold_save.py
-          simulation/tests/test_persistence_cold_save_failures.py
-          simulation/tests/test_persistence_cold_save_bounds.py
+          python -m pytest -q
+          simulation/tests/test_incremental_store.py
+          simulation/tests/test_persistence*.py
+          simulation/tests/test_cold_history.py
+          simulation/tests/test_event_year_queries.py
+          simulation/tests/test_canonical_digest.py
+          simulation/tests/test_history_archive.py
+      - name: full simulation tests
+        if: always()
+        run: python -m pytest -q simulation/tests
