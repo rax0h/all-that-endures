@@ -4552,6 +4552,27 @@ class LazyWorldSession:
             )
         return detached, transfer_replacements, transfer_assignments
 
+    def _stage_detached_owner_index(self):
+        expected = len(self.owner_index)
+        detached = {}
+        replacements = {}
+        for key in self.owner_index:
+            bucket = self.owner_index[key]
+            if not isinstance(bucket, (set, LazyTrackedSet)):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-set owner-index bucket"
+                )
+            replacement = replacements.get(id(bucket))
+            if replacement is None:
+                replacement = set(bucket)
+                replacements[id(bucket)] = replacement
+            detached[key] = replacement
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach owner-index materialization count mismatch"
+            )
+        return detached, replacements
+
     def _publish_materialized_detach(
         self,
         old_log,
@@ -4559,6 +4580,7 @@ class LazyWorldSession:
         detached_people,
         detached_aspirations,
         detached_resources,
+        detached_owner_index,
         assignments,
         cache_removals,
         index_rebindings,
@@ -4636,6 +4658,7 @@ class LazyWorldSession:
         self.people = detached_people
         self.aspirations = detached_aspirations
         self.resources = detached_resources
+        self.owner_index = detached_owner_index
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -4667,6 +4690,10 @@ class LazyWorldSession:
                 transfer_replacements,
                 transfer_assignments,
             ) = self._stage_detached_resources()
+            (
+                detached_owner_index,
+                owner_index_replacements,
+            ) = self._stage_detached_owner_index()
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -4676,7 +4703,9 @@ class LazyWorldSession:
                         id(self.people): detached_people,
                         id(self.aspirations): detached_aspirations,
                         id(self.resources): detached_resources,
+                        id(self.owner_index): detached_owner_index,
                         **transfer_replacements,
+                        **owner_index_replacements,
                     },
                 )
             )
@@ -4694,6 +4723,7 @@ class LazyWorldSession:
                 detached_people,
                 detached_aspirations,
                 detached_resources,
+                detached_owner_index,
                 assignments,
                 cache_removals,
                 index_rebindings,
@@ -4712,6 +4742,7 @@ class LazyWorldSession:
             "people": self.people.diagnostics(),
             "aspirations": self.aspirations.diagnostics(),
             "resources": self.resources.diagnostics(),
+            "owner_index": self.owner_index.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
@@ -4852,6 +4883,7 @@ def open_lazy_world_session(path, *, rules_id):
                     PEOPLE_NAMESPACE,
                     ASPIRATION_NAMESPACE,
                     RESOURCE_NAMESPACE,
+                    OWNER_INDEX_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -4902,6 +4934,7 @@ def open_lazy_world_session(path, *, rules_id):
                         PEOPLE_NAMESPACE,
                         ASPIRATION_NAMESPACE,
                         RESOURCE_NAMESPACE,
+                        OWNER_INDEX_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
