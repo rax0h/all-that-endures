@@ -1,0 +1,1 @@
+Trigger resource order diagnostic.
