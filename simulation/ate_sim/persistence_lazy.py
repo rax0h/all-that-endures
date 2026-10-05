@@ -9,16 +9,20 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from collections.abc import ItemsView, KeysView, ValuesView
-from dataclasses import is_dataclass
+from dataclasses import dataclass, is_dataclass
 import os
 from pathlib import Path
 import tempfile
+import uuid
 import weakref
 from typing import Any, Iterator
 
 from .core import Person, World
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
+    Membership,
+    RecordChange,
+    StoreConflictError,
     StoreError,
     StoreFormatError,
     StoreIntegrityError,
@@ -48,7 +52,9 @@ from .persistence_lazy_identity import (
     Occurrence,
 )
 from .persistence_lazy_store import (
+    IdentityOccurrenceChange,
     LazyRecordStore,
+    VersionChange,
     _identity_occurrence_checksum,
     _identity_state_checksum,
     _namespace_checksum,
@@ -60,6 +66,9 @@ from .record_index import IndexedRecord, RecordTable
 from .persistence_session import (
     COLD_EVENT_KIND,
     COLD_EVENT_STORAGE,
+    COMMIT_DESCRIPTOR_KEY,
+    EVENT_STORAGE,
+    SESSION_DESCRIPTOR_SCHEMA,
     _capture_cold_world,
     _preflight_conversion_paths,
     _publish_private_cold_file,
@@ -520,8 +529,20 @@ def _relative_set(root, path, value):
     return root
 
 
+@dataclass(frozen=True)
+class LazyPeopleSavePlan:
+    token: str
+    target_generation: int
+    version_changes: tuple[VersionChange, ...]
+    identity_changes: tuple[IdentityOccurrenceChange, ...]
+    ordinary_changes: tuple[RecordChange, ...]
+    metadata: dict[str, Any]
+    touched_keys: tuple[Any, ...]
+    structural_keys: tuple[Any, ...]
+
+
 class LazyRecordTable(RecordTable):
-    """RecordTable-compatible storage facade; underlying dict is cache only."""
+    """RecordTable-compatible lazy people authority with a bounded clean cache."""
 
     def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
         dict.__init__(self)
@@ -532,29 +553,115 @@ class LazyRecordTable(RecordTable):
         self._clean_limit = clean_limit
         self._lru = OrderedDict()
         self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence: dict[Any, bool] = {}
+        self._baseline_payload: dict[Any, bytes] = {}
+        self._baseline_incarnation: dict[Any, int | None] = {}
+        self._baseline_ordinal: dict[Any, int] = {}
+        self._dirty: set[Any] = set()
+        self._removed: set[Any] = set()
+        self._new_keys: set[Any] = set()
+        self._reinserted: set[Any] = set()
+        self._overlay_ordinals: dict[Any, int] = {}
 
     def _ensure(self):
         self._session._ensure_active()
 
+    def _ensure_mutation(self):
+        self._session._ensure_people_mutation_allowed()
+
+    def _baseline_exists(self, key):
+        if key not in self._baseline_presence:
+            self._baseline_presence[key] = self._store.contains_lazy_key(
+                self._pin, self._namespace, key
+            )
+        return self._baseline_presence[key]
+
+    def _persisted_ordinal(self, key):
+        if key not in self._baseline_ordinal:
+            typed_key = self._store.codec.encode(key)
+            order = self._store._visible_order(
+                self._namespace, typed_key, self._pin.captured_head
+            )
+            if order is None:
+                raise KeyError(key)
+            self._baseline_ordinal[key] = order[0]
+        return self._baseline_ordinal[key]
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=LAZY_PERSON_SCHEMA,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def _baseline_incarnation_id(self, key):
+        if key not in self._baseline_incarnation:
+            try:
+                checked = self._store.read_identity_occurrence(
+                    self._pin, self._namespace, key, ()
+                )
+            except KeyError:
+                self._baseline_incarnation[key] = None
+            else:
+                self._baseline_incarnation[key] = checked.incarnation_id
+        return self._baseline_incarnation[key]
+
+    def _visible(self, key):
+        if key in self._new_keys or key in self._reinserted:
+            return True
+        if key in self._removed:
+            return False
+        return self._baseline_exists(key)
+
     def __len__(self):
         self._ensure()
-        return self._store.namespace_size(self._pin, self._namespace)
+        return (
+            self._baseline_count
+            - len(self._removed)
+            + len(self._new_keys)
+        )
 
     def __iter__(self) -> Iterator[Any]:
         self._ensure()
-        return self._store.iter_keys(self._pin, self._namespace)
+        for key in self._store.iter_keys(self._pin, self._namespace):
+            if key in self._removed or key in self._reinserted:
+                continue
+            yield key
+        appended = [
+            key
+            for key in (self._new_keys | self._reinserted)
+            if key not in self._removed
+        ]
+        appended.sort(key=lambda key: self._overlay_ordinals[key])
+        yield from appended
 
     def __contains__(self, key):
         self._ensure()
-        if dict.__contains__(self, key):
-            return True
-        return self._store.contains_lazy_key(self._pin, self._namespace, key)
+        return self._visible(key)
 
     def __getitem__(self, key):
         self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
         if dict.__contains__(self, key):
             self._lru.pop(key, None)
-            self._lru[key] = None
+            if key not in self._dirty:
+                self._lru[key] = None
             return dict.__getitem__(self, key)
         checked = self._store.read_version(
             self._pin,
@@ -564,19 +671,26 @@ class LazyRecordTable(RecordTable):
         )
         if not isinstance(checked.value, Person):
             raise StoreFormatError("lazy world.people payload is not Person")
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(checked.value)
+        )
+        self._baseline_presence.setdefault(key, True)
         record = self._session._bind_loaded_person(key, checked.value)
         dict.__setitem__(self, key, record)
         if isinstance(record, IndexedRecord):
             object.__setattr__(record, "_index_table", weakref.ref(self))
             object.__setattr__(record, "_index_key", key)
         self._loads += 1
-        self._lru[key] = None
+        if key not in self._dirty:
+            self._lru[key] = None
         self._evict_clean()
         return record
 
     def _evict_clean(self):
         while len(self._lru) > self._clean_limit:
             key, _ = self._lru.popitem(last=False)
+            if key in self._dirty:
+                continue
             if dict.__contains__(self, key):
                 dict.__delitem__(self, key)
 
@@ -595,6 +709,13 @@ class LazyRecordTable(RecordTable):
         except KeyError:
             return default
 
+    def _current_ordinal(self, key):
+        if key in self._overlay_ordinals and (
+            key in self._new_keys or key in self._reinserted
+        ):
+            return self._overlay_ordinals[key]
+        return self._persisted_ordinal(key)
+
     def ids(self, fields, *values):
         self._ensure()
         fields = (fields,) if isinstance(fields, str) else tuple(fields)
@@ -602,9 +723,21 @@ class LazyRecordTable(RecordTable):
             raise StoreError(
                 "people pilot currently supports only indexed alive queries"
             )
-        return self._store.query_keys(
-            self._pin, self._namespace, "alive", values[0]
+        desired = values[0]
+        baseline = set(
+            self._store.query_keys(
+                self._pin, self._namespace, "alive", desired
+            )
         )
+        touched = self._dirty | self._new_keys | self._reinserted | self._removed
+        baseline.difference_update(touched)
+        for key in touched:
+            if not self._visible(key):
+                continue
+            record = dict.__getitem__(self, key)
+            if bool(record.alive) == desired:
+                baseline.add(key)
+        return tuple(sorted(baseline, key=self._current_ordinal))
 
     def select(self, fields, *values):
         return [self[key] for key in self.ids(fields, *values)]
@@ -621,29 +754,271 @@ class LazyRecordTable(RecordTable):
             (True,): set(self.ids(fields, True)),
         }
 
-    # Mutation becomes available in the next lifecycle slice.  Blocking it here
-    # makes accidental partial-save semantics impossible.
     def changed(self, key, field=None):
         if key in self.__dict__.get("_loading_keys", ()):
             return
-        raise StoreError(
-            "lazy people pilot mutation is not enabled until lifecycle integration"
-        )
+        self._ensure_mutation()
+        if not self._visible(key) or not dict.__contains__(self, key):
+            raise StoreIntegrityError(
+                "mutation notification has no current lazy Person"
+            )
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+        if field == "alive":
+            self._session.world.__dict__.pop("_living_cache", None)
+
+    def _detach_index_binding(self, value):
+        if isinstance(value, IndexedRecord):
+            object.__setattr__(value, "_index_table", None)
 
     def __setitem__(self, key, record):
-        raise StoreError(
-            "lazy people pilot mutation is not enabled until lifecycle integration"
-        )
+        self._ensure_mutation()
+        if not isinstance(record, Person):
+            raise TypeError("world.people values must be Person")
+        baseline_exists = self._baseline_exists(key)
+        currently_visible = self._visible(key)
+        old = dict.__getitem__(self, key) if dict.__contains__(self, key) else None
+        if old is record and currently_visible:
+            return
+
+        was_removed = key in self._removed
+        if old is not None and old is not record:
+            self._detach_index_binding(old)
+
+        incarnation = self._session._bind_assigned_person(key, record)
+        del incarnation
+        dict.__setitem__(self, key, record)
+        object.__setattr__(record, "_index_table", weakref.ref(self))
+        object.__setattr__(record, "_index_key", key)
+
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+        self._session.world.__dict__.pop("_living_cache", None)
 
     def __delitem__(self, key):
-        raise StoreError(
-            "lazy people pilot mutation is not enabled until lifecycle integration"
-        )
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        old = dict.__getitem__(self, key) if dict.__contains__(self, key) else None
+        if old is not None:
+            self._detach_index_binding(old)
+            self._session._detach_assigned_person(key, old)
+            dict.__delitem__(self, key)
+        else:
+            self._session._detach_unloaded_person(key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+        self._session.world.__dict__.pop("_living_cache", None)
 
     def clear(self):
-        raise StoreError(
-            "lazy people pilot mutation is not enabled until lifecycle integration"
+        for key in tuple(self):
+            del self[key]
+
+    def update(self, records=(), **kwargs):
+        for key, value in dict(records, **kwargs).items():
+            self[key] = value
+
+    def setdefault(self, key, default=None):
+        if key not in self:
+            self[key] = default
+        return self[key]
+
+    def pop(self, key, *default):
+        if key not in self:
+            if default:
+                return default[0]
+            raise KeyError(key)
+        value = self[key]
+        del self[key]
+        return value
+
+    def popitem(self):
+        keys = tuple(self)
+        if not keys:
+            raise KeyError("popitem(): dictionary is empty")
+        key = keys[-1]
+        return key, self.pop(key)
+
+    def _effective_touched(self):
+        return (
+            set(self._dirty)
+            | set(self._removed)
+            | set(self._new_keys)
+            | set(self._reinserted)
         )
+
+    def _planned_structural_ordinals(self):
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        next_ordinal = 0 if state is None else state[1]
+        structural = [
+            key for key in (self._new_keys | self._reinserted)
+            if key not in self._removed
+        ]
+        structural.sort(key=lambda key: self._overlay_ordinals[key])
+        return {
+            key: next_ordinal + index
+            for index, key in enumerate(structural)
+        }
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        structural_ordinals = self._planned_structural_ordinals()
+        version_changes = []
+        identity_changes = []
+        effective_keys = []
+        structural_keys = []
+
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            baseline_incarnation = (
+                self._baseline_incarnation_id(key)
+                if baseline_exists else None
+            )
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=LAZY_PERSON_SCHEMA,
+                        )
+                    )
+                    identity_changes.append(
+                        IdentityOccurrenceChange(
+                            self._namespace,
+                            key,
+                            (),
+                            delete=True,
+                        )
+                    )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+
+            record = dict.__getitem__(self, key)
+            payload = self._store.codec.encode(record)
+            incarnation = self._session._registry.incarnation_for_object(record)
+            if incarnation is None:
+                raise StoreIntegrityError(
+                    "current lazy Person has no runtime incarnation"
+                )
+            if incarnation.store_identity != self._store.store_identity:
+                raise StoreIntegrityError(
+                    "current lazy Person incarnation belongs to another store"
+                )
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new
+                or reinsertion
+                or payload != self._baseline_bytes(key)
+            )
+            if is_new or reinsertion:
+                ordinal = structural_ordinals[key]
+            else:
+                ordinal = self._persisted_ordinal(key)
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        record,
+                        record_schema=LAZY_PERSON_SCHEMA,
+                        memberships=(
+                            Membership("alive", bool(record.alive), ordinal),
+                        ),
+                        reinsertion=reinsertion,
+                    )
+                )
+            if baseline_incarnation != incarnation.value:
+                identity_changes.append(
+                    IdentityOccurrenceChange(
+                        self._namespace,
+                        key,
+                        (),
+                        incarnation_id=incarnation.value,
+                    )
+                )
+            if value_changed or baseline_incarnation != incarnation.value:
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+
+        return (
+            tuple(version_changes),
+            tuple(identity_changes),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in plan.touched_keys:
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                record = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(record)
+                incarnation = self._session._registry.incarnation_for_object(
+                    record
+                )
+                self._baseline_incarnation[key] = (
+                    None if incarnation is None else incarnation.value
+                )
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        "committed lazy Person lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_incarnation[key] = None
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
 
     def diagnostics(self):
         return {
@@ -652,6 +1027,10 @@ class LazyRecordTable(RecordTable):
             "clean_cache_entries": len(self._lru),
             "clean_cache_limit": self._clean_limit,
             "person_payload_loads": self._loads,
+            "dirty_people": len(self._dirty),
+            "removed_people": len(self._removed),
+            "new_people": len(self._new_keys),
+            "reinserted_people": len(self._reinserted),
         }
 
 
@@ -667,20 +1046,26 @@ class _LazyLifetime:
         return session
 
     def ensure_mutation(self, _operation="mutation"):
+        # World/EventLog mutation is not yet part of the people-only write gate.
+        session = self._session()
+        session._ensure_people_mutation_allowed()
         raise StoreError(
-            "lazy people pilot mutation is not enabled until lifecycle integration"
+            "non-people lazy World mutation is not enabled yet"
         )
 
     def ensure_simulation(self, _operation="simulation"):
+        self._session()
         raise StoreError(
-            "lazy people pilot simulation is not enabled until lifecycle integration"
+            "lazy World simulation is not enabled until non-people/EventLog integration"
         )
 
     def ensure_eventlog_read(self):
         self._session()
 
     def begin_operation(self, operation, *, allow_stale=False):
-        self._session()
+        session = self._session()
+        if session._state == "stale" and not allow_stale:
+            raise StoreConflictError("lazy World session is stale")
 
     def end_operation(self, operation):
         self._session()
@@ -700,6 +1085,7 @@ class LazyWorldSession:
         links,
         prefix,
         next_incarnation,
+        head,
     ):
         self.store = store
         self.pin = pin
@@ -708,6 +1094,9 @@ class LazyWorldSession:
         self.identity_links = tuple(links)
         self.prefix = prefix
         self._active = True
+        self._state = "active"
+        self._pending_save: LazyPeopleSavePlan | None = None
+        self._head = head
         self._registry = LazyIdentityRegistry(
             store.store_identity,
             next_incarnation=next_incarnation,
@@ -721,6 +1110,57 @@ class LazyWorldSession:
     def _ensure_active(self):
         if not self._active:
             raise StoreError("lazy World session is closed")
+
+    def _ensure_people_mutation_allowed(self):
+        self._ensure_active()
+        if self._state == "stale":
+            raise StoreConflictError("lazy World session is stale")
+        if self._state != "active":
+            raise StoreError(
+                f"lazy World mutation is unavailable while {self._state}"
+            )
+
+    def _top_occurrence(self, key):
+        return Occurrence(PEOPLE_NAMESPACE, key, ())
+
+    def _bind_assigned_person(self, key, person):
+        existing = self._registry.incarnation_for_object(person)
+        if existing is None:
+            existing = self._registry.bind(person)
+        occurrences = self._registry.occurrences_for_incarnation(existing)
+        foreign = [
+            item for item in occurrences
+            if item != self._top_occurrence(key)
+        ]
+        if foreign:
+            raise StoreError(
+                "one Person incarnation cannot be current at multiple people keys"
+            )
+        self._registry.attach_occurrence(
+            person, self._top_occurrence(key)
+        )
+        return existing
+
+    def _detach_assigned_person(self, key, person):
+        incarnation = self._registry.incarnation_for_object(person)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._top_occurrence(key), expected=incarnation
+            )
+
+    def _detach_unloaded_person(self, key):
+        baseline = self.people._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        self._registry.attach_existing(
+            incarnation, self._top_occurrence(key)
+        )
+        self._registry.detach_occurrence(
+            self._top_occurrence(key), expected=incarnation
+        )
 
     def _bind_loaded_person(self, key, person):
         owner = (PEOPLE_NAMESPACE, key)
@@ -758,6 +1198,7 @@ class LazyWorldSession:
                         incarnation=incarnation,
                     )
                 self._registry.attach_existing(incarnation, occurrence)
+                self.people._baseline_incarnation[key] = incarnation.value
                 continue
 
             current = _relative_get(result, path)
@@ -773,8 +1214,6 @@ class LazyWorldSession:
                 )
             self._registry.attach_existing(incarnation, occurrence)
 
-        # Prove label completeness for this decoded owner without walking any
-        # unrelated Person/archive rows.
         from .persistence_schema import RECORD_FIELDS
 
         probe = IdentityOccurrenceIndex(
@@ -794,9 +1233,149 @@ class LazyWorldSession:
             )
         return result
 
+    def _validate_people_only_head_changes(self, structural_keys):
+        expected = self._head.metadata
+        if self.world.seed != expected["seed"]:
+            raise StoreError("people-only lazy save cannot change World seed")
+        if self.world.year != expected["simulation_position"]:
+            raise StoreError("people-only lazy save cannot advance simulation year")
+        current_next = {
+            key: getattr(self.world, key)
+            for key in (
+                "next_person",
+                "next_household",
+                "next_settlement",
+                "next_event",
+            )
+        }
+        baseline_next = expected["next_ids"]
+        for key in ("next_household", "next_settlement", "next_event"):
+            if current_next[key] != baseline_next[key]:
+                raise StoreError(
+                    f"people-only lazy save cannot change {key}"
+                )
+        if (
+            current_next["next_person"] != baseline_next["next_person"]
+            and not structural_keys
+        ):
+            raise StoreError(
+                "next_person changed without a people structural edit"
+            )
+        return {
+            "simulation_position": self.world.year,
+            "seed": self.world.seed,
+            "next_ids": current_next,
+            "namespaces": expected["namespaces"],
+        }
+
+    def _prepare_people_save(self):
+        (
+            version_changes,
+            identity_changes,
+            touched_keys,
+            structural_keys,
+        ) = self.people.prepare_save_changes()
+        metadata = self._validate_people_only_head_changes(structural_keys)
+        if (
+            not version_changes
+            and not identity_changes
+            and metadata["next_ids"] == self._head.metadata["next_ids"]
+        ):
+            return None
+        token = uuid.uuid4().hex
+        target = self.pin.captured_head + 1
+        ordinary = (
+            RecordChange(
+                EVENT_STORAGE,
+                COMMIT_DESCRIPTOR_KEY,
+                (1, target, token),
+                record_schema=SESSION_DESCRIPTOR_SCHEMA,
+            ),
+        )
+        return LazyPeopleSavePlan(
+            token=token,
+            target_generation=target,
+            version_changes=version_changes,
+            identity_changes=identity_changes,
+            ordinary_changes=ordinary,
+            metadata=metadata,
+            touched_keys=touched_keys,
+            structural_keys=structural_keys,
+        )
+
+    def _accept_people_save(self, plan, result):
+        self.pin = result.pin
+        self.people.accept_save(plan, result.pin)
+        self._head = self.store.checked_head()
+        self._pending_save = None
+        self._state = "active"
+
+    def save(self):
+        self._ensure_people_mutation_allowed()
+        plan = self._prepare_people_save()
+        if plan is None:
+            return self.pin.captured_head
+        self._pending_save = plan
+        self._state = "saving"
+        try:
+            result = self.store.commit(
+                self.pin,
+                commit_token=plan.token,
+                version_changes=plan.version_changes,
+                identity_changes=plan.identity_changes,
+                next_incarnation_id=self._registry.next_incarnation,
+                changes=plan.ordinary_changes,
+                new_segments=(),
+                metadata=plan.metadata,
+            )
+        except Exception:
+            self._state = "recovery-required"
+            raise
+        if result.outcome == "conflict":
+            self._state = "stale"
+            raise StoreConflictError("lazy World save lost the generation race")
+        if result.outcome == "not_committed":
+            self._pending_save = None
+            self._state = "active"
+            return result.generation
+        if result.outcome != "committed":
+            self._state = "recovery-required"
+            raise StoreIntegrityError(
+                f"unexpected lazy save outcome: {result.outcome}"
+            )
+        self._accept_people_save(plan, result)
+        return result.generation
+
+    def resolve_save(self):
+        self._ensure_active()
+        if self._state == "stale":
+            raise StoreConflictError("lazy World session is stale")
+        plan = self._pending_save
+        if plan is None:
+            if self._state != "active":
+                raise StoreError(
+                    f"lazy session has no resolvable save while {self._state}"
+                )
+            return self.pin.captured_head
+        if self._state != "recovery-required":
+            raise StoreError(
+                f"lazy save cannot resolve while {self._state}"
+            )
+        result = self.store.resolve_commit(self.pin, plan.token)
+        if result.outcome == "committed":
+            self._accept_people_save(plan, result)
+            return result.generation
+        if result.outcome == "not_committed":
+            self._pending_save = None
+            self._state = "active"
+            return result.generation
+        self._state = "stale"
+        raise StoreConflictError("lazy World save resolved as stale/conflict")
+
     def diagnostics(self):
         self._ensure_active()
         return {
+            "state": self._state,
             "people": self.people.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
@@ -805,6 +1384,10 @@ class LazyWorldSession:
     def close(self):
         if not self._active:
             return
+        if self._state == "recovery-required":
+            raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
         self._lifetime.close()
         self.prefix.close()
         try:
@@ -813,6 +1396,7 @@ class LazyWorldSession:
             self._registry.close()
             self.store.close()
             self._active = False
+            self._state = "closed"
 
     def __enter__(self):
         self._ensure_active()
@@ -820,7 +1404,6 @@ class LazyWorldSession:
 
     def __exit__(self, *_args):
         self.close()
-
 
 def _begin_matching_snapshot(store, pin):
     store.db.execute("BEGIN")
@@ -987,6 +1570,7 @@ def open_lazy_world_session(path, *, rules_id):
                 links,
                 prefix,
                 next_incarnation,
+                head,
             )
             prefix = None
             pin = None
