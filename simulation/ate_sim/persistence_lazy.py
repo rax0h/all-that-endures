@@ -1180,8 +1180,15 @@ class LazyRecordTable(RecordTable):
         self._evict_clean()
 
     def diagnostics(self):
+        # Diagnostics remain readable while save acknowledgement is uncertain;
+        # do not route through guarded mapping reads here.
+        logical_people = (
+            self._baseline_count
+            - len(self._removed)
+            + len(self._new_keys)
+        )
         return {
-            "logical_people": len(self),
+            "logical_people": logical_people,
             "resident_people": dict.__len__(self),
             "clean_cache_entries": len(self._lru),
             "clean_cache_limit": self._clean_limit,
@@ -1695,7 +1702,12 @@ class LazyWorldSession:
                 "lazy save cannot run inside current_people_scope"
             )
 
-        plan = self._prepare_hybrid_save()
+        try:
+            plan = self._prepare_hybrid_save()
+        except StoreConflictError:
+            self._eager_tracker._cold_state = "stale"
+            self._state = "stale"
+            raise
         if plan is None:
             return self.pin.captured_head
 
