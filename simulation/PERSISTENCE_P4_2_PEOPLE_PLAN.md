@@ -137,3 +137,50 @@ D/F/N authority or stale-state semantics.
 Run focused conversion/open/query tests plus P4.1/P4.2 storage regressions.
 Do not run a full suite until the integrated save/lifecycle product bytes
 stabilize. No millennium/endurance, balance, default-checkpoint, Stage 1 or merge.
+
+
+## People write subgate
+
+This subgate enables only the already-migrated `world.people` family. It does
+not yet enable `Simulation.step()`, EventLog mutation or non-people root
+mutation.
+
+Implementation:
+- `LazyRecordTable.changed()` records loaded Person field edits and keeps dirty
+  entries resident.
+- table insert/delete/replacement are local overlays over the captured pin;
+  inherited dict storage remains cache only.
+- structural insertion order is allocated from the checked namespace
+  `next_ordinal`; existing updates preserve ordinal; delete+reinsert receives a
+  new ordinal.
+- top-level Person incarnation is the authoritative occurrence for this family:
+  same live object remove/reinsert preserves its incarnation; distinct
+  replacement gets a new one; retained old aliases are detached.
+- save emits only effective `VersionChange` /
+  `IdentityOccurrenceChange` rows and the checked World head metadata.
+- redundant field assignment or a structural sequence whose final state equals
+  the captured baseline is a true no-op where possible; no lifetime attempt log.
+- save conflict marks the session stale and retains local overlays; after stale
+  detection further people mutation/save is rejected.
+- lost/ambiguous acknowledgement keeps the exact token and frozen change plan;
+  `resolve_save()` delegates to `LazyRecordStore.resolve_commit()`.
+  Committed resolution advances the pin and clears only the plan's dirty state;
+  not-committed resolution returns to active with edits retained; conflict marks
+  stale.
+- close releases the current pin only when no unresolved acknowledgement exists.
+
+Focused proofs:
+1. one Person scalar edit writes one payload and reopens exactly;
+2. no-op save writes zero payloads and does not advance;
+3. insert/delete/replacement and delete+reinsert preserve exact order/query
+   membership and incarnation rules;
+4. retained replaced alias remains detached and cannot dirty the replacement;
+5. fixed-H local edit does not decode or rewrite unrelated people;
+6. failed publication leaves old complete state and edits retryable;
+7. lost acknowledgement resolves committed exactly once;
+8. competing writer causes stale state; local edits remain inspectable but
+   further bound mutation/save is rejected;
+9. save/reopen `current_people()` matches an eager control.
+
+Only after this subgate passes do EventLog/non-people tracking and
+materializing detach become eligible.
