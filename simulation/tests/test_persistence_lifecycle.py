@@ -10,11 +10,8 @@ from ate_sim.incremental_store import (
     StoreFormatError,
     TransactionalStore,
 )
-from ate_sim.persistence_adapters import (
-    bind_snapshot,
-    read_snapshot,
-    write_snapshot,
-)
+from ate_sim.persistence_adapters import read_snapshot, write_snapshot
+from ate_sim.persistence_tracking import bind_snapshot
 from ate_sim.persistence_events import CHUNK_SIZE
 from ate_sim.persistence_session import open_world_session, write_cold_snapshot
 import ate_sim.core as core
