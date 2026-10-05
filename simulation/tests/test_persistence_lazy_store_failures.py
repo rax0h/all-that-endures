@@ -1,6 +1,7 @@
 import json
 import os
 import signal
+import sqlite3
 import subprocess
 import sys
 import threading
@@ -179,7 +180,7 @@ def test_only_latest_receipt_per_pin_is_resolvable(tmp_path):
             metadata=metadata(2, ("people",)),
         )
         assert r2.generation == 2
-        with pytest.raises(StoreConflictError, match="latest receipt"):
+        with pytest.raises(StoreConflictError, match="latest attempt"):
             store.resolve_commit(pin0, "one")
         assert store.resolve_commit(r1.pin, "two").generation == 2
         assert store.db.execute("SELECT COUNT(*) FROM pin_receipts").fetchone()[0] == 1
@@ -480,3 +481,208 @@ def test_copy_current_head_no_overwrite_failure_cleanup_and_corruption_rejection
             expected_rules_id="stage-0.5",
         )
     assert not corrupt.exists()
+
+
+
+def test_release_old_pin_transactionally_reclaims_then_verify_backup_copy_and_reopen(tmp_path):
+    source = tmp_path / "release-source.sqlite"
+    backup = tmp_path / "release-backup.sqlite"
+    copied = tmp_path / "release-copy.sqlite"
+    with make_store(source) as store:
+        writer = store.capture_pin()
+        writer = full_commit(store, writer, "g1", "one", 1).pin
+        old = store.capture_pin()
+        writer = full_commit(store, writer, "g2", "two", 2).pin
+        assert store.storage_metrics()["lazy_record_versions"] == 2
+
+        store.release_pin(old)
+        assert store.storage_metrics()["lazy_record_versions"] == 1
+        assert store.verify_all()["generation"] == 2
+        store.backup(backup)
+        result = LazyRecordStore.copy_current_head(
+            source,
+            copied,
+            codec=codec(),
+            expected_simulation_schema="8",
+            expected_rules_id="stage-0.5",
+        )
+        assert result.generation == 2
+        assert store.verify_all()["generation"] == 2
+
+    with open_store(backup) as reopened:
+        assert reopened.verify_all()["generation"] == 2
+    with open_store(copied) as recovered:
+        assert recovered.verify_all()["generation"] == 2
+
+
+def test_release_cleanup_failure_rolls_back_pin_and_reclamation_and_last_pin_release_is_healthy(tmp_path):
+    path = tmp_path / "release-fault.sqlite"
+    with make_store(path) as store:
+        writer = store.capture_pin()
+        writer = full_commit(store, writer, "g1", "one", 1).pin
+        old = store.capture_pin()
+        writer = full_commit(store, writer, "g2", "two", 2).pin
+        before = store.storage_metrics()["lazy_record_versions"]
+
+        store._phase_hook = lambda phase: (
+            (_ for _ in ()).throw(OSError("cleanup fail"))
+            if phase == "during_pin_release_cleanup"
+            else None
+        )
+        with pytest.raises(OSError, match="cleanup fail"):
+            store.release_pin(old)
+        store._phase_hook = lambda phase: None
+        assert store.db.execute(
+            "SELECT COUNT(*) FROM generation_pins WHERE token=?", (old.token,)
+        ).fetchone() == (1,)
+        assert store.storage_metrics()["lazy_record_versions"] == before
+        store.verify_all()
+
+        store.release_pin(old)
+        store.verify_all()
+        store.release_pin(writer)
+        assert store.verify_all()["pins"] == 0
+        assert store.storage_metrics()["lazy_record_versions"] == 1
+
+
+def test_corrupt_operational_metadata_cannot_drive_release_reclamation(tmp_path):
+    path = tmp_path / "corrupt-pin.sqlite"
+    with make_store(path) as store:
+        writer = store.capture_pin()
+        writer = full_commit(store, writer, "g1", "one", 1).pin
+        old = store.capture_pin()
+        writer = full_commit(store, writer, "g2", "two", 2).pin
+        before = store.storage_metrics()["lazy_record_versions"]
+        store.db.execute(
+            "UPDATE generation_pins SET row_checksum='bad' WHERE token=?", (writer.token,)
+        )
+        store.db.commit()
+        with pytest.raises(StoreIntegrityError, match="pin checksum"):
+            store.release_pin(old)
+        assert store.storage_metrics()["lazy_record_versions"] == before
+        assert store.db.execute(
+            "SELECT COUNT(*) FROM generation_pins WHERE token=?", (old.token,)
+        ).fetchone() == (1,)
+
+
+def test_failed_later_attempt_resolves_against_attempt_not_older_receipt_and_can_retry(tmp_path):
+    path = tmp_path / "attempt-after-success.sqlite"
+    with make_store(path) as store:
+        pin0 = store.capture_pin()
+        first = full_commit(store, pin0, "old-success", "one", 1)
+        pin = first.pin
+
+        store._phase_hook = lambda phase: (
+            (_ for _ in ()).throw(OSError("new failed"))
+            if phase == "before_commit"
+            else None
+        )
+        with pytest.raises(OSError, match="new failed"):
+            full_commit(store, pin, "new-attempt", "two", 2)
+        store._phase_hook = lambda phase: None
+
+        result = store.resolve_commit(pin, "new-attempt")
+        assert result.outcome == "not_committed"
+        assert result.generation == 1
+        assert store.resolve_commit(pin, "new-attempt") == result
+        with pytest.raises(StoreConflictError, match="latest attempt"):
+            store.resolve_commit(pin0, "old-success")
+        with pytest.raises(StoreConflictError, match="latest attempt"):
+            store.resolve_commit(pin, "unknown")
+
+        later = full_commit(store, pin, "later-success", "three", 3)
+        assert later.outcome == "committed"
+        assert later.generation == 2
+        assert store.read_version(
+            later.pin, "people", 1, expected_record_schema=1
+        ).value == "three"
+
+
+def test_failed_attempt_then_competing_winner_resolves_conflict_without_guessing(tmp_path):
+    path = tmp_path / "attempt-competitor.sqlite"
+    seed = make_store(path)
+    pin = seed.capture_pin()
+    pin = full_commit(seed, pin, "old-success", "one", 1).pin
+    competitor_pin = seed.capture_pin()
+    seed._phase_hook = lambda phase: (
+        (_ for _ in ()).throw(OSError("failed before commit"))
+        if phase == "before_commit"
+        else None
+    )
+    with pytest.raises(OSError):
+        full_commit(seed, pin, "failed-new", "two", 2)
+    seed._phase_hook = lambda phase: None
+    seed.close()
+
+    with open_store(path) as competitor:
+        winner = full_commit(competitor, competitor_pin, "winner", "winner", 2)
+        resolved = competitor.resolve_commit(pin, "failed-new")
+        assert resolved.outcome == "conflict"
+        assert resolved.stale
+        assert resolved.generation == 2
+        with pytest.raises(GenerationPressureError):
+            full_commit(competitor, winner.pin, "blocked", "later", 3)
+
+
+def test_actual_commit_then_sqlite_error_is_resolved_as_committed(tmp_path):
+    path = tmp_path / "ambiguous-sqlite-commit.sqlite"
+    store = make_store(path)
+    pin = store.capture_pin()
+    original = store._commit_sqlite
+
+    def commit_then_raise():
+        original()
+        raise sqlite3.OperationalError("simulated ambiguous sqlite acknowledgement")
+
+    store._commit_sqlite = commit_then_raise
+    with pytest.raises(sqlite3.OperationalError, match="ambiguous"):
+        full_commit(store, pin, "ambiguous", "new", 1)
+    with pytest.raises(StoreConflictError, match="unresolved"):
+        store.release_pin(pin)
+    store.close()
+
+    with open_store(path) as recovered:
+        result = recovered.resolve_commit(pin, "ambiguous")
+        assert result.outcome == "committed"
+        assert result.generation == 1
+        assert recovered.read_version(
+            result.pin, "people", 1, expected_record_schema=1
+        ).value == "new"
+        recovered.verify_all()
+
+
+def test_sqlite_commit_error_before_commit_resolves_not_committed(tmp_path):
+    path = tmp_path / "sqlite-commit-fail.sqlite"
+    store = make_store(path)
+    pin = store.capture_pin()
+
+    def fail_commit():
+        raise sqlite3.OperationalError("simulated sqlite commit failure")
+
+    store._commit_sqlite = fail_commit
+    with pytest.raises(sqlite3.OperationalError, match="commit failure"):
+        full_commit(store, pin, "failed", "new", 1)
+    store._commit_sqlite = store.db.commit
+    result = store.resolve_commit(pin, "failed")
+    assert result.outcome == "not_committed"
+    assert result.generation == 0
+    assert store.generation == 0
+    store.verify_all()
+    store.close()
+
+
+def test_verify_all_reuses_owned_snapshot_and_standalone_leaves_no_transaction(tmp_path):
+    path = tmp_path / "verify-snapshot.sqlite"
+    with make_store(path) as store:
+        pin = store.capture_pin()
+        pin = full_commit(store, pin, "g1", "one", 1).pin
+        assert not store.db.in_transaction
+        store.verify_all()
+        assert not store.db.in_transaction
+
+        store.db.execute("BEGIN")
+        assert store.db.in_transaction
+        store.verify_all()
+        assert store.db.in_transaction
+        store.db.rollback()
+        assert not store.db.in_transaction
