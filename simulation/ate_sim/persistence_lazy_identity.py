@@ -376,6 +376,19 @@ class LazyIdentityRegistry:
             groups.append(frozenset(component))
         return tuple(groups)
 
+    def live_bindings(self):
+        """Return currently live incarnation/object pairs without retaining them."""
+        self._ensure_open()
+        rows = []
+        for incarnation, reference in tuple(self._by_incarnation.items()):
+            obj = reference()
+            if obj is None:
+                self._by_incarnation.pop(incarnation, None)
+                continue
+            rows.append((incarnation, obj))
+        rows.sort(key=lambda item: item[0])
+        return tuple(rows)
+
     def diagnostics(self) -> dict[str, int]:
         self._ensure_open()
         live = sum(1 for reference in self._by_incarnation.values() if reference() is not None)
