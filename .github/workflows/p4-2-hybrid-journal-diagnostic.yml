@@ -1,0 +1,70 @@
+name: P4.2 hybrid journal diagnostic
+
+on:
+  push:
+    branches:
+      - sol-p4-2-hybrid-journal-diagnostic
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from collections import Counter
+          from ate_sim import Simulation, generate_world
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_adapters import META, COLLECTION_LAYOUT, RECORD_SCHEMA
+          RULES="diag-hybrid-journal"
+
+          with tempfile.TemporaryDirectory() as d:
+              d=Path(d)
+              w=generate_world(918273,width=8,height=6,settlements=1)
+              w.event_ids={event.id for event in w.events}
+              cold=d/"cold.sqlite"; lazy=d/"lazy.sqlite"
+              write_cold_snapshot(w,cold,rules_id=RULES)
+              convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+
+              s=open_lazy_world_session(lazy,rules_id=RULES)
+              try:
+                  t=s._eager_tracker
+                  before={ns:t._cold_head.namespace_counts.get(ns,(0,0))[0] for ns in t._root_containers}
+                  Simulation(s.world).step()
+                  dirty=Counter(ns for ns,_ in t._dirty)
+                  deleted=Counter(ns for ns,_ in t._deleted)
+                  changed=[]
+                  for ns,container in t._root_containers.items():
+                      if ns=="world.events" or ns=="world.people":
+                          continue
+                      try:
+                          live=len(container)
+                      except TypeError:
+                          continue
+                      if live!=before.get(ns,0) or dirty[ns] or deleted[ns]:
+                          changed.append((ns,before.get(ns,0),live,dirty[ns],deleted[ns],t._description(ns)))
+                  print("PRE_SAVE_CHANGED",changed)
+                  gen=s.save()
+                  print("GEN",gen)
+                  head=s.store.checked_head()
+                  metadata={k:v for k,v,_ in s.store.read_records(META,expected_record_schema=RECORD_SCHEMA)}
+                  layout=metadata.get(COLLECTION_LAYOUT) or s.manifest["collections"]
+                  mismatches=[]
+                  for ns,desc in layout.items():
+                      if ns in ("world.events","world.people"):
+                          continue
+                      hc=head.namespace_counts.get(ns,(0,0))[0]
+                      if hc!=desc[1]:
+                          mismatches.append((ns,desc[1],hc,dirty[ns],deleted[ns]))
+                  print("POST_SAVE_MISMATCHES",mismatches)
+              finally:
+                  s.close()
+          PY
