@@ -3,7 +3,7 @@
 **Implementation baseline:** `953240816b6d332aa95e65a26b463b10a4b58ef4`  
 **Stable P4.1 code candidate:** `c3f3525d7ddf3b2afdf39946a6fa9add9dd98225`  
 **Focused gate:** Actions run `37307695625` — **56 passed in 5.10 s**.  
-**Full simulation/tests gate:** Actions run `37307789377` — launched against the exact stable code candidate above; result pending at this documentation commit. Do not infer acceptance until that run is green and this record is finalized.
+**Full simulation/tests gate:** Actions run `37307789377` — **674 passed in 1737.93 s (28:57)** against the exact stable code candidate above.
 
 ## Scope landed
 
@@ -267,6 +267,9 @@ Not implemented or run in P4.1:
 - Stage 1;
 - merge.
 
-P4.1 is not architecturally accepted until the full `simulation/tests` gate
-(run `37307789377`) is confirmed green and this validation record is finalized
-with its actual result.
+The required implementation validation is complete: focused run `37307695625`
+passed **56/56 in 5.10 s**, and full `simulation/tests` run `37307789377`
+passed **674/674 in 1737.93 s (28:57)** against stable code candidate
+`c3f3525d7ddf3b2afdf39946a6fa9add9dd98225`. P4.1 now stops for architect
+review; this validation record does not authorize P4.2 implementation or any
+excluded work listed above.
