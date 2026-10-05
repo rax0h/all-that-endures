@@ -1,0 +1,23 @@
+name: P4.1 full suite gate
+
+on:
+  push:
+    branches: [sol/p4-1-apply]
+    paths: [.github/workflows/p4-1-full.yml]
+
+jobs:
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: c3f3525d7ddf3b2afdf39946a6fa9add9dd98225
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: Full simulation unit and integration suite only
+        run: pytest -vv --durations=20 simulation/tests
