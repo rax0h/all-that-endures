@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import fields, is_dataclass
 import pickle
+import weakref
 import zlib
 
 from .core import Event
@@ -187,6 +188,7 @@ def _stage_plain_graph(session, old_log, new_log):
     memo = {id(old_log): new_log}
     assignments = []
     cache_removals = []
+    index_rebindings = []
 
     def stage(value):
         cls = type(value)
@@ -211,7 +213,17 @@ def _stage_plain_graph(session, old_log, new_log):
             result = RecordTable()
             memo[ident] = result
             for key, child in value.items():
-                result[stage(key)] = stage(child)
+                staged_key = stage(key)
+                staged_child = stage(child)
+                # Staging must not call RecordTable.__setitem__: that would
+                # rewrite the live IndexedRecord's _index_table/_index_key
+                # before publication. Build the detached table structurally,
+                # then rebind record index metadata only during publication.
+                dict.__setitem__(result, staged_key, staged_child)
+                if hasattr(staged_child, "_index_table"):
+                    index_rebindings.append(
+                        (staged_child, result, staged_key)
+                    )
             return result
         if isinstance(value, (TrackedDict, _RootDict)):
             result = {}
@@ -291,10 +303,17 @@ def _stage_plain_graph(session, old_log, new_log):
     staged_world = stage(session.world)
     if staged_world is not session.world:
         raise StoreIntegrityError("detach cannot replace the World object")
-    return assignments, cache_removals
+    return assignments, cache_removals, index_rebindings
 
 
-def _publish_detach(session, old_log, new_log, assignments, cache_removals):
+def _publish_detach(
+    session,
+    old_log,
+    new_log,
+    assignments,
+    cache_removals,
+    index_rebindings,
+):
     """Publish a fully staged standalone graph; remaining steps are teardown."""
     old_prefix = old_log._disk_prefix
     pending_old_prefix = session._cold_old_prefix_pending
@@ -307,6 +326,9 @@ def _publish_detach(session, old_log, new_log, assignments, cache_removals):
         for obj, names in cache_removals:
             for name in names:
                 obj.__dict__.pop(name, None)
+        for record, table, key in index_rebindings:
+            object.__setattr__(record, "_index_table", weakref.ref(table))
+            object.__setattr__(record, "_index_key", key)
         session.world.__dict__.pop("_ate_persistence_lifetime", None)
         new_log.__dict__.pop("_ate_persistence_lifetime", None)
     finally:
@@ -347,12 +369,17 @@ def detach(session, *, materialize_history=False):
         _lifecycle_phase("before_history", session)
         new_log = _standalone_log(old_log, session)
         _lifecycle_phase("after_history", session)
-        assignments, cache_removals = _stage_plain_graph(
+        assignments, cache_removals, index_rebindings = _stage_plain_graph(
             session, old_log, new_log
         )
         _lifecycle_phase("before_publish", session)
         world = _publish_detach(
-            session, old_log, new_log, assignments, cache_removals
+            session,
+            old_log,
+            new_log,
+            assignments,
+            cache_removals,
+            index_rebindings,
         )
         published = True
         return world
