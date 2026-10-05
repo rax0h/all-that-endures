@@ -1,0 +1,1 @@
+Trigger post-migration magic-family residual measurement.
