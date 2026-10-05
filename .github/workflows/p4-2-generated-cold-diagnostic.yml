@@ -19,7 +19,7 @@ jobs:
           from pathlib import Path
           import tempfile
           from ate_sim import generate_world
-          from ate_sim.persistence_adapters import write_snapshot, WorldCodec, SCHEMA, _read_manifest
+          from ate_sim.persistence_adapters import write_snapshot, WorldCodec, SCHEMA, _read_cold_manifest
           from ate_sim.incremental_store import TransactionalStore
           from ate_sim.persistence_session import (
               _normalized_bootstrap_view,
@@ -48,7 +48,7 @@ jobs:
                       projected_links=projected_links,
                   )
                   with s.read_transaction():
-                      m=_read_manifest(s)
+                      m=_read_cold_manifest(s)
                       h=s.checked_head()
                       mismatches=[]
                       for ns,desc in m["collections"].items():
