@@ -647,7 +647,7 @@ class LazyRecordTable(RecordTable):
 
     def diagnostics(self):
         return {
-            "loaded_people": len(self),
+            "logical_people": len(self),
             "resident_people": dict.__len__(self),
             "clean_cache_entries": len(self._lru),
             "clean_cache_limit": self._clean_limit,
@@ -699,6 +699,7 @@ class LazyWorldSession:
         manifest,
         links,
         prefix,
+        next_incarnation,
     ):
         self.store = store
         self.pin = pin
@@ -709,7 +710,7 @@ class LazyWorldSession:
         self._active = True
         self._registry = LazyIdentityRegistry(
             store.store_identity,
-            next_incarnation=store.read_identity_state(pin),
+            next_incarnation=next_incarnation,
         )
         self.people = LazyRecordTable(self)
         object.__setattr__(world, "people", self.people)
@@ -975,8 +976,17 @@ def open_lazy_world_session(path, *, rules_id):
                     "lazy World next_event disagrees with EventLog"
                 )
 
+            next_incarnation = store._identity_state_at(
+                head.generation
+            )[0]
             session = LazyWorldSession(
-                store, pin, world, manifest, links, prefix
+                store,
+                pin,
+                world,
+                manifest,
+                links,
+                prefix,
+                next_incarnation,
             )
             prefix = None
             pin = None
