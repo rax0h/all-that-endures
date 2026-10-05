@@ -80,6 +80,17 @@ class _ColdLifetime:
                 "cold EventLog is unavailable until save acknowledgement resolves"
             )
 
+    def begin_operation(self, operation, *, allow_stale=False):
+        session = self._session()
+        session._begin_lifecycle_operation(
+            operation, allow_stale=allow_stale
+        )
+
+    def end_operation(self, operation):
+        session = self._session_ref()
+        if session is not None and session._active:
+            session._end_lifecycle_operation(operation)
+
     def close(self):
         self.closed = True
         self._session_ref = lambda: None
@@ -1003,6 +1014,7 @@ class IncrementalWorldSession:
         self._cold_persisted_keys = {}
         self._cold_step_depth = 0
         self._cold_operation_depth = 0
+        self._cold_operation_name = None
         self._cold_head = None
         self._cold_prefix_descriptor = None
         self._cold_tail_descriptor = None
@@ -1035,6 +1047,48 @@ class IncrementalWorldSession:
             raise StoreError(
                 f"cold World session mutation is blocked while {self._cold_state}"
             )
+        if self._cold_mode and self._cold_operation_depth:
+            raise StoreError(
+                "cold World session mutation is blocked during "
+                f"{self._cold_operation_name or 'an active operation'}"
+            )
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        if not self._cold_mode:
+            raise StoreError(
+                f"{operation} is only available for cold World sessions"
+            )
+        if self._cold_operation_depth:
+            raise StoreError(
+                f"reentrant cold session {operation} is not allowed"
+            )
+        if self._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._cold_state == "active" or (
+            allow_stale and self._cold_state == "stale"
+        )
+        if not allowed:
+            raise StoreError(
+                f"cold session cannot {operation} while {self._cold_state}"
+            )
+        self._cold_operation_depth = 1
+        self._cold_operation_name = operation
+
+    def _end_lifecycle_operation(self, operation):
+        if (
+            self._cold_operation_depth != 1
+            or self._cold_operation_name != operation
+        ):
+            raise StoreError("cold lifecycle operation guard changed")
+        self._cold_operation_depth = 0
+        self._cold_operation_name = None
 
     def _initialize_cold_persisted_keys(self):
         if not self._cold_mode:
@@ -2138,6 +2192,20 @@ class IncrementalWorldSession:
             raise StoreError("resolve_save is only available for cold World sessions")
         from .persistence_cold_save import resolve_cold_save
         return resolve_cold_save(self)
+
+    def detach(self, *, materialize_history=False):
+        if not self._cold_mode:
+            raise StoreError("detach is only available for cold World sessions")
+        from .persistence_lifecycle import detach
+        return detach(self, materialize_history=materialize_history)
+
+    def verify_history(self):
+        if not self._cold_mode:
+            raise StoreError(
+                "verify_history is only available for cold World sessions"
+            )
+        from .persistence_lifecycle import verify_history
+        return verify_history(self)
 
     @property
     def cold_state(self):
