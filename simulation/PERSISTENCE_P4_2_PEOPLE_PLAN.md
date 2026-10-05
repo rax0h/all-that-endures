@@ -455,3 +455,17 @@ Contract:
 
 After this gate, rerun the 1k/10k residual measurement. The owner-index migration
 passes only if ordinary open no longer scales with owner-index payload count.
+
+
+### Owner-index migration result
+
+Post-migration residual measurement (run 37389555878) is flat:
+- 1,000 owner buckets: 33 payload reads, 16,673 bytes;
+- 10,000 owner buckets: 33 payload reads, 16,680 bytes;
+- resource payload loads = 0;
+- aspiration payload loads = 0;
+- owner-bucket payload loads = 0.
+
+This closes the measured magic-resource/aspiration/owner-index open-scaling
+source. The remaining 33 reads are unrelated eager metadata/current families and
+must be attributed by subsequent residual-family measurements.
