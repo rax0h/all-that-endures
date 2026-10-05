@@ -288,9 +288,22 @@ def prepare_sealed_append(
 class SealedEventPrefix(Sequence):
     """Read-only view of one committed immutable sealed-event prefix."""
 
+    @staticmethod
+    def _require_checked_store(store):
+        required = (
+            "read_transaction",
+            "read_record",
+            "read_segment_checked",
+            "generation",
+            "db",
+            "_ensure_open",
+        )
+        if any(not hasattr(store, name) for name in required):
+            raise TypeError("store must provide checked persistence reads")
+        return store
+
     def __init__(self, store: TransactionalStore):
-        if not isinstance(store, TransactionalStore):
-            raise TypeError("store must be a TransactionalStore")
+        self._require_checked_store(store)
         with store.read_transaction() as generation:
             descriptor = _read_descriptor(store, allow_absent=False)
         self._initialize(store, generation, descriptor)
@@ -305,8 +318,7 @@ class SealedEventPrefix(Sequence):
         can capture the head and prefix descriptor from one SQLite snapshot
         without nesting TransactionalStore.read_transaction().
         """
-        if not isinstance(store, TransactionalStore):
-            raise TypeError("store must be a TransactionalStore")
+        cls._require_checked_store(store)
         if (
             not getattr(store, "_active_read_transaction", False)
             or not store.db.in_transaction
