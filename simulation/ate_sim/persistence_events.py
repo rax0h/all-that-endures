@@ -212,8 +212,7 @@ def prepare_sealed_append(
     The caller owns P1.commit and therefore can atomically compose this result
     with other changes in P3B.  At most four chunks are inspected/prepared.
     """
-    if not isinstance(store, TransactionalStore):
-        raise TypeError("store must be a TransactionalStore")
+    SealedEventPrefix._require_checked_store(store)
     if (
         isinstance(events, (str, bytes, bytearray))
         or not isinstance(events, Sequence)
