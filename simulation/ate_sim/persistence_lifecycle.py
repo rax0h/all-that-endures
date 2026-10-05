@@ -99,7 +99,7 @@ def verify_history(session):
         _end(session, "verify_history")
 
 
-def _standalone_log(old_log):
+def _standalone_log(old_log, session):
     """Stage a portable in-memory EventLog without changing the source."""
     old_log._ensure_backend_readable()
     prefix = old_log._disk_prefix
@@ -141,7 +141,7 @@ def _standalone_log(old_log):
                 level=1,
             )
         )
-        _lifecycle_phase("after_disk_chunk", None)
+        _lifecycle_phase("after_disk_chunk", session)
 
     for number, compressed in enumerate(old_log._chunks):
         try:
@@ -281,6 +281,13 @@ def _stage_plain_graph(session, old_log, new_log):
             return value
         return value
 
+    # The canonical EventLog root is remapped without traversing history, but
+    # its resident tail Events remain the same objects and must shed any tracked
+    # payload wrappers before the session closes.
+    for event in new_log._tail:
+        if stage(event) is not event:
+            raise StoreIntegrityError("detach cannot replace resident tail Events")
+
     staged_world = stage(session.world)
     if staged_world is not session.world:
         raise StoreIntegrityError("detach cannot replace the World object")
@@ -306,6 +313,8 @@ def _publish_detach(session, old_log, new_log, assignments, cache_removals):
         session._suspended -= 1
 
     session._clear_bindings()
+    session._cold_operation_depth = 0
+    session._cold_operation_name = None
     session._active = False
     session._cold_state = "closed"
     if lifetime is not None:
@@ -336,7 +345,7 @@ def detach(session, *, materialize_history=False):
             )
         old_log = session.world.events
         _lifecycle_phase("before_history", session)
-        new_log = _standalone_log(old_log)
+        new_log = _standalone_log(old_log, session)
         _lifecycle_phase("after_history", session)
         assignments, cache_removals = _stage_plain_graph(
             session, old_log, new_log
