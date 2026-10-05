@@ -7,7 +7,7 @@ import time
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any, Iterable, Iterator, Mapping
 
 from .incremental_store import (
     CODEC_VERSION,
@@ -92,12 +92,15 @@ class CopyResult:
 class LazyStoreDiagnostics:
     payload_reads: int
     payload_read_bytes: int
+    payload_check_reads: int
+    payload_check_bytes: int
     payload_writes: int
     payload_write_bytes: int
     metadata_rows: int
     query_rows: int
     pin_rows: int
     maintenance_rows: int
+    temporary_keys_peak: int
 
 
 P4_DDL = """
@@ -135,6 +138,12 @@ CREATE TABLE lazy_order_versions(
 );
 CREATE INDEX lazy_order_visible
     ON lazy_order_versions(namespace, valid_from, valid_to, ordinal, typed_key);
+CREATE INDEX lazy_order_current
+    ON lazy_order_versions(namespace, ordinal, typed_key, valid_from)
+    WHERE valid_to IS NULL;
+CREATE INDEX lazy_order_closed_generation
+    ON lazy_order_versions(namespace, valid_to, ordinal, typed_key)
+    WHERE valid_to IS NOT NULL;
 CREATE INDEX lazy_order_expiry
     ON lazy_order_versions(valid_to, namespace, typed_key, valid_from);
 
@@ -154,6 +163,15 @@ CREATE TABLE lazy_query_versions(
 );
 CREATE INDEX lazy_query_visible
     ON lazy_query_versions(namespace, index_name, index_value, valid_from, valid_to, ordinal, record_key);
+CREATE INDEX lazy_query_current
+    ON lazy_query_versions(namespace, index_name, index_value, ordinal, record_key, valid_from)
+    WHERE valid_to IS NULL;
+CREATE INDEX lazy_query_open_generation
+    ON lazy_query_versions(namespace, index_name, index_value, valid_from, ordinal, record_key)
+    WHERE valid_to IS NULL;
+CREATE INDEX lazy_query_closed_generation
+    ON lazy_query_versions(namespace, index_name, index_value, valid_to, ordinal, record_key)
+    WHERE valid_to IS NOT NULL;
 CREATE INDEX lazy_query_owner_visible
     ON lazy_query_versions(namespace, record_key, valid_from, valid_to);
 CREATE INDEX lazy_query_expiry
@@ -194,6 +212,18 @@ CREATE TABLE pin_receipts(
     outcome TEXT NOT NULL,
     row_checksum TEXT NOT NULL,
     FOREIGN KEY(pin_token) REFERENCES generation_pins(token) ON DELETE CASCADE
+);
+
+CREATE TABLE pin_attempts(
+    pin_token TEXT PRIMARY KEY,
+    commit_token BLOB NOT NULL,
+    parent_generation INTEGER NOT NULL,
+    state TEXT NOT NULL,
+    generation INTEGER,
+    row_checksum TEXT NOT NULL,
+    FOREIGN KEY(pin_token) REFERENCES generation_pins(token) ON DELETE CASCADE,
+    CHECK(state IN ('pending','committed','acknowledged','not_committed','conflict')),
+    CHECK(generation IS NULL OR generation >= 0)
 );
 """
 
@@ -303,6 +333,23 @@ def _receipt_checksum(
         _int_bytes(generation),
         _int_bytes(parent_generation),
         outcome.encode("ascii"),
+    )
+
+
+def _attempt_checksum(
+    pin_token: str,
+    commit_token: bytes,
+    parent_generation: int,
+    state: str,
+    generation: int | None,
+) -> str:
+    return _framed_sha(
+        b"pin-attempt-v1",
+        pin_token.encode("ascii"),
+        commit_token,
+        _int_bytes(parent_generation),
+        state.encode("ascii"),
+        _optional_int(generation),
     )
 
 
@@ -439,6 +486,9 @@ class LazyRecordStore:
         if int(db.execute("PRAGMA synchronous").fetchone()[0]) != 2:
             raise StoreFormatError("SQLite could not provide synchronous=FULL")
 
+    def _commit_sqlite(self) -> None:
+        self.db.commit()
+
     @staticmethod
     def _fsync_dir(path: Path) -> None:
         if os.name != "posix":
@@ -459,23 +509,29 @@ class LazyRecordStore:
     def reset_diagnostics(self) -> None:
         self._payload_reads = 0
         self._payload_read_bytes = 0
+        self._payload_check_reads = 0
+        self._payload_check_bytes = 0
         self._payload_writes = 0
         self._payload_write_bytes = 0
         self._metadata_rows = 0
         self._query_rows = 0
         self._pin_rows = 0
         self._maintenance_rows = 0
+        self._temporary_keys_peak = 0
 
     def diagnostics(self) -> LazyStoreDiagnostics:
         return LazyStoreDiagnostics(
             self._payload_reads,
             self._payload_read_bytes,
+            self._payload_check_reads,
+            self._payload_check_bytes,
             self._payload_writes,
             self._payload_write_bytes,
             self._metadata_rows,
             self._query_rows,
             self._pin_rows,
             self._maintenance_rows,
+            self._temporary_keys_peak,
         )
 
     def _checked_head_row(self) -> tuple[Any, ...]:
@@ -548,16 +604,172 @@ class LazyRecordStore:
             )
         return generation
 
+    def _checked_operational_rows(
+        self, head_generation: int
+    ) -> tuple[list[tuple[Any, ...]], list[tuple[Any, ...]], list[tuple[Any, ...]]]:
+        pins = self.db.execute(
+            "SELECT token,store_uuid,generation,row_checksum FROM generation_pins"
+        ).fetchall()
+        self._pin_rows += len(pins)
+        if len(pins) > MAX_PINS:
+            raise StoreIntegrityError("generation pin capacity exceeded")
+        pin_tokens = set()
+        pin_generation: dict[str, int] = {}
+        for token, store_uuid, generation, checksum in pins:
+            if (
+                store_uuid != self.store_identity
+                or type(generation) is not int
+                or checksum != _pin_checksum(store_uuid, token, generation)
+            ):
+                raise StoreIntegrityError("generation pin checksum mismatch")
+            if generation > head_generation or generation < max(0, head_generation - 1):
+                raise StoreIntegrityError("generation pin lies outside two-snapshot retention")
+            pin_tokens.add(token)
+            pin_generation[token] = generation
+
+        receipts = self.db.execute(
+            "SELECT pin_token,commit_token,generation,parent_generation,outcome,row_checksum FROM pin_receipts"
+        ).fetchall()
+        self._pin_rows += len(receipts)
+        if len(receipts) > len(pins):
+            raise StoreIntegrityError("receipt bookkeeping exceeds live pins")
+        receipt_by_pin = {}
+        for token, commit_token, generation, parent, outcome, checksum in receipts:
+            if token not in pin_tokens:
+                raise StoreIntegrityError("receipt exists without a pin")
+            if checksum != _receipt_checksum(token, commit_token, generation, parent, outcome):
+                raise StoreIntegrityError("pin receipt checksum mismatch")
+            if outcome != "committed" or parent != generation - 1:
+                raise StoreIntegrityError("invalid pin receipt outcome")
+            if pin_generation[token] != generation:
+                raise StoreIntegrityError("pin receipt is inconsistent with durable pin state")
+            receipt_by_pin[token] = (commit_token, generation, parent)
+
+        attempts = self.db.execute(
+            "SELECT pin_token,commit_token,parent_generation,state,generation,row_checksum FROM pin_attempts"
+        ).fetchall()
+        self._pin_rows += len(attempts)
+        if len(attempts) > len(pins):
+            raise StoreIntegrityError("attempt bookkeeping exceeds live pins")
+        for token, commit_token, parent, state, generation, checksum in attempts:
+            if token not in pin_tokens:
+                raise StoreIntegrityError("attempt exists without a pin")
+            if state not in {"pending", "committed", "acknowledged", "not_committed", "conflict"}:
+                raise StoreIntegrityError("invalid pin attempt state")
+            if checksum != _attempt_checksum(token, commit_token, parent, state, generation):
+                raise StoreIntegrityError("pin attempt checksum mismatch")
+            if state in {"committed", "acknowledged"}:
+                if generation != parent + 1:
+                    raise StoreIntegrityError("committed attempt has invalid generation")
+                receipt = receipt_by_pin.get(token)
+                if receipt is None or receipt != (commit_token, generation, parent):
+                    raise StoreIntegrityError("committed attempt is inconsistent with receipt")
+            elif generation is not None:
+                raise StoreIntegrityError("noncommitted attempt carries a generation")
+            if parent > head_generation:
+                raise StoreIntegrityError("attempt parent is ahead of save head")
+        return pins, receipts, attempts
+
+    def _validated_retention_floor(self, head_generation: int) -> int:
+        pins, _, _ = self._checked_operational_rows(head_generation)
+        if not pins:
+            return head_generation
+        return min(int(row[2]) for row in pins)
+
+    def _attempt_row(self, pin_token: str) -> tuple[Any, ...] | None:
+        row = self.db.execute(
+            "SELECT commit_token,parent_generation,state,generation,row_checksum FROM pin_attempts WHERE pin_token=?",
+            (pin_token,),
+        ).fetchone()
+        self._pin_rows += int(row is not None)
+        return row
+
+    def _write_attempt_state(
+        self,
+        pin_token: str,
+        commit_token: bytes,
+        parent_generation: int,
+        state: str,
+        generation: int | None,
+    ) -> None:
+        checksum = _attempt_checksum(pin_token, commit_token, parent_generation, state, generation)
+        self.db.execute(
+            "INSERT INTO pin_attempts(pin_token,commit_token,parent_generation,state,generation,row_checksum) "
+            "VALUES (?,?,?,?,?,?) ON CONFLICT(pin_token) DO UPDATE SET "
+            "commit_token=excluded.commit_token,parent_generation=excluded.parent_generation,"
+            "state=excluded.state,generation=excluded.generation,row_checksum=excluded.row_checksum",
+            (pin_token, commit_token, parent_generation, state, generation, checksum),
+        )
+        self._pin_rows += 1
+
+    def _register_attempt(
+        self, pin: GenerationPin, encoded_commit_token: bytes, expected_parent: int
+    ) -> None:
+        self.db.execute("BEGIN IMMEDIATE")
+        try:
+            head = int(self._checked_head_row()[0])
+            pins, receipts, attempts = self._checked_operational_rows(head)
+            pin_row = next((row for row in pins if row[0] == pin.token), None)
+            if pin_row is None:
+                raise StoreConflictError("generation pin is not registered")
+            if pin.store_identity != self.store_identity:
+                raise StoreConflictError("generation pin belongs to another store")
+            if int(pin_row[2]) != expected_parent or head != expected_parent:
+                raise StoreConflictError("generation pin or save head moved before attempt registration")
+            existing = next((row for row in attempts if row[0] == pin.token), None)
+            if existing is not None:
+                _, old_token, _old_parent, old_state, _old_generation, _ = existing
+                if old_state in {"pending", "committed"}:
+                    raise StoreConflictError("pin has an unresolved commit attempt")
+                if old_token == encoded_commit_token:
+                    raise StoreConflictError("commit token is already the pin's latest attempt")
+            receipt = next((row for row in receipts if row[0] == pin.token), None)
+            if receipt is not None and receipt[1] == encoded_commit_token:
+                raise StoreConflictError("commit token is already the pin's latest receipt")
+            self._write_attempt_state(
+                pin.token, encoded_commit_token, expected_parent, "pending", None
+            )
+            self.db.commit()
+        except Exception:
+            if self.db.in_transaction:
+                self.db.rollback()
+            raise
+
+    def _acknowledge_attempt(
+        self, pin: GenerationPin, encoded_commit_token: bytes, generation: int
+    ) -> None:
+        self.db.execute("BEGIN IMMEDIATE")
+        try:
+            head = int(self._checked_head_row()[0])
+            self._checked_operational_rows(head)
+            row = self._attempt_row(pin.token)
+            if row is None:
+                raise StoreIntegrityError("missing durable commit attempt")
+            token, parent, state, stored_generation, checksum = row
+            if token != encoded_commit_token:
+                raise StoreConflictError("commit token does not match the pin's latest attempt")
+            if checksum != _attempt_checksum(pin.token, token, parent, state, stored_generation):
+                raise StoreIntegrityError("pin attempt checksum mismatch")
+            if state not in {"committed", "acknowledged"} or stored_generation != generation:
+                raise StoreIntegrityError("commit attempt cannot be acknowledged")
+            self._write_attempt_state(
+                pin.token, token, parent, "acknowledged", stored_generation
+            )
+            self.db.commit()
+        except Exception:
+            if self.db.in_transaction:
+                self.db.rollback()
+            raise
+
     def capture_pin(self) -> GenerationPin:
         self._ensure_open()
         token = str(uuid.uuid4())
         self._phase_hook("before_pin_capture")
         self.db.execute("BEGIN IMMEDIATE")
         try:
-            head = self._checked_head_row()[0]
-            count = self.db.execute("SELECT COUNT(*) FROM generation_pins").fetchone()[0]
-            self._pin_rows += 1
-            if count >= MAX_PINS:
+            head = int(self._checked_head_row()[0])
+            pins, _, _ = self._checked_operational_rows(head)
+            if len(pins) >= MAX_PINS:
                 raise GenerationPressureError(head, head)
             checksum = _pin_checksum(self.store_identity, token, head)
             self.db.execute(
@@ -568,9 +780,10 @@ class LazyRecordStore:
             self._phase_hook("before_pin_capture_commit")
             self.db.commit()
         except Exception:
-            self.db.rollback()
+            if self.db.in_transaction:
+                self.db.rollback()
             raise
-        return GenerationPin(token, self.store_identity, int(head))
+        return GenerationPin(token, self.store_identity, head)
 
     def release_pin(self, pin: GenerationPin) -> None:
         self._ensure_open()
@@ -581,21 +794,24 @@ class LazyRecordStore:
         try:
             if pin.store_identity != self.store_identity:
                 raise StoreConflictError("generation pin belongs to another store")
-            row = self.db.execute(
-                "SELECT store_uuid,generation,row_checksum FROM generation_pins WHERE token=?",
-                (pin.token,),
-            ).fetchone()
-            self._pin_rows += 1
+            head = int(self._checked_head_row()[0])
+            pins, _, attempts = self._checked_operational_rows(head)
+            row = next((item for item in pins if item[0] == pin.token), None)
             if row is None:
                 self.db.rollback()
                 return
-            if row[0] != self.store_identity or row[2] != _pin_checksum(row[0], pin.token, row[1]):
-                raise StoreIntegrityError("generation pin checksum mismatch")
-            if int(row[1]) != pin.captured_head:
+            if int(row[2]) != pin.captured_head:
                 raise StoreConflictError("generation pin has advanced; use the updated pin")
+            attempt = next((item for item in attempts if item[0] == pin.token), None)
+            if attempt is not None and attempt[3] in {"pending", "committed"}:
+                raise StoreConflictError("pin has unresolved commit acknowledgement")
             self.db.execute("DELETE FROM pin_receipts WHERE pin_token=?", (pin.token,))
+            self.db.execute("DELETE FROM pin_attempts WHERE pin_token=?", (pin.token,))
             self.db.execute("DELETE FROM generation_pins WHERE token=?", (pin.token,))
-            self._pin_rows += 2
+            self._pin_rows += 3
+            floor = self._validated_retention_floor(head)
+            self._cleanup_expired(floor)
+            self._phase_hook("during_pin_release_cleanup")
             self._phase_hook("before_pin_release_commit")
             self.db.commit()
         except Exception:
@@ -608,9 +824,7 @@ class LazyRecordStore:
         try:
             generation = self._require_pin(pin)
             head = int(self._checked_head_row()[0])
-            minimum = self.db.execute("SELECT MIN(generation) FROM generation_pins").fetchone()[0]
-            self._pin_rows += 1
-            floor = head if minimum is None else int(minimum)
+            floor = self._validated_retention_floor(head)
             if generation < floor or generation > head:
                 raise StoreConflictError("generation pin is outside retained visibility")
             return generation
@@ -644,6 +858,8 @@ class LazyRecordStore:
             raise StoreIntegrityError("invalid record validity interval")
         if codec_version != self.codec.version:
             raise StoreFormatError("payload codec version mismatch")
+        self._payload_check_reads += 1
+        self._payload_check_bytes += len(payload)
         if payload_checksum != _framed_sha(b"lazy-payload-v1", payload):
             raise StoreIntegrityError("lazy payload checksum mismatch")
         expected = _version_checksum(
@@ -699,41 +915,118 @@ class LazyRecordStore:
         finally:
             self._read_snapshot_end()
 
-    def iter_keys(self, pin: GenerationPin, namespace: str, *, page_size: int = 128) -> tuple[Any, ...]:
+    def iter_keys(
+        self, pin: GenerationPin, namespace: str, *, page_size: int = 128
+    ) -> Iterator[Any]:
         self._ensure_open()
         _validate_namespace(namespace)
         if type(page_size) is not int or page_size <= 0 or page_size > MAX_PAGE_SIZE:
             raise ValueError("page_size must be in 1..128")
-        result: list[Any] = []
-        last_ordinal = -1
-        last_key = b""
-        while True:
-            generation = self._read_snapshot_start(pin)
-            try:
-                rows = self.db.execute(
-                    "SELECT typed_key,ordinal,valid_from,valid_to,row_checksum FROM lazy_order_versions "
-                    "WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) "
-                    "AND (ordinal>? OR (ordinal=? AND typed_key>?)) "
-                    "ORDER BY ordinal,typed_key LIMIT ?",
-                    (namespace, generation, generation, last_ordinal, last_ordinal, last_key, page_size),
-                ).fetchall()
-                self._query_rows += len(rows)
-                for typed_key, ordinal, valid_from, valid_to, checksum in rows:
-                    if checksum != _order_checksum(namespace, typed_key, ordinal, valid_from, valid_to):
-                        raise StoreIntegrityError("lazy order checksum mismatch")
-                    record = self._visible_record_row(generation, namespace, typed_key)
-                    if record is None:
-                        raise StoreIntegrityError("ordered key has no visible record")
-                    self._check_record_row(namespace, typed_key, record, decode=False)
-                    result.append(self.codec.decode(typed_key))
-                    last_ordinal, last_key = int(ordinal), typed_key
-            finally:
-                self._read_snapshot_end()
-            if len(rows) < page_size:
-                break
-        return tuple(result)
 
-    def query_keys(self, pin: GenerationPin, namespace: str, index_name: str, value: Any) -> tuple[Any, ...]:
+        def iterator() -> Iterator[Any]:
+            last_ordinal = -1
+            last_key = b""
+            yielded = 0
+            expected_count: int | None = None
+            while expected_count is None or yielded < expected_count:
+                self._ensure_open()
+                generation = self._read_snapshot_start(pin)
+                decoded_page: list[tuple[int, bytes, Any]] = []
+                try:
+                    head = int(self._checked_head_row()[0])
+                    state = self._namespace_state_at(namespace, generation)
+                    if state is None:
+                        expected_count = 0
+                        page = []
+                    else:
+                        expected_count = int(state[0])
+                        if expected_count == 0:
+                            page = []
+                        elif generation == head:
+                            page = self.db.execute(
+                                "SELECT typed_key,ordinal,valid_from,valid_to,row_checksum "
+                                "FROM lazy_order_versions INDEXED BY lazy_order_current "
+                                "WHERE namespace=? AND valid_to IS NULL "
+                                "AND (ordinal>? OR (ordinal=? AND typed_key>?)) "
+                                "ORDER BY ordinal,typed_key LIMIT ?",
+                                (namespace, last_ordinal, last_ordinal, last_key, page_size),
+                            ).fetchall()
+                        else:
+                            open_rows = self.db.execute(
+                                "SELECT typed_key,ordinal,valid_from,valid_to,row_checksum "
+                                "FROM lazy_order_versions INDEXED BY lazy_order_current "
+                                "WHERE namespace=? AND valid_to IS NULL AND valid_from<=? "
+                                "AND (ordinal>? OR (ordinal=? AND typed_key>?)) "
+                                "ORDER BY ordinal,typed_key LIMIT ?",
+                                (
+                                    namespace,
+                                    generation,
+                                    last_ordinal,
+                                    last_ordinal,
+                                    last_key,
+                                    page_size,
+                                ),
+                            ).fetchall()
+                            closed_rows = self.db.execute(
+                                "SELECT typed_key,ordinal,valid_from,valid_to,row_checksum "
+                                "FROM lazy_order_versions INDEXED BY lazy_order_closed_generation "
+                                "WHERE namespace=? AND valid_to=? "
+                                "AND (ordinal>? OR (ordinal=? AND typed_key>?)) "
+                                "ORDER BY ordinal,typed_key LIMIT ?",
+                                (
+                                    namespace,
+                                    generation + 1,
+                                    last_ordinal,
+                                    last_ordinal,
+                                    last_key,
+                                    page_size,
+                                ),
+                            ).fetchall()
+                            page = sorted(
+                                open_rows + closed_rows,
+                                key=lambda row: (int(row[1]), row[0]),
+                            )[:page_size]
+                    self._query_rows += len(page)
+                    for typed_key, ordinal, valid_from, valid_to, checksum in page:
+                        if checksum != _order_checksum(
+                            namespace, typed_key, ordinal, valid_from, valid_to
+                        ):
+                            raise StoreIntegrityError("lazy order checksum mismatch")
+                        record = self._visible_record_row(generation, namespace, typed_key)
+                        if record is None:
+                            raise StoreIntegrityError("ordered key has no visible record")
+                        self._check_record_row(
+                            namespace, typed_key, record, decode=False
+                        )
+                        decoded_page.append(
+                            (int(ordinal), typed_key, self.codec.decode(typed_key))
+                        )
+                    self._temporary_keys_peak = max(
+                        self._temporary_keys_peak, len(decoded_page)
+                    )
+                finally:
+                    self._read_snapshot_end()
+
+                if not decoded_page:
+                    if yielded != expected_count:
+                        raise StoreIntegrityError(
+                            "lazy collection order ended before namespace count"
+                        )
+                    return
+                for ordinal, typed_key, decoded_key in decoded_page:
+                    last_ordinal, last_key = ordinal, typed_key
+                    yielded += 1
+                    yield decoded_key
+                if len(decoded_page) < page_size and yielded != expected_count:
+                    raise StoreIntegrityError(
+                        "lazy collection order ended before namespace count"
+                    )
+
+        return iterator()
+
+    def query_keys(
+        self, pin: GenerationPin, namespace: str, index_name: str, value: Any
+    ) -> tuple[Any, ...]:
         self._ensure_open()
         _validate_namespace(namespace)
         if not isinstance(index_name, str) or not index_name or "\x00" in index_name:
@@ -741,27 +1034,66 @@ class LazyRecordStore:
         encoded_value = self.codec.encode(value)
         generation = self._read_snapshot_start(pin)
         try:
-            rows = self.db.execute(
-                "SELECT record_key,ordinal,valid_from,valid_to,row_checksum FROM lazy_query_versions "
-                "WHERE namespace=? AND index_name=? AND index_value=? AND valid_from<=? "
-                "AND (valid_to IS NULL OR ?<valid_to) ORDER BY ordinal,record_key",
-                (namespace, index_name, encoded_value, generation, generation),
-            ).fetchall()
+            head = int(self._checked_head_row()[0])
+            if generation == head:
+                rows = self.db.execute(
+                    "SELECT record_key,ordinal,valid_from,valid_to,row_checksum "
+                    "FROM lazy_query_versions INDEXED BY lazy_query_current "
+                    "WHERE namespace=? AND index_name=? AND index_value=? AND valid_to IS NULL "
+                    "ORDER BY ordinal,record_key",
+                    (namespace, index_name, encoded_value),
+                ).fetchall()
+            else:
+                open_rows = self.db.execute(
+                    "SELECT record_key,ordinal,valid_from,valid_to,row_checksum "
+                    "FROM lazy_query_versions INDEXED BY lazy_query_open_generation "
+                    "WHERE namespace=? AND index_name=? AND index_value=? "
+                    "AND valid_to IS NULL AND valid_from<=? "
+                    "ORDER BY ordinal,record_key",
+                    (namespace, index_name, encoded_value, generation),
+                ).fetchall()
+                closed_rows = self.db.execute(
+                    "SELECT record_key,ordinal,valid_from,valid_to,row_checksum "
+                    "FROM lazy_query_versions INDEXED BY lazy_query_closed_generation "
+                    "WHERE namespace=? AND index_name=? AND index_value=? AND valid_to=? "
+                    "ORDER BY ordinal,record_key",
+                    (namespace, index_name, encoded_value, generation + 1),
+                ).fetchall()
+                rows = sorted(
+                    open_rows + closed_rows,
+                    key=lambda row: (int(row[1]), row[0]),
+                )
             self._query_rows += len(rows)
             out = []
+            seen = set()
+            decoded_value = self.codec.decode(encoded_value)
             for record_key, ordinal, valid_from, valid_to, checksum in rows:
+                marker_key = (record_key, int(ordinal))
+                if marker_key in seen:
+                    raise StoreIntegrityError("duplicate visible lazy query membership")
+                seen.add(marker_key)
                 expected = _query_checksum(
-                    namespace, index_name, encoded_value, record_key, ordinal, valid_from, valid_to
+                    namespace,
+                    index_name,
+                    encoded_value,
+                    record_key,
+                    ordinal,
+                    valid_from,
+                    valid_to,
                 )
                 if checksum != expected:
                     raise StoreIntegrityError("lazy query checksum mismatch")
                 record = self._visible_record_row(generation, namespace, record_key)
                 if record is None:
                     raise StoreIntegrityError("query membership has no visible owner")
-                _, _, _, _, memberships = self._check_record_row(namespace, record_key, record, decode=False)
-                marker = (index_name, self.codec.decode(encoded_value), int(ordinal))
-                if marker not in memberships:
-                    raise StoreIntegrityError("query membership is absent from owner metadata")
+                _, _, _, _, memberships = self._check_record_row(
+                    namespace, record_key, record, decode=False
+                )
+                owner_marker = (index_name, decoded_value, int(ordinal))
+                if owner_marker not in memberships:
+                    raise StoreIntegrityError(
+                        "query membership is absent from owner metadata"
+                    )
                 out.append(self.codec.decode(record_key))
             return tuple(out)
         finally:
@@ -1321,40 +1653,48 @@ class LazyRecordStore:
         ):
             return CommitResult("not_committed", current_generation, pin, stale=False)
 
+        pins, _, attempts = self._checked_operational_rows(current_generation)
+        existing_attempt = next((row for row in attempts if row[0] == pin.token), None)
+        if existing_attempt is not None and existing_attempt[3] in {"pending", "committed"}:
+            raise StoreConflictError("pin has an unresolved commit attempt")
+        other_generations = [int(row[2]) for row in pins if row[0] != pin.token]
+        if other_generations and min(other_generations) < current_generation:
+            raise GenerationPressureError(current_generation, min(other_generations))
+
+        self._register_attempt(pin, encoded_commit_token, current_generation)
         self._phase_hook("before_transaction")
         self.db.execute("BEGIN IMMEDIATE")
         committed = False
         try:
             locked = self._checked_head_row()
             locked_generation = int(locked[0])
-            pin_row = self.db.execute(
-                "SELECT store_uuid,generation,row_checksum FROM generation_pins WHERE token=?", (pin.token,)
-            ).fetchone()
-            self._pin_rows += 1
+            pins, _, attempts = self._checked_operational_rows(locked_generation)
+            pin_row = next((row for row in pins if row[0] == pin.token), None)
             if pin_row is None:
                 raise StoreConflictError("generation pin is not registered")
-            if pin_row[0] != self.store_identity or pin_row[2] != _pin_checksum(pin_row[0], pin.token, pin_row[1]):
-                raise StoreIntegrityError("generation pin checksum mismatch")
-            if locked_generation != pin.captured_head or int(pin_row[1]) != pin.captured_head:
+            attempt = next((row for row in attempts if row[0] == pin.token), None)
+            if attempt is None or attempt[1] != encoded_commit_token or attempt[3] != "pending":
+                raise StoreConflictError("commit attempt is no longer pending")
+            if locked_generation != pin.captured_head or int(pin_row[2]) != pin.captured_head:
                 self.db.rollback()
+                self.db.execute("BEGIN IMMEDIATE")
+                row = self._attempt_row(pin.token)
+                if row is not None and row[0] == encoded_commit_token and row[2] == "pending":
+                    self._write_attempt_state(
+                        pin.token, encoded_commit_token, current_generation, "conflict", None
+                    )
+                self.db.commit()
                 return CommitResult("conflict", locked_generation, pin, stale=True)
-            existing_receipt = self.db.execute(
-                "SELECT commit_token FROM pin_receipts WHERE pin_token=?", (pin.token,)
-            ).fetchone()
-            self._pin_rows += int(existing_receipt is not None)
-            if existing_receipt is not None and existing_receipt[0] == encoded_commit_token:
-                raise StoreConflictError("commit token is already the pin's latest receipt; resolve it instead")
 
-            other_min = self.db.execute(
-                "SELECT MIN(generation) FROM generation_pins WHERE token<>?", (pin.token,)
-            ).fetchone()[0]
-            self._pin_rows += 1
-            if other_min is not None and int(other_min) < locked_generation:
-                raise GenerationPressureError(locked_generation, int(other_min))
+            other_generations = [int(row[2]) for row in pins if row[0] != pin.token]
+            if other_generations and min(other_generations) < locked_generation:
+                raise GenerationPressureError(locked_generation, min(other_generations))
 
             counts = _namespace_counts(self.codec, locked[6])
             new_generation = locked_generation + 1
-            self._write_lazy_changes(version_prepared, locked_generation, new_generation, counts)
+            self._write_lazy_changes(
+                version_prepared, locked_generation, new_generation, counts
+            )
             self._phase_hook("during_version_writes")
             self._write_ordinary_changes(ordinary_prepared, new_generation, counts)
             self._phase_hook("during_ordinary_writes")
@@ -1391,13 +1731,19 @@ class LazyRecordStore:
                     checksum,
                 ),
             )
-            new_pin_checksum = _pin_checksum(self.store_identity, pin.token, new_generation)
+            new_pin_checksum = _pin_checksum(
+                self.store_identity, pin.token, new_generation
+            )
             self.db.execute(
                 "UPDATE generation_pins SET generation=?,row_checksum=? WHERE token=?",
                 (new_generation, new_pin_checksum, pin.token),
             )
             receipt_checksum = _receipt_checksum(
-                pin.token, encoded_commit_token, new_generation, locked_generation, "committed"
+                pin.token,
+                encoded_commit_token,
+                new_generation,
+                locked_generation,
+                "committed",
             )
             self.db.execute(
                 "INSERT INTO pin_receipts(pin_token,commit_token,generation,parent_generation,outcome,row_checksum) "
@@ -1413,14 +1759,25 @@ class LazyRecordStore:
                     receipt_checksum,
                 ),
             )
+            self._write_attempt_state(
+                pin.token,
+                encoded_commit_token,
+                locked_generation,
+                "committed",
+                new_generation,
+            )
             self._pin_rows += 2
-            minimum = self.db.execute("SELECT MIN(generation) FROM generation_pins").fetchone()[0]
-            self._pin_rows += 1
-            floor = new_generation if minimum is None else int(minimum)
+            floor = self._validated_retention_floor(new_generation)
             self._cleanup_expired(floor)
             self._phase_hook("before_commit")
-            self.db.commit()
-            committed = True
+            try:
+                self._commit_sqlite()
+                committed = True
+            except sqlite3.Error:
+                if self.db.in_transaction:
+                    self.db.rollback()
+                self._recovery_required[pin.token] = encoded_commit_token
+                raise
         except Exception:
             if not committed and self.db.in_transaction:
                 self.db.rollback()
@@ -1429,6 +1786,7 @@ class LazyRecordStore:
         updated = GenerationPin(pin.token, self.store_identity, new_generation)
         try:
             self._phase_hook("after_commit")
+            self._acknowledge_attempt(updated, encoded_commit_token, new_generation)
         except Exception:
             self._recovery_required[pin.token] = encoded_commit_token
             raise
@@ -1439,48 +1797,113 @@ class LazyRecordStore:
         if pin.store_identity != self.store_identity:
             raise StoreConflictError("generation pin belongs to another store")
         encoded = self.codec.encode(commit_token)
-        resolved = False
         result: CommitResult | None = None
-        self.db.execute("BEGIN")
+        self.db.execute("BEGIN IMMEDIATE")
         try:
-            row = self.db.execute(
-                "SELECT store_uuid,generation,row_checksum FROM generation_pins WHERE token=?", (pin.token,)
-            ).fetchone()
-            self._pin_rows += 1
-            if row is None:
-                raise StoreConflictError("generation pin is not registered")
-            if row[0] != self.store_identity or row[2] != _pin_checksum(row[0], pin.token, row[1]):
-                raise StoreIntegrityError("generation pin checksum mismatch")
-            receipt = self.db.execute(
-                "SELECT commit_token,generation,parent_generation,outcome,row_checksum FROM pin_receipts WHERE pin_token=?",
-                (pin.token,),
-            ).fetchone()
-            self._pin_rows += int(receipt is not None)
             head = int(self._checked_head_row()[0])
-            if receipt is None:
+            pins, receipts, attempts = self._checked_operational_rows(head)
+            pin_row = next((row for row in pins if row[0] == pin.token), None)
+            if pin_row is None:
+                raise StoreConflictError("generation pin is not registered")
+            attempt = next((row for row in attempts if row[0] == pin.token), None)
+            if attempt is None or attempt[1] != encoded:
+                raise StoreConflictError(
+                    "commit token does not match the pin's latest attempt"
+                )
+            _, stored_token, parent, state, generation, checksum = attempt
+            if checksum != _attempt_checksum(
+                pin.token, stored_token, parent, state, generation
+            ):
+                raise StoreIntegrityError("pin attempt checksum mismatch")
+            pin_generation = int(pin_row[2])
+            receipt = next((row for row in receipts if row[0] == pin.token), None)
+
+            if state in {"committed", "acknowledged"}:
+                if (
+                    receipt is None
+                    or receipt[1] != encoded
+                    or int(receipt[2]) != int(generation)
+                    or int(receipt[3]) != int(parent)
+                    or pin_generation != int(generation)
+                ):
+                    raise StoreIntegrityError(
+                        "committed attempt is inconsistent with durable receipt or pin"
+                    )
+                if state == "committed":
+                    self._write_attempt_state(
+                        pin.token,
+                        encoded,
+                        int(parent),
+                        "acknowledged",
+                        int(generation),
+                    )
+                updated = GenerationPin(
+                    pin.token, self.store_identity, int(generation)
+                )
+                result = CommitResult(
+                    "committed",
+                    int(generation),
+                    updated,
+                    stale=head > int(generation),
+                )
+            elif state == "pending":
+                if receipt is not None and receipt[1] == encoded:
+                    raise StoreIntegrityError(
+                        "pending attempt unexpectedly has a committed receipt"
+                    )
+                if pin_generation == int(parent) and head == int(parent):
+                    self._write_attempt_state(
+                        pin.token, encoded, int(parent), "not_committed", None
+                    )
+                    result = CommitResult(
+                        "not_committed",
+                        pin_generation,
+                        GenerationPin(
+                            pin.token, self.store_identity, pin_generation
+                        ),
+                        stale=False,
+                    )
+                elif pin_generation == int(parent) and head > int(parent):
+                    self._write_attempt_state(
+                        pin.token, encoded, int(parent), "conflict", None
+                    )
+                    result = CommitResult(
+                        "conflict",
+                        head,
+                        GenerationPin(
+                            pin.token, self.store_identity, pin_generation
+                        ),
+                        stale=True,
+                    )
+                else:
+                    raise StoreIntegrityError(
+                        "pending attempt cannot be reconciled with head and pin"
+                    )
+            elif state == "not_committed":
                 result = CommitResult(
                     "not_committed",
-                    int(row[1]),
-                    GenerationPin(pin.token, self.store_identity, int(row[1])),
-                    stale=head > int(row[1]),
+                    pin_generation,
+                    GenerationPin(pin.token, self.store_identity, pin_generation),
+                    stale=head > pin_generation,
                 )
-                resolved = True
-                return result
-            stored_token, generation, parent, outcome, checksum = receipt
-            if stored_token != encoded:
-                raise StoreConflictError("commit token does not match the pin's latest receipt")
-            if checksum != _receipt_checksum(pin.token, stored_token, generation, parent, outcome):
-                raise StoreIntegrityError("pin receipt checksum mismatch")
-            if outcome != "committed" or int(row[1]) != int(generation):
-                raise StoreIntegrityError("pin receipt is inconsistent with durable pin state")
-            updated = GenerationPin(pin.token, self.store_identity, int(generation))
-            result = CommitResult("committed", int(generation), updated, stale=head > int(generation))
-            resolved = True
-            return result
-        finally:
-            self._read_snapshot_end()
-            if resolved and self._recovery_required.get(pin.token) == encoded:
-                self._recovery_required.pop(pin.token, None)
+            elif state == "conflict":
+                result = CommitResult(
+                    "conflict",
+                    head,
+                    GenerationPin(pin.token, self.store_identity, pin_generation),
+                    stale=head > pin_generation,
+                )
+            else:
+                raise StoreIntegrityError("invalid pin attempt state")
+            self.db.commit()
+        except Exception:
+            if self.db.in_transaction:
+                self.db.rollback()
+            raise
+        if self._recovery_required.get(pin.token) == encoded:
+            self._recovery_required.pop(pin.token, None)
+        assert result is not None
+        return result
 
     def _verify_ordinary(self, inventory: set[str]) -> tuple[dict[str, tuple[int, int]], int, int]:
         counts: dict[str, tuple[int, int]] = {}
@@ -1528,8 +1951,7 @@ class LazyRecordStore:
         return counts, records, segments
 
     def _retained_generations(self, head: int) -> tuple[int, ...]:
-        minimum = self.db.execute("SELECT MIN(generation) FROM generation_pins").fetchone()[0]
-        floor = head if minimum is None else int(minimum)
+        floor = self._validated_retention_floor(head)
         if floor < head - 1:
             raise StoreIntegrityError("more than two visible snapshots are retained")
         return tuple(range(floor, head + 1))
@@ -1609,6 +2031,16 @@ class LazyRecordStore:
 
     def verify_all(self) -> dict[str, int]:
         self._ensure_open()
+        owns_snapshot = not self.db.in_transaction
+        if owns_snapshot:
+            self.db.execute("BEGIN")
+        try:
+            return self._verify_all_in_snapshot()
+        finally:
+            if owns_snapshot and self.db.in_transaction:
+                self.db.rollback()
+
+    def _verify_all_in_snapshot(self) -> dict[str, int]:
         integrity = self.db.execute("PRAGMA integrity_check").fetchone()[0]
         if integrity != "ok":
             raise StoreIntegrityError(f"SQLite integrity check failed: {integrity}")
@@ -1619,29 +2051,7 @@ class LazyRecordStore:
         inventory = set(self.codec.decode(head[5]))
         expected_counts = _namespace_counts(self.codec, head[6])
 
-        pins = self.db.execute(
-            "SELECT token,store_uuid,generation,row_checksum FROM generation_pins"
-        ).fetchall()
-        if len(pins) > MAX_PINS:
-            raise StoreIntegrityError("generation pin capacity exceeded")
-        for token, store_uuid, generation, checksum in pins:
-            if store_uuid != self.store_identity or checksum != _pin_checksum(store_uuid, token, generation):
-                raise StoreIntegrityError("generation pin checksum mismatch")
-            if generation > head_generation or generation < max(0, head_generation - 1):
-                raise StoreIntegrityError("generation pin lies outside two-snapshot retention")
-        receipts = self.db.execute(
-            "SELECT pin_token,commit_token,generation,parent_generation,outcome,row_checksum FROM pin_receipts"
-        ).fetchall()
-        if len(receipts) > len(pins):
-            raise StoreIntegrityError("receipt bookkeeping exceeds live pins")
-        pin_tokens = {row[0] for row in pins}
-        for token, commit_token, generation, parent, outcome, checksum in receipts:
-            if token not in pin_tokens:
-                raise StoreIntegrityError("receipt exists without a pin")
-            if checksum != _receipt_checksum(token, commit_token, generation, parent, outcome):
-                raise StoreIntegrityError("pin receipt checksum mismatch")
-            if outcome != "committed" or parent != generation - 1:
-                raise StoreIntegrityError("invalid pin receipt outcome")
+        pins, receipts, attempts = self._checked_operational_rows(head_generation)
 
         ordinary_counts, ordinary_records, segments = self._verify_ordinary(inventory)
         retained = self._retained_generations(head_generation)
@@ -1709,6 +2119,7 @@ class LazyRecordStore:
             "segments": segments,
             "pins": len(pins),
             "receipts": len(receipts),
+            "attempts": len(attempts),
         }
 
     def storage_metrics(self) -> dict[str, int]:
@@ -1726,19 +2137,39 @@ class LazyRecordStore:
             "segment_payload_bytes": self.db.execute("SELECT COALESCE(SUM(LENGTH(payload)),0) FROM segments").fetchone()[0],
             "pins": self.db.execute("SELECT COUNT(*) FROM generation_pins").fetchone()[0],
             "receipts": self.db.execute("SELECT COUNT(*) FROM pin_receipts").fetchone()[0],
+            "attempts": self.db.execute("SELECT COUNT(*) FROM pin_attempts").fetchone()[0],
             "sqlite_bytes": page_count * page_size,
             "sqlite_reusable_bytes": freelist * page_size,
         }
 
-    def query_plan(self, pin: GenerationPin, namespace: str, index_name: str, value: Any) -> tuple[str, ...]:
+    def query_plan(
+        self, pin: GenerationPin, namespace: str, index_name: str, value: Any
+    ) -> tuple[str, ...]:
         encoded = self.codec.encode(value)
         generation = self._read_snapshot_start(pin)
         try:
-            rows = self.db.execute(
-                "EXPLAIN QUERY PLAN SELECT record_key FROM lazy_query_versions WHERE namespace=? AND index_name=? "
-                "AND index_value=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY ordinal,record_key",
-                (namespace, index_name, encoded, generation, generation),
-            ).fetchall()
+            head = int(self._checked_head_row()[0])
+            if generation == head:
+                rows = self.db.execute(
+                    "EXPLAIN QUERY PLAN SELECT record_key FROM lazy_query_versions "
+                    "INDEXED BY lazy_query_current WHERE namespace=? AND index_name=? "
+                    "AND index_value=? AND valid_to IS NULL ORDER BY ordinal,record_key",
+                    (namespace, index_name, encoded),
+                ).fetchall()
+            else:
+                rows = self.db.execute(
+                    "EXPLAIN QUERY PLAN SELECT record_key FROM lazy_query_versions "
+                    "INDEXED BY lazy_query_open_generation WHERE namespace=? AND index_name=? "
+                    "AND index_value=? AND valid_to IS NULL AND valid_from<=? "
+                    "ORDER BY ordinal,record_key",
+                    (namespace, index_name, encoded, generation),
+                ).fetchall()
+                rows += self.db.execute(
+                    "EXPLAIN QUERY PLAN SELECT record_key FROM lazy_query_versions "
+                    "INDEXED BY lazy_query_closed_generation WHERE namespace=? AND index_name=? "
+                    "AND index_value=? AND valid_to=? ORDER BY ordinal,record_key",
+                    (namespace, index_name, encoded, generation + 1),
+                ).fetchall()
             return tuple(str(row[-1]) for row in rows)
         finally:
             self._read_snapshot_end()
@@ -1858,8 +2289,9 @@ class LazyRecordStore:
                 )
                 # create() starts with no pins/receipts; keep operational state empty.
                 new_store.db.execute("DELETE FROM save_receipts")
-                new_store.db.execute("DELETE FROM generation_pins")
                 new_store.db.execute("DELETE FROM pin_receipts")
+                new_store.db.execute("DELETE FROM pin_attempts")
+                new_store.db.execute("DELETE FROM generation_pins")
                 new_store.db.commit()
             except Exception:
                 new_store.db.rollback()
