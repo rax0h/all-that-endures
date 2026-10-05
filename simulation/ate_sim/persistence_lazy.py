@@ -706,6 +706,10 @@ class LazyRecordTable(RecordTable):
 
     def _ensure(self):
         self._session._ensure_active()
+        if self._session._state == "recovery-required":
+            raise StoreError(
+                "lazy people reads are blocked until save acknowledgement resolves"
+            )
 
     def _ensure_mutation(self):
         self._session._ensure_people_mutation_allowed()
@@ -1490,6 +1494,7 @@ class LazyWorldSession:
         ) = self.people.prepare_save_changes()
         people_effective = bool(version_changes or identity_changes)
 
+        prior_manifest_dirty = self._eager_tracker._manifest_dirty
         if structural_keys:
             # Make the shared cold journal aware that collection-layout
             # publication is pending before it freezes acknowledgement state.
@@ -1504,9 +1509,8 @@ class LazyWorldSession:
             )
         except Exception:
             if structural_keys:
-                # The people overlay remains pending; the next prepare will set
-                # this flag again. Do not leave a half-prepared cold operation.
-                self._eager_tracker._manifest_dirty = False
+                # Restore any pre-existing eager structural journal exactly.
+                self._eager_tracker._manifest_dirty = prior_manifest_dirty
             raise
 
         if cold_plan is None:
@@ -1628,6 +1632,11 @@ class LazyWorldSession:
         tracker._cold_state = "recovery-required"
 
     def _publish_committed_hybrid(self, plan, result):
+        # The durable pin has already moved with the commit. Advance runtime
+        # pin references immediately so recovery/stale close can release the
+        # correct generation even if later publication checks fail.
+        self.pin = result.pin
+        self.people._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -1652,10 +1661,15 @@ class LazyWorldSession:
         publish_cold_save(
             tracker, plan.cold_plan, replacement_prefix
         )
-        self.pin = result.pin
         self.people.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
+        self.identity_links = tuple(
+            sorted(
+                self._eager_tracker._committed_identity_targets.items(),
+                key=lambda item: self.store.codec.encode(item[0]),
+            )
+        ) + tuple(self._cross_boundary_links)
         self._pending_save = None
         self._state = "active"
         return result.generation
