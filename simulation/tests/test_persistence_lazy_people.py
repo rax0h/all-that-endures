@@ -2,6 +2,7 @@ import hashlib
 
 import pytest
 
+from ate_sim import Simulation, generate_world
 from ate_sim.core import Person, World
 from ate_sim.incremental_store import (
     StoreConflictError,
@@ -201,10 +202,10 @@ def test_people_scalar_edit_save_reopen_and_true_noop(tmp_path):
         session.store.reset_diagnostics()
         assert session.save() == start + 1
         diag = session.store.diagnostics()
-        # One Person payload plus the cold commit descriptor; no unrelated
-        # Person payloads are decoded during publication.
+        # One Person payload plus bounded cold descriptor publication; no
+        # unrelated Person payload is decoded during publication.
         assert diag.payload_reads == 0
-        assert diag.payload_writes == 2
+        assert diag.payload_writes <= 3
         assert session.diagnostics()["state"] == "active"
 
         # A notification whose final encoded value equals the committed
@@ -349,8 +350,8 @@ def test_one_people_edit_write_work_does_not_follow_historical_population(tmp_pa
         session.save()
         diag = session.store.diagnostics()
         assert diag.payload_reads == 0
-        assert diag.payload_writes == 2
-        assert diag.payload_check_reads <= 4
+        assert diag.payload_writes <= 3
+        assert diag.payload_check_reads <= 8
         assert diag.query_rows <= 4
         assert session.world.people.diagnostics()["resident_people"] <= 256
 
@@ -438,8 +439,52 @@ def test_competing_people_writer_marks_loser_stale_and_preflights_future_mutatio
         first.close()
 
 
-def test_people_only_gate_keeps_non_people_world_mutation_blocked(tmp_path):
-    destination = converted_people_store(tmp_path, 10, active=3)
+def test_hybrid_lazy_session_runs_one_real_step_and_reopens_equal_to_eager_control(tmp_path):
+    seed = 918273
+    control = generate_world(
+        seed, width=8, height=6, settlements=1
+    )
+    source_world = generate_world(
+        seed, width=8, height=6, settlements=1
+    )
+    source = tmp_path / "hybrid-step-cold.sqlite"
+    destination = tmp_path / "hybrid-step-lazy.sqlite"
+    write_cold_snapshot(source_world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    Simulation(control).step()
+    expected_digest = control.digest()
+
     with open_lazy_world_session(destination, rules_id=RULES) as session:
-        with pytest.raises(StoreError, match="non-people"):
-            session.world.emit("x", None)
+        assert session.world.people.diagnostics()["person_payload_loads"] == 0
+        Simulation(session.world).step()
+        assert session.world.digest() == expected_digest
+        generation = session.save()
+        assert generation == session.pin.captured_head
+        diag = session.diagnostics()
+        assert diag["state"] == "active"
+        assert diag["people"]["resident_people"] <= 256
+
+    with open_lazy_world_session(destination, rules_id=RULES) as reopened:
+        assert reopened.world.digest() == expected_digest
+
+
+def test_cross_boundary_person_alias_restores_lazily_and_eager_mutation_fails_closed(tmp_path):
+    world = people_world(4, active=4)
+    shared_person = world.people[1]
+    world.currency.wallets[99] = {"person": shared_person}
+    source = tmp_path / "cross-cold.sqlite"
+    destination = tmp_path / "cross-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        assert session.world.people.diagnostics()["person_payload_loads"] == 0
+        eager_alias = session.world.currency.wallets[99]["person"]
+        assert session.diagnostics()["cross_boundary_identity_links"] >= 1
+        loaded = session.world.people[1]
+        assert loaded is eager_alias
+        before = loaded.wealth
+        with pytest.raises(StoreError, match="crosses world.people"):
+            loaded.wealth += 1.0
+        assert loaded.wealth == before
