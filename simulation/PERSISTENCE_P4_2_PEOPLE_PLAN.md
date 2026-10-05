@@ -416,3 +416,42 @@ The existing canonical `owner_index` remains exact during this subgate. Once
 resource membership/query behavior is green, replace its eager open cost with a
 checked lazy adapter and prove differential equality before removing eager
 materialization.
+
+
+## Measured family expansion — lazy magic-resource owner index
+
+Post-resource measurement on product head
+`fa3b6481e98f4fd91058d5318bdaa3ed727a4876`
+(run 37388835042) proves the remaining eager owner index dominates ordinary
+open for this family:
+- 1,000 resources/owners: 2,033 payload reads, 114,239 payload bytes;
+- 10,000 resources/owners: 20,033 payload reads, 1,032,248 payload bytes;
+- resource payload loads = 0 and aspiration payload loads = 0 in both cases.
+
+Migrate `world.magic_resources.owner_index` into a bounded lazy mapping rather
+than leaving a stale compatibility copy or teaching gameplay about persistence.
+
+Contract:
+- conversion migrates every owner-index bucket into versioned lazy rows with
+  exact current key order and persisted top-level set incarnation;
+- ordinary open decodes zero owner-index payloads;
+- key iteration uses lazy collection order metadata and does not decode bucket
+  payloads;
+- point get/setdefault loads only the addressed bucket;
+- loaded buckets are weakly bound notifying set wrappers; retained bucket aliases
+  after cache eviction rehydrate the canonical owner row and remain authoritative;
+- add/discard/remove/pop/clear/update mutate exactly as normal sets and dirty only
+  the corresponding owner row;
+- resource transfer/create/consume behavior and existing MagicResourceState API
+  remain unchanged;
+- owner-index changes, resource memberships/payloads, aspirations, people,
+  eager roots, EventLog and head publish in one generation/token;
+- exact differential proofs require each current owner bucket to equal
+  `set(resources.owner_ids(*owner))` before save and after reopen;
+- no-op save writes no owner-index payload;
+- explicit detach materializes a normal dict of normal sets;
+- eager tracker and ordinary open exclude the owner-index namespace only after
+  the lazy adapter is installed.
+
+After this gate, rerun the 1k/10k residual measurement. The owner-index migration
+passes only if ordinary open no longer scales with owner-index payload count.
