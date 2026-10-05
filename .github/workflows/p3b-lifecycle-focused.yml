@@ -1,4 +1,4 @@
-name: p3b-lifecycle-final-targeted
+name: p3b-lifecycle-final-targeted-v2
 on:
   push:
     branches:
