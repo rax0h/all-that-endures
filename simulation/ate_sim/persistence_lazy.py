@@ -756,6 +756,13 @@ class LazyRecordTable(RecordTable):
             (True,): set(self.ids(fields, True)),
         }
 
+    def preflight_change(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current lazy Person"
+            )
+
     def changed(self, key, field=None):
         if key in self.__dict__.get("_loading_keys", ()):
             return
