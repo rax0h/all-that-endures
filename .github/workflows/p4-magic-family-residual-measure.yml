@@ -1,0 +1,63 @@
+name: P4 magic family residual measure
+
+on:
+  push:
+    branches:
+      - sol-p4-magic-family-residual-measure
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from ate_sim.core import World
+          from ate_sim.magic_resources import MagicAspiration, MagicResource
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+
+          RULES="p4-magic-family-residual-final"
+
+          def build(n):
+              w=World(843000)
+              for i in range(1,n+1):
+                  w.magic_resources.resources[i]=MagicResource(
+                      i,"essence","fire","common",1,"person",i,0,None
+                  )
+                  w.magic_resources.owner_index[("person",i)]={i}
+                  w.magic_resources.aspirations[i]=MagicAspiration(
+                      .5,3,20,"curiosity",0
+                  )
+              w.magic_resources.next_id=n+1
+              return w
+
+          for n in (1000,10000):
+              with tempfile.TemporaryDirectory() as td:
+                  td=Path(td); cold=td/"cold.sqlite"; lazy=td/"lazy.sqlite"
+                  write_cold_snapshot(build(n),cold,rules_id=RULES)
+                  convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+                  with open_lazy_world_session(lazy,rules_id=RULES) as s:
+                      d=s.store.diagnostics()
+                      print("MEASURE",n,{
+                          "payload_reads":d.payload_reads,
+                          "payload_read_bytes":d.payload_read_bytes,
+                          "payload_check_reads":d.payload_check_reads,
+                          "payload_check_bytes":d.payload_check_bytes,
+                          "metadata_rows":d.metadata_rows,
+                          "people_loads":s.people.diagnostics()["person_payload_loads"],
+                          "aspiration_loads":s.aspirations.diagnostics()["aspiration_payload_loads"],
+                          "resource_loads":s.resources.diagnostics()["resource_payload_loads"],
+                          "owner_bucket_loads":s.owner_index.diagnostics()["owner_bucket_payload_loads"],
+                          "resources":len(s.resources),
+                          "aspirations":len(s.aspirations),
+                          "owner_buckets":len(s.owner_index),
+                      })
+          PY
