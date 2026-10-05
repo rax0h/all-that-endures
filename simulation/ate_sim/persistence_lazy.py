@@ -768,6 +768,16 @@ def _seed_cross_boundary_lazy_identity(session, links):
             incarnation,
             Occurrence(namespace, key, relative),
         )
+        if not relative and isinstance(eager_object, IndexedRecord):
+            table = (
+                session.people
+                if namespace == PEOPLE_NAMESPACE
+                else session.aspirations
+            )
+            object.__setattr__(
+                eager_object, "_index_table", weakref.ref(table)
+            )
+            object.__setattr__(eager_object, "_index_key", key)
         cross.append((target, owner))
     return tuple(cross)
 
