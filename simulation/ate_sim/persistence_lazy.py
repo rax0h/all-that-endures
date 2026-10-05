@@ -2784,11 +2784,28 @@ class LazyWorldSession:
             )
         return detached
 
+    def _stage_detached_aspirations(self):
+        expected = len(self.aspirations)
+        detached = {}
+        for key in self.aspirations:
+            value = self.aspirations[key]
+            if not isinstance(value, MagicAspiration):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-aspiration value"
+                )
+            detached[key] = value
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach aspiration materialization count mismatch"
+            )
+        return detached
+
     def _publish_materialized_detach(
         self,
         old_log,
         new_log,
         detached_people,
+        detached_aspirations,
         assignments,
         cache_removals,
         index_rebindings,
@@ -2805,6 +2822,7 @@ class LazyWorldSession:
             (record, weakref.ref(table), key)
             for record, table, key in index_rebindings
         ]
+        aspiration_records = tuple(detached_aspirations.values())
 
         # This is the final fallible storage operation.  If release/cleanup
         # fails, no staged graph replacement has been published and the session
@@ -2821,6 +2839,9 @@ class LazyWorldSession:
             for record, table_ref, key in prepared_rebindings:
                 object.__setattr__(record, "_index_table", table_ref)
                 object.__setattr__(record, "_index_key", key)
+            for record in aspiration_records:
+                object.__setattr__(record, "_index_table", None)
+                object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
             new_log.__dict__.pop("_ate_persistence_lifetime", None)
         finally:
@@ -2856,6 +2877,7 @@ class LazyWorldSession:
 
         self._registry.close()
         self.people = detached_people
+        self.aspirations = detached_aspirations
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -2881,12 +2903,16 @@ class LazyWorldSession:
             lifecycle._lifecycle_phase("after_history", self)
 
             detached_people = self._stage_detached_people()
+            detached_aspirations = self._stage_detached_aspirations()
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
                     old_log,
                     new_log,
-                    replacements={id(self.people): detached_people},
+                    replacements={
+                        id(self.people): detached_people,
+                        id(self.aspirations): detached_aspirations,
+                    },
                 )
             )
             for key, person in dict.items(detached_people):
@@ -2900,6 +2926,7 @@ class LazyWorldSession:
                 old_log,
                 new_log,
                 detached_people,
+                detached_aspirations,
                 assignments,
                 cache_removals,
                 index_rebindings,
@@ -2916,6 +2943,7 @@ class LazyWorldSession:
         return {
             "state": self._state,
             "people": self.people.diagnostics(),
+            "aspirations": self.aspirations.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
