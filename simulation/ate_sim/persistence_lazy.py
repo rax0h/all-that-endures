@@ -863,6 +863,20 @@ def _resource_occurrence_from_path(path):
     return None
 
 
+def _owner_index_occurrence_from_path(path):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "magic_resources")
+        and path[1] == ("field", "owner_index")
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
+
+
 def _lazy_occurrence_from_path(path):
     people = _people_occurrence_from_path(path)
     if people is not None:
@@ -888,6 +902,14 @@ def _lazy_occurrence_from_path(path):
             resource[0],
             relative,
             expected_type,
+        )
+    owner_bucket = _owner_index_occurrence_from_path(path)
+    if owner_bucket is not None:
+        return (
+            OWNER_INDEX_NAMESPACE,
+            owner_bucket[0],
+            owner_bucket[1],
+            set,
         )
     return None
 
@@ -1035,7 +1057,10 @@ def _initialize_eager_tracker(
         cold_mode=True,
     )
     tracker._excluded_namespaces = {
-        PEOPLE_NAMESPACE, ASPIRATION_NAMESPACE, RESOURCE_NAMESPACE
+        PEOPLE_NAMESPACE,
+        ASPIRATION_NAMESPACE,
+        RESOURCE_NAMESPACE,
+        OWNER_INDEX_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -2952,6 +2977,10 @@ class LazyWorldSession:
         self.resources = LazyResourceTable(self)
         object.__setattr__(
             world.magic_resources, "resources", self.resources
+        )
+        self.owner_index = LazyOwnerIndexTable(self)
+        object.__setattr__(
+            world.magic_resources, "owner_index", self.owner_index
         )
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
