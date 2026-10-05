@@ -1,0 +1,50 @@
+name: P4.2 generated cold diagnostic
+
+on:
+  push:
+    branches:
+      - sol-p4-2-generated-cold-diagnostic
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from ate_sim import generate_world
+          from ate_sim.persistence_adapters import write_snapshot, WorldCodec, SCHEMA, _read_manifest
+          from ate_sim.incremental_store import TransactionalStore
+
+          w=generate_world(918273,width=8,height=6,settlements=1)
+          w.event_ids={event.id for event in w.events}
+          with tempfile.TemporaryDirectory() as d:
+              p=Path(d)/"world.sqlite"
+              write_snapshot(w,p,rules_id="diag")
+              with TransactionalStore.open(
+                  p,codec=WorldCodec(identity_links_recorded=True),
+                  expected_simulation_schema=SCHEMA,
+                  expected_rules_id="diag"
+              ) as s:
+                  with s.read_transaction():
+                      m=_read_manifest(s)
+                      h=s.checked_head()
+                      mismatches=[]
+                      for ns,desc in m["collections"].items():
+                          actual=s.db.execute(
+                              "SELECT COUNT(*) FROM records WHERE namespace=?",(ns,)
+                          ).fetchone()[0]
+                          head=h.namespace_counts.get(ns,(0,0))[0]
+                          size=desc[1]
+                          if actual!=size or head!=size:
+                              mismatches.append((ns,size,actual,head))
+                      print("MISMATCHES",mismatches)
+                      print("LINEAGE_LEN",len(w.lineage.nodes))
+                      print("LINEAGE_KEYS",list(w.lineage.nodes)[:20])
+          PY
