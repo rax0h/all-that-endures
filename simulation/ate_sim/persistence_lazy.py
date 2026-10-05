@@ -838,9 +838,13 @@ class LazyPeopleSavePlan:
     target_generation: int
     version_changes: tuple[VersionChange, ...]
     identity_changes: tuple[IdentityOccurrenceChange, ...]
+    aspiration_version_changes: tuple[VersionChange, ...]
+    aspiration_identity_changes: tuple[IdentityOccurrenceChange, ...]
     cold_plan: Any
     touched_keys: tuple[Any, ...]
     structural_keys: tuple[Any, ...]
+    aspiration_touched_keys: tuple[Any, ...]
+    aspiration_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
@@ -1784,6 +1788,10 @@ class LazyWorldSession:
         )
         self.people = LazyRecordTable(self)
         object.__setattr__(world, "people", self.people)
+        self.aspirations = LazyAspirationTable(self)
+        object.__setattr__(
+            world.magic_resources, "aspirations", self.aspirations
+        )
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
@@ -2054,6 +2062,85 @@ class LazyWorldSession:
 
     def _top_occurrence(self, key):
         return Occurrence(PEOPLE_NAMESPACE, key, ())
+
+    def _aspiration_occurrence(self, key):
+        return Occurrence(ASPIRATION_NAMESPACE, key, ())
+
+    def _bind_assigned_aspiration(self, key, aspiration):
+        existing = self._registry.incarnation_for_object(aspiration)
+        if existing is None:
+            existing = self._registry.bind(aspiration)
+        occurrences = self._registry.occurrences_for_incarnation(existing)
+        foreign = [
+            item for item in occurrences
+            if item != self._aspiration_occurrence(key)
+        ]
+        if foreign:
+            raise StoreError(
+                "one aspiration incarnation cannot be assigned "
+                "to multiple lazy owners"
+            )
+        self._registry.attach_occurrence(
+            aspiration, self._aspiration_occurrence(key)
+        )
+        return existing
+
+    def _detach_assigned_aspiration(self, key, aspiration):
+        incarnation = self._registry.incarnation_for_object(aspiration)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._aspiration_occurrence(key),
+                expected=incarnation,
+            )
+
+    def _detach_unloaded_aspiration(self, key):
+        baseline = self.aspirations._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        self._registry.attach_existing(
+            incarnation, self._aspiration_occurrence(key)
+        )
+        self._registry.detach_occurrence(
+            self._aspiration_occurrence(key),
+            expected=incarnation,
+        )
+
+    def _bind_loaded_aspiration(self, key, aspiration):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, ASPIRATION_NAMESPACE, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy aspiration occurrence labels are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, MagicAspiration):
+                raise StoreIntegrityError(
+                    "aspiration incarnation is bound to wrong type"
+                )
+            result = live
+        else:
+            result = aspiration
+            self._registry.bind(
+                result,
+                self._aspiration_occurrence(key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation, self._aspiration_occurrence(key)
+        )
+        self.aspirations._baseline_incarnation[key] = incarnation.value
+        return result
+
 
     def _bind_assigned_person(self, key, person):
         existing = self._registry.incarnation_for_object(person)
