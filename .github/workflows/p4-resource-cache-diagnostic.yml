@@ -1,0 +1,47 @@
+name: P4 resource cache diagnostic
+
+on:
+  push:
+    branches:
+      - sol-p4-resource-cache-diagnostic
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from ate_sim.core import World
+          from ate_sim.magic_resources import MagicResource
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+
+          RULES="p4-resource-cache-diag"
+          w=World(843000)
+          for rid in range(1,301):
+              r=MagicResource(rid,"essence","fire","common",1,"person",rid,0,None)
+              w.magic_resources.resources[rid]=r
+              w.magic_resources.owner_index[("person",rid)]={rid}
+          w.magic_resources.next_id=301
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td); cold=td/"c.sqlite"; lazy=td/"l.sqlite"
+              write_cold_snapshot(w,cold,rules_id=RULES)
+              convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+              with open_lazy_world_session(lazy,rules_id=RULES) as s:
+                  t=s.world.magic_resources.resources
+                  retained=t[1]; transfers=retained.transfers
+                  print("AFTER_ONE",t.diagnostics(),"DIRTY1",1 in t._dirty,"LRU1",1 in t._lru)
+                  for key in range(2,301): t[key]
+                  print("AFTER_ALL",t.diagnostics(),"CONTAINS1",dict.__contains__(t,1),"DIRTY1",1 in t._dirty,"LRU1",1 in t._lru)
+                  print("LRU_HEAD",list(t._lru)[:10])
+                  print("LRU_TAIL",list(t._lru)[-10:])
+                  print("TRANSFER_SAME",transfers is retained.transfers)
+          PY
