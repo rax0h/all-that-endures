@@ -74,6 +74,22 @@ class VersionChange:
 
 
 @dataclass(frozen=True)
+class IdentityOccurrenceChange:
+    owner_namespace: str
+    owner_key: Any
+    occurrence_path: tuple[Any, ...]
+    incarnation_id: int | None = None
+    delete: bool = False
+
+
+@dataclass(frozen=True)
+class CheckedIdentityOccurrence:
+    incarnation_id: int
+    valid_from: int
+    valid_to: int | None
+
+
+@dataclass(frozen=True)
 class CommitResult:
     outcome: str
     generation: int
@@ -195,6 +211,47 @@ CREATE INDEX lazy_namespace_visible
 CREATE INDEX lazy_namespace_expiry
     ON lazy_namespace_state(valid_to, namespace, valid_from);
 
+CREATE TABLE lazy_identity_occurrence_versions(
+    owner_namespace TEXT NOT NULL,
+    owner_key BLOB NOT NULL,
+    occurrence_path BLOB NOT NULL,
+    incarnation_id INTEGER NOT NULL,
+    valid_from INTEGER NOT NULL,
+    valid_to INTEGER,
+    row_checksum TEXT NOT NULL,
+    PRIMARY KEY(owner_namespace, owner_key, occurrence_path, valid_from),
+    CHECK(incarnation_id > 0),
+    CHECK(valid_from >= 0),
+    CHECK(valid_to IS NULL OR valid_to > valid_from)
+);
+CREATE INDEX lazy_identity_occurrence_lookup
+    ON lazy_identity_occurrence_versions(
+        owner_namespace, owner_key, occurrence_path, valid_from, valid_to
+    );
+CREATE INDEX lazy_identity_occurrence_current
+    ON lazy_identity_occurrence_versions(
+        owner_namespace, owner_key, occurrence_path, incarnation_id
+    )
+    WHERE valid_to IS NULL;
+CREATE INDEX lazy_identity_occurrence_expiry
+    ON lazy_identity_occurrence_versions(
+        valid_to, owner_namespace, owner_key, occurrence_path, valid_from
+    );
+
+CREATE TABLE lazy_identity_state(
+    valid_from INTEGER PRIMARY KEY,
+    valid_to INTEGER,
+    next_incarnation_id INTEGER NOT NULL,
+    row_checksum TEXT NOT NULL,
+    CHECK(next_incarnation_id > 0),
+    CHECK(valid_from >= 0),
+    CHECK(valid_to IS NULL OR valid_to > valid_from)
+);
+CREATE INDEX lazy_identity_state_visible
+    ON lazy_identity_state(valid_from, valid_to);
+CREATE INDEX lazy_identity_state_expiry
+    ON lazy_identity_state(valid_to, valid_from);
+
 CREATE TABLE generation_pins(
     token TEXT PRIMARY KEY,
     store_uuid TEXT NOT NULL,
@@ -310,6 +367,38 @@ def _namespace_checksum(
     )
 
 
+def _identity_occurrence_checksum(
+    owner_namespace: str,
+    owner_key: bytes,
+    occurrence_path: bytes,
+    incarnation_id: int,
+    valid_from: int,
+    valid_to: int | None,
+) -> str:
+    return _framed_sha(
+        b"lazy-identity-occurrence-v1",
+        owner_namespace.encode("utf-8"),
+        owner_key,
+        occurrence_path,
+        _int_bytes(incarnation_id),
+        _int_bytes(valid_from),
+        _optional_int(valid_to),
+    )
+
+
+def _identity_state_checksum(
+    next_incarnation_id: int,
+    valid_from: int,
+    valid_to: int | None,
+) -> str:
+    return _framed_sha(
+        b"lazy-identity-state-v1",
+        _int_bytes(next_incarnation_id),
+        _int_bytes(valid_from),
+        _optional_int(valid_to),
+    )
+
+
 def _pin_checksum(store_uuid: str, token: str, generation: int) -> str:
     return _framed_sha(
         b"generation-pin-v1",
@@ -408,6 +497,11 @@ class LazyRecordStore:
             db.execute(
                 "INSERT INTO save_head VALUES (1,0,NULL,?,?,?,?,?,?)",
                 (position, seed, next_ids, namespaces, counts, checksum),
+            )
+            db.execute(
+                "INSERT INTO lazy_identity_state(valid_from,valid_to,next_incarnation_id,row_checksum) "
+                "VALUES (0,NULL,1,?)",
+                (_identity_state_checksum(1, 0, None),),
             )
             db.commit()
             db.close()
@@ -1164,6 +1258,194 @@ class LazyRecordStore:
             )
         return tuple(prepared)
 
+
+
+    def _identity_state_at(
+        self, generation: int
+    ) -> tuple[int, int, int | None]:
+        rows = self.db.execute(
+            "SELECT next_incarnation_id,valid_from,valid_to,row_checksum "
+            "FROM lazy_identity_state WHERE valid_from<=? "
+            "AND (valid_to IS NULL OR ?<valid_to) "
+            "ORDER BY valid_from DESC LIMIT 2",
+            (generation, generation),
+        ).fetchall()
+        self._metadata_rows += len(rows)
+        if len(rows) != 1:
+            raise StoreIntegrityError(
+                "identity state must have exactly one visible version"
+            )
+        next_id, valid_from, valid_to, checksum = rows[0]
+        if (
+            type(next_id) is not int
+            or next_id <= 0
+            or checksum
+            != _identity_state_checksum(next_id, valid_from, valid_to)
+        ):
+            raise StoreIntegrityError("lazy identity state checksum mismatch")
+        return int(next_id), int(valid_from), valid_to
+
+    def _visible_identity_occurrence(
+        self,
+        generation: int,
+        owner_namespace: str,
+        owner_key: bytes,
+        occurrence_path: bytes,
+    ) -> tuple[int, int, int | None, str] | None:
+        rows = self.db.execute(
+            "SELECT incarnation_id,valid_from,valid_to,row_checksum "
+            "FROM lazy_identity_occurrence_versions "
+            "WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? "
+            "AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) "
+            "ORDER BY valid_from DESC LIMIT 2",
+            (
+                owner_namespace,
+                owner_key,
+                occurrence_path,
+                generation,
+                generation,
+            ),
+        ).fetchall()
+        self._metadata_rows += len(rows)
+        if len(rows) > 1:
+            raise StoreIntegrityError(
+                "overlapping visible identity occurrence versions"
+            )
+        if not rows:
+            return None
+        incarnation_id, valid_from, valid_to, checksum = rows[0]
+        if (
+            type(incarnation_id) is not int
+            or incarnation_id <= 0
+            or checksum
+            != _identity_occurrence_checksum(
+                owner_namespace,
+                owner_key,
+                occurrence_path,
+                incarnation_id,
+                valid_from,
+                valid_to,
+            )
+        ):
+            raise StoreIntegrityError(
+                "lazy identity occurrence checksum mismatch"
+            )
+        return int(incarnation_id), int(valid_from), valid_to, checksum
+
+    def read_identity_state(self, pin: GenerationPin) -> int:
+        self._ensure_open()
+        generation = self._read_snapshot_start(pin)
+        try:
+            return self._identity_state_at(generation)[0]
+        finally:
+            self._read_snapshot_end()
+
+    def read_identity_occurrence(
+        self,
+        pin: GenerationPin,
+        owner_namespace: str,
+        owner_key: Any,
+        occurrence_path: tuple[Any, ...],
+    ) -> CheckedIdentityOccurrence:
+        self._ensure_open()
+        namespace = _validate_namespace(owner_namespace)
+        if type(occurrence_path) is not tuple:
+            raise TypeError("identity occurrence path must be a tuple")
+        encoded_key = self.codec.encode(owner_key)
+        encoded_path = self.codec.encode(occurrence_path)
+        generation = self._read_snapshot_start(pin)
+        try:
+            row = self._visible_identity_occurrence(
+                generation, namespace, encoded_key, encoded_path
+            )
+            if row is None:
+                raise KeyError(
+                    (owner_namespace, owner_key, occurrence_path)
+                )
+            return CheckedIdentityOccurrence(row[0], row[1], row[2])
+        finally:
+            self._read_snapshot_end()
+
+    def identity_occurrences_for_owner(
+        self,
+        pin: GenerationPin,
+        owner_namespace: str,
+        owner_key: Any,
+    ) -> tuple[tuple[tuple[Any, ...], int], ...]:
+        self._ensure_open()
+        namespace = _validate_namespace(owner_namespace)
+        encoded_key = self.codec.encode(owner_key)
+        generation = self._read_snapshot_start(pin)
+        try:
+            rows = self.db.execute(
+                "SELECT occurrence_path,incarnation_id,valid_from,valid_to,row_checksum "
+                "FROM lazy_identity_occurrence_versions "
+                "WHERE owner_namespace=? AND owner_key=? AND valid_from<=? "
+                "AND (valid_to IS NULL OR ?<valid_to) ORDER BY occurrence_path",
+                (namespace, encoded_key, generation, generation),
+            ).fetchall()
+            self._metadata_rows += len(rows)
+            out = []
+            for path, incarnation_id, valid_from, valid_to, checksum in rows:
+                if checksum != _identity_occurrence_checksum(
+                    namespace,
+                    encoded_key,
+                    path,
+                    incarnation_id,
+                    valid_from,
+                    valid_to,
+                ):
+                    raise StoreIntegrityError(
+                        "lazy identity occurrence checksum mismatch"
+                    )
+                decoded_path = self.codec.decode(path)
+                if type(decoded_path) is not tuple:
+                    raise StoreIntegrityError(
+                        "identity occurrence path is not a tuple"
+                    )
+                out.append((decoded_path, int(incarnation_id)))
+            return tuple(out)
+        finally:
+            self._read_snapshot_end()
+
+    def _prepare_identity_changes(
+        self, changes: Iterable[IdentityOccurrenceChange]
+    ) -> tuple[dict[str, Any], ...]:
+        prepared = []
+        seen = set()
+        for change in tuple(changes):
+            if not isinstance(change, IdentityOccurrenceChange):
+                raise TypeError(
+                    "identity_changes must contain IdentityOccurrenceChange"
+                )
+            namespace = _validate_namespace(change.owner_namespace)
+            if type(change.occurrence_path) is not tuple:
+                raise TypeError("identity occurrence path must be a tuple")
+            owner_key = self.codec.encode(change.owner_key)
+            occurrence_path = self.codec.encode(change.occurrence_path)
+            identity = (namespace, owner_key, occurrence_path)
+            if identity in seen:
+                raise ValueError("duplicate identity occurrence change")
+            seen.add(identity)
+            if change.delete:
+                if change.incarnation_id is not None:
+                    raise ValueError(
+                        "deleted identity occurrence must not supply incarnation_id"
+                    )
+            elif type(change.incarnation_id) is not int or change.incarnation_id <= 0:
+                raise ValueError(
+                    "identity occurrence incarnation_id must be a positive int"
+                )
+            prepared.append(
+                {
+                    "change": change,
+                    "owner_namespace": namespace,
+                    "owner_key": owner_key,
+                    "occurrence_path": occurrence_path,
+                }
+            )
+        return tuple(prepared)
+
     def _prepare_ordinary_changes(self, changes: Iterable[RecordChange]) -> tuple[dict[str, Any], ...]:
         prepared = []
         seen = set()
@@ -1487,6 +1769,154 @@ class LazyRecordStore:
             )
             self._metadata_rows += 1
 
+
+    def _write_identity_changes(
+        self,
+        prepared: tuple[dict[str, Any], ...],
+        current_generation: int,
+        new_generation: int,
+        *,
+        requested_next_incarnation_id: int | None,
+    ) -> None:
+        current_next, state_from, _state_to = self._identity_state_at(
+            current_generation
+        )
+        maximum_seen = current_next - 1
+        changed = False
+        for item in prepared:
+            change: IdentityOccurrenceChange = item["change"]
+            namespace = item["owner_namespace"]
+            owner_key = item["owner_key"]
+            occurrence_path = item["occurrence_path"]
+            existing = self._visible_identity_occurrence(
+                current_generation, namespace, owner_key, occurrence_path
+            )
+            if change.delete:
+                if existing is None:
+                    continue
+                incarnation_id, valid_from, _valid_to, _checksum = existing
+                new_checksum = _identity_occurrence_checksum(
+                    namespace,
+                    owner_key,
+                    occurrence_path,
+                    incarnation_id,
+                    valid_from,
+                    new_generation,
+                )
+                self.db.execute(
+                    "UPDATE lazy_identity_occurrence_versions "
+                    "SET valid_to=?,row_checksum=? "
+                    "WHERE owner_namespace=? AND owner_key=? "
+                    "AND occurrence_path=? AND valid_from=?",
+                    (
+                        new_generation,
+                        new_checksum,
+                        namespace,
+                        owner_key,
+                        occurrence_path,
+                        valid_from,
+                    ),
+                )
+                self._metadata_rows += 1
+                changed = True
+                continue
+
+            incarnation_id = int(change.incarnation_id)
+            maximum_seen = max(maximum_seen, incarnation_id)
+            if existing is not None and existing[0] == incarnation_id:
+                continue
+            if existing is not None:
+                old_id, valid_from, _valid_to, _checksum = existing
+                close_checksum = _identity_occurrence_checksum(
+                    namespace,
+                    owner_key,
+                    occurrence_path,
+                    old_id,
+                    valid_from,
+                    new_generation,
+                )
+                self.db.execute(
+                    "UPDATE lazy_identity_occurrence_versions "
+                    "SET valid_to=?,row_checksum=? "
+                    "WHERE owner_namespace=? AND owner_key=? "
+                    "AND occurrence_path=? AND valid_from=?",
+                    (
+                        new_generation,
+                        close_checksum,
+                        namespace,
+                        owner_key,
+                        occurrence_path,
+                        valid_from,
+                    ),
+                )
+                self._metadata_rows += 1
+            row_checksum = _identity_occurrence_checksum(
+                namespace,
+                owner_key,
+                occurrence_path,
+                incarnation_id,
+                new_generation,
+                None,
+            )
+            self.db.execute(
+                "INSERT INTO lazy_identity_occurrence_versions("
+                "owner_namespace,owner_key,occurrence_path,incarnation_id,"
+                "valid_from,valid_to,row_checksum) VALUES (?,?,?,?,?,NULL,?)",
+                (
+                    namespace,
+                    owner_key,
+                    occurrence_path,
+                    incarnation_id,
+                    new_generation,
+                    row_checksum,
+                ),
+            )
+            self._metadata_rows += 1
+            changed = True
+
+        derived_next = max(current_next, maximum_seen + 1)
+        if requested_next_incarnation_id is None:
+            final_next = derived_next
+        else:
+            if (
+                type(requested_next_incarnation_id) is not int
+                or requested_next_incarnation_id <= 0
+            ):
+                raise ValueError(
+                    "next_incarnation_id must be a positive int"
+                )
+            if requested_next_incarnation_id < derived_next:
+                raise ValueError(
+                    "next_incarnation_id cannot move behind observed incarnations"
+                )
+            final_next = requested_next_incarnation_id
+
+        if not changed and final_next == current_next:
+            return
+        closed_checksum = _identity_state_checksum(
+            current_next, state_from, new_generation
+        )
+        updated = self.db.execute(
+            "UPDATE lazy_identity_state SET valid_to=?,row_checksum=? "
+            "WHERE valid_from=? AND valid_to IS NULL",
+            (new_generation, closed_checksum, state_from),
+        ).rowcount
+        if updated != 1:
+            raise StoreIntegrityError(
+                "current lazy identity state could not be closed"
+            )
+        self.db.execute(
+            "INSERT INTO lazy_identity_state("
+            "valid_from,valid_to,next_incarnation_id,row_checksum"
+            ") VALUES (?,NULL,?,?)",
+            (
+                new_generation,
+                final_next,
+                _identity_state_checksum(final_next, new_generation, None),
+            ),
+        )
+        self._metadata_rows += 2
+
     def _write_ordinary_changes(
         self,
         prepared: tuple[dict[str, Any], ...],
@@ -1593,6 +2023,8 @@ class LazyRecordStore:
             "lazy_order_versions",
             "lazy_record_versions",
             "lazy_namespace_state",
+            "lazy_identity_occurrence_versions",
+            "lazy_identity_state",
         ):
             while True:
                 rowids = [
@@ -1622,12 +2054,15 @@ class LazyRecordStore:
         changes: Iterable[RecordChange],
         new_segments: Iterable[NewSegment],
         metadata: Mapping[str, Any],
+        identity_changes: Iterable[IdentityOccurrenceChange] = (),
+        next_incarnation_id: int | None = None,
     ) -> CommitResult:
         self._ensure_open()
         if pin.token in self._recovery_required:
             raise StoreConflictError("pin has unresolved commit acknowledgement")
         encoded_commit_token = self.codec.encode(commit_token)
         version_prepared = self._prepare_version_changes(version_changes)
+        identity_prepared = self._prepare_identity_changes(identity_changes)
         ordinary_prepared = self._prepare_ordinary_changes(changes)
         segment_prepared = self._prepare_segments(new_segments)
         position, seed, next_ids, namespaces_blob = _head_values(self.codec, metadata)
@@ -1643,60 +2078,124 @@ class LazyRecordStore:
             return CommitResult("conflict", current_generation, pin, stale=True)
         if registered_generation != current_generation:
             return CommitResult("conflict", current_generation, pin, stale=True)
-        if not version_prepared and not ordinary_prepared and not segment_prepared and current[2:6] == (
-            position,
-            seed,
-            next_ids,
-            namespaces_blob,
+        current_identity_next = self._identity_state_at(current_generation)[0]
+        identity_counter_change = (
+            next_incarnation_id is not None
+            and next_incarnation_id != current_identity_next
+        )
+        if (
+            not version_prepared
+            and not identity_prepared
+            and not identity_counter_change
+            and not ordinary_prepared
+            and not segment_prepared
+            and current[2:6]
+            == (position, seed, next_ids, namespaces_blob)
         ):
-            return CommitResult("not_committed", current_generation, pin, stale=False)
+            return CommitResult(
+                "not_committed", current_generation, pin, stale=False
+            )
 
         pins, _, attempts = self._checked_operational_rows(current_generation)
-        existing_attempt = next((row for row in attempts if row[0] == pin.token), None)
-        if existing_attempt is not None and existing_attempt[3] in {"pending", "committed"}:
+        existing_attempt = next(
+            (row for row in attempts if row[0] == pin.token), None
+        )
+        if (
+            existing_attempt is not None
+            and existing_attempt[3] in {"pending", "committed"}
+        ):
             raise StoreConflictError("pin has an unresolved commit attempt")
-        other_generations = [int(row[2]) for row in pins if row[0] != pin.token]
+        other_generations = [
+            int(row[2]) for row in pins if row[0] != pin.token
+        ]
         if other_generations and min(other_generations) < current_generation:
-            raise GenerationPressureError(current_generation, min(other_generations))
+            raise GenerationPressureError(
+                current_generation, min(other_generations)
+            )
 
-        self._register_attempt(pin, encoded_commit_token, current_generation)
+        self._register_attempt(
+            pin, encoded_commit_token, current_generation
+        )
         self._phase_hook("before_transaction")
         self.db.execute("BEGIN IMMEDIATE")
         committed = False
         try:
             locked = self._checked_head_row()
             locked_generation = int(locked[0])
-            pins, _, attempts = self._checked_operational_rows(locked_generation)
-            pin_row = next((row for row in pins if row[0] == pin.token), None)
+            pins, _, attempts = self._checked_operational_rows(
+                locked_generation
+            )
+            pin_row = next(
+                (row for row in pins if row[0] == pin.token), None
+            )
             if pin_row is None:
                 raise StoreConflictError("generation pin is not registered")
-            attempt = next((row for row in attempts if row[0] == pin.token), None)
-            if attempt is None or attempt[1] != encoded_commit_token or attempt[3] != "pending":
-                raise StoreConflictError("commit attempt is no longer pending")
-            if locked_generation != pin.captured_head or int(pin_row[2]) != pin.captured_head:
+            attempt = next(
+                (row for row in attempts if row[0] == pin.token), None
+            )
+            if (
+                attempt is None
+                or attempt[1] != encoded_commit_token
+                or attempt[3] != "pending"
+            ):
+                raise StoreConflictError(
+                    "commit attempt is no longer pending"
+                )
+            if (
+                locked_generation != pin.captured_head
+                or int(pin_row[2]) != pin.captured_head
+            ):
                 self.db.rollback()
                 self.db.execute("BEGIN IMMEDIATE")
                 row = self._attempt_row(pin.token)
-                if row is not None and row[0] == encoded_commit_token and row[2] == "pending":
+                if (
+                    row is not None
+                    and row[0] == encoded_commit_token
+                    and row[2] == "pending"
+                ):
                     self._write_attempt_state(
-                        pin.token, encoded_commit_token, current_generation, "conflict", None
+                        pin.token,
+                        encoded_commit_token,
+                        current_generation,
+                        "conflict",
+                        None,
                     )
                 self.db.commit()
-                return CommitResult("conflict", locked_generation, pin, stale=True)
+                return CommitResult(
+                    "conflict", locked_generation, pin, stale=True
+                )
 
-            other_generations = [int(row[2]) for row in pins if row[0] != pin.token]
+            other_generations = [
+                int(row[2]) for row in pins if row[0] != pin.token
+            ]
             if other_generations and min(other_generations) < locked_generation:
-                raise GenerationPressureError(locked_generation, min(other_generations))
+                raise GenerationPressureError(
+                    locked_generation, min(other_generations)
+                )
 
             counts = _namespace_counts(self.codec, locked[6])
             new_generation = locked_generation + 1
             self._write_lazy_changes(
-                version_prepared, locked_generation, new_generation, counts
+                version_prepared,
+                locked_generation,
+                new_generation,
+                counts,
             )
             self._phase_hook("during_version_writes")
-            self._write_ordinary_changes(ordinary_prepared, new_generation, counts)
+            self._write_identity_changes(
+                identity_prepared,
+                locked_generation,
+                new_generation,
+                requested_next_incarnation_id=next_incarnation_id,
+            )
+            self._phase_hook("during_identity_writes")
+            self._write_ordinary_changes(
+                ordinary_prepared, new_generation, counts
+            )
             self._phase_hook("during_ordinary_writes")
-            self._write_segments(segment_prepared, new_generation, counts)
+            self._write_segments(
+                segment_prepared, new_generation, counts
+            )
             self._phase_hook("during_segment_writes")
 
             missing = set(counts) - namespace_inventory
@@ -1734,7 +2233,11 @@ class LazyRecordStore:
             )
             self.db.execute(
                 "UPDATE generation_pins SET generation=?,row_checksum=? WHERE token=?",
-                (new_generation, new_pin_checksum, pin.token),
+                (
+                    new_generation,
+                    new_pin_checksum,
+                    pin.token,
+                ),
             )
             receipt_checksum = _receipt_checksum(
                 pin.token,
@@ -1774,21 +2277,29 @@ class LazyRecordStore:
             except sqlite3.Error:
                 if self.db.in_transaction:
                     self.db.rollback()
-                self._recovery_required[pin.token] = encoded_commit_token
+                self._recovery_required[pin.token] = (
+                    encoded_commit_token
+                )
                 raise
         except Exception:
             if not committed and self.db.in_transaction:
                 self.db.rollback()
             raise
 
-        updated = GenerationPin(pin.token, self.store_identity, new_generation)
+        updated = GenerationPin(
+            pin.token, self.store_identity, new_generation
+        )
         try:
             self._phase_hook("after_commit")
-            self._acknowledge_attempt(updated, encoded_commit_token, new_generation)
+            self._acknowledge_attempt(
+                updated, encoded_commit_token, new_generation
+            )
         except Exception:
             self._recovery_required[pin.token] = encoded_commit_token
             raise
-        return CommitResult("committed", new_generation, updated, stale=False)
+        return CommitResult(
+            "committed", new_generation, updated, stale=False
+        )
 
     def resolve_commit(self, pin: GenerationPin, commit_token: Any) -> CommitResult:
         self._ensure_open()
@@ -2059,6 +2570,8 @@ class LazyRecordStore:
             "lazy_order_versions",
             "lazy_record_versions",
             "lazy_namespace_state",
+            "lazy_identity_occurrence_versions",
+            "lazy_identity_state",
         ):
             obsolete = self.db.execute(
                 f"SELECT 1 FROM {table} WHERE valid_to IS NOT NULL AND valid_to<=? LIMIT 1",
@@ -2067,10 +2580,57 @@ class LazyRecordStore:
             if obsolete is not None:
                 raise StoreIntegrityError("expired lazy versions remain below the retention floor")
         current_lazy_counts: dict[str, int] = {}
+        current_identity_occurrences = 0
         for generation in retained:
             lazy_counts = self._verify_lazy_generation(generation)
+            next_identity = self._identity_state_at(generation)[0]
+            occurrence_rows = self.db.execute(
+                "SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,"
+                "valid_from,valid_to,row_checksum "
+                "FROM lazy_identity_occurrence_versions "
+                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+                (generation, generation),
+            ).fetchall()
+            seen_occurrences = set()
+            for (
+                owner_namespace,
+                owner_key,
+                occurrence_path,
+                incarnation_id,
+                valid_from,
+                valid_to,
+                checksum,
+            ) in occurrence_rows:
+                marker = (owner_namespace, owner_key, occurrence_path)
+                if marker in seen_occurrences:
+                    raise StoreIntegrityError(
+                        "overlapping visible identity occurrences"
+                    )
+                seen_occurrences.add(marker)
+                if checksum != _identity_occurrence_checksum(
+                    owner_namespace,
+                    owner_key,
+                    occurrence_path,
+                    incarnation_id,
+                    valid_from,
+                    valid_to,
+                ):
+                    raise StoreIntegrityError(
+                        "lazy identity occurrence checksum mismatch"
+                    )
+                self.codec.decode(owner_key)
+                path_value = self.codec.decode(occurrence_path)
+                if type(path_value) is not tuple:
+                    raise StoreIntegrityError(
+                        "identity occurrence path is not a tuple"
+                    )
+                if incarnation_id >= next_identity:
+                    raise StoreIntegrityError(
+                        "identity occurrence exceeds allocator state"
+                    )
             if generation == head_generation:
                 current_lazy_counts = lazy_counts
+                current_identity_occurrences = len(occurrence_rows)
 
         actual_counts = dict(ordinary_counts)
         for namespace, count in current_lazy_counts.items():
@@ -2109,6 +2669,36 @@ class LazyRecordStore:
         ):
             if checksum != _namespace_checksum(namespace, member_count, next_ordinal, valid_from, valid_to):
                 raise StoreIntegrityError("lazy namespace state checksum mismatch")
+        for owner_namespace, owner_key, occurrence_path, incarnation_id, valid_from, valid_to, checksum in self.db.execute(
+            "SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,valid_from,valid_to,row_checksum "
+            "FROM lazy_identity_occurrence_versions"
+        ):
+            if checksum != _identity_occurrence_checksum(
+                owner_namespace,
+                owner_key,
+                occurrence_path,
+                incarnation_id,
+                valid_from,
+                valid_to,
+            ):
+                raise StoreIntegrityError(
+                    "lazy identity occurrence checksum mismatch"
+                )
+            self.codec.decode(owner_key)
+            if type(self.codec.decode(occurrence_path)) is not tuple:
+                raise StoreIntegrityError(
+                    "identity occurrence path is not a tuple"
+                )
+        for next_identity, valid_from, valid_to, checksum in self.db.execute(
+            "SELECT next_incarnation_id,valid_from,valid_to,row_checksum "
+            "FROM lazy_identity_state"
+        ):
+            if checksum != _identity_state_checksum(
+                next_identity, valid_from, valid_to
+            ):
+                raise StoreIntegrityError(
+                    "lazy identity state checksum mismatch"
+                )
 
         return {
             "generation": head_generation,
@@ -2118,6 +2708,10 @@ class LazyRecordStore:
             "pins": len(pins),
             "receipts": len(receipts),
             "attempts": len(attempts),
+            "identity_occurrences": current_identity_occurrences,
+            "next_incarnation_id": self._identity_state_at(
+                head_generation
+            )[0],
         }
 
     def storage_metrics(self) -> dict[str, int]:
@@ -2130,6 +2724,12 @@ class LazyRecordStore:
             "lazy_order_versions": self.db.execute("SELECT COUNT(*) FROM lazy_order_versions").fetchone()[0],
             "lazy_query_versions": self.db.execute("SELECT COUNT(*) FROM lazy_query_versions").fetchone()[0],
             "lazy_namespace_versions": self.db.execute("SELECT COUNT(*) FROM lazy_namespace_state").fetchone()[0],
+            "identity_occurrence_versions": self.db.execute(
+                "SELECT COUNT(*) FROM lazy_identity_occurrence_versions"
+            ).fetchone()[0],
+            "identity_state_versions": self.db.execute(
+                "SELECT COUNT(*) FROM lazy_identity_state"
+            ).fetchone()[0],
             "lazy_payload_bytes": self.db.execute("SELECT COALESCE(SUM(LENGTH(payload)),0) FROM lazy_record_versions").fetchone()[0],
             "ordinary_payload_bytes": self.db.execute("SELECT COALESCE(SUM(LENGTH(payload)),0) FROM records").fetchone()[0],
             "segment_payload_bytes": self.db.execute("SELECT COALESCE(SUM(LENGTH(payload)),0) FROM segments").fetchone()[0],
@@ -2246,6 +2846,23 @@ class LazyRecordStore:
                 "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
                 (generation, generation),
             ).fetchall()
+            identity_occurrences = source_store.db.execute(
+                "SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,"
+                "valid_from,valid_to,row_checksum "
+                "FROM lazy_identity_occurrence_versions "
+                "WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+                (generation, generation),
+            ).fetchall()
+            identity_state = source_store.db.execute(
+                "SELECT valid_from,valid_to,next_incarnation_id,row_checksum "
+                "FROM lazy_identity_state WHERE valid_from<=? "
+                "AND (valid_to IS NULL OR ?<valid_to)",
+                (generation, generation),
+            ).fetchall()
+            if len(identity_state) != 1:
+                raise StoreIntegrityError(
+                    "identity state must have exactly one current version"
+                )
             ordinary_records = source_store.db.execute("SELECT * FROM records").fetchall()
             ordinary_memberships = source_store.db.execute("SELECT * FROM query_membership").fetchall()
             segments = source_store.db.execute("SELECT * FROM segments").fetchall()
@@ -2284,6 +2901,15 @@ class LazyRecordStore:
                 )
                 new_store.db.executemany(
                     "INSERT INTO lazy_namespace_state VALUES (?,?,?,?,?,?)", lazy_states
+                )
+                new_store.db.execute("DELETE FROM lazy_identity_state")
+                new_store.db.executemany(
+                    "INSERT INTO lazy_identity_occurrence_versions VALUES (?,?,?,?,?,?,?)",
+                    identity_occurrences,
+                )
+                new_store.db.executemany(
+                    "INSERT INTO lazy_identity_state VALUES (?,?,?,?)",
+                    identity_state,
                 )
                 # create() starts with no pins/receipts; keep operational state empty.
                 new_store.db.execute("DELETE FROM save_receipts")
