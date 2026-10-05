@@ -18,6 +18,7 @@ import weakref
 from typing import Any, Iterator
 
 from .core import Person, World
+from .magic_resources import MagicAspiration
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
     Membership,
@@ -93,7 +94,9 @@ from .persistence_tracking import IncrementalWorldSession
 
 
 PEOPLE_NAMESPACE = "world.people"
+ASPIRATION_NAMESPACE = "world.magic_resources.aspirations"
 LAZY_PERSON_SCHEMA = 1
+LAZY_ASPIRATION_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
