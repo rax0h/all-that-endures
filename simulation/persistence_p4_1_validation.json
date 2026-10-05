@@ -2,12 +2,12 @@
   "schema": 1,
   "tranche": "P4.1",
   "baseline_head": "953240816b6d332aa95e65a26b463b10a4b58ef4",
-  "stable_code_candidate": "c3f3525d7ddf3b2afdf39946a6fa9add9dd98225",
+  "stable_code_candidate": "4fc8cf187aeac82970fc80e5666ce824c33dce1d",
   "focused": {
-    "workflow_run_id": 37307695625,
+    "workflow_run_id": 37314495881,
     "result": "success",
-    "passed": 56,
-    "seconds": 5.1,
+    "passed": 68,
+    "seconds": 7.12,
     "includes": [
       "simulation/tests/test_persistence_lazy_store.py",
       "simulation/tests/test_persistence_lazy_store_failures.py",
@@ -15,13 +15,17 @@
     ]
   },
   "full_suite": {
-    "workflow_run_id": 37307789377,
-    "tested_sha": "c3f3525d7ddf3b2afdf39946a6fa9add9dd98225",
-    "scope": "pytest -vv --durations=20 simulation/tests",
+    "workflow_run_id": 37326902078,
+    "tested_product_sha": "4fc8cf187aeac82970fc80e5666ce824c33dce1d",
+    "helper_head_sha": "8b0d79624ec57f8004e43f13842101d0d2023c32",
+    "helper_only_difference": [
+      ".github/workflows/p4-1-foundation-full.yml"
+    ],
+    "scope": "PYTHONPATH=simulation:. python -m pytest -vv --durations=20 simulation/tests",
     "result": "success",
-    "passed": 674,
-    "seconds": 1737.93,
-    "duration": "0:28:57"
+    "passed": 686,
+    "seconds": 2034.19,
+    "duration": "0:33:54"
   },
   "bounds": {
     "max_registered_pins": 64,
@@ -35,7 +39,10 @@
     ],
     "hot_query_rows_at_each_scale": 1,
     "hot_query_payload_reads": 0,
-    "zero_result_query_rows": 0
+    "zero_result_query_rows": 0,
+    "latest_attempt_slots_per_pin": 1,
+    "iteration_is_lazy": true,
+    "payload_check_bytes_reported": true
   },
   "contracts": {
     "format_version": 3,
@@ -46,10 +53,13 @@
     "explicit_lost_ack_resolution": true,
     "source_preserving_current_head_copy": true,
     "exact_backup_preserves_operational_metadata": true,
-    "timeout_or_pid_pin_reaping": false
+    "timeout_or_pid_pin_reaping": false,
+    "transactional_pin_release_cleanup": true,
+    "checked_operational_metadata_before_reclamation": true,
+    "ambiguous_sqlite_commit_resolution": true
   },
   "p4_2_addendum": {
-    "status": "design_only",
+    "status": "authorized_next_slice",
     "authoritative_identity": "stable object incarnation scoped by store/world identity",
     "owner_key_is_identity": false,
     "sharing_group_is_identity": false,
@@ -62,7 +72,8 @@
       "group merge/split without incarnation rewrite",
       "group size and retained byte bounds",
       "no hidden whole-archive load through compatibility APIs"
-    ]
+    ],
+    "reinsertion_rule": "same Python object preserves incarnation; equal-but-distinct replacement gets a new incarnation"
   },
   "excluded": [
     "World integration",
@@ -72,5 +83,25 @@
     "checkpoint-default replacement",
     "Stage 1",
     "merge"
+  ],
+  "original_stable_code_candidate": "c3f3525d7ddf3b2afdf39946a6fa9add9dd98225",
+  "post_review_repairs": {
+    "authority": "simulation/STAGE_0_5_SOL_EXECUTION_HANDOFF.md",
+    "blockers_repaired": [
+      "lazy iter_keys page-bounded iterator",
+      "generation-specific query/order access paths",
+      "transactional release-time cleanup",
+      "durable most-recent attempt resolution"
+    ],
+    "foundation_audit": [
+      "standalone verify snapshot",
+      "checked operational metadata before reclamation",
+      "ambiguous SQLite commit acknowledgement",
+      "actual payload-check bytes"
+    ]
+  },
+  "notes": [
+    "Run 37314644932 failed during collection because helper PYTHONPATH omitted simulation; it is not product-code evidence.",
+    "Post-review result is an implementation gate pass, not a later Astra acceptance."
   ]
 }
