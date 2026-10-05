@@ -3336,6 +3336,90 @@ class LazyWorldSession:
         return result
 
 
+    def _owner_bucket_occurrence(self, key):
+        return Occurrence(OWNER_INDEX_NAMESPACE, key, ())
+
+    def _bind_assigned_owner_bucket(self, key, bucket):
+        if isinstance(bucket, LazyTrackedSet):
+            wrapper = bucket
+            wrapper._attach(self.owner_index, key)
+        else:
+            wrapper = LazyTrackedSet(bucket, self.owner_index, key)
+
+        existing = self._registry.incarnation_for_object(wrapper)
+        if existing is None:
+            existing = self._registry.bind(wrapper)
+        occurrences = self._registry.occurrences_for_incarnation(existing)
+        foreign = [
+            item for item in occurrences
+            if item != self._owner_bucket_occurrence(key)
+        ]
+        if foreign:
+            raise StoreError(
+                "one owner-index bucket cannot be assigned to multiple owners"
+            )
+        self._registry.attach_occurrence(
+            wrapper, self._owner_bucket_occurrence(key)
+        )
+        return wrapper
+
+    def _detach_assigned_owner_bucket(self, key, bucket):
+        incarnation = self._registry.incarnation_for_object(bucket)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._owner_bucket_occurrence(key),
+                expected=incarnation,
+            )
+        if isinstance(bucket, LazyTrackedSet):
+            bucket._detach()
+
+    def _detach_unloaded_owner_bucket(self, key):
+        baseline = self.owner_index._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        occurrence = self._owner_bucket_occurrence(key)
+        self._registry.attach_existing(incarnation, occurrence)
+        self._registry.detach_occurrence(
+            occurrence, expected=incarnation
+        )
+
+    def _bind_loaded_owner_bucket(self, key, bucket):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, OWNER_INDEX_NAMESPACE, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy owner-index occurrence labels are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, LazyTrackedSet):
+                raise StoreIntegrityError(
+                    "owner-index incarnation is bound to wrong type"
+                )
+            live._attach(self.owner_index, key)
+            result = live
+        else:
+            result = LazyTrackedSet(bucket, self.owner_index, key)
+            self._registry.bind(
+                result,
+                self._owner_bucket_occurrence(key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation, self._owner_bucket_occurrence(key)
+        )
+        self.owner_index._baseline_incarnation[key] = incarnation.value
+        return result
+
     def _resource_occurrence(self, key, path=()):
         return Occurrence(RESOURCE_NAMESPACE, key, tuple(path))
 
