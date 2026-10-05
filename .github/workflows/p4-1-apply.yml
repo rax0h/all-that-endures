@@ -48,3 +48,5 @@ jobs:
           git add simulation/ate_sim/persistence_lazy_store.py simulation/tests/test_persistence_lazy_store.py simulation/tests/test_persistence_lazy_store_failures.py
           git commit -m "Implement P4.1 versioned lazy storage [skip ci]"
           git push origin HEAD:sim/stage-0-5-stabilization
+
+# retry after staged payload verification
