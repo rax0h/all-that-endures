@@ -248,6 +248,17 @@ def _write_snapshot(world, path, *, rules_id, legacy_identity=False):
     validate_schema()
     if type(world) is not World:
         raise CodecError('expected World from this package registry')
+    if (
+        world.__dict__.get('_ate_persistence_lifetime') is not None
+        or (
+            isinstance(world.events, EventLog)
+            and world.events._disk_prefix is not None
+        )
+    ):
+        raise StoreFormatError(
+            'write_snapshot does not accept a cold World; use '
+            'session.detach(materialize_history=True) or cold-store backup'
+        )
     if world.__dict__.get('_index_current_people') or world.advancement.__dict__.get('_rank_cache') is not None:
         raise CodecError('snapshot requires a completed simulation step')
     links = []
@@ -743,6 +754,17 @@ def read_snapshot(path, *, rules_id):
     with TransactionalStore.open(path, codec=codec, expected_simulation_schema=SCHEMA,
                                  expected_rules_id=rules_id) as store:
         with store.read_transaction():
+            raw_manifest = store.read_record(
+                META, 'manifest', expected_record_schema=RECORD_SCHEMA
+            )
+            if (
+                type(raw_manifest) is dict
+                and raw_manifest.get('event_storage') is not None
+            ):
+                raise StoreFormatError(
+                    'read_snapshot does not accept cold event storage; '
+                    'use open_world_session'
+                )
             counts = store.verify_all()
             if counts['segments']:
                 raise StoreFormatError('P2A does not use store segments')

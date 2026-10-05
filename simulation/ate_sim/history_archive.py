@@ -84,7 +84,7 @@ CREATE INDEX link_target ON links(target_kind,target_id,relation,source_kind,sou
 '''
 
 
-def export_archive(world, path, *, digest=None):
+def _export_archive_impl(world, path, *, digest=None, _cold_guarded=False):
     """Atomically create a new archive; refuse overwrite. Timings stay outside bytes.
 
     Byte determinism is guaranteed for the same SQLite version/settings. The
@@ -107,8 +107,16 @@ def export_archive(world, path, *, digest=None):
             logical.update(encode([table, row]).encode()); logical.update(b'\n')
         def link(sk, si, relation, tk, ti, ordinal=0):
             if ti is not None: insert('links', (sk, key(si), relation, tk, key(ti), ordinal))
+        if digest is None:
+            if _cold_guarded:
+                from .core import _digest_world_unchecked
+                world_digest = _digest_world_unchecked(world)
+            else:
+                world_digest = world.digest()
+        else:
+            world_digest = digest
         metadata = {'schema': SCHEMA_VERSION, 'seed': world.seed, 'year': world.year,
-                    'world_digest': digest or world.digest(), 'coverage': COVERAGE,
+                    'world_digest': world_digest, 'coverage': COVERAGE,
                     'collections': COLLECTIONS}
         for k, v in sorted(metadata.items()): insert('metadata', (k, encode(v)))
         # Insert all event nodes before foreign-key edges; validate chronology.
@@ -190,6 +198,20 @@ def export_archive(world, path, *, digest=None):
     return {'record': 'archive', 'archive_seconds': perf_counter()-start,
             'archive_bytes': path.stat().st_size, 'logical_sha256': logical.hexdigest(),
             'path': str(path)}
+
+
+def export_archive(world, path, *, digest=None):
+    """Guard cold full-history export before any filesystem side effect."""
+    marker = getattr(world, "__dict__", {}).get("_ate_persistence_lifetime")
+    if marker is None:
+        return _export_archive_impl(world, path, digest=digest)
+    marker.begin_operation("archive")
+    try:
+        return _export_archive_impl(
+            world, path, digest=digest, _cold_guarded=True
+        )
+    finally:
+        marker.end_operation("archive")
 
 
 class HistoryArchive:

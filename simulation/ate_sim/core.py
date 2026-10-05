@@ -115,8 +115,16 @@ class World:
    if p.alive:out[p.settlement].append(p)
   return out
  def digest(self):
-  from .canonical_stream import digest
-  return digest(self,_canonical,_canonical_fields)
+  marker=self.__dict__.get('_ate_persistence_lifetime')
+  if marker is None:return _digest_world_unchecked(self)
+  marker.begin_operation('digest')
+  try:return _digest_world_unchecked(self)
+  finally:marker.end_operation('digest')
+
+def _digest_world_unchecked(world):
+ from .canonical_stream import digest
+ return digest(world,_canonical,_canonical_fields)
+
 
 _MASK=(1<<64)-1
 class _FastRandom:
