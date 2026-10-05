@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from collections.abc import ItemsView, KeysView, ValuesView
-from dataclasses import dataclass, is_dataclass
+from dataclasses import dataclass, is_dataclass, replace
 import os
 from pathlib import Path
 import tempfile
@@ -36,10 +36,18 @@ from .persistence_adapters import (
     ROOT_TYPES,
     SCHEMA,
     WorldCodec,
+    _at_path,
     _read_current_identity_links,
     _restore_collection,
     _restore_identity,
     _roots,
+)
+from .persistence_cold_save import (
+    _capture_successor,
+    _change_evidence,
+    _counts_tuple,
+    prepare_cold_save,
+    publish_cold_save,
 )
 from .persistence_events import SealedEventPrefix
 from .persistence_identity import (
@@ -70,6 +78,7 @@ from .persistence_session import (
     COMMIT_DESCRIPTOR_KEY,
     EVENT_STORAGE,
     SESSION_DESCRIPTOR_SCHEMA,
+    _capture_cold_baseline_ordinals,
     _capture_cold_world,
     _preflight_conversion_paths,
     _publish_private_cold_file,
@@ -77,6 +86,7 @@ from .persistence_session import (
     _read_suffix,
     _validate_head_inventory,
 )
+from .persistence_tracking import IncrementalWorldSession
 
 
 PEOPLE_NAMESPACE = "world.people"
