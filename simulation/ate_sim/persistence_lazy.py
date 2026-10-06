@@ -9505,6 +9505,133 @@ class LazyWorldSession:
         return detached, replacements
 
 
+    def _stage_plain_advancement_value(
+        self,
+        value,
+        replacements,
+        assignments,
+        records,
+        memo,
+    ):
+        cls = type(value)
+        if value is None or cls in (
+            bool, int, float, str, bytes, FrozenDict, FrozenList
+        ):
+            return value
+        ident = id(value)
+        if ident in memo:
+            return memo[ident]
+        if ident in replacements:
+            memo[ident] = replacements[ident]
+            return replacements[ident]
+
+        if is_dataclass(value):
+            memo[ident] = value
+            if isinstance(value, IndexedRecord):
+                records[id(value)] = value
+            for name in RECORD_FIELDS.get(cls, ()):
+                child = getattr(value, name)
+                replacement = self._stage_plain_advancement_value(
+                    child,
+                    replacements,
+                    assignments,
+                    records,
+                    memo,
+                )
+                if replacement is not child:
+                    assignments.append((value, name, replacement))
+            return value
+
+        if isinstance(value, dict):
+            plain = {}
+            memo[ident] = plain
+            replacements[ident] = plain
+            for key, child in value.items():
+                plain[key] = self._stage_plain_advancement_value(
+                    child,
+                    replacements,
+                    assignments,
+                    records,
+                    memo,
+                )
+            return plain
+
+        if isinstance(value, list):
+            plain = []
+            memo[ident] = plain
+            replacements[ident] = plain
+            plain.extend(
+                self._stage_plain_advancement_value(
+                    child,
+                    replacements,
+                    assignments,
+                    records,
+                    memo,
+                )
+                for child in value
+            )
+            return plain
+
+        if isinstance(value, set):
+            plain = set(value)
+            memo[ident] = plain
+            replacements[ident] = plain
+            return plain
+
+        if cls is tuple:
+            plain = tuple(
+                self._stage_plain_advancement_value(
+                    child,
+                    replacements,
+                    assignments,
+                    records,
+                    memo,
+                )
+                for child in value
+            )
+            memo[ident] = plain
+            return plain
+
+        return value
+
+    def _stage_detached_advancement_paths(self, replacements=None):
+        expected = len(self.advancement_paths)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        assignments = []
+        records = {}
+        memo = {}
+        for key in self.advancement_paths:
+            path = self.advancement_paths[key]
+            if not isinstance(path, EssencePath):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-EssencePath value"
+                )
+            staged = self._stage_plain_advancement_value(
+                path,
+                replacements,
+                assignments,
+                records,
+                memo,
+            )
+            if staged is not path:
+                raise StoreIntegrityError(
+                    "advancement detach replaced top-level path identity"
+                )
+            detached[key] = path
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach advancement path count mismatch"
+            )
+        return (
+            detached,
+            replacements,
+            assignments,
+            tuple(records.values()),
+        )
+
+
     def _stage_detached_souls(self, replacements=None):
         expected = len(self.souls)
         detached = {}
