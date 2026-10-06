@@ -13470,6 +13470,107 @@ class LazyWorldSession:
                 )
 
 
+    def _validate_lineage_child_successor(self, plan, generation):
+        for change in plan.lineage_child_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, LINEAGE_CHILD_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted lineage child bucket remains visible"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved lineage child bucket is absent"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                LINEAGE_CHILD_NAMESPACE,
+                typed_key,
+                row,
+                decode=False,
+            )
+            if (
+                schema != LAZY_LINEAGE_CHILD_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved lineage-child bucket evidence mismatch"
+                )
+
+        for change in plan.lineage_child_edge_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, LINEAGE_CHILD_EDGE_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted lineage child edge remains visible"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved lineage child edge is absent"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                LINEAGE_CHILD_EDGE_NAMESPACE,
+                typed_key,
+                row,
+                decode=False,
+            )
+            expected_memberships = tuple(
+                (
+                    member.index_name,
+                    member.value,
+                    member.ordinal,
+                )
+                for member in change.memberships
+            )
+            if (
+                schema != LAZY_LINEAGE_CHILD_EDGE_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships != expected_memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved lineage-child edge evidence mismatch"
+                )
+
+        for change in plan.lineage_child_identity_changes:
+            encoded_key = self.store.codec.encode(change.owner_key)
+            encoded_path = self.store.codec.encode(change.occurrence_path)
+            row = self.store._visible_identity_occurrence(
+                generation,
+                change.owner_namespace,
+                encoded_key,
+                encoded_path,
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted lineage-child incarnation remains visible"
+                    )
+            elif row is None or row[0] != change.incarnation_id:
+                raise StoreIntegrityError(
+                    "saved lineage-child incarnation evidence mismatch"
+                )
+
+
     def _validate_genealogy_parent_successor(self, plan, generation):
         for change in plan.genealogy_parent_version_changes:
             typed_key = self.store.codec.encode(change.key)
@@ -13650,6 +13751,7 @@ class LazyWorldSession:
         self.social_partnerships._pin = result.pin
         self.skills._pin = result.pin
         self.lineage_nodes._pin = result.pin
+        self.lineage_children._pin = result.pin
         self.genealogy_parents._pin = result.pin
         self.genealogy_children._pin = result.pin
         self.community_memberships._pin = result.pin
@@ -13689,6 +13791,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_lineage_node_successor(
+            plan, result.generation
+        )
+        self._validate_lineage_child_successor(
             plan, result.generation
         )
         self._validate_genealogy_parent_successor(
@@ -13741,6 +13846,7 @@ class LazyWorldSession:
         self.social_partnerships.accept_save(plan, result.pin)
         self.skills.accept_save(plan, result.pin)
         self.lineage_nodes.accept_save(plan, result.pin)
+        self.lineage_children.accept_save(plan, result.pin)
         self.genealogy_parents.accept_save(plan, result.pin)
         self.genealogy_children.accept_save(plan, result.pin)
         self.community_memberships.accept_save(plan, result.pin)
@@ -13823,6 +13929,8 @@ class LazyWorldSession:
                     + plan.social_partnership_version_changes
                     + plan.skill_version_changes
                     + plan.lineage_node_version_changes
+                    + plan.lineage_child_version_changes
+                    + plan.lineage_child_edge_version_changes
                     + plan.genealogy_parent_version_changes
                     + plan.genealogy_child_version_changes
                     + plan.community_membership_version_changes
@@ -13850,6 +13958,7 @@ class LazyWorldSession:
                     + plan.social_partnership_identity_changes
                     + plan.skill_identity_changes
                     + plan.lineage_node_identity_changes
+                    + plan.lineage_child_identity_changes
                     + plan.genealogy_parent_identity_changes
                     + plan.genealogy_child_identity_changes
                     + plan.community_membership_identity_changes
