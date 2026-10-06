@@ -32,3 +32,5 @@ After focused + scaling + affected gates, rerun residual eager inventory.
 P4.13 focused run 37500040627: 16/16 passed in 35.91s.
 
 P4.13 scaling run 37500284618: open 35 reads at 1k and 10k; person query 1 read / 30 bytes; one membership save 3 writes / 176 bytes; resident memberships 1.
+
+P4.13 affected run 37500470378: 312/312 passed in 379.90s (6:19).
