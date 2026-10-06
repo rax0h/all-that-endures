@@ -1,5 +1,7 @@
 name: Hot working set validation
 
+# Candidate includes pinned membership-query reuse.
+
 on:
   push:
     branches:
