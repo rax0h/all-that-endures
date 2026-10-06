@@ -679,6 +679,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     treasury_next_ordinal = 0
                     soul_count = 0
                     soul_next_ordinal = 0
+                    advancement_count = 0
+                    advancement_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -705,6 +707,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             WALLET_NAMESPACE,
                             TREASURY_NAMESPACE,
                             SOUL_NAMESPACE,
+                            ADVANCEMENT_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -902,7 +905,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             treasury_next_ordinal = max(
                                 treasury_next_ordinal, ordinal + 1
                             )
-                        else:
+                        elif namespace == SOUL_NAMESPACE:
                             if not isinstance(value, SoulState):
                                 raise StoreFormatError(
                                     "invalid soul source envelope"
@@ -919,6 +922,24 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             soul_count += 1
                             soul_next_ordinal = max(
                                 soul_next_ordinal, ordinal + 1
+                            )
+                        else:
+                            if not isinstance(value, EssencePath):
+                                raise StoreFormatError(
+                                    "invalid advancement path source envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=ADVANCEMENT_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_ADVANCEMENT_SCHEMA,
+                            )
+                            advancement_count += 1
+                            advancement_next_ordinal = max(
+                                advancement_next_ordinal, ordinal + 1
                             )
 
                     for row in source_store.db.execute(
@@ -937,6 +958,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             WALLET_NAMESPACE,
                             TREASURY_NAMESPACE,
                             SOUL_NAMESPACE,
+                            ADVANCEMENT_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1067,6 +1089,11 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             soul_count,
                             soul_next_ordinal,
                         ),
+                        (
+                            ADVANCEMENT_NAMESPACE,
+                            advancement_count,
+                            advancement_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1156,6 +1183,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "wallets": wallet_count,
                 "treasuries": treasury_count,
                 "souls": soul_count,
+                "advancement_paths": advancement_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
