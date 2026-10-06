@@ -12218,8 +12218,8 @@ class LazyWorldSession:
                 raise StoreIntegrityError(
                     f"lazy detach encountered wrong {label} value"
                 )
-            dict.__setitem__(detached, key, record)
-        if dict.__len__(detached) != expected:
+            detached[key] = record
+        if len(detached) != expected:
             raise StoreIntegrityError(
                 f"lazy detach {label} count mismatch"
             )
@@ -12250,7 +12250,7 @@ class LazyWorldSession:
 
     def _stage_detached_social_edges(self, replacements=None):
         expected = len(self.social_edges)
-        detached = RecordTable()
+        detached = {}
         if replacements is None:
             replacements = {}
         assignments = []
@@ -12389,6 +12389,9 @@ class LazyWorldSession:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             for record in advancement_records:
+                object.__setattr__(record, "_index_table", None)
+                object.__setattr__(record, "_index_key", None)
+            for record in social_edge_records:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
@@ -12625,7 +12628,6 @@ class LazyWorldSession:
                 detached_institution_applications,
                 detached_transmissions,
                 detached_motives,
-                detached_social_edges,
             ):
                 for key, record in dict.items(table):
                     index_rebindings.append((record, table, key))
