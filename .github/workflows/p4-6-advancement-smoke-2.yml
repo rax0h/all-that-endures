@@ -1,0 +1,73 @@
+name: P4.6 advancement smoke 2
+
+on:
+  push:
+    branches:
+      - sol-p4-6-advancement-smoke-2
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from ate_sim.core import World
+          from ate_sim.advancement import AdvancementState
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim import checkpoint
+
+          RULES="p4-6-advancement-smoke"
+          with tempfile.TemporaryDirectory() as td:
+              root=Path(td)
+              cold=root/"cold.sqlite"
+              lazy=root/"lazy.sqlite"
+              world=World(846001)
+              world.advancement=AdvancementState()
+              path,_=world.advancement.absorb_essence(
+                  1,"fire",0,("smith","neutral","worker")
+              )
+              world.advancement.awaken_skill(
+                  1,"eyes",1,("worker",),target_essence="fire"
+              )
+              write_cold_snapshot(world,cold,rules_id=RULES)
+              convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+
+              with open_lazy_world_session(lazy,rules_id=RULES) as s:
+                  assert s.advancement_paths.diagnostics()["advancement_payload_loads"] == 0
+                  path=s.world.advancement.path(1)
+                  assert path is not None
+                  assert s.advancement_paths.diagnostics()["advancement_payload_loads"] == 1
+                  path.core_fraction=.25
+                  ability=path.abilities[0]
+                  ability.rank=2
+                  ability.understanding.evidence["smoke"]=1
+                  ability.response_model.samples.append(
+                      {"event":1,"inputs":[1.0,2.0],"response":.5}
+                  )
+                  generation=s.pin.captured_head
+                  assert s.save() == generation + 1
+
+              with open_lazy_world_session(lazy,rules_id=RULES) as s:
+                  assert s.advancement_paths.diagnostics()["advancement_payload_loads"] == 0
+                  path=s.world.advancement.path(1)
+                  ability=path.abilities[0]
+                  assert path.core_fraction == .25
+                  assert ability.rank == 2
+                  assert ability.understanding.evidence["smoke"] == 1
+                  assert ability.response_model.samples[-1]["event"] == 1
+                  detached=s.detach(materialize_history=True)
+                  assert type(detached.advancement.paths) is dict
+                  assert detached.advancement.path(1).abilities[0].rank == 2
+                  restored=checkpoint.loads(checkpoint.dumps(detached))
+                  assert restored.digest() == detached.digest()
+          print("ADVANCEMENT_SMOKE_OK")
+          PY
