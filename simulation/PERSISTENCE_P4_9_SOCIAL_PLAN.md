@@ -88,3 +88,32 @@ and must not recreate archive-sized memory.
   fixed relationship/partnership queries bounded.
 
 After P4.9 closes, rerun residual inventory and continue by measured cost.
+
+
+## Focused and scaling evidence
+
+Product implementation head: `eb6a419475fff8feafa59386f145df84b0d99088`.
+
+Focused run `37411175904` passed **6/6 in 1.08s**, covering the new
+lazy-social persistence proofs plus the existing living-partnership behavior.
+
+Scaling run `37411269270` passed the 1,000/10,000 fixed-work proof:
+
+| Measure | 1,000 pairs | 10,000 pairs |
+| --- | ---: | ---: |
+| ordinary-open payload reads | 33 | 33 |
+| ordinary-open payload bytes | 16,670 | 16,676 |
+| fixed social query payload reads | 4 | 4 |
+| fixed social query payload bytes | 836 | 836 |
+| one-edge save payload writes | 3 | 3 |
+| one-edge save payload bytes | 539 | 539 |
+| resident relationships | 2 | 2 |
+| resident adjacency rows | 1 | 1 |
+| resident partnerships | 1 | 1 |
+
+The fixed queries returned exactly the same results at both sizes:
+relationships `[(1,2),(1,3)]`, neighbors `[2,3]`, and living partnership
+`{(1,2): 2000001}`.
+
+The broad affected P4 regression gate is still required before P4.9 is
+accepted closed.
