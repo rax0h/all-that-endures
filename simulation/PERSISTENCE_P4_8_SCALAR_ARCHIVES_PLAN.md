@@ -94,3 +94,26 @@ The fixed transmission history returned IDs `[1,2]` at both sizes.
 
 Affected P4 regression evidence is still required before this tranche is
 accepted closed.
+
+
+## Final validation evidence
+
+P4.8 is accepted closed on product head
+`7d07ca3035882b3c1f0b46ce6782dd7c7abb926c`.
+
+- Focused run `37405892154`: **11/11 passed in 2.70s**.
+- Scaling run `37405979599`: 1,000 and 10,000 rows both opened at
+  **33 payload reads** (~16.7 KB), fixed transmission-history + motive point
+  access used **3 payload reads / 1,180 bytes**, one motive save used
+  **3 payload writes / 528 bytes**, and residency stayed at
+  **2 transmissions / 1 motive**.
+- Motive real-step regression run `37408711813`: **2/2 passed in 3.00s**.
+- Corrected affected P4 run `37408783568`: **252/252 passed in 212.94s
+  (3:32)**.
+
+The earlier affected failures were resolved by excluding persistence binding
+metadata from Agency motive selection; no gameplay balance or simulation rule
+changed.
+
+Next action: rerun the residual eager inventory from this validated head and
+select the next family strictly by measured remaining cost.
