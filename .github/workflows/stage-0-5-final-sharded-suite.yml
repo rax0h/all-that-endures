@@ -1,0 +1,51 @@
+name: Stage 0.5 final sharded suite
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-final-sharded-suite
+
+jobs:
+  full-suite-shard:
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONPATH: .:simulation
+      SHARD_COUNT: "8"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - name: Run full-suite shard
+        env:
+          SHARD_INDEX: ${{ matrix.shard }}
+        run: |
+          python - <<'PY'
+          import os, subprocess, sys
+          collected = subprocess.check_output(
+              [sys.executable, "-m", "pytest", "--collect-only", "-q", "simulation/tests"],
+              text=True,
+              env=os.environ,
+          )
+          nodeids = [
+              line.strip()
+              for line in collected.splitlines()
+              if line.startswith("simulation/tests/") and "::" in line
+          ]
+          shard = int(os.environ["SHARD_INDEX"])
+          count = int(os.environ["SHARD_COUNT"])
+          selected = [nodeid for i, nodeid in enumerate(nodeids) if i % count == shard]
+          print(f"shard {shard}/{count}: {len(selected)} of {len(nodeids)} tests")
+          if not selected:
+              raise SystemExit("empty test shard")
+          raise SystemExit(subprocess.call(
+              [sys.executable, "-m", "pytest", "-q", *selected],
+              env=os.environ,
+          ))
+          PY
