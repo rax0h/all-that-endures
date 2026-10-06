@@ -28,3 +28,5 @@ Acceptance:
   regressions stay green.
 
 After focused + scaling + affected gates, rerun residual eager inventory.
+
+P4.13 focused run 37500040627: 16/16 passed in 35.91s.
