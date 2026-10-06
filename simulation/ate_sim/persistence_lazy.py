@@ -9016,6 +9016,61 @@ class LazyWorldSession:
                 )
 
 
+    def _validate_advancement_successor(self, plan, generation):
+        for change in plan.advancement_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, ADVANCEMENT_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted advancement path remains visible after save"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved advancement path is absent after save"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                ADVANCEMENT_NAMESPACE, typed_key, row, decode=False
+            )
+            if (
+                schema != LAZY_ADVANCEMENT_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved advancement path payload evidence mismatch"
+                )
+        for change in plan.advancement_identity_changes:
+            encoded_key = self.store.codec.encode(change.owner_key)
+            encoded_path = self.store.codec.encode(
+                change.occurrence_path
+            )
+            row = self.store._visible_identity_occurrence(
+                generation,
+                change.owner_namespace,
+                encoded_key,
+                encoded_path,
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted advancement incarnation remains visible"
+                    )
+            elif row is None or row[0] != change.incarnation_id:
+                raise StoreIntegrityError(
+                    "saved advancement incarnation evidence mismatch"
+                )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -9043,6 +9098,7 @@ class LazyWorldSession:
         self.wallets._pin = result.pin
         self.treasuries._pin = result.pin
         self.souls._pin = result.pin
+        self.advancement_paths._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -9064,6 +9120,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_soul_successor(
+            plan, result.generation
+        )
+        self._validate_advancement_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -9096,6 +9155,7 @@ class LazyWorldSession:
         self.wallets.accept_save(plan, result.pin)
         self.treasuries.accept_save(plan, result.pin)
         self.souls.accept_save(plan, result.pin)
+        self.advancement_paths.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -9107,7 +9167,7 @@ class LazyWorldSession:
         self._cross_boundary_links = tuple(
             link for link in self.identity_links
             if _path_under_lazy(link[0])
-            != _path_under_lazy(link[1])
+            or _path_under_lazy(link[1])
         )
         self._pending_save = None
         self._state = "active"
@@ -9164,6 +9224,7 @@ class LazyWorldSession:
                     + plan.wallet_version_changes
                     + plan.treasury_version_changes
                     + plan.soul_version_changes
+                    + plan.advancement_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -9177,6 +9238,7 @@ class LazyWorldSession:
                     + plan.wallet_identity_changes
                     + plan.treasury_identity_changes
                     + plan.soul_identity_changes
+                    + plan.advancement_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
