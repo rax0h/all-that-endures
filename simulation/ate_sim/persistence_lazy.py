@@ -4677,6 +4677,562 @@ class LazyMaterialLotTable(LazyRecordTable):
         }
 
 
+def _plain_soul_value(soul):
+    """Storage value for a live lazy soul without runtime wrappers."""
+    if not isinstance(soul, SoulState):
+        raise TypeError("expected SoulState")
+    return replace(
+        soul,
+        authorities=set(soul.authorities),
+        marks=set(soul.marks),
+        cosmic_links=dict(soul.cosmic_links),
+        transformations=list(soul.transformations),
+    )
+
+
+class _LazySoulBindingMixin:
+    """Multi-owner weak bindings for one nested mutable soul object."""
+
+    def _init_soul_bindings(self):
+        self._soul_bindings = {}
+
+    def _bindings(self):
+        dead = []
+        out = []
+        for token, (table_ref, key, field) in self._soul_bindings.items():
+            table = table_ref()
+            if table is None:
+                dead.append(token)
+            else:
+                out.append((table, key, field))
+        for token in dead:
+            self._soul_bindings.pop(token, None)
+        return tuple(out)
+
+    def _attach(self, table, key, field):
+        token = (id(table), key, field)
+        self._soul_bindings[token] = (weakref.ref(table), key, field)
+
+    def _detach(self, table, key, field):
+        self._soul_bindings.pop((id(table), key, field), None)
+
+    def _guard(self):
+        bindings = self._bindings()
+        for table, key, _field in bindings:
+            table._ensure_mutation()
+            if not table._visible(key):
+                raise StoreIntegrityError(
+                    "tracked soul child retained a non-current owner"
+                )
+        return bindings
+
+    @staticmethod
+    def _touch(bindings):
+        for table, key, field in bindings:
+            table.changed(key, field)
+
+
+class LazySoulTrackedSet(_LazySoulBindingMixin, set):
+    def __init__(self, values=()):
+        set.__init__(self, values)
+        self._init_soul_bindings()
+
+    def add(self, value):
+        bindings = self._guard()
+        before = len(self)
+        set.add(self, value)
+        if len(self) != before:
+            self._touch(bindings)
+
+    def discard(self, value):
+        bindings = self._guard()
+        before = len(self)
+        set.discard(self, value)
+        if len(self) != before:
+            self._touch(bindings)
+
+    def remove(self, value):
+        bindings = self._guard()
+        set.remove(self, value)
+        self._touch(bindings)
+
+    def pop(self):
+        bindings = self._guard()
+        value = set.pop(self)
+        self._touch(bindings)
+        return value
+
+    def clear(self):
+        bindings = self._guard()
+        if self:
+            set.clear(self)
+            self._touch(bindings)
+
+    def update(self, *others):
+        bindings = self._guard()
+        before = set(self)
+        set.update(self, *others)
+        if self != before:
+            self._touch(bindings)
+
+    def intersection_update(self, *others):
+        bindings = self._guard()
+        before = set(self)
+        set.intersection_update(self, *others)
+        if self != before:
+            self._touch(bindings)
+
+    def difference_update(self, *others):
+        bindings = self._guard()
+        before = set(self)
+        set.difference_update(self, *others)
+        if self != before:
+            self._touch(bindings)
+
+    def symmetric_difference_update(self, other):
+        bindings = self._guard()
+        before = set(self)
+        set.symmetric_difference_update(self, other)
+        if self != before:
+            self._touch(bindings)
+
+    def __ior__(self, other):
+        self.update(other)
+        return self
+
+    def __iand__(self, other):
+        self.intersection_update(other)
+        return self
+
+    def __isub__(self, other):
+        self.difference_update(other)
+        return self
+
+    def __ixor__(self, other):
+        self.symmetric_difference_update(other)
+        return self
+
+
+class LazySoulTrackedList(_LazySoulBindingMixin, list):
+    def __init__(self, values=()):
+        list.__init__(self, values)
+        self._init_soul_bindings()
+
+    def append(self, value):
+        bindings = self._guard()
+        list.append(self, value)
+        self._touch(bindings)
+
+    def extend(self, values):
+        bindings = self._guard()
+        list.extend(self, values)
+        if values:
+            self._touch(bindings)
+
+    def insert(self, index, value):
+        bindings = self._guard()
+        list.insert(self, index, value)
+        self._touch(bindings)
+
+    def __setitem__(self, index, value):
+        bindings = self._guard()
+        list.__setitem__(self, index, value)
+        self._touch(bindings)
+
+    def __delitem__(self, index):
+        bindings = self._guard()
+        list.__delitem__(self, index)
+        self._touch(bindings)
+
+    def pop(self, index=-1):
+        bindings = self._guard()
+        value = list.pop(self, index)
+        self._touch(bindings)
+        return value
+
+    def remove(self, value):
+        bindings = self._guard()
+        list.remove(self, value)
+        self._touch(bindings)
+
+    def clear(self):
+        bindings = self._guard()
+        if self:
+            list.clear(self)
+            self._touch(bindings)
+
+    def reverse(self):
+        bindings = self._guard()
+        list.reverse(self)
+        self._touch(bindings)
+
+    def sort(self, *args, **kwargs):
+        bindings = self._guard()
+        list.sort(self, *args, **kwargs)
+        self._touch(bindings)
+
+    def __iadd__(self, values):
+        self.extend(values)
+        return self
+
+    def __imul__(self, count):
+        bindings = self._guard()
+        list.__imul__(self, count)
+        self._touch(bindings)
+        return self
+
+
+class LazySoulTable(LazyRecordTable):
+    """Bounded lazy soul authority with nested mutable incarnation tracking."""
+
+    _nested_paths = {
+        "authorities": (("field", "authorities"),),
+        "marks": (("field", "marks"),),
+        "cosmic_links": (("field", "cosmic_links"),),
+        "transformations": (("field", "transformations"),),
+    }
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        dict.__init__(self)
+        self._session = session
+        self._store = session.store
+        self._pin = session.pin
+        self._namespace = SOUL_NAMESPACE
+        self._clean_limit = clean_limit
+        self._lru = OrderedDict()
+        self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence = {}
+        self._baseline_payload = {}
+        self._baseline_incarnation = {}
+        self._baseline_identity_labels = {}
+        self._baseline_ordinal = {}
+        self._dirty = set()
+        self._removed = set()
+        self._new_keys = set()
+        self._reinserted = set()
+        self._overlay_ordinals = {}
+        self._pending_nested_old = {}
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=LAZY_SOUL_SCHEMA,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def _baseline_labels(self, key):
+        if key not in self._baseline_identity_labels:
+            self._baseline_identity_labels[key] = dict(
+                self._store.identity_occurrences_for_owner(
+                    self._pin, self._namespace, key
+                )
+            )
+        return dict(self._baseline_identity_labels[key])
+
+    def __getitem__(self, key):
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        if dict.__contains__(self, key):
+            self._lru.pop(key, None)
+            if key not in self._dirty:
+                self._lru[key] = None
+            return dict.__getitem__(self, key)
+        checked = self._store.read_version(
+            self._pin,
+            self._namespace,
+            key,
+            expected_record_schema=LAZY_SOUL_SCHEMA,
+        )
+        if not isinstance(checked.value, SoulState):
+            raise StoreFormatError("lazy soul payload is not SoulState")
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(checked.value)
+        )
+        self._baseline_presence.setdefault(key, True)
+        record = self._session._bind_loaded_soul(key, checked.value)
+        dict.__setitem__(self, key, record)
+        object.__setattr__(record, "_index_table", weakref.ref(self))
+        object.__setattr__(record, "_index_key", key)
+        self._loads += 1
+        if key not in self._dirty:
+            self._lru[key] = None
+        self._evict_clean()
+        return record
+
+    def preflight_change(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current lazy soul"
+            )
+        if field in self._nested_paths:
+            live = (
+                dict.__getitem__(self, key)
+                if dict.__contains__(self, key)
+                else self._session._live_soul_for_key(key)
+            )
+            if live is not None:
+                self._pending_nested_old[(key, field)] = getattr(live, field)
+
+    def changed(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current lazy soul"
+            )
+        if not dict.__contains__(self, key):
+            self[key]
+        record = dict.__getitem__(self, key)
+        token = (key, field)
+        if field in self._nested_paths and token in self._pending_nested_old:
+            old = self._pending_nested_old.pop(token)
+            new = getattr(record, field)
+            if old is not new:
+                self._session._replace_soul_nested(
+                    key, record, field, old, new
+                )
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __setitem__(self, key, record):
+        self._ensure_mutation()
+        if not isinstance(record, SoulState):
+            raise TypeError("world.metaphysics.souls values must be SoulState")
+        baseline_exists = self._baseline_exists(key)
+        currently_visible = self._visible(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is record and currently_visible:
+            return
+        was_removed = key in self._removed
+        if old is not None and old is not record:
+            self._detach_index_binding(old)
+            self._session._detach_assigned_soul(key, old)
+        record = self._session._bind_assigned_soul(key, record)
+        dict.__setitem__(self, key, record)
+        object.__setattr__(record, "_index_table", weakref.ref(self))
+        object.__setattr__(record, "_index_key", key)
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __delitem__(self, key):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is not None:
+            self._detach_index_binding(old)
+            self._session._detach_assigned_soul(key, old)
+            dict.__delitem__(self, key)
+        else:
+            self._session._detach_unloaded_soul(key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        structural_ordinals = self._planned_structural_ordinals()
+        version_changes = []
+        identity_changes = []
+        effective_keys = []
+        structural_keys = []
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            baseline_labels = (
+                self._baseline_labels(key) if baseline_exists else {}
+            )
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=LAZY_SOUL_SCHEMA,
+                        )
+                    )
+                    for path in baseline_labels:
+                        identity_changes.append(
+                            IdentityOccurrenceChange(
+                                self._namespace,
+                                key,
+                                path,
+                                delete=True,
+                            )
+                        )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+
+            record = dict.__getitem__(self, key)
+            stored_record = _plain_soul_value(record)
+            payload = self._store.codec.encode(stored_record)
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new
+                or reinsertion
+                or payload != self._baseline_bytes(key)
+            )
+            if is_new or reinsertion:
+                structural_ordinals[key]
+            else:
+                self._persisted_ordinal(key)
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        stored_record,
+                        record_schema=LAZY_SOUL_SCHEMA,
+                        reinsertion=reinsertion,
+                    )
+                )
+
+            current_labels = self._session._soul_incarnation_labels(
+                key, record
+            )
+            all_paths = set(baseline_labels) | set(current_labels)
+            identity_changed = False
+            for path in sorted(
+                all_paths, key=self._store.codec.encode
+            ):
+                before = baseline_labels.get(path)
+                after = current_labels.get(path)
+                if before == after:
+                    continue
+                identity_changed = True
+                identity_changes.append(
+                    IdentityOccurrenceChange(
+                        self._namespace,
+                        key,
+                        path,
+                        delete=after is None,
+                        incarnation_id=after,
+                    )
+                )
+            if value_changed or identity_changed:
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+
+        return (
+            tuple(version_changes),
+            tuple(identity_changes),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in plan.soul_touched_keys:
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                soul = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(
+                    _plain_soul_value(soul)
+                )
+                self._baseline_identity_labels[key] = (
+                    self._session._soul_incarnation_labels(key, soul)
+                )
+                top = self._session._registry.incarnation_for_object(soul)
+                self._baseline_incarnation[key] = (
+                    None if top is None else top.value
+                )
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        "committed soul lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_identity_labels.pop(key, None)
+                self._baseline_incarnation[key] = None
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._pending_nested_old.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
+
+    def diagnostics(self):
+        return {
+            "logical_souls": (
+                self._baseline_count
+                - len(self._removed)
+                + len(self._new_keys)
+            ),
+            "resident_souls": dict.__len__(self),
+            "clean_cache_entries": len(self._lru),
+            "clean_cache_limit": self._clean_limit,
+            "soul_payload_loads": self._loads,
+            "dirty_souls": len(self._dirty),
+            "removed_souls": len(self._removed),
+            "new_souls": len(self._new_keys),
+            "reinserted_souls": len(self._reinserted),
+        }
+
+
 class _LazyLifetime:
     def __init__(self, session):
         self._session_ref = weakref.ref(session)
