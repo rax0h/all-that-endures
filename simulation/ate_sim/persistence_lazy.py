@@ -10334,6 +10334,181 @@ class LazyWorldSession:
         return result
 
 
+    def _skill_occurrence(self, key, path=()):
+        return Occurrence(SKILL_NAMESPACE, key, tuple(path))
+
+    def _live_skill_for_key(self, key):
+        incarnation = self._registry.incarnation_for_occurrence(
+            self._skill_occurrence(key)
+        )
+        if incarnation is None:
+            return None
+        value = self._registry.object_for_incarnation(incarnation)
+        return value if isinstance(value, SkillHistory) else None
+
+    def _bind_skill_list(self, key, field, values, *, incarnation=None):
+        occurrence = self._skill_occurrence(
+            key, LazySkillTable._nested_paths[field]
+        )
+        if incarnation is not None:
+            live = self._registry.object_for_incarnation(incarnation)
+            if live is not None:
+                if not isinstance(live, LazySoulTrackedList):
+                    raise StoreIntegrityError(
+                        "skill list incarnation is bound to wrong live type"
+                    )
+                live._attach(self.skills, key, field)
+                self._registry.attach_existing(incarnation, occurrence)
+                return live
+        wrapper = (
+            values if isinstance(values, LazySoulTrackedList)
+            else LazySoulTrackedList(values)
+        )
+        wrapper._attach(self.skills, key, field)
+        existing = self._registry.incarnation_for_object(wrapper)
+        if incarnation is not None:
+            if existing is None:
+                self._registry.bind(
+                    wrapper, occurrence, incarnation=incarnation
+                )
+            elif existing != incarnation:
+                raise StoreIntegrityError(
+                    "skill list bound to wrong incarnation"
+                )
+            self._registry.attach_existing(incarnation, occurrence)
+        else:
+            if existing is None:
+                self._registry.bind(wrapper, occurrence)
+            else:
+                self._registry.attach_occurrence(wrapper, occurrence)
+        return wrapper
+
+    def _skill_incarnation_labels(self, key, record):
+        labels = {}
+        top = self._registry.incarnation_for_object(record)
+        if top is None:
+            raise StoreIntegrityError(
+                "lazy skill history has no top-level incarnation"
+            )
+        labels[()] = top.value
+        for field, path in LazySkillTable._nested_paths.items():
+            value = getattr(record, field)
+            incarnation = self._registry.incarnation_for_object(value)
+            if incarnation is None:
+                raise StoreIntegrityError(
+                    f"lazy skill field {field} has no incarnation"
+                )
+            labels[path] = incarnation.value
+        return labels
+
+    def _bind_assigned_skill(self, key, record):
+        existing = self._registry.incarnation_for_object(record)
+        if existing is None:
+            existing = self._registry.bind(record)
+        self._registry.attach_occurrence(
+            record, self._skill_occurrence(key)
+        )
+        for field in LazySkillTable._nested_paths:
+            value = getattr(record, field)
+            wrapper = self._bind_skill_list(key, field, value)
+            if wrapper is not value:
+                object.__setattr__(record, field, wrapper)
+        return record
+
+    def _detach_skill_child_binding(self, key, field, value):
+        occurrence = self._skill_occurrence(
+            key, LazySkillTable._nested_paths[field]
+        )
+        incarnation = self._registry.incarnation_for_object(value)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
+        if isinstance(value, LazySoulTrackedList):
+            value._detach(self.skills, key, field)
+
+    def _detach_assigned_skill(self, key, record):
+        labels = self._skill_incarnation_labels(key, record)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            self._registry.detach_occurrence(
+                self._skill_occurrence(key, path),
+                expected=incarnation,
+            )
+        for field in LazySkillTable._nested_paths:
+            value = getattr(record, field)
+            if isinstance(value, LazySoulTrackedList):
+                value._detach(self.skills, key, field)
+
+    def _detach_unloaded_skill(self, key):
+        labels = self.skills._baseline_labels(key)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            occurrence = self._skill_occurrence(key, path)
+            self._registry.attach_existing(incarnation, occurrence)
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
+
+    def _replace_skill_nested(self, key, record, field, old, new):
+        self._detach_skill_child_binding(key, field, old)
+        replacement = self._bind_skill_list(key, field, new)
+        if replacement is not new:
+            object.__setattr__(record, field, replacement)
+
+    def _bind_loaded_skill(self, key, record):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, SKILL_NAMESPACE, key
+            )
+        )
+        expected_paths = {
+            (),
+            *LazySkillTable._nested_paths.values(),
+        }
+        if set(labels) != expected_paths:
+            raise StoreIntegrityError(
+                "lazy skill occurrence labels are incomplete or extra"
+            )
+        top_incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(top_incarnation)
+        if live is not None:
+            if not isinstance(live, SkillHistory):
+                raise StoreIntegrityError(
+                    "skill incarnation is bound to wrong live type"
+                )
+            result = live
+        else:
+            result = record
+            self._registry.bind(
+                result,
+                self._skill_occurrence(key),
+                incarnation=top_incarnation,
+            )
+        self._registry.attach_existing(
+            top_incarnation, self._skill_occurrence(key)
+        )
+        for field, path in LazySkillTable._nested_paths.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, labels[path]
+            )
+            current = getattr(result, field)
+            wrapper = self._bind_skill_list(
+                key, field, current, incarnation=incarnation
+            )
+            if wrapper is not current:
+                object.__setattr__(result, field, wrapper)
+        self.skills._baseline_identity_labels[key] = labels
+        self.skills._baseline_incarnation[key] = top_incarnation.value
+        return result
+
+
     def _bind_assigned_person(self, key, person):
         existing = self._registry.incarnation_for_object(person)
         if existing is None:
