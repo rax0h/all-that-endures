@@ -10406,6 +10406,24 @@ class LazyWorldSession:
             motive_touched_keys,
             motive_structural_keys,
         ) = self.motives.prepare_save_changes()
+        (
+            social_edge_version_changes,
+            social_edge_identity_changes,
+            social_edge_touched_keys,
+            social_edge_structural_keys,
+        ) = self.social_edges.prepare_save_changes()
+        (
+            social_adjacency_version_changes,
+            social_adjacency_identity_changes,
+            social_adjacency_touched_keys,
+            social_adjacency_structural_keys,
+        ) = self.social_adjacency.prepare_save_changes()
+        (
+            social_partnership_version_changes,
+            social_partnership_identity_changes,
+            social_partnership_touched_keys,
+            social_partnership_structural_keys,
+        ) = self.social_partnerships.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -10442,6 +10460,12 @@ class LazyWorldSession:
             or transmission_identity_changes
             or motive_version_changes
             or motive_identity_changes
+            or social_edge_version_changes
+            or social_edge_identity_changes
+            or social_adjacency_version_changes
+            or social_adjacency_identity_changes
+            or social_partnership_version_changes
+            or social_partnership_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -10463,6 +10487,9 @@ class LazyWorldSession:
             or institution_application_structural_keys
             or transmission_structural_keys
             or motive_structural_keys
+            or social_edge_structural_keys
+            or social_adjacency_structural_keys
+            or social_partnership_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -10583,6 +10610,24 @@ class LazyWorldSession:
                 motive_structural_keys,
                 "motives",
             ),
+            (
+                SOCIAL_EDGE_NAMESPACE,
+                self.social_edges,
+                social_edge_structural_keys,
+                "social edges",
+            ),
+            (
+                SOCIAL_ADJACENCY_NAMESPACE,
+                self.social_adjacency,
+                social_adjacency_structural_keys,
+                "social adjacency",
+            ),
+            (
+                SOCIAL_PARTNERSHIP_NAMESPACE,
+                self.social_partnerships,
+                social_partnership_structural_keys,
+                "social partnerships",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -10625,6 +10670,9 @@ class LazyWorldSession:
             ),
             (TRANSMISSION_NAMESPACE, len(self.transmissions)),
             (MOTIVE_NAMESPACE, len(self.motives)),
+            (SOCIAL_EDGE_NAMESPACE, len(self.social_edges)),
+            (SOCIAL_ADJACENCY_NAMESPACE, len(self.social_adjacency)),
+            (SOCIAL_PARTNERSHIP_NAMESPACE, len(self.social_partnerships)),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -10747,6 +10795,32 @@ class LazyWorldSession:
             motive_identity_changes=motive_identity_changes,
             motive_touched_keys=motive_touched_keys,
             motive_structural_keys=motive_structural_keys,
+            social_edge_version_changes=social_edge_version_changes,
+            social_edge_identity_changes=social_edge_identity_changes,
+            social_edge_touched_keys=social_edge_touched_keys,
+            social_edge_structural_keys=social_edge_structural_keys,
+            social_adjacency_version_changes=(
+                social_adjacency_version_changes
+            ),
+            social_adjacency_identity_changes=(
+                social_adjacency_identity_changes
+            ),
+            social_adjacency_touched_keys=social_adjacency_touched_keys,
+            social_adjacency_structural_keys=(
+                social_adjacency_structural_keys
+            ),
+            social_partnership_version_changes=(
+                social_partnership_version_changes
+            ),
+            social_partnership_identity_changes=(
+                social_partnership_identity_changes
+            ),
+            social_partnership_touched_keys=(
+                social_partnership_touched_keys
+            ),
+            social_partnership_structural_keys=(
+                social_partnership_structural_keys
+            ),
             layout_value=layout_value,
         )
 
