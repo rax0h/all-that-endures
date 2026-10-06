@@ -26,8 +26,8 @@ class SocialGraph:
         r=self.get(a,b); r.familiarity=min(1.,r.familiarity+.03); r.trust=max(0.,min(1.,r.trust+trust)); r.attachment=max(0.,min(1.,r.attachment+attachment)); r.obligation=max(0.,min(1.,r.obligation+obligation)); r.resentment=max(0.,min(1.,r.resentment+resentment)); r.shared_history.append(event_id); return r
     def neighbors(self,pid): return self.adjacency.get(pid,())
     def relationships_for(self,pid):
-        # Retain references, not copies of mutable weights. Direct relationship
-        # edits remain visible; new edges extend already materialized adjacency.
+        query=getattr(self.edges,'for_person',None)
+        if query is not None:return query(pid)
         if not hasattr(self,'_relationships'):self._relationships={}
         if pid not in self._relationships:
             self._relationships[pid]={other:self.edges[self.key(pid,other)] for other in self.neighbors(pid)}
