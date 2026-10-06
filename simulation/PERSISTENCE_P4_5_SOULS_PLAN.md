@@ -99,5 +99,16 @@ incarnation preservation; delete/reinsert order; real death/resurrection/mark/
 transcendence paths; true no-op save; precommit/lost-ack recovery; stale-writer
 rejection; and materializing detach/checkpoint portability.
 
-Affected P4 regression evidence is still required before this family is accepted
-closed and before residual advancement measurement proceeds.
+Affected P4 regression evidence is complete.
+
+Corrected affected run `37397887371` passed **187/187 in 179.89s** after
+preserving nested Person incarnation labels inside the newly lazy
+wallet/treasury buckets and generalizing current-link reconciliation to retain
+lazy↔lazy as well as lazy↔eager sharing. The compatibility repair also removes
+stale currency-owner occurrences before link publication so moving a Person
+alias between wallet owners cannot resurrect the old link.
+
+This affected matrix revalidated lazy people/identity/store failure behavior,
+resources, materials, currency, lifecycle, session open, and the soul family
+together. P4.5 souls is therefore implementation-green and residual
+advancement measurement may proceed.
