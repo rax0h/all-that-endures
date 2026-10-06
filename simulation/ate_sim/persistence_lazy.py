@@ -13017,6 +13017,23 @@ class LazyWorldSession:
         return detached, replacements, nested_assignments
 
 
+    def _stage_detached_lineage_nodes(self):
+        expected = len(self.lineage_nodes)
+        detached = {}
+        for key in self.lineage_nodes:
+            record = self.lineage_nodes[key]
+            if not isinstance(record, LineageNode):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-LineageNode value"
+                )
+            detached[key] = record
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach lineage-node count mismatch"
+            )
+        return detached
+
+
     def _stage_detached_institution_table(
         self, table, expected_type, label
     ):
@@ -13148,6 +13165,7 @@ class LazyWorldSession:
         detached_social_adjacency,
         detached_social_partnerships,
         detached_skills,
+        detached_lineage_nodes,
         advancement_records,
         assignments,
         cache_removals,
