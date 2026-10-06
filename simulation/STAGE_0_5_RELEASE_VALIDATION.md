@@ -78,3 +78,31 @@ provenance, measured working-set costs, recovery/lifecycle proof, honest
 limitations and PR integration status.
 
 No green validation result implies merge, tagging or Stage 1 authorization.
+
+
+## P5 short integrated evidence
+
+Run `37514431256` passed on the final-code validation head.
+
+Seed `843000`, split `3 + 4 + 3` years:
+- year-7 control digest: `b31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387`;
+- year-10 control/final digest: `3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`;
+- final ordered event count: **439**, last event ID **439**;
+- schema-8 checkpoint lane matched exactly after continuation;
+- cold -> lazy lane matched after first continuation/save;
+- close/reopen matched and a second continuation/save matched;
+- byte-for-byte store backup/relocation opened to the same year-7 authority;
+- materializing detach matched year-10 authority;
+- checkpoint roundtrip after detach matched year-10 authority.
+
+The explicit lazy conversion reported `source_preserved=true`.
+
+Measured first continuation: **3.058s**. First incremental save:
+**102 payload reads / 36,805 bytes; 2,143 writes / 642,542 bytes**.
+Second continuation: **2.314s**. Second save:
+**7 payload reads / 516 bytes; 1,713 writes / 549,086 bytes**.
+Full digest/event audits are reported separately and intentionally materialize
+history.
+
+Durable machine-readable summary:
+`simulation/p5_short_validation.json`.
