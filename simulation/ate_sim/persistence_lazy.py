@@ -2298,6 +2298,7 @@ def _initialize_eager_tracker(
         SOCIAL_ADJACENCY_NAMESPACE,
         SOCIAL_PARTNERSHIP_NAMESPACE,
         SKILL_NAMESPACE,
+        LINEAGE_NODE_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -2421,6 +2422,10 @@ class LazyPeopleSavePlan:
     skill_identity_changes: tuple[IdentityOccurrenceChange, ...]
     skill_touched_keys: tuple[Any, ...]
     skill_structural_keys: tuple[Any, ...]
+    lineage_node_version_changes: tuple[VersionChange, ...]
+    lineage_node_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    lineage_node_touched_keys: tuple[Any, ...]
+    lineage_node_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
@@ -8278,6 +8283,7 @@ class LazyWorldSession:
                     MotiveState,
                     Relationship,
                     SkillHistory,
+                    LineageNode,
                 ),
             )
             and field in RECORD_FIELDS.get(type(subject), ())
@@ -8384,6 +8390,7 @@ class LazyWorldSession:
                     SOCIAL_EDGE_NAMESPACE,
                     SOCIAL_ADJACENCY_NAMESPACE,
                     SKILL_NAMESPACE,
+                    LINEAGE_NODE_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
@@ -8421,6 +8428,7 @@ class LazyWorldSession:
                     MOTIVE_NAMESPACE,
                     SOCIAL_EDGE_NAMESPACE,
                     SOCIAL_ADJACENCY_NAMESPACE,
+                    LINEAGE_NODE_NAMESPACE,
                 }
             )
             lazy_paths = {
@@ -11044,6 +11052,12 @@ class LazyWorldSession:
             skill_touched_keys,
             skill_structural_keys,
         ) = self.skills.prepare_save_changes()
+        (
+            lineage_node_version_changes,
+            lineage_node_identity_changes,
+            lineage_node_touched_keys,
+            lineage_node_structural_keys,
+        ) = self.lineage_nodes.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -11088,6 +11102,8 @@ class LazyWorldSession:
             or social_partnership_identity_changes
             or skill_version_changes
             or skill_identity_changes
+            or lineage_node_version_changes
+            or lineage_node_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -11113,6 +11129,7 @@ class LazyWorldSession:
             or social_adjacency_structural_keys
             or social_partnership_structural_keys
             or skill_structural_keys
+            or lineage_node_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -11257,6 +11274,12 @@ class LazyWorldSession:
                 skill_structural_keys,
                 "skill histories",
             ),
+            (
+                LINEAGE_NODE_NAMESPACE,
+                self.lineage_nodes,
+                lineage_node_structural_keys,
+                "lineage nodes",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -11303,6 +11326,7 @@ class LazyWorldSession:
             (SOCIAL_ADJACENCY_NAMESPACE, len(self.social_adjacency)),
             (SOCIAL_PARTNERSHIP_NAMESPACE, len(self.social_partnerships)),
             (SKILL_NAMESPACE, len(self.skills)),
+            (LINEAGE_NODE_NAMESPACE, len(self.lineage_nodes)),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -11455,6 +11479,10 @@ class LazyWorldSession:
             skill_identity_changes=skill_identity_changes,
             skill_touched_keys=skill_touched_keys,
             skill_structural_keys=skill_structural_keys,
+            lineage_node_version_changes=lineage_node_version_changes,
+            lineage_node_identity_changes=lineage_node_identity_changes,
+            lineage_node_touched_keys=lineage_node_touched_keys,
+            lineage_node_structural_keys=lineage_node_structural_keys,
             layout_value=layout_value,
         )
 
@@ -12260,6 +12288,58 @@ class LazyWorldSession:
                     "saved skill incarnation evidence mismatch"
                 )
 
+    def _validate_lineage_node_successor(self, plan, generation):
+        for change in plan.lineage_node_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, LINEAGE_NODE_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted lineage node remains visible after save"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved lineage node is absent after save"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                LINEAGE_NODE_NAMESPACE, typed_key, row, decode=False
+            )
+            if (
+                schema != LAZY_LINEAGE_NODE_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved lineage-node evidence mismatch"
+                )
+        for change in plan.lineage_node_identity_changes:
+            encoded_key = self.store.codec.encode(change.owner_key)
+            encoded_path = self.store.codec.encode(change.occurrence_path)
+            row = self.store._visible_identity_occurrence(
+                generation,
+                change.owner_namespace,
+                encoded_key,
+                encoded_path,
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted lineage-node incarnation remains visible"
+                    )
+            elif row is None or row[0] != change.incarnation_id:
+                raise StoreIntegrityError(
+                    "saved lineage-node incarnation evidence mismatch"
+                )
+
 
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
@@ -12298,6 +12378,7 @@ class LazyWorldSession:
         self.social_adjacency._pin = result.pin
         self.social_partnerships._pin = result.pin
         self.skills._pin = result.pin
+        self.lineage_nodes._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -12331,6 +12412,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_skill_successor(
+            plan, result.generation
+        )
+        self._validate_lineage_node_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -12373,6 +12457,7 @@ class LazyWorldSession:
         self.social_adjacency.accept_save(plan, result.pin)
         self.social_partnerships.accept_save(plan, result.pin)
         self.skills.accept_save(plan, result.pin)
+        self.lineage_nodes.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -12451,6 +12536,7 @@ class LazyWorldSession:
                     + plan.social_adjacency_version_changes
                     + plan.social_partnership_version_changes
                     + plan.skill_version_changes
+                    + plan.lineage_node_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -12474,6 +12560,7 @@ class LazyWorldSession:
                     + plan.social_adjacency_identity_changes
                     + plan.social_partnership_identity_changes
                     + plan.skill_identity_changes
+                    + plan.lineage_node_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
@@ -13592,6 +13679,7 @@ def open_lazy_world_session(path, *, rules_id):
                     SOCIAL_ADJACENCY_NAMESPACE,
                     SOCIAL_PARTNERSHIP_NAMESPACE,
                     SKILL_NAMESPACE,
+                    LINEAGE_NODE_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -13660,6 +13748,7 @@ def open_lazy_world_session(path, *, rules_id):
                         SOCIAL_ADJACENCY_NAMESPACE,
                         SOCIAL_PARTNERSHIP_NAMESPACE,
                         SKILL_NAMESPACE,
+                        LINEAGE_NODE_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
