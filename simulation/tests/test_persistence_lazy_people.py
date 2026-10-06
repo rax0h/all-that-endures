@@ -183,6 +183,53 @@ def test_lazy_people_cache_is_bounded_and_reuses_external_alias_by_incarnation(t
 
 
 
+def test_multi_year_run_retains_only_step_hot_working_set_then_restores_cache_bound(tmp_path):
+    source = tmp_path / "hot-run-cold.sqlite"
+    destination = tmp_path / "hot-run-lazy.sqlite"
+    write_cold_snapshot(
+        people_world(400, active=400),
+        source,
+        rules_id=RULES,
+    )
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        lifetime = session.world.__dict__["_ate_persistence_lifetime"]
+        people = session.world.people
+
+        lifetime.begin_run()
+        try:
+            lifetime.begin_step()
+            try:
+                for key in range(1, 401):
+                    people[key]
+            finally:
+                lifetime.end_step()
+
+            # A multi-year run may retain the active step working set even
+            # when it is larger than the ordinary point-query cache.
+            assert people.diagnostics()["resident_people"] == 400
+
+            session.store.reset_diagnostics()
+            lifetime.begin_step()
+            try:
+                for key in range(1, 401):
+                    people[key]
+            finally:
+                lifetime.end_step()
+            warm = session.store.diagnostics()
+            assert warm.payload_reads == 0
+            assert people.diagnostics()["person_payload_loads"] == 400
+        finally:
+            lifetime.end_run()
+
+        # Hot residency is scoped to Simulation.run and cannot turn into a
+        # second unbounded archive.
+        diag = people.diagnostics()
+        assert diag["clean_cache_entries"] <= 256
+        assert diag["resident_people"] <= 256
+
+
 def converted_people_store(tmp_path, count=30, *, active=8, name="write"):
     source = tmp_path / f"{name}-cold.sqlite"
     destination = tmp_path / f"{name}-lazy.sqlite"
