@@ -327,6 +327,16 @@ def _insert_lazy_plain_record(
 
 
 def _institution_memberships(namespace, record, ordinal):
+    if namespace == TRANSMISSION_NAMESPACE:
+        if not isinstance(record, Transmission):
+            raise TypeError("expected Transmission")
+        return (
+            ("item", (record.item_kind, record.item_id), ordinal),
+        )
+    if namespace == MOTIVE_NAMESPACE:
+        if not isinstance(record, MotiveState):
+            raise TypeError("expected MotiveState")
+        return ()
     if namespace == INSTITUTION_MAGIC_RECORD_NAMESPACE:
         if not isinstance(record, MagicUserRecord):
             raise TypeError("expected MagicUserRecord")
