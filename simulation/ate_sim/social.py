@@ -38,6 +38,9 @@ class SocialGraph:
             for pid in key:self._partnership_index.setdefault(pid,set()).add(key)
             self._partnership_count=len(self.partnerships)
     def living_partnerships(self,people):
+        living={p.id for p in people if p.alive}
+        query=getattr(self.partnerships,'for_people',None)
+        if query is not None:return query(living)
         # Historical pairs remain authoritative; query through living endpoints.
         # Rebuild on old checkpoints or direct additions/removals to the archive.
         if not hasattr(self,'_partnership_index') or self._partnership_count!=len(self.partnerships):
@@ -45,7 +48,7 @@ class SocialGraph:
             for key in self.partnerships:
                 for pid in key:self._partnership_index.setdefault(pid,set()).add(key)
             self._partnership_count=len(self.partnerships)
-        living={p.id for p in people if p.alive};pairs=set()
+        pairs=set()
         for pid in living:
             for key in self._partnership_index.get(pid,()):
                 if key[0] in living and key[1] in living:pairs.add(key)
