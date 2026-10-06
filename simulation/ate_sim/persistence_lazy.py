@@ -4522,6 +4522,33 @@ class LazyInstitutionApplicationTable(_LazyInstitutionRecordTable):
         )
 
 
+class LazyTransmissionRecordTable(_LazyInstitutionRecordTable):
+    _record_type = Transmission
+    _record_schema = LAZY_TRANSMISSION_SCHEMA
+    _touched_attr = "transmission_touched_keys"
+    _label = "transmission record"
+    _index_fields = {
+        ("item_kind", "item_id"): "item",
+    }
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session, TRANSMISSION_NAMESPACE, clean_limit=clean_limit
+        )
+
+
+class LazyMotiveTable(_LazyInstitutionRecordTable):
+    _record_type = MotiveState
+    _record_schema = LAZY_MOTIVE_SCHEMA
+    _touched_attr = "motive_touched_keys"
+    _label = "motive"
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session, MOTIVE_NAMESPACE, clean_limit=clean_limit
+        )
+
+
 class _LazyMaterialContainerTable(LazyRecordTable):
     """Bounded lazy material index whose values are mutable list/set buckets."""
 
