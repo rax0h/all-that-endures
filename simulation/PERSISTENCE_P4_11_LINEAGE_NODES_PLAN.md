@@ -43,3 +43,25 @@ behavior and all lineage/history-archive semantics.
 - 1k -> 10k node history keeps ordinary-open lineage-node payload work at zero.
 
 After focused + scaling + affected gates, rerun residual inventory.
+
+
+## Focused and scaling evidence
+
+Product implementation head: `b7e006345e0ddb0d76b1240c6c67c068fece4a98`.
+
+Corrected focused run `37414711945` passed **9/9 in 38.09s**.
+
+Scaling run `37415118779` passed the 1,000/10,000 bounded-work proof:
+
+| Measure | 1,000 nodes | 10,000 nodes |
+| --- | ---: | ---: |
+| ordinary-open payload reads | 33 | 33 |
+| ordinary-open payload bytes | 16,658 | 16,660 |
+| fixed ancestor-walk payload reads | 3 | 3 |
+| fixed ancestor-walk payload bytes | 588 | 588 |
+| one-node save payload writes | 3 | 3 |
+| one-node save payload bytes | 357 | 357 |
+| resident lineage nodes | 3 | 3 |
+
+The broad affected P4 regression gate is still required before P4.11A is
+accepted closed.
