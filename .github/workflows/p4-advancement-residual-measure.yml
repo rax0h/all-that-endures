@@ -1,0 +1,86 @@
+name: P4 advancement residual measure
+
+on:
+  push:
+    branches:
+      - sol-p4-advancement-residual-measure
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from ate_sim.core import World
+          from ate_sim.advancement import EssencePath, AbilityProgress, Understanding
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+
+          RULES="p4-advancement-residual-measure"
+
+          def path_for(pid):
+              path=EssencePath(
+                  base_essences=["fire","water","earth"],
+                  confluence=f"confluence-{pid}",
+                  confluence_name=f"Path {pid}",
+                  confluence_concepts=("force","flow"),
+                  core_fraction=.1,
+              )
+              path.abilities.append(
+                  AbilityProgress(
+                      essence="fire",
+                      source="essence",
+                      semantic_key=f"ability-{pid}",
+                      name=f"Ability {pid}",
+                      function="control",
+                      domain="force",
+                      awakened_year=0,
+                      understanding=Understanding(
+                          evidence={"use":1},
+                          applications={"a":{"difficulty":1}},
+                          transfers=[{"difficulty":1}],
+                          integration=.2,
+                      ),
+                  )
+              )
+              return path
+
+          def build(n):
+              w=World(844000+n)
+              for pid in range(1,n+1):
+                  w.advancement.paths[pid]=path_for(pid)
+              return w
+
+          for n in (1000,10000):
+              with tempfile.TemporaryDirectory() as td:
+                  td=Path(td)
+                  cold=td/"cold.sqlite"
+                  lazy=td/"lazy.sqlite"
+                  write_cold_snapshot(build(n),cold,rules_id=RULES)
+                  convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+                  with open_lazy_world_session(lazy,rules_id=RULES) as s:
+                      d=s.store.diagnostics()
+                      print("ADV_MEASURE",n,{
+                          "payload_reads":d.payload_reads,
+                          "payload_read_bytes":d.payload_read_bytes,
+                          "paths":len(s.world.advancement.paths),
+                          "path_type":type(s.world.advancement.paths).__name__,
+                          "identity_live":s._registry.diagnostics()["live_incarnations"],
+                      })
+                      s.store.reset_diagnostics()
+                      p=s.world.advancement.path(n)
+                      d2=s.store.diagnostics()
+                      print("ADV_POINT",n,{
+                          "payload_reads":d2.payload_reads,
+                          "payload_read_bytes":d2.payload_read_bytes,
+                          "name":p.confluence_name,
+                      })
+          PY
