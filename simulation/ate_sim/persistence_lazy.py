@@ -2333,6 +2333,7 @@ def _initialize_eager_tracker(
         SOCIAL_PARTNERSHIP_NAMESPACE,
         SKILL_NAMESPACE,
         LINEAGE_NODE_NAMESPACE,
+        GENEALOGY_PARENT_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -14141,6 +14142,7 @@ def open_lazy_world_session(path, *, rules_id):
                         SOCIAL_PARTNERSHIP_NAMESPACE,
                         SKILL_NAMESPACE,
                         LINEAGE_NODE_NAMESPACE,
+                        GENEALOGY_PARENT_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
