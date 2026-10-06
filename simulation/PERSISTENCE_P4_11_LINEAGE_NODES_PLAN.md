@@ -63,5 +63,10 @@ Scaling run `37415118779` passed the 1,000/10,000 bounded-work proof:
 | one-node save payload bytes | 357 | 357 |
 | resident lineage nodes | 3 | 3 |
 
-The broad affected P4 regression gate is still required before P4.11A is
-accepted closed.
+Affected P4 regression run `37475477424` passed **298/298 in 346.98s
+(5:46)**. P4.11A lineage nodes is accepted closed on product head
+`875adeeb35d11cfae2ed1e20ae473c39ae49471c`.
+
+Next action: rerun the residual eager inventory and decide whether
+`world.lineage.children` remains large enough to merit its own migration
+before moving to the next family.
