@@ -8381,6 +8381,40 @@ class LazyWorldSession:
         return detached, replacements
 
 
+    def _stage_detached_souls(self, replacements=None):
+        expected = len(self.souls)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        nested_assignments = []
+        for key in self.souls:
+            soul = self.souls[key]
+            if not isinstance(soul, SoulState):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-SoulState value"
+                )
+            for field in LazySoulTable._nested_paths:
+                value = getattr(soul, field)
+                replacement = replacements.get(id(value))
+                if replacement is None:
+                    if field in ("authorities", "marks"):
+                        replacement = set(value)
+                    elif field == "cosmic_links":
+                        replacement = dict(value)
+                    else:
+                        replacement = list(value)
+                    replacements[id(value)] = replacement
+                nested_assignments.append(
+                    (soul, field, replacement)
+                )
+            detached[key] = soul
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach soul materialization count mismatch"
+            )
+        return detached, replacements, nested_assignments
+
+
     def _stage_detached_currency_table(self, table, replacements=None):
         expected = len(table)
         detached = {}
@@ -8417,6 +8451,7 @@ class LazyWorldSession:
         detached_material_active_index,
         detached_wallets,
         detached_treasuries,
+        detached_souls,
         assignments,
         cache_removals,
         index_rebindings,
@@ -8437,6 +8472,7 @@ class LazyWorldSession:
         resource_records = tuple(detached_resources.values())
         material_lot_records = tuple(detached_material_lots.values())
         material_item_records = tuple(detached_material_items.values())
+        soul_records = tuple(detached_souls.values())
 
         # This is the final fallible storage operation.  If release/cleanup
         # fails, no staged graph replacement has been published and the session
@@ -8460,6 +8496,9 @@ class LazyWorldSession:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             for record in material_lot_records + material_item_records:
+                object.__setattr__(record, "_index_table", None)
+                object.__setattr__(record, "_index_key", None)
+            for record in soul_records:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
@@ -8506,6 +8545,7 @@ class LazyWorldSession:
         self.material_active_index = detached_material_active_index
         self.wallets = detached_wallets
         self.treasuries = detached_treasuries
+        self.souls = detached_souls
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -8574,6 +8614,11 @@ class LazyWorldSession:
             ) = self._stage_detached_currency_table(
                 self.treasuries, mutable_replacements
             )
+            (
+                detached_souls,
+                mutable_replacements,
+                soul_nested_assignments,
+            ) = self._stage_detached_souls(mutable_replacements)
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -8592,12 +8637,14 @@ class LazyWorldSession:
                         ),
                         id(self.wallets): detached_wallets,
                         id(self.treasuries): detached_treasuries,
+                        id(self.souls): detached_souls,
                         **mutable_replacements,
                     },
                 )
             )
             assignments.extend(transfer_assignments)
             assignments.extend(material_transfer_assignments)
+            assignments.extend(soul_nested_assignments)
             for key, person in dict.items(detached_people):
                 if isinstance(person, IndexedRecord):
                     index_rebindings.append(
@@ -8618,6 +8665,7 @@ class LazyWorldSession:
                 detached_material_active_index,
                 detached_wallets,
                 detached_treasuries,
+                detached_souls,
                 assignments,
                 cache_removals,
                 index_rebindings,
@@ -8643,6 +8691,7 @@ class LazyWorldSession:
             "material_active_index": self.material_active_index.diagnostics(),
             "wallets": self.wallets.diagnostics(),
             "treasuries": self.treasuries.diagnostics(),
+            "souls": self.souls.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
