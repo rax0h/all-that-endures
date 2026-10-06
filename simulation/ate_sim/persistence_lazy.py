@@ -2744,6 +2744,11 @@ class LazyPeopleSavePlan:
     lineage_node_identity_changes: tuple[IdentityOccurrenceChange, ...]
     lineage_node_touched_keys: tuple[Any, ...]
     lineage_node_structural_keys: tuple[Any, ...]
+    lineage_child_version_changes: tuple[VersionChange, ...]
+    lineage_child_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    lineage_child_touched_keys: tuple[Any, ...]
+    lineage_child_structural_keys: tuple[Any, ...]
+    lineage_child_edge_version_changes: tuple[VersionChange, ...]
     genealogy_parent_version_changes: tuple[VersionChange, ...]
     genealogy_parent_identity_changes: tuple[IdentityOccurrenceChange, ...]
     genealogy_parent_touched_keys: tuple[Any, ...]
@@ -12075,6 +12080,13 @@ class LazyWorldSession:
             lineage_node_structural_keys,
         ) = self.lineage_nodes.prepare_save_changes()
         (
+            lineage_child_version_changes,
+            lineage_child_identity_changes,
+            lineage_child_touched_keys,
+            lineage_child_structural_keys,
+            lineage_child_edge_version_changes,
+        ) = self.lineage_children.prepare_save_changes()
+        (
             genealogy_parent_version_changes,
             genealogy_parent_identity_changes,
             genealogy_parent_touched_keys,
@@ -12138,6 +12150,9 @@ class LazyWorldSession:
             or skill_identity_changes
             or lineage_node_version_changes
             or lineage_node_identity_changes
+            or lineage_child_version_changes
+            or lineage_child_identity_changes
+            or lineage_child_edge_version_changes
             or genealogy_parent_version_changes
             or genealogy_parent_identity_changes
             or genealogy_child_version_changes
@@ -12170,6 +12185,7 @@ class LazyWorldSession:
             or social_partnership_structural_keys
             or skill_structural_keys
             or lineage_node_structural_keys
+            or lineage_child_structural_keys
             or genealogy_parent_structural_keys
             or genealogy_child_structural_keys
             or community_membership_structural_keys
@@ -12324,6 +12340,12 @@ class LazyWorldSession:
                 "lineage nodes",
             ),
             (
+                LINEAGE_CHILD_NAMESPACE,
+                self.lineage_children,
+                lineage_child_structural_keys,
+                "lineage children",
+            ),
+            (
                 GENEALOGY_PARENT_NAMESPACE,
                 self.genealogy_parents,
                 genealogy_parent_structural_keys,
@@ -12388,6 +12410,7 @@ class LazyWorldSession:
             (SOCIAL_PARTNERSHIP_NAMESPACE, len(self.social_partnerships)),
             (SKILL_NAMESPACE, len(self.skills)),
             (LINEAGE_NODE_NAMESPACE, len(self.lineage_nodes)),
+            (LINEAGE_CHILD_NAMESPACE, len(self.lineage_children)),
             (GENEALOGY_PARENT_NAMESPACE, len(self.genealogy_parents)),
             (GENEALOGY_CHILD_NAMESPACE, len(self.genealogy_children)),
             (
@@ -12550,6 +12573,13 @@ class LazyWorldSession:
             lineage_node_identity_changes=lineage_node_identity_changes,
             lineage_node_touched_keys=lineage_node_touched_keys,
             lineage_node_structural_keys=lineage_node_structural_keys,
+            lineage_child_version_changes=lineage_child_version_changes,
+            lineage_child_identity_changes=lineage_child_identity_changes,
+            lineage_child_touched_keys=lineage_child_touched_keys,
+            lineage_child_structural_keys=lineage_child_structural_keys,
+            lineage_child_edge_version_changes=(
+                lineage_child_edge_version_changes
+            ),
             genealogy_parent_version_changes=(
                 genealogy_parent_version_changes
             ),
