@@ -1,0 +1,131 @@
+name: P4.9 social scaling
+
+on:
+  push:
+    branches:
+      - sol-p4-9-social-scaling
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          from types import SimpleNamespace
+          import tempfile
+          from ate_sim.core import World
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.persistence_lazy import (
+              convert_cold_to_lazy, open_lazy_world_session,
+          )
+
+          RULES="p4-9-social-scaling"
+
+          def build(n):
+              w=World(849000+n)
+              pairs=[(1,2),(1,3)]
+              pairs.extend(
+                  (100000+i,200000+i)
+                  for i in range(3,n+1)
+              )
+              for i,(a,b) in enumerate(pairs,1):
+                  w.social.record(
+                      a,b,1000000+i,
+                      trust=.1,attachment=.1
+                  )
+                  w.social.partner(a,b,2000000+i)
+              return w
+
+          def living(*ids):
+              return [
+                  SimpleNamespace(id=pid,alive=True)
+                  for pid in ids
+              ]
+
+          def measure(n):
+              with tempfile.TemporaryDirectory() as td:
+                  td=Path(td)
+                  cold=td/"cold.sqlite"
+                  lazy=td/"lazy.sqlite"
+                  write_cold_snapshot(build(n),cold,rules_id=RULES)
+                  convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+                  with open_lazy_world_session(lazy,rules_id=RULES) as s:
+                      open_diag=s.store.diagnostics()
+                      assert s.social_edges.diagnostics()[
+                          "social_edge_payload_loads"
+                      ] == 0
+                      assert s.social_adjacency.diagnostics()[
+                          "social_adjacency_payload_loads"
+                      ] == 0
+                      assert s.social_partnerships.diagnostics()[
+                          "social_partnership_payload_loads"
+                      ] == 0
+
+                      before=s.store.diagnostics()
+                      relationships=list(
+                          s.world.social.relationships_for(1)
+                      )
+                      neighbors=set(s.world.social.neighbors(1))
+                      partnerships=s.world.social.living_partnerships(
+                          living(1,2)
+                      )
+                      after=s.store.diagnostics()
+
+                      s.store.reset_diagnostics()
+                      s.world.social.get(1,2).trust=.88
+                      s.save()
+                      save_diag=s.store.diagnostics()
+
+                      result={
+                          "n":n,
+                          "open_payload_reads":open_diag.payload_reads,
+                          "open_payload_bytes":open_diag.payload_read_bytes,
+                          "query_payload_reads":(
+                              after.payload_reads-before.payload_reads
+                          ),
+                          "query_payload_bytes":(
+                              after.payload_read_bytes-before.payload_read_bytes
+                          ),
+                          "relationships":[
+                              (r.a,r.b) for r in relationships
+                          ],
+                          "neighbors":sorted(neighbors),
+                          "partnerships":partnerships,
+                          "save_payload_writes":save_diag.payload_writes,
+                          "save_payload_write_bytes":(
+                              save_diag.payload_write_bytes
+                          ),
+                          "resident_edges":s.social_edges.diagnostics()[
+                              "resident_social_edges"
+                          ],
+                          "resident_adjacency":s.social_adjacency.diagnostics()[
+                              "resident_social_adjacency"
+                          ],
+                          "resident_partnerships":s.social_partnerships.diagnostics()[
+                              "resident_social_partnerships"
+                          ],
+                      }
+                      print("SOCIAL_AFTER",result)
+                      return result
+
+          small=measure(1000)
+          large=measure(10000)
+          assert small["open_payload_reads"] == large["open_payload_reads"]
+          assert small["query_payload_reads"] == large["query_payload_reads"]
+          assert small["query_payload_bytes"] == large["query_payload_bytes"]
+          assert small["relationships"] == large["relationships"] == [(1,2),(1,3)]
+          assert small["neighbors"] == large["neighbors"] == [2,3]
+          assert small["partnerships"] == large["partnerships"] == {(1,2):2000001}
+          assert small["save_payload_writes"] == large["save_payload_writes"]
+          assert small["save_payload_write_bytes"] == large["save_payload_write_bytes"]
+          assert large["resident_edges"] <= 2
+          assert large["resident_adjacency"] <= 1
+          assert large["resident_partnerships"] <= 1
+          PY
