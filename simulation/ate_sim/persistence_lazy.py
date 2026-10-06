@@ -955,6 +955,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     social_partnership_next_ordinal = 0
                     skill_count = 0
                     skill_next_ordinal = 0
+                    lineage_node_count = 0
+                    lineage_node_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -991,6 +993,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SOCIAL_ADJACENCY_NAMESPACE,
                             SOCIAL_PARTNERSHIP_NAMESPACE,
                             SKILL_NAMESPACE,
+                            LINEAGE_NODE_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -1377,7 +1380,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                                 social_partnership_next_ordinal,
                                 ordinal + 1,
                             )
-                        else:
+                        elif namespace == SKILL_NAMESPACE:
                             if not isinstance(value, SkillHistory):
                                 raise StoreFormatError(
                                     "invalid skill history envelope"
@@ -1394,6 +1397,24 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             skill_count += 1
                             skill_next_ordinal = max(
                                 skill_next_ordinal, ordinal + 1
+                            )
+                        else:
+                            if not isinstance(value, LineageNode):
+                                raise StoreFormatError(
+                                    "invalid lineage-node envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=LINEAGE_NODE_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_LINEAGE_NODE_SCHEMA,
+                            )
+                            lineage_node_count += 1
+                            lineage_node_next_ordinal = max(
+                                lineage_node_next_ordinal, ordinal + 1
                             )
 
                     for row in source_store.db.execute(
@@ -1422,6 +1443,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SOCIAL_ADJACENCY_NAMESPACE,
                             SOCIAL_PARTNERSHIP_NAMESPACE,
                             SKILL_NAMESPACE,
+                            LINEAGE_NODE_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1602,6 +1624,11 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             skill_count,
                             skill_next_ordinal,
                         ),
+                        (
+                            LINEAGE_NODE_NAMESPACE,
+                            lineage_node_count,
+                            lineage_node_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1701,6 +1728,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "social_adjacency": social_adjacency_count,
                 "social_partnerships": social_partnership_count,
                 "skills": skill_count,
+                "lineage_nodes": lineage_node_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
