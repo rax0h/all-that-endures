@@ -5800,6 +5800,22 @@ class LazyMotiveTable(_LazyInstitutionRecordTable):
         )
 
 
+class LazyLineageNodeTable(_LazyInstitutionRecordTable):
+    _record_type = LineageNode
+    _record_schema = LAZY_LINEAGE_NODE_SCHEMA
+    _touched_attr = "lineage_node_touched_keys"
+    _label = "lineage node"
+
+    def _memberships(self, record, ordinal):
+        del record, ordinal
+        return ()
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session, LINEAGE_NODE_NAMESPACE, clean_limit=clean_limit
+        )
+
+
 class _LazyMaterialContainerTable(LazyRecordTable):
     """Bounded lazy material index whose values are mutable list/set buckets."""
 
@@ -8162,6 +8178,8 @@ class LazyWorldSession:
         )
         self.motives = LazyMotiveTable(self)
         object.__setattr__(world.agency, "motives", self.motives)
+        self.lineage_nodes = LazyLineageNodeTable(self)
+        object.__setattr__(world.lineage, "nodes", self.lineage_nodes)
         self.social_edges = LazySocialEdgeTable(self)
         object.__setattr__(world.social, "edges", self.social_edges)
         self.social_adjacency = LazySocialAdjacencyTable(self)
@@ -9355,6 +9373,7 @@ class LazyWorldSession:
             INSTITUTION_APPLICATION_NAMESPACE: self.institution_applications,
             TRANSMISSION_NAMESPACE: self.transmissions,
             MOTIVE_NAMESPACE: self.motives,
+            LINEAGE_NODE_NAMESPACE: self.lineage_nodes,
         }.get(namespace)
         if table is None:
             raise StoreIntegrityError(
@@ -9382,6 +9401,7 @@ class LazyWorldSession:
                 INSTITUTION_APPLICATION_NAMESPACE,
                 TRANSMISSION_NAMESPACE,
                 MOTIVE_NAMESPACE,
+                LINEAGE_NODE_NAMESPACE,
             }
             and item != occurrence
         ]
