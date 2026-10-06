@@ -575,7 +575,8 @@ class LazyLineageChildrenTable(dict):
         if type(checked.value) is not int or checked.value < 0:
             raise StoreFormatError("invalid lineage child bucket count")
         values = self._edge_keys(key)
-        if len(values) != checked.value:
+        current_count = self._count_overrides.get(key, checked.value)
+        if len(values) != current_count:
             raise StoreIntegrityError(
                 "lineage child count disagrees with edge rows"
             )
