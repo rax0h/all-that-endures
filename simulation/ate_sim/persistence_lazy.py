@@ -2613,6 +2613,7 @@ def _initialize_eager_tracker(
         SOCIAL_PARTNERSHIP_NAMESPACE,
         SKILL_NAMESPACE,
         LINEAGE_NODE_NAMESPACE,
+        LINEAGE_CHILD_NAMESPACE,
         GENEALOGY_PARENT_NAMESPACE,
         GENEALOGY_CHILD_NAMESPACE,
         COMMUNITY_MEMBERSHIP_NAMESPACE,
@@ -9027,6 +9028,10 @@ class LazyWorldSession:
         object.__setattr__(world.agency, "motives", self.motives)
         self.lineage_nodes = LazyLineageNodeTable(self)
         object.__setattr__(world.lineage, "nodes", self.lineage_nodes)
+        self.lineage_children = LazyLineageChildrenTable(self)
+        object.__setattr__(
+            world.lineage, "children", self.lineage_children
+        )
         self.genealogy_parents = LazyGenealogyParentTable(self)
         object.__setattr__(
             world.genealogy, "parents", self.genealogy_parents
@@ -11426,6 +11431,87 @@ class LazyWorldSession:
                 object.__setattr__(result, field, wrapper)
         self.skills._baseline_identity_labels[key] = labels
         self.skills._baseline_incarnation[key] = top_incarnation.value
+        return result
+
+
+    def _lineage_child_occurrence(self, key):
+        return Occurrence(LINEAGE_CHILD_NAMESPACE, key, ())
+
+    def _bind_assigned_lineage_children(self, key, values):
+        wrapper = (
+            values
+            if isinstance(values, LazyLineageTrackedSet)
+            else LazyLineageTrackedSet(values)
+        )
+        wrapper._attach(self.lineage_children, key)
+        existing = self._registry.incarnation_for_object(wrapper)
+        if existing is None:
+            existing = self._registry.bind(wrapper)
+        self._registry.attach_occurrence(
+            wrapper, self._lineage_child_occurrence(key)
+        )
+        return wrapper
+
+    def _detach_assigned_lineage_children(self, key, values):
+        incarnation = self._registry.incarnation_for_object(values)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._lineage_child_occurrence(key),
+                expected=incarnation,
+            )
+        if isinstance(values, LazyLineageTrackedSet):
+            values._detach(self.lineage_children, key)
+
+    def _detach_unloaded_lineage_children(self, key):
+        baseline = self.lineage_children._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        occurrence = self._lineage_child_occurrence(key)
+        self._registry.attach_existing(incarnation, occurrence)
+        self._registry.detach_occurrence(
+            occurrence, expected=incarnation
+        )
+
+    def _bind_loaded_lineage_children(self, key, values):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, LINEAGE_CHILD_NAMESPACE, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy lineage-child occurrence labels are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, LazyLineageTrackedSet):
+                raise StoreIntegrityError(
+                    "lineage child-set incarnation is bound to wrong type"
+                )
+            if set(live) != set(values):
+                raise StoreIntegrityError(
+                    "shared lineage child-set disagrees with edge authority"
+                )
+            live._attach(self.lineage_children, key)
+            result = live
+        else:
+            result = LazyLineageTrackedSet(values)
+            result._attach(self.lineage_children, key)
+            self._registry.bind(
+                result,
+                self._lineage_child_occurrence(key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation, self._lineage_child_occurrence(key)
+        )
+        self.lineage_children._baseline_incarnation[key] = incarnation.value
         return result
 
 
@@ -14983,6 +15069,7 @@ def open_lazy_world_session(path, *, rules_id):
                     SOCIAL_PARTNERSHIP_NAMESPACE,
                     SKILL_NAMESPACE,
                     LINEAGE_NODE_NAMESPACE,
+                    LINEAGE_CHILD_NAMESPACE,
                     GENEALOGY_PARENT_NAMESPACE,
                     GENEALOGY_CHILD_NAMESPACE,
                     COMMUNITY_MEMBERSHIP_NAMESPACE,
@@ -15055,6 +15142,7 @@ def open_lazy_world_session(path, *, rules_id):
                         SOCIAL_PARTNERSHIP_NAMESPACE,
                         SKILL_NAMESPACE,
                         LINEAGE_NODE_NAMESPACE,
+                        LINEAGE_CHILD_NAMESPACE,
                         GENEALOGY_PARENT_NAMESPACE,
                         GENEALOGY_CHILD_NAMESPACE,
                         COMMUNITY_MEMBERSHIP_NAMESPACE,
