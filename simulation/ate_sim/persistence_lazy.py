@@ -12556,6 +12556,22 @@ class LazyWorldSession:
             detached_motives = self._stage_detached_institution_table(
                 self.motives, MotiveState, "motive"
             )
+            (
+                detached_social_edges,
+                mutable_replacements,
+                social_edge_assignments,
+            ) = self._stage_detached_social_edges(
+                mutable_replacements
+            )
+            (
+                detached_social_adjacency,
+                mutable_replacements,
+            ) = self._stage_detached_social_adjacency(
+                mutable_replacements
+            )
+            detached_social_partnerships = (
+                self._stage_detached_social_partnerships()
+            )
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -12587,6 +12603,11 @@ class LazyWorldSession:
                         ),
                         id(self.transmissions): detached_transmissions,
                         id(self.motives): detached_motives,
+                        id(self.social_edges): detached_social_edges,
+                        id(self.social_adjacency): detached_social_adjacency,
+                        id(self.social_partnerships): (
+                            detached_social_partnerships
+                        ),
                         **mutable_replacements,
                     },
                 )
@@ -12595,6 +12616,7 @@ class LazyWorldSession:
             assignments.extend(material_transfer_assignments)
             assignments.extend(soul_nested_assignments)
             assignments.extend(advancement_assignments)
+            assignments.extend(social_edge_assignments)
             for key, person in dict.items(detached_people):
                 if isinstance(person, IndexedRecord):
                     index_rebindings.append(
@@ -12606,6 +12628,7 @@ class LazyWorldSession:
                 detached_institution_applications,
                 detached_transmissions,
                 detached_motives,
+                detached_social_edges,
             ):
                 for key, record in dict.items(table):
                     index_rebindings.append((record, table, key))
@@ -12631,6 +12654,9 @@ class LazyWorldSession:
                 detached_institution_applications,
                 detached_transmissions,
                 detached_motives,
+                detached_social_edges,
+                detached_social_adjacency,
+                detached_social_partnerships,
                 advancement_records,
                 assignments,
                 cache_removals,
@@ -12668,6 +12694,9 @@ class LazyWorldSession:
             ),
             "transmissions": self.transmissions.diagnostics(),
             "motives": self.motives.diagnostics(),
+            "social_edges": self.social_edges.diagnostics(),
+            "social_adjacency": self.social_adjacency.diagnostics(),
+            "social_partnerships": self.social_partnerships.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
