@@ -12848,6 +12848,35 @@ class LazyWorldSession:
         return detached, replacements, nested_assignments
 
 
+    def _stage_detached_skills(self, replacements=None):
+        expected = len(self.skills)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        nested_assignments = []
+        for key in self.skills:
+            record = self.skills[key]
+            if not isinstance(record, SkillHistory):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-SkillHistory value"
+                )
+            for field in LazySkillTable._nested_paths:
+                value = getattr(record, field)
+                replacement = replacements.get(id(value))
+                if replacement is None:
+                    replacement = list(value)
+                    replacements[id(value)] = replacement
+                nested_assignments.append(
+                    (record, field, replacement)
+                )
+            detached[key] = record
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach skill-history count mismatch"
+            )
+        return detached, replacements, nested_assignments
+
+
     def _stage_detached_institution_table(
         self, table, expected_type, label
     ):
@@ -12978,6 +13007,7 @@ class LazyWorldSession:
         detached_social_edges,
         detached_social_adjacency,
         detached_social_partnerships,
+        detached_skills,
         advancement_records,
         assignments,
         cache_removals,
@@ -13001,6 +13031,7 @@ class LazyWorldSession:
         material_item_records = tuple(detached_material_items.values())
         soul_records = tuple(detached_souls.values())
         social_edge_records = tuple(detached_social_edges.values())
+        skill_records = tuple(detached_skills.values())
 
         # This is the final fallible storage operation.  If release/cleanup
         # fails, no staged graph replacement has been published and the session
@@ -13033,6 +13064,9 @@ class LazyWorldSession:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             for record in social_edge_records:
+                object.__setattr__(record, "_index_table", None)
+                object.__setattr__(record, "_index_key", None)
+            for record in skill_records:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
@@ -13089,6 +13123,7 @@ class LazyWorldSession:
         self.social_edges = detached_social_edges
         self.social_adjacency = detached_social_adjacency
         self.social_partnerships = detached_social_partnerships
+        self.skills = detached_skills
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -13213,6 +13248,11 @@ class LazyWorldSession:
             detached_social_partnerships = (
                 self._stage_detached_social_partnerships()
             )
+            (
+                detached_skills,
+                mutable_replacements,
+                skill_nested_assignments,
+            ) = self._stage_detached_skills(mutable_replacements)
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -13249,6 +13289,7 @@ class LazyWorldSession:
                         id(self.social_partnerships): (
                             detached_social_partnerships
                         ),
+                        id(self.skills): detached_skills,
                         **mutable_replacements,
                     },
                 )
@@ -13258,6 +13299,7 @@ class LazyWorldSession:
             assignments.extend(soul_nested_assignments)
             assignments.extend(advancement_assignments)
             assignments.extend(social_edge_assignments)
+            assignments.extend(skill_nested_assignments)
             for key, person in dict.items(detached_people):
                 if isinstance(person, IndexedRecord):
                     index_rebindings.append(
@@ -13297,6 +13339,7 @@ class LazyWorldSession:
                 detached_social_edges,
                 detached_social_adjacency,
                 detached_social_partnerships,
+                detached_skills,
                 advancement_records,
                 assignments,
                 cache_removals,
@@ -13337,6 +13380,7 @@ class LazyWorldSession:
             "social_edges": self.social_edges.diagnostics(),
             "social_adjacency": self.social_adjacency.diagnostics(),
             "social_partnerships": self.social_partnerships.diagnostics(),
+            "skills": self.skills.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
