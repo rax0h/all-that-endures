@@ -1066,6 +1066,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     genealogy_child_next_ordinal = 0
                     community_membership_count = 0
                     community_membership_next_ordinal = 0
+                    lineage_child_count = 0
+                    lineage_child_next_ordinal = 0
+                    lineage_child_edge_count = 0
+                    lineage_child_edge_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -1103,6 +1107,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SOCIAL_PARTNERSHIP_NAMESPACE,
                             SKILL_NAMESPACE,
                             LINEAGE_NODE_NAMESPACE,
+                            LINEAGE_CHILD_NAMESPACE,
                             GENEALOGY_PARENT_NAMESPACE,
                             GENEALOGY_CHILD_NAMESPACE,
                             COMMUNITY_MEMBERSHIP_NAMESPACE,
@@ -1528,6 +1533,47 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             lineage_node_next_ordinal = max(
                                 lineage_node_next_ordinal, ordinal + 1
                             )
+                        elif namespace == LINEAGE_CHILD_NAMESPACE:
+                            if (
+                                type(key) is not tuple
+                                or len(key) != 2
+                                or type(key[0]) is not str
+                                or type(key[1]) is not int
+                                or type(value) is not set
+                                or any(
+                                    type(child) is not tuple
+                                    or len(child) != 2
+                                    or type(child[0]) is not str
+                                    or type(child[1]) is not int
+                                    for child in value
+                                )
+                            ):
+                                raise StoreFormatError(
+                                    "invalid lineage-child envelope"
+                                )
+                            insert_lineage_child_bucket(
+                                target,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                count=len(value),
+                            )
+                            lineage_child_count += 1
+                            lineage_child_next_ordinal = max(
+                                lineage_child_next_ordinal, ordinal + 1
+                            )
+                            for child in sorted(
+                                value, key=codec.encode
+                            ):
+                                insert_lineage_child_edge(
+                                    target,
+                                    generation=generation,
+                                    parent=key,
+                                    child=child,
+                                    ordinal=lineage_child_edge_next_ordinal,
+                                )
+                                lineage_child_edge_count += 1
+                                lineage_child_edge_next_ordinal += 1
                         elif namespace == GENEALOGY_PARENT_NAMESPACE:
                             if (
                                 type(key) is not int
@@ -1623,6 +1669,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SOCIAL_PARTNERSHIP_NAMESPACE,
                             SKILL_NAMESPACE,
                             LINEAGE_NODE_NAMESPACE,
+                            LINEAGE_CHILD_NAMESPACE,
                             GENEALOGY_PARENT_NAMESPACE,
                             GENEALOGY_CHILD_NAMESPACE,
                             COMMUNITY_MEMBERSHIP_NAMESPACE,
@@ -1812,6 +1859,16 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             lineage_node_next_ordinal,
                         ),
                         (
+                            LINEAGE_CHILD_NAMESPACE,
+                            lineage_child_count,
+                            lineage_child_next_ordinal,
+                        ),
+                        (
+                            LINEAGE_CHILD_EDGE_NAMESPACE,
+                            lineage_child_edge_count,
+                            lineage_child_edge_next_ordinal,
+                        ),
+                        (
                             GENEALOGY_PARENT_NAMESPACE,
                             genealogy_parent_count,
                             genealogy_parent_next_ordinal,
@@ -1926,6 +1983,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "social_partnerships": social_partnership_count,
                 "skills": skill_count,
                 "lineage_nodes": lineage_node_count,
+                "lineage_children": lineage_child_count,
+                "lineage_child_edges": lineage_child_edge_count,
                 "genealogy_parents": genealogy_parent_count,
                 "genealogy_children": genealogy_child_count,
                 "community_memberships": community_membership_count,
@@ -2094,6 +2153,20 @@ def _social_occurrence_from_path(path, field):
     return None
 
 
+def _lineage_children_occurrence_from_path(path):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "lineage")
+        and path[1] == ("field", "children")
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
+
+
 def _scalar_archive_occurrence_from_path(path):
     if (
         type(path) is tuple
@@ -2241,6 +2314,14 @@ def _lazy_occurrence_from_path(path):
             INSTITUTION_APPLICATION_NAMESPACE: SocietyApplication,
         }[namespace]
         return namespace, key, relative, expected
+    lineage_children = _lineage_children_occurrence_from_path(path)
+    if lineage_children is not None:
+        return (
+            LINEAGE_CHILD_NAMESPACE,
+            lineage_children[0],
+            lineage_children[1],
+            set,
+        )
     scalar_archive = _scalar_archive_occurrence_from_path(path)
     if scalar_archive is not None:
         namespace, key, relative = scalar_archive
@@ -2422,6 +2503,16 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 ):
                     eager_object = LazySoulTrackedList(eager_object)
                     _relative_set(session.world, eager_path, eager_object)
+            elif (
+                namespace == LINEAGE_CHILD_NAMESPACE
+                and not relative
+                and type(eager_object) is set
+            ):
+                eager_object = LazyLineageTrackedSet(eager_object)
+                eager_object._attach(
+                    session.lineage_children, key
+                )
+                _relative_set(session.world, eager_path, eager_object)
             elif namespace == ADVANCEMENT_NAMESPACE and relative:
                 # A lazy advancement descendant can share identity with a
                 # still-eager owner. Built-in containers are not weakrefable,
