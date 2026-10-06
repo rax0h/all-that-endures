@@ -241,6 +241,20 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
             simulation_io = _io(session.store.diagnostics())
 
             session.store.reset_diagnostics()
+            live_digest_before_save, live_digest_seconds = _digest(
+                session.world
+            )
+            control_before_save = controls[str(mark)]["digest"]
+            print(
+                "LIVE_BEFORE_SAVE",
+                mark,
+                live_digest_before_save,
+                "MATCH",
+                live_digest_before_save == control_before_save,
+                "DIGEST_SECONDS",
+                live_digest_seconds,
+            )
+
             started = time.perf_counter()
             generation = session.save()
             save_seconds = time.perf_counter() - started
