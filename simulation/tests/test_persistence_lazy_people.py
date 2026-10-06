@@ -764,6 +764,32 @@ def test_lazy_detach_preserves_cross_boundary_person_alias(tmp_path):
     assert restored.people[1] is restored.currency.wallets[99]["person"]
 
 
+def test_cross_boundary_person_alias_mutates_before_people_payload_load(tmp_path):
+    world = people_world(4, active=4)
+    shared_person = world.people[1]
+    world.currency.wallets[99] = {"person": shared_person}
+    source = tmp_path / "cross-preload-cold.sqlite"
+    destination = tmp_path / "cross-preload-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        table = session.world.people
+        eager_alias = session.world.currency.wallets[99]["person"]
+        assert table.diagnostics()["person_payload_loads"] == 0
+        before = eager_alias.wealth
+        eager_alias.wealth = before + 3.0
+        assert table.diagnostics()["person_payload_loads"] == 0
+        assert table[1] is eager_alias
+        session.save()
+
+    with open_lazy_world_session(destination, rules_id=RULES) as reopened:
+        lazy = reopened.world.people[1]
+        eager = reopened.world.currency.wallets[99]["person"]
+        assert lazy is eager
+        assert lazy.wealth == before + 3.0
+
+
 def test_cross_boundary_person_field_edit_and_owner_replacement_publish_atomically(
     tmp_path,
 ):
