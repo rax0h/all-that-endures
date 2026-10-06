@@ -10385,6 +10385,25 @@ class LazyWorldSession:
         return detached, replacements, nested_assignments
 
 
+    def _stage_detached_institution_table(
+        self, table, expected_type, label
+    ):
+        expected = len(table)
+        detached = RecordTable()
+        for key in table:
+            record = table[key]
+            if not isinstance(record, expected_type):
+                raise StoreIntegrityError(
+                    f"lazy detach encountered wrong {label} value"
+                )
+            dict.__setitem__(detached, key, record)
+        if dict.__len__(detached) != expected:
+            raise StoreIntegrityError(
+                f"lazy detach {label} count mismatch"
+            )
+        return detached
+
+
     def _stage_detached_currency_table(self, table, replacements=None):
         expected = len(table)
         detached = {}
@@ -10423,6 +10442,9 @@ class LazyWorldSession:
         detached_treasuries,
         detached_souls,
         detached_advancement_paths,
+        detached_institution_magic_records,
+        detached_institution_notices,
+        detached_institution_applications,
         advancement_records,
         assignments,
         cache_removals,
@@ -10522,6 +10544,9 @@ class LazyWorldSession:
         self.treasuries = detached_treasuries
         self.souls = detached_souls
         self.advancement_paths = detached_advancement_paths
+        self.institution_magic_records = detached_institution_magic_records
+        self.institution_notices = detached_institution_notices
+        self.institution_applications = detached_institution_applications
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -10603,6 +10628,27 @@ class LazyWorldSession:
             ) = self._stage_detached_advancement_paths(
                 mutable_replacements
             )
+            detached_institution_magic_records = (
+                self._stage_detached_institution_table(
+                    self.institution_magic_records,
+                    MagicUserRecord,
+                    "institution magic-record",
+                )
+            )
+            detached_institution_notices = (
+                self._stage_detached_institution_table(
+                    self.institution_notices,
+                    AdventureNotice,
+                    "institution notice",
+                )
+            )
+            detached_institution_applications = (
+                self._stage_detached_institution_table(
+                    self.institution_applications,
+                    SocietyApplication,
+                    "institution application",
+                )
+            )
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -10623,6 +10669,15 @@ class LazyWorldSession:
                         id(self.treasuries): detached_treasuries,
                         id(self.souls): detached_souls,
                         id(self.advancement_paths): detached_advancement_paths,
+                        id(self.institution_magic_records): (
+                            detached_institution_magic_records
+                        ),
+                        id(self.institution_notices): (
+                            detached_institution_notices
+                        ),
+                        id(self.institution_applications): (
+                            detached_institution_applications
+                        ),
                         **mutable_replacements,
                     },
                 )
@@ -10636,6 +10691,13 @@ class LazyWorldSession:
                     index_rebindings.append(
                         (person, detached_people, key)
                     )
+            for table in (
+                detached_institution_magic_records,
+                detached_institution_notices,
+                detached_institution_applications,
+            ):
+                for key, record in dict.items(table):
+                    index_rebindings.append((record, table, key))
 
             lifecycle._lifecycle_phase("before_publish", self)
             world = self._publish_materialized_detach(
@@ -10653,6 +10715,9 @@ class LazyWorldSession:
                 detached_treasuries,
                 detached_souls,
                 detached_advancement_paths,
+                detached_institution_magic_records,
+                detached_institution_notices,
+                detached_institution_applications,
                 advancement_records,
                 assignments,
                 cache_removals,
@@ -10681,6 +10746,13 @@ class LazyWorldSession:
             "treasuries": self.treasuries.diagnostics(),
             "souls": self.souls.diagnostics(),
             "advancement_paths": self.advancement_paths.diagnostics(),
+            "institution_magic_records": (
+                self.institution_magic_records.diagnostics()
+            ),
+            "institution_notices": self.institution_notices.diagnostics(),
+            "institution_applications": (
+                self.institution_applications.diagnostics()
+            ),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
