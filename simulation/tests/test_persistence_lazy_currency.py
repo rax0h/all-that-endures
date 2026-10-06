@@ -149,6 +149,7 @@ def test_real_currency_operations_match_expected_and_reopen(tmp_path):
         )
         assert state.treasuries[1]["iron"] == 22
 
+        state.credit(2, {"lesser": 100})
         state.exchange(
             1,
             2,
