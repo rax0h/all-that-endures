@@ -13548,6 +13548,7 @@ class LazyWorldSession:
             "social_adjacency": self.social_adjacency.diagnostics(),
             "social_partnerships": self.social_partnerships.diagnostics(),
             "skills": self.skills.diagnostics(),
+            "lineage_nodes": self.lineage_nodes.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
