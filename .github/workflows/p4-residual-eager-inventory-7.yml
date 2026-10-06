@@ -1,0 +1,134 @@
+name: P4 residual eager inventory 7
+
+on:
+  push:
+    branches:
+      - sol-p4-residual-eager-inventory-7
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from ate_sim.core import World
+          from ate_sim.social import Relationship
+          from ate_sim.skills import SkillHistory
+          from ate_sim.transmission import Transmission
+          from ate_sim.agency import MotiveState, ActionRecord
+          from ate_sim.institutions import MagicUserRecord, AdventureNotice, SocietyApplication
+          from ate_sim.lineage import LineageNode
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_lazy_store import LazyRecordStore
+          from ate_sim.persistence_adapters import WorldCodec, SCHEMA
+
+          RULES="p4-residual-eager-inventory"
+
+          def build(n):
+              w=World(845000+n)
+              for i in range(1,n+1):
+                  a=i
+                  b=n+i+1
+                  key=(min(a,b),max(a,b))
+                  w.social.edges[key]=Relationship(
+                      key[0],key[1],familiarity=.5,trust=.6,
+                      shared_history=[i]
+                  )
+                  w.social.partnerships[key]=i
+                  w.social.adjacency.setdefault(key[0],set()).add(key[1])
+                  w.social.adjacency.setdefault(key[1],set()).add(key[0])
+
+                  child=i+1
+                  w.genealogy.parents[child]=(i,)
+                  w.genealogy.children.setdefault(i,[]).append(child)
+
+                  w.communities.memberships[(i,1)]=.5
+
+                  w.skills.skills[(i,"craft")]=SkillHistory(
+                      i,"craft",level=.4,practice=2.,
+                      teachers=[max(1,i-1)],provenance=[i]
+                  )
+
+                  w.transmission.records[i]=Transmission(
+                      i,0,"teaching","skill",i,
+                      "person",i,"person",child,i,.9,.01
+                  )
+
+                  w.agency.motives[i]=MotiveState(
+                      .1,.2,.3,.4,.5,.6,.7,.8
+                  )
+                  w.agency.actions.append(
+                      ActionRecord(0,i,"work","wealth",.5,i)
+                  )
+
+                  w.institutions.magic_records[i]=MagicUserRecord(
+                      i,i,1,0,("fire",),"confluence-x","X",
+                      ("a",),("Ability",),"full",i
+                  )
+                  w.institutions.notices[i]=AdventureNotice(
+                      i,1,0,"danger",1,i,status="resolved",
+                      resolved_event=i
+                  )
+                  w.institutions.applications[i]=SocietyApplication(
+                      i,"magic_society",i,1,0,True,
+                      stage="passed",passed=True,origin_event=i,resolved_event=i
+                  )
+
+                  k=("person",i)
+                  w.lineage.nodes[k]=LineageNode("person",i,(),i,0)
+                  w.lineage.children.setdefault(("root",1),set()).add(k)
+
+              w.transmission.next_id=n+1
+              w.institutions.next_record=n+1
+              w.institutions.next_notice=n+1
+              w.institutions.next_application=n+1
+              return w
+
+          def measure(n):
+              with tempfile.TemporaryDirectory() as td:
+                  td=Path(td)
+                  cold=td/"cold.sqlite"
+                  lazy=td/"lazy.sqlite"
+                  write_cold_snapshot(build(n),cold,rules_id=RULES)
+                  convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+
+                  with LazyRecordStore.open(
+                      lazy,
+                      codec=WorldCodec(identity_links_recorded=True),
+                      expected_simulation_schema=SCHEMA,
+                      expected_rules_id=RULES,
+                  ) as s:
+                      rows=list(s.db.execute(
+                          "SELECT namespace,COUNT(*),"
+                          "COALESCE(SUM(LENGTH(payload)),0) "
+                          "FROM records GROUP BY namespace "
+                          "ORDER BY COALESCE(SUM(LENGTH(payload)),0) DESC"
+                      ))
+                      identities=s.db.execute(
+                          "SELECT owner_namespace,COUNT(*) "
+                          "FROM lazy_identity_occurrence_versions "
+                          "GROUP BY owner_namespace ORDER BY COUNT(*) DESC"
+                      ).fetchall()
+
+                  with open_lazy_world_session(lazy,rules_id=RULES) as session:
+                      d=session.store.diagnostics()
+                      print("RESIDUAL_OPEN",n,{
+                          "payload_reads":d.payload_reads,
+                          "payload_read_bytes":d.payload_read_bytes,
+                          "identity_live":session._registry.diagnostics()["live_incarnations"],
+                      })
+                      print("RESIDUAL_ROWS",n,rows)
+                      print("RESIDUAL_IDENTITIES",n,identities)
+
+          for n in (1000,10000):
+              measure(n)
+          PY
