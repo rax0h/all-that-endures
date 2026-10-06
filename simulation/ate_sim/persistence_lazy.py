@@ -1933,6 +1933,8 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 INSTITUTION_MAGIC_RECORD_NAMESPACE: session.institution_magic_records,
                 INSTITUTION_NOTICE_NAMESPACE: session.institution_notices,
                 INSTITUTION_APPLICATION_NAMESPACE: session.institution_applications,
+                TRANSMISSION_NAMESPACE: session.transmissions,
+                MOTIVE_NAMESPACE: session.motives,
             }.get(namespace)
             if table is None:
                 raise StoreIntegrityError(
@@ -1986,6 +1988,8 @@ def _initialize_eager_tracker(
         INSTITUTION_MAGIC_RECORD_NAMESPACE,
         INSTITUTION_NOTICE_NAMESPACE,
         INSTITUTION_APPLICATION_NAMESPACE,
+        TRANSMISSION_NAMESPACE,
+        MOTIVE_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -6643,6 +6647,8 @@ class LazyWorldSession:
                     MagicUserRecord,
                     AdventureNotice,
                     SocietyApplication,
+                    Transmission,
+                    MotiveState,
                 ),
             )
             and field in RECORD_FIELDS.get(type(subject), ())
@@ -6744,6 +6750,8 @@ class LazyWorldSession:
                     INSTITUTION_MAGIC_RECORD_NAMESPACE,
                     INSTITUTION_NOTICE_NAMESPACE,
                     INSTITUTION_APPLICATION_NAMESPACE,
+                    TRANSMISSION_NAMESPACE,
+                    MOTIVE_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
@@ -6777,6 +6785,8 @@ class LazyWorldSession:
                     INSTITUTION_MAGIC_RECORD_NAMESPACE,
                     INSTITUTION_NOTICE_NAMESPACE,
                     INSTITUTION_APPLICATION_NAMESPACE,
+                    TRANSMISSION_NAMESPACE,
+                    MOTIVE_NAMESPACE,
                 }
             )
             lazy_paths = {
