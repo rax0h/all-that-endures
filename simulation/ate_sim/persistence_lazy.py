@@ -1421,6 +1421,22 @@ class LazyPeopleSavePlan:
     resource_structural_keys: tuple[Any, ...]
     owner_index_touched_keys: tuple[Any, ...]
     owner_index_structural_keys: tuple[Any, ...]
+    material_lot_version_changes: tuple[VersionChange, ...]
+    material_lot_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    material_lot_touched_keys: tuple[Any, ...]
+    material_lot_structural_keys: tuple[Any, ...]
+    material_item_version_changes: tuple[VersionChange, ...]
+    material_item_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    material_item_touched_keys: tuple[Any, ...]
+    material_item_structural_keys: tuple[Any, ...]
+    material_lot_index_version_changes: tuple[VersionChange, ...]
+    material_lot_index_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    material_lot_index_touched_keys: tuple[Any, ...]
+    material_lot_index_structural_keys: tuple[Any, ...]
+    material_active_index_version_changes: tuple[VersionChange, ...]
+    material_active_index_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    material_active_index_touched_keys: tuple[Any, ...]
+    material_active_index_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
@@ -3183,6 +3199,1181 @@ class LazyResourceTable(LazyRecordTable):
             "removed_resources": len(self._removed),
             "new_resources": len(self._new_keys),
             "reinserted_resources": len(self._reinserted),
+        }
+
+
+
+class LazyTrackedIdList(list):
+    """Weakly bound integer list used by lazy material index buckets."""
+
+    def __init__(self, values, table, key):
+        values = self._validate(values)
+        list.__init__(self, values)
+        self._table_ref = weakref.ref(table)
+        self._key = key
+
+    @staticmethod
+    def _validate(values):
+        values = list(values)
+        if any(type(value) is not int for value in values):
+            raise TypeError("tracked material index requires integer IDs")
+        return values
+
+    def _table(self):
+        return None if self._table_ref is None else self._table_ref()
+
+    def _guard(self):
+        table = self._table()
+        if table is not None:
+            table._ensure_mutation()
+        return table
+
+    def _touch(self, table):
+        if table is not None:
+            table.changed(self._key)
+
+    def _attach(self, table, key):
+        self._table_ref = weakref.ref(table)
+        self._key = key
+
+    def _detach(self):
+        self._table_ref = None
+        self._key = None
+
+    def append(self, value):
+        table = self._guard()
+        self._validate((value,))
+        list.append(self, value)
+        self._touch(table)
+
+    def extend(self, values):
+        values = self._validate(values)
+        table = self._guard()
+        list.extend(self, values)
+        self._touch(table)
+
+    def insert(self, index, value):
+        table = self._guard()
+        self._validate((value,))
+        list.insert(self, index, value)
+        self._touch(table)
+
+    def __setitem__(self, index, value):
+        table = self._guard()
+        if isinstance(index, slice):
+            value = self._validate(value)
+        else:
+            self._validate((value,))
+        list.__setitem__(self, index, value)
+        self._touch(table)
+
+    def __delitem__(self, index):
+        table = self._guard()
+        list.__delitem__(self, index)
+        self._touch(table)
+
+    def pop(self, index=-1):
+        table = self._guard()
+        value = list.pop(self, index)
+        self._touch(table)
+        return value
+
+    def remove(self, value):
+        table = self._guard()
+        list.remove(self, value)
+        self._touch(table)
+
+    def clear(self):
+        table = self._guard()
+        if self:
+            list.clear(self)
+            self._touch(table)
+
+    def reverse(self):
+        table = self._guard()
+        list.reverse(self)
+        self._touch(table)
+
+    def sort(self, *args, **kwargs):
+        table = self._guard()
+        list.sort(self, *args, **kwargs)
+        self._touch(table)
+
+    def __iadd__(self, values):
+        self.extend(values)
+        return self
+
+    def __imul__(self, count):
+        table = self._guard()
+        list.__imul__(self, count)
+        self._touch(table)
+        return self
+
+
+class _LazySimpleMaterialObjectTable(LazyRecordTable):
+    """Shared bounded mapping behavior for top-level material object records."""
+
+    _record_type = object
+    _record_schema = 0
+    _touched_attr = ""
+    _label = "material record"
+
+    def __init__(self, session, namespace, *, clean_limit=CLEAN_GROUP_LIMIT):
+        dict.__init__(self)
+        self._session = session
+        self._store = session.store
+        self._pin = session.pin
+        self._namespace = namespace
+        self._clean_limit = clean_limit
+        self._lru = OrderedDict()
+        self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence = {}
+        self._baseline_payload = {}
+        self._baseline_incarnation = {}
+        self._baseline_ordinal = {}
+        self._dirty = set()
+        self._removed = set()
+        self._new_keys = set()
+        self._reinserted = set()
+        self._overlay_ordinals = {}
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=self._record_schema,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def _bind_loaded_record(self, key, record):
+        raise NotImplementedError
+
+    def _bind_assigned_record(self, key, record):
+        raise NotImplementedError
+
+    def _detach_assigned_record(self, key, record):
+        raise NotImplementedError
+
+    def _detach_unloaded_record(self, key):
+        raise NotImplementedError
+
+    def __getitem__(self, key):
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        if dict.__contains__(self, key):
+            self._lru.pop(key, None)
+            if key not in self._dirty:
+                self._lru[key] = None
+            return dict.__getitem__(self, key)
+        checked = self._store.read_version(
+            self._pin,
+            self._namespace,
+            key,
+            expected_record_schema=self._record_schema,
+        )
+        if not isinstance(checked.value, self._record_type):
+            raise StoreFormatError(
+                f"lazy {self._label} payload has wrong type"
+            )
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(checked.value)
+        )
+        self._baseline_presence.setdefault(key, True)
+        record = self._bind_loaded_record(key, checked.value)
+        dict.__setitem__(self, key, record)
+        object.__setattr__(record, "_index_table", weakref.ref(self))
+        object.__setattr__(record, "_index_key", key)
+        self._loads += 1
+        if key not in self._dirty:
+            self._lru[key] = None
+        self._evict_clean()
+        return record
+
+    def changed(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                f"mutation notification has no current lazy {self._label}"
+            )
+        if not dict.__contains__(self, key):
+            self[key]
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __setitem__(self, key, record):
+        self._ensure_mutation()
+        if not isinstance(record, self._record_type):
+            raise TypeError(f"{self._label} value has wrong type")
+        baseline_exists = self._baseline_exists(key)
+        currently_visible = self._visible(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is record and currently_visible:
+            return
+        was_removed = key in self._removed
+        if old is not None and old is not record:
+            self._detach_index_binding(old)
+            self._detach_assigned_record(key, old)
+        record = self._bind_assigned_record(key, record)
+        dict.__setitem__(self, key, record)
+        object.__setattr__(record, "_index_table", weakref.ref(self))
+        object.__setattr__(record, "_index_key", key)
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __delitem__(self, key):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is not None:
+            self._detach_index_binding(old)
+            self._detach_assigned_record(key, old)
+            dict.__delitem__(self, key)
+        else:
+            self._detach_unloaded_record(key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        structural_ordinals = self._planned_structural_ordinals()
+        version_changes = []
+        identity_changes = []
+        effective_keys = []
+        structural_keys = []
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            baseline_incarnation = (
+                self._baseline_incarnation_id(key)
+                if baseline_exists else None
+            )
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=self._record_schema,
+                        )
+                    )
+                    identity_changes.append(
+                        IdentityOccurrenceChange(
+                            self._namespace, key, (), delete=True
+                        )
+                    )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+            record = dict.__getitem__(self, key)
+            payload = self._store.codec.encode(record)
+            incarnation = self._session._registry.incarnation_for_object(
+                record
+            )
+            if incarnation is None:
+                raise StoreIntegrityError(
+                    f"current lazy {self._label} has no runtime incarnation"
+                )
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new or reinsertion or payload != self._baseline_bytes(key)
+            )
+            if is_new or reinsertion:
+                ordinal = structural_ordinals[key]
+            else:
+                ordinal = self._persisted_ordinal(key)
+            del ordinal
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        record,
+                        record_schema=self._record_schema,
+                        reinsertion=reinsertion,
+                    )
+                )
+            if baseline_incarnation != incarnation.value:
+                identity_changes.append(
+                    IdentityOccurrenceChange(
+                        self._namespace,
+                        key,
+                        (),
+                        incarnation_id=incarnation.value,
+                    )
+                )
+            if value_changed or baseline_incarnation != incarnation.value:
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+        return (
+            tuple(version_changes),
+            tuple(identity_changes),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in getattr(plan, self._touched_attr):
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                record = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(record)
+                incarnation = self._session._registry.incarnation_for_object(
+                    record
+                )
+                self._baseline_incarnation[key] = (
+                    None if incarnation is None else incarnation.value
+                )
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        f"committed {self._label} lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_incarnation[key] = None
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
+
+    def diagnostics(self):
+        return {
+            "logical_records": (
+                self._baseline_count
+                - len(self._removed)
+                + len(self._new_keys)
+            ),
+            "resident_records": dict.__len__(self),
+            "clean_cache_entries": len(self._lru),
+            "clean_cache_limit": self._clean_limit,
+            "payload_loads": self._loads,
+            "dirty_records": len(self._dirty),
+            "removed_records": len(self._removed),
+            "new_records": len(self._new_keys),
+            "reinserted_records": len(self._reinserted),
+        }
+
+
+class LazyMaterialItemTable(_LazySimpleMaterialObjectTable):
+    _record_type = CraftedItem
+    _record_schema = LAZY_MATERIAL_ITEM_SCHEMA
+    _touched_attr = "material_item_touched_keys"
+    _label = "crafted item"
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session, MATERIAL_ITEM_NAMESPACE, clean_limit=clean_limit
+        )
+
+    def _bind_loaded_record(self, key, record):
+        return self._session._bind_loaded_material_item(key, record)
+
+    def _bind_assigned_record(self, key, record):
+        return self._session._bind_assigned_material_item(key, record)
+
+    def _detach_assigned_record(self, key, record):
+        self._session._detach_assigned_material_item(key, record)
+
+    def _detach_unloaded_record(self, key):
+        self._session._detach_unloaded_material_item(key)
+
+
+class _LazyMaterialContainerTable(LazyRecordTable):
+    """Bounded lazy material index whose values are mutable list/set buckets."""
+
+    _record_schema = 0
+    _touched_attr = ""
+    _label = "material index"
+
+    def __init__(self, session, namespace, *, clean_limit=CLEAN_GROUP_LIMIT):
+        dict.__init__(self)
+        self._session = session
+        self._store = session.store
+        self._pin = session.pin
+        self._namespace = namespace
+        self._clean_limit = clean_limit
+        self._lru = OrderedDict()
+        self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence = {}
+        self._baseline_payload = {}
+        self._baseline_incarnation = {}
+        self._baseline_ordinal = {}
+        self._dirty = set()
+        self._removed = set()
+        self._new_keys = set()
+        self._reinserted = set()
+        self._overlay_ordinals = {}
+
+    def _plain(self, value):
+        raise NotImplementedError
+
+    def _valid_plain(self, value):
+        raise NotImplementedError
+
+    def _bind_loaded_bucket(self, key, value):
+        raise NotImplementedError
+
+    def _bind_assigned_bucket(self, key, value):
+        raise NotImplementedError
+
+    def _detach_assigned_bucket(self, key, value):
+        raise NotImplementedError
+
+    def _detach_unloaded_bucket(self, key):
+        raise NotImplementedError
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=self._record_schema,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def __getitem__(self, key):
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        if dict.__contains__(self, key):
+            self._lru.pop(key, None)
+            if key not in self._dirty:
+                self._lru[key] = None
+            return dict.__getitem__(self, key)
+        checked = self._store.read_version(
+            self._pin,
+            self._namespace,
+            key,
+            expected_record_schema=self._record_schema,
+        )
+        if not self._valid_plain(checked.value):
+            raise StoreFormatError(
+                f"lazy {self._label} payload has wrong type"
+            )
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(checked.value)
+        )
+        self._baseline_presence.setdefault(key, True)
+        bucket = self._bind_loaded_bucket(key, checked.value)
+        dict.__setitem__(self, key, bucket)
+        self._loads += 1
+        if key not in self._dirty:
+            self._lru[key] = None
+        self._evict_clean()
+        return bucket
+
+    def changed(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                f"mutation notification has no current lazy {self._label}"
+            )
+        if not dict.__contains__(self, key):
+            self[key]
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __setitem__(self, key, value):
+        self._ensure_mutation()
+        if not self._valid_plain(self._plain(value)):
+            raise TypeError(f"{self._label} value has wrong type")
+        baseline_exists = self._baseline_exists(key)
+        currently_visible = self._visible(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is value and currently_visible:
+            return
+        was_removed = key in self._removed
+        if old is not None and old is not value:
+            self._detach_assigned_bucket(key, old)
+        bucket = self._bind_assigned_bucket(key, value)
+        dict.__setitem__(self, key, bucket)
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __delitem__(self, key):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is not None:
+            self._detach_assigned_bucket(key, old)
+            dict.__delitem__(self, key)
+        else:
+            self._detach_unloaded_bucket(key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        version_changes = []
+        identity_changes = []
+        effective_keys = []
+        structural_keys = []
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            baseline_incarnation = (
+                self._baseline_incarnation_id(key)
+                if baseline_exists else None
+            )
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=self._record_schema,
+                        )
+                    )
+                    identity_changes.append(
+                        IdentityOccurrenceChange(
+                            self._namespace, key, (), delete=True
+                        )
+                    )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+            bucket = dict.__getitem__(self, key)
+            stored_value = self._plain(bucket)
+            payload = self._store.codec.encode(stored_value)
+            incarnation = self._session._registry.incarnation_for_object(
+                bucket
+            )
+            if incarnation is None:
+                raise StoreIntegrityError(
+                    f"current lazy {self._label} has no runtime incarnation"
+                )
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new or reinsertion or payload != self._baseline_bytes(key)
+            )
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        stored_value,
+                        record_schema=self._record_schema,
+                        reinsertion=reinsertion,
+                    )
+                )
+            if baseline_incarnation != incarnation.value:
+                identity_changes.append(
+                    IdentityOccurrenceChange(
+                        self._namespace,
+                        key,
+                        (),
+                        incarnation_id=incarnation.value,
+                    )
+                )
+            if value_changed or baseline_incarnation != incarnation.value:
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+        return (
+            tuple(version_changes),
+            tuple(identity_changes),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in getattr(plan, self._touched_attr):
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                bucket = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(
+                    self._plain(bucket)
+                )
+                incarnation = self._session._registry.incarnation_for_object(
+                    bucket
+                )
+                self._baseline_incarnation[key] = (
+                    None if incarnation is None else incarnation.value
+                )
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        f"committed {self._label} lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_incarnation[key] = None
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
+
+    def diagnostics(self):
+        return {
+            "logical_buckets": (
+                self._baseline_count
+                - len(self._removed)
+                + len(self._new_keys)
+            ),
+            "resident_buckets": dict.__len__(self),
+            "clean_cache_entries": len(self._lru),
+            "clean_cache_limit": self._clean_limit,
+            "bucket_payload_loads": self._loads,
+            "dirty_buckets": len(self._dirty),
+        }
+
+
+class LazyMaterialLotIndexTable(_LazyMaterialContainerTable):
+    _record_schema = LAZY_MATERIAL_LOT_INDEX_SCHEMA
+    _touched_attr = "material_lot_index_touched_keys"
+    _label = "material lot-index bucket"
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session, MATERIAL_LOT_INDEX_NAMESPACE, clean_limit=clean_limit
+        )
+
+    def _plain(self, value):
+        return list(value)
+
+    def _valid_plain(self, value):
+        return type(value) is list and all(type(item) is int for item in value)
+
+    def _bind_loaded_bucket(self, key, value):
+        return self._session._bind_loaded_material_lot_index(key, value)
+
+    def _bind_assigned_bucket(self, key, value):
+        return self._session._bind_assigned_material_lot_index(key, value)
+
+    def _detach_assigned_bucket(self, key, value):
+        self._session._detach_assigned_material_lot_index(key, value)
+
+    def _detach_unloaded_bucket(self, key):
+        self._session._detach_unloaded_material_lot_index(key)
+
+
+class LazyMaterialActiveIndexTable(_LazyMaterialContainerTable):
+    _record_schema = LAZY_MATERIAL_ACTIVE_INDEX_SCHEMA
+    _touched_attr = "material_active_index_touched_keys"
+    _label = "material active-index bucket"
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session, MATERIAL_ACTIVE_INDEX_NAMESPACE, clean_limit=clean_limit
+        )
+
+    def _plain(self, value):
+        return set(value)
+
+    def _valid_plain(self, value):
+        return type(value) is set and all(type(item) is int for item in value)
+
+    def _bind_loaded_bucket(self, key, value):
+        return self._session._bind_loaded_material_active_index(key, value)
+
+    def _bind_assigned_bucket(self, key, value):
+        return self._session._bind_assigned_material_active_index(key, value)
+
+    def _detach_assigned_bucket(self, key, value):
+        self._session._detach_assigned_material_active_index(key, value)
+
+    def _detach_unloaded_bucket(self, key):
+        self._session._detach_unloaded_material_active_index(key)
+
+
+class LazyMaterialLotTable(LazyRecordTable):
+    """Bounded lazy MaterialLot authority with persistent active memberships."""
+
+    _transfer_path = (("field", "transfers"),)
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        dict.__init__(self)
+        self._session = session
+        self._store = session.store
+        self._pin = session.pin
+        self._namespace = MATERIAL_LOT_NAMESPACE
+        self._clean_limit = clean_limit
+        self._lru = OrderedDict()
+        self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence = {}
+        self._baseline_payload = {}
+        self._baseline_incarnation = {}
+        self._baseline_identity_labels = {}
+        self._baseline_ordinal = {}
+        self._dirty = set()
+        self._removed = set()
+        self._new_keys = set()
+        self._reinserted = set()
+        self._overlay_ordinals = {}
+        self._pending_transfer_old = {}
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=LAZY_MATERIAL_LOT_SCHEMA,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def _baseline_labels(self, key):
+        if key not in self._baseline_identity_labels:
+            self._baseline_identity_labels[key] = dict(
+                self._store.identity_occurrences_for_owner(
+                    self._pin, self._namespace, key
+                )
+            )
+        return dict(self._baseline_identity_labels[key])
+
+    def __getitem__(self, key):
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        if dict.__contains__(self, key):
+            self._lru.pop(key, None)
+            if key not in self._dirty:
+                self._lru[key] = None
+            return dict.__getitem__(self, key)
+        checked = self._store.read_version(
+            self._pin,
+            self._namespace,
+            key,
+            expected_record_schema=LAZY_MATERIAL_LOT_SCHEMA,
+        )
+        if not isinstance(checked.value, MaterialLot):
+            raise StoreFormatError(
+                "lazy material-lot payload is not MaterialLot"
+            )
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(checked.value)
+        )
+        self._baseline_presence.setdefault(key, True)
+        record = self._session._bind_loaded_material_lot(
+            key, checked.value
+        )
+        dict.__setitem__(self, key, record)
+        object.__setattr__(record, "_index_table", weakref.ref(self))
+        object.__setattr__(record, "_index_key", key)
+        self._loads += 1
+        if key not in self._dirty:
+            self._lru[key] = None
+        self._evict_clean()
+        return record
+
+    def preflight_change(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current lazy material lot"
+            )
+        if field == "transfers":
+            live = (
+                dict.__getitem__(self, key)
+                if dict.__contains__(self, key)
+                else self._session._live_material_lot_for_key(key)
+            )
+            if live is not None:
+                self._pending_transfer_old[key] = live.transfers
+
+    def changed(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current lazy material lot"
+            )
+        if not dict.__contains__(self, key):
+            self[key]
+        record = dict.__getitem__(self, key)
+        if field == "transfers" and key in self._pending_transfer_old:
+            old = self._pending_transfer_old.pop(key)
+            if old is not record.transfers:
+                self._session._replace_material_lot_transfers(
+                    key, record, old, record.transfers
+                )
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __setitem__(self, key, record):
+        self._ensure_mutation()
+        if not isinstance(record, MaterialLot):
+            raise TypeError("world.materials.lots values must be MaterialLot")
+        baseline_exists = self._baseline_exists(key)
+        currently_visible = self._visible(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is record and currently_visible:
+            return
+        was_removed = key in self._removed
+        if old is not None and old is not record:
+            self._detach_index_binding(old)
+            self._session._detach_assigned_material_lot(key, old)
+        record = self._session._bind_assigned_material_lot(key, record)
+        dict.__setitem__(self, key, record)
+        object.__setattr__(record, "_index_table", weakref.ref(self))
+        object.__setattr__(record, "_index_key", key)
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __delitem__(self, key):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is not None:
+            self._detach_index_binding(old)
+            self._session._detach_assigned_material_lot(key, old)
+            dict.__delitem__(self, key)
+        else:
+            self._session._detach_unloaded_material_lot(key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+
+    def _overlay_memberships(self, lot, ordinal):
+        return tuple(
+            Membership(name, value, member_ordinal)
+            for name, value, member_ordinal
+            in _material_lot_memberships(lot, ordinal)
+        )
+
+    def ids(self, index_name, value):
+        self._ensure()
+        if index_name not in {"active_settlement", "active_rank"}:
+            raise StoreError("unsupported lazy material-lot membership query")
+        baseline = set(
+            self._store.query_keys(
+                self._pin, self._namespace, index_name, value
+            )
+        )
+        touched = self._effective_touched()
+        baseline.difference_update(touched)
+        for key in touched:
+            if not self._visible(key):
+                continue
+            record = dict.__getitem__(self, key)
+            ordinal = self._current_ordinal(key)
+            current = {
+                (member.index_name, member.value)
+                for member in self._overlay_memberships(record, ordinal)
+            }
+            if (index_name, value) in current:
+                baseline.add(key)
+        return tuple(sorted(baseline, key=self._current_ordinal))
+
+    def active_ids(self, settlement):
+        return self.ids("active_settlement", settlement)
+
+    def active_rank_ids(self, settlement, rank):
+        return self.ids("active_rank", (settlement, rank))
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        structural_ordinals = self._planned_structural_ordinals()
+        version_changes = []
+        identity_changes = []
+        effective_keys = []
+        structural_keys = []
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            baseline_labels = (
+                self._baseline_labels(key) if baseline_exists else {}
+            )
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=LAZY_MATERIAL_LOT_SCHEMA,
+                        )
+                    )
+                    for path in baseline_labels:
+                        identity_changes.append(
+                            IdentityOccurrenceChange(
+                                self._namespace, key, path, delete=True
+                            )
+                        )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+            record = dict.__getitem__(self, key)
+            stored_record = _plain_material_lot_value(record)
+            payload = self._store.codec.encode(stored_record)
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new or reinsertion or payload != self._baseline_bytes(key)
+            )
+            if is_new or reinsertion:
+                ordinal = structural_ordinals[key]
+            else:
+                ordinal = self._persisted_ordinal(key)
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        stored_record,
+                        record_schema=LAZY_MATERIAL_LOT_SCHEMA,
+                        memberships=self._overlay_memberships(
+                            record, ordinal
+                        ),
+                        reinsertion=reinsertion,
+                    )
+                )
+            current_labels = (
+                self._session._material_lot_incarnation_labels(key, record)
+            )
+            all_paths = set(baseline_labels) | set(current_labels)
+            identity_changed = False
+            for path in sorted(
+                all_paths, key=self._store.codec.encode
+            ):
+                before = baseline_labels.get(path)
+                after = current_labels.get(path)
+                if before == after:
+                    continue
+                identity_changed = True
+                identity_changes.append(
+                    IdentityOccurrenceChange(
+                        self._namespace,
+                        key,
+                        path,
+                        delete=after is None,
+                        incarnation_id=after,
+                    )
+                )
+            if value_changed or identity_changed:
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+        return (
+            tuple(version_changes),
+            tuple(identity_changes),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in plan.material_lot_touched_keys:
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                record = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(
+                    _plain_material_lot_value(record)
+                )
+                self._baseline_identity_labels[key] = (
+                    self._session._material_lot_incarnation_labels(
+                        key, record
+                    )
+                )
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        "committed material lot lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_identity_labels.pop(key, None)
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._pending_transfer_old.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
+
+    def diagnostics(self):
+        return {
+            "logical_material_lots": (
+                self._baseline_count
+                - len(self._removed)
+                + len(self._new_keys)
+            ),
+            "resident_material_lots": dict.__len__(self),
+            "clean_cache_entries": len(self._lru),
+            "clean_cache_limit": self._clean_limit,
+            "material_lot_payload_loads": self._loads,
+            "dirty_material_lots": len(self._dirty),
         }
 
 
