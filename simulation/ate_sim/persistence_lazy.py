@@ -26,6 +26,7 @@ from .mastery_training import ResponseModel
 from .institutions import MagicUserRecord, AdventureNotice, SocietyApplication
 from .transmission import Transmission
 from .agency import MotiveState
+from .social import Relationship
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
     Membership,
@@ -117,6 +118,9 @@ INSTITUTION_NOTICE_NAMESPACE = "world.institutions.notices"
 INSTITUTION_APPLICATION_NAMESPACE = "world.institutions.applications"
 TRANSMISSION_NAMESPACE = "world.transmission.records"
 MOTIVE_NAMESPACE = "world.agency.motives"
+SOCIAL_EDGE_NAMESPACE = "world.social.edges"
+SOCIAL_ADJACENCY_NAMESPACE = "world.social.adjacency"
+SOCIAL_PARTNERSHIP_NAMESPACE = "world.social.partnerships"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
@@ -134,6 +138,9 @@ LAZY_INSTITUTION_NOTICE_SCHEMA = 1
 LAZY_INSTITUTION_APPLICATION_SCHEMA = 1
 LAZY_TRANSMISSION_SCHEMA = 1
 LAZY_MOTIVE_SCHEMA = 1
+LAZY_SOCIAL_EDGE_SCHEMA = 1
+LAZY_SOCIAL_ADJACENCY_SCHEMA = 1
+LAZY_SOCIAL_PARTNERSHIP_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
