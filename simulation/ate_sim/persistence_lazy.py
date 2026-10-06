@@ -1597,6 +1597,30 @@ def _institution_occurrence_from_path(path):
     return None
 
 
+def _scalar_archive_occurrence_from_path(path):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and type(path[0]) is tuple
+        and len(path[0]) == 2
+        and path[0][0] == "field"
+        and type(path[1]) is tuple
+        and len(path[1]) == 2
+        and path[1][0] == "field"
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        pair = (path[0][1], path[1][1])
+        namespace = {
+            ("transmission", "records"): TRANSMISSION_NAMESPACE,
+            ("agency", "motives"): MOTIVE_NAMESPACE,
+        }.get(pair)
+        if namespace is not None:
+            return namespace, path[2][1], tuple(path[3:])
+    return None
+
+
 def _lazy_occurrence_from_path(path):
     people = _people_occurrence_from_path(path)
     if people is not None:
@@ -1708,6 +1732,14 @@ def _lazy_occurrence_from_path(path):
             INSTITUTION_MAGIC_RECORD_NAMESPACE: MagicUserRecord,
             INSTITUTION_NOTICE_NAMESPACE: AdventureNotice,
             INSTITUTION_APPLICATION_NAMESPACE: SocietyApplication,
+        }[namespace]
+        return namespace, key, relative, expected
+    scalar_archive = _scalar_archive_occurrence_from_path(path)
+    if scalar_archive is not None:
+        namespace, key, relative = scalar_archive
+        expected = {
+            TRANSMISSION_NAMESPACE: Transmission,
+            MOTIVE_NAMESPACE: MotiveState,
         }[namespace]
         return namespace, key, relative, expected
     return None
