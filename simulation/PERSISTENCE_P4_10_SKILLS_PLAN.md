@@ -77,5 +77,9 @@ Scaling run `37412803730` passed the 1,000/10,000 bounded-work proof:
 | one-skill save payload bytes | 409 | 409 |
 | resident skills | 1 | 1 |
 
-The broad affected P4 regression gate is still required before P4.10 is
-accepted closed.
+Affected P4 regression run `37413133031` passed **279/279 in 302.41s
+(5:02)**. P4.10 is accepted closed on product head
+`634c517d943b0d71c94fa9603a7ba87eda660add`.
+
+Next action: rerun the residual eager inventory and select the next migration
+strictly by measured remaining archive cost.
