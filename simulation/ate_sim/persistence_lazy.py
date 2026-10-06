@@ -334,6 +334,27 @@ def _insert_lazy_plain_record(
 
 
 def _institution_memberships(namespace, record, ordinal):
+    if namespace == SOCIAL_EDGE_NAMESPACE:
+        if not isinstance(record, Relationship):
+            raise TypeError("expected Relationship")
+        return (
+            ("person", record.a, ordinal),
+            ("person", record.b, ordinal),
+        )
+    if namespace == SOCIAL_PARTNERSHIP_NAMESPACE:
+        if (
+            type(record) is not tuple
+            or len(record) != 2
+            or type(record[0]) is not tuple
+            or len(record[0]) != 2
+            or type(record[1]) is not int
+        ):
+            raise TypeError("expected ((person_a, person_b), event_id)")
+        pair, _event_id = record
+        return (
+            ("person", pair[0], ordinal),
+            ("person", pair[1], ordinal),
+        )
     if namespace == TRANSMISSION_NAMESPACE:
         if not isinstance(record, Transmission):
             raise TypeError("expected Transmission")
