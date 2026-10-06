@@ -190,3 +190,28 @@ def test_lineage_children_noop_save_is_free(tmp_path):
     with open_lazy_world_session(path, rules_id=RULES) as session:
         generation = session.pin.captured_head
         assert session.save() == generation
+
+
+def test_lineage_add_to_unloaded_bucket_can_be_read_before_save(tmp_path):
+    path = converted(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        assert session.lineage_children.diagnostics()[
+            "lineage_child_bucket_payload_loads"
+        ] == 0
+        session.world.lineage.register(
+            "practice", 4, (("practice", 1),), 104, 4
+        )
+        assert session.lineage_children.diagnostics()[
+            "lineage_child_bucket_payload_loads"
+        ] == 0
+        assert session.world.lineage.children[("practice", 1)] == {
+            ("practice", 2),
+            ("practice", 4),
+        }
+        session.save()
+
+    with open_lazy_world_session(path, rules_id=RULES) as reopened:
+        assert reopened.world.lineage.children[("practice", 1)] == {
+            ("practice", 2),
+            ("practice", 4),
+        }
