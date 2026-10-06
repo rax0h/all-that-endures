@@ -345,6 +345,23 @@ class LazyIdentityRegistry:
             )
         )
 
+    def occurrences_for_owner(
+        self, owner_namespace: str, owner_key: Any
+    ) -> tuple[Occurrence, ...]:
+        """Return current placements for one owner without scanning objects."""
+        self._ensure_open()
+        owner = (owner_namespace, owner_key)
+        return tuple(
+            sorted(
+                (
+                    occurrence
+                    for occurrence in self._occurrences
+                    if occurrence.owner == owner
+                ),
+                key=repr,
+            )
+        )
+
     def is_detached(self, obj: Any) -> bool:
         incarnation = self.incarnation_for_object(obj)
         if incarnation is None:
