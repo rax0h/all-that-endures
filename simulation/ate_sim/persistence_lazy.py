@@ -4269,6 +4269,104 @@ class LazyMaterialItemTable(_LazySimpleMaterialObjectTable):
         self._session._detach_unloaded_material_item(key)
 
 
+class _LazyInstitutionRecordTable(_LazySimpleMaterialObjectTable):
+    """Shared bounded RecordTable-compatible institution record storage."""
+
+    _index_fields = {}
+
+    def _bind_loaded_record(self, key, record):
+        return self._session._bind_loaded_institution_record(
+            self, self._namespace, key, record, self._record_type
+        )
+
+    def _bind_assigned_record(self, key, record):
+        return self._session._bind_assigned_institution_record(
+            self, self._namespace, key, record
+        )
+
+    def _detach_assigned_record(self, key, record):
+        self._session._detach_assigned_institution_record(
+            self, self._namespace, key, record
+        )
+
+    def _detach_unloaded_record(self, key):
+        self._session._detach_unloaded_institution_record(
+            self, self._namespace, key
+        )
+
+    def _memberships(self, record, ordinal):
+        return tuple(
+            Membership(name, value, member_ordinal)
+            for name, value, member_ordinal
+            in _institution_memberships(
+                self._namespace, record, ordinal
+            )
+        )
+
+    def _index_name(self, fields):
+        normalized = (fields,) if isinstance(fields, str) else tuple(fields)
+        try:
+            return self._index_fields[normalized]
+        except KeyError as exc:
+            raise StoreError(
+                f"unsupported {self._label} membership query: {normalized!r}"
+            ) from exc
+
+
+class LazyInstitutionMagicRecordTable(_LazyInstitutionRecordTable):
+    _record_type = MagicUserRecord
+    _record_schema = LAZY_INSTITUTION_MAGIC_RECORD_SCHEMA
+    _touched_attr = "institution_magic_record_touched_keys"
+    _label = "institution magic record"
+    _index_fields = {
+        ("person",): "person",
+    }
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session,
+            INSTITUTION_MAGIC_RECORD_NAMESPACE,
+            clean_limit=clean_limit,
+        )
+
+
+class LazyInstitutionNoticeTable(_LazyInstitutionRecordTable):
+    _record_type = AdventureNotice
+    _record_schema = LAZY_INSTITUTION_NOTICE_SCHEMA
+    _touched_attr = "institution_notice_touched_keys"
+    _label = "institution notice"
+    _index_fields = {
+        ("status",): "status",
+        ("cause_event",): "cause_event",
+    }
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session,
+            INSTITUTION_NOTICE_NAMESPACE,
+            clean_limit=clean_limit,
+        )
+
+
+class LazyInstitutionApplicationTable(_LazyInstitutionRecordTable):
+    _record_type = SocietyApplication
+    _record_schema = LAZY_INSTITUTION_APPLICATION_SCHEMA
+    _touched_attr = "institution_application_touched_keys"
+    _label = "institution application"
+    _index_fields = {
+        ("passed",): "passed",
+        ("person", "society"): "person_society",
+        ("person", "society", "passed"): "person_society_passed",
+    }
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session,
+            INSTITUTION_APPLICATION_NAMESPACE,
+            clean_limit=clean_limit,
+        )
+
+
 class _LazyMaterialContainerTable(LazyRecordTable):
     """Bounded lazy material index whose values are mutable list/set buckets."""
 
