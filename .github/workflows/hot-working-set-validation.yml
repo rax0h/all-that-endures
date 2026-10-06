@@ -78,3 +78,30 @@ jobs:
                   "reopen_digest_seconds", row["reopen_digest_seconds"],
               )
           PY
+
+      - name: Integrated P5 medium benchmark
+        run: |
+          python simulation/persistence_p5_long_validation.py \
+            --seed 843000 \
+            --milestones 25 50 100 \
+            --bootstrap-year 3 \
+            --workdir p5-hot-medium \
+            --output p5-hot-medium.json \
+            --product-sha "$GITHUB_SHA" \
+            --workflow-sha "$GITHUB_SHA"
+      - name: Print compact medium metrics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("p5-hot-medium.json").read_text())
+          print("MEDIUM_CONTROL", data["control_wall_seconds"])
+          for year,row in sorted(data["p4"].items(), key=lambda item:int(item[0])):
+              print(
+                  year,
+                  "simulation_seconds", row["simulation_seconds"],
+                  "payload_reads", row["simulation_io"]["payload_reads"],
+                  "save_seconds", row["save_seconds"],
+                  "reopen_digest_seconds", row["reopen_digest_seconds"],
+              )
+          PY
