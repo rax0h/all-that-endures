@@ -108,16 +108,36 @@ includes:
 
 ## Integrated P4 closeout gate
 
-Required full-suite run:
-`37513490616` — P4 integrated full suite.
-
-Command:
+Integrated full-suite run `37513490616` executed:
 
 `PYTHONPATH=simulation:. python -m pytest -q simulation/tests`
 
-This run is the final P4 integrated gate on source/test bytes identical to
-candidate `14f178623a6ef6e0d915fb4fe061079f54b15c21`.
-Record its exact result here before declaring P4 implementation complete.
+Result: **834 passed, 1 failed in 2558.52s (42:38)**. The single failure was
+`test_cross_boundary_aspiration_alias_mutates_without_payload_load`. It exposed
+a real cross-lazy identity bug: an `IndexedRecord` first materialized through a
+different lazy owner (an aspiration through a wallet alias) retained identity
+but lacked the canonical lazy table's mutation callback, so a field edit could
+be omitted from save planning.
+
+The fix is frozen in product/test head
+`e4752e306d30dcff41be1cc17ddc6e63004646a3`. It restores mutation routing
+from the identity registry without forcing the canonical payload load and adds
+the analogous Person-before-load regression.
+
+Post-fix evidence:
+- focused helper `37520218759`: **2/2 exact regressions** in 0.88s and
+  **57/57 affected people/aspiration/currency/identity tests** in 49.32s;
+- final landed-head gate `37520547147`: **2/2 regressions** in 0.91s,
+  canonical 10-year smoke green, **138/138** recovery/lifecycle/compatibility
+  tests in 113.71s, and P5 short integrated continuation green with the expected
+  year-10 digest/event authority.
+
+Per owner direction, the 42-minute 835-test suite was **not rerun merely to
+recheck this localized fix**. The 834 previously passing tests remain evidence
+on the immediately preceding product bytes; the localized affected/final-code
+gates above are the post-fix substitution. Astra must decide at final review
+whether this evidence substitution is sufficient for the literal final-full-
+suite completion-plan bullet; do not represent a second 835-test green run.
 
 ## Remaining limitations / boundaries
 
