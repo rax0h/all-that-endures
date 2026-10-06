@@ -1916,7 +1916,8 @@ class LazyRecordStore:
                     ordinal = final_next
                     final_next += 1
                     final_count += 1
-                    _bump_count(counts, namespace, records=1)
+                    if not _auxiliary_namespace(namespace):
+                        _bump_count(counts, namespace, records=1)
                 payload = item["payload"]
                 payload_checksum = _framed_sha(b"lazy-payload-v1", payload)
                 row_checksum = _version_checksum(
