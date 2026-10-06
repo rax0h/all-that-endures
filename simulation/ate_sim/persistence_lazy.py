@@ -20,6 +20,7 @@ from typing import Any, Iterator
 from .core import Person, World
 from .magic_resources import MagicAspiration, MagicResource
 from .materials import MaterialLot, CraftedItem
+from .metaphysics import SoulState
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
     Membership,
@@ -104,6 +105,7 @@ MATERIAL_LOT_INDEX_NAMESPACE = "world.materials.lot_index"
 MATERIAL_ACTIVE_INDEX_NAMESPACE = "world.materials.active_lot_index"
 WALLET_NAMESPACE = "world.currency.wallets"
 TREASURY_NAMESPACE = "world.currency.treasuries"
+SOUL_NAMESPACE = "world.metaphysics.souls"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
@@ -114,6 +116,7 @@ LAZY_MATERIAL_LOT_INDEX_SCHEMA = 1
 LAZY_MATERIAL_ACTIVE_INDEX_SCHEMA = 1
 LAZY_WALLET_SCHEMA = 1
 LAZY_TREASURY_SCHEMA = 1
+LAZY_SOUL_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
@@ -670,6 +673,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     wallet_next_ordinal = 0
                     treasury_count = 0
                     treasury_next_ordinal = 0
+                    soul_count = 0
+                    soul_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -695,6 +700,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             MATERIAL_ACTIVE_INDEX_NAMESPACE,
                             WALLET_NAMESPACE,
                             TREASURY_NAMESPACE,
+                            SOUL_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -874,7 +880,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             wallet_next_ordinal = max(
                                 wallet_next_ordinal, ordinal + 1
                             )
-                        else:
+                        elif namespace == TREASURY_NAMESPACE:
                             if type(value) is not dict:
                                 raise StoreFormatError(
                                     "invalid treasury source envelope"
@@ -892,6 +898,24 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             treasury_next_ordinal = max(
                                 treasury_next_ordinal, ordinal + 1
                             )
+                        else:
+                            if not isinstance(value, SoulState):
+                                raise StoreFormatError(
+                                    "invalid soul source envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=SOUL_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_SOUL_SCHEMA,
+                            )
+                            soul_count += 1
+                            soul_next_ordinal = max(
+                                soul_next_ordinal, ordinal + 1
+                            )
 
                     for row in source_store.db.execute(
                         "SELECT namespace,index_name,index_value,record_key,"
@@ -908,6 +932,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             MATERIAL_ACTIVE_INDEX_NAMESPACE,
                             WALLET_NAMESPACE,
                             TREASURY_NAMESPACE,
+                            SOUL_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1033,6 +1058,11 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             treasury_count,
                             treasury_next_ordinal,
                         ),
+                        (
+                            SOUL_NAMESPACE,
+                            soul_count,
+                            soul_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1121,6 +1151,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "material_active_index": material_active_index_count,
                 "wallets": wallet_count,
                 "treasuries": treasury_count,
+                "souls": soul_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
@@ -1199,6 +1230,20 @@ def _currency_occurrence_from_path(path, field):
         and len(path) >= 3
         and path[0] == ("field", "currency")
         and path[1] == ("field", field)
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
+
+
+def _soul_occurrence_from_path(path):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "metaphysics")
+        and path[1] == ("field", "souls")
         and type(path[2]) is tuple
         and len(path[2]) == 2
         and path[2][0] == "key"
@@ -1287,6 +1332,21 @@ def _lazy_occurrence_from_path(path):
     treasury = _currency_occurrence_from_path(path, "treasuries")
     if treasury is not None:
         return TREASURY_NAMESPACE, treasury[0], treasury[1], dict
+    soul = _soul_occurrence_from_path(path)
+    if soul is not None:
+        relative = soul[1]
+        if relative in (
+            (("field", "authorities"),),
+            (("field", "marks"),),
+        ):
+            expected_type = set
+        elif relative == (("field", "cosmic_links"),):
+            expected_type = dict
+        elif relative == (("field", "transformations"),):
+            expected_type = list
+        else:
+            expected_type = SoulState
+        return SOUL_NAMESPACE, soul[0], relative, expected_type
     return None
 
 
@@ -1451,6 +1511,7 @@ def _initialize_eager_tracker(
         MATERIAL_ACTIVE_INDEX_NAMESPACE,
         WALLET_NAMESPACE,
         TREASURY_NAMESPACE,
+        SOUL_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -4923,6 +4984,7 @@ class LazyWorldSession:
                     MATERIAL_ACTIVE_INDEX_NAMESPACE,
                     WALLET_NAMESPACE,
                     TREASURY_NAMESPACE,
+                    SOUL_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
@@ -4951,6 +5013,7 @@ class LazyWorldSession:
                     MATERIAL_ACTIVE_INDEX_NAMESPACE,
                     WALLET_NAMESPACE,
                     TREASURY_NAMESPACE,
+                    SOUL_NAMESPACE,
                 }
             )
             lazy_paths = {
@@ -7787,6 +7850,7 @@ def open_lazy_world_session(path, *, rules_id):
                     MATERIAL_ACTIVE_INDEX_NAMESPACE,
                     WALLET_NAMESPACE,
                     TREASURY_NAMESPACE,
+                    SOUL_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -7844,6 +7908,7 @@ def open_lazy_world_session(path, *, rules_id):
                         MATERIAL_ACTIVE_INDEX_NAMESPACE,
                         WALLET_NAMESPACE,
                         TREASURY_NAMESPACE,
+                        SOUL_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
