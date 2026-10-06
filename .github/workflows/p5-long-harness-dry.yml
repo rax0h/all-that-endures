@@ -15,7 +15,7 @@ jobs:
           python-version: "3.12"
       - name: Dry-run endurance harness
         run: |
-          PRODUCT_SHA="da1e6ff215af7b1083494a9cdc8fa9c4df51d119"
+          PRODUCT_SHA="e4752e306d30dcff41be1cc17ddc6e63004646a3"
           python simulation/persistence_p5_long_validation.py \
             --seed 843000 \
             --milestones 4 7 10 \
