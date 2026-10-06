@@ -20,7 +20,7 @@ from .incremental_store import (
     StoreFormatError, StoreIntegrityError,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_TYPES, ROOT_FIELDS
-from . import advancement, social, communities, magic_resources, materials
+from . import advancement, social, communities, magic_resources, materials, agency
 
 SCHEMA = 'ate-world-p2a/1'
 RECORD_SCHEMA = 1
