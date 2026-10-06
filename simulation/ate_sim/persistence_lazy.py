@@ -167,6 +167,45 @@ LAZY_COMMUNITY_MEMBERSHIP_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
+class _StepAwareLRU(OrderedDict):
+    """LRU that records the clean working set touched by one simulation step."""
+
+    def __init__(self, session):
+        super().__init__()
+        self._session_ref = weakref.ref(session)
+        self._step_epoch = None
+        self._step_touched = set()
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        session = self._session_ref()
+        if session is None:
+            return
+        tracker = getattr(session, "_eager_tracker", None)
+        if tracker is None or not tracker._cold_step_depth:
+            return
+        epoch = getattr(session, "_hot_step_epoch", 0)
+        if self._step_epoch != epoch:
+            self._step_epoch = epoch
+            self._step_touched.clear()
+        self._step_touched.add(key)
+
+    def touched(self, epoch):
+        if self._step_epoch != epoch:
+            return set()
+        return set(self._step_touched)
+
+    def finish_step(self, epoch):
+        if self._step_epoch == epoch:
+            self._step_touched.clear()
+            self._step_epoch = None
+
+    def clear(self):
+        super().clear()
+        self._step_touched.clear()
+        self._step_epoch = None
+
+
 def _cross_boundary_field_value_is_immutable(value) -> bool:
     cls = type(value)
     if value is None or cls in (
@@ -2774,7 +2813,7 @@ class LazyRecordTable(RecordTable):
         self._pin = session.pin
         self._namespace = PEOPLE_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -2914,12 +2953,37 @@ class LazyRecordTable(RecordTable):
         return record
 
     def _evict_clean(self):
+        tracker = getattr(self._session, "_eager_tracker", None)
+        if tracker is not None and tracker._cold_step_depth:
+            # During a real simulation step, repeated access to live working
+            # state must not churn through SQLite merely because the ordinary
+            # clean-cache cap is smaller than the active workload. The step
+            # boundary prunes this back to the actual hot working set.
+            return
         while len(self._lru) > self._clean_limit:
             key, _ = self._lru.popitem(last=False)
             if key in self._dirty:
                 continue
             if dict.__contains__(self, key):
                 dict.__delitem__(self, key)
+
+    def _finish_simulation_step(self, epoch):
+        touched = self._lru.touched(epoch)
+        # Dirty owners are already pinned outside the clean LRU. For clean
+        # state, retain at most the keys actually used this step (or the
+        # ordinary small-query cache, whichever is larger). Since every clean
+        # access moves its key to the LRU tail, untouched prior-step state is
+        # evicted first and historical growth cannot accumulate here.
+        touched.intersection_update(self._lru.keys())
+        limit = max(self._clean_limit, len(touched))
+        while len(self._lru) > limit:
+            key, _ = self._lru.popitem(last=False)
+            if key in self._dirty:
+                continue
+            if dict.__contains__(self, key):
+                dict.__delitem__(self, key)
+        self._last_step_hot_entries = len(touched)
+        self._lru.finish_step(epoch)
 
     def keys(self):
         return KeysView(self)
@@ -3301,7 +3365,7 @@ class LazyAspirationTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = ASPIRATION_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -3840,7 +3904,7 @@ class LazyOwnerIndexTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = OWNER_INDEX_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -4242,7 +4306,7 @@ class LazySocialEdgeTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = SOCIAL_EDGE_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -4607,7 +4671,7 @@ class LazySocialAdjacencyTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = SOCIAL_ADJACENCY_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -4891,7 +4955,7 @@ class LazySocialPartnershipTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = SOCIAL_PARTNERSHIP_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -5155,7 +5219,7 @@ class LazyCommunityMembershipTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = COMMUNITY_MEMBERSHIP_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -5408,7 +5472,7 @@ class LazyResourceTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = RESOURCE_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -5915,7 +5979,7 @@ class _LazySimpleMaterialObjectTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = namespace
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -6417,7 +6481,7 @@ class LazyGenealogyParentTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = GENEALOGY_PARENT_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -6643,7 +6707,7 @@ class _LazyMaterialContainerTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = namespace
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -7234,7 +7298,7 @@ class LazyMaterialLotTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = MATERIAL_LOT_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -7854,7 +7918,7 @@ class LazyAdvancementPathTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = ADVANCEMENT_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -8190,7 +8254,7 @@ class LazySkillTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = SKILL_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -8536,7 +8600,7 @@ class LazySoulTable(LazyRecordTable):
         self._pin = session.pin
         self._namespace = SOUL_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        self._lru = _StepAwareLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -8893,6 +8957,7 @@ class _LazyLifetime:
         tracker = session._eager_tracker
         if tracker._cold_step_depth:
             raise StoreError("reentrant lazy simulation step is not allowed")
+        session._hot_step_epoch = getattr(session, "_hot_step_epoch", 0) + 1
         tracker._cold_step_depth += 1
 
     def end_step(self):
@@ -8903,6 +8968,11 @@ class _LazyLifetime:
             and session._eager_tracker._cold_step_depth
         ):
             session._eager_tracker._cold_step_depth -= 1
+            if not session._eager_tracker._cold_step_depth:
+                epoch = getattr(session, "_hot_step_epoch", 0)
+                for value in tuple(session.__dict__.values()):
+                    if isinstance(value, LazyRecordTable):
+                        value._finish_simulation_step(epoch)
 
     def ensure_eventlog_read(self):
         session = self._session()
