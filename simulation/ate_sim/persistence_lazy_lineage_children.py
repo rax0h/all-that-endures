@@ -185,69 +185,85 @@ class LazyLineageTrackedSet(set):
             raise TypeError("lineage children require (str,int) keys")
         return values
 
-    def __init__(self, values, table, key):
+    def __init__(self, values=()):
         set.__init__(self, self._validate(values))
-        self._table_ref = weakref.ref(table)
-        self._key = key
+        self._lazy_bindings = {}
 
-    def _table(self):
-        return None if self._table_ref is None else self._table_ref()
+    def _bindings(self):
+        live = []
+        stale = []
+        for marker, (table_ref, key) in self._lazy_bindings.items():
+            table = table_ref()
+            if table is None:
+                stale.append(marker)
+            else:
+                live.append((table, key))
+        for marker in stale:
+            self._lazy_bindings.pop(marker, None)
+        return live
 
     def _guard(self):
-        table = self._table()
-        if table is not None:
+        bindings = self._bindings()
+        for table, key in bindings:
             table._ensure_mutation()
-        return table
+            if not table._visible(key):
+                raise StoreIntegrityError(
+                    "tracked lineage child set retained a non-current owner"
+                )
+        return bindings
 
     def _attach(self, table, key):
-        self._table_ref = weakref.ref(table)
-        self._key = key
+        self._lazy_bindings[(id(table), key)] = (weakref.ref(table), key)
 
-    def _detach(self):
-        self._table_ref = None
-        self._key = None
+    def _detach(self, table, key):
+        self._lazy_bindings.pop((id(table), key), None)
+
+    @staticmethod
+    def _record_add(bindings, value):
+        for table, key in bindings:
+            table._record_edge_add(key, value)
+
+    @staticmethod
+    def _record_remove(bindings, value):
+        for table, key in bindings:
+            table._record_edge_remove(key, value)
 
     def add(self, value):
         self._validate((value,))
-        table = self._guard()
+        bindings = self._guard()
         if value in self:
             return
-        if table is not None:
-            table._record_edge_add(self._key, value)
+        self._record_add(bindings, value)
         set.add(self, value)
 
     def discard(self, value):
-        table = self._guard()
+        bindings = self._guard()
         if value not in self:
             return
-        if table is not None:
-            table._record_edge_remove(self._key, value)
+        self._record_remove(bindings, value)
         set.discard(self, value)
 
     def remove(self, value):
-        table = self._guard()
+        bindings = self._guard()
         if value not in self:
             raise KeyError(value)
-        if table is not None:
-            table._record_edge_remove(self._key, value)
+        self._record_remove(bindings, value)
         set.remove(self, value)
 
     def pop(self):
-        table = self._guard()
+        bindings = self._guard()
         if not self:
             raise KeyError("pop from an empty set")
         value = next(iter(self))
-        if table is not None:
-            table._record_edge_remove(self._key, value)
+        self._record_remove(bindings, value)
         set.remove(self, value)
         return value
 
     def clear(self):
-        table = self._guard()
+        bindings = self._guard()
         before = tuple(self)
-        if table is not None:
-            for value in before:
-                table._record_edge_remove(self._key, value)
+        for value in before:
+            self._record_remove(bindings, value)
         set.clear(self)
 
     def update(self, *others):
