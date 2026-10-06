@@ -12391,9 +12391,6 @@ class LazyWorldSession:
             for record in advancement_records:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
-            for record in social_edge_records:
-                object.__setattr__(record, "_index_table", None)
-                object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
             new_log.__dict__.pop("_ate_persistence_lifetime", None)
         finally:
