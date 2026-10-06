@@ -2172,6 +2172,7 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 INSTITUTION_APPLICATION_NAMESPACE: session.institution_applications,
                 TRANSMISSION_NAMESPACE: session.transmissions,
                 MOTIVE_NAMESPACE: session.motives,
+                SOCIAL_EDGE_NAMESPACE: session.social_edges,
             }.get(namespace)
             if table is None:
                 raise StoreIntegrityError(
@@ -2227,6 +2228,9 @@ def _initialize_eager_tracker(
         INSTITUTION_APPLICATION_NAMESPACE,
         TRANSMISSION_NAMESPACE,
         MOTIVE_NAMESPACE,
+        SOCIAL_EDGE_NAMESPACE,
+        SOCIAL_ADJACENCY_NAMESPACE,
+        SOCIAL_PARTNERSHIP_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -7731,6 +7735,16 @@ class LazyWorldSession:
         )
         self.motives = LazyMotiveTable(self)
         object.__setattr__(world.agency, "motives", self.motives)
+        self.social_edges = LazySocialEdgeTable(self)
+        object.__setattr__(world.social, "edges", self.social_edges)
+        self.social_adjacency = LazySocialAdjacencyTable(self)
+        object.__setattr__(
+            world.social, "adjacency", self.social_adjacency
+        )
+        self.social_partnerships = LazySocialPartnershipTable(self)
+        object.__setattr__(
+            world.social, "partnerships", self.social_partnerships
+        )
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
@@ -7815,6 +7829,7 @@ class LazyWorldSession:
                     SocietyApplication,
                     Transmission,
                     MotiveState,
+                    Relationship,
                 ),
             )
             and field in RECORD_FIELDS.get(type(subject), ())
@@ -7918,6 +7933,8 @@ class LazyWorldSession:
                     INSTITUTION_APPLICATION_NAMESPACE,
                     TRANSMISSION_NAMESPACE,
                     MOTIVE_NAMESPACE,
+                    SOCIAL_EDGE_NAMESPACE,
+                    SOCIAL_ADJACENCY_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
@@ -7953,6 +7970,8 @@ class LazyWorldSession:
                     INSTITUTION_APPLICATION_NAMESPACE,
                     TRANSMISSION_NAMESPACE,
                     MOTIVE_NAMESPACE,
+                    SOCIAL_EDGE_NAMESPACE,
+                    SOCIAL_ADJACENCY_NAMESPACE,
                 }
             )
             lazy_paths = {
