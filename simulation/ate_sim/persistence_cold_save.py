@@ -23,6 +23,10 @@ from .incremental_store import (
 )
 from .persistence_adapters import (
     COLLECTION_LAYOUT,
+    AGENCY_ACTIONS_NAMESPACE,
+    PACKED_LIST_KIND,
+    PACKED_LIST_KEY,
+    PACKED_LIST_PAYLOAD,
     IDENTITY_LINKS,
     IDENTITY_LINK_SCHEMA,
     META,
@@ -409,11 +413,67 @@ def prepare_cold_save(session, *, force=False, token=None):
     dirty = frozenset(session._dirty)
     deleted = frozenset(session._deleted)
 
+    # The capped agency action tail remains a normal mutable runtime list with
+    # exact P2 identity/mutation behavior. Physically, however, index-keyed
+    # persistence turns a rolling 50k tail into ~50k writes per save. Coalesce
+    # only that bounded family into one checked payload record.
+    agency_changed = any(
+        owner[0] == AGENCY_ACTIONS_NAMESPACE
+        for owner in dirty | deleted
+    )
+    if agency_changed:
+        description = session._manifest["collections"][
+            AGENCY_ACTIONS_NAMESPACE
+        ]
+        stored_kind, stored_size, _chunks = description
+        if session._base_kind(stored_kind) != "list":
+            raise StoreIntegrityError(
+                "agency actions are not stored as a list"
+            )
+        if stored_kind != PACKED_LIST_KIND:
+            persisted = session._cold_persisted_keys.get(
+                AGENCY_ACTIONS_NAMESPACE,
+                set(range(stored_size)),
+            )
+            for key in sorted(persisted, key=session.codec.encode):
+                if key == PACKED_LIST_KEY:
+                    continue
+                _put_change(
+                    change_map,
+                    session.codec,
+                    RecordChange(
+                        AGENCY_ACTIONS_NAMESPACE,
+                        key,
+                        delete=True,
+                    ),
+                )
+        container = session._root_containers[AGENCY_ACTIONS_NAMESPACE]
+        container._kind = PACKED_LIST_KIND
+        session._manifest_dirty = True
+        envelope = (
+            0,
+            (
+                PACKED_LIST_PAYLOAD,
+                tuple(container),
+            ),
+        )
+        detached, _bytes = _encoded_copy(session.codec, envelope)
+        _put_change(
+            change_map,
+            session.codec,
+            RecordChange(
+                AGENCY_ACTIONS_NAMESPACE,
+                PACKED_LIST_KEY,
+                detached,
+                record_schema=RECORD_SCHEMA,
+            ),
+        )
+
     # Non-event owner journal follows the accepted P2C serializer.
     for namespace, key in sorted(
         deleted, key=lambda item: (item[0], session.codec.encode(item[1]))
     ):
-        if namespace == "world.events":
+        if namespace in ("world.events", AGENCY_ACTIONS_NAMESPACE):
             continue
         _put_change(
             change_map, session.codec,
@@ -422,7 +482,7 @@ def prepare_cold_save(session, *, force=False, token=None):
     for namespace, key in sorted(
         dirty, key=lambda item: (item[0], session.codec.encode(item[1]))
     ):
-        if namespace == "world.events":
+        if namespace in ("world.events", AGENCY_ACTIONS_NAMESPACE):
             continue
         envelope = session._plain(session._record_value(namespace, key))
         detached, _bytes = _encoded_copy(session.codec, envelope)
