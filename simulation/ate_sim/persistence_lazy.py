@@ -9703,6 +9703,8 @@ class LazyWorldSession:
         detached_wallets,
         detached_treasuries,
         detached_souls,
+        detached_advancement_paths,
+        advancement_records,
         assignments,
         cache_removals,
         index_rebindings,
@@ -9752,6 +9754,9 @@ class LazyWorldSession:
             for record in soul_records:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
+            for record in advancement_records:
+                object.__setattr__(record, "_index_table", None)
+                object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
             new_log.__dict__.pop("_ate_persistence_lifetime", None)
         finally:
@@ -9797,6 +9802,7 @@ class LazyWorldSession:
         self.wallets = detached_wallets
         self.treasuries = detached_treasuries
         self.souls = detached_souls
+        self.advancement_paths = detached_advancement_paths
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -9870,6 +9876,14 @@ class LazyWorldSession:
                 mutable_replacements,
                 soul_nested_assignments,
             ) = self._stage_detached_souls(mutable_replacements)
+            (
+                detached_advancement_paths,
+                mutable_replacements,
+                advancement_assignments,
+                advancement_records,
+            ) = self._stage_detached_advancement_paths(
+                mutable_replacements
+            )
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -9889,6 +9903,7 @@ class LazyWorldSession:
                         id(self.wallets): detached_wallets,
                         id(self.treasuries): detached_treasuries,
                         id(self.souls): detached_souls,
+                        id(self.advancement_paths): detached_advancement_paths,
                         **mutable_replacements,
                     },
                 )
@@ -9896,6 +9911,7 @@ class LazyWorldSession:
             assignments.extend(transfer_assignments)
             assignments.extend(material_transfer_assignments)
             assignments.extend(soul_nested_assignments)
+            assignments.extend(advancement_assignments)
             for key, person in dict.items(detached_people):
                 if isinstance(person, IndexedRecord):
                     index_rebindings.append(
@@ -9917,6 +9933,8 @@ class LazyWorldSession:
                 detached_wallets,
                 detached_treasuries,
                 detached_souls,
+                detached_advancement_paths,
+                advancement_records,
                 assignments,
                 cache_removals,
                 index_rebindings,
@@ -9943,6 +9961,7 @@ class LazyWorldSession:
             "wallets": self.wallets.diagnostics(),
             "treasuries": self.treasuries.diagnostics(),
             "souls": self.souls.diagnostics(),
+            "advancement_paths": self.advancement_paths.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
