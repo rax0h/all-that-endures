@@ -1,0 +1,90 @@
+name: P4.6 advancement scaling
+
+on:
+  push:
+    branches:
+      - sol-p4-6-advancement-scaling
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from ate_sim.core import World
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+
+          RULES="p4-6-advancement-scaling"
+
+          def build(n):
+              world=World(847000+n)
+              for pid in range(1,n+1):
+                  world.advancement.absorb_essence(
+                      pid,"fire",0,("worker","neutral",pid)
+                  )
+                  world.advancement.awaken_skill(
+                      pid,"eyes",1,(pid,),target_essence="fire"
+                  )
+              return world
+
+          metrics=[]
+          for n in (1000,10000):
+              with tempfile.TemporaryDirectory() as td:
+                  root=Path(td)
+                  cold=root/"cold.sqlite"
+                  lazy=root/"lazy.sqlite"
+                  write_cold_snapshot(build(n),cold,rules_id=RULES)
+                  convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+                  with open_lazy_world_session(lazy,rules_id=RULES) as s:
+                      table=s.advancement_paths
+                      open_diag=s.store.diagnostics()
+                      assert table.diagnostics()["advancement_payload_loads"] == 0
+                      assert table.diagnostics()["resident_advancement_paths"] == 0
+
+                      before=s.store.diagnostics()
+                      path=s.world.advancement.path(7)
+                      after=s.store.diagnostics()
+                      point_reads=after.payload_reads-before.payload_reads
+                      point_bytes=after.payload_read_bytes-before.payload_read_bytes
+                      assert point_reads <= 1
+                      assert table.diagnostics()["advancement_payload_loads"] == 1
+
+                      path.core_fraction += .01
+                      s.store.reset_diagnostics()
+                      s.save()
+                      saved=s.store.diagnostics()
+                      identity=s.diagnostics()["identity"]
+                      row={
+                          "n":n,
+                          "open_payload_reads":open_diag.payload_reads,
+                          "open_payload_bytes":open_diag.payload_read_bytes,
+                          "point_payload_reads":point_reads,
+                          "point_payload_bytes":point_bytes,
+                          "save_payload_writes":saved.payload_writes,
+                          "save_payload_write_bytes":saved.payload_write_bytes,
+                          "resident_paths":table.diagnostics()["resident_advancement_paths"],
+                          "clean_cache_entries":table.diagnostics()["clean_cache_entries"],
+                          "live_incarnations":identity["live_incarnations"],
+                          "owner_groups":identity["owner_groups"],
+                          "pin_rows":saved.pin_rows,
+                      }
+                      metrics.append(row)
+                      print("ADV_AFTER",row)
+
+          small,large=metrics
+          assert small["open_payload_reads"] == large["open_payload_reads"]
+          assert small["point_payload_reads"] == large["point_payload_reads"] == 1
+          assert small["save_payload_writes"] == large["save_payload_writes"]
+          assert small["resident_paths"] == large["resident_paths"] == 1
+          assert small["clean_cache_entries"] == large["clean_cache_entries"] == 1
+          print("ADVANCEMENT_SCALING_OK")
+          PY
