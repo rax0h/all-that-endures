@@ -7268,6 +7268,350 @@ class LazyAdvancementPathTable(LazyRecordTable):
         }
 
 
+class LazySkillTable(LazyRecordTable):
+    """Bounded lazy SkillHistory authority with two tracked list children."""
+
+    _nested_paths = {
+        "teachers": (("field", "teachers"),),
+        "provenance": (("field", "provenance"),),
+    }
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        dict.__init__(self)
+        self._session = session
+        self._store = session.store
+        self._pin = session.pin
+        self._namespace = SKILL_NAMESPACE
+        self._clean_limit = clean_limit
+        self._lru = OrderedDict()
+        self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence = {}
+        self._baseline_payload = {}
+        self._baseline_incarnation = {}
+        self._baseline_identity_labels = {}
+        self._baseline_ordinal = {}
+        self._dirty = set()
+        self._removed = set()
+        self._new_keys = set()
+        self._reinserted = set()
+        self._overlay_ordinals = {}
+        self._pending_nested_old = {}
+
+    @staticmethod
+    def _plain(record):
+        return replace(
+            record,
+            teachers=list(record.teachers),
+            provenance=list(record.provenance),
+        )
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=LAZY_SKILL_SCHEMA,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def _baseline_labels(self, key):
+        if key not in self._baseline_identity_labels:
+            self._baseline_identity_labels[key] = dict(
+                self._store.identity_occurrences_for_owner(
+                    self._pin, self._namespace, key
+                )
+            )
+        return dict(self._baseline_identity_labels[key])
+
+    def __getitem__(self, key):
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        if dict.__contains__(self, key):
+            self._lru.pop(key, None)
+            if key not in self._dirty:
+                self._lru[key] = None
+            return dict.__getitem__(self, key)
+        checked = self._store.read_version(
+            self._pin,
+            self._namespace,
+            key,
+            expected_record_schema=LAZY_SKILL_SCHEMA,
+        )
+        if not isinstance(checked.value, SkillHistory):
+            raise StoreFormatError(
+                "lazy skill payload is not SkillHistory"
+            )
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(checked.value)
+        )
+        self._baseline_presence.setdefault(key, True)
+        record = self._session._bind_loaded_skill(key, checked.value)
+        dict.__setitem__(self, key, record)
+        object.__setattr__(record, "_index_table", weakref.ref(self))
+        object.__setattr__(record, "_index_key", key)
+        self._loads += 1
+        if key not in self._dirty:
+            self._lru[key] = None
+        self._evict_clean()
+        return record
+
+    def preflight_change(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current skill history"
+            )
+        if field in self._nested_paths:
+            live = (
+                dict.__getitem__(self, key)
+                if dict.__contains__(self, key)
+                else self._session._live_skill_for_key(key)
+            )
+            if live is not None:
+                self._pending_nested_old[(key, field)] = getattr(live, field)
+
+    def changed(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current skill history"
+            )
+        if not dict.__contains__(self, key):
+            self[key]
+        record = dict.__getitem__(self, key)
+        token = (key, field)
+        if field in self._nested_paths and token in self._pending_nested_old:
+            old = self._pending_nested_old.pop(token)
+            new = getattr(record, field)
+            if old is not new:
+                self._session._replace_skill_nested(
+                    key, record, field, old, new
+                )
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __setitem__(self, key, record):
+        self._ensure_mutation()
+        if not isinstance(record, SkillHistory):
+            raise TypeError(
+                "world.skills.skills values must be SkillHistory"
+            )
+        baseline_exists = self._baseline_exists(key)
+        currently_visible = self._visible(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is record and currently_visible:
+            return
+        was_removed = key in self._removed
+        if old is not None and old is not record:
+            self._detach_index_binding(old)
+            self._session._detach_assigned_skill(key, old)
+        record = self._session._bind_assigned_skill(key, record)
+        dict.__setitem__(self, key, record)
+        object.__setattr__(record, "_index_table", weakref.ref(self))
+        object.__setattr__(record, "_index_key", key)
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __delitem__(self, key):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is not None:
+            self._detach_index_binding(old)
+            self._session._detach_assigned_skill(key, old)
+            dict.__delitem__(self, key)
+        else:
+            self._session._detach_unloaded_skill(key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        version_changes = []
+        identity_changes = []
+        effective_keys = []
+        structural_keys = []
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            baseline_labels = (
+                self._baseline_labels(key) if baseline_exists else {}
+            )
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=LAZY_SKILL_SCHEMA,
+                        )
+                    )
+                    for path in baseline_labels:
+                        identity_changes.append(
+                            IdentityOccurrenceChange(
+                                self._namespace, key, path, delete=True
+                            )
+                        )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+
+            record = dict.__getitem__(self, key)
+            stored = self._plain(record)
+            payload = self._store.codec.encode(stored)
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new or reinsertion or payload != self._baseline_bytes(key)
+            )
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        stored,
+                        record_schema=LAZY_SKILL_SCHEMA,
+                        reinsertion=reinsertion,
+                    )
+                )
+            current_labels = self._session._skill_incarnation_labels(
+                key, record
+            )
+            identity_changed = False
+            for path in sorted(
+                set(baseline_labels) | set(current_labels),
+                key=self._store.codec.encode,
+            ):
+                before = baseline_labels.get(path)
+                after = current_labels.get(path)
+                if before == after:
+                    continue
+                identity_changed = True
+                identity_changes.append(
+                    IdentityOccurrenceChange(
+                        self._namespace,
+                        key,
+                        path,
+                        delete=after is None,
+                        incarnation_id=after,
+                    )
+                )
+            if value_changed or identity_changed:
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+        return (
+            tuple(version_changes),
+            tuple(identity_changes),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in plan.skill_touched_keys:
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                record = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(
+                    self._plain(record)
+                )
+                labels = self._session._skill_incarnation_labels(
+                    key, record
+                )
+                self._baseline_identity_labels[key] = labels
+                self._baseline_incarnation[key] = labels.get(())
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        "committed skill history lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_identity_labels.pop(key, None)
+                self._baseline_incarnation[key] = None
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._pending_nested_old.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
+
+    def diagnostics(self):
+        return {
+            "logical_skills": (
+                self._baseline_count
+                - len(self._removed)
+                + len(self._new_keys)
+            ),
+            "resident_skills": dict.__len__(self),
+            "clean_cache_entries": len(self._lru),
+            "clean_cache_limit": self._clean_limit,
+            "skill_payload_loads": self._loads,
+            "dirty_skills": len(self._dirty),
+        }
+
+
 class LazySoulTable(LazyRecordTable):
     """Bounded lazy soul authority with nested mutable incarnation tracking."""
 
