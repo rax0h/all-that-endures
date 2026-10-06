@@ -1501,6 +1501,28 @@ def _advancement_occurrence_from_path(path):
     return None
 
 
+def _institution_occurrence_from_path(path):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "institutions")
+        and type(path[1]) is tuple
+        and len(path[1]) == 2
+        and path[1][0] == "field"
+        and path[1][1] in ("magic_records", "notices", "applications")
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        namespace = {
+            "magic_records": INSTITUTION_MAGIC_RECORD_NAMESPACE,
+            "notices": INSTITUTION_NOTICE_NAMESPACE,
+            "applications": INSTITUTION_APPLICATION_NAMESPACE,
+        }[path[1][1]]
+        return namespace, path[2][1], tuple(path[3:])
+    return None
+
+
 def _lazy_occurrence_from_path(path):
     people = _people_occurrence_from_path(path)
     if people is not None:
@@ -1605,6 +1627,15 @@ def _lazy_occurrence_from_path(path):
             relative,
             EssencePath if not relative else object,
         )
+    institution = _institution_occurrence_from_path(path)
+    if institution is not None:
+        namespace, key, relative = institution
+        expected = {
+            INSTITUTION_MAGIC_RECORD_NAMESPACE: MagicUserRecord,
+            INSTITUTION_NOTICE_NAMESPACE: AdventureNotice,
+            INSTITUTION_APPLICATION_NAMESPACE: SocietyApplication,
+        }[namespace]
+        return namespace, key, relative, expected
     return None
 
 
