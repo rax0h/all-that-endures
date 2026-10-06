@@ -81,6 +81,65 @@ def test_social_opens_lazy_and_endpoint_queries_are_bounded(tmp_path):
         )
 
 
+def test_simulation_run_reuses_pinned_social_memberships_and_overlays_unsaved_changes(tmp_path):
+    path = converted(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        lifetime = session.world.__dict__["_ate_persistence_lifetime"]
+        lifetime.begin_run()
+        try:
+            lifetime.begin_step()
+            try:
+                first_relationships = [
+                    (r.a, r.b)
+                    for r in session.world.social.relationships_for(1)
+                ]
+                first_partnerships = session.world.social.living_partnerships(
+                    living(1, 2, 4, 5)
+                )
+            finally:
+                lifetime.end_step()
+
+            assert first_relationships == [(1, 2), (1, 3)]
+            assert first_partnerships == {(1, 2): 201, (4, 5): 202}
+
+            session.store.reset_diagnostics()
+            lifetime.begin_step()
+            try:
+                second_relationships = [
+                    (r.a, r.b)
+                    for r in session.world.social.relationships_for(1)
+                ]
+                second_partnerships = session.world.social.living_partnerships(
+                    living(1, 2, 4, 5)
+                )
+            finally:
+                lifetime.end_step()
+            warm = session.store.diagnostics()
+
+            assert second_relationships == first_relationships
+            assert second_partnerships == first_partnerships
+            assert warm.query_rows == 0
+
+            # Cached baseline membership is not current-state authority.
+            # Unsaved local edits are overlaid before query results are exposed.
+            session.world.social.record(1, 6, 303, trust=.1)
+            session.world.social.partner(1, 6, 304)
+            session.store.reset_diagnostics()
+            assert [
+                (r.a, r.b)
+                for r in session.world.social.relationships_for(1)
+            ] == [(1, 2), (1, 3), (1, 6)]
+            assert session.world.social.living_partnerships(
+                living(1, 2, 4, 5, 6)
+            ) == {(1, 2): 201, (1, 6): 304, (4, 5): 202}
+            assert session.store.diagnostics().query_rows == 0
+        finally:
+            lifetime.end_run()
+
+        assert len(session.social_edges._person_query_cache) <= 256
+        assert len(session.social_partnerships._person_query_cache) <= 256
+
+
 def test_social_mutation_save_and_reopen(tmp_path):
     path = converted(tmp_path)
     with open_lazy_world_session(path, rules_id=RULES) as session:
