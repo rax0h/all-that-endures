@@ -8977,6 +8977,18 @@ class LazyWorldSession:
             institution_application_touched_keys,
             institution_application_structural_keys,
         ) = self.institution_applications.prepare_save_changes()
+        (
+            transmission_version_changes,
+            transmission_identity_changes,
+            transmission_touched_keys,
+            transmission_structural_keys,
+        ) = self.transmissions.prepare_save_changes()
+        (
+            motive_version_changes,
+            motive_identity_changes,
+            motive_touched_keys,
+            motive_structural_keys,
+        ) = self.motives.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -9009,6 +9021,10 @@ class LazyWorldSession:
             or institution_notice_identity_changes
             or institution_application_version_changes
             or institution_application_identity_changes
+            or transmission_version_changes
+            or transmission_identity_changes
+            or motive_version_changes
+            or motive_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -9028,6 +9044,8 @@ class LazyWorldSession:
             or institution_magic_record_structural_keys
             or institution_notice_structural_keys
             or institution_application_structural_keys
+            or transmission_structural_keys
+            or motive_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -9136,6 +9154,18 @@ class LazyWorldSession:
                 institution_application_structural_keys,
                 "institution applications",
             ),
+            (
+                TRANSMISSION_NAMESPACE,
+                self.transmissions,
+                transmission_structural_keys,
+                "transmission records",
+            ),
+            (
+                MOTIVE_NAMESPACE,
+                self.motives,
+                motive_structural_keys,
+                "motives",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -9176,6 +9206,8 @@ class LazyWorldSession:
                 INSTITUTION_APPLICATION_NAMESPACE,
                 len(self.institution_applications),
             ),
+            (TRANSMISSION_NAMESPACE, len(self.transmissions)),
+            (MOTIVE_NAMESPACE, len(self.motives)),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -9290,6 +9322,14 @@ class LazyWorldSession:
             institution_application_structural_keys=(
                 institution_application_structural_keys
             ),
+            transmission_version_changes=transmission_version_changes,
+            transmission_identity_changes=transmission_identity_changes,
+            transmission_touched_keys=transmission_touched_keys,
+            transmission_structural_keys=transmission_structural_keys,
+            motive_version_changes=motive_version_changes,
+            motive_identity_changes=motive_identity_changes,
+            motive_touched_keys=motive_touched_keys,
+            motive_structural_keys=motive_structural_keys,
             layout_value=layout_value,
         )
 
