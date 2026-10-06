@@ -2903,6 +2903,8 @@ class LazyRecordStore:
 
         actual_counts = dict(ordinary_counts)
         for namespace, count in current_lazy_counts.items():
+            if _auxiliary_namespace(namespace):
+                continue
             if count:
                 _bump_count(actual_counts, namespace, records=count)
             if namespace not in inventory:
