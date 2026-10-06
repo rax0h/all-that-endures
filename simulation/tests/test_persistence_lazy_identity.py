@@ -39,6 +39,31 @@ def test_equal_distinct_objects_get_distinct_incarnations_and_old_alias_stays_ol
     assert registry.object_for_incarnation(second_id) is second
 
 
+def test_owner_occurrence_index_tracks_attach_move_detach_and_replace():
+    registry = LazyIdentityRegistry("store-a")
+    first = Box("first")
+    second = Box("second")
+    left = occ("people", 1, ("field", "a"))
+    right = occ("people", 2, ("field", "b"))
+
+    first_id = registry.bind(first, left)
+    registry.attach_occurrence(first, right)
+    assert registry.occurrences_for_owner("people", 1) == (left,)
+    assert registry.occurrences_for_owner("people", 2) == (right,)
+
+    moved = occ("people", 3, ("field", "c"))
+    registry.move(first, right, moved)
+    assert registry.occurrences_for_owner("people", 2) == ()
+    assert registry.occurrences_for_owner("people", 3) == (moved,)
+
+    registry.detach_occurrence(left, expected=first_id)
+    assert registry.occurrences_for_owner("people", 1) == ()
+
+    second_id = registry.bind(second, left)
+    assert second_id != first_id
+    assert registry.occurrences_for_owner("people", 1) == (left,)
+
+
 def test_move_remove_and_reinsert_same_object_preserves_incarnation():
     registry = LazyIdentityRegistry("store-a")
     value = Box("same")
