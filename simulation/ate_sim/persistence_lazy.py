@@ -6674,6 +6674,24 @@ class LazyWorldSession:
             raise StoreIntegrityError(
                 "lazy currency bucket lacks top-level identity"
             )
+
+        # Reconcile runtime occurrence placement with the bucket's current
+        # graph before global P2C link generation. Mutable aliases may move
+        # between lazy buckets within one generation; leaving the old
+        # occurrence attached would resurrect a stale identity link.
+        current_paths = set(labels)
+        owner = (namespace, key)
+        for incarnation, _obj in self._registry.live_bindings():
+            for occurrence in self._registry.occurrences_for_incarnation(
+                incarnation
+            ):
+                if (
+                    occurrence.owner == owner
+                    and occurrence.path not in current_paths
+                ):
+                    self._registry.detach_occurrence(
+                        occurrence, expected=incarnation
+                    )
         return labels
 
     def _bind_assigned_currency_bucket(
