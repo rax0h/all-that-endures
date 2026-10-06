@@ -1,0 +1,28 @@
+name: P4 cross-lazy index fix
+on:
+  push:
+    branches: [sol-p4-cross-boundary-index-fix]
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - name: Exact regressions
+        run: |
+          python -m pytest -q \
+            simulation/tests/test_persistence_lazy_aspirations.py::test_cross_boundary_aspiration_alias_mutates_without_payload_load \
+            simulation/tests/test_persistence_lazy_people.py::test_cross_boundary_person_alias_mutates_before_people_payload_load
+      - name: Affected lazy persistence files
+        run: |
+          python -m pytest -q \
+            simulation/tests/test_persistence_lazy_aspirations.py \
+            simulation/tests/test_persistence_lazy_people.py \
+            simulation/tests/test_persistence_lazy_currency.py \
+            simulation/tests/test_persistence_lazy_identity.py
