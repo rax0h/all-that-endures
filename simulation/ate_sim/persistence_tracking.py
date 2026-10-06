@@ -23,6 +23,8 @@ from .persistence_adapters import (
     WorldCodec, _audit, _roots, _kind, _restore_collection, _identity_groups,
     _verify_identity_graph, _read_manifest, _identity_mode, _read_identity_links,
     COLLECTION_LAYOUT,
+    AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KIND, PACKED_LIST_KEY,
+    PACKED_LIST_PAYLOAD,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
 from .persistence_identity import (
@@ -333,6 +335,15 @@ class TrackedList(_NestedMixin, list):
     _ate_tracked_kind = "list"
 
     def __setitem__(self, index, value):
+        if self._namespace == AGENCY_ACTIONS_NAMESPACE:
+            trial = list(self)
+            if isinstance(index, slice):
+                raw = list(value)
+                list.__setitem__(trial, index, raw)
+            else:
+                list.__setitem__(trial, index, value)
+            self._replace_from(trial)
+            return
         if isinstance(index, slice):
             old = self[index]
             values = [self._bind(v) for v in value]
@@ -667,6 +678,19 @@ class _RootList(list):
         self._kind = kind
 
     def append(self, value):
+        if self._namespace == AGENCY_ACTIONS_NAMESPACE:
+            self._session._ensure_mutation_allowed()
+            self._session._mark_packed_action_tail(self)
+            # ActionRecord is immutable; validation still passes through the
+            # normal nested-value guard without creating per-index ownership.
+            wrapped = self._session._prepare_nested(
+                value,
+                {(self._namespace, PACKED_LIST_KEY)},
+                allow_existing=True,
+            )
+            list.append(self, wrapped)
+            self._session._changed_member_work += 1
+            return
         index = len(self)
         owner = (self._namespace, index)
         wrapped = self._session._prepare_nested(value, {owner})
@@ -742,8 +766,37 @@ class _RootList(list):
         self._replace_from(trial)
         return self
 
+    def trim_left(self, count):
+        if type(count) is not int or count < 0:
+            raise ValueError("trim count must be a non-negative integer")
+        if count == 0:
+            return
+        if count > len(self):
+            count = len(self)
+        if self._namespace != AGENCY_ACTIONS_NAMESPACE:
+            self._replace_from(list(self)[count:])
+            return
+        self._session._ensure_mutation_allowed()
+        self._session._mark_packed_action_tail(self)
+        list.__delitem__(self, slice(0, count))
+        self._session._changed_member_work += 1
+
     def _replace_from(self, raw):
         self._session._ensure_mutation_allowed()
+        if self._namespace == AGENCY_ACTIONS_NAMESPACE:
+            self._session._mark_packed_action_tail(self)
+            prepared = [
+                self._session._prepare_nested(
+                    value,
+                    {(self._namespace, PACKED_LIST_KEY)},
+                    allow_existing=True,
+                )
+                for value in raw
+            ]
+            list.clear(self)
+            list.extend(self, prepared)
+            self._session._changed_member_work += 1
+            return
         old = list(self)
         prepared = [
             self._session._prepare_nested(value, {(self._namespace, i)}, allow_existing=True)
@@ -1129,7 +1182,13 @@ class IncrementalWorldSession:
             if kind in ("dict", "RecordTable"):
                 keys[namespace] = set(container)
             elif kind == "list":
-                keys[namespace] = set(range(len(container)))
+                if (
+                    namespace == AGENCY_ACTIONS_NAMESPACE
+                    and self._description(namespace)[0] == PACKED_LIST_KIND
+                ):
+                    keys[namespace] = {PACKED_LIST_KEY}
+                else:
+                    keys[namespace] = set(range(len(container)))
             elif kind == "set":
                 keys[namespace] = set(container._by_ordinal)
         self._cold_persisted_keys = keys
@@ -1182,6 +1241,7 @@ class IncrementalWorldSession:
             "RecordTable-stable/v1": "RecordTable",
             "set-stable/v1": "set",
             "EventLog-disk/v1": "EventLog",
+            PACKED_LIST_KIND: "list",
         }.get(kind, kind)
 
     def _validate_baseline(self):
@@ -1326,7 +1386,7 @@ class IncrementalWorldSession:
             return wrapped
         if expected == "list":
             wrapped = _RootList()
-            wrapped._setup(self, namespace, "list")
+            wrapped._setup(self, namespace, stored_kind)
             for i, item in enumerate(value):
                 list.append(wrapped, self._bind_nested(item, {(namespace, i)}, initial=True))
             self._root_containers[namespace] = wrapped
@@ -1808,7 +1868,10 @@ class IncrementalWorldSession:
         if namespace != "world.agency.actions" or kind != "list" or type(value) is not list:
             raise StoreError("bound root collection replacement is unsupported in P2B")
         wrapped = _RootList()
-        wrapped._setup(self, namespace, "list")
+        wrapped._setup(
+            self, namespace,
+            getattr(self._root_containers[namespace], "_kind", "list"),
+        )
         for i, item in enumerate(value):
             list.append(
                 wrapped,
@@ -1817,6 +1880,15 @@ class IncrementalWorldSession:
         return ("root_collection", namespace, old, wrapped)
 
     def _finish_root_assignment(self, token):
+        if (
+            token[0] == "root_collection"
+            and token[1] == AGENCY_ACTIONS_NAMESPACE
+        ):
+            _, namespace, _old, wrapped = token
+            self._root_containers[namespace] = wrapped
+            self._mark_packed_action_tail(wrapped)
+            self._changed_member_work += 1
+            return
         if token[0] == "root_collection_normalize":
             _, namespace, _old, wrapped = token
             self._root_containers[namespace] = wrapped
@@ -2070,7 +2142,57 @@ class IncrementalWorldSession:
             return clone
         return value
 
+    def _mark_packed_action_tail(self, container):
+        if container._namespace != AGENCY_ACTIONS_NAMESPACE:
+            raise StoreError("packed action-tail marker used for wrong namespace")
+        if container._kind != PACKED_LIST_KIND:
+            description = self._manifest["collections"][AGENCY_ACTIONS_NAMESPACE]
+            stored_kind, stored_size, _chunks = description
+            if self._base_kind(stored_kind) != "list":
+                raise StoreFormatError("agency actions are not stored as a list")
+            # Convert the old index-keyed bounded tail once. The first P4 save
+            # removes only the captured baseline rows; subsequent saves update
+            # one packed record regardless of the 50k logical tail length.
+            if stored_kind != PACKED_LIST_KIND:
+                persisted = self._cold_persisted_keys.get(
+                    AGENCY_ACTIONS_NAMESPACE,
+                    set(range(stored_size)),
+                )
+                for old_key in persisted:
+                    if old_key == PACKED_LIST_KEY:
+                        continue
+                    self._dirty.discard(
+                        (AGENCY_ACTIONS_NAMESPACE, old_key)
+                    )
+                    self._deleted.add(
+                        (AGENCY_ACTIONS_NAMESPACE, old_key)
+                    )
+            container._kind = PACKED_LIST_KIND
+        self._deleted.discard(
+            (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY)
+        )
+        self._dirty.add(
+            (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY)
+        )
+        self._manifest_dirty = True
+
     def _record_value(self, namespace, key):
+        if (
+            namespace == AGENCY_ACTIONS_NAMESPACE
+            and key == PACKED_LIST_KEY
+        ):
+            container = self._root_containers[namespace]
+            if getattr(container, "_kind", None) != PACKED_LIST_KIND:
+                raise StoreIntegrityError(
+                    "packed agency action owner lacks packed collection kind"
+                )
+            return (
+                0,
+                (
+                    PACKED_LIST_PAYLOAD,
+                    tuple(container),
+                ),
+            )
         if namespace in self._scalar_fields:
             obj, name = self._scalar_fields[namespace]
             return (0, getattr(obj, name))
