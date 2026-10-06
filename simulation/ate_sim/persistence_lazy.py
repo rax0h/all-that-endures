@@ -6011,6 +6011,10 @@ class LazyWorldSession:
         object.__setattr__(world.currency, "treasuries", self.treasuries)
         self.souls = LazySoulTable(self)
         object.__setattr__(world.metaphysics, "souls", self.souls)
+        self.advancement_paths = LazyAdvancementPathTable(self)
+        object.__setattr__(
+            world.advancement, "paths", self.advancement_paths
+        )
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
