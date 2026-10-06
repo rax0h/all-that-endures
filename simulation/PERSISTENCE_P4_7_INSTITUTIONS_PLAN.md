@@ -103,5 +103,9 @@ The fixed queries returned the same exact IDs/order at both sizes:
 magic records `[1,2]`, active notices `[1,2]`, latest application `2`,
 qualified application `True`.
 
-Affected P4 regression evidence is still required before this tranche is
-accepted closed.
+Affected P4 regression run `37404013691` passed **241/241 in 207.02s
+(3:27)**. P4.7 is accepted closed on product head
+`bae8e47da772524db24517d2459f83f356476b57`.
+
+Next action: rerun the residual eager inventory and select the next migration by
+measured remaining archive cost.
