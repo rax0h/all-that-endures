@@ -6304,6 +6304,290 @@ class LazyWorldSession:
             for token in sorted(desired_cross_map)
         )
 
+    def _advancement_occurrence(self, key, path=()):
+        return Occurrence(ADVANCEMENT_NAMESPACE, key, tuple(path))
+
+    @staticmethod
+    def _advancement_identity_compatible(current, live):
+        if is_dataclass(current) or is_dataclass(live):
+            return type(current) is type(live)
+        if isinstance(current, dict) or isinstance(live, dict):
+            return isinstance(current, dict) and isinstance(live, dict)
+        if isinstance(current, list) or isinstance(live, list):
+            return isinstance(current, list) and isinstance(live, list)
+        if isinstance(current, set) or isinstance(live, set):
+            return isinstance(current, set) and isinstance(live, set)
+        return type(current) is type(live)
+
+    def _wrap_advancement_value(
+        self, key, value, path=(), memo=None
+    ):
+        if memo is None:
+            memo = {}
+        cls = type(value)
+        if value is None or cls in (
+            bool, int, float, str, bytes, FrozenDict, FrozenList
+        ):
+            return value
+        ident = id(value)
+        if ident in memo:
+            return memo[ident]
+
+        if is_dataclass(value):
+            memo[ident] = value
+            if isinstance(value, IndexedRecord):
+                object.__setattr__(
+                    value, "_index_table", weakref.ref(self.advancement_paths)
+                )
+                object.__setattr__(value, "_index_key", key)
+            for name in RECORD_FIELDS.get(cls, ()):
+                child = getattr(value, name)
+                wrapped = self._wrap_advancement_value(
+                    key,
+                    child,
+                    path + (("field", name),),
+                    memo,
+                )
+                if wrapped is not child:
+                    object.__setattr__(value, name, wrapped)
+            return value
+
+        if isinstance(value, dict):
+            if isinstance(value, LazyTrackedDict):
+                wrapper = value
+                wrapper._attach(self.advancement_paths, key)
+                memo[ident] = wrapper
+                for child_key, child in tuple(dict.items(wrapper)):
+                    wrapped = self._wrap_advancement_value(
+                        key,
+                        child,
+                        path + (("key", child_key),),
+                        memo,
+                    )
+                    if wrapped is not child:
+                        dict.__setitem__(wrapper, child_key, wrapped)
+                return wrapper
+            wrapper = LazyTrackedDict()
+            memo[ident] = wrapper
+            wrapper._attach(self.advancement_paths, key)
+            for child_key, child in value.items():
+                dict.__setitem__(
+                    wrapper,
+                    child_key,
+                    self._wrap_advancement_value(
+                        key,
+                        child,
+                        path + (("key", child_key),),
+                        memo,
+                    ),
+                )
+            return wrapper
+
+        if isinstance(value, list):
+            if isinstance(value, LazySoulTrackedList):
+                wrapper = value
+                wrapper._attach(self.advancement_paths, key, path)
+                memo[ident] = wrapper
+                for index, child in enumerate(tuple(wrapper)):
+                    wrapped = self._wrap_advancement_value(
+                        key,
+                        child,
+                        path + (("index", index),),
+                        memo,
+                    )
+                    if wrapped is not child:
+                        list.__setitem__(wrapper, index, wrapped)
+                return wrapper
+            wrapper = LazySoulTrackedList()
+            memo[ident] = wrapper
+            wrapper._attach(self.advancement_paths, key, path)
+            for index, child in enumerate(value):
+                list.append(
+                    wrapper,
+                    self._wrap_advancement_value(
+                        key,
+                        child,
+                        path + (("index", index),),
+                        memo,
+                    ),
+                )
+            return wrapper
+
+        if isinstance(value, set):
+            if isinstance(value, LazySoulTrackedSet):
+                wrapper = value
+                wrapper._attach(self.advancement_paths, key, path)
+                memo[ident] = wrapper
+                return wrapper
+            wrapper = LazySoulTrackedSet(value)
+            memo[ident] = wrapper
+            wrapper._attach(self.advancement_paths, key, path)
+            return wrapper
+
+        if cls is tuple:
+            memo[ident] = value
+            wrapped = tuple(
+                self._wrap_advancement_value(
+                    key,
+                    child,
+                    path + (("index", index),),
+                    memo,
+                )
+                for index, child in enumerate(value)
+            )
+            memo[ident] = wrapped
+            return wrapped
+
+        return value
+
+    def _probe_advancement_occurrences(self, key, path):
+        owner = (ADVANCEMENT_NAMESPACE, key)
+        owner_path = _owner_path(self.manifest, owner)
+        probe = IdentityOccurrenceIndex(
+            self.store.codec,
+            RECORD_FIELDS,
+            mutable_event_tail_only=True,
+        )
+        probe.bootstrap([(owner, path, owner_path)])
+        rows = []
+        for _ident, obj, absolute in probe.owner_occurrences[owner]:
+            if absolute[: len(owner_path)] != owner_path:
+                raise StoreIntegrityError(
+                    "advancement identity occurrence escaped its owner"
+                )
+            rows.append((tuple(absolute[len(owner_path):]), obj))
+        return tuple(rows)
+
+    def _reconcile_advancement_graph(self, key, path):
+        path = self._wrap_advancement_value(key, path)
+        current = {}
+        for relative, obj in self._probe_advancement_occurrences(key, path):
+            occurrence = self._advancement_occurrence(key, relative)
+            incarnation = self._registry.incarnation_for_object(obj)
+            if incarnation is None:
+                incarnation = self._registry.bind(obj)
+            self._registry.attach_occurrence(obj, occurrence)
+            current[relative] = incarnation.value
+
+        current_occurrences = {
+            self._advancement_occurrence(key, relative)
+            for relative in current
+        }
+        for occurrence in self._registry.occurrences_for_owner(
+            ADVANCEMENT_NAMESPACE, key
+        ):
+            if occurrence not in current_occurrences:
+                self._registry.detach_occurrence(occurrence)
+        return path, current
+
+    def _advancement_incarnation_labels(self, key, path):
+        _path, labels = self._reconcile_advancement_graph(key, path)
+        return labels
+
+    def _bind_loaded_advancement_path(self, key, path):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, ADVANCEMENT_NAMESPACE, key
+            )
+        )
+        if () not in labels:
+            raise StoreIntegrityError(
+                "lazy advancement path lacks top-level occurrence label"
+            )
+        path = self._wrap_advancement_value(key, path)
+
+        for relative, incarnation_value in sorted(
+            labels.items(),
+            key=lambda item: (
+                len(item[0]),
+                self.store.codec.encode(item[0]),
+            ),
+        ):
+            incarnation = IncarnationId(
+                self.store.store_identity, incarnation_value
+            )
+            try:
+                current = _relative_get(path, relative)
+            except (KeyError, IndexError, AttributeError, TypeError) as exc:
+                raise StoreIntegrityError(
+                    "lazy advancement identity path is absent from payload"
+                ) from exc
+            live = self._registry.object_for_incarnation(incarnation)
+            if live is not None and live is not current:
+                if not self._advancement_identity_compatible(current, live):
+                    raise StoreIntegrityError(
+                        "advancement incarnation has incompatible live type"
+                    )
+                path = _relative_set(path, relative, live)
+                current = live
+            if live is None:
+                try:
+                    self._registry.bind(
+                        current,
+                        self._advancement_occurrence(key, relative),
+                        incarnation=incarnation,
+                    )
+                except TypeError as exc:
+                    raise StoreIntegrityError(
+                        "advancement mutable identity is not weak-referenceable"
+                    ) from exc
+            self._registry.attach_existing(
+                incarnation,
+                self._advancement_occurrence(key, relative),
+            )
+
+        path = self._wrap_advancement_value(key, path)
+        actual_paths = {
+            relative
+            for relative, _obj in self._probe_advancement_occurrences(
+                key, path
+            )
+        }
+        if actual_paths != set(labels):
+            raise StoreIntegrityError(
+                "lazy advancement occurrence labels are incomplete or extra"
+            )
+        self.advancement_paths._baseline_identity_labels[key] = dict(labels)
+        self.advancement_paths._baseline_incarnation[key] = labels[()]
+        return path
+
+    def _bind_assigned_advancement_path(self, key, path):
+        path, _labels = self._reconcile_advancement_graph(key, path)
+        return path
+
+    def _detach_advancement_runtime_bindings(self, key, path):
+        for relative, obj in self._probe_advancement_occurrences(key, path):
+            occurrence = self._advancement_occurrence(key, relative)
+            incarnation = self._registry.incarnation_for_object(obj)
+            if incarnation is not None:
+                self._registry.detach_occurrence(
+                    occurrence, expected=incarnation
+                )
+            if isinstance(obj, IndexedRecord):
+                ref = obj.__dict__.get("_index_table")
+                table = None if ref is None else ref()
+                if table is self.advancement_paths:
+                    object.__setattr__(obj, "_index_table", None)
+            elif isinstance(obj, LazyTrackedDict):
+                obj._detach(self.advancement_paths, key)
+            elif isinstance(obj, (LazySoulTrackedList, LazySoulTrackedSet)):
+                obj._detach(self.advancement_paths, key, relative)
+
+    def _detach_assigned_advancement_path(self, key, path):
+        self._detach_advancement_runtime_bindings(key, path)
+
+    def _detach_unloaded_advancement_path(self, key):
+        labels = self.advancement_paths._baseline_labels(key)
+        for relative, incarnation_value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, incarnation_value
+            )
+            occurrence = self._advancement_occurrence(key, relative)
+            self._registry.attach_existing(incarnation, occurrence)
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
+
     def _top_occurrence(self, key):
         return Occurrence(PEOPLE_NAMESPACE, key, ())
 
