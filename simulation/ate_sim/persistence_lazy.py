@@ -320,6 +320,115 @@ def _insert_lazy_plain_record(
     )
 
 
+def _institution_memberships(namespace, record, ordinal):
+    if namespace == INSTITUTION_MAGIC_RECORD_NAMESPACE:
+        if not isinstance(record, MagicUserRecord):
+            raise TypeError("expected MagicUserRecord")
+        return (("person", record.person, ordinal),)
+    if namespace == INSTITUTION_NOTICE_NAMESPACE:
+        if not isinstance(record, AdventureNotice):
+            raise TypeError("expected AdventureNotice")
+        return (
+            ("status", record.status, ordinal),
+            ("cause_event", record.cause_event, ordinal),
+        )
+    if namespace == INSTITUTION_APPLICATION_NAMESPACE:
+        if not isinstance(record, SocietyApplication):
+            raise TypeError("expected SocietyApplication")
+        return (
+            ("passed", record.passed, ordinal),
+            ("person_society", (record.person, record.society), ordinal),
+            (
+                "person_society_passed",
+                (record.person, record.society, record.passed),
+                ordinal,
+            ),
+        )
+    raise ValueError(f"unsupported institution namespace: {namespace}")
+
+
+def _insert_lazy_indexed_record(
+    destination: LazyRecordStore,
+    *,
+    namespace: str,
+    generation: int,
+    typed_key: bytes,
+    ordinal: int,
+    value: Any,
+    record_schema: int,
+) -> None:
+    codec = destination.codec
+    memberships = _institution_memberships(namespace, value, ordinal)
+    payload = codec.encode(value)
+    memberships_blob = codec.encode(memberships)
+    payload_checksum = __import__(
+        "ate_sim.incremental_store", fromlist=["_framed_sha"]
+    )._framed_sha(b"lazy-payload-v1", payload)
+    destination.db.execute(
+        "INSERT INTO lazy_record_versions("
+        "namespace,typed_key,valid_from,valid_to,payload,payload_checksum,"
+        "codec_version,record_schema,memberships,row_checksum"
+        ") VALUES (?,?,?,NULL,?,?,?,?,?,?)",
+        (
+            namespace,
+            typed_key,
+            generation,
+            payload,
+            payload_checksum,
+            codec.version,
+            record_schema,
+            memberships_blob,
+            _version_checksum(
+                namespace,
+                typed_key,
+                record_schema,
+                codec.version,
+                generation,
+                None,
+                memberships_blob,
+                payload,
+            ),
+        ),
+    )
+    destination.db.execute(
+        "INSERT INTO lazy_order_versions("
+        "namespace,typed_key,ordinal,valid_from,valid_to,row_checksum"
+        ") VALUES (?,?,?,?,NULL,?)",
+        (
+            namespace,
+            typed_key,
+            ordinal,
+            generation,
+            _order_checksum(namespace, typed_key, ordinal, generation, None),
+        ),
+    )
+    for index_name, index_value, member_ordinal in memberships:
+        encoded_value = codec.encode(index_value)
+        destination.db.execute(
+            "INSERT INTO lazy_query_versions("
+            "namespace,index_name,index_value,record_key,ordinal,"
+            "valid_from,valid_to,row_checksum"
+            ") VALUES (?,?,?,?,?,?,NULL,?)",
+            (
+                namespace,
+                index_name,
+                encoded_value,
+                typed_key,
+                member_ordinal,
+                generation,
+                _query_checksum(
+                    namespace,
+                    index_name,
+                    encoded_value,
+                    typed_key,
+                    member_ordinal,
+                    generation,
+                    None,
+                ),
+            ),
+        )
+
+
 def _insert_lazy_person(
     destination: LazyRecordStore,
     *,
