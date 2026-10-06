@@ -127,6 +127,7 @@ SKILL_NAMESPACE = "world.skills.skills"
 LINEAGE_NODE_NAMESPACE = "world.lineage.nodes"
 GENEALOGY_PARENT_NAMESPACE = "world.genealogy.parents"
 GENEALOGY_CHILD_NAMESPACE = "world.genealogy.children"
+COMMUNITY_MEMBERSHIP_NAMESPACE = "world.communities.memberships"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
@@ -151,6 +152,7 @@ LAZY_SKILL_SCHEMA = 1
 LAZY_LINEAGE_NODE_SCHEMA = 1
 LAZY_GENEALOGY_PARENT_SCHEMA = 1
 LAZY_GENEALOGY_CHILD_SCHEMA = 1
+LAZY_COMMUNITY_MEMBERSHIP_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
@@ -573,6 +575,92 @@ def _insert_lazy_social_partnership(
         )
 
 
+def _insert_lazy_community_membership(
+    destination: LazyRecordStore,
+    *,
+    generation: int,
+    typed_key: bytes,
+    key: tuple[int, int],
+    ordinal: int,
+    strength: float,
+) -> None:
+    codec = destination.codec
+    memberships = (("person", key[0], ordinal),)
+    payload = codec.encode(strength)
+    memberships_blob = codec.encode(memberships)
+    payload_checksum = __import__(
+        "ate_sim.incremental_store", fromlist=["_framed_sha"]
+    )._framed_sha(b"lazy-payload-v1", payload)
+    destination.db.execute(
+        "INSERT INTO lazy_record_versions("
+        "namespace,typed_key,valid_from,valid_to,payload,payload_checksum,"
+        "codec_version,record_schema,memberships,row_checksum"
+        ") VALUES (?,?,?,NULL,?,?,?,?,?,?)",
+        (
+            COMMUNITY_MEMBERSHIP_NAMESPACE,
+            typed_key,
+            generation,
+            payload,
+            payload_checksum,
+            codec.version,
+            LAZY_COMMUNITY_MEMBERSHIP_SCHEMA,
+            memberships_blob,
+            _version_checksum(
+                COMMUNITY_MEMBERSHIP_NAMESPACE,
+                typed_key,
+                LAZY_COMMUNITY_MEMBERSHIP_SCHEMA,
+                codec.version,
+                generation,
+                None,
+                memberships_blob,
+                payload,
+            ),
+        ),
+    )
+    destination.db.execute(
+        "INSERT INTO lazy_order_versions("
+        "namespace,typed_key,ordinal,valid_from,valid_to,row_checksum"
+        ") VALUES (?,?,?,?,NULL,?)",
+        (
+            COMMUNITY_MEMBERSHIP_NAMESPACE,
+            typed_key,
+            ordinal,
+            generation,
+            _order_checksum(
+                COMMUNITY_MEMBERSHIP_NAMESPACE,
+                typed_key,
+                ordinal,
+                generation,
+                None,
+            ),
+        ),
+    )
+    encoded_value = codec.encode(key[0])
+    destination.db.execute(
+        "INSERT INTO lazy_query_versions("
+        "namespace,index_name,index_value,record_key,ordinal,"
+        "valid_from,valid_to,row_checksum"
+        ") VALUES (?,?,?,?,?,?,NULL,?)",
+        (
+            COMMUNITY_MEMBERSHIP_NAMESPACE,
+            "person",
+            encoded_value,
+            typed_key,
+            ordinal,
+            generation,
+            _query_checksum(
+                COMMUNITY_MEMBERSHIP_NAMESPACE,
+                "person",
+                encoded_value,
+                typed_key,
+                ordinal,
+                generation,
+                None,
+            ),
+        ),
+    )
+
+
 def _insert_lazy_person(
     destination: LazyRecordStore,
     *,
@@ -965,6 +1053,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     genealogy_parent_next_ordinal = 0
                     genealogy_child_count = 0
                     genealogy_child_next_ordinal = 0
+                    community_membership_count = 0
+                    community_membership_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -1004,6 +1094,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             LINEAGE_NODE_NAMESPACE,
                             GENEALOGY_PARENT_NAMESPACE,
                             GENEALOGY_CHILD_NAMESPACE,
+                            COMMUNITY_MEMBERSHIP_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -1448,7 +1539,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             genealogy_parent_next_ordinal = max(
                                 genealogy_parent_next_ordinal, ordinal + 1
                             )
-                        else:
+                        elif namespace == GENEALOGY_CHILD_NAMESPACE:
                             if (
                                 type(key) is not int
                                 or type(value) is not list
@@ -1469,6 +1560,29 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             genealogy_child_count += 1
                             genealogy_child_next_ordinal = max(
                                 genealogy_child_next_ordinal, ordinal + 1
+                            )
+                        else:
+                            if (
+                                type(key) is not tuple
+                                or len(key) != 2
+                                or any(type(part) is not int for part in key)
+                                or type(value) not in (int, float)
+                            ):
+                                raise StoreFormatError(
+                                    "invalid community-membership envelope"
+                                )
+                            _insert_lazy_community_membership(
+                                target,
+                                generation=generation,
+                                typed_key=typed_key,
+                                key=key,
+                                ordinal=ordinal,
+                                strength=value,
+                            )
+                            community_membership_count += 1
+                            community_membership_next_ordinal = max(
+                                community_membership_next_ordinal,
+                                ordinal + 1,
                             )
 
                     for row in source_store.db.execute(
@@ -1500,6 +1614,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             LINEAGE_NODE_NAMESPACE,
                             GENEALOGY_PARENT_NAMESPACE,
                             GENEALOGY_CHILD_NAMESPACE,
+                            COMMUNITY_MEMBERSHIP_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1695,6 +1810,11 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             genealogy_child_count,
                             genealogy_child_next_ordinal,
                         ),
+                        (
+                            COMMUNITY_MEMBERSHIP_NAMESPACE,
+                            community_membership_count,
+                            community_membership_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1797,6 +1917,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "lineage_nodes": lineage_node_count,
                 "genealogy_parents": genealogy_parent_count,
                 "genealogy_children": genealogy_child_count,
+                "community_memberships": community_membership_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
@@ -2392,6 +2513,7 @@ def _initialize_eager_tracker(
         LINEAGE_NODE_NAMESPACE,
         GENEALOGY_PARENT_NAMESPACE,
         GENEALOGY_CHILD_NAMESPACE,
+        COMMUNITY_MEMBERSHIP_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -4908,6 +5030,257 @@ class LazySocialPartnershipTable(LazyRecordTable):
             "clean_cache_limit": self._clean_limit,
             "social_partnership_payload_loads": self._loads,
             "dirty_social_partnerships": len(self._dirty),
+        }
+
+
+class LazyCommunityMembershipTable(LazyRecordTable):
+    """Bounded lazy (person, community) -> strength authority."""
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        dict.__init__(self)
+        self._session = session
+        self._store = session.store
+        self._pin = session.pin
+        self._namespace = COMMUNITY_MEMBERSHIP_NAMESPACE
+        self._clean_limit = clean_limit
+        self._lru = OrderedDict()
+        self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence = {}
+        self._baseline_payload = {}
+        self._baseline_ordinal = {}
+        self._dirty = set()
+        self._removed = set()
+        self._new_keys = set()
+        self._reinserted = set()
+        self._overlay_ordinals = {}
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=LAZY_COMMUNITY_MEMBERSHIP_SCHEMA,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def __getitem__(self, key):
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        if dict.__contains__(self, key):
+            self._lru.pop(key, None)
+            if key not in self._dirty:
+                self._lru[key] = None
+            return dict.__getitem__(self, key)
+        checked = self._store.read_version(
+            self._pin,
+            self._namespace,
+            key,
+            expected_record_schema=LAZY_COMMUNITY_MEMBERSHIP_SCHEMA,
+        )
+        if type(checked.value) not in (int, float):
+            raise StoreFormatError(
+                "lazy community membership payload is not numeric"
+            )
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(checked.value)
+        )
+        self._baseline_presence.setdefault(key, True)
+        dict.__setitem__(self, key, checked.value)
+        self._loads += 1
+        if key not in self._dirty:
+            self._lru[key] = None
+        self._evict_clean()
+        return checked.value
+
+    def __setitem__(self, key, strength):
+        self._ensure_mutation()
+        if (
+            type(key) is not tuple
+            or len(key) != 2
+            or any(type(part) is not int for part in key)
+            or type(strength) not in (int, float)
+        ):
+            raise TypeError(
+                "community memberships require (int,int) -> numeric strength"
+            )
+        baseline_exists = self._baseline_exists(key)
+        was_removed = key in self._removed
+        dict.__setitem__(self, key, strength)
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __delitem__(self, key):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        if dict.__contains__(self, key):
+            dict.__delitem__(self, key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+
+    @staticmethod
+    def _memberships(key, ordinal):
+        return (Membership("person", key[0], ordinal),)
+
+    def keys_for_person(self, person):
+        self._ensure()
+        baseline = set(
+            self._store.query_keys(
+                self._pin, self._namespace, "person", person
+            )
+        )
+        touched = self._effective_touched()
+        baseline.difference_update(touched)
+        for key in touched:
+            if self._visible(key) and key[0] == person:
+                baseline.add(key)
+        return tuple(sorted(baseline, key=self._current_ordinal))
+
+    def for_person(self, person):
+        return {
+            key[1]: self[key]
+            for key in self.keys_for_person(person)
+        }
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        structural_ordinals = self._planned_structural_ordinals()
+        version_changes = []
+        effective_keys = []
+        structural_keys = []
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=LAZY_COMMUNITY_MEMBERSHIP_SCHEMA,
+                        )
+                    )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+            strength = dict.__getitem__(self, key)
+            payload = self._store.codec.encode(strength)
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new or reinsertion or payload != self._baseline_bytes(key)
+            )
+            ordinal = (
+                structural_ordinals[key]
+                if is_new or reinsertion
+                else self._persisted_ordinal(key)
+            )
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        strength,
+                        record_schema=LAZY_COMMUNITY_MEMBERSHIP_SCHEMA,
+                        memberships=self._memberships(key, ordinal),
+                        reinsertion=reinsertion,
+                    )
+                )
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+        return (
+            tuple(version_changes),
+            (),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in plan.community_membership_touched_keys:
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                value = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(value)
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        "committed community membership lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
+
+    def diagnostics(self):
+        return {
+            "logical_community_memberships": (
+                self._baseline_count
+                - len(self._removed)
+                + len(self._new_keys)
+            ),
+            "resident_community_memberships": dict.__len__(self),
+            "clean_cache_entries": len(self._lru),
+            "clean_cache_limit": self._clean_limit,
+            "community_membership_payload_loads": self._loads,
+            "dirty_community_memberships": len(self._dirty),
         }
 
 
@@ -8555,6 +8928,10 @@ class LazyWorldSession:
         self.genealogy_children = LazyGenealogyChildrenTable(self)
         object.__setattr__(
             world.genealogy, "children", self.genealogy_children
+        )
+        self.community_memberships = LazyCommunityMembershipTable(self)
+        object.__setattr__(
+            world.communities, "memberships", self.community_memberships
         )
         self.social_edges = LazySocialEdgeTable(self)
         object.__setattr__(world.social, "edges", self.social_edges)
@@ -14381,6 +14758,7 @@ def open_lazy_world_session(path, *, rules_id):
                     LINEAGE_NODE_NAMESPACE,
                     GENEALOGY_PARENT_NAMESPACE,
                     GENEALOGY_CHILD_NAMESPACE,
+                    COMMUNITY_MEMBERSHIP_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -14452,6 +14830,7 @@ def open_lazy_world_session(path, *, rules_id):
                         LINEAGE_NODE_NAMESPACE,
                         GENEALOGY_PARENT_NAMESPACE,
                         GENEALOGY_CHILD_NAMESPACE,
+                        COMMUNITY_MEMBERSHIP_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
