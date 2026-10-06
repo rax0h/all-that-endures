@@ -5119,6 +5119,433 @@ class LazyWorldSession:
         return result
 
 
+
+    def _material_item_occurrence(self, key):
+        return Occurrence(MATERIAL_ITEM_NAMESPACE, key, ())
+
+    def _bind_assigned_material_item(self, key, item):
+        existing = self._registry.incarnation_for_object(item)
+        if existing is None:
+            existing = self._registry.bind(item)
+        occurrences = self._registry.occurrences_for_incarnation(existing)
+        foreign = [
+            occurrence
+            for occurrence in occurrences
+            if occurrence != self._material_item_occurrence(key)
+        ]
+        if foreign:
+            raise StoreError(
+                "one crafted-item incarnation cannot be assigned "
+                "to multiple lazy owners"
+            )
+        self._registry.attach_occurrence(
+            item, self._material_item_occurrence(key)
+        )
+        return item
+
+    def _detach_assigned_material_item(self, key, item):
+        incarnation = self._registry.incarnation_for_object(item)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._material_item_occurrence(key),
+                expected=incarnation,
+            )
+
+    def _detach_unloaded_material_item(self, key):
+        baseline = self.material_items._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        occurrence = self._material_item_occurrence(key)
+        self._registry.attach_existing(incarnation, occurrence)
+        self._registry.detach_occurrence(
+            occurrence, expected=incarnation
+        )
+
+    def _bind_loaded_material_item(self, key, item):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, MATERIAL_ITEM_NAMESPACE, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy crafted-item occurrence labels are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, CraftedItem):
+                raise StoreIntegrityError(
+                    "crafted-item incarnation is bound to wrong type"
+                )
+            result = live
+        else:
+            result = item
+            self._registry.bind(
+                result,
+                self._material_item_occurrence(key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation, self._material_item_occurrence(key)
+        )
+        self.material_items._baseline_incarnation[key] = incarnation.value
+        return result
+
+    def _material_lot_index_occurrence(self, key):
+        return Occurrence(MATERIAL_LOT_INDEX_NAMESPACE, key, ())
+
+    def _bind_assigned_material_lot_index(self, key, values):
+        if isinstance(values, LazyTrackedIdList):
+            wrapper = values
+            wrapper._attach(self.material_lot_index, key)
+        else:
+            wrapper = LazyTrackedIdList(
+                values, self.material_lot_index, key
+            )
+        existing = self._registry.incarnation_for_object(wrapper)
+        if existing is None:
+            existing = self._registry.bind(wrapper)
+        occurrences = self._registry.occurrences_for_incarnation(existing)
+        foreign = [
+            occurrence
+            for occurrence in occurrences
+            if occurrence != self._material_lot_index_occurrence(key)
+        ]
+        if foreign:
+            raise StoreError(
+                "one material lot-index list cannot be assigned "
+                "to multiple lazy owners"
+            )
+        self._registry.attach_occurrence(
+            wrapper, self._material_lot_index_occurrence(key)
+        )
+        return wrapper
+
+    def _detach_assigned_material_lot_index(self, key, values):
+        incarnation = self._registry.incarnation_for_object(values)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._material_lot_index_occurrence(key),
+                expected=incarnation,
+            )
+        if isinstance(values, LazyTrackedIdList):
+            values._detach()
+
+    def _detach_unloaded_material_lot_index(self, key):
+        baseline = self.material_lot_index._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        occurrence = self._material_lot_index_occurrence(key)
+        self._registry.attach_existing(incarnation, occurrence)
+        self._registry.detach_occurrence(
+            occurrence, expected=incarnation
+        )
+
+    def _bind_loaded_material_lot_index(self, key, values):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, MATERIAL_LOT_INDEX_NAMESPACE, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy material lot-index occurrence labels are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, LazyTrackedIdList):
+                raise StoreIntegrityError(
+                    "material lot-index incarnation is bound to wrong type"
+                )
+            live._attach(self.material_lot_index, key)
+            result = live
+        else:
+            result = LazyTrackedIdList(
+                values, self.material_lot_index, key
+            )
+            self._registry.bind(
+                result,
+                self._material_lot_index_occurrence(key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation, self._material_lot_index_occurrence(key)
+        )
+        self.material_lot_index._baseline_incarnation[key] = incarnation.value
+        return result
+
+    def _material_active_index_occurrence(self, key):
+        return Occurrence(MATERIAL_ACTIVE_INDEX_NAMESPACE, key, ())
+
+    def _bind_assigned_material_active_index(self, key, values):
+        if isinstance(values, LazyTrackedSet):
+            wrapper = values
+            wrapper._attach(self.material_active_index, key)
+        else:
+            wrapper = LazyTrackedSet(
+                values, self.material_active_index, key
+            )
+        existing = self._registry.incarnation_for_object(wrapper)
+        if existing is None:
+            existing = self._registry.bind(wrapper)
+        occurrences = self._registry.occurrences_for_incarnation(existing)
+        foreign = [
+            occurrence
+            for occurrence in occurrences
+            if occurrence != self._material_active_index_occurrence(key)
+        ]
+        if foreign:
+            raise StoreError(
+                "one material active-index set cannot be assigned "
+                "to multiple lazy owners"
+            )
+        self._registry.attach_occurrence(
+            wrapper, self._material_active_index_occurrence(key)
+        )
+        return wrapper
+
+    def _detach_assigned_material_active_index(self, key, values):
+        incarnation = self._registry.incarnation_for_object(values)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._material_active_index_occurrence(key),
+                expected=incarnation,
+            )
+        if isinstance(values, LazyTrackedSet):
+            values._detach()
+
+    def _detach_unloaded_material_active_index(self, key):
+        baseline = self.material_active_index._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        occurrence = self._material_active_index_occurrence(key)
+        self._registry.attach_existing(incarnation, occurrence)
+        self._registry.detach_occurrence(
+            occurrence, expected=incarnation
+        )
+
+    def _bind_loaded_material_active_index(self, key, values):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, MATERIAL_ACTIVE_INDEX_NAMESPACE, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy material active-index occurrence labels "
+                "are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, LazyTrackedSet):
+                raise StoreIntegrityError(
+                    "material active-index incarnation is bound to wrong type"
+                )
+            live._attach(self.material_active_index, key)
+            result = live
+        else:
+            result = LazyTrackedSet(
+                values, self.material_active_index, key
+            )
+            self._registry.bind(
+                result,
+                self._material_active_index_occurrence(key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation, self._material_active_index_occurrence(key)
+        )
+        self.material_active_index._baseline_incarnation[key] = incarnation.value
+        return result
+
+    def _material_lot_occurrence(self, key, path=()):
+        return Occurrence(MATERIAL_LOT_NAMESPACE, key, tuple(path))
+
+    def _live_material_lot_for_key(self, key):
+        incarnation = self._registry.incarnation_for_occurrence(
+            self._material_lot_occurrence(key)
+        )
+        if incarnation is None:
+            return None
+        value = self._registry.object_for_incarnation(incarnation)
+        return value if isinstance(value, MaterialLot) else None
+
+    def _bind_material_lot_transfers(
+        self, key, transfers, *, incarnation=None
+    ):
+        occurrence = self._material_lot_occurrence(
+            key, LazyMaterialLotTable._transfer_path
+        )
+        if incarnation is not None:
+            live = self._registry.object_for_incarnation(incarnation)
+            if live is not None:
+                if not isinstance(live, LazyTrackedList):
+                    raise StoreError(
+                        "cross-boundary material transfer-list sharing "
+                        "requires an explicit lazy-list authority"
+                    )
+                live._attach(self.material_lots, key)
+                self._registry.attach_existing(incarnation, occurrence)
+                return live
+
+        if isinstance(transfers, LazyTrackedList):
+            wrapper = transfers
+            wrapper._attach(self.material_lots, key)
+        else:
+            wrapper = LazyTrackedList(
+                transfers, self.material_lots, key
+            )
+
+        existing = self._registry.incarnation_for_object(wrapper)
+        if incarnation is not None:
+            if existing is None:
+                self._registry.bind(
+                    wrapper, occurrence, incarnation=incarnation
+                )
+            elif existing != incarnation:
+                raise StoreIntegrityError(
+                    "material transfers bound to wrong incarnation"
+                )
+            self._registry.attach_existing(incarnation, occurrence)
+        else:
+            self._registry.bind(wrapper, occurrence)
+        return wrapper
+
+    def _material_lot_incarnation_labels(self, key, lot):
+        top = self._registry.incarnation_for_object(lot)
+        transfers = self._registry.incarnation_for_object(lot.transfers)
+        if top is None or transfers is None:
+            raise StoreIntegrityError(
+                "lazy material lot has incomplete runtime incarnation labels"
+            )
+        return {
+            (): top.value,
+            LazyMaterialLotTable._transfer_path: transfers.value,
+        }
+
+    def _bind_assigned_material_lot(self, key, lot):
+        existing = self._registry.incarnation_for_object(lot)
+        if existing is None:
+            existing = self._registry.bind(lot)
+        self._registry.attach_occurrence(
+            lot, self._material_lot_occurrence(key)
+        )
+        transfers = self._bind_material_lot_transfers(
+            key, lot.transfers
+        )
+        if transfers is not lot.transfers:
+            object.__setattr__(lot, "transfers", transfers)
+        return lot
+
+    def _detach_assigned_material_lot(self, key, lot):
+        labels = self._material_lot_incarnation_labels(key, lot)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            self._registry.detach_occurrence(
+                self._material_lot_occurrence(key, path),
+                expected=incarnation,
+            )
+        if isinstance(lot.transfers, LazyTrackedList):
+            lot.transfers._detach()
+
+    def _detach_unloaded_material_lot(self, key):
+        labels = self.material_lots._baseline_labels(key)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            occurrence = self._material_lot_occurrence(key, path)
+            self._registry.attach_existing(incarnation, occurrence)
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
+
+    def _replace_material_lot_transfers(
+        self, key, lot, old, new
+    ):
+        occurrence = self._material_lot_occurrence(
+            key, LazyMaterialLotTable._transfer_path
+        )
+        old_incarnation = self._registry.incarnation_for_object(old)
+        if old_incarnation is not None:
+            self._registry.detach_occurrence(
+                occurrence, expected=old_incarnation
+            )
+        if isinstance(old, LazyTrackedList):
+            old._detach()
+        replacement = self._bind_material_lot_transfers(key, new)
+        object.__setattr__(lot, "transfers", replacement)
+
+    def _bind_loaded_material_lot(self, key, lot):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, MATERIAL_LOT_NAMESPACE, key
+            )
+        )
+        expected_paths = {
+            (), LazyMaterialLotTable._transfer_path
+        }
+        if set(labels) != expected_paths:
+            raise StoreIntegrityError(
+                "lazy material-lot occurrence labels are incomplete or extra"
+            )
+
+        top_incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(top_incarnation)
+        if live is not None:
+            if not isinstance(live, MaterialLot):
+                raise StoreIntegrityError(
+                    "material-lot incarnation is bound to wrong type"
+                )
+            result = live
+        else:
+            result = lot
+            self._registry.bind(
+                result,
+                self._material_lot_occurrence(key),
+                incarnation=top_incarnation,
+            )
+        self._registry.attach_existing(
+            top_incarnation, self._material_lot_occurrence(key)
+        )
+
+        transfer_incarnation = IncarnationId(
+            self.store.store_identity,
+            labels[LazyMaterialLotTable._transfer_path],
+        )
+        transfers = self._bind_material_lot_transfers(
+            key,
+            result.transfers,
+            incarnation=transfer_incarnation,
+        )
+        if transfers is not result.transfers:
+            object.__setattr__(result, "transfers", transfers)
+        self.material_lots._baseline_identity_labels[key] = labels
+        return result
+
+
     def _bind_assigned_person(self, key, person):
         existing = self._registry.incarnation_for_object(person)
         if existing is None:
