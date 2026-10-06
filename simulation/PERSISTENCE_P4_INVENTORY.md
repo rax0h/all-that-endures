@@ -294,3 +294,24 @@ The next candidate class remains the architect-identified person-coupled state:
 measured residuals justify migration. Currency is taken first because it is
 person-keyed, grows with participation, and the existing P4 probe deliberately
 contains shared wallet aliases that make alias preservation testable.
+
+
+## 2026-10-05 soul-family focused evidence
+
+The person-coupled `world.metaphysics.souls` family is now implemented as a
+bounded lazy P4 family under `PERSISTENCE_P4_5_SOULS_PLAN.md`.
+
+Focused GitHub Actions run `37396222483`: **20 passed in 11.91s**.
+
+The 1,000 -> 10,000 historical-soul probe held requested access fixed and
+measured identical bounded work: 33 ordinary-open payload reads, one point
+payload read (458 B), three save payload writes (604 B), one resident soul
+owner, and five live incarnations representing the owner plus its four nested
+mutable identity-bearing fields. The nested `authorities`, `marks`,
+`cosmic_links`, and `transformations` containers remain mutable, retainable,
+identity-preserving state rather than being flattened or frozen.
+
+Focused behavior covers old-soul mutation through death/resurrection and
+transcendence, retained nested aliases after parent eviction, shared nested
+identity, stale/recovery behavior and explicit portable detach. Affected P4
+regressions remain the final closure gate for this family.

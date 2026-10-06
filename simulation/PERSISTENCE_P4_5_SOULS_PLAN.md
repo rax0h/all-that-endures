@@ -63,3 +63,41 @@ After focused + affected soul tests are green, remeasure residual P4 families.
 Proceed autonomously to `world.advancement.paths` only if that residual remains
 material. Do not start relationships/genealogy before the soul/path tranche is
 green.
+
+
+## Focused implementation evidence
+
+Product head tested: `82c345b4573f0b243020e516aae639b626667922`.
+
+GitHub Actions run `37396222483` completed the soul-focused matrix with
+**20 passed in 11.91s**, including existing metaphysics/divinity behavior.
+
+Measured fixed-access results:
+
+| Measure | 1,000 souls | 10,000 souls |
+| --- | ---: | ---: |
+| ordinary-open payload reads | 33 | 33 |
+| ordinary-open payload bytes | 16,658 | 16,660 |
+| requested point-access payload reads | 1 | 1 |
+| requested point-access payload bytes | 458 | 458 |
+| one-soul save payload writes | 3 | 3 |
+| one-soul save payload write bytes | 604 | 604 |
+| resident soul owners after fixed access | 1 | 1 |
+| clean-cache entries | 1 | 1 |
+| live incarnations for loaded soul | 5 | 5 |
+| owner groups | 1 | 1 |
+| checked pin rows during save evidence | 61 | 61 |
+
+The 10x historical-soul increase therefore did not increase ordinary-open
+payload work, fixed point-access payload work, changed-soul write work, or
+resident soul-owner count. The five live incarnations are the SoulState plus
+its four nested mutable identity-bearing fields.
+
+Focused proofs also cover direct scalar changes; all four nested mutable fields;
+retained nested aliases after parent eviction; shared nested identity; exact
+incarnation preservation; delete/reinsert order; real death/resurrection/mark/
+transcendence paths; true no-op save; precommit/lost-ack recovery; stale-writer
+rejection; and materializing detach/checkpoint portability.
+
+Affected P4 regression evidence is still required before this family is accepted
+closed and before residual advancement measurement proceeds.
