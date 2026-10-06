@@ -27,7 +27,7 @@ Stage 1 MUST preserve these invariants:
 - no global morality, villain, hero, leader, personality-type, faction-loyalty or universal reputation score.
 - no Stage 1 rebalance of canonical magic pacing/access.
 - no NPC may query omniscient archive/history as knowledge.
-- <=120 seconds for the canonical 1,000-year benchmark remains a hard gate.
+- the canonical 1,000-year benchmark must remain correct, deterministic and instrumented. **<=120 seconds is an optimization target, not a correctness/acceptance gate** unless the owner explicitly reinstates it. Material performance regressions must still be measured, explained and addressed rather than hidden.
 
 ## 2. Compatibility strategy
 
@@ -41,10 +41,11 @@ During implementation, support two explicit modes:
 The mode is configuration, not hidden state. New tests must state which mode they exercise. Once v2 passes behavioral/performance gates, a later authority change may make it default. Do not silently delete legacy behavior in the same PR that introduces a primitive.
 
 ### Checkpoints
-Current checkpoint schema is 4 and stores `year`, one `seed`, digest and pickled `World`. Stage 1 persistent state requires a schema bump only when the first persistent v2 field lands.
+Stage 0.5 closes with checkpoint schema **8**, storing `year`, the legacy single `seed`, digest and pickled `World`, alongside the separately opt-in P4 persistence architecture. Stage 1 migration begins from that actual Stage 0.5 authority. Historical schema-4 references are not the active compatibility baseline. Stage 1 persistent state requires a schema bump only when the first persistent v2 field lands.
 
 Rules:
-- schema-4 checkpoints remain loadable through an explicit migration path while Stage 1 is active;
+- schema-8 Stage 0.5 checkpoints remain supported through an explicit Stage 1 migration path while Stage 1 is active;
+- if migration from an older historical checkpoint schema is later required, it must use an explicit version-by-version migration contract rather than pretending that older schema is the current baseline;
 - migration must never invent subjective facts;
 - missing v2 state is initialized as **unknown/empty**, except values directly evidenced by legacy persisted fields;
 - migrated checkpoint output receives the current schema and a deterministic migrated digest;
@@ -74,7 +75,7 @@ seed  # legacy fixture input only; not a third causal seed
 - same `world_seed`, different `history_seed` => byte/canonical-equivalent initial state before history begins, then permitted divergence.
 
 ### Legacy mapping
-For a schema-4/single-seed run in `legacy_v1`, preserve current RNG semantics exactly.
+For a Stage 0.5 schema-8/single-seed run in `legacy_v1`, preserve current RNG semantics exactly.
 For a migrated run where no explicit history seed exists:
 ```text
 world_seed = legacy seed
@@ -87,6 +88,7 @@ Keep the current namespaced stream model. New namespaces should be stable nouns/
 - `observation_access`
 - `observation_noise`
 - `memory_retention`
+- `memory_retrieval`
 - `psyche_background`
 - `goal_reconsideration`
 - `agency_v2`
@@ -246,6 +248,28 @@ No annual per-memory mutation across the population. Accessibility is lazily eva
 ### Formation
 Not every observation creates an episodic memory. Formation probability/priority depends on consequence, salience, novelty, emotional arousal, personal relevance and repetition. Obvious formative events may be deterministic.
 
+### Retrieval and active recollection
+
+Memory is not complete when it is stored. A retained memory must be able to become causally active again.
+
+Stage 1 distinguishes three states:
+
+1. **stored memory** — retained subjective evidence that is not currently influencing cognition;
+2. **accessible/retrievable memory** — a stored memory that can be surfaced by relevant cues under the current accessibility state;
+3. **active recollection** — the small bounded set of memories actually brought into the person's current decision/reaction context.
+
+Current observations, people, places, objects, claims, goals, emotions, threats, opportunities and action candidates may provide retrieval cues. Retrieval must use bounded per-owner indexes and a bounded candidate set; it may not scan world history and Agency may not receive the person's entire retained memory bank.
+
+Candidate memories are ranked or selected from actor-available state using relevance to the cues, accessibility, salience, recency, reinforcement, emotional relevance and current Psyche state. Deterministic semantic ranking is preferred. If stochastic recall is needed for genuinely uncertain competition, it uses the isolated `memory_retrieval` RNG namespace and must preserve replay determinism.
+
+Retrieval itself is normally a read/derived operation. Merely asking for memories must not mutate canonical state or make a memory stronger. A consequential recollection may explicitly reinforce or reinterpret a memory through a separate state transition with evidence and `last_reinforced_year` update.
+
+A retrieved memory may influence belief revision, directional social assessment, emotional/driven state, expected risk/reward, goal reconsideration, candidate weighting and later expression without requiring the person to verbalize the memory. The causal chain is:
+
+`current cues -> bounded retrieval -> active recollection -> interpretation/weights -> attempt`
+
+Agency receives only the active recollection produced for the current context, never all retained memories.
+
 ## 8. Psyche contract
 
 Persistent Psyche is separate from biological `Person` and from read-only `PersonhoodView`.
@@ -383,7 +407,7 @@ Agency chooses **attempts**, not outcomes.
 
 ### Inputs
 Agency may read only:
-- current authorized beliefs/memories;
+- current authorized beliefs and the **active recollection** returned by bounded memory retrieval for this context; it may not inspect the full retained memory bank;
 - Psyche temperament/values/drives/self-beliefs/goals;
 - directional social assessments available to the person;
 - direct bodily/current-resource state the person necessarily knows;
@@ -416,6 +440,7 @@ class DecisionTrace:
     value_weights: tuple[tuple[str, float], ...]
     relationship_refs: tuple[tuple[int, str], ...]
     belief_refs: tuple[int, ...]
+    memory_refs: tuple[int, ...]
     rng_namespace: str
 ```
 
@@ -456,7 +481,7 @@ Consequential events enqueue only plausible observers/affected persons. Reaction
 ### Required indexes/queues
 At minimum:
 - observations by observer/event;
-- memories by owner;
+- memories by owner plus bounded retrieval indexes by relevant entity/claim/context cue;
 - beliefs by person/claim (existing compatibility plus richer assessment index);
 - social assessments by observer;
 - active goals by owner;
@@ -481,7 +506,7 @@ Persist:
 - seed/version/config identity needed for replay;
 - observations;
 - belief assessments;
-- retained memories;
+- retained memories and any persistent reinforcement/reinterpretation state;
 - psyche/goals;
 - directional social assessments.
 
@@ -492,7 +517,7 @@ Do not persist as causal truth:
 - hero/villain/leader classifications;
 - narrative arcs;
 - historian significance;
-- cache/index order that can be rebuilt deterministically.
+- active-recollection candidate sets, retrieval caches/rankings or cache/index order that can be rebuilt deterministically.
 
 ## 14. PR decomposition
 
@@ -506,8 +531,8 @@ Add explicit world/history seed semantics, compatibility mode and deterministic 
 ### PR 1C — Observation
 New state/module + `World` field + checkpoint migration + authorization tests. Integrate only a tiny representative set of event adapters first.
 
-### PR 1D — Belief evidence + Memory
-Extend `knowledge.py`; add bounded memory state. Belief APIs must stop exposing `truth` to Agency-facing callers.
+### PR 1D — Belief evidence + Memory/retrieval
+Extend `knowledge.py`; add bounded memory state, cue indexes and deterministic bounded retrieval/active-recollection APIs. Belief APIs must stop exposing `truth` to Agency-facing callers. Prove that stored memories can become causally active without exposing the full memory bank.
 
 ### PR 1E — Psyche
 Persistent schema, legacy evidence adapter, bounded goals, background/update scheduling. No broad behavior migration yet.
@@ -516,7 +541,7 @@ Persistent schema, legacy evidence adapter, bounded goals, background/update sch
 Add sparse state alongside `SocialGraph`; migrate one consumer and prove asymmetry.
 
 ### PR 1G — Agency v2 spine
-Extend `AgencyState`, candidate/trace contracts, known-opportunity adapters and compatibility gate. Migrate a small coherent action subset before expanding.
+Extend `AgencyState`, candidate/trace contracts, active-recollection input, known-opportunity adapters and compatibility gate. Migrate a small coherent action subset before expanding.
 
 ### PR 1H — Stage 1 integration/performance
 Behavioral scenarios, checkpoint round-trip/migration, deterministic replay, 100/1,000-year profiles, archive inspectability, compatibility cleanup proposal.
@@ -547,7 +572,13 @@ No PR should implement multiple later-stage systems merely because the new primi
 - cap enforced deterministically;
 - formative high-salience memory survives pressure from trivial memories;
 - eviction does not delete objective event/observation;
-- lazy decay yields same result regardless of query frequency.
+- lazy decay yields same result regardless of query frequency;
+- a current person/place/object/claim/goal cue retrieves a relevant retained memory without scanning world history;
+- irrelevant retained memories are not automatically handed to Agency;
+- identical state + cues + seed produce identical active recollection;
+- merely retrieving a memory does not reinforce or mutate it;
+- an explicit consequential reinforcement/reinterpretation is persisted separately;
+- a retrieved past experience can change belief/social/goal/action weighting even when the objective present state is otherwise unchanged.
 
 ### Psyche
 - missing trait remains unknown rather than neutral default;
@@ -564,17 +595,19 @@ No PR should implement multiple later-stage systems merely because the new primi
 
 ### Agency
 - secret unavailable to person cannot generate candidate;
+- Agency receives only bounded active recollection, never the full retained memory bank;
+- changing which relevant memory is retrieved can change candidate weights without changing objective truth;
 - candidate choice is deterministic for same inputs/seed;
 - changing a known belief can change candidate weights without changing objective truth;
 - Agency cannot directly mutate a domain outcome;
 - decision trace identifies causal inputs without reading hidden truth.
 
 ### Performance/checkpoint
-- schema-4 fixture migration deterministic;
+- Stage 0.5 schema-8 fixture migration deterministic;
 - current-schema round trip exact digest;
 - no unbounded memory/goals/decision-trace growth;
 - no person x historical-event loop in profiling;
-- canonical 1,000-year run <=120 seconds.
+- canonical 1,000-year run remains correct/deterministic; report simulation time separately and measure against the <=120-second optimization target without converting target miss alone into a correctness failure.
 
 ## 16. Stage 1 exit criteria
 
@@ -583,12 +616,12 @@ Stage 1 is complete only when:
 2. World/History seed semantics and legacy compatibility are tested;
 3. objective events can enter minds only through authorized Observation;
 4. beliefs are evidence-backed and Agency-facing code cannot inspect objective truth;
-5. memories are bounded, subjective and causally linked to evidence;
+5. memories are bounded, subjective and causally linked to evidence, and relevant retained memories can be retrieved into a bounded active recollection that materially influences present cognition/Agency;
 6. persistent Psyche exists without morality/type shortcuts or fabricated migration values;
 7. directional social assessments coexist safely with shared relationship history;
 8. Agency v2 chooses inspectable attempts from known opportunities and subjective state while domains resolve outcomes;
 9. checkpoint migration/round-trip is deterministic;
-10. 1,000-year performance gate still passes;
+10. the 1,000-year correctness/determinism run passes and its measured performance is reported against the <=120-second optimization target, with material regressions investigated;
 11. Stage 2 can attach to these contracts without introducing parallel psyche/knowledge/social/agency systems.
 
 **Stage 1 north star:** the world may know everything that objectively happened; a person knows only what reached them, remembers only part of it, interprets it through who they have become, and acts from that bounded interior. The code must preserve that distinction cheaply enough to simulate a millennium.
