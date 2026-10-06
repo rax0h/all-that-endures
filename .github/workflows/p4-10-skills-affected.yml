@@ -1,0 +1,49 @@
+name: P4.10 skills affected
+
+on:
+  push:
+    branches:
+      - sol-p4-10-skills-affected
+
+jobs:
+  affected:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python -m pytest -q \
+            simulation/tests/test_persistence_lazy_skills.py \
+            simulation/tests/test_development_systems.py \
+            simulation/tests/test_current_standard_integration.py \
+            simulation/tests/test_history_archive.py \
+            simulation/tests/test_persistence_lazy_social.py \
+            simulation/tests/test_living_partnerships.py \
+            simulation/tests/test_kernel.py \
+            simulation/tests/test_persistence_lazy_scalar_archives.py \
+            simulation/tests/test_agency.py \
+            simulation/tests/test_agency_hot_state.py \
+            simulation/tests/test_persistence_lazy_institutions.py \
+            simulation/tests/test_persistence_lazy_advancement.py \
+            simulation/tests/test_advancement.py \
+            simulation/tests/test_magic_understanding.py \
+            simulation/tests/test_mastery_training.py \
+            simulation/tests/test_magic_progression_history.py \
+            simulation/tests/test_magic_economy_and_lifespan.py \
+            simulation/tests/test_magic_institutions.py \
+            simulation/tests/test_materials_and_magic_aspiration.py \
+            simulation/tests/test_persistence_lazy_souls.py \
+            simulation/tests/test_metaphysics_divinity.py \
+            simulation/tests/test_persistence_lazy_people.py \
+            simulation/tests/test_persistence_lazy_identity.py \
+            simulation/tests/test_persistence_lazy_store.py \
+            simulation/tests/test_persistence_lazy_store_failures.py \
+            simulation/tests/test_persistence_lazy_resources.py \
+            simulation/tests/test_persistence_lazy_materials.py \
+            simulation/tests/test_persistence_lazy_currency.py \
+            simulation/tests/test_persistence_lifecycle.py \
+            simulation/tests/test_persistence_session_open.py
