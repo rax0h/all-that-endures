@@ -1,0 +1,23 @@
+name: P4 currency nested alias regression 3
+
+on:
+  push:
+    branches:
+      - sol-p4-currency-alias-regression-3
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python -m pytest -q \
+            simulation/tests/test_persistence_lazy_people.py::test_lazy_detach_preserves_cross_boundary_person_alias \
+            simulation/tests/test_persistence_lazy_people.py::test_cross_boundary_person_field_edit_and_owner_replacement_publish_atomically \
+            simulation/tests/test_persistence_lazy_people.py::test_new_cross_boundary_person_alias_creation_persists_identity \
+            simulation/tests/test_persistence_lazy_people.py::test_cross_boundary_person_alias_moves_between_eager_owners
