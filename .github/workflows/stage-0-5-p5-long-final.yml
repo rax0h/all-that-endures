@@ -1,0 +1,38 @@
+name: Stage 0.5 P5 long horizon
+on:
+  push:
+    branches: [sol-stage-0-5-p5-long-final]
+jobs:
+  endurance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Seed 843000 P4 100/500/1000 endurance
+        run: |
+          set -o pipefail
+          python simulation/persistence_p5_long_validation.py \
+            --seed 843000 \
+            --milestones 100 500 1000 \
+            --bootstrap-year 3 \
+            --workdir p5-long \
+            --output p5-long-summary.json \
+            --product-sha e4752e306d30dcff41be1cc17ddc6e63004646a3 \
+            --workflow-sha "$GITHUB_SHA" \
+            | tee p5-long.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-0-5-p5-long-seed-843000
+          path: |
+            p5-long-summary.json
+            p5-long.log
+            p5-long/p5-long-restore.sqlite
+          compression-level: 0
+          retention-days: 90
+          if-no-files-found: warn
