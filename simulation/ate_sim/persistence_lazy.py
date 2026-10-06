@@ -1709,6 +1709,10 @@ class LazyPeopleSavePlan:
     soul_identity_changes: tuple[IdentityOccurrenceChange, ...]
     soul_touched_keys: tuple[Any, ...]
     soul_structural_keys: tuple[Any, ...]
+    advancement_version_changes: tuple[VersionChange, ...]
+    advancement_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    advancement_touched_keys: tuple[Any, ...]
+    advancement_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
