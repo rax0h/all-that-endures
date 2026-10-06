@@ -5044,6 +5044,11 @@ class LazySocialPartnershipTable(LazyRecordTable):
         self._new_keys = set()
         self._reinserted = set()
         self._overlay_ordinals = {}
+        self._touched_by_person = {}
+
+    def _mark_touched_pair(self, key):
+        for person in dict.fromkeys(key):
+            self._touched_by_person.setdefault(person, set()).add(key)
 
     def _baseline_bytes(self, key):
         if key not in self._baseline_payload:
@@ -5114,6 +5119,7 @@ class LazySocialPartnershipTable(LazyRecordTable):
                 self._overlay_ordinals[key] = self._next_overlay_ordinal
                 self._next_overlay_ordinal += 1
         self._dirty.add(key)
+        self._mark_touched_pair(key)
         self._lru.pop(key, None)
 
     def __delitem__(self, key):
@@ -5131,6 +5137,7 @@ class LazySocialPartnershipTable(LazyRecordTable):
         else:
             self._new_keys.discard(key)
             self._overlay_ordinals.pop(key, None)
+        self._mark_touched_pair(key)
 
     @staticmethod
     def _memberships(key, ordinal):
@@ -5146,10 +5153,10 @@ class LazySocialPartnershipTable(LazyRecordTable):
                 self._person_query_cache, "person", person
             )
         )
-        touched = self._effective_touched()
+        touched = self._touched_by_person.get(person, ())
         baseline.difference_update(touched)
         for key in touched:
-            if self._visible(key) and person in key:
+            if self._visible(key):
                 baseline.add(key)
         return tuple(sorted(baseline, key=self._current_ordinal))
 
@@ -5258,6 +5265,7 @@ class LazySocialPartnershipTable(LazyRecordTable):
         self._new_keys.clear()
         self._reinserted.clear()
         self._overlay_ordinals.clear()
+        self._touched_by_person.clear()
         self._lru.clear()
         for key in list(dict.keys(self)):
             self._lru[key] = None
