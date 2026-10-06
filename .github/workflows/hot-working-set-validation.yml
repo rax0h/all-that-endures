@@ -6,9 +6,9 @@ on:
       - sol-stage-0-5-hot-working-set
 
 jobs:
-  focused:
+  profile:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     env:
       PYTHONPATH: .:simulation
     steps:
@@ -16,27 +16,41 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install test dependency
-        run: python -m pip install pytest
-      - name: Focused lazy persistence regressions
-        run: |
-          python -m pytest -q             simulation/tests/test_persistence_lazy_people.py             simulation/tests/test_persistence_lazy_social.py             simulation/tests/test_persistence_lazy_skills.py             simulation/tests/test_persistence_lazy_communities.py             simulation/tests/test_persistence_lazy_souls.py
-      - name: Integrated P5 dry benchmark
-        run: |
-          python simulation/persistence_p5_long_validation.py             --seed 843000             --milestones 4 7 10             --bootstrap-year 3             --workdir p5-hot-dry             --output p5-hot-dry.json             --product-sha "$GITHUB_SHA"             --workflow-sha "$GITHUB_SHA"
-      - name: Print compact P5 metrics
+      - name: Profile integrated lazy simulation
         run: |
           python - <<'PY'
-          import json
+          import cProfile
+          import pstats
+          import tempfile
+          import time
           from pathlib import Path
-          data=json.loads(Path("p5-hot-dry.json").read_text())
-          print("control_wall_seconds", data["control_wall_seconds"])
-          for year,row in data["p4"].items():
-              print(
-                  year,
-                  "simulation_seconds", row["simulation_seconds"],
-                  "payload_reads", row["simulation_io"]["payload_reads"],
-                  "save_seconds", row["save_seconds"],
-                  "reopen_digest_seconds", row["reopen_digest_seconds"],
-              )
+
+          from ate_sim.engine import Simulation
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.worldgen import generate_world
+
+          rules="hot-working-set-profile"
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td)
+              cold=td/"cold.sqlite"
+              lazy=td/"lazy.sqlite"
+              source=generate_world(843000)
+              Simulation(source).run(3)
+              write_cold_snapshot(source,cold,rules_id=rules)
+              convert_cold_to_lazy(cold,lazy,rules_id=rules)
+              with open_lazy_world_session(lazy,rules_id=rules) as session:
+                  session.store.reset_diagnostics()
+                  prof=cProfile.Profile()
+                  started=time.perf_counter()
+                  prof.enable()
+                  Simulation(session.world).run(7)
+                  prof.disable()
+                  elapsed=time.perf_counter()-started
+                  diag=session.store.diagnostics()
+                  print("PROFILE_SIM_SECONDS",elapsed)
+                  print("PROFILE_PAYLOAD_READS",diag.payload_reads)
+                  print("PROFILE_QUERY_ROWS",diag.query_rows)
+                  print("PROFILE_PAYLOAD_CHECK_READS",diag.payload_check_reads)
+                  pstats.Stats(prof).strip_dirs().sort_stats("cumtime").print_stats(80)
           PY
