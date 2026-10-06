@@ -2338,6 +2338,18 @@ class LazyPeopleSavePlan:
     motive_identity_changes: tuple[IdentityOccurrenceChange, ...]
     motive_touched_keys: tuple[Any, ...]
     motive_structural_keys: tuple[Any, ...]
+    social_edge_version_changes: tuple[VersionChange, ...]
+    social_edge_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    social_edge_touched_keys: tuple[Any, ...]
+    social_edge_structural_keys: tuple[Any, ...]
+    social_adjacency_version_changes: tuple[VersionChange, ...]
+    social_adjacency_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    social_adjacency_touched_keys: tuple[Any, ...]
+    social_adjacency_structural_keys: tuple[Any, ...]
+    social_partnership_version_changes: tuple[VersionChange, ...]
+    social_partnership_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    social_partnership_touched_keys: tuple[Any, ...]
+    social_partnership_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
