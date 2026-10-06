@@ -92,5 +92,23 @@ lazy-advancement persistence suite with the existing advancement,
 magic-understanding and mastery-training suites. The implementation therefore
 preserves the existing progression APIs while path storage is lazy.
 
-Post-migration 1,000/10,000 scaling evidence and the broader affected P4 matrix
-remain required before P4.6 is closed.
+Post-migration scaling run `37400542367` passed. Fixed-access results:
+
+| Measure | 1,000 paths | 10,000 paths |
+| --- | ---: | ---: |
+| ordinary-open payload reads | 33 | 33 |
+| ordinary-open payload bytes | 16,658 | 16,660 |
+| point path payload reads | 1 | 1 |
+| point path payload bytes | 1,963 | 1,963 |
+| one-path save payload writes | 3 | 3 |
+| one-path save payload bytes | 2,109 | 2,109 |
+| resident paths | 1 | 1 |
+| clean-cache entries | 1 | 1 |
+| live incarnations | 19 | 19 |
+| owner groups | 1 | 1 |
+| checked pin rows | 65 | 65 |
+
+The 10× historical-path increase therefore does not increase ordinary-open,
+fixed point-access, one-path write, residency, or loaded identity work.
+
+The broader affected P4 matrix remains required before P4.6 is closed.
