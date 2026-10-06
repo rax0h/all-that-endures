@@ -102,6 +102,8 @@ MATERIAL_LOT_NAMESPACE = "world.materials.lots"
 MATERIAL_ITEM_NAMESPACE = "world.materials.items"
 MATERIAL_LOT_INDEX_NAMESPACE = "world.materials.lot_index"
 MATERIAL_ACTIVE_INDEX_NAMESPACE = "world.materials.active_lot_index"
+WALLET_NAMESPACE = "world.currency.wallets"
+TREASURY_NAMESPACE = "world.currency.treasuries"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
@@ -110,6 +112,8 @@ LAZY_MATERIAL_LOT_SCHEMA = 1
 LAZY_MATERIAL_ITEM_SCHEMA = 1
 LAZY_MATERIAL_LOT_INDEX_SCHEMA = 1
 LAZY_MATERIAL_ACTIVE_INDEX_SCHEMA = 1
+LAZY_WALLET_SCHEMA = 1
+LAZY_TREASURY_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
@@ -662,6 +666,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     material_lot_index_next_ordinal = 0
                     material_active_index_count = 0
                     material_active_index_next_ordinal = 0
+                    wallet_count = 0
+                    wallet_next_ordinal = 0
+                    treasury_count = 0
+                    treasury_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -685,6 +693,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             MATERIAL_ITEM_NAMESPACE,
                             MATERIAL_LOT_INDEX_NAMESPACE,
                             MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                            WALLET_NAMESPACE,
+                            TREASURY_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -826,7 +836,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             material_lot_index_next_ordinal = max(
                                 material_lot_index_next_ordinal, ordinal + 1
                             )
-                        else:
+                        elif namespace == MATERIAL_ACTIVE_INDEX_NAMESPACE:
                             if type(value) is not set or any(
                                 type(item) is not int for item in value
                             ):
@@ -846,6 +856,42 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             material_active_index_next_ordinal = max(
                                 material_active_index_next_ordinal, ordinal + 1
                             )
+                        elif namespace == WALLET_NAMESPACE:
+                            if type(value) is not dict:
+                                raise StoreFormatError(
+                                    "invalid wallet source envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=WALLET_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_WALLET_SCHEMA,
+                            )
+                            wallet_count += 1
+                            wallet_next_ordinal = max(
+                                wallet_next_ordinal, ordinal + 1
+                            )
+                        else:
+                            if type(value) is not dict:
+                                raise StoreFormatError(
+                                    "invalid treasury source envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=TREASURY_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_TREASURY_SCHEMA,
+                            )
+                            treasury_count += 1
+                            treasury_next_ordinal = max(
+                                treasury_next_ordinal, ordinal + 1
+                            )
 
                     for row in source_store.db.execute(
                         "SELECT namespace,index_name,index_value,record_key,"
@@ -860,6 +906,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             MATERIAL_ITEM_NAMESPACE,
                             MATERIAL_LOT_INDEX_NAMESPACE,
                             MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                            WALLET_NAMESPACE,
+                            TREASURY_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -979,6 +1027,12 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             material_active_index_count,
                             material_active_index_next_ordinal,
                         ),
+                        (WALLET_NAMESPACE, wallet_count, wallet_next_ordinal),
+                        (
+                            TREASURY_NAMESPACE,
+                            treasury_count,
+                            treasury_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1065,6 +1119,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "material_items": material_item_count,
                 "material_lot_index": material_lot_index_count,
                 "material_active_index": material_active_index_count,
+                "wallets": wallet_count,
+                "treasuries": treasury_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
@@ -1127,6 +1183,21 @@ def _material_occurrence_from_path(path, field):
         type(path) is tuple
         and len(path) >= 3
         and path[0] == ("field", "materials")
+        and path[1] == ("field", field)
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
+
+
+
+def _currency_occurrence_from_path(path, field):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "currency")
         and path[1] == ("field", field)
         and type(path[2]) is tuple
         and len(path[2]) == 2
@@ -1210,6 +1281,12 @@ def _lazy_occurrence_from_path(path):
             material_active_index[1],
             set,
         )
+    wallet = _currency_occurrence_from_path(path, "wallets")
+    if wallet is not None:
+        return WALLET_NAMESPACE, wallet[0], wallet[1], dict
+    treasury = _currency_occurrence_from_path(path, "treasuries")
+    if treasury is not None:
+        return TREASURY_NAMESPACE, treasury[0], treasury[1], dict
     return None
 
 
@@ -1366,6 +1443,8 @@ def _initialize_eager_tracker(
         MATERIAL_ITEM_NAMESPACE,
         MATERIAL_LOT_INDEX_NAMESPACE,
         MATERIAL_ACTIVE_INDEX_NAMESPACE,
+        WALLET_NAMESPACE,
+        TREASURY_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -1437,6 +1516,14 @@ class LazyPeopleSavePlan:
     material_active_index_identity_changes: tuple[IdentityOccurrenceChange, ...]
     material_active_index_touched_keys: tuple[Any, ...]
     material_active_index_structural_keys: tuple[Any, ...]
+    wallet_version_changes: tuple[VersionChange, ...]
+    wallet_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    wallet_touched_keys: tuple[Any, ...]
+    wallet_structural_keys: tuple[Any, ...]
+    treasury_version_changes: tuple[VersionChange, ...]
+    treasury_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    treasury_touched_keys: tuple[Any, ...]
+    treasury_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
@@ -7276,6 +7363,8 @@ def open_lazy_world_session(path, *, rules_id):
                     MATERIAL_ITEM_NAMESPACE,
                     MATERIAL_LOT_INDEX_NAMESPACE,
                     MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                    WALLET_NAMESPACE,
+                    TREASURY_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -7331,6 +7420,8 @@ def open_lazy_world_session(path, *, rules_id):
                         MATERIAL_ITEM_NAMESPACE,
                         MATERIAL_LOT_INDEX_NAMESPACE,
                         MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                        WALLET_NAMESPACE,
+                        TREASURY_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
