@@ -337,9 +337,9 @@ def _institution_memberships(namespace, record, ordinal):
     if namespace == SOCIAL_EDGE_NAMESPACE:
         if not isinstance(record, Relationship):
             raise TypeError("expected Relationship")
-        return (
-            ("person", record.a, ordinal),
-            ("person", record.b, ordinal),
+        return tuple(
+            ("person", person, ordinal)
+            for person in dict.fromkeys((record.a, record.b))
         )
     if namespace == SOCIAL_PARTNERSHIP_NAMESPACE:
         if (
@@ -351,9 +351,9 @@ def _institution_memberships(namespace, record, ordinal):
         ):
             raise TypeError("expected ((person_a, person_b), event_id)")
         pair, _event_id = record
-        return (
-            ("person", pair[0], ordinal),
-            ("person", pair[1], ordinal),
+        return tuple(
+            ("person", person, ordinal)
+            for person in dict.fromkeys(pair)
         )
     if namespace == TRANSMISSION_NAMESPACE:
         if not isinstance(record, Transmission):
@@ -483,9 +483,9 @@ def _insert_lazy_social_partnership(
     event_id: int,
 ) -> None:
     codec = destination.codec
-    memberships = (
-        ("person", pair[0], ordinal),
-        ("person", pair[1], ordinal),
+    memberships = tuple(
+        ("person", person, ordinal)
+        for person in dict.fromkeys(pair)
     )
     payload = codec.encode(event_id)
     memberships_blob = codec.encode(memberships)
@@ -4007,9 +4007,9 @@ class LazySocialEdgeTable(LazyRecordTable):
             self._overlay_ordinals.pop(key, None)
 
     def _memberships(self, record, ordinal):
-        return (
-            Membership("person", record.a, ordinal),
-            Membership("person", record.b, ordinal),
+        return tuple(
+            Membership("person", person, ordinal)
+            for person in dict.fromkeys((record.a, record.b))
         )
 
     def ids_for_person(self, person):
@@ -4590,9 +4590,9 @@ class LazySocialPartnershipTable(LazyRecordTable):
 
     @staticmethod
     def _memberships(key, ordinal):
-        return (
-            Membership("person", key[0], ordinal),
-            Membership("person", key[1], ordinal),
+        return tuple(
+            Membership("person", person, ordinal)
+            for person in dict.fromkeys(key)
         )
 
     def ids_for_person(self, person):
