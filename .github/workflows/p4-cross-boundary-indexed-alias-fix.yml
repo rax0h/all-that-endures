@@ -1,0 +1,25 @@
+name: P4 cross-boundary indexed alias fix
+
+on:
+  push:
+    branches:
+      - sol-p4-cross-boundary-indexed-alias-fix
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - name: Failing aspiration regression and aspiration family
+        run: python -m pytest -q simulation/tests/test_persistence_lazy_aspirations.py
+      - name: Cross-boundary person regressions
+        run: python -m pytest -q simulation/tests/test_persistence_lazy_people.py -k cross_boundary
+      - name: Currency alias family
+        run: python -m pytest -q simulation/tests/test_persistence_lazy_currency.py
