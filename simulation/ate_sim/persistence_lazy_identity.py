@@ -106,6 +106,12 @@ class LazyIdentityRegistry:
         ] = {}
         self._occurrences: dict[Occurrence, IncarnationId] = {}
         self._occurrences_by_incarnation: dict[IncarnationId, set[Occurrence]] = {}
+        # Current placements grouped by owner. Advancement mutation consults
+        # this on every changed path; owner-scoped lookup must not scan the
+        # entire live occurrence registry.
+        self._occurrences_by_owner: dict[
+            tuple[str, Any], set[Occurrence]
+        ] = {}
         self._next_runtime_token = 1
         self._closed = False
 
@@ -259,6 +265,9 @@ class LazyIdentityRegistry:
         self._occurrences_by_incarnation.setdefault(incarnation, set()).add(
             occurrence
         )
+        self._occurrences_by_owner.setdefault(occurrence.owner, set()).add(
+            occurrence
+        )
         return incarnation
 
     def attach_existing(
@@ -285,6 +294,9 @@ class LazyIdentityRegistry:
         self._occurrences_by_incarnation.setdefault(incarnation, set()).add(
             occurrence
         )
+        self._occurrences_by_owner.setdefault(occurrence.owner, set()).add(
+            occurrence
+        )
         self.allocator.observe(incarnation)
 
     def detach_occurrence(
@@ -307,6 +319,11 @@ class LazyIdentityRegistry:
             entries.discard(occurrence)
             if not entries:
                 self._occurrences_by_incarnation.pop(current, None)
+        owner_entries = self._occurrences_by_owner.get(occurrence.owner)
+        if owner_entries is not None:
+            owner_entries.discard(occurrence)
+            if not owner_entries:
+                self._occurrences_by_owner.pop(occurrence.owner, None)
         return current
 
     def move(
@@ -352,14 +369,7 @@ class LazyIdentityRegistry:
         self._ensure_open()
         owner = (owner_namespace, owner_key)
         return tuple(
-            sorted(
-                (
-                    occurrence
-                    for occurrence in self._occurrences
-                    if occurrence.owner == owner
-                ),
-                key=repr,
-            )
+            sorted(self._occurrences_by_owner.get(owner, ()), key=repr)
         )
 
     def is_detached(self, obj: Any) -> bool:
@@ -416,6 +426,7 @@ class LazyIdentityRegistry:
             + sys.getsizeof(self._by_object_id)
             + sys.getsizeof(self._occurrences)
             + sys.getsizeof(self._occurrences_by_incarnation)
+            + sys.getsizeof(self._occurrences_by_owner)
         )
         return {
             "live_incarnations": live,
@@ -423,6 +434,7 @@ class LazyIdentityRegistry:
             "weak_reverse_entries": len(self._by_object_id),
             "occurrences": len(self._occurrences),
             "incarnations_with_occurrences": len(self._occurrences_by_incarnation),
+            "owners_with_occurrences": len(self._occurrences_by_owner),
             "owner_groups": len(groups),
             "max_owner_group_size": max_group,
             "metadata_container_bytes": metadata_bytes,
@@ -437,4 +449,5 @@ class LazyIdentityRegistry:
         self._by_object_id.clear()
         self._occurrences.clear()
         self._occurrences_by_incarnation.clear()
+        self._occurrences_by_owner.clear()
         self._closed = True
