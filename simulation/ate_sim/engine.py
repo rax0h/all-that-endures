@@ -27,6 +27,9 @@ class Simulation:
  def run(self,years):
   marker=self.w.__dict__.get('_ate_persistence_lifetime')
   if marker is not None:marker.ensure_simulation('run')
+  begin_run=None if marker is None else getattr(marker,'begin_run',None)
+  end_run=None if marker is None else getattr(marker,'end_run',None)
+  if begin_run is not None:begin_run()
   # Reference counting remains active. Bound cyclic garbage, but avoid repeated
   # full scans of the growing live archive at Python's allocation-driven cadence.
   import gc
@@ -39,10 +42,13 @@ class Simulation:
     if managed and (i+1)%25==0:gc.collect(0)
     if managed and (i+1)%250==0:gc.collect();collected=True
   finally:
-   if managed:
-    try:
-     if not collected:gc.collect()
-    finally:gc.enable()
+   try:
+    if managed:
+     try:
+      if not collected:gc.collect()
+     finally:gc.enable()
+   finally:
+    if end_run is not None:end_run()
   return self.w
 
  def step(self):
