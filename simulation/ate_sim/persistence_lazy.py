@@ -8139,6 +8139,8 @@ class LazyWorldSession:
         object.__setattr__(
             world.social, "partnerships", self.social_partnerships
         )
+        self.skills = LazySkillTable(self)
+        object.__setattr__(world.skills, "skills", self.skills)
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
@@ -8224,6 +8226,7 @@ class LazyWorldSession:
                     Transmission,
                     MotiveState,
                     Relationship,
+                    SkillHistory,
                 ),
             )
             and field in RECORD_FIELDS.get(type(subject), ())
@@ -8329,6 +8332,7 @@ class LazyWorldSession:
                     MOTIVE_NAMESPACE,
                     SOCIAL_EDGE_NAMESPACE,
                     SOCIAL_ADJACENCY_NAMESPACE,
+                    SKILL_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
