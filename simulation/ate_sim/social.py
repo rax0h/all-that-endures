@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from .record_index import IndexedRecord
 
 @dataclass
-class Relationship:
+class Relationship(IndexedRecord):
     a:int; b:int; familiarity:float=0.; trust:float=.5; attachment:float=0.; obligation:float=0.; resentment:float=0.; attraction:float=0.; shared_history:list[int]=field(default_factory=list)
 
 @dataclass
