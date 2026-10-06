@@ -14435,6 +14435,29 @@ class LazyWorldSession:
         return detached
 
 
+    def _stage_detached_lineage_children(self, replacements=None):
+        expected = len(self.lineage_children)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        for key in self.lineage_children:
+            bucket = self.lineage_children[key]
+            if not isinstance(bucket, (set, LazyLineageTrackedSet)):
+                raise StoreIntegrityError(
+                    "lazy detach encountered invalid lineage child set"
+                )
+            replacement = replacements.get(id(bucket))
+            if replacement is None:
+                replacement = set(bucket)
+                replacements[id(bucket)] = replacement
+            detached[key] = replacement
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach lineage-child count mismatch"
+            )
+        return detached, replacements
+
+
     def _stage_detached_genealogy_parents(self):
         expected = len(self.genealogy_parents)
         detached = {}
@@ -14631,6 +14654,7 @@ class LazyWorldSession:
         detached_social_partnerships,
         detached_skills,
         detached_lineage_nodes,
+        detached_lineage_children,
         detached_genealogy_parents,
         detached_genealogy_children,
         detached_community_memberships,
@@ -14755,6 +14779,7 @@ class LazyWorldSession:
         self.social_partnerships = detached_social_partnerships
         self.skills = detached_skills
         self.lineage_nodes = detached_lineage_nodes
+        self.lineage_children = detached_lineage_children
         self.genealogy_parents = detached_genealogy_parents
         self.genealogy_children = detached_genealogy_children
         self.community_memberships = detached_community_memberships
@@ -14889,6 +14914,12 @@ class LazyWorldSession:
                 skill_nested_assignments,
             ) = self._stage_detached_skills(mutable_replacements)
             detached_lineage_nodes = self._stage_detached_lineage_nodes()
+            (
+                detached_lineage_children,
+                mutable_replacements,
+            ) = self._stage_detached_lineage_children(
+                mutable_replacements
+            )
             detached_genealogy_parents = (
                 self._stage_detached_genealogy_parents()
             )
@@ -14939,6 +14970,9 @@ class LazyWorldSession:
                         ),
                         id(self.skills): detached_skills,
                         id(self.lineage_nodes): detached_lineage_nodes,
+                        id(self.lineage_children): (
+                            detached_lineage_children
+                        ),
                         id(self.genealogy_parents): (
                             detached_genealogy_parents
                         ),
@@ -14999,6 +15033,7 @@ class LazyWorldSession:
                 detached_social_partnerships,
                 detached_skills,
                 detached_lineage_nodes,
+                detached_lineage_children,
                 detached_genealogy_parents,
                 detached_genealogy_children,
                 detached_community_memberships,
@@ -15044,6 +15079,7 @@ class LazyWorldSession:
             "social_partnerships": self.social_partnerships.diagnostics(),
             "skills": self.skills.diagnostics(),
             "lineage_nodes": self.lineage_nodes.diagnostics(),
+            "lineage_children": self.lineage_children.diagnostics(),
             "genealogy_parents": self.genealogy_parents.diagnostics(),
             "genealogy_children": self.genealogy_children.diagnostics(),
             "community_memberships": (
