@@ -10124,6 +10124,7 @@ def open_lazy_world_session(path, *, rules_id):
                     WALLET_NAMESPACE,
                     TREASURY_NAMESPACE,
                     SOUL_NAMESPACE,
+                    ADVANCEMENT_NAMESPACE,
                 },
             )
             _validate_head_inventory(
