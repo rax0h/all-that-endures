@@ -1,0 +1,19 @@
+name: P4.5 soul focused gate
+
+on:
+  push:
+    branches:
+      - sol-p4-5-soul-focused-gate
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: python -m py_compile simulation/ate_sim/metaphysics.py simulation/ate_sim/persistence_lazy.py simulation/tests/test_persistence_lazy_souls.py
+      - run: PYTHONPATH=simulation:. python -m pytest -q -s simulation/tests/test_persistence_lazy_souls.py simulation/tests/test_metaphysics_divinity.py
