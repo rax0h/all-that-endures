@@ -78,3 +78,19 @@ state only.
 Focused advancement persistence tests + existing advancement/understanding/
 mastery tests, then affected P4 identity/lifecycle tests. Remeasure residual
 families only after the path gate is green.
+
+
+## Focused implementation evidence
+
+Initial smoke run `37400214362` passed after excluding the new lazy namespace
+from the accepted eager baseline-ordinal bootstrap. The smoke proved zero-load
+open, one-path access, nested ability/understanding/response-model mutations,
+save/reopen and explicit materializing detach/checkpoint portability.
+
+Focused run `37400414548` passed **33/33 in 10.75s**. It combined the new
+lazy-advancement persistence suite with the existing advancement,
+magic-understanding and mastery-training suites. The implementation therefore
+preserves the existing progression APIs while path storage is lazy.
+
+Post-migration 1,000/10,000 scaling evidence and the broader affected P4 matrix
+remain required before P4.6 is closed.
