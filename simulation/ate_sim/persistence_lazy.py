@@ -24,6 +24,8 @@ from .metaphysics import SoulState
 from .advancement import EssencePath, AbilityProgress, Understanding
 from .mastery_training import ResponseModel
 from .institutions import MagicUserRecord, AdventureNotice, SocietyApplication
+from .transmission import Transmission
+from .agency import MotiveState
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
     Membership,
@@ -113,6 +115,8 @@ ADVANCEMENT_NAMESPACE = "world.advancement.paths"
 INSTITUTION_MAGIC_RECORD_NAMESPACE = "world.institutions.magic_records"
 INSTITUTION_NOTICE_NAMESPACE = "world.institutions.notices"
 INSTITUTION_APPLICATION_NAMESPACE = "world.institutions.applications"
+TRANSMISSION_NAMESPACE = "world.transmission.records"
+MOTIVE_NAMESPACE = "world.agency.motives"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
@@ -128,6 +132,8 @@ LAZY_ADVANCEMENT_SCHEMA = 1
 LAZY_INSTITUTION_MAGIC_RECORD_SCHEMA = 1
 LAZY_INSTITUTION_NOTICE_SCHEMA = 1
 LAZY_INSTITUTION_APPLICATION_SCHEMA = 1
+LAZY_TRANSMISSION_SCHEMA = 1
+LAZY_MOTIVE_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
