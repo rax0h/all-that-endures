@@ -797,6 +797,12 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     soul_next_ordinal = 0
                     advancement_count = 0
                     advancement_next_ordinal = 0
+                    institution_magic_record_count = 0
+                    institution_magic_record_next_ordinal = 0
+                    institution_notice_count = 0
+                    institution_notice_next_ordinal = 0
+                    institution_application_count = 0
+                    institution_application_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -824,6 +830,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             TREASURY_NAMESPACE,
                             SOUL_NAMESPACE,
                             ADVANCEMENT_NAMESPACE,
+                            INSTITUTION_MAGIC_RECORD_NAMESPACE,
+                            INSTITUTION_NOTICE_NAMESPACE,
+                            INSTITUTION_APPLICATION_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -1039,7 +1048,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             soul_next_ordinal = max(
                                 soul_next_ordinal, ordinal + 1
                             )
-                        else:
+                        elif namespace == ADVANCEMENT_NAMESPACE:
                             if not isinstance(value, EssencePath):
                                 raise StoreFormatError(
                                     "invalid advancement path source envelope"
@@ -1056,6 +1065,63 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             advancement_count += 1
                             advancement_next_ordinal = max(
                                 advancement_next_ordinal, ordinal + 1
+                            )
+                        elif namespace == INSTITUTION_MAGIC_RECORD_NAMESPACE:
+                            if not isinstance(value, MagicUserRecord):
+                                raise StoreFormatError(
+                                    "invalid institution magic-record envelope"
+                                )
+                            _insert_lazy_indexed_record(
+                                target,
+                                namespace=namespace,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_INSTITUTION_MAGIC_RECORD_SCHEMA,
+                            )
+                            institution_magic_record_count += 1
+                            institution_magic_record_next_ordinal = max(
+                                institution_magic_record_next_ordinal,
+                                ordinal + 1,
+                            )
+                        elif namespace == INSTITUTION_NOTICE_NAMESPACE:
+                            if not isinstance(value, AdventureNotice):
+                                raise StoreFormatError(
+                                    "invalid institution notice envelope"
+                                )
+                            _insert_lazy_indexed_record(
+                                target,
+                                namespace=namespace,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_INSTITUTION_NOTICE_SCHEMA,
+                            )
+                            institution_notice_count += 1
+                            institution_notice_next_ordinal = max(
+                                institution_notice_next_ordinal,
+                                ordinal + 1,
+                            )
+                        else:
+                            if not isinstance(value, SocietyApplication):
+                                raise StoreFormatError(
+                                    "invalid institution application envelope"
+                                )
+                            _insert_lazy_indexed_record(
+                                target,
+                                namespace=INSTITUTION_APPLICATION_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_INSTITUTION_APPLICATION_SCHEMA,
+                            )
+                            institution_application_count += 1
+                            institution_application_next_ordinal = max(
+                                institution_application_next_ordinal,
+                                ordinal + 1,
                             )
 
                     for row in source_store.db.execute(
@@ -1075,6 +1141,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             TREASURY_NAMESPACE,
                             SOUL_NAMESPACE,
                             ADVANCEMENT_NAMESPACE,
+                            INSTITUTION_MAGIC_RECORD_NAMESPACE,
+                            INSTITUTION_NOTICE_NAMESPACE,
+                            INSTITUTION_APPLICATION_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1210,6 +1279,21 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             advancement_count,
                             advancement_next_ordinal,
                         ),
+                        (
+                            INSTITUTION_MAGIC_RECORD_NAMESPACE,
+                            institution_magic_record_count,
+                            institution_magic_record_next_ordinal,
+                        ),
+                        (
+                            INSTITUTION_NOTICE_NAMESPACE,
+                            institution_notice_count,
+                            institution_notice_next_ordinal,
+                        ),
+                        (
+                            INSTITUTION_APPLICATION_NAMESPACE,
+                            institution_application_count,
+                            institution_application_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1300,6 +1384,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "treasuries": treasury_count,
                 "souls": soul_count,
                 "advancement_paths": advancement_count,
+                "institution_magic_records": institution_magic_record_count,
+                "institution_notices": institution_notice_count,
+                "institution_applications": institution_application_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
