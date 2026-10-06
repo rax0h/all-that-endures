@@ -19,6 +19,7 @@ from typing import Any, Iterator
 
 from .core import Person, World
 from .magic_resources import MagicAspiration, MagicResource
+from .materials import MaterialLot, CraftedItem
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
     Membership,
@@ -97,10 +98,18 @@ PEOPLE_NAMESPACE = "world.people"
 ASPIRATION_NAMESPACE = "world.magic_resources.aspirations"
 RESOURCE_NAMESPACE = "world.magic_resources.resources"
 OWNER_INDEX_NAMESPACE = "world.magic_resources.owner_index"
+MATERIAL_LOT_NAMESPACE = "world.materials.lots"
+MATERIAL_ITEM_NAMESPACE = "world.materials.items"
+MATERIAL_LOT_INDEX_NAMESPACE = "world.materials.lot_index"
+MATERIAL_ACTIVE_INDEX_NAMESPACE = "world.materials.active_lot_index"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
 LAZY_OWNER_INDEX_SCHEMA = 1
+LAZY_MATERIAL_LOT_SCHEMA = 1
+LAZY_MATERIAL_ITEM_SCHEMA = 1
+LAZY_MATERIAL_LOT_INDEX_SCHEMA = 1
+LAZY_MATERIAL_ACTIVE_INDEX_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
@@ -479,6 +488,105 @@ def _insert_lazy_resource(
         )
 
 
+
+def _plain_material_lot_value(lot):
+    """Storage value for a live lazy material lot without runtime wrappers."""
+    if not isinstance(lot, MaterialLot):
+        raise TypeError("expected MaterialLot")
+    return replace(lot, transfers=list(lot.transfers))
+
+
+def _material_lot_memberships(lot, ordinal):
+    if lot.quantity - lot.consumed <= .01:
+        return ()
+    return (
+        ("active_settlement", lot.settlement, ordinal),
+        ("active_rank", (lot.settlement, lot.material_rank), ordinal),
+    )
+
+
+def _insert_lazy_material_lot(
+    destination: LazyRecordStore,
+    *,
+    generation: int,
+    typed_key: bytes,
+    ordinal: int,
+    lot: MaterialLot,
+) -> None:
+    codec = destination.codec
+    payload = codec.encode(lot)
+    memberships = _material_lot_memberships(lot, ordinal)
+    memberships_blob = codec.encode(memberships)
+    payload_checksum = __import__(
+        "ate_sim.incremental_store", fromlist=["_framed_sha"]
+    )._framed_sha(b"lazy-payload-v1", payload)
+    destination.db.execute(
+        "INSERT INTO lazy_record_versions("
+        "namespace,typed_key,valid_from,valid_to,payload,payload_checksum,"
+        "codec_version,record_schema,memberships,row_checksum"
+        ") VALUES (?,?,?,NULL,?,?,?,?,?,?)",
+        (
+            MATERIAL_LOT_NAMESPACE,
+            typed_key,
+            generation,
+            payload,
+            payload_checksum,
+            codec.version,
+            LAZY_MATERIAL_LOT_SCHEMA,
+            memberships_blob,
+            _version_checksum(
+                MATERIAL_LOT_NAMESPACE,
+                typed_key,
+                LAZY_MATERIAL_LOT_SCHEMA,
+                codec.version,
+                generation,
+                None,
+                memberships_blob,
+                payload,
+            ),
+        ),
+    )
+    destination.db.execute(
+        "INSERT INTO lazy_order_versions("
+        "namespace,typed_key,ordinal,valid_from,valid_to,row_checksum"
+        ") VALUES (?,?,?,?,NULL,?)",
+        (
+            MATERIAL_LOT_NAMESPACE,
+            typed_key,
+            ordinal,
+            generation,
+            _order_checksum(
+                MATERIAL_LOT_NAMESPACE, typed_key, ordinal, generation, None
+            ),
+        ),
+    )
+    for index_name, index_value, member_ordinal in memberships:
+        encoded_value = codec.encode(index_value)
+        destination.db.execute(
+            "INSERT INTO lazy_query_versions("
+            "namespace,index_name,index_value,record_key,ordinal,"
+            "valid_from,valid_to,row_checksum"
+            ") VALUES (?,?,?,?,?,?,NULL,?)",
+            (
+                MATERIAL_LOT_NAMESPACE,
+                index_name,
+                encoded_value,
+                typed_key,
+                member_ordinal,
+                generation,
+                _query_checksum(
+                    MATERIAL_LOT_NAMESPACE,
+                    index_name,
+                    encoded_value,
+                    typed_key,
+                    member_ordinal,
+                    generation,
+                    None,
+                ),
+            ),
+        )
+
+
 def convert_cold_to_lazy(source, destination, *, rules_id):
     """Explicit checked P3B cold -> P4 conversion into a new destination."""
     source, destination = _preflight_conversion_paths(source, destination)
@@ -546,6 +654,14 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     resource_next_ordinal = 0
                     owner_index_count = 0
                     owner_index_next_ordinal = 0
+                    material_lot_count = 0
+                    material_lot_next_ordinal = 0
+                    material_item_count = 0
+                    material_item_next_ordinal = 0
+                    material_lot_index_count = 0
+                    material_lot_index_next_ordinal = 0
+                    material_active_index_count = 0
+                    material_active_index_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -565,6 +681,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             ASPIRATION_NAMESPACE,
                             RESOURCE_NAMESPACE,
                             OWNER_INDEX_NAMESPACE,
+                            MATERIAL_LOT_NAMESPACE,
+                            MATERIAL_ITEM_NAMESPACE,
+                            MATERIAL_LOT_INDEX_NAMESPACE,
+                            MATERIAL_ACTIVE_INDEX_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -632,7 +752,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             resource_next_ordinal = max(
                                 resource_next_ordinal, ordinal + 1
                             )
-                        else:
+                        elif namespace == OWNER_INDEX_NAMESPACE:
                             if type(value) is not set or any(
                                 type(item) is not int for item in value
                             ):
@@ -652,6 +772,80 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             owner_index_next_ordinal = max(
                                 owner_index_next_ordinal, ordinal + 1
                             )
+                        elif namespace == MATERIAL_LOT_NAMESPACE:
+                            if not isinstance(value, MaterialLot):
+                                raise StoreFormatError(
+                                    "invalid material-lot source envelope"
+                                )
+                            _insert_lazy_material_lot(
+                                target,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                lot=value,
+                            )
+                            material_lot_count += 1
+                            material_lot_next_ordinal = max(
+                                material_lot_next_ordinal, ordinal + 1
+                            )
+                        elif namespace == MATERIAL_ITEM_NAMESPACE:
+                            if not isinstance(value, CraftedItem):
+                                raise StoreFormatError(
+                                    "invalid crafted-item source envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=MATERIAL_ITEM_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_MATERIAL_ITEM_SCHEMA,
+                            )
+                            material_item_count += 1
+                            material_item_next_ordinal = max(
+                                material_item_next_ordinal, ordinal + 1
+                            )
+                        elif namespace == MATERIAL_LOT_INDEX_NAMESPACE:
+                            if type(value) is not list or any(
+                                type(item) is not int for item in value
+                            ):
+                                raise StoreFormatError(
+                                    "invalid material lot-index source envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=MATERIAL_LOT_INDEX_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_MATERIAL_LOT_INDEX_SCHEMA,
+                            )
+                            material_lot_index_count += 1
+                            material_lot_index_next_ordinal = max(
+                                material_lot_index_next_ordinal, ordinal + 1
+                            )
+                        else:
+                            if type(value) is not set or any(
+                                type(item) is not int for item in value
+                            ):
+                                raise StoreFormatError(
+                                    "invalid material active-index source envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_MATERIAL_ACTIVE_INDEX_SCHEMA,
+                            )
+                            material_active_index_count += 1
+                            material_active_index_next_ordinal = max(
+                                material_active_index_next_ordinal, ordinal + 1
+                            )
 
                     for row in source_store.db.execute(
                         "SELECT namespace,index_name,index_value,record_key,"
@@ -662,6 +856,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             ASPIRATION_NAMESPACE,
                             RESOURCE_NAMESPACE,
                             OWNER_INDEX_NAMESPACE,
+                            MATERIAL_LOT_NAMESPACE,
+                            MATERIAL_ITEM_NAMESPACE,
+                            MATERIAL_LOT_INDEX_NAMESPACE,
+                            MATERIAL_ACTIVE_INDEX_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -760,6 +958,48 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                         ),
                     )
 
+                    for namespace, member_count, next_ord in (
+                        (
+                            MATERIAL_LOT_NAMESPACE,
+                            material_lot_count,
+                            material_lot_next_ordinal,
+                        ),
+                        (
+                            MATERIAL_ITEM_NAMESPACE,
+                            material_item_count,
+                            material_item_next_ordinal,
+                        ),
+                        (
+                            MATERIAL_LOT_INDEX_NAMESPACE,
+                            material_lot_index_count,
+                            material_lot_index_next_ordinal,
+                        ),
+                        (
+                            MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                            material_active_index_count,
+                            material_active_index_next_ordinal,
+                        ),
+                    ):
+                        target.db.execute(
+                            "INSERT INTO lazy_namespace_state("
+                            "namespace,valid_from,valid_to,member_count,"
+                            "next_ordinal,row_checksum"
+                            ") VALUES (?,?,NULL,?,?,?)",
+                            (
+                                namespace,
+                                generation,
+                                member_count,
+                                next_ord,
+                                _namespace_checksum(
+                                    namespace,
+                                    member_count,
+                                    next_ord,
+                                    generation,
+                                    None,
+                                ),
+                            ),
+                        )
+
                     target.db.execute("DELETE FROM lazy_identity_state")
                     for namespace, key, path, incarnation_id in identity_rows:
                         encoded_key = codec.encode(key)
@@ -821,6 +1061,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "aspirations": aspiration_count,
                 "resources": resource_count,
                 "owner_index": owner_index_count,
+                "material_lots": material_lot_count,
+                "material_items": material_item_count,
+                "material_lot_index": material_lot_index_count,
+                "material_active_index": material_active_index_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
@@ -877,6 +1121,21 @@ def _owner_index_occurrence_from_path(path):
     return None
 
 
+
+def _material_occurrence_from_path(path, field):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "materials")
+        and path[1] == ("field", field)
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
+
+
 def _lazy_occurrence_from_path(path):
     people = _people_occurrence_from_path(path)
     if people is not None:
@@ -909,6 +1168,46 @@ def _lazy_occurrence_from_path(path):
             OWNER_INDEX_NAMESPACE,
             owner_bucket[0],
             owner_bucket[1],
+            set,
+        )
+    material_lot = _material_occurrence_from_path(path, "lots")
+    if material_lot is not None:
+        relative = material_lot[1]
+        expected_type = (
+            list
+            if relative == LazyMaterialLotTable._transfer_path
+            else MaterialLot
+        )
+        return (
+            MATERIAL_LOT_NAMESPACE,
+            material_lot[0],
+            relative,
+            expected_type,
+        )
+    material_item = _material_occurrence_from_path(path, "items")
+    if material_item is not None:
+        return (
+            MATERIAL_ITEM_NAMESPACE,
+            material_item[0],
+            material_item[1],
+            CraftedItem,
+        )
+    material_lot_index = _material_occurrence_from_path(path, "lot_index")
+    if material_lot_index is not None:
+        return (
+            MATERIAL_LOT_INDEX_NAMESPACE,
+            material_lot_index[0],
+            material_lot_index[1],
+            list,
+        )
+    material_active_index = _material_occurrence_from_path(
+        path, "active_lot_index"
+    )
+    if material_active_index is not None:
+        return (
+            MATERIAL_ACTIVE_INDEX_NAMESPACE,
+            material_active_index[0],
+            material_active_index[1],
             set,
         )
     return None
@@ -1015,15 +1314,17 @@ def _seed_cross_boundary_lazy_identity(session, links):
             Occurrence(namespace, key, relative),
         )
         if not relative and isinstance(eager_object, IndexedRecord):
-            table = (
-                session.people
-                if namespace == PEOPLE_NAMESPACE
-                else (
-                    session.aspirations
-                    if namespace == ASPIRATION_NAMESPACE
-                    else session.resources
+            table = {
+                PEOPLE_NAMESPACE: session.people,
+                ASPIRATION_NAMESPACE: session.aspirations,
+                RESOURCE_NAMESPACE: session.resources,
+                MATERIAL_LOT_NAMESPACE: session.material_lots,
+                MATERIAL_ITEM_NAMESPACE: session.material_items,
+            }.get(namespace)
+            if table is None:
+                raise StoreIntegrityError(
+                    "indexed lazy occurrence has no owning table"
                 )
-            )
             object.__setattr__(
                 eager_object, "_index_table", weakref.ref(table)
             )
@@ -1061,6 +1362,10 @@ def _initialize_eager_tracker(
         ASPIRATION_NAMESPACE,
         RESOURCE_NAMESPACE,
         OWNER_INDEX_NAMESPACE,
+        MATERIAL_LOT_NAMESPACE,
+        MATERIAL_ITEM_NAMESPACE,
+        MATERIAL_LOT_INDEX_NAMESPACE,
+        MATERIAL_ACTIVE_INDEX_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -4884,6 +5189,10 @@ def open_lazy_world_session(path, *, rules_id):
                     ASPIRATION_NAMESPACE,
                     RESOURCE_NAMESPACE,
                     OWNER_INDEX_NAMESPACE,
+                    MATERIAL_LOT_NAMESPACE,
+                    MATERIAL_ITEM_NAMESPACE,
+                    MATERIAL_LOT_INDEX_NAMESPACE,
+                    MATERIAL_ACTIVE_INDEX_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -4935,6 +5244,10 @@ def open_lazy_world_session(path, *, rules_id):
                         ASPIRATION_NAMESPACE,
                         RESOURCE_NAMESPACE,
                         OWNER_INDEX_NAMESPACE,
+                        MATERIAL_LOT_NAMESPACE,
+                        MATERIAL_ITEM_NAMESPACE,
+                        MATERIAL_LOT_INDEX_NAMESPACE,
+                        MATERIAL_ACTIVE_INDEX_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
