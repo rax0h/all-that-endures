@@ -6456,6 +6456,15 @@ class LazyMaterialLotIndexTable(_LazyMaterialContainerTable):
             session, MATERIAL_LOT_INDEX_NAMESPACE, clean_limit=clean_limit
         )
 
+    def setdefault(self, key, default=None):
+        self._ensure_mutation()
+        if self._visible(key):
+            return self[key]
+        if default is None:
+            default = []
+        self[key] = default
+        return self[key]
+
     def _plain(self, value):
         return list(value)
 
