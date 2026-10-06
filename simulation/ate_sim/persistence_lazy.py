@@ -7518,12 +7518,14 @@ class LazyWorldSession:
                 INSTITUTION_MAGIC_RECORD_NAMESPACE,
                 INSTITUTION_NOTICE_NAMESPACE,
                 INSTITUTION_APPLICATION_NAMESPACE,
+                TRANSMISSION_NAMESPACE,
+                MOTIVE_NAMESPACE,
             }
             and item != occurrence
         ]
         if foreign_lazy:
             raise StoreError(
-                "one institution record incarnation cannot own "
+                "one scalar record incarnation cannot own "
                 "multiple lazy record keys"
             )
         self._registry.attach_occurrence(record, occurrence)
@@ -7565,7 +7567,7 @@ class LazyWorldSession:
         )
         if set(labels) != {()}:
             raise StoreIntegrityError(
-                "lazy institution record occurrence labels "
+                "lazy scalar record occurrence labels "
                 "are incomplete or extra"
             )
         incarnation = IncarnationId(
@@ -7575,7 +7577,7 @@ class LazyWorldSession:
         if live is not None:
             if not isinstance(live, expected_type):
                 raise StoreIntegrityError(
-                    "institution record incarnation is bound to wrong type"
+                    "scalar record incarnation is bound to wrong type"
                 )
             result = live
         else:
