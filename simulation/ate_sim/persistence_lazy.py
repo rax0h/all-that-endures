@@ -21,6 +21,8 @@ from .core import Person, World
 from .magic_resources import MagicAspiration, MagicResource
 from .materials import MaterialLot, CraftedItem
 from .metaphysics import SoulState
+from .advancement import EssencePath, AbilityProgress, Understanding
+from .mastery_training import ResponseModel
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
     Membership,
@@ -106,6 +108,7 @@ MATERIAL_ACTIVE_INDEX_NAMESPACE = "world.materials.active_lot_index"
 WALLET_NAMESPACE = "world.currency.wallets"
 TREASURY_NAMESPACE = "world.currency.treasuries"
 SOUL_NAMESPACE = "world.metaphysics.souls"
+ADVANCEMENT_NAMESPACE = "world.advancement.paths"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
@@ -117,6 +120,7 @@ LAZY_MATERIAL_ACTIVE_INDEX_SCHEMA = 1
 LAZY_WALLET_SCHEMA = 1
 LAZY_TREASURY_SCHEMA = 1
 LAZY_SOUL_SCHEMA = 1
+LAZY_ADVANCEMENT_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
