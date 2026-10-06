@@ -2089,6 +2089,14 @@ class LazyPeopleSavePlan:
     institution_application_identity_changes: tuple[IdentityOccurrenceChange, ...]
     institution_application_touched_keys: tuple[Any, ...]
     institution_application_structural_keys: tuple[Any, ...]
+    transmission_version_changes: tuple[VersionChange, ...]
+    transmission_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    transmission_touched_keys: tuple[Any, ...]
+    transmission_structural_keys: tuple[Any, ...]
+    motive_version_changes: tuple[VersionChange, ...]
+    motive_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    motive_touched_keys: tuple[Any, ...]
+    motive_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
