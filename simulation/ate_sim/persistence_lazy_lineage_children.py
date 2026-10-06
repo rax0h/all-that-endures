@@ -212,38 +212,43 @@ class LazyLineageTrackedSet(set):
         table = self._guard()
         if value in self:
             return
-        set.add(self, value)
         if table is not None:
             table._record_edge_add(self._key, value)
+        set.add(self, value)
 
     def discard(self, value):
         table = self._guard()
         if value not in self:
             return
-        set.discard(self, value)
         if table is not None:
             table._record_edge_remove(self._key, value)
+        set.discard(self, value)
 
     def remove(self, value):
         table = self._guard()
-        set.remove(self, value)
+        if value not in self:
+            raise KeyError(value)
         if table is not None:
             table._record_edge_remove(self._key, value)
+        set.remove(self, value)
 
     def pop(self):
         table = self._guard()
-        value = set.pop(self)
+        if not self:
+            raise KeyError("pop from an empty set")
+        value = next(iter(self))
         if table is not None:
             table._record_edge_remove(self._key, value)
+        set.remove(self, value)
         return value
 
     def clear(self):
         table = self._guard()
         before = tuple(self)
-        set.clear(self)
         if table is not None:
             for value in before:
                 table._record_edge_remove(self._key, value)
+        set.clear(self)
 
     def update(self, *others):
         values = set()
