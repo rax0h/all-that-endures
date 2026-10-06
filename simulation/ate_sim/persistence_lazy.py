@@ -819,6 +819,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     institution_notice_next_ordinal = 0
                     institution_application_count = 0
                     institution_application_next_ordinal = 0
+                    transmission_count = 0
+                    transmission_next_ordinal = 0
+                    motive_count = 0
+                    motive_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -849,6 +853,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             INSTITUTION_MAGIC_RECORD_NAMESPACE,
                             INSTITUTION_NOTICE_NAMESPACE,
                             INSTITUTION_APPLICATION_NAMESPACE,
+                            TRANSMISSION_NAMESPACE,
+                            MOTIVE_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -1120,7 +1126,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                                 institution_notice_next_ordinal,
                                 ordinal + 1,
                             )
-                        else:
+                        elif namespace == INSTITUTION_APPLICATION_NAMESPACE:
                             if not isinstance(value, SocietyApplication):
                                 raise StoreFormatError(
                                     "invalid institution application envelope"
@@ -1137,6 +1143,44 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             institution_application_count += 1
                             institution_application_next_ordinal = max(
                                 institution_application_next_ordinal,
+                                ordinal + 1,
+                            )
+                        elif namespace == TRANSMISSION_NAMESPACE:
+                            if not isinstance(value, Transmission):
+                                raise StoreFormatError(
+                                    "invalid transmission envelope"
+                                )
+                            _insert_lazy_indexed_record(
+                                target,
+                                namespace=TRANSMISSION_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_TRANSMISSION_SCHEMA,
+                            )
+                            transmission_count += 1
+                            transmission_next_ordinal = max(
+                                transmission_next_ordinal,
+                                ordinal + 1,
+                            )
+                        else:
+                            if not isinstance(value, MotiveState):
+                                raise StoreFormatError(
+                                    "invalid motive envelope"
+                                )
+                            _insert_lazy_indexed_record(
+                                target,
+                                namespace=MOTIVE_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_MOTIVE_SCHEMA,
+                            )
+                            motive_count += 1
+                            motive_next_ordinal = max(
+                                motive_next_ordinal,
                                 ordinal + 1,
                             )
 
@@ -1160,6 +1204,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             INSTITUTION_MAGIC_RECORD_NAMESPACE,
                             INSTITUTION_NOTICE_NAMESPACE,
                             INSTITUTION_APPLICATION_NAMESPACE,
+                            TRANSMISSION_NAMESPACE,
+                            MOTIVE_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1310,6 +1356,16 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             institution_application_count,
                             institution_application_next_ordinal,
                         ),
+                        (
+                            TRANSMISSION_NAMESPACE,
+                            transmission_count,
+                            transmission_next_ordinal,
+                        ),
+                        (
+                            MOTIVE_NAMESPACE,
+                            motive_count,
+                            motive_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1403,6 +1459,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "institution_magic_records": institution_magic_record_count,
                 "institution_notices": institution_notice_count,
                 "institution_applications": institution_application_count,
+                "transmissions": transmission_count,
+                "motives": motive_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
