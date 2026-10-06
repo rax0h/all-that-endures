@@ -46,3 +46,5 @@ families remain, proceed to integrated P4 closeout.
 P4.14 focused run 37507068538: 10/10 passed in 4.19s.
 
 P4.14 scaling run 37507255485: open 33 reads at 1k and 10k; bounded add 1 payload read and 7 metadata rows; one edge add/save 4 writes; resident child buckets 0.
+
+Targeted overlay regression run 37510624230: 13/13 passed in 6.72s after fixing pre-save reads of modified unloaded buckets to validate against the current overlay count.
