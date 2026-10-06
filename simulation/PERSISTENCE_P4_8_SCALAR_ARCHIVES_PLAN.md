@@ -67,3 +67,30 @@ field mutation and annual replacement through `assess()` must remain exact.
 
 After focused + affected gates, rerun residual inventory and choose the next
 family from measured remaining cost.
+
+
+## Focused implementation evidence
+
+Product implementation head:
+`eeb7f474d1a7bb5c0836e20341d3f88f43cdaf87`.
+
+Focused run `37405753215` passed **12/12 in 1.55s**, covering the new
+scalar-archive persistence proofs plus agency and institution integration.
+
+Scaling run `37405836051` passed the 1,000/10,000 fixed-work proof:
+
+| Measure | 1,000 rows/family | 10,000 rows/family |
+| --- | ---: | ---: |
+| ordinary-open payload reads | 33 | 33 |
+| ordinary-open payload bytes | 16,667 | 16,672 |
+| fixed history + motive point payload reads | 3 | 3 |
+| fixed query payload bytes | 1,180 | 1,180 |
+| one-motive save payload writes | 3 | 3 |
+| one-motive save payload bytes | 528 | 528 |
+| resident transmissions | 2 | 2 |
+| resident motives | 1 | 1 |
+
+The fixed transmission history returned IDs `[1,2]` at both sizes.
+
+Affected P4 regression evidence is still required before this tranche is
+accepted closed.
