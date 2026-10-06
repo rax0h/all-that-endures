@@ -28,7 +28,7 @@ from .transmission import Transmission
 from .agency import MotiveState
 from .social import Relationship
 from .skills import SkillHistory
-from .lineage import LineageNode
+from .lineage import LineageNode\nfrom .persistence_lazy_lineage_children import (\n    LINEAGE_CHILD_NAMESPACE,\n    LINEAGE_CHILD_EDGE_NAMESPACE,\n    LAZY_LINEAGE_CHILD_SCHEMA,\n    LAZY_LINEAGE_CHILD_EDGE_SCHEMA,\n    LazyLineageChildrenTable,\n    LazyLineageTrackedSet,\n    insert_lineage_child_bucket,\n    insert_lineage_child_edge,\n)\n
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
     Membership,
