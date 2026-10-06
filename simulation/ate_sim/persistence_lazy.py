@@ -125,6 +125,7 @@ SOCIAL_ADJACENCY_NAMESPACE = "world.social.adjacency"
 SOCIAL_PARTNERSHIP_NAMESPACE = "world.social.partnerships"
 SKILL_NAMESPACE = "world.skills.skills"
 LINEAGE_NODE_NAMESPACE = "world.lineage.nodes"
+GENEALOGY_PARENT_NAMESPACE = "world.genealogy.parents"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
@@ -147,6 +148,7 @@ LAZY_SOCIAL_ADJACENCY_SCHEMA = 1
 LAZY_SOCIAL_PARTNERSHIP_SCHEMA = 1
 LAZY_SKILL_SCHEMA = 1
 LAZY_LINEAGE_NODE_SCHEMA = 1
+LAZY_GENEALOGY_PARENT_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
@@ -957,6 +959,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     skill_next_ordinal = 0
                     lineage_node_count = 0
                     lineage_node_next_ordinal = 0
+                    genealogy_parent_count = 0
+                    genealogy_parent_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -994,6 +998,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SOCIAL_PARTNERSHIP_NAMESPACE,
                             SKILL_NAMESPACE,
                             LINEAGE_NODE_NAMESPACE,
+                            GENEALOGY_PARENT_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -1398,7 +1403,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             skill_next_ordinal = max(
                                 skill_next_ordinal, ordinal + 1
                             )
-                        else:
+                        elif namespace == LINEAGE_NODE_NAMESPACE:
                             if not isinstance(value, LineageNode):
                                 raise StoreFormatError(
                                     "invalid lineage-node envelope"
@@ -1415,6 +1420,28 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             lineage_node_count += 1
                             lineage_node_next_ordinal = max(
                                 lineage_node_next_ordinal, ordinal + 1
+                            )
+                        else:
+                            if (
+                                type(key) is not int
+                                or type(value) is not tuple
+                                or any(type(parent) is not int for parent in value)
+                            ):
+                                raise StoreFormatError(
+                                    "invalid genealogy-parent envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=GENEALOGY_PARENT_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_GENEALOGY_PARENT_SCHEMA,
+                            )
+                            genealogy_parent_count += 1
+                            genealogy_parent_next_ordinal = max(
+                                genealogy_parent_next_ordinal, ordinal + 1
                             )
 
                     for row in source_store.db.execute(
@@ -1444,6 +1471,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SOCIAL_PARTNERSHIP_NAMESPACE,
                             SKILL_NAMESPACE,
                             LINEAGE_NODE_NAMESPACE,
+                            GENEALOGY_PARENT_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1629,6 +1657,11 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             lineage_node_count,
                             lineage_node_next_ordinal,
                         ),
+                        (
+                            GENEALOGY_PARENT_NAMESPACE,
+                            genealogy_parent_count,
+                            genealogy_parent_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1729,6 +1762,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "social_partnerships": social_partnership_count,
                 "skills": skill_count,
                 "lineage_nodes": lineage_node_count,
+                "genealogy_parents": genealogy_parent_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
@@ -2426,6 +2460,10 @@ class LazyPeopleSavePlan:
     lineage_node_identity_changes: tuple[IdentityOccurrenceChange, ...]
     lineage_node_touched_keys: tuple[Any, ...]
     lineage_node_structural_keys: tuple[Any, ...]
+    genealogy_parent_version_changes: tuple[VersionChange, ...]
+    genealogy_parent_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    genealogy_parent_touched_keys: tuple[Any, ...]
+    genealogy_parent_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
@@ -5821,6 +5859,228 @@ class LazyLineageNodeTable(_LazyInstitutionRecordTable):
         )
 
 
+class LazyGenealogyParentTable(LazyRecordTable):
+    """Bounded lazy child -> immutable parent tuple authority."""
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        dict.__init__(self)
+        self._session = session
+        self._store = session.store
+        self._pin = session.pin
+        self._namespace = GENEALOGY_PARENT_NAMESPACE
+        self._clean_limit = clean_limit
+        self._lru = OrderedDict()
+        self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence = {}
+        self._baseline_payload = {}
+        self._baseline_ordinal = {}
+        self._dirty = set()
+        self._removed = set()
+        self._new_keys = set()
+        self._reinserted = set()
+        self._overlay_ordinals = {}
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=LAZY_GENEALOGY_PARENT_SCHEMA,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def __getitem__(self, key):
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        if dict.__contains__(self, key):
+            self._lru.pop(key, None)
+            if key not in self._dirty:
+                self._lru[key] = None
+            return dict.__getitem__(self, key)
+        checked = self._store.read_version(
+            self._pin,
+            self._namespace,
+            key,
+            expected_record_schema=LAZY_GENEALOGY_PARENT_SCHEMA,
+        )
+        value = checked.value
+        if type(value) is not tuple or any(
+            type(parent) is not int for parent in value
+        ):
+            raise StoreFormatError(
+                "lazy genealogy parent payload is not an integer tuple"
+            )
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(value)
+        )
+        self._baseline_presence.setdefault(key, True)
+        dict.__setitem__(self, key, value)
+        self._loads += 1
+        if key not in self._dirty:
+            self._lru[key] = None
+        self._evict_clean()
+        return value
+
+    def __setitem__(self, key, value):
+        self._ensure_mutation()
+        if (
+            type(key) is not int
+            or type(value) is not tuple
+            or any(type(parent) is not int for parent in value)
+        ):
+            raise TypeError(
+                "genealogy parents require int -> tuple[int,...]"
+            )
+        baseline_exists = self._baseline_exists(key)
+        was_removed = key in self._removed
+        dict.__setitem__(self, key, value)
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+
+    def __delitem__(self, key):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        if dict.__contains__(self, key):
+            dict.__delitem__(self, key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        version_changes = []
+        effective_keys = []
+        structural_keys = []
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=LAZY_GENEALOGY_PARENT_SCHEMA,
+                        )
+                    )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+            value = dict.__getitem__(self, key)
+            payload = self._store.codec.encode(value)
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new or reinsertion or payload != self._baseline_bytes(key)
+            )
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        value,
+                        record_schema=LAZY_GENEALOGY_PARENT_SCHEMA,
+                        reinsertion=reinsertion,
+                    )
+                )
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+        return (
+            tuple(version_changes),
+            (),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in plan.genealogy_parent_touched_keys:
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                value = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(value)
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        "committed genealogy parent lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
+
+    def diagnostics(self):
+        return {
+            "logical_genealogy_parents": (
+                self._baseline_count
+                - len(self._removed)
+                + len(self._new_keys)
+            ),
+            "resident_genealogy_parents": dict.__len__(self),
+            "clean_cache_entries": len(self._lru),
+            "clean_cache_limit": self._clean_limit,
+            "genealogy_parent_payload_loads": self._loads,
+            "dirty_genealogy_parents": len(self._dirty),
+        }
+
+
 class _LazyMaterialContainerTable(LazyRecordTable):
     """Bounded lazy material index whose values are mutable list/set buckets."""
 
@@ -8185,6 +8445,10 @@ class LazyWorldSession:
         object.__setattr__(world.agency, "motives", self.motives)
         self.lineage_nodes = LazyLineageNodeTable(self)
         object.__setattr__(world.lineage, "nodes", self.lineage_nodes)
+        self.genealogy_parents = LazyGenealogyParentTable(self)
+        object.__setattr__(
+            world.genealogy, "parents", self.genealogy_parents
+        )
         self.social_edges = LazySocialEdgeTable(self)
         object.__setattr__(world.social, "edges", self.social_edges)
         self.social_adjacency = LazySocialAdjacencyTable(self)
@@ -11058,6 +11322,12 @@ class LazyWorldSession:
             lineage_node_touched_keys,
             lineage_node_structural_keys,
         ) = self.lineage_nodes.prepare_save_changes()
+        (
+            genealogy_parent_version_changes,
+            genealogy_parent_identity_changes,
+            genealogy_parent_touched_keys,
+            genealogy_parent_structural_keys,
+        ) = self.genealogy_parents.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -11104,6 +11374,8 @@ class LazyWorldSession:
             or skill_identity_changes
             or lineage_node_version_changes
             or lineage_node_identity_changes
+            or genealogy_parent_version_changes
+            or genealogy_parent_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -11130,6 +11402,7 @@ class LazyWorldSession:
             or social_partnership_structural_keys
             or skill_structural_keys
             or lineage_node_structural_keys
+            or genealogy_parent_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -11280,6 +11553,12 @@ class LazyWorldSession:
                 lineage_node_structural_keys,
                 "lineage nodes",
             ),
+            (
+                GENEALOGY_PARENT_NAMESPACE,
+                self.genealogy_parents,
+                genealogy_parent_structural_keys,
+                "genealogy parents",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -11327,6 +11606,7 @@ class LazyWorldSession:
             (SOCIAL_PARTNERSHIP_NAMESPACE, len(self.social_partnerships)),
             (SKILL_NAMESPACE, len(self.skills)),
             (LINEAGE_NODE_NAMESPACE, len(self.lineage_nodes)),
+            (GENEALOGY_PARENT_NAMESPACE, len(self.genealogy_parents)),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -11483,6 +11763,16 @@ class LazyWorldSession:
             lineage_node_identity_changes=lineage_node_identity_changes,
             lineage_node_touched_keys=lineage_node_touched_keys,
             lineage_node_structural_keys=lineage_node_structural_keys,
+            genealogy_parent_version_changes=(
+                genealogy_parent_version_changes
+            ),
+            genealogy_parent_identity_changes=(
+                genealogy_parent_identity_changes
+            ),
+            genealogy_parent_touched_keys=genealogy_parent_touched_keys,
+            genealogy_parent_structural_keys=(
+                genealogy_parent_structural_keys
+            ),
             layout_value=layout_value,
         )
 
@@ -12341,6 +12631,44 @@ class LazyWorldSession:
                 )
 
 
+    def _validate_genealogy_parent_successor(self, plan, generation):
+        for change in plan.genealogy_parent_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, GENEALOGY_PARENT_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted genealogy parent remains visible after save"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved genealogy parent is absent after save"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                GENEALOGY_PARENT_NAMESPACE,
+                typed_key,
+                row,
+                decode=False,
+            )
+            if (
+                schema != LAZY_GENEALOGY_PARENT_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved genealogy-parent evidence mismatch"
+                )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -12379,6 +12707,7 @@ class LazyWorldSession:
         self.social_partnerships._pin = result.pin
         self.skills._pin = result.pin
         self.lineage_nodes._pin = result.pin
+        self.genealogy_parents._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -12415,6 +12744,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_lineage_node_successor(
+            plan, result.generation
+        )
+        self._validate_genealogy_parent_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -12458,6 +12790,7 @@ class LazyWorldSession:
         self.social_partnerships.accept_save(plan, result.pin)
         self.skills.accept_save(plan, result.pin)
         self.lineage_nodes.accept_save(plan, result.pin)
+        self.genealogy_parents.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -12537,6 +12870,7 @@ class LazyWorldSession:
                     + plan.social_partnership_version_changes
                     + plan.skill_version_changes
                     + plan.lineage_node_version_changes
+                    + plan.genealogy_parent_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -12561,6 +12895,7 @@ class LazyWorldSession:
                     + plan.social_partnership_identity_changes
                     + plan.skill_identity_changes
                     + plan.lineage_node_identity_changes
+                    + plan.genealogy_parent_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
@@ -13034,6 +13369,25 @@ class LazyWorldSession:
         return detached
 
 
+    def _stage_detached_genealogy_parents(self):
+        expected = len(self.genealogy_parents)
+        detached = {}
+        for key in self.genealogy_parents:
+            value = self.genealogy_parents[key]
+            if type(value) is not tuple or any(
+                type(parent) is not int for parent in value
+            ):
+                raise StoreIntegrityError(
+                    "lazy detach encountered invalid genealogy parent tuple"
+                )
+            detached[key] = value
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach genealogy-parent count mismatch"
+            )
+        return detached
+
+
     def _stage_detached_institution_table(
         self, table, expected_type, label
     ):
@@ -13166,6 +13520,7 @@ class LazyWorldSession:
         detached_social_partnerships,
         detached_skills,
         detached_lineage_nodes,
+        detached_genealogy_parents,
         advancement_records,
         assignments,
         cache_removals,
@@ -13287,6 +13642,7 @@ class LazyWorldSession:
         self.social_partnerships = detached_social_partnerships
         self.skills = detached_skills
         self.lineage_nodes = detached_lineage_nodes
+        self.genealogy_parents = detached_genealogy_parents
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -13417,6 +13773,9 @@ class LazyWorldSession:
                 skill_nested_assignments,
             ) = self._stage_detached_skills(mutable_replacements)
             detached_lineage_nodes = self._stage_detached_lineage_nodes()
+            detached_genealogy_parents = (
+                self._stage_detached_genealogy_parents()
+            )
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -13455,6 +13814,9 @@ class LazyWorldSession:
                         ),
                         id(self.skills): detached_skills,
                         id(self.lineage_nodes): detached_lineage_nodes,
+                        id(self.genealogy_parents): (
+                            detached_genealogy_parents
+                        ),
                         **mutable_replacements,
                     },
                 )
@@ -13506,6 +13868,7 @@ class LazyWorldSession:
                 detached_social_partnerships,
                 detached_skills,
                 detached_lineage_nodes,
+                detached_genealogy_parents,
                 advancement_records,
                 assignments,
                 cache_removals,
@@ -13548,6 +13911,7 @@ class LazyWorldSession:
             "social_partnerships": self.social_partnerships.diagnostics(),
             "skills": self.skills.diagnostics(),
             "lineage_nodes": self.lineage_nodes.diagnostics(),
+            "genealogy_parents": self.genealogy_parents.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
@@ -13707,6 +14071,7 @@ def open_lazy_world_session(path, *, rules_id):
                     SOCIAL_PARTNERSHIP_NAMESPACE,
                     SKILL_NAMESPACE,
                     LINEAGE_NODE_NAMESPACE,
+                    GENEALOGY_PARENT_NAMESPACE,
                 },
             )
             _validate_head_inventory(
