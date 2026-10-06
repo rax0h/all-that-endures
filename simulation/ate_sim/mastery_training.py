@@ -8,9 +8,10 @@ from dataclasses import dataclass,field
 import hashlib
 from .core_types import layer_ref
 from .magic_progression import record_application
+from .record_index import IndexedRecord
 
 @dataclass
-class ResponseModel:
+class ResponseModel(IndexedRecord):
     samples:list=field(default_factory=list)
     coefficients:list=field(default_factory=list)
     trials:int=0
