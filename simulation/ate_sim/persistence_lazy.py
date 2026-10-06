@@ -2814,6 +2814,8 @@ class LazyRecordTable(RecordTable):
         self._namespace = PEOPLE_NAMESPACE
         self._clean_limit = clean_limit
         self._lru = _StepAwareLRU(session)
+        self._alive_query_cache = _StepAwareLRU(session)
+        self._query_caches = (self._alive_query_cache,)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -2952,6 +2954,45 @@ class LazyRecordTable(RecordTable):
         self._evict_clean()
         return record
 
+    def _cached_query_keys(self, cache, index_name, value):
+        # Query memberships are immutable for one captured generation.
+        # During Simulation.run, cache only that pinned baseline; unsaved
+        # mutations are still overlaid by each table's touched-owner logic.
+        if not getattr(self._session, "_hot_run_depth", 0):
+            return self._store.query_keys(
+                self._pin, self._namespace, index_name, value
+            )
+        cache_key = (
+            self._pin.captured_head,
+            index_name,
+            self._store.codec.encode(value),
+        )
+        try:
+            rows = cache.pop(cache_key)
+        except KeyError:
+            rows = self._store.query_keys(
+                self._pin, self._namespace, index_name, value
+            )
+        cache[cache_key] = rows
+        return rows
+
+    def _prune_query_caches(self, epoch=None, *, retain_hot=False):
+        for cache in getattr(self, "_query_caches", ()):
+            if epoch is None:
+                limit = self._clean_limit
+            else:
+                touched = cache.touched(epoch)
+                touched.intersection_update(cache.keys())
+                limit = (
+                    max(self._clean_limit, len(touched))
+                    if retain_hot
+                    else self._clean_limit
+                )
+            while len(cache) > limit:
+                cache.popitem(last=False)
+            if epoch is not None:
+                cache.finish_step(epoch)
+
     def _evict_clean(self):
         tracker = getattr(self._session, "_eager_tracker", None)
         if tracker is not None and tracker._cold_step_depth:
@@ -2966,6 +3007,7 @@ class LazyRecordTable(RecordTable):
                 continue
             if dict.__contains__(self, key):
                 dict.__delitem__(self, key)
+        self._prune_query_caches()
 
     def _finish_simulation_step(self, epoch, *, retain_hot):
         touched = self._lru.touched(epoch)
@@ -2990,6 +3032,7 @@ class LazyRecordTable(RecordTable):
                 dict.__delitem__(self, key)
         self._last_step_hot_entries = len(touched) if retain_hot else 0
         self._lru.finish_step(epoch)
+        self._prune_query_caches(epoch, retain_hot=retain_hot)
 
     def keys(self):
         return KeysView(self)
@@ -3022,8 +3065,8 @@ class LazyRecordTable(RecordTable):
             )
         desired = values[0]
         baseline = set(
-            self._store.query_keys(
-                self._pin, self._namespace, "alive", desired
+            self._cached_query_keys(
+                self._alive_query_cache, "alive", desired
             )
         )
         touched = self._dirty | self._new_keys | self._reinserted | self._removed
@@ -4313,6 +4356,8 @@ class LazySocialEdgeTable(LazyRecordTable):
         self._namespace = SOCIAL_EDGE_NAMESPACE
         self._clean_limit = clean_limit
         self._lru = _StepAwareLRU(session)
+        self._person_query_cache = _StepAwareLRU(session)
+        self._query_caches = (self._person_query_cache,)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -4496,8 +4541,8 @@ class LazySocialEdgeTable(LazyRecordTable):
     def ids_for_person(self, person):
         self._ensure()
         baseline = set(
-            self._store.query_keys(
-                self._pin, self._namespace, "person", person
+            self._cached_query_keys(
+                self._person_query_cache, "person", person
             )
         )
         touched = self._effective_touched()
@@ -4962,6 +5007,8 @@ class LazySocialPartnershipTable(LazyRecordTable):
         self._namespace = SOCIAL_PARTNERSHIP_NAMESPACE
         self._clean_limit = clean_limit
         self._lru = _StepAwareLRU(session)
+        self._person_query_cache = _StepAwareLRU(session)
+        self._query_caches = (self._person_query_cache,)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -5079,8 +5126,8 @@ class LazySocialPartnershipTable(LazyRecordTable):
     def ids_for_person(self, person):
         self._ensure()
         baseline = set(
-            self._store.query_keys(
-                self._pin, self._namespace, "person", person
+            self._cached_query_keys(
+                self._person_query_cache, "person", person
             )
         )
         touched = self._effective_touched()
