@@ -3507,6 +3507,7 @@ class LazyAspirationTable(LazyRecordTable):
             object.__setattr__(live, "_index_table", weakref.ref(self))
             object.__setattr__(live, "_index_key", key)
         self._dirty.add(key)
+        self._index_touched_edge(key)
         self._lru.pop(key, None)
 
     def __setitem__(self, key, record):
@@ -4379,6 +4380,10 @@ class LazySocialEdgeTable(LazyRecordTable):
         self._reinserted = set()
         self._overlay_ordinals = {}
         self._pending_history_old = {}
+        # Unsaved social-edge changes are indexed by endpoint so person-scoped
+        # queries overlay only relevant touched edges instead of scanning every
+        # touched relationship accumulated since the last save.
+        self._touched_by_person = {}
 
     def _baseline_bytes(self, key):
         if key not in self._baseline_payload:
@@ -4440,6 +4445,14 @@ class LazySocialEdgeTable(LazyRecordTable):
             self._lru[key] = None
         self._evict_clean()
         return record
+
+    def _index_touched_edge(self, key):
+        people = set(key if type(key) is tuple else ())
+        if dict.__contains__(self, key):
+            record = dict.__getitem__(self, key)
+            people.update((record.a, record.b))
+        for person in people:
+            self._touched_by_person.setdefault(person, set()).add(key)
 
     def preflight_change(self, key, field=None):
         self._ensure_mutation()
@@ -4506,6 +4519,7 @@ class LazySocialEdgeTable(LazyRecordTable):
                 self._overlay_ordinals[key] = self._next_overlay_ordinal
                 self._next_overlay_ordinal += 1
         self._dirty.add(key)
+        self._index_touched_edge(key)
         self._lru.pop(key, None)
 
     def __delitem__(self, key):
@@ -4531,6 +4545,7 @@ class LazySocialEdgeTable(LazyRecordTable):
         else:
             self._new_keys.discard(key)
             self._overlay_ordinals.pop(key, None)
+        self._index_touched_edge(key)
 
     def _memberships(self, record, ordinal):
         return tuple(
@@ -4545,7 +4560,7 @@ class LazySocialEdgeTable(LazyRecordTable):
                 self._person_query_cache, "person", person
             )
         )
-        touched = self._effective_touched()
+        touched = self._touched_by_person.get(person, ())
         baseline.difference_update(touched)
         for key in touched:
             if not self._visible(key):
@@ -4692,6 +4707,7 @@ class LazySocialEdgeTable(LazyRecordTable):
         self._reinserted.clear()
         self._overlay_ordinals.clear()
         self._pending_history_old.clear()
+        self._touched_by_person.clear()
         self._lru.clear()
         for key in list(dict.keys(self)):
             self._lru[key] = None
