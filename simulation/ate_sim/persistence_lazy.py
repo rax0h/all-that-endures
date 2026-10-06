@@ -13454,6 +13454,7 @@ class LazyWorldSession:
                             detached_social_partnerships
                         ),
                         id(self.skills): detached_skills,
+                        id(self.lineage_nodes): detached_lineage_nodes,
                         **mutable_replacements,
                     },
                 )
