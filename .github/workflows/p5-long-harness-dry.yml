@@ -1,0 +1,33 @@
+name: P5 long harness dry run
+on:
+  push:
+    branches: [sol-stage-0-5-p5-long-prep]
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dry-run endurance harness
+        run: |
+          PRODUCT_SHA="$(git rev-parse HEAD^)"
+          python simulation/persistence_p5_long_validation.py \
+            --seed 843000 \
+            --milestones 4 7 10 \
+            --bootstrap-year 3 \
+            --workdir p5-long-dry \
+            --output p5-long-dry.json \
+            --product-sha "$PRODUCT_SHA" \
+            --workflow-sha "$GITHUB_SHA"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p5-long-dry-run
+          path: |
+            p5-long-dry.json
+            p5-long-dry/p5-long-restore.sqlite
+          compression-level: 0
