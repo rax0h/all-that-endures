@@ -1,5 +1,7 @@
 name: simulation
 on:
+  push:
+    branches: [sim/stage-0-5-stabilization]
   pull_request:
     branches: [main]
 
