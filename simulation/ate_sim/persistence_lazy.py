@@ -2649,6 +2649,10 @@ class LazyPeopleSavePlan:
     genealogy_child_identity_changes: tuple[IdentityOccurrenceChange, ...]
     genealogy_child_touched_keys: tuple[Any, ...]
     genealogy_child_structural_keys: tuple[Any, ...]
+    community_membership_version_changes: tuple[VersionChange, ...]
+    community_membership_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    community_membership_touched_keys: tuple[Any, ...]
+    community_membership_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
@@ -11894,6 +11898,12 @@ class LazyWorldSession:
             genealogy_child_touched_keys,
             genealogy_child_structural_keys,
         ) = self.genealogy_children.prepare_save_changes()
+        (
+            community_membership_version_changes,
+            community_membership_identity_changes,
+            community_membership_touched_keys,
+            community_membership_structural_keys,
+        ) = self.community_memberships.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -11944,6 +11954,8 @@ class LazyWorldSession:
             or genealogy_parent_identity_changes
             or genealogy_child_version_changes
             or genealogy_child_identity_changes
+            or community_membership_version_changes
+            or community_membership_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -11972,6 +11984,7 @@ class LazyWorldSession:
             or lineage_node_structural_keys
             or genealogy_parent_structural_keys
             or genealogy_child_structural_keys
+            or community_membership_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -12134,6 +12147,12 @@ class LazyWorldSession:
                 genealogy_child_structural_keys,
                 "genealogy children",
             ),
+            (
+                COMMUNITY_MEMBERSHIP_NAMESPACE,
+                self.community_memberships,
+                community_membership_structural_keys,
+                "community memberships",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -12183,6 +12202,10 @@ class LazyWorldSession:
             (LINEAGE_NODE_NAMESPACE, len(self.lineage_nodes)),
             (GENEALOGY_PARENT_NAMESPACE, len(self.genealogy_parents)),
             (GENEALOGY_CHILD_NAMESPACE, len(self.genealogy_children)),
+            (
+                COMMUNITY_MEMBERSHIP_NAMESPACE,
+                len(self.community_memberships),
+            ),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -12358,6 +12381,18 @@ class LazyWorldSession:
             genealogy_child_touched_keys=genealogy_child_touched_keys,
             genealogy_child_structural_keys=(
                 genealogy_child_structural_keys
+            ),
+            community_membership_version_changes=(
+                community_membership_version_changes
+            ),
+            community_membership_identity_changes=(
+                community_membership_identity_changes
+            ),
+            community_membership_touched_keys=(
+                community_membership_touched_keys
+            ),
+            community_membership_structural_keys=(
+                community_membership_structural_keys
             ),
             layout_value=layout_value,
         )
@@ -13311,6 +13346,54 @@ class LazyWorldSession:
                 )
 
 
+    def _validate_community_membership_successor(
+        self, plan, generation
+    ):
+        for change in plan.community_membership_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, COMMUNITY_MEMBERSHIP_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted community membership remains visible"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved community membership is absent"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                COMMUNITY_MEMBERSHIP_NAMESPACE,
+                typed_key,
+                row,
+                decode=False,
+            )
+            expected_memberships = tuple(
+                (
+                    member.index_name,
+                    member.value,
+                    member.ordinal,
+                )
+                for member in change.memberships
+            )
+            if (
+                schema != LAZY_COMMUNITY_MEMBERSHIP_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships != expected_memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved community-membership evidence mismatch"
+                )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -13351,6 +13434,7 @@ class LazyWorldSession:
         self.lineage_nodes._pin = result.pin
         self.genealogy_parents._pin = result.pin
         self.genealogy_children._pin = result.pin
+        self.community_memberships._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -13393,6 +13477,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_genealogy_child_successor(
+            plan, result.generation
+        )
+        self._validate_community_membership_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -13438,6 +13525,7 @@ class LazyWorldSession:
         self.lineage_nodes.accept_save(plan, result.pin)
         self.genealogy_parents.accept_save(plan, result.pin)
         self.genealogy_children.accept_save(plan, result.pin)
+        self.community_memberships.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -13519,6 +13607,7 @@ class LazyWorldSession:
                     + plan.lineage_node_version_changes
                     + plan.genealogy_parent_version_changes
                     + plan.genealogy_child_version_changes
+                    + plan.community_membership_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -13545,6 +13634,7 @@ class LazyWorldSession:
                     + plan.lineage_node_identity_changes
                     + plan.genealogy_parent_identity_changes
                     + plan.genealogy_child_identity_changes
+                    + plan.community_membership_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
@@ -14166,6 +14256,28 @@ class LazyWorldSession:
         return detached
 
 
+    def _stage_detached_community_memberships(self):
+        expected = len(self.community_memberships)
+        detached = {}
+        for key in self.community_memberships:
+            value = self.community_memberships[key]
+            if (
+                type(key) is not tuple
+                or len(key) != 2
+                or any(type(part) is not int for part in key)
+                or type(value) not in (int, float)
+            ):
+                raise StoreIntegrityError(
+                    "lazy detach encountered invalid community membership"
+                )
+            detached[key] = value
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach community-membership count mismatch"
+            )
+        return detached
+
+
     def _publish_materialized_detach(
         self,
         old_log,
@@ -14194,6 +14306,7 @@ class LazyWorldSession:
         detached_lineage_nodes,
         detached_genealogy_parents,
         detached_genealogy_children,
+        detached_community_memberships,
         advancement_records,
         assignments,
         cache_removals,
@@ -14317,6 +14430,8 @@ class LazyWorldSession:
         self.lineage_nodes = detached_lineage_nodes
         self.genealogy_parents = detached_genealogy_parents
         self.genealogy_children = detached_genealogy_children
+        self.community_memberships = detached_community_memberships
+        self.world.communities.__dict__.pop("_membership_index", None)
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -14456,6 +14571,9 @@ class LazyWorldSession:
             ) = self._stage_detached_genealogy_children(
                 mutable_replacements
             )
+            detached_community_memberships = (
+                self._stage_detached_community_memberships()
+            )
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -14499,6 +14617,9 @@ class LazyWorldSession:
                         ),
                         id(self.genealogy_children): (
                             detached_genealogy_children
+                        ),
+                        id(self.community_memberships): (
+                            detached_community_memberships
                         ),
                         **mutable_replacements,
                     },
@@ -14553,6 +14674,7 @@ class LazyWorldSession:
                 detached_lineage_nodes,
                 detached_genealogy_parents,
                 detached_genealogy_children,
+                detached_community_memberships,
                 advancement_records,
                 assignments,
                 cache_removals,
@@ -14597,6 +14719,9 @@ class LazyWorldSession:
             "lineage_nodes": self.lineage_nodes.diagnostics(),
             "genealogy_parents": self.genealogy_parents.diagnostics(),
             "genealogy_children": self.genealogy_children.diagnostics(),
+            "community_memberships": (
+                self.community_memberships.diagnostics()
+            ),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
