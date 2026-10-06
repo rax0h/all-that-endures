@@ -57,3 +57,25 @@ list mutation and whole-list replacement dirty only that skill owner.
   fixed point mutation/save bounded.
 
 After focused + scaling + affected gates, rerun residual inventory.
+
+
+## Focused and scaling evidence
+
+Product implementation head: `6c943bc883bfb5d06eb439d7141d1bca3818a584`.
+
+Focused run `37412669585` passed **8/8 in 27.49s**.
+
+Scaling run `37412803730` passed the 1,000/10,000 bounded-work proof:
+
+| Measure | 1,000 skills | 10,000 skills |
+| --- | ---: | ---: |
+| ordinary-open payload reads | 33 | 33 |
+| ordinary-open payload bytes | 16,658 | 16,660 |
+| point payload reads | 1 | 1 |
+| point payload bytes | 246 | 246 |
+| one-skill save payload writes | 3 | 3 |
+| one-skill save payload bytes | 409 | 409 |
+| resident skills | 1 | 1 |
+
+The broad affected P4 regression gate is still required before P4.10 is
+accepted closed.
