@@ -31,6 +31,10 @@ IDENTITY_LINKS = 'world_identity_links'
 IDENTITY_LINK_SCHEMA = 1
 IDENTITY_STORAGE_CURRENT = 'current-links/v1'
 COLLECTION_LAYOUT = 'collections/v1'
+AGENCY_ACTIONS_NAMESPACE = 'world.agency.actions'
+PACKED_LIST_KIND = 'list-packed/v1'
+PACKED_LIST_KEY = '__packed__'
+PACKED_LIST_PAYLOAD = 'packed-list/v1'
 # Explicitly reviewed rebuildable state. Unknown non-fields fail closed.
 CACHES = {
     World: {'_living_cache'},
@@ -353,13 +357,35 @@ def _restore_collection(store, namespace, expected, description):
         raise StoreFormatError(f'invalid collection description: {namespace}')
     kind, size, chunks = description
     allowed = {'dict': ('dict', 'RecordTable', 'dict-stable/v1', 'RecordTable-stable/v1'),
-               'list': ('list',), 'set': ('set', 'set-stable/v1'),
+               'list': ('list', PACKED_LIST_KIND), 'set': ('set', 'set-stable/v1'),
                'events': ('list', 'EventLog'), 'int': ('int',)}[expected]
     if kind not in allowed or type(size) is not int or size < 0 or type(chunks) is not int or chunks < 0:
         raise StoreFormatError(f'invalid collection kind/count: {namespace}')
     if kind != 'EventLog' and chunks != 0:
         raise StoreFormatError('unexpected event segments')
     rows = store.read_records(namespace, expected_record_schema=RECORD_SCHEMA)
+    if kind == PACKED_LIST_KIND:
+        if namespace != AGENCY_ACTIONS_NAMESPACE:
+            raise StoreFormatError('packed list kind is reserved for agency actions')
+        if len(rows) != 1:
+            raise StoreIntegrityError(
+                f'missing/extra packed collection rows: {namespace}'
+            )
+        key, envelope, _schema = rows[0]
+        if key != PACKED_LIST_KEY or type(envelope) is not tuple or len(envelope) != 2:
+            raise StoreFormatError('invalid packed list envelope')
+        ordinal, payload = envelope
+        if (
+            ordinal != 0
+            or type(payload) is not tuple
+            or len(payload) != 2
+            or payload[0] != PACKED_LIST_PAYLOAD
+            or type(payload[1]) is not tuple
+            or len(payload[1]) != size
+            or any(type(item) is not agency.ActionRecord for item in payload[1])
+        ):
+            raise StoreIntegrityError('invalid packed agency action tail')
+        return list(payload[1])
     if len(rows) != size:
         raise StoreIntegrityError(f'missing/extra collection rows: {namespace}')
     stable = kind in ('dict-stable/v1', 'RecordTable-stable/v1', 'set-stable/v1')
