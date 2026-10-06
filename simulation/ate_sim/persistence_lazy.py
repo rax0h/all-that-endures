@@ -8266,6 +8266,12 @@ class LazyWorldSession:
             soul_touched_keys,
             soul_structural_keys,
         ) = self.souls.prepare_save_changes()
+        (
+            advancement_version_changes,
+            advancement_identity_changes,
+            advancement_touched_keys,
+            advancement_structural_keys,
+        ) = self.advancement_paths.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -8290,6 +8296,8 @@ class LazyWorldSession:
             or treasury_identity_changes
             or soul_version_changes
             or soul_identity_changes
+            or advancement_version_changes
+            or advancement_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -8305,6 +8313,7 @@ class LazyWorldSession:
             or wallet_structural_keys
             or treasury_structural_keys
             or soul_structural_keys
+            or advancement_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -8389,6 +8398,12 @@ class LazyWorldSession:
                 soul_structural_keys,
                 "metaphysics souls",
             ),
+            (
+                ADVANCEMENT_NAMESPACE,
+                self.advancement_paths,
+                advancement_structural_keys,
+                "advancement paths",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -8416,6 +8431,7 @@ class LazyWorldSession:
             (WALLET_NAMESPACE, len(self.wallets)),
             (TREASURY_NAMESPACE, len(self.treasuries)),
             (SOUL_NAMESPACE, len(self.souls)),
+            (ADVANCEMENT_NAMESPACE, len(self.advancement_paths)),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -8492,6 +8508,10 @@ class LazyWorldSession:
             soul_identity_changes=soul_identity_changes,
             soul_touched_keys=soul_touched_keys,
             soul_structural_keys=soul_structural_keys,
+            advancement_version_changes=advancement_version_changes,
+            advancement_identity_changes=advancement_identity_changes,
+            advancement_touched_keys=advancement_touched_keys,
+            advancement_structural_keys=advancement_structural_keys,
             layout_value=layout_value,
         )
 
