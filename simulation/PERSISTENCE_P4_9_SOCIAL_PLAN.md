@@ -115,5 +115,9 @@ The fixed queries returned exactly the same results at both sizes:
 relationships `[(1,2),(1,3)]`, neighbors `[2,3]`, and living partnership
 `{(1,2): 2000001}`.
 
-The broad affected P4 regression gate is still required before P4.9 is
-accepted closed.
+Affected P4 regression run `37411415039` passed **266/266 in 145.29s
+(2:25)**. P4.9 is accepted closed on product head
+`724dfd57a40bdfde252ba863f992f0a1704f44ad`.
+
+Next action: rerun the residual eager inventory and choose the next migration
+strictly by measured remaining archive cost.
