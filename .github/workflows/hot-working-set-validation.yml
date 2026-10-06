@@ -1,0 +1,40 @@
+name: Hot working set validation
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-hot-working-set
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Focused lazy persistence regressions
+        run: |
+          python -m pytest -q             simulation/tests/test_persistence_lazy_people.py             simulation/tests/test_persistence_lazy_social.py             simulation/tests/test_persistence_lazy_skills.py             simulation/tests/test_persistence_lazy_communities.py             simulation/tests/test_persistence_lazy_souls.py
+      - name: Integrated P5 dry benchmark
+        run: |
+          python simulation/persistence_p5_long_validation.py             --seed 843000             --milestones 4 7 10             --bootstrap-year 3             --workdir p5-hot-dry             --output p5-hot-dry.json             --product-sha "$GITHUB_SHA"             --workflow-sha "$GITHUB_SHA"
+      - name: Print compact P5 metrics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("p5-hot-dry.json").read_text())
+          print("control_wall_seconds", data["control_wall_seconds"])
+          for year,row in data["p4"].items():
+              print(
+                  year,
+                  "simulation_seconds", row["simulation_seconds"],
+                  "payload_reads", row["simulation_io"]["payload_reads"],
+                  "save_seconds", row["save_seconds"],
+                  "reopen_digest_seconds", row["reopen_digest_seconds"],
+              )
+          PY
