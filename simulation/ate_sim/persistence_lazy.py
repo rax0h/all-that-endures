@@ -1430,25 +1430,48 @@ def _seed_cross_boundary_lazy_identity(session, links):
             eager_path,
             mutable_event_tail_only=True,
         )
-        if (
-            namespace in {WALLET_NAMESPACE, TREASURY_NAMESPACE}
-            and type(eager_object) is dict
-        ):
-            eager_object = LazyTrackedDict(eager_object)
-            _relative_set(session.world, eager_path, eager_object)
-        if not isinstance(eager_object, expected_type):
-            raise StoreIntegrityError(
-                "cross-boundary lazy identity resolves to wrong type"
-            )
         incarnation = IncarnationId(
             session.store.store_identity, int(row[0])
         )
         live = session._registry.object_for_incarnation(incarnation)
-        if live is not None and live is not eager_object:
-            raise StoreIntegrityError(
-                "cross-boundary incarnation has two live objects"
-            )
-        if live is None:
+        if live is not None:
+            if not isinstance(live, expected_type):
+                raise StoreIntegrityError(
+                    "cross-boundary incarnation has wrong live type"
+                )
+            if eager_object is not live:
+                _relative_set(session.world, eager_path, live)
+            eager_object = live
+        else:
+            if (
+                namespace in {WALLET_NAMESPACE, TREASURY_NAMESPACE}
+                and type(eager_object) is dict
+            ):
+                eager_object = LazyTrackedDict(eager_object)
+                _relative_set(session.world, eager_path, eager_object)
+            elif namespace == SOUL_NAMESPACE and relative:
+                if relative in (
+                    (("field", "authorities"),),
+                    (("field", "marks"),),
+                ) and type(eager_object) is set:
+                    eager_object = LazySoulTrackedSet(eager_object)
+                    _relative_set(session.world, eager_path, eager_object)
+                elif (
+                    relative == (("field", "cosmic_links"),)
+                    and type(eager_object) is dict
+                ):
+                    eager_object = LazyTrackedDict(eager_object)
+                    _relative_set(session.world, eager_path, eager_object)
+                elif (
+                    relative == (("field", "transformations"),)
+                    and type(eager_object) is list
+                ):
+                    eager_object = LazySoulTrackedList(eager_object)
+                    _relative_set(session.world, eager_path, eager_object)
+            if not isinstance(eager_object, expected_type):
+                raise StoreIntegrityError(
+                    "cross-boundary lazy identity resolves to wrong type"
+                )
             session._registry.bind(
                 eager_object, incarnation=incarnation
             )
@@ -1463,6 +1486,7 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 RESOURCE_NAMESPACE: session.resources,
                 MATERIAL_LOT_NAMESPACE: session.material_lots,
                 MATERIAL_ITEM_NAMESPACE: session.material_items,
+                SOUL_NAMESPACE: session.souls,
             }.get(namespace)
             if table is None:
                 raise StoreIntegrityError(
@@ -1591,6 +1615,10 @@ class LazyPeopleSavePlan:
     treasury_identity_changes: tuple[IdentityOccurrenceChange, ...]
     treasury_touched_keys: tuple[Any, ...]
     treasury_structural_keys: tuple[Any, ...]
+    soul_version_changes: tuple[VersionChange, ...]
+    soul_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    soul_touched_keys: tuple[Any, ...]
+    soul_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
@@ -5366,6 +5394,8 @@ class LazyWorldSession:
             "treasury",
         )
         object.__setattr__(world.currency, "treasuries", self.treasuries)
+        self.souls = LazySoulTable(self)
+        object.__setattr__(world.metaphysics, "souls", self.souls)
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
@@ -5444,6 +5474,7 @@ class LazyWorldSession:
                     MagicResource,
                     MaterialLot,
                     CraftedItem,
+                    SoulState,
                 ),
             )
             and field in RECORD_FIELDS.get(type(subject), ())
@@ -6503,6 +6534,277 @@ class LazyWorldSession:
         wrapper._attach(table, key)
         table._baseline_incarnation[key] = incarnation.value
         return wrapper
+
+
+    def _soul_occurrence(self, key, path=()):
+        return Occurrence(SOUL_NAMESPACE, key, tuple(path))
+
+    def _live_soul_for_key(self, key):
+        incarnation = self._registry.incarnation_for_occurrence(
+            self._soul_occurrence(key)
+        )
+        if incarnation is None:
+            return None
+        value = self._registry.object_for_incarnation(incarnation)
+        return value if isinstance(value, SoulState) else None
+
+    def _bind_soul_set(self, key, field, values, *, incarnation=None):
+        occurrence = self._soul_occurrence(
+            key, LazySoulTable._nested_paths[field]
+        )
+        if incarnation is not None:
+            live = self._registry.object_for_incarnation(incarnation)
+            if live is not None:
+                if not isinstance(live, LazySoulTrackedSet):
+                    raise StoreIntegrityError(
+                        "soul set incarnation is bound to wrong live type"
+                    )
+                live._attach(self.souls, key, field)
+                self._registry.attach_existing(incarnation, occurrence)
+                return live
+        wrapper = (
+            values if isinstance(values, LazySoulTrackedSet)
+            else LazySoulTrackedSet(values)
+        )
+        wrapper._attach(self.souls, key, field)
+        existing = self._registry.incarnation_for_object(wrapper)
+        if incarnation is not None:
+            if existing is None:
+                self._registry.bind(
+                    wrapper, occurrence, incarnation=incarnation
+                )
+            elif existing != incarnation:
+                raise StoreIntegrityError(
+                    "soul set bound to wrong incarnation"
+                )
+            self._registry.attach_existing(incarnation, occurrence)
+        else:
+            if existing is None:
+                self._registry.bind(wrapper, occurrence)
+            else:
+                self._registry.attach_occurrence(wrapper, occurrence)
+        return wrapper
+
+    def _bind_soul_dict(self, key, field, values, *, incarnation=None):
+        occurrence = self._soul_occurrence(
+            key, LazySoulTable._nested_paths[field]
+        )
+        if incarnation is not None:
+            live = self._registry.object_for_incarnation(incarnation)
+            if live is not None:
+                if not isinstance(live, LazyTrackedDict):
+                    raise StoreIntegrityError(
+                        "soul dict incarnation is bound to wrong live type"
+                    )
+                live._attach(self.souls, key)
+                self._registry.attach_existing(incarnation, occurrence)
+                return live
+        wrapper = (
+            values if isinstance(values, LazyTrackedDict)
+            else LazyTrackedDict(values)
+        )
+        wrapper._attach(self.souls, key)
+        existing = self._registry.incarnation_for_object(wrapper)
+        if incarnation is not None:
+            if existing is None:
+                self._registry.bind(
+                    wrapper, occurrence, incarnation=incarnation
+                )
+            elif existing != incarnation:
+                raise StoreIntegrityError(
+                    "soul dict bound to wrong incarnation"
+                )
+            self._registry.attach_existing(incarnation, occurrence)
+        else:
+            if existing is None:
+                self._registry.bind(wrapper, occurrence)
+            else:
+                self._registry.attach_occurrence(wrapper, occurrence)
+        return wrapper
+
+    def _bind_soul_list(self, key, field, values, *, incarnation=None):
+        occurrence = self._soul_occurrence(
+            key, LazySoulTable._nested_paths[field]
+        )
+        if incarnation is not None:
+            live = self._registry.object_for_incarnation(incarnation)
+            if live is not None:
+                if not isinstance(live, LazySoulTrackedList):
+                    raise StoreIntegrityError(
+                        "soul list incarnation is bound to wrong live type"
+                    )
+                live._attach(self.souls, key, field)
+                self._registry.attach_existing(incarnation, occurrence)
+                return live
+        wrapper = (
+            values if isinstance(values, LazySoulTrackedList)
+            else LazySoulTrackedList(values)
+        )
+        wrapper._attach(self.souls, key, field)
+        existing = self._registry.incarnation_for_object(wrapper)
+        if incarnation is not None:
+            if existing is None:
+                self._registry.bind(
+                    wrapper, occurrence, incarnation=incarnation
+                )
+            elif existing != incarnation:
+                raise StoreIntegrityError(
+                    "soul list bound to wrong incarnation"
+                )
+            self._registry.attach_existing(incarnation, occurrence)
+        else:
+            if existing is None:
+                self._registry.bind(wrapper, occurrence)
+            else:
+                self._registry.attach_occurrence(wrapper, occurrence)
+        return wrapper
+
+    def _bind_soul_nested(self, key, field, value, *, incarnation=None):
+        if field in ("authorities", "marks"):
+            return self._bind_soul_set(
+                key, field, value, incarnation=incarnation
+            )
+        if field == "cosmic_links":
+            return self._bind_soul_dict(
+                key, field, value, incarnation=incarnation
+            )
+        if field == "transformations":
+            return self._bind_soul_list(
+                key, field, value, incarnation=incarnation
+            )
+        raise StoreIntegrityError("unknown nested soul field")
+
+    def _soul_incarnation_labels(self, key, soul):
+        labels = {}
+        top = self._registry.incarnation_for_object(soul)
+        if top is None:
+            raise StoreIntegrityError(
+                "lazy soul has no top-level incarnation"
+            )
+        labels[()] = top.value
+        for field, path in LazySoulTable._nested_paths.items():
+            value = getattr(soul, field)
+            incarnation = self._registry.incarnation_for_object(value)
+            if incarnation is None:
+                raise StoreIntegrityError(
+                    f"lazy soul field {field} has no incarnation"
+                )
+            labels[path] = incarnation.value
+        return labels
+
+    def _bind_assigned_soul(self, key, soul):
+        existing = self._registry.incarnation_for_object(soul)
+        if existing is None:
+            existing = self._registry.bind(soul)
+        self._registry.attach_occurrence(
+            soul, self._soul_occurrence(key)
+        )
+        for field in LazySoulTable._nested_paths:
+            value = getattr(soul, field)
+            wrapper = self._bind_soul_nested(key, field, value)
+            if wrapper is not value:
+                object.__setattr__(soul, field, wrapper)
+        return soul
+
+    def _detach_soul_child_binding(self, key, field, value):
+        path = LazySoulTable._nested_paths[field]
+        occurrence = self._soul_occurrence(key, path)
+        incarnation = self._registry.incarnation_for_object(value)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
+        if isinstance(value, LazySoulTrackedSet):
+            value._detach(self.souls, key, field)
+        elif isinstance(value, LazySoulTrackedList):
+            value._detach(self.souls, key, field)
+        elif isinstance(value, LazyTrackedDict):
+            value._detach(self.souls, key)
+
+    def _detach_assigned_soul(self, key, soul):
+        labels = self._soul_incarnation_labels(key, soul)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            self._registry.detach_occurrence(
+                self._soul_occurrence(key, path),
+                expected=incarnation,
+            )
+        for field in LazySoulTable._nested_paths:
+            value = getattr(soul, field)
+            if isinstance(value, LazySoulTrackedSet):
+                value._detach(self.souls, key, field)
+            elif isinstance(value, LazySoulTrackedList):
+                value._detach(self.souls, key, field)
+            elif isinstance(value, LazyTrackedDict):
+                value._detach(self.souls, key)
+
+    def _detach_unloaded_soul(self, key):
+        labels = self.souls._baseline_labels(key)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            occurrence = self._soul_occurrence(key, path)
+            self._registry.attach_existing(incarnation, occurrence)
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
+
+    def _replace_soul_nested(self, key, soul, field, old, new):
+        self._detach_soul_child_binding(key, field, old)
+        replacement = self._bind_soul_nested(key, field, new)
+        if replacement is not new:
+            object.__setattr__(soul, field, replacement)
+
+    def _bind_loaded_soul(self, key, soul):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, SOUL_NAMESPACE, key
+            )
+        )
+        expected_paths = {
+            (),
+            *LazySoulTable._nested_paths.values(),
+        }
+        if set(labels) != expected_paths:
+            raise StoreIntegrityError(
+                "lazy soul occurrence labels are incomplete or extra"
+            )
+        top_incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(top_incarnation)
+        if live is not None:
+            if not isinstance(live, SoulState):
+                raise StoreIntegrityError(
+                    "soul incarnation is bound to wrong live type"
+                )
+            result = live
+        else:
+            result = soul
+            self._registry.bind(
+                result,
+                self._soul_occurrence(key),
+                incarnation=top_incarnation,
+            )
+        self._registry.attach_existing(
+            top_incarnation, self._soul_occurrence(key)
+        )
+        for field, path in LazySoulTable._nested_paths.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, labels[path]
+            )
+            current = getattr(result, field)
+            wrapper = self._bind_soul_nested(
+                key, field, current, incarnation=incarnation
+            )
+            if wrapper is not current:
+                object.__setattr__(result, field, wrapper)
+        self.souls._baseline_identity_labels[key] = labels
+        self.souls._baseline_incarnation[key] = top_incarnation.value
+        return result
 
 
     def _bind_assigned_person(self, key, person):
