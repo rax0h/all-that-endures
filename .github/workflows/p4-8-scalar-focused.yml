@@ -1,0 +1,22 @@
+name: P4.8 scalar archives focused
+
+on:
+  push:
+    branches:
+      - sol-p4-8-scalar-focused
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python -m pytest -q \
+            simulation/tests/test_persistence_lazy_scalar_archives.py \
+            simulation/tests/test_agency.py \
+            simulation/tests/test_magic_institutions.py
