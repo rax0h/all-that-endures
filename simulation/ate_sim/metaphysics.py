@@ -1,10 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
+from .record_index import IndexedRecord
 
 TRANSCENDENT_KINDS=('god','astral_king','great_astral_being')
 
 @dataclass
-class SoulState:
+class SoulState(IndexedRecord):
  person:int
  origin_world:str='local'
  outworlder:bool=False
