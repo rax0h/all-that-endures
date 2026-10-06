@@ -473,6 +473,96 @@ def _insert_lazy_indexed_record(
         )
 
 
+def _insert_lazy_social_partnership(
+    destination: LazyRecordStore,
+    *,
+    generation: int,
+    typed_key: bytes,
+    pair: tuple[int, int],
+    ordinal: int,
+    event_id: int,
+) -> None:
+    codec = destination.codec
+    memberships = (
+        ("person", pair[0], ordinal),
+        ("person", pair[1], ordinal),
+    )
+    payload = codec.encode(event_id)
+    memberships_blob = codec.encode(memberships)
+    payload_checksum = __import__(
+        "ate_sim.incremental_store", fromlist=["_framed_sha"]
+    )._framed_sha(b"lazy-payload-v1", payload)
+    destination.db.execute(
+        "INSERT INTO lazy_record_versions("
+        "namespace,typed_key,valid_from,valid_to,payload,payload_checksum,"
+        "codec_version,record_schema,memberships,row_checksum"
+        ") VALUES (?,?,?,NULL,?,?,?,?,?,?)",
+        (
+            SOCIAL_PARTNERSHIP_NAMESPACE,
+            typed_key,
+            generation,
+            payload,
+            payload_checksum,
+            codec.version,
+            LAZY_SOCIAL_PARTNERSHIP_SCHEMA,
+            memberships_blob,
+            _version_checksum(
+                SOCIAL_PARTNERSHIP_NAMESPACE,
+                typed_key,
+                LAZY_SOCIAL_PARTNERSHIP_SCHEMA,
+                codec.version,
+                generation,
+                None,
+                memberships_blob,
+                payload,
+            ),
+        ),
+    )
+    destination.db.execute(
+        "INSERT INTO lazy_order_versions("
+        "namespace,typed_key,ordinal,valid_from,valid_to,row_checksum"
+        ") VALUES (?,?,?,?,NULL,?)",
+        (
+            SOCIAL_PARTNERSHIP_NAMESPACE,
+            typed_key,
+            ordinal,
+            generation,
+            _order_checksum(
+                SOCIAL_PARTNERSHIP_NAMESPACE,
+                typed_key,
+                ordinal,
+                generation,
+                None,
+            ),
+        ),
+    )
+    for index_name, index_value, member_ordinal in memberships:
+        encoded_value = codec.encode(index_value)
+        destination.db.execute(
+            "INSERT INTO lazy_query_versions("
+            "namespace,index_name,index_value,record_key,ordinal,"
+            "valid_from,valid_to,row_checksum"
+            ") VALUES (?,?,?,?,?,?,NULL,?)",
+            (
+                SOCIAL_PARTNERSHIP_NAMESPACE,
+                index_name,
+                encoded_value,
+                typed_key,
+                member_ordinal,
+                generation,
+                _query_checksum(
+                    SOCIAL_PARTNERSHIP_NAMESPACE,
+                    index_name,
+                    encoded_value,
+                    typed_key,
+                    member_ordinal,
+                    generation,
+                    None,
+                ),
+            ),
+        )
+
+
 def _insert_lazy_person(
     destination: LazyRecordStore,
     *,
@@ -1265,14 +1355,13 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                                 raise StoreFormatError(
                                     "invalid social partnership envelope"
                                 )
-                            _insert_lazy_indexed_record(
+                            _insert_lazy_social_partnership(
                                 target,
-                                namespace=SOCIAL_PARTNERSHIP_NAMESPACE,
                                 generation=generation,
                                 typed_key=typed_key,
+                                pair=key,
                                 ordinal=ordinal,
-                                value=(key, value),
-                                record_schema=LAZY_SOCIAL_PARTNERSHIP_SCHEMA,
+                                event_id=value,
                             )
                             social_partnership_count += 1
                             social_partnership_next_ordinal = max(
