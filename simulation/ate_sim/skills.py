@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
+from .record_index import IndexedRecord
 
 @dataclass
-class SkillHistory:
+class SkillHistory(IndexedRecord):
     person:int
     domain:str
     level:float=.05
