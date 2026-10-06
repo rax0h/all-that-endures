@@ -35,7 +35,7 @@ class InstitutionState:
  def register_magic_user(self,branch,person,path,year,source_event=None,disclosure='full'):
   if disclosure not in ('identity','essences','full'):raise ValueError('invalid disclosure level')
   ess=tuple(path.essences) if disclosure!='identity' else ();cid=path.confluence if disclosure!='identity' else None;cname=path.confluence_name if disclosure!='identity' else None;abilities=tuple(a.semantic_key for a in path.abilities) if disclosure=='full' else ();names=tuple(a.name for a in path.abilities) if disclosure=='full' else ();rid=self.next_record;self.next_record+=1;r=MagicUserRecord(rid,person,branch,year,ess,cid,cname,abilities,names,disclosure,source_event);self.magic_records[rid]=r;self.branches[branch].records.add(rid);return r
- def records_for_person(self,pid):return sorted((r for r in self.magic_records.values() if r.person==pid),key=lambda r:(r.year,r.id))
+ def records_for_person(self,pid):return sorted(self.table('magic_records').select('person',pid),key=lambda r:(r.year,r.id))
  def table(self,name):return indexed(self,name)
  def active_notices(self):return self.table('notices').select('status','open')+self.table('notices').select('status','assigned')
  def has_application(self,pid,society,qualified=False):
