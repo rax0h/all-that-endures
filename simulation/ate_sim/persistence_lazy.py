@@ -7218,6 +7218,12 @@ class LazyWorldSession:
             treasury_touched_keys,
             treasury_structural_keys,
         ) = self.treasuries.prepare_save_changes()
+        (
+            soul_version_changes,
+            soul_identity_changes,
+            soul_touched_keys,
+            soul_structural_keys,
+        ) = self.souls.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -7240,6 +7246,8 @@ class LazyWorldSession:
             or wallet_identity_changes
             or treasury_version_changes
             or treasury_identity_changes
+            or soul_version_changes
+            or soul_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -7254,6 +7262,7 @@ class LazyWorldSession:
             or material_active_index_structural_keys
             or wallet_structural_keys
             or treasury_structural_keys
+            or soul_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -7332,6 +7341,12 @@ class LazyWorldSession:
                 treasury_structural_keys,
                 "currency treasuries",
             ),
+            (
+                SOUL_NAMESPACE,
+                self.souls,
+                soul_structural_keys,
+                "metaphysics souls",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -7358,6 +7373,7 @@ class LazyWorldSession:
             ),
             (WALLET_NAMESPACE, len(self.wallets)),
             (TREASURY_NAMESPACE, len(self.treasuries)),
+            (SOUL_NAMESPACE, len(self.souls)),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -7430,6 +7446,10 @@ class LazyWorldSession:
             treasury_identity_changes=treasury_identity_changes,
             treasury_touched_keys=treasury_touched_keys,
             treasury_structural_keys=treasury_structural_keys,
+            soul_version_changes=soul_version_changes,
+            soul_identity_changes=soul_identity_changes,
+            soul_touched_keys=soul_touched_keys,
+            soul_structural_keys=soul_structural_keys,
             layout_value=layout_value,
         )
 
@@ -7879,6 +7899,61 @@ class LazyWorldSession:
                     )
 
 
+    def _validate_soul_successor(self, plan, generation):
+        for change in plan.soul_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, SOUL_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted soul remains visible after save"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved soul is absent after save"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                SOUL_NAMESPACE, typed_key, row, decode=False
+            )
+            if (
+                schema != LAZY_SOUL_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved soul payload evidence mismatch"
+                )
+        for change in plan.soul_identity_changes:
+            encoded_key = self.store.codec.encode(change.owner_key)
+            encoded_path = self.store.codec.encode(
+                change.occurrence_path
+            )
+            row = self.store._visible_identity_occurrence(
+                generation,
+                change.owner_namespace,
+                encoded_key,
+                encoded_path,
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted soul incarnation remains visible"
+                    )
+            elif row is None or row[0] != change.incarnation_id:
+                raise StoreIntegrityError(
+                    "saved soul incarnation evidence mismatch"
+                )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -7905,6 +7980,7 @@ class LazyWorldSession:
         self.material_active_index._pin = result.pin
         self.wallets._pin = result.pin
         self.treasuries._pin = result.pin
+        self.souls._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -7923,6 +7999,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_currency_successor(
+            plan, result.generation
+        )
+        self._validate_soul_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -7954,6 +8033,7 @@ class LazyWorldSession:
         self.material_active_index.accept_save(plan, result.pin)
         self.wallets.accept_save(plan, result.pin)
         self.treasuries.accept_save(plan, result.pin)
+        self.souls.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -8021,6 +8101,7 @@ class LazyWorldSession:
                     + plan.material_active_index_version_changes
                     + plan.wallet_version_changes
                     + plan.treasury_version_changes
+                    + plan.soul_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -8033,6 +8114,7 @@ class LazyWorldSession:
                     + plan.material_active_index_identity_changes
                     + plan.wallet_identity_changes
                     + plan.treasury_identity_changes
+                    + plan.soul_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
