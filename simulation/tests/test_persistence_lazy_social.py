@@ -140,6 +140,28 @@ def test_simulation_run_reuses_pinned_social_memberships_and_overlays_unsaved_ch
         assert len(session.social_partnerships._person_query_cache) <= 256
 
 
+def test_unsaved_partnership_overlay_is_endpoint_scoped(tmp_path):
+    path = converted(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        # Accumulate unrelated unsaved partnership edits.
+        for person in range(10, 110, 2):
+            session.world.social.partner(person, person + 1, 1000 + person)
+
+        relevant = session.social_partnerships._touched_by_person.get(1, set())
+        assert relevant == set()
+
+        session.world.social.partner(1, 6, 2001)
+        assert session.social_partnerships._touched_by_person[1] == {(1, 6)}
+        assert session.world.social.living_partnerships(
+            living(1, 2, 4, 5, 6)
+        ) == {(1, 2): 201, (1, 6): 2001, (4, 5): 202}
+
+        del session.world.social.partnerships[(1, 6)]
+        assert session.world.social.living_partnerships(
+            living(1, 2, 4, 5, 6)
+        ) == {(1, 2): 201, (4, 5): 202}
+
+
 def test_social_mutation_save_and_reopen(tmp_path):
     path = converted(tmp_path)
     with open_lazy_world_session(path, rules_id=RULES) as session:
