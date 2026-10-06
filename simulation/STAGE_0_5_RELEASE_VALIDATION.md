@@ -149,3 +149,35 @@ The remaining execution gate before authorized long-horizon evidence is the
 already-running integrated P4/full-suite run `37513490616`. Do not launch a
 redundant full suite unless material product/test bytes change.
 
+## Cross-lazy alias closeout correction
+
+The integrated full suite `37513490616` completed with **834 passed / 1 failed**
+in **2558.52s**. The sole failure exposed a real dirty-tracking defect for an
+`IndexedRecord` materialized through another lazy owner before its canonical
+payload was loaded.
+
+Frozen product/test head after correction:
+`e4752e306d30dcff41be1cc17ddc6e63004646a3`.
+
+Validation of the correction:
+- `37520218759`: 2/2 exact regressions and 57/57 directly affected lazy
+  people/aspiration/currency/identity tests;
+- `37520547147`: 2/2 exact regressions, canonical seed-843000 10-year smoke,
+  138/138 final-code recovery/lifecycle/compatibility tests, and the P5 short
+  integrated continuation. The year-10 digest remains
+  `3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`
+  with 439 ordered events and last event ID 439.
+
+The owner explicitly directed that another 42-minute full-suite run not be used
+solely to recheck this localized correction unless it proves necessary. This
+release record therefore preserves the exact evidence boundary: there is no
+claim of a second post-fix 835-test full-suite pass. Final architecture review
+must decide whether the 834 prior passes plus the focused/affected/final-code
+substitution satisfy the completion-plan full-suite intent.
+
+The dedicated P5 long-horizon harness was dry-run successfully in
+`37521427781` at years 4/7/10, including independent-control digest equality,
+incremental save/reopen, checked durable backup/restore and uploaded artifact
+`11439363432`. The harness itself is validation-only and does not change
+simulation product semantics.
+
