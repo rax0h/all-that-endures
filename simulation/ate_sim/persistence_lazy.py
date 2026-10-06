@@ -8512,6 +8512,240 @@ class LazyWorldSession:
         self.owner_index._baseline_incarnation[key] = incarnation.value
         return result
 
+    def _social_edge_occurrence(self, key, path=()):
+        return Occurrence(SOCIAL_EDGE_NAMESPACE, key, tuple(path))
+
+    def _live_social_edge_for_key(self, key):
+        incarnation = self._registry.incarnation_for_occurrence(
+            self._social_edge_occurrence(key)
+        )
+        if incarnation is None:
+            return None
+        value = self._registry.object_for_incarnation(incarnation)
+        return value if isinstance(value, Relationship) else None
+
+    def _bind_social_history(self, key, values, *, incarnation=None):
+        occurrence = self._social_edge_occurrence(
+            key, LazySocialEdgeTable._history_path
+        )
+        if incarnation is not None:
+            live = self._registry.object_for_incarnation(incarnation)
+            if live is not None:
+                if not isinstance(live, LazyTrackedList):
+                    raise StoreIntegrityError(
+                        "social history incarnation is bound to wrong type"
+                    )
+                live._attach(self.social_edges, key)
+                self._registry.attach_existing(incarnation, occurrence)
+                return live
+        if isinstance(values, LazyTrackedList):
+            wrapper = values
+            wrapper._attach(self.social_edges, key)
+        else:
+            wrapper = LazyTrackedList(values, self.social_edges, key)
+        existing = self._registry.incarnation_for_object(wrapper)
+        if incarnation is not None:
+            if existing is None:
+                self._registry.bind(
+                    wrapper, occurrence, incarnation=incarnation
+                )
+            elif existing != incarnation:
+                raise StoreIntegrityError(
+                    "social history is bound to wrong incarnation"
+                )
+            self._registry.attach_existing(incarnation, occurrence)
+        else:
+            self._registry.bind(wrapper, occurrence)
+        return wrapper
+
+    def _social_edge_incarnation_labels(self, key, record):
+        top = self._registry.incarnation_for_object(record)
+        history = self._registry.incarnation_for_object(
+            record.shared_history
+        )
+        if top is None or history is None:
+            raise StoreIntegrityError(
+                "lazy social edge has incomplete runtime incarnation labels"
+            )
+        return {
+            (): top.value,
+            LazySocialEdgeTable._history_path: history.value,
+        }
+
+    def _bind_assigned_social_edge(self, key, record):
+        top_occurrence = self._social_edge_occurrence(key)
+        existing = self._registry.incarnation_for_object(record)
+        if existing is None:
+            existing = self._registry.bind(record)
+        self._registry.attach_occurrence(record, top_occurrence)
+        history = self._bind_social_history(
+            key, record.shared_history
+        )
+        if history is not record.shared_history:
+            object.__setattr__(record, "shared_history", history)
+        return record
+
+    def _detach_assigned_social_edge(self, key, record):
+        labels = self._social_edge_incarnation_labels(key, record)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            self._registry.detach_occurrence(
+                self._social_edge_occurrence(key, path),
+                expected=incarnation,
+            )
+        if isinstance(record.shared_history, LazyTrackedList):
+            record.shared_history._detach()
+
+    def _detach_unloaded_social_edge(self, key):
+        labels = self.social_edges._baseline_labels(key)
+        for path, value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, value
+            )
+            occurrence = self._social_edge_occurrence(key, path)
+            self._registry.attach_existing(incarnation, occurrence)
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
+
+    def _replace_social_history(self, key, record, old, new):
+        occurrence = self._social_edge_occurrence(
+            key, LazySocialEdgeTable._history_path
+        )
+        old_incarnation = self._registry.incarnation_for_object(old)
+        if old_incarnation is not None:
+            self._registry.detach_occurrence(
+                occurrence, expected=old_incarnation
+            )
+        if isinstance(old, LazyTrackedList):
+            old._detach()
+        replacement = self._bind_social_history(key, new)
+        object.__setattr__(record, "shared_history", replacement)
+
+    def _bind_loaded_social_edge(self, key, record):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, SOCIAL_EDGE_NAMESPACE, key
+            )
+        )
+        expected_paths = {
+            (), LazySocialEdgeTable._history_path
+        }
+        if set(labels) != expected_paths:
+            raise StoreIntegrityError(
+                "lazy social edge occurrence labels are incomplete or extra"
+            )
+        top_incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(top_incarnation)
+        if live is not None:
+            if not isinstance(live, Relationship):
+                raise StoreIntegrityError(
+                    "social edge incarnation is bound to wrong type"
+                )
+            result = live
+        else:
+            result = record
+            self._registry.bind(
+                result,
+                self._social_edge_occurrence(key),
+                incarnation=top_incarnation,
+            )
+        self._registry.attach_existing(
+            top_incarnation, self._social_edge_occurrence(key)
+        )
+        history_incarnation = IncarnationId(
+            self.store.store_identity,
+            labels[LazySocialEdgeTable._history_path],
+        )
+        history = self._bind_social_history(
+            key,
+            result.shared_history,
+            incarnation=history_incarnation,
+        )
+        if history is not result.shared_history:
+            object.__setattr__(result, "shared_history", history)
+        self.social_edges._baseline_identity_labels[key] = labels
+        return result
+
+    def _social_adjacency_occurrence(self, key):
+        return Occurrence(SOCIAL_ADJACENCY_NAMESPACE, key, ())
+
+    def _bind_assigned_social_adjacency(self, key, values):
+        if isinstance(values, LazyTrackedSet):
+            bucket = values
+            bucket._attach(self.social_adjacency, key)
+        else:
+            bucket = LazyTrackedSet(values, self.social_adjacency, key)
+        existing = self._registry.incarnation_for_object(bucket)
+        occurrence = self._social_adjacency_occurrence(key)
+        if existing is None:
+            existing = self._registry.bind(bucket)
+        self._registry.attach_occurrence(bucket, occurrence)
+        return bucket
+
+    def _detach_assigned_social_adjacency(self, key, bucket):
+        incarnation = self._registry.incarnation_for_object(bucket)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._social_adjacency_occurrence(key),
+                expected=incarnation,
+            )
+        if isinstance(bucket, LazyTrackedSet):
+            bucket._detach()
+
+    def _detach_unloaded_social_adjacency(self, key):
+        baseline = self.social_adjacency._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        occurrence = self._social_adjacency_occurrence(key)
+        self._registry.attach_existing(incarnation, occurrence)
+        self._registry.detach_occurrence(
+            occurrence, expected=incarnation
+        )
+
+    def _bind_loaded_social_adjacency(self, key, values):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, SOCIAL_ADJACENCY_NAMESPACE, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy social adjacency occurrence labels are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, LazyTrackedSet):
+                raise StoreIntegrityError(
+                    "social adjacency incarnation is bound to wrong type"
+                )
+            live._attach(self.social_adjacency, key)
+            result = live
+        else:
+            result = LazyTrackedSet(
+                values, self.social_adjacency, key
+            )
+            self._registry.bind(
+                result,
+                self._social_adjacency_occurrence(key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation, self._social_adjacency_occurrence(key)
+        )
+        self.social_adjacency._baseline_incarnation[key] = incarnation.value
+        return result
+
     def _resource_occurrence(self, key, path=()):
         return Occurrence(RESOURCE_NAMESPACE, key, tuple(path))
 
