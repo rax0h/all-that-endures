@@ -12334,6 +12334,9 @@ class LazyWorldSession:
         detached_institution_applications,
         detached_transmissions,
         detached_motives,
+        detached_social_edges,
+        detached_social_adjacency,
+        detached_social_partnerships,
         advancement_records,
         assignments,
         cache_removals,
@@ -12356,6 +12359,7 @@ class LazyWorldSession:
         material_lot_records = tuple(detached_material_lots.values())
         material_item_records = tuple(detached_material_items.values())
         soul_records = tuple(detached_souls.values())
+        social_edge_records = tuple(detached_social_edges.values())
 
         # This is the final fallible storage operation.  If release/cleanup
         # fails, no staged graph replacement has been published and the session
@@ -12385,6 +12389,9 @@ class LazyWorldSession:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             for record in advancement_records:
+                object.__setattr__(record, "_index_table", None)
+                object.__setattr__(record, "_index_key", None)
+            for record in social_edge_records:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
@@ -12438,6 +12445,9 @@ class LazyWorldSession:
         self.institution_applications = detached_institution_applications
         self.transmissions = detached_transmissions
         self.motives = detached_motives
+        self.social_edges = detached_social_edges
+        self.social_adjacency = detached_social_adjacency
+        self.social_partnerships = detached_social_partnerships
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
