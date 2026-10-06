@@ -1967,6 +1967,18 @@ class LazyPeopleSavePlan:
     advancement_identity_changes: tuple[IdentityOccurrenceChange, ...]
     advancement_touched_keys: tuple[Any, ...]
     advancement_structural_keys: tuple[Any, ...]
+    institution_magic_record_version_changes: tuple[VersionChange, ...]
+    institution_magic_record_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    institution_magic_record_touched_keys: tuple[Any, ...]
+    institution_magic_record_structural_keys: tuple[Any, ...]
+    institution_notice_version_changes: tuple[VersionChange, ...]
+    institution_notice_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    institution_notice_touched_keys: tuple[Any, ...]
+    institution_notice_structural_keys: tuple[Any, ...]
+    institution_application_version_changes: tuple[VersionChange, ...]
+    institution_application_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    institution_application_touched_keys: tuple[Any, ...]
+    institution_application_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
