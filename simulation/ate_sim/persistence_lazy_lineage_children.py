@@ -595,6 +595,7 @@ class LazyLineageChildrenTable(dict):
         self._ensure_mutation()
         if not _valid_lineage_key(key):
             raise TypeError("lineage parent key must be (str,int)")
+        assigned = values
         desired = LazyLineageTrackedSet._validate(values)
         baseline_exists = self._baseline_exists(key)
         currently_visible = self._visible(key)
@@ -610,7 +611,10 @@ class LazyLineageChildrenTable(dict):
             self._record_edge_add(key, child)
         if old is not None:
             self._session._detach_assigned_lineage_children(key, old)
-        bucket = self._session._bind_assigned_lineage_children(key, desired)
+        bucket = self._session._bind_assigned_lineage_children(
+            key,
+            assigned if isinstance(assigned, LazyLineageTrackedSet) else desired,
+        )
         dict.__setitem__(self, key, bucket)
         was_removed = key in self._removed
         if baseline_exists:
