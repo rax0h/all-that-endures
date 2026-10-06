@@ -139,7 +139,7 @@ def _audit(world):
             f"material_refs={bad_item_materials}"
         )
 
-    report = snapshot(world, include_digest=False)
+    report = json.loads(json.dumps(snapshot(world, include_digest=False), sort_keys=True))
     threat_words = ("monster", "threat", "war", "raid", "attack", "flood", "drought", "fire", "storm")
     threat_events = {
         kind: count for kind, count in sorted(kinds.items())
