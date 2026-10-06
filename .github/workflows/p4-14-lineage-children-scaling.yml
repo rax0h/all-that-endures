@@ -1,0 +1,88 @@
+name: P4.14 lineage children scaling
+
+on:
+  push:
+    branches:
+      - sol-p4-14-lineage-children-scaling
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: |
+          PYTHONPATH=simulation:. python - <<'PY'
+          from pathlib import Path
+          import tempfile
+          from ate_sim.core import World
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+
+          RULES="p4-14-lineage-children-scaling"
+          PARENT=("practice",1)
+
+          def build(n):
+              w=World(863000+n)
+              w.lineage.children[PARENT]={
+                  ("practice", i) for i in range(2,n+2)
+              }
+              return w
+
+          def measure(n):
+              with tempfile.TemporaryDirectory() as td:
+                  td=Path(td)
+                  cold=td/"cold.sqlite"
+                  lazy=td/"lazy.sqlite"
+                  write_cold_snapshot(build(n),cold,rules_id=RULES)
+                  convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+                  with open_lazy_world_session(lazy,rules_id=RULES) as s:
+                      open_diag=s.store.diagnostics()
+                      ldiag=s.lineage_children.diagnostics()
+                      assert ldiag["lineage_child_bucket_payload_loads"] == 0
+                      assert ldiag["resident_lineage_child_buckets"] == 0
+
+                      s.store.reset_diagnostics()
+                      s.lineage_children.add_child(
+                          PARENT, ("practice", n+100000)
+                      )
+                      add_diag=s.store.diagnostics()
+                      assert s.lineage_children.diagnostics()[
+                          "lineage_child_bucket_payload_loads"
+                      ] == 0
+                      assert s.lineage_children.diagnostics()[
+                          "resident_lineage_child_buckets"
+                      ] == 0
+
+                      s.store.reset_diagnostics()
+                      s.save()
+                      save_diag=s.store.diagnostics()
+
+                      result={
+                          "n":n,
+                          "open_payload_reads":open_diag.payload_reads,
+                          "open_payload_bytes":open_diag.payload_read_bytes,
+                          "add_payload_reads":add_diag.payload_reads,
+                          "add_payload_bytes":add_diag.payload_read_bytes,
+                          "add_metadata_rows":add_diag.metadata_rows,
+                          "save_payload_writes":save_diag.payload_writes,
+                          "save_payload_write_bytes":save_diag.payload_write_bytes,
+                          "resident_buckets":s.lineage_children.diagnostics()[
+                              "resident_lineage_child_buckets"
+                          ],
+                      }
+                      print("LINEAGE_CHILD_AFTER",result)
+                      return result
+
+          small=measure(1000)
+          large=measure(10000)
+          assert small["open_payload_reads"] == large["open_payload_reads"]
+          assert small["add_payload_reads"] == large["add_payload_reads"] == 1
+          assert small["add_metadata_rows"] == large["add_metadata_rows"]
+          assert small["save_payload_writes"] == large["save_payload_writes"]
+          assert small["resident_buckets"] == large["resident_buckets"] == 0
+          PY
