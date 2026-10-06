@@ -11,6 +11,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: b7e006345e0ddb0d76b1240c6c67c068fece4a98
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
