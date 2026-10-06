@@ -86,6 +86,23 @@ def test_format3_is_explicit_and_legacy_format2_is_rejected_both_ways(tmp_path):
         open_store(p1)
 
 
+def test_validated_head_decode_cache_still_detects_live_raw_corruption(tmp_path):
+    with make_store(tmp_path / "head-cache-corrupt.sqlite") as store:
+        # Prime the semantic validation cache.
+        assert store.generation == 0
+
+        # The cache may skip redundant decoding, but every access must still
+        # reread and checksum the raw head row.
+        store.db.execute(
+            "UPDATE save_head SET namespace_counts=? WHERE singleton=1",
+            (b"corrupt-after-validation",),
+        )
+        store.db.commit()
+
+        with pytest.raises(StoreIntegrityError, match="save head checksum"):
+            _ = store.generation
+
+
 def test_versioned_read_query_order_previous_snapshot_and_reinsertion(tmp_path):
     path = tmp_path / "save.sqlite"
     with make_store(path) as store:
