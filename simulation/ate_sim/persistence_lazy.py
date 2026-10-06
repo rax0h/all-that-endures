@@ -13476,6 +13476,7 @@ class LazyWorldSession:
                 detached_institution_applications,
                 detached_transmissions,
                 detached_motives,
+                detached_lineage_nodes,
             ):
                 for key, record in dict.items(table):
                     index_rebindings.append((record, table, key))
