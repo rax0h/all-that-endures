@@ -16,6 +16,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install test dependency
+        run: python -m pip install pytest
       - name: Focused lazy persistence regressions
         run: |
           python -m pytest -q             simulation/tests/test_persistence_lazy_people.py             simulation/tests/test_persistence_lazy_social.py             simulation/tests/test_persistence_lazy_skills.py             simulation/tests/test_persistence_lazy_communities.py             simulation/tests/test_persistence_lazy_souls.py
