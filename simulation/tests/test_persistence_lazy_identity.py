@@ -1,3 +1,4 @@
+# CI rerun marker: owner-scoped identity + partnership overlays
 import gc
 import weakref
 from dataclasses import dataclass
