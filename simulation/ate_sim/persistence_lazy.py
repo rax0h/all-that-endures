@@ -13190,6 +13190,7 @@ class LazyWorldSession:
         soul_records = tuple(detached_souls.values())
         social_edge_records = tuple(detached_social_edges.values())
         skill_records = tuple(detached_skills.values())
+        lineage_node_records = tuple(detached_lineage_nodes.values())
 
         # This is the final fallible storage operation.  If release/cleanup
         # fails, no staged graph replacement has been published and the session
@@ -13225,6 +13226,9 @@ class LazyWorldSession:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             for record in skill_records:
+                object.__setattr__(record, "_index_table", None)
+                object.__setattr__(record, "_index_key", None)
+            for record in lineage_node_records:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
@@ -13282,6 +13286,7 @@ class LazyWorldSession:
         self.social_adjacency = detached_social_adjacency
         self.social_partnerships = detached_social_partnerships
         self.skills = detached_skills
+        self.lineage_nodes = detached_lineage_nodes
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
