@@ -1,4 +1,5 @@
 name: Hot working set validation
+# rerun after packed agency restore import
 # rerun after social touched-index scope fix
 
 # Candidate includes pinned membership-query reuse.
