@@ -1370,6 +1370,12 @@ def _seed_cross_boundary_lazy_identity(session, links):
             eager_path,
             mutable_event_tail_only=True,
         )
+        if (
+            namespace in {WALLET_NAMESPACE, TREASURY_NAMESPACE}
+            and type(eager_object) is dict
+        ):
+            eager_object = LazyTrackedDict(eager_object)
+            _relative_set(session.world, eager_path, eager_object)
         if not isinstance(eager_object, expected_type):
             raise StoreIntegrityError(
                 "cross-boundary lazy identity resolves to wrong type"
@@ -2372,6 +2378,106 @@ class LazyAspirationTable(LazyRecordTable):
             "new_aspirations": len(self._new_keys),
             "reinserted_aspirations": len(self._reinserted),
         }
+
+
+
+class LazyTrackedDict(dict):
+    """Mutable dict that can dirty multiple lazy owners sharing one identity."""
+
+    def __init__(self, values=()):
+        dict.__init__(self, values)
+        self._lazy_bindings = {}
+
+    def _bindings(self):
+        dead = []
+        out = []
+        for token, (table_ref, key) in self._lazy_bindings.items():
+            table = table_ref()
+            if table is None:
+                dead.append(token)
+            else:
+                out.append((table, key))
+        for token in dead:
+            self._lazy_bindings.pop(token, None)
+        return tuple(out)
+
+    def _attach(self, table, key):
+        self._lazy_bindings[(id(table), key)] = (weakref.ref(table), key)
+
+    def _detach(self, table, key):
+        self._lazy_bindings.pop((id(table), key), None)
+
+    def _guard(self):
+        bindings = self._bindings()
+        for table, key in bindings:
+            table._ensure_mutation()
+            if not table._visible(key):
+                raise StoreIntegrityError(
+                    "tracked currency dict retained a non-current owner"
+                )
+        return bindings
+
+    @staticmethod
+    def _touch(bindings):
+        for table, key in bindings:
+            table.changed(key)
+
+    def __setitem__(self, key, value):
+        bindings = self._guard()
+        before = self.get(key, object())
+        dict.__setitem__(self, key, value)
+        if before != value:
+            self._touch(bindings)
+
+    def __delitem__(self, key):
+        bindings = self._guard()
+        dict.__delitem__(self, key)
+        self._touch(bindings)
+
+    def clear(self):
+        bindings = self._guard()
+        if self:
+            dict.clear(self)
+            self._touch(bindings)
+
+    def pop(self, key, *default):
+        bindings = self._guard()
+        if key not in self:
+            if default:
+                return default[0]
+            raise KeyError(key)
+        value = dict.pop(self, key)
+        self._touch(bindings)
+        return value
+
+    def popitem(self):
+        bindings = self._guard()
+        value = dict.popitem(self)
+        self._touch(bindings)
+        return value
+
+    def setdefault(self, key, default=None):
+        if key in self:
+            return dict.__getitem__(self, key)
+        bindings = self._guard()
+        dict.__setitem__(self, key, default)
+        self._touch(bindings)
+        return default
+
+    def update(self, *args, **kwargs):
+        incoming = dict(*args, **kwargs)
+        bindings = self._guard()
+        changed = any(
+            key not in self or self[key] != value
+            for key, value in incoming.items()
+        )
+        dict.update(self, incoming)
+        if changed:
+            self._touch(bindings)
+
+    def __ior__(self, other):
+        self.update(other)
+        return self
 
 
 class LazyTrackedSet(set):
@@ -4090,6 +4196,52 @@ class LazyMaterialActiveIndexTable(_LazyMaterialContainerTable):
         self._session._detach_unloaded_material_active_index(key)
 
 
+
+class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
+    """Bounded lazy outer mapping for shared mutable currency dictionaries."""
+
+    def __init__(
+        self,
+        session,
+        namespace,
+        record_schema,
+        touched_attr,
+        label,
+        *,
+        clean_limit=CLEAN_GROUP_LIMIT,
+    ):
+        self._record_schema = record_schema
+        self._touched_attr = touched_attr
+        self._label = label
+        super().__init__(session, namespace, clean_limit=clean_limit)
+
+    def _plain(self, value):
+        return dict(value)
+
+    def _valid_plain(self, value):
+        return type(value) is dict
+
+    def _bind_loaded_bucket(self, key, value):
+        return self._session._bind_loaded_currency_bucket(
+            self, self._namespace, key, value
+        )
+
+    def _bind_assigned_bucket(self, key, value):
+        return self._session._bind_assigned_currency_bucket(
+            self, self._namespace, key, value
+        )
+
+    def _detach_assigned_bucket(self, key, value):
+        self._session._detach_assigned_currency_bucket(
+            self, self._namespace, key, value
+        )
+
+    def _detach_unloaded_bucket(self, key):
+        self._session._detach_unloaded_currency_bucket(
+            self, self._namespace, key
+        )
+
+
 class LazyMaterialLotTable(LazyRecordTable):
     """Bounded lazy MaterialLot authority with persistent active memberships."""
 
@@ -4581,6 +4733,22 @@ class LazyWorldSession:
         object.__setattr__(
             world.materials, "active_lot_index", self.material_active_index
         )
+        self.wallets = LazyCurrencyBucketTable(
+            self,
+            WALLET_NAMESPACE,
+            LAZY_WALLET_SCHEMA,
+            "wallet_touched_keys",
+            "wallet",
+        )
+        object.__setattr__(world.currency, "wallets", self.wallets)
+        self.treasuries = LazyCurrencyBucketTable(
+            self,
+            TREASURY_NAMESPACE,
+            LAZY_TREASURY_SCHEMA,
+            "treasury_touched_keys",
+            "treasury",
+        )
+        object.__setattr__(world.currency, "treasuries", self.treasuries)
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
@@ -5631,6 +5799,87 @@ class LazyWorldSession:
             object.__setattr__(result, "transfers", transfers)
         self.material_lots._baseline_identity_labels[key] = labels
         return result
+
+
+
+    def _currency_occurrence(self, namespace, key):
+        return Occurrence(namespace, key, ())
+
+    def _bind_assigned_currency_bucket(
+        self, table, namespace, key, value
+    ):
+        if isinstance(value, LazyTrackedDict):
+            wrapper = value
+        else:
+            wrapper = LazyTrackedDict(value)
+        existing = self._registry.incarnation_for_object(wrapper)
+        if existing is None:
+            existing = self._registry.bind(wrapper)
+        occurrence = self._currency_occurrence(namespace, key)
+        self._registry.attach_occurrence(wrapper, occurrence)
+        wrapper._attach(table, key)
+        return wrapper
+
+    def _detach_assigned_currency_bucket(
+        self, table, namespace, key, value
+    ):
+        incarnation = self._registry.incarnation_for_object(value)
+        occurrence = self._currency_occurrence(namespace, key)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
+        if isinstance(value, LazyTrackedDict):
+            value._detach(table, key)
+
+    def _detach_unloaded_currency_bucket(self, table, namespace, key):
+        baseline = table._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        occurrence = self._currency_occurrence(namespace, key)
+        self._registry.attach_existing(incarnation, occurrence)
+        self._registry.detach_occurrence(
+            occurrence, expected=incarnation
+        )
+
+    def _bind_loaded_currency_bucket(
+        self, table, namespace, key, value
+    ):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, namespace, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy currency bucket occurrence labels are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, LazyTrackedDict):
+                raise StoreIntegrityError(
+                    "currency incarnation is bound to wrong live type"
+                )
+            wrapper = live
+        else:
+            wrapper = LazyTrackedDict(value)
+            self._registry.bind(
+                wrapper,
+                self._currency_occurrence(namespace, key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation, self._currency_occurrence(namespace, key)
+        )
+        wrapper._attach(table, key)
+        table._baseline_incarnation[key] = incarnation.value
+        return wrapper
 
 
     def _bind_assigned_person(self, key, person):
