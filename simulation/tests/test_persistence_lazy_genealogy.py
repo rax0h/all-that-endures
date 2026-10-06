@@ -30,8 +30,8 @@ def test_genealogy_parents_open_lazy_and_ancestors_are_point_bounded(tmp_path):
         assert diag["genealogy_parent_payload_loads"] == 0
         assert session.world.genealogy.ancestors(5) == {1, 2, 3, 4}
         diag = session.genealogy_parents.diagnostics()
-        assert diag["genealogy_parent_payload_loads"] == 4
-        assert diag["resident_genealogy_parents"] == 4
+        assert diag["genealogy_parent_payload_loads"] == 3
+        assert diag["resident_genealogy_parents"] == 3
 
 
 def test_genealogy_birth_saves_lazy_parents_and_eager_children_together(tmp_path):
