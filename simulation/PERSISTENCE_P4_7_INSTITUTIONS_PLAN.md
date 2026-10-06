@@ -75,3 +75,33 @@ detach use the accepted simple-record P4 machinery.
 
 After this gate, rerun the residual inventory and choose the next family by
 measured remaining cost.
+
+
+## Focused implementation evidence
+
+Product head through focused/scaling implementation:
+`b4b575b8a24f4df07e55e7399be7581f2139b55e`.
+
+Focused run `37403787799` passed **9/9 in 0.94s**, covering the new
+lazy-institution persistence tests plus existing institution gameplay tests.
+
+Scaling run `37403872554` passed the 1,000/10,000 fixed-query proof:
+
+| Measure | 1,000 rows/family | 10,000 rows/family |
+| --- | ---: | ---: |
+| ordinary-open payload reads | 33 | 33 |
+| ordinary-open payload bytes | 16,679 | 16,688 |
+| fixed query payload reads | 5 | 5 |
+| fixed query payload bytes | 1,887 | 1,887 |
+| one-notice save payload writes | 3 | 3 |
+| one-notice save payload bytes | 447 | 447 |
+| resident magic records | 2 | 2 |
+| resident notices | 2 | 2 |
+| resident applications | 1 | 1 |
+
+The fixed queries returned the same exact IDs/order at both sizes:
+magic records `[1,2]`, active notices `[1,2]`, latest application `2`,
+qualified application `True`.
+
+Affected P4 regression evidence is still required before this tranche is
+accepted closed.
