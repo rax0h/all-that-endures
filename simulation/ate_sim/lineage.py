@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from .record_index import IndexedRecord
 
 @dataclass
-class LineageNode:
+class LineageNode(IndexedRecord):
     kind:str
     id:int
     parents:tuple[tuple[str,int],...]=()
