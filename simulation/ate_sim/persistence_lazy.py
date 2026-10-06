@@ -1803,6 +1803,20 @@ def _institution_occurrence_from_path(path):
     return None
 
 
+def _social_occurrence_from_path(path, field):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "social")
+        and path[1] == ("field", field)
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
+
+
 def _scalar_archive_occurrence_from_path(path):
     if (
         type(path) is tuple
@@ -1948,6 +1962,23 @@ def _lazy_occurrence_from_path(path):
             MOTIVE_NAMESPACE: MotiveState,
         }[namespace]
         return namespace, key, relative, expected
+    social_edge = _social_occurrence_from_path(path, "edges")
+    if social_edge is not None:
+        relative = social_edge[1]
+        expected = (
+            list
+            if relative == LazySocialEdgeTable._history_path
+            else Relationship
+        )
+        return SOCIAL_EDGE_NAMESPACE, social_edge[0], relative, expected
+    social_adjacency = _social_occurrence_from_path(path, "adjacency")
+    if social_adjacency is not None:
+        return (
+            SOCIAL_ADJACENCY_NAMESPACE,
+            social_adjacency[0],
+            social_adjacency[1],
+            set,
+        )
     return None
 
 
