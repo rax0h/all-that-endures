@@ -12151,6 +12151,59 @@ class LazyWorldSession:
                     )
 
 
+    def _validate_skill_successor(self, plan, generation):
+        for change in plan.skill_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, SKILL_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted skill history remains visible after save"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved skill history is absent after save"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                SKILL_NAMESPACE, typed_key, row, decode=False
+            )
+            if (
+                schema != LAZY_SKILL_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved skill history evidence mismatch"
+                )
+        for change in plan.skill_identity_changes:
+            encoded_key = self.store.codec.encode(change.owner_key)
+            encoded_path = self.store.codec.encode(change.occurrence_path)
+            row = self.store._visible_identity_occurrence(
+                generation,
+                change.owner_namespace,
+                encoded_key,
+                encoded_path,
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted skill incarnation remains visible"
+                    )
+            elif row is None or row[0] != change.incarnation_id:
+                raise StoreIntegrityError(
+                    "saved skill incarnation evidence mismatch"
+                )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -12187,6 +12240,7 @@ class LazyWorldSession:
         self.social_edges._pin = result.pin
         self.social_adjacency._pin = result.pin
         self.social_partnerships._pin = result.pin
+        self.skills._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -12217,6 +12271,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_social_successor(
+            plan, result.generation
+        )
+        self._validate_skill_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -12258,6 +12315,7 @@ class LazyWorldSession:
         self.social_edges.accept_save(plan, result.pin)
         self.social_adjacency.accept_save(plan, result.pin)
         self.social_partnerships.accept_save(plan, result.pin)
+        self.skills.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -12335,6 +12393,7 @@ class LazyWorldSession:
                     + plan.social_edge_version_changes
                     + plan.social_adjacency_version_changes
                     + plan.social_partnership_version_changes
+                    + plan.skill_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -12357,6 +12416,7 @@ class LazyWorldSession:
                     + plan.social_edge_identity_changes
                     + plan.social_adjacency_identity_changes
                     + plan.social_partnership_identity_changes
+                    + plan.skill_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
