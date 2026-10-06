@@ -10668,6 +10668,8 @@ class LazyWorldSession:
         detached_institution_magic_records,
         detached_institution_notices,
         detached_institution_applications,
+        detached_transmissions,
+        detached_motives,
         advancement_records,
         assignments,
         cache_removals,
@@ -10770,6 +10772,8 @@ class LazyWorldSession:
         self.institution_magic_records = detached_institution_magic_records
         self.institution_notices = detached_institution_notices
         self.institution_applications = detached_institution_applications
+        self.transmissions = detached_transmissions
+        self.motives = detached_motives
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -10872,6 +10876,12 @@ class LazyWorldSession:
                     "institution application",
                 )
             )
+            detached_transmissions = self._stage_detached_institution_table(
+                self.transmissions, Transmission, "transmission record"
+            )
+            detached_motives = self._stage_detached_institution_table(
+                self.motives, MotiveState, "motive"
+            )
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -10901,6 +10911,8 @@ class LazyWorldSession:
                         id(self.institution_applications): (
                             detached_institution_applications
                         ),
+                        id(self.transmissions): detached_transmissions,
+                        id(self.motives): detached_motives,
                         **mutable_replacements,
                     },
                 )
@@ -10918,6 +10930,8 @@ class LazyWorldSession:
                 detached_institution_magic_records,
                 detached_institution_notices,
                 detached_institution_applications,
+                detached_transmissions,
+                detached_motives,
             ):
                 for key, record in dict.items(table):
                     index_rebindings.append((record, table, key))
@@ -10941,6 +10955,8 @@ class LazyWorldSession:
                 detached_institution_magic_records,
                 detached_institution_notices,
                 detached_institution_applications,
+                detached_transmissions,
+                detached_motives,
                 advancement_records,
                 assignments,
                 cache_removals,
@@ -10976,6 +10992,8 @@ class LazyWorldSession:
             "institution_applications": (
                 self.institution_applications.diagnostics()
             ),
+            "transmissions": self.transmissions.diagnostics(),
+            "motives": self.motives.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
