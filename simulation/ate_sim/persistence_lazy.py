@@ -126,6 +126,7 @@ SOCIAL_PARTNERSHIP_NAMESPACE = "world.social.partnerships"
 SKILL_NAMESPACE = "world.skills.skills"
 LINEAGE_NODE_NAMESPACE = "world.lineage.nodes"
 GENEALOGY_PARENT_NAMESPACE = "world.genealogy.parents"
+GENEALOGY_CHILD_NAMESPACE = "world.genealogy.children"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
@@ -149,6 +150,7 @@ LAZY_SOCIAL_PARTNERSHIP_SCHEMA = 1
 LAZY_SKILL_SCHEMA = 1
 LAZY_LINEAGE_NODE_SCHEMA = 1
 LAZY_GENEALOGY_PARENT_SCHEMA = 1
+LAZY_GENEALOGY_CHILD_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
@@ -961,6 +963,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     lineage_node_next_ordinal = 0
                     genealogy_parent_count = 0
                     genealogy_parent_next_ordinal = 0
+                    genealogy_child_count = 0
+                    genealogy_child_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -999,6 +1003,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SKILL_NAMESPACE,
                             LINEAGE_NODE_NAMESPACE,
                             GENEALOGY_PARENT_NAMESPACE,
+                            GENEALOGY_CHILD_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -1421,7 +1426,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             lineage_node_next_ordinal = max(
                                 lineage_node_next_ordinal, ordinal + 1
                             )
-                        else:
+                        elif namespace == GENEALOGY_PARENT_NAMESPACE:
                             if (
                                 type(key) is not int
                                 or type(value) is not tuple
@@ -1442,6 +1447,28 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             genealogy_parent_count += 1
                             genealogy_parent_next_ordinal = max(
                                 genealogy_parent_next_ordinal, ordinal + 1
+                            )
+                        else:
+                            if (
+                                type(key) is not int
+                                or type(value) is not list
+                                or any(type(child) is not int for child in value)
+                            ):
+                                raise StoreFormatError(
+                                    "invalid genealogy-child envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=GENEALOGY_CHILD_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_GENEALOGY_CHILD_SCHEMA,
+                            )
+                            genealogy_child_count += 1
+                            genealogy_child_next_ordinal = max(
+                                genealogy_child_next_ordinal, ordinal + 1
                             )
 
                     for row in source_store.db.execute(
@@ -1472,6 +1499,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SKILL_NAMESPACE,
                             LINEAGE_NODE_NAMESPACE,
                             GENEALOGY_PARENT_NAMESPACE,
+                            GENEALOGY_CHILD_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1662,6 +1690,11 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             genealogy_parent_count,
                             genealogy_parent_next_ordinal,
                         ),
+                        (
+                            GENEALOGY_CHILD_NAMESPACE,
+                            genealogy_child_count,
+                            genealogy_child_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1763,6 +1796,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "skills": skill_count,
                 "lineage_nodes": lineage_node_count,
                 "genealogy_parents": genealogy_parent_count,
+                "genealogy_children": genealogy_child_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
@@ -1833,6 +1867,21 @@ def _material_occurrence_from_path(path, field):
         return path[2][1], tuple(path[3:])
     return None
 
+
+
+
+def _genealogy_occurrence_from_path(path, field):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "genealogy")
+        and path[1] == ("field", field)
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
 
 
 def _currency_occurrence_from_path(path, field):
@@ -2012,6 +2061,14 @@ def _lazy_occurrence_from_path(path):
             material_active_index[0],
             material_active_index[1],
             set,
+        )
+    genealogy_child = _genealogy_occurrence_from_path(path, "children")
+    if genealogy_child is not None:
+        return (
+            GENEALOGY_CHILD_NAMESPACE,
+            genealogy_child[0],
+            genealogy_child[1],
+            list,
         )
     wallet = _currency_occurrence_from_path(path, "wallets")
     if wallet is not None:
@@ -2334,6 +2391,7 @@ def _initialize_eager_tracker(
         SKILL_NAMESPACE,
         LINEAGE_NODE_NAMESPACE,
         GENEALOGY_PARENT_NAMESPACE,
+        GENEALOGY_CHILD_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -6082,6 +6140,37 @@ class LazyGenealogyParentTable(LazyRecordTable):
         }
 
 
+class LazyGenealogyChildrenTable(_LazyMaterialContainerTable):
+    """Bounded lazy parent -> ordered mutable child-ID list authority."""
+
+    _record_schema = LAZY_GENEALOGY_CHILD_SCHEMA
+    _touched_attr = "genealogy_child_touched_keys"
+    _label = "genealogy child bucket"
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session, GENEALOGY_CHILD_NAMESPACE, clean_limit=clean_limit
+        )
+
+    def _plain(self, value):
+        return list(value)
+
+    def _valid_plain(self, value):
+        return type(value) is list and all(type(item) is int for item in value)
+
+    def _bind_loaded_bucket(self, key, value):
+        return self._session._bind_loaded_genealogy_children(key, value)
+
+    def _bind_assigned_bucket(self, key, value):
+        return self._session._bind_assigned_genealogy_children(key, value)
+
+    def _detach_assigned_bucket(self, key, value):
+        self._session._detach_assigned_genealogy_children(key, value)
+
+    def _detach_unloaded_bucket(self, key):
+        self._session._detach_unloaded_genealogy_children(key)
+
+
 class _LazyMaterialContainerTable(LazyRecordTable):
     """Bounded lazy material index whose values are mutable list/set buckets."""
 
@@ -8449,6 +8538,10 @@ class LazyWorldSession:
         self.genealogy_parents = LazyGenealogyParentTable(self)
         object.__setattr__(
             world.genealogy, "parents", self.genealogy_parents
+        )
+        self.genealogy_children = LazyGenealogyChildrenTable(self)
+        object.__setattr__(
+            world.genealogy, "children", self.genealogy_children
         )
         self.social_edges = LazySocialEdgeTable(self)
         object.__setattr__(world.social, "edges", self.social_edges)
@@ -10837,6 +10930,82 @@ class LazyWorldSession:
                 object.__setattr__(result, field, wrapper)
         self.skills._baseline_identity_labels[key] = labels
         self.skills._baseline_incarnation[key] = top_incarnation.value
+        return result
+
+
+    def _genealogy_child_occurrence(self, key):
+        return Occurrence(GENEALOGY_CHILD_NAMESPACE, key, ())
+
+    def _bind_assigned_genealogy_children(self, key, values):
+        wrapper = (
+            values if isinstance(values, LazySoulTrackedList)
+            else LazySoulTrackedList(values)
+        )
+        wrapper._attach(self.genealogy_children, key, "children")
+        existing = self._registry.incarnation_for_object(wrapper)
+        if existing is None:
+            existing = self._registry.bind(wrapper)
+        self._registry.attach_occurrence(
+            wrapper, self._genealogy_child_occurrence(key)
+        )
+        return wrapper
+
+    def _detach_assigned_genealogy_children(self, key, values):
+        incarnation = self._registry.incarnation_for_object(values)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._genealogy_child_occurrence(key),
+                expected=incarnation,
+            )
+        if isinstance(values, LazySoulTrackedList):
+            values._detach(self.genealogy_children, key, "children")
+
+    def _detach_unloaded_genealogy_children(self, key):
+        baseline = self.genealogy_children._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        occurrence = self._genealogy_child_occurrence(key)
+        self._registry.attach_existing(incarnation, occurrence)
+        self._registry.detach_occurrence(
+            occurrence, expected=incarnation
+        )
+
+    def _bind_loaded_genealogy_children(self, key, values):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, GENEALOGY_CHILD_NAMESPACE, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy genealogy-child occurrence labels are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, LazySoulTrackedList):
+                raise StoreIntegrityError(
+                    "genealogy child-list incarnation is bound to wrong type"
+                )
+            live._attach(self.genealogy_children, key, "children")
+            result = live
+        else:
+            result = LazySoulTrackedList(values)
+            result._attach(self.genealogy_children, key, "children")
+            self._registry.bind(
+                result,
+                self._genealogy_child_occurrence(key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation, self._genealogy_child_occurrence(key)
+        )
+        self.genealogy_children._baseline_incarnation[key] = incarnation.value
         return result
 
 
@@ -14073,6 +14242,7 @@ def open_lazy_world_session(path, *, rules_id):
                     SKILL_NAMESPACE,
                     LINEAGE_NODE_NAMESPACE,
                     GENEALOGY_PARENT_NAMESPACE,
+                    GENEALOGY_CHILD_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -14143,6 +14313,7 @@ def open_lazy_world_session(path, *, rules_id):
                         SKILL_NAMESPACE,
                         LINEAGE_NODE_NAMESPACE,
                         GENEALOGY_PARENT_NAMESPACE,
+                        GENEALOGY_CHILD_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
