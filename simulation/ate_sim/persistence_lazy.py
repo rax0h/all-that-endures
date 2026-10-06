@@ -6603,8 +6603,46 @@ class LazyWorldSession:
 
 
 
-    def _currency_occurrence(self, namespace, key):
-        return Occurrence(namespace, key, ())
+    def _currency_occurrence(self, namespace, key, path=()):
+        return Occurrence(namespace, key, tuple(path))
+
+    def _currency_incarnation_labels(
+        self, namespace, key, bucket
+    ):
+        owner = (namespace, key)
+        owner_path = _owner_path(self.manifest, owner)
+        probe = IdentityOccurrenceIndex(
+            self.store.codec,
+            RECORD_FIELDS,
+            mutable_event_tail_only=True,
+        )
+        probe.bootstrap([(owner, bucket, owner_path)])
+        labels = {}
+        for _ident, obj, path in probe.owner_occurrences[owner]:
+            if path[: len(owner_path)] != owner_path:
+                raise StoreIntegrityError(
+                    "currency identity occurrence escaped its owner"
+                )
+            relative = tuple(path[len(owner_path):])
+            occurrence = self._currency_occurrence(
+                namespace, key, relative
+            )
+            incarnation = self._registry.incarnation_for_object(obj)
+            if incarnation is None:
+                try:
+                    incarnation = self._registry.bind(obj)
+                except TypeError as exc:
+                    raise StoreIntegrityError(
+                        "lazy currency nested mutable identity "
+                        "is not weak-referenceable"
+                    ) from exc
+            self._registry.attach_occurrence(obj, occurrence)
+            labels[relative] = incarnation.value
+        if () not in labels:
+            raise StoreIntegrityError(
+                "lazy currency bucket lacks top-level identity"
+            )
+        return labels
 
     def _bind_assigned_currency_bucket(
         self, table, namespace, key, value
@@ -6619,32 +6657,55 @@ class LazyWorldSession:
         occurrence = self._currency_occurrence(namespace, key)
         self._registry.attach_occurrence(wrapper, occurrence)
         wrapper._attach(table, key)
+        # Discover/attach any nested mutable identities immediately. This keeps
+        # new cross-owner aliases visible to the same save's link reconciliation.
+        self._currency_incarnation_labels(
+            namespace, key, wrapper
+        )
         return wrapper
 
     def _detach_assigned_currency_bucket(
         self, table, namespace, key, value
     ):
-        incarnation = self._registry.incarnation_for_object(value)
-        occurrence = self._currency_occurrence(namespace, key)
-        if incarnation is not None:
+        labels = self._currency_incarnation_labels(
+            namespace, key, value
+        )
+        for path, incarnation_value in labels.items():
+            incarnation = IncarnationId(
+                self.store.store_identity, incarnation_value
+            )
             self._registry.detach_occurrence(
-                occurrence, expected=incarnation
+                self._currency_occurrence(namespace, key, path),
+                expected=incarnation,
             )
         if isinstance(value, LazyTrackedDict):
             value._detach(table, key)
 
-    def _detach_unloaded_currency_bucket(self, table, namespace, key):
-        baseline = table._baseline_incarnation_id(key)
-        if baseline is None:
-            return
-        incarnation = IncarnationId(
-            self.store.store_identity, baseline
+    def _detach_unloaded_currency_bucket(
+        self, table, namespace, key
+    ):
+        labels = (
+            table._baseline_labels(key)
+            if hasattr(table, "_baseline_labels")
+            else {
+                (): table._baseline_incarnation_id(key)
+            }
         )
-        occurrence = self._currency_occurrence(namespace, key)
-        self._registry.attach_existing(incarnation, occurrence)
-        self._registry.detach_occurrence(
-            occurrence, expected=incarnation
-        )
+        for path, incarnation_value in labels.items():
+            if incarnation_value is None:
+                continue
+            incarnation = IncarnationId(
+                self.store.store_identity, incarnation_value
+            )
+            occurrence = self._currency_occurrence(
+                namespace, key, path
+            )
+            self._registry.attach_existing(
+                incarnation, occurrence
+            )
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
 
     def _bind_loaded_currency_bucket(
         self, table, namespace, key, value
@@ -6654,14 +6715,17 @@ class LazyWorldSession:
                 self.pin, namespace, key
             )
         )
-        if set(labels) != {()}:
+        if () not in labels:
             raise StoreIntegrityError(
-                "lazy currency bucket occurrence labels are incomplete or extra"
+                "lazy currency bucket lacks top-level occurrence label"
             )
-        incarnation = IncarnationId(
+
+        top_incarnation = IncarnationId(
             self.store.store_identity, labels[()]
         )
-        live = self._registry.object_for_incarnation(incarnation)
+        live = self._registry.object_for_incarnation(
+            top_incarnation
+        )
         if live is not None:
             if not isinstance(live, LazyTrackedDict):
                 raise StoreIntegrityError(
@@ -6673,13 +6737,69 @@ class LazyWorldSession:
             self._registry.bind(
                 wrapper,
                 self._currency_occurrence(namespace, key),
-                incarnation=incarnation,
+                incarnation=top_incarnation,
             )
         self._registry.attach_existing(
-            incarnation, self._currency_occurrence(namespace, key)
+            top_incarnation,
+            self._currency_occurrence(namespace, key),
         )
         wrapper._attach(table, key)
-        table._baseline_incarnation[key] = incarnation.value
+
+        for path, incarnation_value in sorted(
+            labels.items(),
+            key=lambda item: (
+                len(item[0]),
+                self.store.codec.encode(item[0]),
+            ),
+        ):
+            if not path:
+                continue
+            incarnation = IncarnationId(
+                self.store.store_identity,
+                incarnation_value,
+            )
+            try:
+                current = _relative_get(wrapper, path)
+            except (KeyError, IndexError, AttributeError, TypeError) as exc:
+                raise StoreIntegrityError(
+                    "lazy currency identity path is absent from payload"
+                ) from exc
+            existing = self._registry.object_for_incarnation(
+                incarnation
+            )
+            if existing is not None and existing is not current:
+                _relative_set(wrapper, path, existing)
+                current = existing
+            if existing is None:
+                try:
+                    self._registry.bind(
+                        current,
+                        self._currency_occurrence(
+                            namespace, key, path
+                        ),
+                        incarnation=incarnation,
+                    )
+                except TypeError as exc:
+                    raise StoreIntegrityError(
+                        "lazy currency nested persisted identity "
+                        "is not weak-referenceable"
+                    ) from exc
+            self._registry.attach_existing(
+                incarnation,
+                self._currency_occurrence(namespace, key, path),
+            )
+
+        actual = self._currency_incarnation_labels(
+            namespace, key, wrapper
+        )
+        if actual != labels:
+            raise StoreIntegrityError(
+                "lazy currency bucket occurrence labels "
+                "are incomplete or extra"
+            )
+        table._baseline_incarnation[key] = top_incarnation.value
+        if hasattr(table, "_baseline_identity_labels"):
+            table._baseline_identity_labels[key] = dict(labels)
         return wrapper
 
 
