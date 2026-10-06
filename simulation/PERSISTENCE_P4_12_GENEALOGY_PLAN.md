@@ -30,3 +30,5 @@ After both slices are focused/scaling green, run one affected P4 matrix, close P
 P4.12A focused run 37493767218: 9/9 passed in 1.11s.
 
 P4.12A scaling run 37494131473: open 33 reads at 1k and 10k; point lookup 1 read / 35 bytes; one-parent save 3 writes / 169 bytes; resident parent rows 1.
+
+P4.12B scaling run 37495816413: open 33 reads at 1k and 10k; point lookup 1 read / 27 bytes; one child-list mutation save 3 writes / 190 bytes; resident child buckets 1.
