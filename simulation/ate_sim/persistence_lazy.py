@@ -12429,19 +12429,32 @@ class LazyWorldSession:
                 "hybrid cold plan generation/token mismatch"
             )
 
-        cold_plan, layout_value = self._merge_people_layout(
-            cold_plan, structural_keys
-        )
-        cold_plan, layout_value = self._merge_aspiration_layout(
-            cold_plan, aspiration_structural_keys
-        )
-        cold_plan, layout_value = self._merge_resource_layout(
-            cold_plan, resource_structural_keys
-        )
-        cold_plan, layout_value = self._merge_owner_index_layout(
-            cold_plan, owner_index_structural_keys
-        )
-        for namespace, table, structural, label in (
+        # Structural changes across lazy families share one collection-layout
+        # authority. Build that successor once and replace the manifest change
+        # once; rebuilding/sorting the entire cold-plan change map separately
+        # for every family makes save preparation quadratic in the number of
+        # changed families and owners.
+        layout_value = cold_plan.layout_value
+        layout_updates = (
+            (PEOPLE_NAMESPACE, self.people, structural_keys, "people"),
+            (
+                ASPIRATION_NAMESPACE,
+                self.aspirations,
+                aspiration_structural_keys,
+                "aspirations",
+            ),
+            (
+                RESOURCE_NAMESPACE,
+                self.resources,
+                resource_structural_keys,
+                "resources",
+            ),
+            (
+                OWNER_INDEX_NAMESPACE,
+                self.owner_index,
+                owner_index_structural_keys,
+                "owner index",
+            ),
             (
                 MATERIAL_LOT_NAMESPACE,
                 self.material_lots,
@@ -12574,13 +12587,59 @@ class LazyWorldSession:
                 community_membership_structural_keys,
                 "community memberships",
             ),
-        ):
-            cold_plan, layout_value = self._merge_material_layout(
+        )
+        changed_layout = [
+            (namespace, table, label)
+            for namespace, table, structural, label in layout_updates
+            if structural
+        ]
+        if changed_layout:
+            layout_value = dict(
+                self.manifest["collections"]
+                if layout_value is None
+                else layout_value
+            )
+            for namespace, table, label in changed_layout:
+                current = layout_value[namespace]
+                if type(current) is not tuple or len(current) != 3:
+                    raise StoreFormatError(
+                        f"invalid {label} collection description"
+                    )
+                layout_value[namespace] = (
+                    current[0], len(table), current[2]
+                )
+
+            change_map = {
+                (
+                    change.namespace,
+                    self.store.codec.encode(change.key),
+                ): change
+                for change in cold_plan.changes
+            }
+            layout_change = RecordChange(
+                META,
+                COLLECTION_LAYOUT,
+                layout_value,
+                record_schema=RECORD_SCHEMA,
+            )
+            change_map[
+                (META, self.store.codec.encode(COLLECTION_LAYOUT))
+            ] = layout_change
+            changes = tuple(
+                change_map[key]
+                for key in sorted(
+                    change_map, key=lambda item: (item[0], item[1])
+                )
+            )
+            self._eager_tracker._manifest_dirty = True
+            cold_plan = replace(
                 cold_plan,
-                namespace,
-                table,
-                structural,
-                label,
+                changes=changes,
+                record_evidence=_change_evidence(
+                    self.store.codec, changes
+                ),
+                manifest_dirty=True,
+                layout_value=layout_value,
             )
 
         expected_counts = self.store.codec.decode(
