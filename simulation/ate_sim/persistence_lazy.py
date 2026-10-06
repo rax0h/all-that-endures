@@ -28,6 +28,7 @@ from .transmission import Transmission
 from .agency import MotiveState
 from .social import Relationship
 from .skills import SkillHistory
+from .lineage import LineageNode
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
     Membership,
@@ -123,6 +124,7 @@ SOCIAL_EDGE_NAMESPACE = "world.social.edges"
 SOCIAL_ADJACENCY_NAMESPACE = "world.social.adjacency"
 SOCIAL_PARTNERSHIP_NAMESPACE = "world.social.partnerships"
 SKILL_NAMESPACE = "world.skills.skills"
+LINEAGE_NODE_NAMESPACE = "world.lineage.nodes"
 LAZY_PERSON_SCHEMA = 1
 LAZY_ASPIRATION_SCHEMA = 1
 LAZY_RESOURCE_SCHEMA = 1
@@ -144,6 +146,7 @@ LAZY_SOCIAL_EDGE_SCHEMA = 1
 LAZY_SOCIAL_ADJACENCY_SCHEMA = 1
 LAZY_SOCIAL_PARTNERSHIP_SCHEMA = 1
 LAZY_SKILL_SCHEMA = 1
+LAZY_LINEAGE_NODE_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
 
@@ -1867,6 +1870,7 @@ def _scalar_archive_occurrence_from_path(path):
             ("transmission", "records"): TRANSMISSION_NAMESPACE,
             ("agency", "motives"): MOTIVE_NAMESPACE,
             ("skills", "skills"): SKILL_NAMESPACE,
+            ("lineage", "nodes"): LINEAGE_NODE_NAMESPACE,
         }.get(pair)
         if namespace is not None:
             return namespace, path[2][1], tuple(path[3:])
@@ -1993,6 +1997,7 @@ def _lazy_occurrence_from_path(path):
             TRANSMISSION_NAMESPACE: Transmission,
             MOTIVE_NAMESPACE: MotiveState,
             SKILL_NAMESPACE: SkillHistory,
+            LINEAGE_NODE_NAMESPACE: LineageNode,
         }[namespace]
         return namespace, key, relative, expected
     social_edge = _social_occurrence_from_path(path, "edges")
