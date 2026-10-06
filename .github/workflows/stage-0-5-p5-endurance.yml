@@ -1,0 +1,57 @@
+name: Stage 0.5 P5 endurance validation
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-p5-endurance
+
+jobs:
+  endurance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run seed-843000 P4/control endurance validation
+        run: |
+          set -o pipefail
+          PRODUCT_SHA="e4752e306d30dcff41be1cc17ddc6e63004646a3"
+          python simulation/persistence_p5_long_validation.py \
+            --seed 843000 \
+            --milestones 100 500 1000 \
+            --bootstrap-year 3 \
+            --workdir p5-endurance \
+            --output p5-endurance.json \
+            --product-sha "$PRODUCT_SHA" \
+            --workflow-sha "$GITHUB_SHA" \
+            | tee p5-endurance.log
+
+      - name: Verify restore artifact checksum
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          summary = json.loads(Path("p5-endurance.json").read_text())
+          path = Path("p5-endurance/p5-long-restore.sqlite")
+          actual = hashlib.sha256(path.read_bytes()).hexdigest()
+          expected = summary["restore_artifact"]["sha256"]
+          if actual != expected:
+              raise SystemExit(f"restore checksum mismatch: {actual} != {expected}")
+          print("restore checksum verified:", actual)
+          PY
+
+      - name: Upload durable Stage 0.5 endurance evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage-0-5-p5-endurance-seed-843000
+          path: |
+            p5-endurance.json
+            p5-endurance.log
+            p5-endurance/p5-long-restore.sqlite
+          compression-level: 0
+          retention-days: 90
