@@ -1,0 +1,44 @@
+name: Stage 0.5 final short after alias fix
+on:
+  push:
+    branches: [sol-stage-0-5-final-short-after-alias-fix]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - name: Cross-lazy alias regressions
+        run: |
+          python -m pytest -q \
+            simulation/tests/test_persistence_lazy_aspirations.py::test_cross_boundary_aspiration_alias_mutates_without_payload_load \
+            simulation/tests/test_persistence_lazy_people.py::test_cross_boundary_person_alias_mutates_before_people_payload_load
+      - name: Targeted simulation smoke
+        run: python simulation/specific_test.py --seed 843000 --years 10 --section all
+      - name: Final compact recovery lifecycle compatibility battery
+        run: |
+          python -m pytest -q \
+            simulation/tests/test_persistence_lazy_store_failures.py \
+            simulation/tests/test_persistence_lifecycle.py \
+            simulation/tests/test_persistence_session_open.py \
+            simulation/tests/test_persistence_cold_save_failures.py \
+            simulation/tests/test_persistence_lazy_identity.py \
+            simulation/tests/test_persistence_p2c.py
+      - name: P5 short integrated continuation
+        run: |
+          python simulation/persistence_p5_validation.py \
+            --seed 843000 \
+            --pre-years 3 \
+            --continuation-years 4 \
+            --reopen-years 3 \
+            --output p5-short-after-alias-fix.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p5-short-after-alias-fix
+          path: p5-short-after-alias-fix.json
