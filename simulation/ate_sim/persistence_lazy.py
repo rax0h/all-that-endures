@@ -10775,19 +10775,19 @@ class LazyWorldSession:
 
 
 
-    def _currency_occurrence(self, namespace, key, path=()):
-        return Occurrence(namespace, key, tuple(path))
+    def _attach_indexed_alias_callback(self, obj, incarnation):
+        """Bind a live cross-boundary IndexedRecord to its lazy authority.
 
-    def _install_cross_lazy_index_binding(self, obj, incarnation):
-        """Restore IndexedRecord mutation routing for lazy-to-lazy aliases.
-
-        A mutable IndexedRecord may materialize first through a different lazy
-        owner (for example an aspiration nested in a wallet).  Persisted
-        identity establishes that it is the same object, but the object must
-        still notify its canonical lazy record table when a field changes.
+        A mutable record can first materialize through a nested lazy owner
+        (for example, a wallet alias) before its top-level lazy payload is
+        loaded. The identity registry already knows the top-level occurrence,
+        so install that owner's mutation callback without forcing a payload
+        read. Otherwise a mutation through the alias can be invisible to the
+        authoritative lazy table until after the edit has happened.
         """
         if not isinstance(obj, IndexedRecord):
             return
+
         table_by_namespace = {
             PEOPLE_NAMESPACE: self.people,
             ASPIRATION_NAMESPACE: self.aspirations,
@@ -10803,7 +10803,7 @@ class LazyWorldSession:
             MOTIVE_NAMESPACE: self.motives,
             SOCIAL_EDGE_NAMESPACE: self.social_edges,
         }
-        candidates = {}
+        owners = []
         for occurrence in self._registry.occurrences_for_incarnation(
             incarnation
         ):
@@ -10812,18 +10812,21 @@ class LazyWorldSession:
             table = table_by_namespace.get(occurrence.owner_namespace)
             if table is None:
                 continue
-            candidates[(id(table), occurrence.owner_key)] = (
-                table, occurrence.owner_key
-            )
-        if not candidates:
+            owners.append((table, occurrence.owner_key))
+
+        if not owners:
             return
-        if len(candidates) != 1:
+        unique = {(id(table), key) for table, key in owners}
+        if len(unique) != 1:
             raise StoreIntegrityError(
-                "shared IndexedRecord has multiple canonical lazy owners"
+                "cross-boundary IndexedRecord has multiple lazy authorities"
             )
-        table, owner_key = next(iter(candidates.values()))
+        table, key = owners[0]
         object.__setattr__(obj, "_index_table", weakref.ref(table))
-        object.__setattr__(obj, "_index_key", owner_key)
+        object.__setattr__(obj, "_index_key", key)
+
+    def _currency_occurrence(self, namespace, key, path=()):
+        return Occurrence(namespace, key, tuple(path))
 
     def _currency_incarnation_labels(
         self, namespace, key, bucket
@@ -10856,7 +10859,7 @@ class LazyWorldSession:
                         "is not weak-referenceable"
                     ) from exc
             self._registry.attach_occurrence(obj, occurrence)
-            self._install_cross_lazy_index_binding(obj, incarnation)
+            self._attach_indexed_alias_callback(obj, incarnation)
             labels[relative] = incarnation.value
         if () not in labels:
             raise StoreIntegrityError(
