@@ -23,6 +23,8 @@ from .incremental_store import (
 )
 from .persistence_adapters import (
     COLLECTION_LAYOUT,
+    AGENCY_ACTIONS_NAMESPACE,
+    PACKED_LIST_KIND,
     IDENTITY_DELTAS,
     IDENTITY_LINKS,
     IDENTITY_LINK_SCHEMA,
@@ -217,7 +219,13 @@ def _validate_head_inventory(head, manifest, links, event_records):
             raise StoreFormatError(
                 f"invalid collection description: {namespace}"
             )
-        if (records, segments) != (size, 0):
+        expected_records = (
+            1
+            if namespace == AGENCY_ACTIONS_NAMESPACE
+            and _kind == PACKED_LIST_KIND
+            else size
+        )
+        if (records, segments) != (expected_records, 0):
             raise StoreIntegrityError(
                 f"collection count disagrees with head: {namespace}"
             )
