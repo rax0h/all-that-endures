@@ -6144,37 +6144,6 @@ class LazyGenealogyParentTable(LazyRecordTable):
         }
 
 
-class LazyGenealogyChildrenTable(_LazyMaterialContainerTable):
-    """Bounded lazy parent -> ordered mutable child-ID list authority."""
-
-    _record_schema = LAZY_GENEALOGY_CHILD_SCHEMA
-    _touched_attr = "genealogy_child_touched_keys"
-    _label = "genealogy child bucket"
-
-    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
-        super().__init__(
-            session, GENEALOGY_CHILD_NAMESPACE, clean_limit=clean_limit
-        )
-
-    def _plain(self, value):
-        return list(value)
-
-    def _valid_plain(self, value):
-        return type(value) is list and all(type(item) is int for item in value)
-
-    def _bind_loaded_bucket(self, key, value):
-        return self._session._bind_loaded_genealogy_children(key, value)
-
-    def _bind_assigned_bucket(self, key, value):
-        return self._session._bind_assigned_genealogy_children(key, value)
-
-    def _detach_assigned_bucket(self, key, value):
-        self._session._detach_assigned_genealogy_children(key, value)
-
-    def _detach_unloaded_bucket(self, key):
-        self._session._detach_unloaded_genealogy_children(key)
-
-
 class _LazyMaterialContainerTable(LazyRecordTable):
     """Bounded lazy material index whose values are mutable list/set buckets."""
 
@@ -6534,6 +6503,37 @@ class LazyMaterialActiveIndexTable(_LazyMaterialContainerTable):
     def _detach_unloaded_bucket(self, key):
         self._session._detach_unloaded_material_active_index(key)
 
+
+
+class LazyGenealogyChildrenTable(_LazyMaterialContainerTable):
+    """Bounded lazy parent -> ordered mutable child-ID list authority."""
+
+    _record_schema = LAZY_GENEALOGY_CHILD_SCHEMA
+    _touched_attr = "genealogy_child_touched_keys"
+    _label = "genealogy child bucket"
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(
+            session, GENEALOGY_CHILD_NAMESPACE, clean_limit=clean_limit
+        )
+
+    def _plain(self, value):
+        return list(value)
+
+    def _valid_plain(self, value):
+        return type(value) is list and all(type(item) is int for item in value)
+
+    def _bind_loaded_bucket(self, key, value):
+        return self._session._bind_loaded_genealogy_children(key, value)
+
+    def _bind_assigned_bucket(self, key, value):
+        return self._session._bind_assigned_genealogy_children(key, value)
+
+    def _detach_assigned_bucket(self, key, value):
+        self._session._detach_assigned_genealogy_children(key, value)
+
+    def _detach_unloaded_bucket(self, key):
+        self._session._detach_unloaded_genealogy_children(key)
 
 
 class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
