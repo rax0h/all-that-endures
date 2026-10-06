@@ -7343,6 +7343,110 @@ class LazyWorldSession:
 
 
 
+    def _institution_table(self, namespace):
+        table = {
+            INSTITUTION_MAGIC_RECORD_NAMESPACE: self.institution_magic_records,
+            INSTITUTION_NOTICE_NAMESPACE: self.institution_notices,
+            INSTITUTION_APPLICATION_NAMESPACE: self.institution_applications,
+        }.get(namespace)
+        if table is None:
+            raise StoreIntegrityError(
+                f"unknown lazy institution namespace: {namespace}"
+            )
+        return table
+
+    def _institution_occurrence(self, namespace, key):
+        return Occurrence(namespace, key, ())
+
+    def _bind_assigned_institution_record(
+        self, table, namespace, key, record
+    ):
+        existing = self._registry.incarnation_for_object(record)
+        occurrence = self._institution_occurrence(namespace, key)
+        if existing is None:
+            existing = self._registry.bind(record)
+        occurrences = self._registry.occurrences_for_incarnation(existing)
+        foreign_lazy = [
+            item
+            for item in occurrences
+            if item.owner_namespace in {
+                INSTITUTION_MAGIC_RECORD_NAMESPACE,
+                INSTITUTION_NOTICE_NAMESPACE,
+                INSTITUTION_APPLICATION_NAMESPACE,
+            }
+            and item != occurrence
+        ]
+        if foreign_lazy:
+            raise StoreError(
+                "one institution record incarnation cannot own "
+                "multiple lazy record keys"
+            )
+        self._registry.attach_occurrence(record, occurrence)
+        return record
+
+    def _detach_assigned_institution_record(
+        self, table, namespace, key, record
+    ):
+        del table
+        incarnation = self._registry.incarnation_for_object(record)
+        if incarnation is not None:
+            self._registry.detach_occurrence(
+                self._institution_occurrence(namespace, key),
+                expected=incarnation,
+            )
+
+    def _detach_unloaded_institution_record(
+        self, table, namespace, key
+    ):
+        baseline = table._baseline_incarnation_id(key)
+        if baseline is None:
+            return
+        incarnation = IncarnationId(
+            self.store.store_identity, baseline
+        )
+        occurrence = self._institution_occurrence(namespace, key)
+        self._registry.attach_existing(incarnation, occurrence)
+        self._registry.detach_occurrence(
+            occurrence, expected=incarnation
+        )
+
+    def _bind_loaded_institution_record(
+        self, table, namespace, key, record, expected_type
+    ):
+        labels = dict(
+            self.store.identity_occurrences_for_owner(
+                self.pin, namespace, key
+            )
+        )
+        if set(labels) != {()}:
+            raise StoreIntegrityError(
+                "lazy institution record occurrence labels "
+                "are incomplete or extra"
+            )
+        incarnation = IncarnationId(
+            self.store.store_identity, labels[()]
+        )
+        live = self._registry.object_for_incarnation(incarnation)
+        if live is not None:
+            if not isinstance(live, expected_type):
+                raise StoreIntegrityError(
+                    "institution record incarnation is bound to wrong type"
+                )
+            result = live
+        else:
+            result = record
+            self._registry.bind(
+                result,
+                self._institution_occurrence(namespace, key),
+                incarnation=incarnation,
+            )
+        self._registry.attach_existing(
+            incarnation,
+            self._institution_occurrence(namespace, key),
+        )
+        table._baseline_incarnation[key] = incarnation.value
+        return result
+
     def _material_item_occurrence(self, key):
         return Occurrence(MATERIAL_ITEM_NAMESPACE, key, ())
 
