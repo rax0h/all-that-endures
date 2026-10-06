@@ -1824,6 +1824,9 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 MATERIAL_ITEM_NAMESPACE: session.material_items,
                 SOUL_NAMESPACE: session.souls,
                 ADVANCEMENT_NAMESPACE: session.advancement_paths,
+                INSTITUTION_MAGIC_RECORD_NAMESPACE: session.institution_magic_records,
+                INSTITUTION_NOTICE_NAMESPACE: session.institution_notices,
+                INSTITUTION_APPLICATION_NAMESPACE: session.institution_applications,
             }.get(namespace)
             if table is None:
                 raise StoreIntegrityError(
@@ -1874,6 +1877,9 @@ def _initialize_eager_tracker(
         TREASURY_NAMESPACE,
         SOUL_NAMESPACE,
         ADVANCEMENT_NAMESPACE,
+        INSTITUTION_MAGIC_RECORD_NAMESPACE,
+        INSTITUTION_NOTICE_NAMESPACE,
+        INSTITUTION_APPLICATION_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
