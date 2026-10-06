@@ -2383,6 +2383,10 @@ class LazyPeopleSavePlan:
     social_partnership_identity_changes: tuple[IdentityOccurrenceChange, ...]
     social_partnership_touched_keys: tuple[Any, ...]
     social_partnership_structural_keys: tuple[Any, ...]
+    skill_version_changes: tuple[VersionChange, ...]
+    skill_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    skill_touched_keys: tuple[Any, ...]
+    skill_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
