@@ -13506,6 +13506,7 @@ class LazyWorldSession:
                 detached_social_adjacency,
                 detached_social_partnerships,
                 detached_skills,
+                detached_lineage_nodes,
                 advancement_records,
                 assignments,
                 cache_removals,
