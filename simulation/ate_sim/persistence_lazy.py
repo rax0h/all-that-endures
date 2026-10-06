@@ -4303,6 +4303,16 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
         self._touched_attr = touched_attr
         self._label = label
         super().__init__(session, namespace, clean_limit=clean_limit)
+        self._baseline_identity_labels = {}
+
+    def _baseline_labels(self, key):
+        if key not in self._baseline_identity_labels:
+            self._baseline_identity_labels[key] = dict(
+                self._store.identity_occurrences_for_owner(
+                    self._pin, self._namespace, key
+                )
+            )
+        return dict(self._baseline_identity_labels[key])
 
     def _plain(self, value):
         return dict(value)
@@ -4329,6 +4339,143 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
         self._session._detach_unloaded_currency_bucket(
             self, self._namespace, key
         )
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        version_changes = []
+        identity_changes = []
+        effective_keys = []
+        structural_keys = []
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            baseline_labels = (
+                self._baseline_labels(key) if baseline_exists else {}
+            )
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=self._record_schema,
+                        )
+                    )
+                    for path in baseline_labels:
+                        identity_changes.append(
+                            IdentityOccurrenceChange(
+                                self._namespace, key, path, delete=True
+                            )
+                        )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+
+            bucket = dict.__getitem__(self, key)
+            stored_value = self._plain(bucket)
+            payload = self._store.codec.encode(stored_value)
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new
+                or reinsertion
+                or payload != self._baseline_bytes(key)
+            )
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        stored_value,
+                        record_schema=self._record_schema,
+                        reinsertion=reinsertion,
+                    )
+                )
+
+            current_labels = self._session._currency_incarnation_labels(
+                self._namespace, key, bucket
+            )
+            identity_changed = False
+            for path in sorted(
+                set(baseline_labels) | set(current_labels),
+                key=self._store.codec.encode,
+            ):
+                before = baseline_labels.get(path)
+                after = current_labels.get(path)
+                if before == after:
+                    continue
+                identity_changed = True
+                identity_changes.append(
+                    IdentityOccurrenceChange(
+                        self._namespace,
+                        key,
+                        path,
+                        delete=after is None,
+                        incarnation_id=after,
+                    )
+                )
+
+            if value_changed or identity_changed:
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+
+        return (
+            tuple(version_changes),
+            tuple(identity_changes),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in getattr(plan, self._touched_attr):
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                bucket = dict.__getitem__(self, key)
+                self._baseline_payload[key] = self._store.codec.encode(
+                    self._plain(bucket)
+                )
+                labels = self._session._currency_incarnation_labels(
+                    self._namespace, key, bucket
+                )
+                self._baseline_identity_labels[key] = labels
+                self._baseline_incarnation[key] = labels.get(())
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        f"committed {self._label} lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_identity_labels.pop(key, None)
+                self._baseline_incarnation[key] = None
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
 
 
 class LazyMaterialLotTable(LazyRecordTable):
