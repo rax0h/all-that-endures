@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "frozen_product_test_sha": "e4752e306d30dcff41be1cc17ddc6e63004646a3",
+  "integrated_full_suite": {
+    "run_id": 37513490616,
+    "passed": 834,
+    "failed": 1,
+    "seconds": 2558.52,
+    "failure": "simulation/tests/test_persistence_lazy_aspirations.py::test_cross_boundary_aspiration_alias_mutates_without_payload_load"
+  },
+  "localized_fix": {
+    "affected_run_id": 37520218759,
+    "exact_regressions_passed": 2,
+    "exact_seconds": 0.88,
+    "affected_passed": 57,
+    "affected_seconds": 49.32,
+    "final_short_run_id": 37520547147,
+    "final_regressions_passed": 2,
+    "final_recovery_lifecycle_compatibility_passed": 138,
+    "final_recovery_seconds": 113.71,
+    "p5_short_passed": true,
+    "canonical_year_10_digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e",
+    "events_total": 439,
+    "last_event_id": 439
+  },
+  "full_suite_rerun": false,
+  "full_suite_rerun_boundary": "Owner directed no second 42-minute full-suite run solely to recheck localized fix; final architect review decides sufficiency.",
+  "long_harness_dry_run": {
+    "run_id": 37521427781,
+    "passed": true,
+    "artifact_id": 11439363432,
+    "artifact_sha256": "a5a420653a51b283e1736a92c358571f3173056a6fd3a8c1d8a7b2603c3e7901"
+  }
+}
