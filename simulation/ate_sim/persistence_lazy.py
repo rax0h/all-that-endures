@@ -6400,6 +6400,22 @@ class LazyWorldSession:
         object.__setattr__(
             world.advancement, "paths", self.advancement_paths
         )
+        self.institution_magic_records = LazyInstitutionMagicRecordTable(self)
+        object.__setattr__(
+            world.institutions,
+            "magic_records",
+            self.institution_magic_records,
+        )
+        self.institution_notices = LazyInstitutionNoticeTable(self)
+        object.__setattr__(
+            world.institutions, "notices", self.institution_notices
+        )
+        self.institution_applications = LazyInstitutionApplicationTable(self)
+        object.__setattr__(
+            world.institutions,
+            "applications",
+            self.institution_applications,
+        )
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
@@ -6479,6 +6495,9 @@ class LazyWorldSession:
                     MaterialLot,
                     CraftedItem,
                     SoulState,
+                    MagicUserRecord,
+                    AdventureNotice,
+                    SocietyApplication,
                 ),
             )
             and field in RECORD_FIELDS.get(type(subject), ())
@@ -6577,6 +6596,9 @@ class LazyWorldSession:
                     TREASURY_NAMESPACE,
                     SOUL_NAMESPACE,
                     ADVANCEMENT_NAMESPACE,
+                    INSTITUTION_MAGIC_RECORD_NAMESPACE,
+                    INSTITUTION_NOTICE_NAMESPACE,
+                    INSTITUTION_APPLICATION_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
@@ -6607,6 +6629,9 @@ class LazyWorldSession:
                     TREASURY_NAMESPACE,
                     SOUL_NAMESPACE,
                     ADVANCEMENT_NAMESPACE,
+                    INSTITUTION_MAGIC_RECORD_NAMESPACE,
+                    INSTITUTION_NOTICE_NAMESPACE,
+                    INSTITUTION_APPLICATION_NAMESPACE,
                 }
             )
             lazy_paths = {
