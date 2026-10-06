@@ -4482,6 +4482,18 @@ class LazyWorldSession:
         object.__setattr__(
             world.magic_resources, "owner_index", self.owner_index
         )
+        self.material_lots = LazyMaterialLotTable(self)
+        object.__setattr__(world.materials, "lots", self.material_lots)
+        self.material_items = LazyMaterialItemTable(self)
+        object.__setattr__(world.materials, "items", self.material_items)
+        self.material_lot_index = LazyMaterialLotIndexTable(self)
+        object.__setattr__(
+            world.materials, "lot_index", self.material_lot_index
+        )
+        self.material_active_index = LazyMaterialActiveIndexTable(self)
+        object.__setattr__(
+            world.materials, "active_lot_index", self.material_active_index
+        )
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
@@ -4552,7 +4564,16 @@ class LazyWorldSession:
     ):
         self._ensure_people_mutation_allowed()
         if (
-            isinstance(subject, (Person, MagicAspiration, MagicResource))
+            isinstance(
+                subject,
+                (
+                    Person,
+                    MagicAspiration,
+                    MagicResource,
+                    MaterialLot,
+                    CraftedItem,
+                ),
+            )
             and field in RECORD_FIELDS.get(type(subject), ())
             and not _cross_boundary_field_value_is_immutable(value)
         ):
@@ -4641,6 +4662,10 @@ class LazyWorldSession:
                     PEOPLE_NAMESPACE,
                     ASPIRATION_NAMESPACE,
                     RESOURCE_NAMESPACE,
+                    MATERIAL_LOT_NAMESPACE,
+                    MATERIAL_ITEM_NAMESPACE,
+                    MATERIAL_LOT_INDEX_NAMESPACE,
+                    MATERIAL_ACTIVE_INDEX_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
@@ -4663,6 +4688,10 @@ class LazyWorldSession:
                     PEOPLE_NAMESPACE,
                     ASPIRATION_NAMESPACE,
                     RESOURCE_NAMESPACE,
+                    MATERIAL_LOT_NAMESPACE,
+                    MATERIAL_ITEM_NAMESPACE,
+                    MATERIAL_LOT_INDEX_NAMESPACE,
+                    MATERIAL_ACTIVE_INDEX_NAMESPACE,
                 }
             )
             lazy_paths = {
