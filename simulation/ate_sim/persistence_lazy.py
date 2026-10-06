@@ -5147,6 +5147,380 @@ class LazySoulTrackedList(_LazySoulBindingMixin, list):
         return self
 
 
+
+def _plain_advancement_value(value, memo=None):
+    """Remove runtime lazy wrappers while preserving the path value graph."""
+    if memo is None:
+        memo = {}
+    cls = type(value)
+    if value is None or cls in (bool, int, float, str, bytes, FrozenDict, FrozenList):
+        return value
+    ident = id(value)
+    if ident in memo:
+        return memo[ident]
+    if is_dataclass(value):
+        memo[ident] = value
+        updates = {
+            name: _plain_advancement_value(getattr(value, name), memo)
+            for name in RECORD_FIELDS.get(cls, ())
+        }
+        plain = replace(value, **updates)
+        memo[ident] = plain
+        return plain
+    if isinstance(value, dict):
+        out = {}
+        memo[ident] = out
+        for key, child in value.items():
+            out[key] = _plain_advancement_value(child, memo)
+        return out
+    if isinstance(value, list):
+        out = []
+        memo[ident] = out
+        out.extend(_plain_advancement_value(child, memo) for child in value)
+        return out
+    if isinstance(value, set):
+        out = set()
+        memo[ident] = out
+        out.update(_plain_advancement_value(child, memo) for child in value)
+        return out
+    if cls is tuple:
+        out = tuple(_plain_advancement_value(child, memo) for child in value)
+        memo[ident] = out
+        return out
+    return value
+
+
+class LazyAdvancementPathTable(LazyRecordTable):
+    """Bounded lazy authority for one complete mutable EssencePath per person."""
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+        dict.__init__(self)
+        self._session = session
+        self._store = session.store
+        self._pin = session.pin
+        self._namespace = ADVANCEMENT_NAMESPACE
+        self._clean_limit = clean_limit
+        self._lru = OrderedDict()
+        self._loads = 0
+        state = self._store._namespace_state_at(
+            self._namespace, self._pin.captured_head
+        )
+        if state is None:
+            self._baseline_count = 0
+            self._next_overlay_ordinal = 0
+        else:
+            self._baseline_count = state[0]
+            self._next_overlay_ordinal = state[1]
+        self._baseline_presence = {}
+        self._baseline_payload = {}
+        self._baseline_incarnation = {}
+        self._baseline_identity_labels = {}
+        self._baseline_ordinal = {}
+        self._dirty = set()
+        self._removed = set()
+        self._new_keys = set()
+        self._reinserted = set()
+        self._overlay_ordinals = {}
+
+    def _baseline_bytes(self, key):
+        if key not in self._baseline_payload:
+            checked = self._store.read_version(
+                self._pin,
+                self._namespace,
+                key,
+                expected_record_schema=LAZY_ADVANCEMENT_SCHEMA,
+            )
+            self._baseline_payload[key] = self._store.codec.encode(
+                checked.value
+            )
+        return self._baseline_payload[key]
+
+    def _baseline_labels(self, key):
+        if key not in self._baseline_identity_labels:
+            self._baseline_identity_labels[key] = dict(
+                self._store.identity_occurrences_for_owner(
+                    self._pin, self._namespace, key
+                )
+            )
+        return dict(self._baseline_identity_labels[key])
+
+    def __getitem__(self, key):
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        if dict.__contains__(self, key):
+            self._lru.pop(key, None)
+            if key not in self._dirty:
+                self._lru[key] = None
+            return dict.__getitem__(self, key)
+        checked = self._store.read_version(
+            self._pin,
+            self._namespace,
+            key,
+            expected_record_schema=LAZY_ADVANCEMENT_SCHEMA,
+        )
+        if not isinstance(checked.value, EssencePath):
+            raise StoreFormatError(
+                "lazy advancement payload is not EssencePath"
+            )
+        self._baseline_payload.setdefault(
+            key, self._store.codec.encode(checked.value)
+        )
+        self._baseline_presence.setdefault(key, True)
+        path = self._session._bind_loaded_advancement_path(
+            key, checked.value
+        )
+        dict.__setitem__(self, key, path)
+        self._loads += 1
+        if key not in self._dirty:
+            self._lru[key] = None
+        self._evict_clean()
+        return path
+
+    def preflight_change(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current advancement path"
+            )
+
+    def changed(self, key, field=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise StoreIntegrityError(
+                "mutation notification has no current advancement path"
+            )
+        if not dict.__contains__(self, key):
+            self[key]
+        path = dict.__getitem__(self, key)
+        rebound, _labels = self._session._reconcile_advancement_graph(
+            key, path
+        )
+        if rebound is not path:
+            dict.__setitem__(self, key, rebound)
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+        self._session.world.advancement._invalidate_rank(key)
+
+    def __setitem__(self, key, path):
+        self._ensure_mutation()
+        if not isinstance(path, EssencePath):
+            raise TypeError(
+                "world.advancement.paths values must be EssencePath"
+            )
+        baseline_exists = self._baseline_exists(key)
+        currently_visible = self._visible(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is path and currently_visible:
+            return
+        was_removed = key in self._removed
+        if old is not None and old is not path:
+            self._session._detach_assigned_advancement_path(key, old)
+        path = self._session._bind_assigned_advancement_path(key, path)
+        dict.__setitem__(self, key, path)
+        if baseline_exists:
+            self._removed.discard(key)
+            if was_removed:
+                self._reinserted.add(key)
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        else:
+            self._new_keys.add(key)
+            if key not in self._overlay_ordinals:
+                self._overlay_ordinals[key] = self._next_overlay_ordinal
+                self._next_overlay_ordinal += 1
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+        self._session.world.advancement._invalidate_rank(key)
+
+    def __delitem__(self, key):
+        self._ensure_mutation()
+        if not self._visible(key):
+            raise KeyError(key)
+        baseline_exists = self._baseline_exists(key)
+        old = (
+            dict.__getitem__(self, key)
+            if dict.__contains__(self, key) else None
+        )
+        if old is not None:
+            self._session._detach_assigned_advancement_path(key, old)
+            dict.__delitem__(self, key)
+        else:
+            self._session._detach_unloaded_advancement_path(key)
+        self._lru.pop(key, None)
+        self._dirty.discard(key)
+        self._reinserted.discard(key)
+        if baseline_exists:
+            self._removed.add(key)
+        else:
+            self._new_keys.discard(key)
+            self._overlay_ordinals.pop(key, None)
+        self._session.world.advancement._invalidate_rank(key)
+
+    def prepare_save_changes(self):
+        touched = sorted(
+            self._effective_touched(),
+            key=lambda key: self._store.codec.encode(key),
+        )
+        structural_ordinals = self._planned_structural_ordinals()
+        version_changes = []
+        identity_changes = []
+        effective_keys = []
+        structural_keys = []
+
+        for key in touched:
+            baseline_exists = self._baseline_exists(key)
+            visible = self._visible(key)
+            baseline_labels = (
+                self._baseline_labels(key) if baseline_exists else {}
+            )
+            if not visible:
+                if baseline_exists:
+                    version_changes.append(
+                        VersionChange(
+                            self._namespace,
+                            key,
+                            delete=True,
+                            record_schema=LAZY_ADVANCEMENT_SCHEMA,
+                        )
+                    )
+                    for path in baseline_labels:
+                        identity_changes.append(
+                            IdentityOccurrenceChange(
+                                self._namespace, key, path, delete=True
+                            )
+                        )
+                    effective_keys.append(key)
+                    structural_keys.append(key)
+                continue
+
+            path = dict.__getitem__(self, key)
+            path, current_labels = (
+                self._session._reconcile_advancement_graph(key, path)
+            )
+            dict.__setitem__(self, key, path)
+            stored = _plain_advancement_value(path)
+            payload = self._store.codec.encode(stored)
+            reinsertion = key in self._reinserted
+            is_new = not baseline_exists
+            value_changed = (
+                is_new
+                or reinsertion
+                or payload != self._baseline_bytes(key)
+            )
+            if is_new or reinsertion:
+                structural_ordinals[key]
+            else:
+                self._persisted_ordinal(key)
+            if value_changed:
+                version_changes.append(
+                    VersionChange(
+                        self._namespace,
+                        key,
+                        stored,
+                        record_schema=LAZY_ADVANCEMENT_SCHEMA,
+                        reinsertion=reinsertion,
+                    )
+                )
+
+            identity_changed = False
+            for occurrence_path in sorted(
+                set(baseline_labels) | set(current_labels),
+                key=self._store.codec.encode,
+            ):
+                before = baseline_labels.get(occurrence_path)
+                after = current_labels.get(occurrence_path)
+                if before == after:
+                    continue
+                identity_changed = True
+                identity_changes.append(
+                    IdentityOccurrenceChange(
+                        self._namespace,
+                        key,
+                        occurrence_path,
+                        delete=after is None,
+                        incarnation_id=after,
+                    )
+                )
+            if value_changed or identity_changed:
+                effective_keys.append(key)
+            if is_new or reinsertion:
+                structural_keys.append(key)
+
+        return (
+            tuple(version_changes),
+            tuple(identity_changes),
+            tuple(effective_keys),
+            tuple(structural_keys),
+        )
+
+    def accept_save(self, plan, new_pin):
+        self._pin = new_pin
+        self._baseline_count = self._store.namespace_size(
+            new_pin, self._namespace
+        )
+        state = self._store._namespace_state_at(
+            self._namespace, new_pin.captured_head
+        )
+        self._next_overlay_ordinal = 0 if state is None else state[1]
+        for key in plan.advancement_touched_keys:
+            visible = self._visible(key)
+            self._baseline_presence[key] = visible
+            if visible:
+                path = dict.__getitem__(self, key)
+                stored = _plain_advancement_value(path)
+                self._baseline_payload[key] = self._store.codec.encode(stored)
+                self._baseline_identity_labels[key] = (
+                    self._session._advancement_incarnation_labels(
+                        key, path
+                    )
+                )
+                top = self._session._registry.incarnation_for_object(path)
+                self._baseline_incarnation[key] = (
+                    None if top is None else top.value
+                )
+                typed_key = self._store.codec.encode(key)
+                order = self._store._visible_order(
+                    self._namespace, typed_key, new_pin.captured_head
+                )
+                if order is None:
+                    raise StoreIntegrityError(
+                        "committed advancement path lost collection order"
+                    )
+                self._baseline_ordinal[key] = order[0]
+            else:
+                self._baseline_payload.pop(key, None)
+                self._baseline_identity_labels.pop(key, None)
+                self._baseline_incarnation[key] = None
+                self._baseline_ordinal.pop(key, None)
+        self._dirty.clear()
+        self._removed.clear()
+        self._new_keys.clear()
+        self._reinserted.clear()
+        self._overlay_ordinals.clear()
+        self._lru.clear()
+        for key in list(dict.keys(self)):
+            self._lru[key] = None
+        self._evict_clean()
+
+    def diagnostics(self):
+        return {
+            "logical_advancement_paths": (
+                self._baseline_count
+                - len(self._removed)
+                + len(self._new_keys)
+            ),
+            "resident_advancement_paths": dict.__len__(self),
+            "clean_cache_entries": len(self._lru),
+            "clean_cache_limit": self._clean_limit,
+            "advancement_payload_loads": self._loads,
+            "dirty_advancement_paths": len(self._dirty),
+        }
+
+
 class LazySoulTable(LazyRecordTable):
     """Bounded lazy soul authority with nested mutable incarnation tracking."""
 
