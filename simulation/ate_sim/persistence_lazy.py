@@ -12248,6 +12248,71 @@ class LazyWorldSession:
             )
         return detached, replacements
 
+    def _stage_detached_social_edges(self, replacements=None):
+        expected = len(self.social_edges)
+        detached = RecordTable()
+        if replacements is None:
+            replacements = {}
+        assignments = []
+        for key in self.social_edges:
+            record = self.social_edges[key]
+            if not isinstance(record, Relationship):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-Relationship social edge"
+                )
+            history = record.shared_history
+            if isinstance(history, LazyTrackedList):
+                replacement = replacements.get(id(history))
+                if replacement is None:
+                    replacement = list(history)
+                    replacements[id(history)] = replacement
+                assignments.append((record, "shared_history", replacement))
+            dict.__setitem__(detached, key, record)
+        if dict.__len__(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach social-edge count mismatch"
+            )
+        return detached, replacements, assignments
+
+    def _stage_detached_social_adjacency(self, replacements=None):
+        expected = len(self.social_adjacency)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        for key in self.social_adjacency:
+            bucket = self.social_adjacency[key]
+            if not isinstance(bucket, (set, LazyTrackedSet)):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-set social adjacency"
+                )
+            replacement = replacements.get(id(bucket))
+            if replacement is None:
+                replacement = set(bucket)
+                replacements[id(bucket)] = replacement
+            detached[key] = replacement
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach social-adjacency count mismatch"
+            )
+        return detached, replacements
+
+    def _stage_detached_social_partnerships(self):
+        expected = len(self.social_partnerships)
+        detached = {}
+        for key in self.social_partnerships:
+            value = self.social_partnerships[key]
+            if type(value) is not int:
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-int partnership event"
+                )
+            detached[key] = value
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach social-partnership count mismatch"
+            )
+        return detached
+
+
     def _publish_materialized_detach(
         self,
         old_log,
