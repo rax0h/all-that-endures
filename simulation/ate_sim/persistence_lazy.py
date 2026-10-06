@@ -3507,7 +3507,6 @@ class LazyAspirationTable(LazyRecordTable):
             object.__setattr__(live, "_index_table", weakref.ref(self))
             object.__setattr__(live, "_index_key", key)
         self._dirty.add(key)
-        self._index_touched_edge(key)
         self._lru.pop(key, None)
 
     def __setitem__(self, key, record):
@@ -4485,6 +4484,7 @@ class LazySocialEdgeTable(LazyRecordTable):
                     key, record, old, record.shared_history
                 )
         self._dirty.add(key)
+        self._index_touched_edge(key)
         self._lru.pop(key, None)
 
     def __setitem__(self, key, record):
