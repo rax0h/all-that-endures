@@ -11128,6 +11128,8 @@ def open_lazy_world_session(path, *, rules_id):
                     INSTITUTION_MAGIC_RECORD_NAMESPACE,
                     INSTITUTION_NOTICE_NAMESPACE,
                     INSTITUTION_APPLICATION_NAMESPACE,
+                    TRANSMISSION_NAMESPACE,
+                    MOTIVE_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -11190,6 +11192,8 @@ def open_lazy_world_session(path, *, rules_id):
                         INSTITUTION_MAGIC_RECORD_NAMESPACE,
                         INSTITUTION_NOTICE_NAMESPACE,
                         INSTITUTION_APPLICATION_NAMESPACE,
+                        TRANSMISSION_NAMESPACE,
+                        MOTIVE_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
