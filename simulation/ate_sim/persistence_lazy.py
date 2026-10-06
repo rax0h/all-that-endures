@@ -8798,6 +8798,24 @@ class LazyWorldSession:
             advancement_touched_keys,
             advancement_structural_keys,
         ) = self.advancement_paths.prepare_save_changes()
+        (
+            institution_magic_record_version_changes,
+            institution_magic_record_identity_changes,
+            institution_magic_record_touched_keys,
+            institution_magic_record_structural_keys,
+        ) = self.institution_magic_records.prepare_save_changes()
+        (
+            institution_notice_version_changes,
+            institution_notice_identity_changes,
+            institution_notice_touched_keys,
+            institution_notice_structural_keys,
+        ) = self.institution_notices.prepare_save_changes()
+        (
+            institution_application_version_changes,
+            institution_application_identity_changes,
+            institution_application_touched_keys,
+            institution_application_structural_keys,
+        ) = self.institution_applications.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -8824,6 +8842,12 @@ class LazyWorldSession:
             or soul_identity_changes
             or advancement_version_changes
             or advancement_identity_changes
+            or institution_magic_record_version_changes
+            or institution_magic_record_identity_changes
+            or institution_notice_version_changes
+            or institution_notice_identity_changes
+            or institution_application_version_changes
+            or institution_application_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -8840,6 +8864,9 @@ class LazyWorldSession:
             or treasury_structural_keys
             or soul_structural_keys
             or advancement_structural_keys
+            or institution_magic_record_structural_keys
+            or institution_notice_structural_keys
+            or institution_application_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -8930,6 +8957,24 @@ class LazyWorldSession:
                 advancement_structural_keys,
                 "advancement paths",
             ),
+            (
+                INSTITUTION_MAGIC_RECORD_NAMESPACE,
+                self.institution_magic_records,
+                institution_magic_record_structural_keys,
+                "institution magic records",
+            ),
+            (
+                INSTITUTION_NOTICE_NAMESPACE,
+                self.institution_notices,
+                institution_notice_structural_keys,
+                "institution notices",
+            ),
+            (
+                INSTITUTION_APPLICATION_NAMESPACE,
+                self.institution_applications,
+                institution_application_structural_keys,
+                "institution applications",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -8958,6 +9003,18 @@ class LazyWorldSession:
             (TREASURY_NAMESPACE, len(self.treasuries)),
             (SOUL_NAMESPACE, len(self.souls)),
             (ADVANCEMENT_NAMESPACE, len(self.advancement_paths)),
+            (
+                INSTITUTION_MAGIC_RECORD_NAMESPACE,
+                len(self.institution_magic_records),
+            ),
+            (
+                INSTITUTION_NOTICE_NAMESPACE,
+                len(self.institution_notices),
+            ),
+            (
+                INSTITUTION_APPLICATION_NAMESPACE,
+                len(self.institution_applications),
+            ),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -9038,6 +9095,40 @@ class LazyWorldSession:
             advancement_identity_changes=advancement_identity_changes,
             advancement_touched_keys=advancement_touched_keys,
             advancement_structural_keys=advancement_structural_keys,
+            institution_magic_record_version_changes=(
+                institution_magic_record_version_changes
+            ),
+            institution_magic_record_identity_changes=(
+                institution_magic_record_identity_changes
+            ),
+            institution_magic_record_touched_keys=(
+                institution_magic_record_touched_keys
+            ),
+            institution_magic_record_structural_keys=(
+                institution_magic_record_structural_keys
+            ),
+            institution_notice_version_changes=(
+                institution_notice_version_changes
+            ),
+            institution_notice_identity_changes=(
+                institution_notice_identity_changes
+            ),
+            institution_notice_touched_keys=institution_notice_touched_keys,
+            institution_notice_structural_keys=(
+                institution_notice_structural_keys
+            ),
+            institution_application_version_changes=(
+                institution_application_version_changes
+            ),
+            institution_application_identity_changes=(
+                institution_application_identity_changes
+            ),
+            institution_application_touched_keys=(
+                institution_application_touched_keys
+            ),
+            institution_application_structural_keys=(
+                institution_application_structural_keys
+            ),
             layout_value=layout_value,
         )
 
