@@ -11607,6 +11607,9 @@ class LazyWorldSession:
         self.institution_applications._pin = result.pin
         self.transmissions._pin = result.pin
         self.motives._pin = result.pin
+        self.social_edges._pin = result.pin
+        self.social_adjacency._pin = result.pin
+        self.social_partnerships._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -11634,6 +11637,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_institution_successor(
+            plan, result.generation
+        )
+        self._validate_social_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -11672,6 +11678,9 @@ class LazyWorldSession:
         self.institution_applications.accept_save(plan, result.pin)
         self.transmissions.accept_save(plan, result.pin)
         self.motives.accept_save(plan, result.pin)
+        self.social_edges.accept_save(plan, result.pin)
+        self.social_adjacency.accept_save(plan, result.pin)
+        self.social_partnerships.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -11746,6 +11755,9 @@ class LazyWorldSession:
                     + plan.institution_application_version_changes
                     + plan.transmission_version_changes
                     + plan.motive_version_changes
+                    + plan.social_edge_version_changes
+                    + plan.social_adjacency_version_changes
+                    + plan.social_partnership_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -11765,6 +11777,9 @@ class LazyWorldSession:
                     + plan.institution_application_identity_changes
                     + plan.transmission_identity_changes
                     + plan.motive_identity_changes
+                    + plan.social_edge_identity_changes
+                    + plan.social_adjacency_identity_changes
+                    + plan.social_partnership_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
