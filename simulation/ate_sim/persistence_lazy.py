@@ -6774,10 +6774,11 @@ class LazyWorldSession:
             )
         return detached
 
-    def _stage_detached_resources(self):
+    def _stage_detached_resources(self, transfer_replacements=None):
         expected = len(self.resources)
         detached = {}
-        transfer_replacements = {}
+        if transfer_replacements is None:
+            transfer_replacements = {}
         transfer_assignments = []
         for key in self.resources:
             resource = self.resources[key]
@@ -6801,10 +6802,11 @@ class LazyWorldSession:
             )
         return detached, transfer_replacements, transfer_assignments
 
-    def _stage_detached_owner_index(self):
+    def _stage_detached_owner_index(self, replacements=None):
         expected = len(self.owner_index)
         detached = {}
-        replacements = {}
+        if replacements is None:
+            replacements = {}
         for key in self.owner_index:
             bucket = self.owner_index[key]
             if not isinstance(bucket, (set, LazyTrackedSet)):
@@ -6822,6 +6824,95 @@ class LazyWorldSession:
             )
         return detached, replacements
 
+
+    def _stage_detached_material_lots(self, replacements=None):
+        expected = len(self.material_lots)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        transfer_assignments = []
+        for key in self.material_lots:
+            lot = self.material_lots[key]
+            if not isinstance(lot, MaterialLot):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-MaterialLot value"
+                )
+            transfers = lot.transfers
+            if isinstance(transfers, LazyTrackedList):
+                replacement = replacements.get(id(transfers))
+                if replacement is None:
+                    replacement = list(transfers)
+                    replacements[id(transfers)] = replacement
+                transfer_assignments.append(
+                    (lot, "transfers", replacement)
+                )
+            detached[key] = lot
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach material-lot count mismatch"
+            )
+        return detached, replacements, transfer_assignments
+
+    def _stage_detached_material_items(self):
+        expected = len(self.material_items)
+        detached = {}
+        for key in self.material_items:
+            item = self.material_items[key]
+            if not isinstance(item, CraftedItem):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-CraftedItem value"
+                )
+            detached[key] = item
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach crafted-item count mismatch"
+            )
+        return detached
+
+    def _stage_detached_material_lot_index(self, replacements=None):
+        expected = len(self.material_lot_index)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        for key in self.material_lot_index:
+            bucket = self.material_lot_index[key]
+            if not isinstance(bucket, (list, LazyTrackedIdList)):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-list material lot index"
+                )
+            replacement = replacements.get(id(bucket))
+            if replacement is None:
+                replacement = list(bucket)
+                replacements[id(bucket)] = replacement
+            detached[key] = replacement
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach material lot-index count mismatch"
+            )
+        return detached, replacements
+
+    def _stage_detached_material_active_index(self, replacements=None):
+        expected = len(self.material_active_index)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        for key in self.material_active_index:
+            bucket = self.material_active_index[key]
+            if not isinstance(bucket, (set, LazyTrackedSet)):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-set material active index"
+                )
+            replacement = replacements.get(id(bucket))
+            if replacement is None:
+                replacement = set(bucket)
+                replacements[id(bucket)] = replacement
+            detached[key] = replacement
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach material active-index count mismatch"
+            )
+        return detached, replacements
+
     def _publish_materialized_detach(
         self,
         old_log,
@@ -6830,6 +6921,10 @@ class LazyWorldSession:
         detached_aspirations,
         detached_resources,
         detached_owner_index,
+        detached_material_lots,
+        detached_material_items,
+        detached_material_lot_index,
+        detached_material_active_index,
         assignments,
         cache_removals,
         index_rebindings,
@@ -6848,6 +6943,8 @@ class LazyWorldSession:
         ]
         aspiration_records = tuple(detached_aspirations.values())
         resource_records = tuple(detached_resources.values())
+        material_lot_records = tuple(detached_material_lots.values())
+        material_item_records = tuple(detached_material_items.values())
 
         # This is the final fallible storage operation.  If release/cleanup
         # fails, no staged graph replacement has been published and the session
@@ -6868,6 +6965,9 @@ class LazyWorldSession:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             for record in resource_records:
+                object.__setattr__(record, "_index_table", None)
+                object.__setattr__(record, "_index_key", None)
+            for record in material_lot_records + material_item_records:
                 object.__setattr__(record, "_index_table", None)
                 object.__setattr__(record, "_index_key", None)
             self.world.__dict__.pop("_ate_persistence_lifetime", None)
@@ -6908,6 +7008,10 @@ class LazyWorldSession:
         self.aspirations = detached_aspirations
         self.resources = detached_resources
         self.owner_index = detached_owner_index
+        self.material_lots = detached_material_lots
+        self.material_items = detached_material_items
+        self.material_lot_index = detached_material_lot_index
+        self.material_active_index = detached_material_active_index
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -6934,15 +7038,36 @@ class LazyWorldSession:
 
             detached_people = self._stage_detached_people()
             detached_aspirations = self._stage_detached_aspirations()
+            mutable_replacements = {}
             (
                 detached_resources,
-                transfer_replacements,
+                mutable_replacements,
                 transfer_assignments,
-            ) = self._stage_detached_resources()
+            ) = self._stage_detached_resources(mutable_replacements)
             (
                 detached_owner_index,
-                owner_index_replacements,
-            ) = self._stage_detached_owner_index()
+                mutable_replacements,
+            ) = self._stage_detached_owner_index(mutable_replacements)
+            (
+                detached_material_lots,
+                mutable_replacements,
+                material_transfer_assignments,
+            ) = self._stage_detached_material_lots(mutable_replacements)
+            detached_material_items = (
+                self._stage_detached_material_items()
+            )
+            (
+                detached_material_lot_index,
+                mutable_replacements,
+            ) = self._stage_detached_material_lot_index(
+                mutable_replacements
+            )
+            (
+                detached_material_active_index,
+                mutable_replacements,
+            ) = self._stage_detached_material_active_index(
+                mutable_replacements
+            )
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -6953,12 +7078,18 @@ class LazyWorldSession:
                         id(self.aspirations): detached_aspirations,
                         id(self.resources): detached_resources,
                         id(self.owner_index): detached_owner_index,
-                        **transfer_replacements,
-                        **owner_index_replacements,
+                        id(self.material_lots): detached_material_lots,
+                        id(self.material_items): detached_material_items,
+                        id(self.material_lot_index): detached_material_lot_index,
+                        id(self.material_active_index): (
+                            detached_material_active_index
+                        ),
+                        **mutable_replacements,
                     },
                 )
             )
             assignments.extend(transfer_assignments)
+            assignments.extend(material_transfer_assignments)
             for key, person in dict.items(detached_people):
                 if isinstance(person, IndexedRecord):
                     index_rebindings.append(
@@ -6973,6 +7104,10 @@ class LazyWorldSession:
                 detached_aspirations,
                 detached_resources,
                 detached_owner_index,
+                detached_material_lots,
+                detached_material_items,
+                detached_material_lot_index,
+                detached_material_active_index,
                 assignments,
                 cache_removals,
                 index_rebindings,
@@ -6992,6 +7127,10 @@ class LazyWorldSession:
             "aspirations": self.aspirations.diagnostics(),
             "resources": self.resources.diagnostics(),
             "owner_index": self.owner_index.diagnostics(),
+            "material_lots": self.material_lots.diagnostics(),
+            "material_items": self.material_items.diagnostics(),
+            "material_lot_index": self.material_lot_index.diagnostics(),
+            "material_active_index": self.material_active_index.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
