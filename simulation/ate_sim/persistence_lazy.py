@@ -2264,6 +2264,7 @@ def _initialize_eager_tracker(
         SOCIAL_EDGE_NAMESPACE,
         SOCIAL_ADJACENCY_NAMESPACE,
         SOCIAL_PARTNERSHIP_NAMESPACE,
+        SKILL_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -10980,6 +10981,12 @@ class LazyWorldSession:
             social_partnership_touched_keys,
             social_partnership_structural_keys,
         ) = self.social_partnerships.prepare_save_changes()
+        (
+            skill_version_changes,
+            skill_identity_changes,
+            skill_touched_keys,
+            skill_structural_keys,
+        ) = self.skills.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -11022,6 +11029,8 @@ class LazyWorldSession:
             or social_adjacency_identity_changes
             or social_partnership_version_changes
             or social_partnership_identity_changes
+            or skill_version_changes
+            or skill_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -11046,6 +11055,7 @@ class LazyWorldSession:
             or social_edge_structural_keys
             or social_adjacency_structural_keys
             or social_partnership_structural_keys
+            or skill_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -11184,6 +11194,12 @@ class LazyWorldSession:
                 social_partnership_structural_keys,
                 "social partnerships",
             ),
+            (
+                SKILL_NAMESPACE,
+                self.skills,
+                skill_structural_keys,
+                "skill histories",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -11229,6 +11245,7 @@ class LazyWorldSession:
             (SOCIAL_EDGE_NAMESPACE, len(self.social_edges)),
             (SOCIAL_ADJACENCY_NAMESPACE, len(self.social_adjacency)),
             (SOCIAL_PARTNERSHIP_NAMESPACE, len(self.social_partnerships)),
+            (SKILL_NAMESPACE, len(self.skills)),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -11377,6 +11394,10 @@ class LazyWorldSession:
             social_partnership_structural_keys=(
                 social_partnership_structural_keys
             ),
+            skill_version_changes=skill_version_changes,
+            skill_identity_changes=skill_identity_changes,
+            skill_touched_keys=skill_touched_keys,
+            skill_structural_keys=skill_structural_keys,
             layout_value=layout_value,
         )
 
@@ -13409,6 +13430,7 @@ def open_lazy_world_session(path, *, rules_id):
                     SOCIAL_EDGE_NAMESPACE,
                     SOCIAL_ADJACENCY_NAMESPACE,
                     SOCIAL_PARTNERSHIP_NAMESPACE,
+                    SKILL_NAMESPACE,
                 },
             )
             _validate_head_inventory(
@@ -13476,6 +13498,7 @@ def open_lazy_world_session(path, *, rules_id):
                         SOCIAL_EDGE_NAMESPACE,
                         SOCIAL_ADJACENCY_NAMESPACE,
                         SOCIAL_PARTNERSHIP_NAMESPACE,
+                        SKILL_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
