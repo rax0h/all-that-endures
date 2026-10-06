@@ -13416,6 +13416,7 @@ class LazyWorldSession:
                 mutable_replacements,
                 skill_nested_assignments,
             ) = self._stage_detached_skills(mutable_replacements)
+            detached_lineage_nodes = self._stage_detached_lineage_nodes()
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
