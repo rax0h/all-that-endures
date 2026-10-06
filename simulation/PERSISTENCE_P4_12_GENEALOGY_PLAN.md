@@ -25,3 +25,6 @@ Preserve list identity and direct setdefault(...).append(...) behavior used by b
 Birth must update the child parent tuple and both parent child-lists in one hybrid generation.
 
 After both slices are focused/scaling green, run one affected P4 matrix, close P4.12, and remeasure residual eager history.
+
+
+P4.12A focused run 37493767218: 9/9 passed in 1.11s.
