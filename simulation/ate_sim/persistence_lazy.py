@@ -950,6 +950,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     social_adjacency_next_ordinal = 0
                     social_partnership_count = 0
                     social_partnership_next_ordinal = 0
+                    skill_count = 0
+                    skill_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -985,6 +987,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SOCIAL_EDGE_NAMESPACE,
                             SOCIAL_ADJACENCY_NAMESPACE,
                             SOCIAL_PARTNERSHIP_NAMESPACE,
+                            SKILL_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -1353,7 +1356,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                                 social_adjacency_next_ordinal,
                                 ordinal + 1,
                             )
-                        else:
+                        elif namespace == SOCIAL_PARTNERSHIP_NAMESPACE:
                             if type(key) is not tuple or len(key) != 2 or type(value) is not int:
                                 raise StoreFormatError(
                                     "invalid social partnership envelope"
@@ -1370,6 +1373,24 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             social_partnership_next_ordinal = max(
                                 social_partnership_next_ordinal,
                                 ordinal + 1,
+                            )
+                        else:
+                            if not isinstance(value, SkillHistory):
+                                raise StoreFormatError(
+                                    "invalid skill history envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=SKILL_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_SKILL_SCHEMA,
+                            )
+                            skill_count += 1
+                            skill_next_ordinal = max(
+                                skill_next_ordinal, ordinal + 1
                             )
 
                     for row in source_store.db.execute(
@@ -1397,6 +1418,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             SOCIAL_EDGE_NAMESPACE,
                             SOCIAL_ADJACENCY_NAMESPACE,
                             SOCIAL_PARTNERSHIP_NAMESPACE,
+                            SKILL_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1572,6 +1594,11 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             social_partnership_count,
                             social_partnership_next_ordinal,
                         ),
+                        (
+                            SKILL_NAMESPACE,
+                            skill_count,
+                            skill_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1670,6 +1697,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "social_edges": social_edge_count,
                 "social_adjacency": social_adjacency_count,
                 "social_partnerships": social_partnership_count,
+                "skills": skill_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
