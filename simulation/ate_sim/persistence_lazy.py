@@ -11481,6 +11481,99 @@ class LazyWorldSession:
                     )
 
 
+    def _validate_social_successor(self, plan, generation):
+        specs = (
+            (
+                plan.social_edge_version_changes,
+                plan.social_edge_identity_changes,
+                SOCIAL_EDGE_NAMESPACE,
+                LAZY_SOCIAL_EDGE_SCHEMA,
+                "social edge",
+                True,
+            ),
+            (
+                plan.social_adjacency_version_changes,
+                plan.social_adjacency_identity_changes,
+                SOCIAL_ADJACENCY_NAMESPACE,
+                LAZY_SOCIAL_ADJACENCY_SCHEMA,
+                "social adjacency",
+                False,
+            ),
+            (
+                plan.social_partnership_version_changes,
+                plan.social_partnership_identity_changes,
+                SOCIAL_PARTNERSHIP_NAMESPACE,
+                LAZY_SOCIAL_PARTNERSHIP_SCHEMA,
+                "social partnership",
+                True,
+            ),
+        )
+        for versions, identities, namespace, schema_expected, label, has_memberships in specs:
+            for change in versions:
+                typed_key = self.store.codec.encode(change.key)
+                row = self.store._visible_record_row(
+                    generation, namespace, typed_key
+                )
+                if change.delete:
+                    if row is not None:
+                        raise StoreIntegrityError(
+                            f"deleted {label} remains visible after save"
+                        )
+                    continue
+                if row is None:
+                    raise StoreIntegrityError(
+                        f"saved {label} is absent after save"
+                    )
+                (
+                    _value,
+                    schema,
+                    _valid_from,
+                    _valid_to,
+                    memberships,
+                ) = self.store._check_record_row(
+                    namespace, typed_key, row, decode=False
+                )
+                expected_memberships = (
+                    tuple(
+                        (
+                            member.index_name,
+                            member.value,
+                            member.ordinal,
+                        )
+                        for member in change.memberships
+                    )
+                    if has_memberships else ()
+                )
+                if (
+                    schema != schema_expected
+                    or row[2] != self.store.codec.encode(change.value)
+                    or memberships != expected_memberships
+                ):
+                    raise StoreIntegrityError(
+                        f"saved {label} evidence mismatch"
+                    )
+            for change in identities:
+                encoded_key = self.store.codec.encode(change.owner_key)
+                encoded_path = self.store.codec.encode(
+                    change.occurrence_path
+                )
+                row = self.store._visible_identity_occurrence(
+                    generation,
+                    change.owner_namespace,
+                    encoded_key,
+                    encoded_path,
+                )
+                if change.delete:
+                    if row is not None:
+                        raise StoreIntegrityError(
+                            f"deleted {label} incarnation remains visible"
+                        )
+                elif row is None or row[0] != change.incarnation_id:
+                    raise StoreIntegrityError(
+                        f"saved {label} incarnation evidence mismatch"
+                    )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
