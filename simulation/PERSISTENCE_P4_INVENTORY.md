@@ -258,3 +258,39 @@ Counts and encoded bytes below come from the small independent-control fixture i
 ## 10. Inventory conclusion
 
 The current store already has bounded checked point reads and bounded changed-record writes. P4 should therefore **not** redesign P1/P2/P3 transaction semantics. The first implementation task should make `world.people` lazy while preserving direct mapping behavior, one mutable instance, alive-membership ordering, reactivation/resurrection, stale-session semantics and materializing detach. Only after that measured pilot should the same primitives expand to resources/materials and the other families that dominate residual residency.
+
+
+## 2026-10-05 material-family closure
+
+Starting from `5e1e693930bb26b4b11509ff3979574e89a0e924`, the next measured
+high-growth family was migrated under `PERSISTENCE_P4_3_MATERIALS_PLAN.md`.
+
+The focused gate was GitHub Actions run
+`37392683563`: **27 passed in 37.16s**. The gate compiled the touched modules
+and ran the new lazy-material family tests together with the existing material
+selection-index and lazy magic-resource suites.
+
+Accepted material results:
+
+- ordinary lazy open decodes zero material lots/items/index buckets;
+- current active-settlement/rank membership queries can select IDs without
+  decoding historical lot bodies;
+- lots/items preserve direct supported mutation, save/reopen and dictionary
+  delete/reinsert order;
+- retained `MaterialLot.transfers` aliases survive parent cache eviction;
+- retained `lot_index` list and `active_lot_index` set aliases survive bucket
+  eviction and save/reopen;
+- create/consume updates record payload and active memberships atomically;
+- explicit materializing detach returns plain portable dict/list/set structures;
+- 1,000 and 10,000 historical-lot fixtures both open with zero unrequested
+  material-family payload loads.
+
+Per-owner `MaterialLot.transfers` remains a mutable owner payload and is still
+reported as a possible per-owner growth cost. It has not been falsely declared
+segmented.
+
+The next candidate class remains the architect-identified person-coupled state:
+`world.currency.wallets` / treasuries, then advancement/metaphysics where
+measured residuals justify migration. Currency is taken first because it is
+person-keyed, grows with participation, and the existing P4 probe deliberately
+contains shared wallet aliases that make alias preservation testable.
