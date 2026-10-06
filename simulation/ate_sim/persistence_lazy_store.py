@@ -463,6 +463,11 @@ class LazyRecordStore:
         self._phase_hook = lambda phase: None
         self._recovery_required: dict[str, bytes] = {}
         self._active_read_transaction = False
+        # The save-head row is immutable between commits but is consulted by
+        # every checked lazy read. Cache only the fact that one exact raw row
+        # has already passed semantic decoding; every access still rereads the
+        # row and verifies its checksum before this cache is considered.
+        self._validated_head_row_cache: tuple[Any, ...] | None = None
         self.reset_diagnostics()
 
     @classmethod
@@ -656,14 +661,25 @@ class LazyRecordStore:
                 raise StoreIntegrityError("initial save head has a parent generation")
         elif type(parent) is not int or parent != generation - 1:
             raise StoreIntegrityError("invalid save head lineage")
-        self.codec.decode(row[2])
-        self.codec.decode(row[4])
-        namespaces = self.codec.decode(row[5])
-        if type(namespaces) is not tuple or any(type(v) is not str for v in namespaces):
-            raise StoreIntegrityError("invalid namespace inventory")
-        counts = _namespace_counts(self.codec, row[6])
-        if not set(counts).issubset(set(namespaces)):
-            raise StoreIntegrityError("namespace counts are outside head inventory")
+
+        # The checksum above protects every raw field. Semantic decoding of the
+        # same exact row is therefore redundant until a commit changes any
+        # field. Do not cache the row read itself: rereading + rehashing is what
+        # preserves live corruption detection.
+        if row != self._validated_head_row_cache:
+            self.codec.decode(row[2])
+            self.codec.decode(row[4])
+            namespaces = self.codec.decode(row[5])
+            if type(namespaces) is not tuple or any(
+                type(v) is not str for v in namespaces
+            ):
+                raise StoreIntegrityError("invalid namespace inventory")
+            counts = _namespace_counts(self.codec, row[6])
+            if not set(counts).issubset(set(namespaces)):
+                raise StoreIntegrityError(
+                    "namespace counts are outside head inventory"
+                )
+            self._validated_head_row_cache = row
         return row
 
     @property
