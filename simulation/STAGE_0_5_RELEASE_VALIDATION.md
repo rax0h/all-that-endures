@@ -106,3 +106,46 @@ history.
 
 Durable machine-readable summary:
 `simulation/p5_short_validation.json`.
+
+## Final-code short closeout evidence
+
+Run `37516101856` passed on helper head
+`db296bf9c90314c537636e3c236f666679ecef96`, branched directly from
+Stage 0.5 head `6a1990754c777dcb11b1aa8985754359bf2ee803`.
+No material simulation product/test bytes changed between implementation
+candidate `14f178623a6ef6e0d915fb4fe061079f54b15c21` and that tested head.
+
+The required targeted smoke passed:
+
+`PYTHONPATH=.:simulation python simulation/specific_test.py --seed 843000 --years 10 --section all`
+
+It produced year 10 with **439 events**, last event ID **439**, and canonical
+digest `3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`,
+matching the P5 short continuation digest.
+
+The compact final-code failure/lifecycle/compatibility battery passed
+**138/138 in 103.70s**, covering:
+
+- `test_persistence_lazy_store_failures.py`;
+- `test_persistence_lifecycle.py`;
+- `test_persistence_session_open.py`;
+- `test_persistence_cold_save_failures.py`;
+- `test_persistence_lazy_identity.py`;
+- `test_persistence_p2c.py`.
+
+This reruns the accepted atomic failure/recovery, stale session/writer,
+generation-pinned read, close/reopen, detach, identity, corruption/refusal and
+legacy/current compatibility boundaries on final product/test bytes without
+repeating the entire P4 affected matrix.
+
+PR #14's previous dirty merge state was traced to overlapping
+`docs/LIVING_DESIGN.md` edits. The Stage 0.5 branch now preserves main's newer
+living-design document and its README/visual-constitution updates while retaining
+the Stage 0.5-only **Material life and quiet economic pressure** section.
+GitHub now reports PR #14 **mergeable / clean**. These reconciliation commits
+are documentation-only and do not change simulation product/test bytes.
+
+The remaining execution gate before authorized long-horizon evidence is the
+already-running integrated P4/full-suite run `37513490616`. Do not launch a
+redundant full suite unless material product/test bytes change.
+
