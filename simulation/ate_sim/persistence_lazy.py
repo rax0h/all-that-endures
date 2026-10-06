@@ -1284,6 +1284,20 @@ def _soul_occurrence_from_path(path):
     return None
 
 
+def _advancement_occurrence_from_path(path):
+    if (
+        type(path) is tuple
+        and len(path) >= 3
+        and path[0] == ("field", "advancement")
+        and path[1] == ("field", "paths")
+        and type(path[2]) is tuple
+        and len(path[2]) == 2
+        and path[2][0] == "key"
+    ):
+        return path[2][1], tuple(path[3:])
+    return None
+
+
 def _lazy_occurrence_from_path(path):
     people = _people_occurrence_from_path(path)
     if people is not None:
@@ -1379,6 +1393,15 @@ def _lazy_occurrence_from_path(path):
         else:
             expected_type = SoulState
         return SOUL_NAMESPACE, soul[0], relative, expected_type
+    advancement = _advancement_occurrence_from_path(path)
+    if advancement is not None:
+        relative = advancement[1]
+        return (
+            ADVANCEMENT_NAMESPACE,
+            advancement[0],
+            relative,
+            EssencePath if not relative else object,
+        )
     return None
 
 
@@ -1552,6 +1575,7 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 MATERIAL_LOT_NAMESPACE: session.material_lots,
                 MATERIAL_ITEM_NAMESPACE: session.material_items,
                 SOUL_NAMESPACE: session.souls,
+                ADVANCEMENT_NAMESPACE: session.advancement_paths,
             }.get(namespace)
             if table is None:
                 raise StoreIntegrityError(
@@ -1601,6 +1625,7 @@ def _initialize_eager_tracker(
         WALLET_NAMESPACE,
         TREASURY_NAMESPACE,
         SOUL_NAMESPACE,
+        ADVANCEMENT_NAMESPACE,
     }
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
@@ -5784,6 +5809,7 @@ class LazyWorldSession:
                     WALLET_NAMESPACE,
                     TREASURY_NAMESPACE,
                     SOUL_NAMESPACE,
+                    ADVANCEMENT_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
@@ -5813,6 +5839,7 @@ class LazyWorldSession:
                     WALLET_NAMESPACE,
                     TREASURY_NAMESPACE,
                     SOUL_NAMESPACE,
+                    ADVANCEMENT_NAMESPACE,
                 }
             )
             lazy_paths = {
