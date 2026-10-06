@@ -1,12 +1,14 @@
 # Visual Constitution
 
-## 2.75D definition
+## Long-term visual target
 
-All That Endures uses a genuinely spatial 3D world presented through a tightly art-directed elevated three-quarter camera. The intended frame should feel closer to premium fantasy illustration than unrestricted photorealistic 3D.
+All That Endures is intended to become a **full 3D, AAA-quality RPG** capable of supporting first- or third-person play. The final game should feel physically present, historically layered and cinematic without sacrificing the causal truth of the simulation.
 
-Real runtime depth includes terrain/elevation, volumetric architecture and props, occlusion, navigation/collision, perspective, environmental lighting/shadows, water, particles, atmosphere and weather.
+The simulation owns reality; the renderer realizes that reality. Visual systems may change over the life of the project, but the underlying world state must remain renderer-agnostic and sufficiently expressive to reconstruct why a place, object, person or event looks the way it does.
 
-The controlled camera is deliberate. It lets production concentrate detail on visible surfaces, silhouettes and compositions while using aggressive LOD, occlusion, impostors and unseen-side simplification where they preserve the final frame.
+The early **Visual World Laboratory** may use a tightly art-directed elevated camera or 2.75D presentation to prove deterministic world realization, composition, streaming and historical layering quickly. That laboratory is a development strategy, not the final visual ceiling.
+
+Real runtime depth includes terrain/elevation, volumetric architecture and props, interiors, occlusion, navigation/collision, perspective, environmental lighting/shadows, water, particles, atmosphere, weather and physically consequential destruction or alteration where the simulation supports it.
 
 ## Material language
 
@@ -32,6 +34,22 @@ Rank transformation is biological/ontological, not merely a glow. The visual sys
 
 Architecture, clothing, decoration, tools and art can develop style lineages. Motifs and techniques spread through actual contact, teaching, migration, trade, conquest, prestige and imitation. Hybrid visual traditions should therefore have historical ancestry rather than random theme mixing.
 
+## Procedural world realization
+
+Settlements, roads, buildings, interiors, landscapes and visible damage states must be realizable from simulation state rather than depend on fixed handcrafted maps.
+
+Procedural does not mean arbitrary. Stable world and entity identifiers should produce persistent deterministic visual identities. Returning to an unchanged building should reproduce the same building. Historical changes should patch that realization rather than reroll unrelated geometry.
+
+The art pipeline should build **visual languages and grammars**, not preset towns: coherent systems for structure, materials, architecture, vegetation, clothing, decoration, wear, damage, repairs and cultural lineage. These systems combine according to simulated terrain, climate, resources, wealth, technology, labor, culture, law, trade, migration, disaster and history.
+
+A settlement should therefore look the way it does because of what happened there.
+
+## Neural and future rendering
+
+ATE should be designed to benefit from neural rendering and future graphics systems without depending on one named product or version. Neural reconstruction, lighting, material enhancement and similar technologies may supply expensive final-frame fidelity, but they must remain downstream of world truth.
+
+Rendering technology may improve dramatically over the life of the project. The architecture should allow those improvements to be adopted without rewriting simulation history, character identity, settlement state or material causality.
+
 ## Generated cultural works
 
 Generative media may be useful for paintings, manuscripts, heraldry, murals, decorative motifs, portraits and similar works, but outputs must be conditioned by the simulated creator, materials, technique, influences, culture and historical context. Generated media is not the foundation for spatial world geometry.
@@ -44,4 +62,4 @@ For isolated transparent runtime assets, transparency is authored at source/gene
 
 Reject final visuals that read as flat vector villages, primitive final geometry, orthographic board-game framing, chibi/toy proportions, generic mobile-game art, single-plane backgrounds, giant opaque HUD blocks, ungrounded neon magic or procedural variety that routinely produces incoherent composition.
 
-> **Procedural variation cannot lower the art standard.**
+> **Procedural variation cannot lower the art standard. The simulation owns reality; the renderer realizes it.**
