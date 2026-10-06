@@ -122,6 +122,12 @@ class LazyStoreDiagnostics:
     temporary_keys_peak: int
 
 
+AUXILIARY_NAMESPACE_PREFIX = "aux.lazy."
+
+def _auxiliary_namespace(namespace: str) -> bool:
+    return namespace.startswith(AUXILIARY_NAMESPACE_PREFIX)
+
+
 P4_DDL = """
 CREATE TABLE lazy_record_versions(
     namespace TEXT NOT NULL,
