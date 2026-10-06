@@ -3964,6 +3964,39 @@ class _LazySimpleMaterialObjectTable(LazyRecordTable):
     def _detach_unloaded_record(self, key):
         raise NotImplementedError
 
+    def _memberships(self, record, ordinal):
+        return ()
+
+    def _index_name(self, fields):
+        raise StoreError(f"{self._label} has no persistent query index")
+
+    def ids(self, fields, *values):
+        self._ensure()
+        index_name = self._index_name(fields)
+        index_value = values[0] if len(values) == 1 else tuple(values)
+        baseline = set(
+            self._store.query_keys(
+                self._pin, self._namespace, index_name, index_value
+            )
+        )
+        touched = self._effective_touched()
+        baseline.difference_update(touched)
+        for key in touched:
+            if not self._visible(key):
+                continue
+            record = dict.__getitem__(self, key)
+            ordinal = self._current_ordinal(key)
+            memberships = {
+                (member.index_name, member.value)
+                for member in self._memberships(record, ordinal)
+            }
+            if (index_name, index_value) in memberships:
+                baseline.add(key)
+        return tuple(sorted(baseline))
+
+    def select(self, fields, *values):
+        return [self[key] for key in self.ids(fields, *values)]
+
     def __getitem__(self, key):
         self._ensure()
         if not self._visible(key):
@@ -4119,7 +4152,6 @@ class _LazySimpleMaterialObjectTable(LazyRecordTable):
                 ordinal = structural_ordinals[key]
             else:
                 ordinal = self._persisted_ordinal(key)
-            del ordinal
             if value_changed:
                 version_changes.append(
                     VersionChange(
@@ -4127,6 +4159,7 @@ class _LazySimpleMaterialObjectTable(LazyRecordTable):
                         key,
                         record,
                         record_schema=self._record_schema,
+                        memberships=self._memberships(record, ordinal),
                         reinsertion=reinsertion,
                     )
                 )
