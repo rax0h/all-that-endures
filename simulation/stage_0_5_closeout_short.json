@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "run_id": 37516101856,
+  "helper_head": "db296bf9c90314c537636e3c236f666679ecef96",
+  "source_stage_head": "6a1990754c777dcb11b1aa8985754359bf2ee803",
+  "implementation_candidate": "14f178623a6ef6e0d915fb4fe061079f54b15c21",
+  "smoke": {
+    "seed": 843000,
+    "years": 10,
+    "events_total": 439,
+    "last_event_id": 439,
+    "canonical_digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e",
+    "passed": true
+  },
+  "compact_persistence_battery": {
+    "tests_passed": 138,
+    "seconds": 103.7,
+    "files": [
+      "simulation/tests/test_persistence_lazy_store_failures.py",
+      "simulation/tests/test_persistence_lifecycle.py",
+      "simulation/tests/test_persistence_session_open.py",
+      "simulation/tests/test_persistence_cold_save_failures.py",
+      "simulation/tests/test_persistence_lazy_identity.py",
+      "simulation/tests/test_persistence_p2c.py"
+    ],
+    "passed": true
+  },
+  "pr_integration": {
+    "mergeable": true,
+    "mergeable_state": "clean",
+    "reconciliation_product_test_change": false
+  },
+  "pending": {
+    "integrated_full_suite_run_id": 37513490616,
+    "long_horizon_waits_for_full_suite_green": true
+  }
+}
