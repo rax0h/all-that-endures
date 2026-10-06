@@ -1556,6 +1556,20 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 ):
                     eager_object = LazySoulTrackedList(eager_object)
                     _relative_set(session.world, eager_path, eager_object)
+            elif namespace == ADVANCEMENT_NAMESPACE and relative:
+                # A lazy advancement descendant can share identity with a
+                # still-eager owner. Built-in containers are not weakrefable,
+                # so give the eager side the same tracking-capable runtime
+                # wrapper that will later be attached when the path loads.
+                if type(eager_object) is dict:
+                    eager_object = LazyTrackedDict(eager_object)
+                    _relative_set(session.world, eager_path, eager_object)
+                elif type(eager_object) is list:
+                    eager_object = LazySoulTrackedList(eager_object)
+                    _relative_set(session.world, eager_path, eager_object)
+                elif type(eager_object) is set:
+                    eager_object = LazySoulTrackedSet(eager_object)
+                    _relative_set(session.world, eager_path, eager_object)
             if not isinstance(eager_object, expected_type):
                 raise StoreIntegrityError(
                     "cross-boundary lazy identity resolves to wrong type"
@@ -10168,6 +10182,7 @@ def open_lazy_world_session(path, *, rules_id):
                         WALLET_NAMESPACE,
                         TREASURY_NAMESPACE,
                         SOUL_NAMESPACE,
+                        ADVANCEMENT_NAMESPACE,
                     ):
                         value = None
                     elif namespace == "world.events":
