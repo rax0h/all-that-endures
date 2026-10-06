@@ -5846,6 +5846,56 @@ class LazyWorldSession:
             layout_value=layout_value,
         ), layout_value
 
+
+    def _merge_material_layout(
+        self, cold_plan, namespace, table, structural_keys, label
+    ):
+        layout_value = cold_plan.layout_value
+        if not structural_keys:
+            return cold_plan, layout_value
+        if layout_value is None:
+            layout_value = dict(self.manifest["collections"])
+        else:
+            layout_value = dict(layout_value)
+        current = layout_value[namespace]
+        if type(current) is not tuple or len(current) != 3:
+            raise StoreFormatError(
+                f"invalid {label} collection description"
+            )
+        layout_value[namespace] = (
+            current[0], len(table), current[2]
+        )
+        change_map = {
+            (change.namespace, self.store.codec.encode(change.key)): change
+            for change in cold_plan.changes
+        }
+        layout_change = RecordChange(
+            META,
+            COLLECTION_LAYOUT,
+            layout_value,
+            record_schema=RECORD_SCHEMA,
+        )
+        change_map[
+            (META, self.store.codec.encode(COLLECTION_LAYOUT))
+        ] = layout_change
+        changes = tuple(
+            change_map[key]
+            for key in sorted(
+                change_map, key=lambda item: (item[0], item[1])
+            )
+        )
+        self._eager_tracker._manifest_dirty = True
+        return replace(
+            cold_plan,
+            changes=changes,
+            record_evidence=_change_evidence(
+                self.store.codec, changes
+            ),
+            manifest_dirty=True,
+            layout_value=layout_value,
+        ), layout_value
+
+
     def _prepare_hybrid_save(self):
         (
             version_changes,
@@ -5871,6 +5921,30 @@ class LazyWorldSession:
             owner_index_touched_keys,
             owner_index_structural_keys,
         ) = self.owner_index.prepare_save_changes()
+        (
+            material_lot_version_changes,
+            material_lot_identity_changes,
+            material_lot_touched_keys,
+            material_lot_structural_keys,
+        ) = self.material_lots.prepare_save_changes()
+        (
+            material_item_version_changes,
+            material_item_identity_changes,
+            material_item_touched_keys,
+            material_item_structural_keys,
+        ) = self.material_items.prepare_save_changes()
+        (
+            material_lot_index_version_changes,
+            material_lot_index_identity_changes,
+            material_lot_index_touched_keys,
+            material_lot_index_structural_keys,
+        ) = self.material_lot_index.prepare_save_changes()
+        (
+            material_active_index_version_changes,
+            material_active_index_identity_changes,
+            material_active_index_touched_keys,
+            material_active_index_structural_keys,
+        ) = self.material_active_index.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -5881,6 +5955,14 @@ class LazyWorldSession:
             or resource_identity_changes
             or owner_index_version_changes
             or owner_index_identity_changes
+            or material_lot_version_changes
+            or material_lot_identity_changes
+            or material_item_version_changes
+            or material_item_identity_changes
+            or material_lot_index_version_changes
+            or material_lot_index_identity_changes
+            or material_active_index_version_changes
+            or material_active_index_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -5889,6 +5971,10 @@ class LazyWorldSession:
             or aspiration_structural_keys
             or resource_structural_keys
             or owner_index_structural_keys
+            or material_lot_structural_keys
+            or material_item_structural_keys
+            or material_lot_index_structural_keys
+            or material_active_index_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -5930,6 +6016,39 @@ class LazyWorldSession:
         cold_plan, layout_value = self._merge_owner_index_layout(
             cold_plan, owner_index_structural_keys
         )
+        for namespace, table, structural, label in (
+            (
+                MATERIAL_LOT_NAMESPACE,
+                self.material_lots,
+                material_lot_structural_keys,
+                "material lots",
+            ),
+            (
+                MATERIAL_ITEM_NAMESPACE,
+                self.material_items,
+                material_item_structural_keys,
+                "material items",
+            ),
+            (
+                MATERIAL_LOT_INDEX_NAMESPACE,
+                self.material_lot_index,
+                material_lot_index_structural_keys,
+                "material lot index",
+            ),
+            (
+                MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                self.material_active_index,
+                material_active_index_structural_keys,
+                "material active index",
+            ),
+        ):
+            cold_plan, layout_value = self._merge_material_layout(
+                cold_plan,
+                namespace,
+                table,
+                structural,
+                label,
+            )
 
         expected_counts = self.store.codec.decode(
             cold_plan.expected_namespace_counts
@@ -5939,6 +6058,13 @@ class LazyWorldSession:
             (ASPIRATION_NAMESPACE, len(self.aspirations)),
             (RESOURCE_NAMESPACE, len(self.resources)),
             (OWNER_INDEX_NAMESPACE, len(self.owner_index)),
+            (MATERIAL_LOT_NAMESPACE, len(self.material_lots)),
+            (MATERIAL_ITEM_NAMESPACE, len(self.material_items)),
+            (MATERIAL_LOT_INDEX_NAMESPACE, len(self.material_lot_index)),
+            (
+                MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                len(self.material_active_index),
+            ),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -5971,6 +6097,38 @@ class LazyWorldSession:
             resource_structural_keys=resource_structural_keys,
             owner_index_touched_keys=owner_index_touched_keys,
             owner_index_structural_keys=owner_index_structural_keys,
+            material_lot_version_changes=material_lot_version_changes,
+            material_lot_identity_changes=material_lot_identity_changes,
+            material_lot_touched_keys=material_lot_touched_keys,
+            material_lot_structural_keys=material_lot_structural_keys,
+            material_item_version_changes=material_item_version_changes,
+            material_item_identity_changes=material_item_identity_changes,
+            material_item_touched_keys=material_item_touched_keys,
+            material_item_structural_keys=material_item_structural_keys,
+            material_lot_index_version_changes=(
+                material_lot_index_version_changes
+            ),
+            material_lot_index_identity_changes=(
+                material_lot_index_identity_changes
+            ),
+            material_lot_index_touched_keys=(
+                material_lot_index_touched_keys
+            ),
+            material_lot_index_structural_keys=(
+                material_lot_index_structural_keys
+            ),
+            material_active_index_version_changes=(
+                material_active_index_version_changes
+            ),
+            material_active_index_identity_changes=(
+                material_active_index_identity_changes
+            ),
+            material_active_index_touched_keys=(
+                material_active_index_touched_keys
+            ),
+            material_active_index_structural_keys=(
+                material_active_index_structural_keys
+            ),
             layout_value=layout_value,
         )
 
@@ -6227,6 +6385,126 @@ class LazyWorldSession:
                     "saved owner-index incarnation evidence mismatch"
                 )
 
+
+    def _validate_material_successor(self, plan, generation):
+        version_specs = (
+            (
+                plan.material_lot_version_changes,
+                MATERIAL_LOT_NAMESPACE,
+                LAZY_MATERIAL_LOT_SCHEMA,
+                "material lot",
+                True,
+            ),
+            (
+                plan.material_item_version_changes,
+                MATERIAL_ITEM_NAMESPACE,
+                LAZY_MATERIAL_ITEM_SCHEMA,
+                "crafted item",
+                False,
+            ),
+            (
+                plan.material_lot_index_version_changes,
+                MATERIAL_LOT_INDEX_NAMESPACE,
+                LAZY_MATERIAL_LOT_INDEX_SCHEMA,
+                "material lot-index bucket",
+                False,
+            ),
+            (
+                plan.material_active_index_version_changes,
+                MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                LAZY_MATERIAL_ACTIVE_INDEX_SCHEMA,
+                "material active-index bucket",
+                False,
+            ),
+        )
+        for changes, namespace, schema_expected, label, has_memberships in (
+            version_specs
+        ):
+            for change in changes:
+                typed_key = self.store.codec.encode(change.key)
+                row = self.store._visible_record_row(
+                    generation, namespace, typed_key
+                )
+                if change.delete:
+                    if row is not None:
+                        raise StoreIntegrityError(
+                            f"deleted {label} remains visible after save"
+                        )
+                    continue
+                if row is None:
+                    raise StoreIntegrityError(
+                        f"saved {label} is absent after save"
+                    )
+                (
+                    _value,
+                    schema,
+                    _valid_from,
+                    _valid_to,
+                    memberships,
+                ) = self.store._check_record_row(
+                    namespace, typed_key, row, decode=False
+                )
+                expected_memberships = (
+                    tuple(
+                        (
+                            member.index_name,
+                            member.value,
+                            member.ordinal,
+                        )
+                        for member in change.memberships
+                    )
+                    if has_memberships else ()
+                )
+                if (
+                    schema != schema_expected
+                    or row[2] != self.store.codec.encode(change.value)
+                    or memberships != expected_memberships
+                ):
+                    raise StoreIntegrityError(
+                        f"saved {label} payload evidence mismatch"
+                    )
+
+        identity_specs = (
+            (
+                plan.material_lot_identity_changes,
+                "material lot",
+            ),
+            (
+                plan.material_item_identity_changes,
+                "crafted item",
+            ),
+            (
+                plan.material_lot_index_identity_changes,
+                "material lot-index bucket",
+            ),
+            (
+                plan.material_active_index_identity_changes,
+                "material active-index bucket",
+            ),
+        )
+        for changes, label in identity_specs:
+            for change in changes:
+                encoded_key = self.store.codec.encode(change.owner_key)
+                encoded_path = self.store.codec.encode(
+                    change.occurrence_path
+                )
+                row = self.store._visible_identity_occurrence(
+                    generation,
+                    change.owner_namespace,
+                    encoded_key,
+                    encoded_path,
+                )
+                if change.delete:
+                    if row is not None:
+                        raise StoreIntegrityError(
+                            f"deleted {label} incarnation remains visible"
+                        )
+                elif row is None or row[0] != change.incarnation_id:
+                    raise StoreIntegrityError(
+                        f"saved {label} incarnation evidence mismatch"
+                    )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -6247,6 +6525,10 @@ class LazyWorldSession:
         self.aspirations._pin = result.pin
         self.resources._pin = result.pin
         self.owner_index._pin = result.pin
+        self.material_lots._pin = result.pin
+        self.material_items._pin = result.pin
+        self.material_lot_index._pin = result.pin
+        self.material_active_index._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -6259,6 +6541,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_owner_index_successor(
+            plan, result.generation
+        )
+        self._validate_material_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -6284,6 +6569,10 @@ class LazyWorldSession:
         self.aspirations.accept_save(plan, result.pin)
         self.resources.accept_save(plan, result.pin)
         self.owner_index.accept_save(plan, result.pin)
+        self.material_lots.accept_save(plan, result.pin)
+        self.material_items.accept_save(plan, result.pin)
+        self.material_lot_index.accept_save(plan, result.pin)
+        self.material_active_index.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -6345,12 +6634,20 @@ class LazyWorldSession:
                     + plan.aspiration_version_changes
                     + plan.resource_version_changes
                     + plan.owner_index_version_changes
+                    + plan.material_lot_version_changes
+                    + plan.material_item_version_changes
+                    + plan.material_lot_index_version_changes
+                    + plan.material_active_index_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
                     + plan.aspiration_identity_changes
                     + plan.resource_identity_changes
                     + plan.owner_index_identity_changes
+                    + plan.material_lot_identity_changes
+                    + plan.material_item_identity_changes
+                    + plan.material_lot_index_identity_changes
+                    + plan.material_active_index_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
