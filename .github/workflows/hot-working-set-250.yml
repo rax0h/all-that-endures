@@ -1,4 +1,4 @@
-name: Hot working set 250-year gate
+name: Diagnose 250-year divergence
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - sol-stage-0-5-hot-working-set-250
 
 jobs:
-  validate:
+  diagnose:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -16,29 +16,72 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run 250-year integrated persistence gate
-        run: |
-          python simulation/persistence_p5_long_validation.py \
-            --seed 843000 \
-            --milestones 100 250 \
-            --bootstrap-year 3 \
-            --workdir p5-hot-250 \
-            --output p5-hot-250.json \
-            --product-sha "$GITHUB_SHA" \
-            --workflow-sha "$GITHUB_SHA"
-      - name: Print compact 250-year metrics
+      - name: Locate first divergent event and subsystem
         run: |
           python - <<'PY'
-          import json
+          from dataclasses import fields
+          import tempfile
           from pathlib import Path
-          data=json.loads(Path("p5-hot-250.json").read_text())
-          print("CONTROL", data["control_wall_seconds"])
-          for year,row in sorted(data["p4"].items(), key=lambda item:int(item[0])):
-              print(
-                  year,
-                  "simulation_seconds", row["simulation_seconds"],
-                  "payload_reads", row["simulation_io"]["payload_reads"],
-                  "save_seconds", row["save_seconds"],
-                  "reopen_digest_seconds", row["reopen_digest_seconds"],
-              )
+
+          from ate_sim.canonical_stream import digest as stream_digest
+          from ate_sim.core import World, _canonical, _canonical_fields
+          from ate_sim.engine import Simulation
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.worldgen import generate_world
+
+          SEED=843000
+          RULES="diag-250-event"
+
+          def d(value):
+              return stream_digest(value, _canonical, _canonical_fields)
+
+          control=generate_world(SEED)
+          Simulation(control).run(250)
+          print("CONTROL_DIGEST", control.digest(), "EVENTS", len(control.events))
+
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td); cold=td/"cold.sqlite"; lazy=td/"lazy.sqlite"
+              source=generate_world(SEED)
+              Simulation(source).run(3)
+              write_cold_snapshot(source,cold,rules_id=RULES)
+              convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+
+              with open_lazy_world_session(lazy,rules_id=RULES) as session:
+                  Simulation(session.world).run(97)
+                  print("YEAR100_PRE_SAVE_MATCH", session.world.digest()==d(control) if False else session.world.year)
+                  session.save()
+
+              with open_lazy_world_session(lazy,rules_id=RULES) as session:
+                  print("YEAR100_REOPEN_DIGEST", session.world.digest())
+                  Simulation(session.world).run(150)
+                  print("YEAR250_LIVE_DIGEST", session.world.digest(), "EVENTS", len(session.world.events))
+
+                  first=None
+                  common=min(len(control.events),len(session.world.events))
+                  for i in range(common):
+                      left=control.events[i]
+                      right=session.world.events[i]
+                      if d(left)!=d(right):
+                          first=i
+                          print("FIRST_EVENT_DIFF_INDEX",i)
+                          print("CONTROL_EVENT",repr(left))
+                          print("LAZY_EVENT",repr(right))
+                          break
+                  if first is None and len(control.events)!=len(session.world.events):
+                      first=common
+                      print("FIRST_EVENT_LENGTH_DIFF_INDEX",common)
+
+                  if first is not None:
+                      lo=max(0,first-4); hi=min(common,first+5)
+                      for i in range(lo,hi):
+                          print("EVENT_WINDOW",i,"CONTROL",repr(control.events[i]))
+                          print("EVENT_WINDOW",i,"LAZY",repr(session.world.events[i]))
+
+                  for field in fields(World):
+                      name=field.name
+                      left=d(getattr(control,name))
+                      right=d(getattr(session.world,name))
+                      if left!=right:
+                          print("FIELD_DIFF",name,left,right)
           PY
