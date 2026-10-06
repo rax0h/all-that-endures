@@ -1,0 +1,44 @@
+name: P4.14 import patcher
+
+on:
+  push:
+    branches:
+      - sol-p4-14-import-patcher
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: |
+          git config user.name "OpenAI Sol"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout sim/stage-0-5-stabilization
+          python - <<'PY'
+          from pathlib import Path
+          p=Path("simulation/ate_sim/persistence_lazy.py")
+          c=p.read_text()
+          old="from .lineage import LineageNode\n"
+          new="""from .lineage import LineageNode
+from .persistence_lazy_lineage_children import (
+    LINEAGE_CHILD_NAMESPACE,
+    LINEAGE_CHILD_EDGE_NAMESPACE,
+    LAZY_LINEAGE_CHILD_SCHEMA,
+    LAZY_LINEAGE_CHILD_EDGE_SCHEMA,
+    LazyLineageChildrenTable,
+    LazyLineageTrackedSet,
+    insert_lineage_child_bucket,
+    insert_lineage_child_edge,
+)
+"""
+          assert old in c
+          p.write_text(c.replace(old,new,1))
+          PY
+          git add simulation/ate_sim/persistence_lazy.py
+          git commit -m "Import P4.14 lineage child adapter [skip ci]"
+          git push origin HEAD:sim/stage-0-5-stabilization
