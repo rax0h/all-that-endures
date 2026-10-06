@@ -3,8 +3,9 @@ from dataclasses import dataclass,field
 from .core_types import layer_ref
 from .magic_progression import practice_ability,record_body_transition
 from .rank_ecology import rank_ecology_step
+from .record_index import IndexedRecord
 @dataclass
-class MotiveState:hunger:float=0.;safety:float=0.;belonging:float=0.;wealth:float=0.;curiosity:float=0.;legacy:float=0.;obligation:float=0.;status:float=0.
+class MotiveState(IndexedRecord):hunger:float=0.;safety:float=0.;belonging:float=0.;wealth:float=0.;curiosity:float=0.;legacy:float=0.;obligation:float=0.;status:float=0.
 @dataclass
 class ActionRecord:year:int;person:int;action:str;motive:str;strength:float;event_id:int|None=None
 @dataclass
