@@ -851,6 +851,12 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     transmission_next_ordinal = 0
                     motive_count = 0
                     motive_next_ordinal = 0
+                    social_edge_count = 0
+                    social_edge_next_ordinal = 0
+                    social_adjacency_count = 0
+                    social_adjacency_next_ordinal = 0
+                    social_partnership_count = 0
+                    social_partnership_next_ordinal = 0
                     for row in source_store.db.execute(
                         "SELECT namespace,typed_key,payload,payload_checksum,"
                         "codec_version,record_schema,last_changed_generation "
@@ -883,6 +889,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             INSTITUTION_APPLICATION_NAMESPACE,
                             TRANSMISSION_NAMESPACE,
                             MOTIVE_NAMESPACE,
+                            SOCIAL_EDGE_NAMESPACE,
+                            SOCIAL_ADJACENCY_NAMESPACE,
+                            SOCIAL_PARTNERSHIP_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
@@ -1192,7 +1201,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                                 transmission_next_ordinal,
                                 ordinal + 1,
                             )
-                        else:
+                        elif namespace == MOTIVE_NAMESPACE:
                             if not isinstance(value, MotiveState):
                                 raise StoreFormatError(
                                     "invalid motive envelope"
@@ -1209,6 +1218,65 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             motive_count += 1
                             motive_next_ordinal = max(
                                 motive_next_ordinal,
+                                ordinal + 1,
+                            )
+                        elif namespace == SOCIAL_EDGE_NAMESPACE:
+                            if not isinstance(value, Relationship):
+                                raise StoreFormatError(
+                                    "invalid social relationship envelope"
+                                )
+                            _insert_lazy_indexed_record(
+                                target,
+                                namespace=SOCIAL_EDGE_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_SOCIAL_EDGE_SCHEMA,
+                            )
+                            social_edge_count += 1
+                            social_edge_next_ordinal = max(
+                                social_edge_next_ordinal,
+                                ordinal + 1,
+                            )
+                        elif namespace == SOCIAL_ADJACENCY_NAMESPACE:
+                            if type(value) is not set or any(
+                                type(item) is not int for item in value
+                            ):
+                                raise StoreFormatError(
+                                    "invalid social adjacency envelope"
+                                )
+                            _insert_lazy_plain_record(
+                                target,
+                                namespace=SOCIAL_ADJACENCY_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=value,
+                                record_schema=LAZY_SOCIAL_ADJACENCY_SCHEMA,
+                            )
+                            social_adjacency_count += 1
+                            social_adjacency_next_ordinal = max(
+                                social_adjacency_next_ordinal,
+                                ordinal + 1,
+                            )
+                        else:
+                            if type(key) is not tuple or len(key) != 2 or type(value) is not int:
+                                raise StoreFormatError(
+                                    "invalid social partnership envelope"
+                                )
+                            _insert_lazy_indexed_record(
+                                target,
+                                namespace=SOCIAL_PARTNERSHIP_NAMESPACE,
+                                generation=generation,
+                                typed_key=typed_key,
+                                ordinal=ordinal,
+                                value=(key, value),
+                                record_schema=LAZY_SOCIAL_PARTNERSHIP_SCHEMA,
+                            )
+                            social_partnership_count += 1
+                            social_partnership_next_ordinal = max(
+                                social_partnership_next_ordinal,
                                 ordinal + 1,
                             )
 
@@ -1234,6 +1302,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             INSTITUTION_APPLICATION_NAMESPACE,
                             TRANSMISSION_NAMESPACE,
                             MOTIVE_NAMESPACE,
+                            SOCIAL_EDGE_NAMESPACE,
+                            SOCIAL_ADJACENCY_NAMESPACE,
+                            SOCIAL_PARTNERSHIP_NAMESPACE,
                         ):
                             target.db.execute(
                                 "INSERT INTO query_membership VALUES (?,?,?,?,?,?)",
@@ -1394,6 +1465,21 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             motive_count,
                             motive_next_ordinal,
                         ),
+                        (
+                            SOCIAL_EDGE_NAMESPACE,
+                            social_edge_count,
+                            social_edge_next_ordinal,
+                        ),
+                        (
+                            SOCIAL_ADJACENCY_NAMESPACE,
+                            social_adjacency_count,
+                            social_adjacency_next_ordinal,
+                        ),
+                        (
+                            SOCIAL_PARTNERSHIP_NAMESPACE,
+                            social_partnership_count,
+                            social_partnership_next_ordinal,
+                        ),
                     ):
                         target.db.execute(
                             "INSERT INTO lazy_namespace_state("
@@ -1489,6 +1575,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                 "institution_applications": institution_application_count,
                 "transmissions": transmission_count,
                 "motives": motive_count,
+                "social_edges": social_edge_count,
+                "social_adjacency": social_adjacency_count,
+                "social_partnerships": social_partnership_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
                 "source_preserved": True,
