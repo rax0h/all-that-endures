@@ -23,6 +23,8 @@ from .persistence_adapters import (
     WorldCodec, _audit, _roots, _kind, _restore_collection, _identity_groups,
     _verify_identity_graph, _read_manifest, _identity_mode, _read_identity_links,
     COLLECTION_LAYOUT,
+    AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KIND, PACKED_LIST_KEY,
+    PACKED_LIST_PAYLOAD,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_FIELDS, ROOT_TYPES
 from .persistence_identity import (
@@ -1129,7 +1131,13 @@ class IncrementalWorldSession:
             if kind in ("dict", "RecordTable"):
                 keys[namespace] = set(container)
             elif kind == "list":
-                keys[namespace] = set(range(len(container)))
+                if (
+                    namespace == AGENCY_ACTIONS_NAMESPACE
+                    and self._description(namespace)[0] == PACKED_LIST_KIND
+                ):
+                    keys[namespace] = {PACKED_LIST_KEY}
+                else:
+                    keys[namespace] = set(range(len(container)))
             elif kind == "set":
                 keys[namespace] = set(container._by_ordinal)
         self._cold_persisted_keys = keys
@@ -1182,6 +1190,7 @@ class IncrementalWorldSession:
             "RecordTable-stable/v1": "RecordTable",
             "set-stable/v1": "set",
             "EventLog-disk/v1": "EventLog",
+            PACKED_LIST_KIND: "list",
         }.get(kind, kind)
 
     def _validate_baseline(self):
@@ -1326,7 +1335,7 @@ class IncrementalWorldSession:
             return wrapped
         if expected == "list":
             wrapped = _RootList()
-            wrapped._setup(self, namespace, "list")
+            wrapped._setup(self, namespace, stored_kind)
             for i, item in enumerate(value):
                 list.append(wrapped, self._bind_nested(item, {(namespace, i)}, initial=True))
             self._root_containers[namespace] = wrapped
@@ -2100,12 +2109,62 @@ class IncrementalWorldSession:
             "namespaces": namespaces,
         }
 
+    def _packed_agency_action_changes(self):
+        namespace = AGENCY_ACTIONS_NAMESPACE
+        changed = any(
+            owner[0] == namespace
+            for owner in self._dirty | self._deleted
+        )
+        if not changed:
+            return ()
+        container = self._root_containers[namespace]
+        description = self._manifest["collections"][namespace]
+        stored_kind, stored_size, _chunks = description
+        if self._base_kind(stored_kind) != "list":
+            raise StoreFormatError("agency actions are not stored as a list")
+
+        changes = []
+        if stored_kind != PACKED_LIST_KIND:
+            persisted = (
+                self._cold_persisted_keys.get(namespace)
+                if self._cold_mode
+                else None
+            )
+            if persisted is None:
+                persisted = set(range(stored_size))
+            for key in sorted(persisted, key=self.codec.encode):
+                if key == PACKED_LIST_KEY:
+                    continue
+                changes.append(RecordChange(namespace, key, delete=True))
+
+        container._kind = PACKED_LIST_KIND
+        self._manifest_dirty = True
+        changes.append(
+            RecordChange(
+                namespace,
+                PACKED_LIST_KEY,
+                (
+                    0,
+                    (
+                        PACKED_LIST_PAYLOAD,
+                        tuple(container),
+                    ),
+                ),
+                record_schema=RECORD_SCHEMA,
+            )
+        )
+        return tuple(changes)
+
     def _changes(self):
         self._refresh_identity_index()
-        changes = []
+        changes = list(self._packed_agency_action_changes())
         for namespace, key in sorted(self._deleted, key=lambda x: (x[0], self.codec.encode(x[1]))):
+            if namespace == AGENCY_ACTIONS_NAMESPACE:
+                continue
             changes.append(RecordChange(namespace, key, delete=True))
         for namespace, key in sorted(self._dirty, key=lambda x: (x[0], self.codec.encode(x[1]))):
+            if namespace == AGENCY_ACTIONS_NAMESPACE:
+                continue
             envelope = self._plain(self._record_value(namespace, key))
             changes.append(RecordChange(namespace, key, envelope, record_schema=RECORD_SCHEMA))
         if self._identity_mode == "current":
