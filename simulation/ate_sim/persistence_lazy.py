@@ -4921,6 +4921,8 @@ class LazyWorldSession:
                     MATERIAL_ITEM_NAMESPACE,
                     MATERIAL_LOT_INDEX_NAMESPACE,
                     MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                    WALLET_NAMESPACE,
+                    TREASURY_NAMESPACE,
                 }
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
@@ -4947,6 +4949,8 @@ class LazyWorldSession:
                     MATERIAL_ITEM_NAMESPACE,
                     MATERIAL_LOT_INDEX_NAMESPACE,
                     MATERIAL_ACTIVE_INDEX_NAMESPACE,
+                    WALLET_NAMESPACE,
+                    TREASURY_NAMESPACE,
                 }
             )
             lazy_paths = {
@@ -6281,6 +6285,18 @@ class LazyWorldSession:
             material_active_index_touched_keys,
             material_active_index_structural_keys,
         ) = self.material_active_index.prepare_save_changes()
+        (
+            wallet_version_changes,
+            wallet_identity_changes,
+            wallet_touched_keys,
+            wallet_structural_keys,
+        ) = self.wallets.prepare_save_changes()
+        (
+            treasury_version_changes,
+            treasury_identity_changes,
+            treasury_touched_keys,
+            treasury_structural_keys,
+        ) = self.treasuries.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -6299,6 +6315,10 @@ class LazyWorldSession:
             or material_lot_index_identity_changes
             or material_active_index_version_changes
             or material_active_index_identity_changes
+            or wallet_version_changes
+            or wallet_identity_changes
+            or treasury_version_changes
+            or treasury_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -6311,6 +6331,8 @@ class LazyWorldSession:
             or material_item_structural_keys
             or material_lot_index_structural_keys
             or material_active_index_structural_keys
+            or wallet_structural_keys
+            or treasury_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -6377,6 +6399,18 @@ class LazyWorldSession:
                 material_active_index_structural_keys,
                 "material active index",
             ),
+            (
+                WALLET_NAMESPACE,
+                self.wallets,
+                wallet_structural_keys,
+                "currency wallets",
+            ),
+            (
+                TREASURY_NAMESPACE,
+                self.treasuries,
+                treasury_structural_keys,
+                "currency treasuries",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -6401,6 +6435,8 @@ class LazyWorldSession:
                 MATERIAL_ACTIVE_INDEX_NAMESPACE,
                 len(self.material_active_index),
             ),
+            (WALLET_NAMESPACE, len(self.wallets)),
+            (TREASURY_NAMESPACE, len(self.treasuries)),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -6465,6 +6501,14 @@ class LazyWorldSession:
             material_active_index_structural_keys=(
                 material_active_index_structural_keys
             ),
+            wallet_version_changes=wallet_version_changes,
+            wallet_identity_changes=wallet_identity_changes,
+            wallet_touched_keys=wallet_touched_keys,
+            wallet_structural_keys=wallet_structural_keys,
+            treasury_version_changes=treasury_version_changes,
+            treasury_identity_changes=treasury_identity_changes,
+            treasury_touched_keys=treasury_touched_keys,
+            treasury_structural_keys=treasury_structural_keys,
             layout_value=layout_value,
         )
 
@@ -6841,6 +6885,79 @@ class LazyWorldSession:
                     )
 
 
+
+    def _validate_currency_successor(self, plan, generation):
+        specs = (
+            (
+                plan.wallet_version_changes,
+                plan.wallet_identity_changes,
+                WALLET_NAMESPACE,
+                LAZY_WALLET_SCHEMA,
+                "wallet",
+            ),
+            (
+                plan.treasury_version_changes,
+                plan.treasury_identity_changes,
+                TREASURY_NAMESPACE,
+                LAZY_TREASURY_SCHEMA,
+                "treasury",
+            ),
+        )
+        for versions, identities, namespace, schema_expected, label in specs:
+            for change in versions:
+                typed_key = self.store.codec.encode(change.key)
+                row = self.store._visible_record_row(
+                    generation, namespace, typed_key
+                )
+                if change.delete:
+                    if row is not None:
+                        raise StoreIntegrityError(
+                            f"deleted {label} remains visible after save"
+                        )
+                    continue
+                if row is None:
+                    raise StoreIntegrityError(
+                        f"saved {label} is absent after save"
+                    )
+                (
+                    _value,
+                    schema,
+                    _valid_from,
+                    _valid_to,
+                    memberships,
+                ) = self.store._check_record_row(
+                    namespace, typed_key, row, decode=False
+                )
+                if (
+                    schema != schema_expected
+                    or row[2] != self.store.codec.encode(change.value)
+                    or memberships
+                ):
+                    raise StoreIntegrityError(
+                        f"saved {label} payload evidence mismatch"
+                    )
+            for change in identities:
+                encoded_key = self.store.codec.encode(change.owner_key)
+                encoded_path = self.store.codec.encode(
+                    change.occurrence_path
+                )
+                row = self.store._visible_identity_occurrence(
+                    generation,
+                    change.owner_namespace,
+                    encoded_key,
+                    encoded_path,
+                )
+                if change.delete:
+                    if row is not None:
+                        raise StoreIntegrityError(
+                            f"deleted {label} incarnation remains visible"
+                        )
+                elif row is None or row[0] != change.incarnation_id:
+                    raise StoreIntegrityError(
+                        f"saved {label} incarnation evidence mismatch"
+                    )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -6865,6 +6982,8 @@ class LazyWorldSession:
         self.material_items._pin = result.pin
         self.material_lot_index._pin = result.pin
         self.material_active_index._pin = result.pin
+        self.wallets._pin = result.pin
+        self.treasuries._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -6880,6 +6999,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_material_successor(
+            plan, result.generation
+        )
+        self._validate_currency_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -6909,6 +7031,8 @@ class LazyWorldSession:
         self.material_items.accept_save(plan, result.pin)
         self.material_lot_index.accept_save(plan, result.pin)
         self.material_active_index.accept_save(plan, result.pin)
+        self.wallets.accept_save(plan, result.pin)
+        self.treasuries.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -6974,6 +7098,8 @@ class LazyWorldSession:
                     + plan.material_item_version_changes
                     + plan.material_lot_index_version_changes
                     + plan.material_active_index_version_changes
+                    + plan.wallet_version_changes
+                    + plan.treasury_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -6984,6 +7110,8 @@ class LazyWorldSession:
                     + plan.material_item_identity_changes
                     + plan.material_lot_index_identity_changes
                     + plan.material_active_index_identity_changes
+                    + plan.wallet_identity_changes
+                    + plan.treasury_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
@@ -7249,6 +7377,29 @@ class LazyWorldSession:
             )
         return detached, replacements
 
+
+    def _stage_detached_currency_table(self, table, replacements=None):
+        expected = len(table)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        for key in table:
+            bucket = table[key]
+            if not isinstance(bucket, (dict, LazyTrackedDict)):
+                raise StoreIntegrityError(
+                    "lazy detach encountered non-dict currency bucket"
+                )
+            replacement = replacements.get(id(bucket))
+            if replacement is None:
+                replacement = dict(bucket)
+                replacements[id(bucket)] = replacement
+            detached[key] = replacement
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach currency bucket count mismatch"
+            )
+        return detached, replacements
+
     def _publish_materialized_detach(
         self,
         old_log,
@@ -7261,6 +7412,8 @@ class LazyWorldSession:
         detached_material_items,
         detached_material_lot_index,
         detached_material_active_index,
+        detached_wallets,
+        detached_treasuries,
         assignments,
         cache_removals,
         index_rebindings,
@@ -7348,6 +7501,8 @@ class LazyWorldSession:
         self.material_items = detached_material_items
         self.material_lot_index = detached_material_lot_index
         self.material_active_index = detached_material_active_index
+        self.wallets = detached_wallets
+        self.treasuries = detached_treasuries
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -7404,6 +7559,18 @@ class LazyWorldSession:
             ) = self._stage_detached_material_active_index(
                 mutable_replacements
             )
+            (
+                detached_wallets,
+                mutable_replacements,
+            ) = self._stage_detached_currency_table(
+                self.wallets, mutable_replacements
+            )
+            (
+                detached_treasuries,
+                mutable_replacements,
+            ) = self._stage_detached_currency_table(
+                self.treasuries, mutable_replacements
+            )
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -7420,6 +7587,8 @@ class LazyWorldSession:
                         id(self.material_active_index): (
                             detached_material_active_index
                         ),
+                        id(self.wallets): detached_wallets,
+                        id(self.treasuries): detached_treasuries,
                         **mutable_replacements,
                     },
                 )
@@ -7444,6 +7613,8 @@ class LazyWorldSession:
                 detached_material_items,
                 detached_material_lot_index,
                 detached_material_active_index,
+                detached_wallets,
+                detached_treasuries,
                 assignments,
                 cache_removals,
                 index_rebindings,
@@ -7467,6 +7638,8 @@ class LazyWorldSession:
             "material_items": self.material_items.diagnostics(),
             "material_lot_index": self.material_lot_index.diagnostics(),
             "material_active_index": self.material_active_index.diagnostics(),
+            "wallets": self.wallets.diagnostics(),
+            "treasuries": self.treasuries.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
