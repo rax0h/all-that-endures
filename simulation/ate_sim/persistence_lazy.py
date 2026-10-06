@@ -9688,6 +9688,93 @@ class LazyWorldSession:
                 )
 
 
+    def _validate_institution_successor(self, plan, generation):
+        specs = (
+            (
+                plan.institution_magic_record_version_changes,
+                plan.institution_magic_record_identity_changes,
+                INSTITUTION_MAGIC_RECORD_NAMESPACE,
+                LAZY_INSTITUTION_MAGIC_RECORD_SCHEMA,
+                "institution magic record",
+            ),
+            (
+                plan.institution_notice_version_changes,
+                plan.institution_notice_identity_changes,
+                INSTITUTION_NOTICE_NAMESPACE,
+                LAZY_INSTITUTION_NOTICE_SCHEMA,
+                "institution notice",
+            ),
+            (
+                plan.institution_application_version_changes,
+                plan.institution_application_identity_changes,
+                INSTITUTION_APPLICATION_NAMESPACE,
+                LAZY_INSTITUTION_APPLICATION_SCHEMA,
+                "institution application",
+            ),
+        )
+        for versions, identities, namespace, expected_schema, label in specs:
+            for change in versions:
+                typed_key = self.store.codec.encode(change.key)
+                row = self.store._visible_record_row(
+                    generation, namespace, typed_key
+                )
+                if change.delete:
+                    if row is not None:
+                        raise StoreIntegrityError(
+                            f"deleted {label} remains visible after save"
+                        )
+                    continue
+                if row is None:
+                    raise StoreIntegrityError(
+                        f"saved {label} is absent after save"
+                    )
+                (
+                    _value,
+                    schema,
+                    _valid_from,
+                    _valid_to,
+                    memberships,
+                ) = self.store._check_record_row(
+                    namespace, typed_key, row, decode=False
+                )
+                expected_memberships = tuple(
+                    (
+                        member.index_name,
+                        member.value,
+                        member.ordinal,
+                    )
+                    for member in change.memberships
+                )
+                if (
+                    schema != expected_schema
+                    or row[2] != self.store.codec.encode(change.value)
+                    or memberships != expected_memberships
+                ):
+                    raise StoreIntegrityError(
+                        f"saved {label} evidence mismatch"
+                    )
+            for change in identities:
+                encoded_key = self.store.codec.encode(change.owner_key)
+                encoded_path = self.store.codec.encode(
+                    change.occurrence_path
+                )
+                row = self.store._visible_identity_occurrence(
+                    generation,
+                    change.owner_namespace,
+                    encoded_key,
+                    encoded_path,
+                )
+                if change.delete:
+                    if row is not None:
+                        raise StoreIntegrityError(
+                            f"deleted {label} incarnation remains visible"
+                        )
+                elif row is None or row[0] != change.incarnation_id:
+                    raise StoreIntegrityError(
+                        f"saved {label} incarnation evidence mismatch"
+                    )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -9716,6 +9803,9 @@ class LazyWorldSession:
         self.treasuries._pin = result.pin
         self.souls._pin = result.pin
         self.advancement_paths._pin = result.pin
+        self.institution_magic_records._pin = result.pin
+        self.institution_notices._pin = result.pin
+        self.institution_applications._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -9740,6 +9830,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_advancement_successor(
+            plan, result.generation
+        )
+        self._validate_institution_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -9773,6 +9866,9 @@ class LazyWorldSession:
         self.treasuries.accept_save(plan, result.pin)
         self.souls.accept_save(plan, result.pin)
         self.advancement_paths.accept_save(plan, result.pin)
+        self.institution_magic_records.accept_save(plan, result.pin)
+        self.institution_notices.accept_save(plan, result.pin)
+        self.institution_applications.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -9842,6 +9938,9 @@ class LazyWorldSession:
                     + plan.treasury_version_changes
                     + plan.soul_version_changes
                     + plan.advancement_version_changes
+                    + plan.institution_magic_record_version_changes
+                    + plan.institution_notice_version_changes
+                    + plan.institution_application_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -9856,6 +9955,9 @@ class LazyWorldSession:
                     + plan.treasury_identity_changes
                     + plan.soul_identity_changes
                     + plan.advancement_identity_changes
+                    + plan.institution_magic_record_identity_changes
+                    + plan.institution_notice_identity_changes
+                    + plan.institution_application_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
