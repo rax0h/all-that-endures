@@ -1890,7 +1890,8 @@ class LazyRecordStore:
                         self._close_order(namespace, typed_key, new_generation)
                         self._close_queries(namespace, typed_key, new_generation)
                         final_count -= 1
-                        _bump_count(counts, namespace, records=-1)
+                        if not _auxiliary_namespace(namespace):
+                            _bump_count(counts, namespace, records=-1)
                     continue
                 if change.reinsertion and not exists:
                     historical = self.db.execute(
