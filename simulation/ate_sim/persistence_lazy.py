@@ -1407,8 +1407,41 @@ def _seed_cross_boundary_lazy_identity(session, links):
     for target, owner in links:
         target_lazy = _lazy_occurrence_from_path(target)
         owner_lazy = _lazy_occurrence_from_path(owner)
-        if (target_lazy is None) == (owner_lazy is None):
+        if target_lazy is None and owner_lazy is None:
             continue
+
+        if target_lazy is not None and owner_lazy is not None:
+            incarnations = []
+            for namespace, key, relative, _expected_type in (
+                target_lazy, owner_lazy
+            ):
+                encoded_key = session.store.codec.encode(key)
+                encoded_path = session.store.codec.encode(relative)
+                row = session.store._visible_identity_occurrence(
+                    generation,
+                    namespace,
+                    encoded_key,
+                    encoded_path,
+                )
+                if row is None:
+                    raise StoreIntegrityError(
+                        "lazy-to-lazy identity lacks incarnation label"
+                    )
+                incarnation = IncarnationId(
+                    session.store.store_identity, int(row[0])
+                )
+                session._registry.attach_existing(
+                    incarnation,
+                    Occurrence(namespace, key, relative),
+                )
+                incarnations.append(incarnation)
+            if incarnations[0] != incarnations[1]:
+                raise StoreIntegrityError(
+                    "lazy-to-lazy link joins different incarnations"
+                )
+            cross.append((target, owner))
+            continue
+
         namespace, key, relative, expected_type = (
             target_lazy if target_lazy is not None else owner_lazy
         )
@@ -5654,7 +5687,7 @@ class LazyWorldSession:
                     for target, owner
                     in self._eager_tracker._live_identity_targets.items()
                     if _path_under_lazy(target)
-                    != _path_under_lazy(owner)
+                    or _path_under_lazy(owner)
                 ),
                 key=self.store.codec.encode,
             )
@@ -5775,11 +5808,10 @@ class LazyWorldSession:
             group_paths = lazy_paths | eager_paths | historical_paths
 
             desired_all = ()
-            if lazy_paths and eager_paths:
+            identity_paths = lazy_paths | eager_paths
+            if len(identity_paths) > 1:
                 desired_all = tuple(
-                    tracker._identity_index._links_for(
-                        lazy_paths | eager_paths
-                    )
+                    tracker._identity_index._links_for(identity_paths)
                 )
             desired_tokens = {
                 self.store.codec.encode(link): link
@@ -5810,7 +5842,7 @@ class LazyWorldSession:
             desired_cross.extend(
                 link for link in desired_all
                 if _path_under_lazy(link[0])
-                != _path_under_lazy(link[1])
+                or _path_under_lazy(link[1])
             )
 
         remove_map = {
