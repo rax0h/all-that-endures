@@ -2967,22 +2967,28 @@ class LazyRecordTable(RecordTable):
             if dict.__contains__(self, key):
                 dict.__delitem__(self, key)
 
-    def _finish_simulation_step(self, epoch):
+    def _finish_simulation_step(self, epoch, *, retain_hot):
         touched = self._lru.touched(epoch)
-        # Dirty owners are already pinned outside the clean LRU. For clean
-        # state, retain at most the keys actually used this step (or the
-        # ordinary small-query cache, whichever is larger). Since every clean
-        # access moves its key to the LRU tail, untouched prior-step state is
-        # evicted first and historical growth cannot accumulate here.
+        # Dirty owners are already pinned outside the clean LRU. During a
+        # multi-year Simulation.run, retain at most the clean keys actually
+        # used by this step (or the ordinary small-query cache, whichever is
+        # larger). Direct one-step calls keep the original 256-entry bound.
+        # Every clean access moves its key to the LRU tail, so untouched
+        # prior-step state is evicted first and historical growth cannot
+        # accumulate in the hot set.
         touched.intersection_update(self._lru.keys())
-        limit = max(self._clean_limit, len(touched))
+        limit = (
+            max(self._clean_limit, len(touched))
+            if retain_hot
+            else self._clean_limit
+        )
         while len(self._lru) > limit:
             key, _ = self._lru.popitem(last=False)
             if key in self._dirty:
                 continue
             if dict.__contains__(self, key):
                 dict.__delitem__(self, key)
-        self._last_step_hot_entries = len(touched)
+        self._last_step_hot_entries = len(touched) if retain_hot else 0
         self._lru.finish_step(epoch)
 
     def keys(self):
@@ -8951,6 +8957,24 @@ class _LazyLifetime:
     def ensure_simulation(self, _operation="simulation"):
         self._session()._ensure_hybrid_mutation_allowed()
 
+    def begin_run(self):
+        session = self._session()
+        session._ensure_hybrid_mutation_allowed()
+        if getattr(session, "_hot_run_depth", 0):
+            raise StoreError("reentrant lazy simulation run is not allowed")
+        session._hot_run_depth = 1
+
+    def end_run(self):
+        session = self._session_ref()
+        if session is None or not session._active:
+            return
+        session._hot_run_depth = 0
+        # A run may retain an active working set larger than the ordinary
+        # point-query cache, but that residency must not escape the run.
+        for value in tuple(session.__dict__.values()):
+            if isinstance(value, LazyRecordTable):
+                value._evict_clean()
+
     def begin_step(self):
         session = self._session()
         session._ensure_hybrid_mutation_allowed()
@@ -8970,9 +8994,12 @@ class _LazyLifetime:
             session._eager_tracker._cold_step_depth -= 1
             if not session._eager_tracker._cold_step_depth:
                 epoch = getattr(session, "_hot_step_epoch", 0)
+                retain_hot = bool(getattr(session, "_hot_run_depth", 0))
                 for value in tuple(session.__dict__.values()):
                     if isinstance(value, LazyRecordTable):
-                        value._finish_simulation_step(epoch)
+                        value._finish_simulation_step(
+                            epoch, retain_hot=retain_hot
+                        )
 
     def ensure_eventlog_read(self):
         session = self._session()
