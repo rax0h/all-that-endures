@@ -6,9 +6,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
  from .mastery_training import ResponseModel
 from .semantic_dictionary import ESSENCES,AWAKENING_STONES,stone as stone_semantics
+from .record_index import IndexedRecord
 RANKS=('unranked','iron','bronze','silver','gold','diamond');MAX_BASE_ESSENCES=3;SKILLS_PER_ESSENCE=5;MAX_SKILLS=20
 @dataclass
-class Understanding:
+class Understanding(IndexedRecord):
  # At most six successful applications and two held-out transfer proofs per tier.
  evidence:dict[str,int]=field(default_factory=dict)
  applications:dict[str,dict]=field(default_factory=dict)
@@ -21,7 +22,7 @@ class Understanding:
   if application>0 and reflection>0:
    self.integration=min(float(len(self.applications)),self.integration+min(application,reflection)*.08)
 @dataclass
-class AbilityProgress:
+class AbilityProgress(IndexedRecord):
  essence:str; source:str; semantic_key:str; name:str; function:str; domain:str; awakened_year:int; origin_event:int|None=None; special:bool=False; aura:bool=False; rank:int=1; level:int=0; progress:float=0.
  response_model:ResponseModel|None=None
  milestone_event:int|None=None
@@ -31,7 +32,7 @@ class AbilityProgress:
    from .mastery_training import ResponseModel
    self.response_model=ResponseModel()
 @dataclass
-class EssencePath:
+class EssencePath(IndexedRecord):
  base_essences:list[str]=field(default_factory=list);confluence:str|None=None;confluence_name:str|None=None;confluence_concepts:tuple[str,...]=();abilities:list[AbilityProgress]=field(default_factory=list);core_fraction:float=0.
  @property
  def essences(self):return tuple(self.base_essences)+(() if self.confluence is None else (self.confluence,))
