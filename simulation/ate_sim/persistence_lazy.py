@@ -2523,6 +2523,10 @@ class LazyPeopleSavePlan:
     genealogy_parent_identity_changes: tuple[IdentityOccurrenceChange, ...]
     genealogy_parent_touched_keys: tuple[Any, ...]
     genealogy_parent_structural_keys: tuple[Any, ...]
+    genealogy_child_version_changes: tuple[VersionChange, ...]
+    genealogy_child_identity_changes: tuple[IdentityOccurrenceChange, ...]
+    genealogy_child_touched_keys: tuple[Any, ...]
+    genealogy_child_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
 
 
@@ -11498,6 +11502,12 @@ class LazyWorldSession:
             genealogy_parent_touched_keys,
             genealogy_parent_structural_keys,
         ) = self.genealogy_parents.prepare_save_changes()
+        (
+            genealogy_child_version_changes,
+            genealogy_child_identity_changes,
+            genealogy_child_touched_keys,
+            genealogy_child_structural_keys,
+        ) = self.genealogy_children.prepare_save_changes()
 
         lazy_effective = bool(
             version_changes
@@ -11546,6 +11556,8 @@ class LazyWorldSession:
             or lineage_node_identity_changes
             or genealogy_parent_version_changes
             or genealogy_parent_identity_changes
+            or genealogy_child_version_changes
+            or genealogy_child_identity_changes
         )
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
@@ -11573,6 +11585,7 @@ class LazyWorldSession:
             or skill_structural_keys
             or lineage_node_structural_keys
             or genealogy_parent_structural_keys
+            or genealogy_child_structural_keys
         )
         if structural_dirty:
             self._eager_tracker._manifest_dirty = True
@@ -11729,6 +11742,12 @@ class LazyWorldSession:
                 genealogy_parent_structural_keys,
                 "genealogy parents",
             ),
+            (
+                GENEALOGY_CHILD_NAMESPACE,
+                self.genealogy_children,
+                genealogy_child_structural_keys,
+                "genealogy children",
+            ),
         ):
             cold_plan, layout_value = self._merge_material_layout(
                 cold_plan,
@@ -11777,6 +11796,7 @@ class LazyWorldSession:
             (SKILL_NAMESPACE, len(self.skills)),
             (LINEAGE_NODE_NAMESPACE, len(self.lineage_nodes)),
             (GENEALOGY_PARENT_NAMESPACE, len(self.genealogy_parents)),
+            (GENEALOGY_CHILD_NAMESPACE, len(self.genealogy_children)),
         ):
             if size:
                 expected_counts[namespace] = (size, 0)
@@ -11942,6 +11962,16 @@ class LazyWorldSession:
             genealogy_parent_touched_keys=genealogy_parent_touched_keys,
             genealogy_parent_structural_keys=(
                 genealogy_parent_structural_keys
+            ),
+            genealogy_child_version_changes=(
+                genealogy_child_version_changes
+            ),
+            genealogy_child_identity_changes=(
+                genealogy_child_identity_changes
+            ),
+            genealogy_child_touched_keys=genealogy_child_touched_keys,
+            genealogy_child_structural_keys=(
+                genealogy_child_structural_keys
             ),
             layout_value=layout_value,
         )
@@ -12839,6 +12869,62 @@ class LazyWorldSession:
                 )
 
 
+    def _validate_genealogy_child_successor(self, plan, generation):
+        for change in plan.genealogy_child_version_changes:
+            typed_key = self.store.codec.encode(change.key)
+            row = self.store._visible_record_row(
+                generation, GENEALOGY_CHILD_NAMESPACE, typed_key
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted genealogy child bucket remains visible"
+                    )
+                continue
+            if row is None:
+                raise StoreIntegrityError(
+                    "saved genealogy child bucket is absent"
+                )
+            (
+                _value,
+                schema,
+                _valid_from,
+                _valid_to,
+                memberships,
+            ) = self.store._check_record_row(
+                GENEALOGY_CHILD_NAMESPACE,
+                typed_key,
+                row,
+                decode=False,
+            )
+            if (
+                schema != LAZY_GENEALOGY_CHILD_SCHEMA
+                or row[2] != self.store.codec.encode(change.value)
+                or memberships
+            ):
+                raise StoreIntegrityError(
+                    "saved genealogy-child evidence mismatch"
+                )
+        for change in plan.genealogy_child_identity_changes:
+            encoded_key = self.store.codec.encode(change.owner_key)
+            encoded_path = self.store.codec.encode(change.occurrence_path)
+            row = self.store._visible_identity_occurrence(
+                generation,
+                change.owner_namespace,
+                encoded_key,
+                encoded_path,
+            )
+            if change.delete:
+                if row is not None:
+                    raise StoreIntegrityError(
+                        "deleted genealogy-child incarnation remains visible"
+                    )
+            elif row is None or row[0] != change.incarnation_id:
+                raise StoreIntegrityError(
+                    "saved genealogy-child incarnation evidence mismatch"
+                )
+
+
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
         if tracker._cold_plan is None:
@@ -12878,6 +12964,7 @@ class LazyWorldSession:
         self.skills._pin = result.pin
         self.lineage_nodes._pin = result.pin
         self.genealogy_parents._pin = result.pin
+        self.genealogy_children._pin = result.pin
         self._arm_cold_publication(plan)
         tracker = self._eager_tracker
         self._validate_people_successor(
@@ -12917,6 +13004,9 @@ class LazyWorldSession:
             plan, result.generation
         )
         self._validate_genealogy_parent_successor(
+            plan, result.generation
+        )
+        self._validate_genealogy_child_successor(
             plan, result.generation
         )
         status, head, replacement_prefix = _capture_successor(
@@ -12961,6 +13051,7 @@ class LazyWorldSession:
         self.skills.accept_save(plan, result.pin)
         self.lineage_nodes.accept_save(plan, result.pin)
         self.genealogy_parents.accept_save(plan, result.pin)
+        self.genealogy_children.accept_save(plan, result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -13041,6 +13132,7 @@ class LazyWorldSession:
                     + plan.skill_version_changes
                     + plan.lineage_node_version_changes
                     + plan.genealogy_parent_version_changes
+                    + plan.genealogy_child_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -13066,6 +13158,7 @@ class LazyWorldSession:
                     + plan.skill_identity_changes
                     + plan.lineage_node_identity_changes
                     + plan.genealogy_parent_identity_changes
+                    + plan.genealogy_child_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
                 changes=plan.cold_plan.changes,
@@ -13558,6 +13651,29 @@ class LazyWorldSession:
         return detached
 
 
+    def _stage_detached_genealogy_children(self, replacements=None):
+        expected = len(self.genealogy_children)
+        detached = {}
+        if replacements is None:
+            replacements = {}
+        for key in self.genealogy_children:
+            bucket = self.genealogy_children[key]
+            if not isinstance(bucket, (list, LazySoulTrackedList)):
+                raise StoreIntegrityError(
+                    "lazy detach encountered invalid genealogy child list"
+                )
+            replacement = replacements.get(id(bucket))
+            if replacement is None:
+                replacement = list(bucket)
+                replacements[id(bucket)] = replacement
+            detached[key] = replacement
+        if len(detached) != expected:
+            raise StoreIntegrityError(
+                "lazy detach genealogy-child count mismatch"
+            )
+        return detached, replacements
+
+
     def _stage_detached_institution_table(
         self, table, expected_type, label
     ):
@@ -13691,6 +13807,7 @@ class LazyWorldSession:
         detached_skills,
         detached_lineage_nodes,
         detached_genealogy_parents,
+        detached_genealogy_children,
         advancement_records,
         assignments,
         cache_removals,
@@ -13813,6 +13930,7 @@ class LazyWorldSession:
         self.skills = detached_skills
         self.lineage_nodes = detached_lineage_nodes
         self.genealogy_parents = detached_genealogy_parents
+        self.genealogy_children = detached_genealogy_children
         self._cross_boundary_links = ()
         self.identity_links = ()
         self.store.close()
@@ -13946,6 +14064,12 @@ class LazyWorldSession:
             detached_genealogy_parents = (
                 self._stage_detached_genealogy_parents()
             )
+            (
+                detached_genealogy_children,
+                mutable_replacements,
+            ) = self._stage_detached_genealogy_children(
+                mutable_replacements
+            )
             assignments, cache_removals, index_rebindings = (
                 lifecycle._stage_plain_graph(
                     self._eager_tracker,
@@ -13986,6 +14110,9 @@ class LazyWorldSession:
                         id(self.lineage_nodes): detached_lineage_nodes,
                         id(self.genealogy_parents): (
                             detached_genealogy_parents
+                        ),
+                        id(self.genealogy_children): (
+                            detached_genealogy_children
                         ),
                         **mutable_replacements,
                     },
@@ -14039,6 +14166,7 @@ class LazyWorldSession:
                 detached_skills,
                 detached_lineage_nodes,
                 detached_genealogy_parents,
+                detached_genealogy_children,
                 advancement_records,
                 assignments,
                 cache_removals,
@@ -14082,6 +14210,7 @@ class LazyWorldSession:
             "skills": self.skills.diagnostics(),
             "lineage_nodes": self.lineage_nodes.diagnostics(),
             "genealogy_parents": self.genealogy_parents.diagnostics(),
+            "genealogy_children": self.genealogy_children.diagnostics(),
             "identity": self._registry.diagnostics(),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
