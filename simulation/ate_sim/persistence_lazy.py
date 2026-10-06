@@ -6565,6 +6565,12 @@ class LazyWorldSession:
             "applications",
             self.institution_applications,
         )
+        self.transmissions = LazyTransmissionRecordTable(self)
+        object.__setattr__(
+            world.transmission, "records", self.transmissions
+        )
+        self.motives = LazyMotiveTable(self)
+        object.__setattr__(world.agency, "motives", self.motives)
 
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
             self, links
@@ -7503,6 +7509,8 @@ class LazyWorldSession:
             INSTITUTION_MAGIC_RECORD_NAMESPACE: self.institution_magic_records,
             INSTITUTION_NOTICE_NAMESPACE: self.institution_notices,
             INSTITUTION_APPLICATION_NAMESPACE: self.institution_applications,
+            TRANSMISSION_NAMESPACE: self.transmissions,
+            MOTIVE_NAMESPACE: self.motives,
         }.get(namespace)
         if table is None:
             raise StoreIntegrityError(
