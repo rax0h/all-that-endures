@@ -1,0 +1,45 @@
+name: Hot working set 250-year repaired packed-tail gate
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-hot-working-set-250f
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run 250-year integrated persistence gate
+        run: |
+          python simulation/persistence_p5_long_validation.py \
+            --seed 843000 \
+            --milestones 100 250 \
+            --bootstrap-year 3 \
+            --workdir p5-hot-250f \
+            --output p5-hot-250f.json \
+            --product-sha "$GITHUB_SHA" \
+            --workflow-sha "$GITHUB_SHA"
+      - name: Print compact metrics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("p5-hot-250f.json").read_text())
+          print("CONTROL", data["control_wall_seconds"])
+          for year,row in sorted(data["p4"].items(), key=lambda item:int(item[0])):
+              print(
+                  year,
+                  "matches_control", row["matches_control"],
+                  "simulation_seconds", row["simulation_seconds"],
+                  "payload_reads", row["simulation_io"]["payload_reads"],
+                  "save_seconds", row["save_seconds"],
+                  "reopen_digest_seconds", row["reopen_digest_seconds"],
+              )
+          PY
