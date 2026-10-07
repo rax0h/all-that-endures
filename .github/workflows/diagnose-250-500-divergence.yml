@@ -1,0 +1,135 @@
+name: Diagnose year-250 to 500 persistence divergence
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-diagnose-500
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Locate first post-250 divergence
+        run: |
+          python - <<'PY'
+          import hashlib, tempfile
+          from pathlib import Path
+
+          from ate_sim.engine import Simulation
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.worldgen import generate_world
+
+          SEED=843000
+          RULES="stage-0-5-diagnose-250-500"
+          SAMPLES={260,275,300,350,400,450,500}
+
+          def counters(w):
+              out={
+                  "next_person":w.next_person,
+                  "next_household":w.next_household,
+                  "next_settlement":w.next_settlement,
+                  "next_event":w.next_event,
+                  "events":len(w.events),
+                  "alive":sum(1 for p in w.current_people() if p.alive),
+              }
+              for name in (
+                  "economy","knowledge","culture","communities","transmission",
+                  "infrastructure","magic_resources","institutions","metaphysics",
+                  "divinity","materials","warfare","society_accountability",
+                  "threat_ecology",
+              ):
+                  state=getattr(w,name)
+                  for field,value in sorted(state.__dict__.items()):
+                      if field.startswith("next_") and type(value) is int:
+                          out[f"{name}.{field}"]=value
+              return out
+
+          def event_token(e):
+              return (e.id,e.year,e.kind,e.actor,e.target,e.causes,repr(e.data))
+
+          control=generate_world(SEED)
+          Simulation(control).run(250)
+          control_samples={}
+          control_yearly={}
+          for year in range(251,501):
+              before=len(control.events)
+              Simulation(control).run(1)
+              after=len(control.events)
+              control_yearly[year]=(
+                  counters(control),
+                  tuple(event_token(control.events[i]) for i in range(before,after)),
+              )
+              if year in SAMPLES:
+                  control_samples[year]=control.digest()
+                  print("CONTROL_SAMPLE",year,control_samples[year],flush=True)
+
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td); cold=td/"cold.sqlite"; lazy=td/"lazy.sqlite"
+              source=generate_world(SEED)
+              Simulation(source).run(3)
+              write_cold_snapshot(source,cold,rules_id=RULES)
+              convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+
+              session=open_lazy_world_session(lazy,rules_id=RULES)
+              try:
+                  Simulation(session.world).run(97)
+                  session.save()
+                  session.close()
+                  session=open_lazy_world_session(lazy,rules_id=RULES)
+
+                  Simulation(session.world).run(150)
+                  live250=session.world.digest()
+                  print("LIVE_250_PRE_SAVE",live250,flush=True)
+                  session.save()
+                  session.close()
+                  session=open_lazy_world_session(lazy,rules_id=RULES)
+                  reopen250=session.world.digest()
+                  print("REOPEN_250",reopen250,flush=True)
+
+                  for year in range(251,501):
+                      before=len(session.world.events)
+                      Simulation(session.world).run(1)
+                      after=len(session.world.events)
+                      lc=counters(session.world)
+                      cc,ce=control_yearly[year]
+                      if lc != cc:
+                          keys=sorted(set(lc)|set(cc))
+                          diffs=[(k,cc.get(k),lc.get(k)) for k in keys if cc.get(k)!=lc.get(k)]
+                          print("FIRST_COUNTER_DIVERGENCE",year,diffs[:30],flush=True)
+                          break
+                      le=tuple(event_token(session.world.events[i]) for i in range(before,after))
+                      if le != ce:
+                          first=None
+                          for i,(a,b) in enumerate(zip(ce,le)):
+                              if a!=b:
+                                  first=(i,a,b);break
+                          if first is None and len(ce)!=len(le):
+                              first=("length",len(ce),len(le))
+                          print("FIRST_EVENT_DIVERGENCE",year,first,flush=True)
+                          break
+                      if year in SAMPLES:
+                          d=session.world.digest()
+                          ok=d==control_samples[year]
+                          print("LIVE_SAMPLE",year,"MATCH",ok,d,flush=True)
+                          if not ok:
+                              print("FIRST_SAMPLED_DIGEST_DIVERGENCE",year,flush=True)
+                              break
+                  else:
+                      live500=session.world.digest()
+                      print("LIVE_500_BEFORE_SAVE_MATCH",live500==control_samples[500],live500,flush=True)
+                      session.save()
+                      session.close()
+                      session=open_lazy_world_session(lazy,rules_id=RULES)
+                      reopened=session.world.digest()
+                      print("REOPEN_500_MATCH",reopened==control_samples[500],reopened,flush=True)
+              finally:
+                  session.close()
+          PY
