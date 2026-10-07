@@ -36,21 +36,11 @@ class CommunityState:
     def memberships_for(self,person_id,minimum=.01):
         query=getattr(self.memberships,'for_person',None)
         if query is not None:
-            values=query(person_id)
-        else:
-            if not hasattr(self,'_membership_index'):self.rebuild_membership_index()
-            values={
-                cid:self.memberships[(person_id,cid)]
-                for cid in self._membership_index.get(person_id,())
-            }
-        # Membership order is simulation-significant because inheritance emits
-        # sequential Transmission ids. Never let ephemeral dict/index order or
-        # persistence layout choose that history.
-        return {
-            cid:values[cid]
-            for cid in sorted(values)
-            if values[cid]>=minimum
-        }
+            return {cid:v for cid,v in query(person_id).items() if v>=minimum}
+        # Eager worlds retain insertion order through the archive-derived index.
+        # Persistence must reproduce that order; it must not redefine it.
+        if not hasattr(self,'_membership_index'):self.rebuild_membership_index()
+        return {cid:v for cid in self._membership_index.get(person_id,()) if (v:=self.memberships[(person_id,cid)])>=minimum}
 
     def inherit(self,child_id,parent_ids,weight=.72):
         inherited={}
