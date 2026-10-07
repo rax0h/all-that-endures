@@ -1,0 +1,61 @@
+name: Profile corrected year-250 tail
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-profile-250
+
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Profile years 225-250 and year-250 save
+        run: |
+          python - <<'PY'
+          import cProfile, pstats, tempfile, time
+          from pathlib import Path
+          from ate_sim.engine import Simulation
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.worldgen import generate_world
+
+          rules="profile-corrected-250-tail"
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td); cold=td/"cold.sqlite"; lazy=td/"lazy.sqlite"
+              source=generate_world(843000)
+              Simulation(source).run(3)
+              write_cold_snapshot(source,cold,rules_id=rules)
+              convert_cold_to_lazy(cold,lazy,rules_id=rules)
+
+              with open_lazy_world_session(lazy,rules_id=rules) as session:
+                  Simulation(session.world).run(97)
+                  session.save()
+
+              with open_lazy_world_session(lazy,rules_id=rules) as session:
+                  started=time.perf_counter()
+                  Simulation(session.world).run(125)
+                  print("PREP_100_225_SECONDS",time.perf_counter()-started)
+
+                  session.store.reset_diagnostics()
+                  prof=cProfile.Profile(); prof.enable(); started=time.perf_counter()
+                  Simulation(session.world).run(25)
+                  prof.disable()
+                  print("PROFILE_225_250_SIM_SECONDS",time.perf_counter()-started)
+                  print("PROFILE_225_250_SIM_IO",session.store.diagnostics())
+                  pstats.Stats(prof).strip_dirs().sort_stats("cumtime").print_stats(80)
+
+                  session.store.reset_diagnostics()
+                  prof=cProfile.Profile(); prof.enable(); started=time.perf_counter()
+                  session.save()
+                  prof.disable()
+                  print("PROFILE_YEAR250_SAVE_SECONDS",time.perf_counter()-started)
+                  print("PROFILE_YEAR250_SAVE_IO",session.store.diagnostics())
+                  pstats.Stats(prof).strip_dirs().sort_stats("cumtime").print_stats(80)
+          PY
