@@ -63,3 +63,5 @@ jobs:
               finally:
                   session.close()
           PY
+
+# rerun-after-contract-test-fix
