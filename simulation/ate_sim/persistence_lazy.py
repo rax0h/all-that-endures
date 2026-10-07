@@ -5413,17 +5413,23 @@ class LazyCommunityMembershipTable(LazyRecordTable):
 
     def keys_for_person(self, person):
         self._ensure()
-        baseline = set(
-            self._store.query_keys(
+        # query_keys is already ordered by the persisted membership ordinal,
+        # which is the semantic insertion order for CommunityState. Preserve
+        # that order directly. Collection-order rows may be written in a
+        # different batching order and must not redefine simulation history.
+        baseline = [
+            key for key in self._store.query_keys(
                 self._pin, self._namespace, "person", person
             )
-        )
-        touched = self._effective_touched()
-        baseline.difference_update(touched)
-        for key in touched:
-            if self._visible(key) and key[0] == person:
-                baseline.add(key)
-        return tuple(sorted(baseline, key=self._current_ordinal))
+            if key not in self._removed and key not in self._reinserted
+        ]
+        appended = [
+            key
+            for key in (self._new_keys | self._reinserted)
+            if key not in self._removed and key[0] == person
+        ]
+        appended.sort(key=lambda key: self._overlay_ordinals[key])
+        return tuple(baseline + appended)
 
     def for_person(self, person):
         return {
