@@ -6416,6 +6416,75 @@ class _LazyInstitutionRecordTable(_LazySimpleMaterialObjectTable):
 
     _index_fields = {}
 
+    def __init__(self, session, namespace, *, clean_limit=CLEAN_GROUP_LIMIT):
+        super().__init__(session, namespace, clean_limit=clean_limit)
+        # Unsaved institution records can grow large between checkpoints.
+        # Keep an incremental candidate index so indexed lookups examine only
+        # touched records that could match instead of rebuilding memberships
+        # for every touched record on every query.
+        self._touched_membership_index = {}
+        self._overlay_query_checks = 0
+
+    def _index_touched_memberships(self, key, record):
+        for member in self._memberships(record, 0):
+            bucket = self._touched_membership_index.setdefault(
+                (member.index_name, member.value), set()
+            )
+            bucket.add(key)
+
+    def ids(self, fields, *values):
+        self._ensure()
+        index_name = self._index_name(fields)
+        index_value = values[0] if len(values) == 1 else tuple(values)
+        baseline = set(
+            self._store.query_keys(
+                self._pin, self._namespace, index_name, index_value
+            )
+        )
+        touched = self._effective_touched()
+        baseline.difference_update(touched)
+        candidates = self._touched_membership_index.get(
+            (index_name, index_value), ()
+        )
+        for key in candidates:
+            self._overlay_query_checks += 1
+            if key not in touched or not self._visible(key):
+                continue
+            record = dict.__getitem__(self, key)
+            memberships = {
+                (member.index_name, member.value)
+                for member in self._memberships(record, 0)
+            }
+            if (index_name, index_value) in memberships:
+                baseline.add(key)
+        return tuple(sorted(baseline))
+
+    def changed(self, key, field=None):
+        super().changed(key, field)
+        if self._visible(key):
+            self._index_touched_memberships(
+                key, dict.__getitem__(self, key)
+            )
+
+    def __setitem__(self, key, record):
+        super().__setitem__(key, record)
+        if self._visible(key):
+            self._index_touched_memberships(
+                key, dict.__getitem__(self, key)
+            )
+
+    def accept_save(self, plan, new_pin):
+        super().accept_save(plan, new_pin)
+        self._touched_membership_index.clear()
+
+    def diagnostics(self):
+        result = super().diagnostics()
+        result["overlay_query_checks"] = self._overlay_query_checks
+        result["touched_membership_buckets"] = len(
+            self._touched_membership_index
+        )
+        return result
+
     def _bind_loaded_record(self, key, record):
         return self._session._bind_loaded_institution_record(
             self, self._namespace, key, record, self._record_type
