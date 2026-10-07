@@ -1,60 +1,46 @@
-name: canonical-endurance
+name: Stage 0.5 optimized 1000-year validation
 
 on:
-  workflow_dispatch:
-    inputs:
-      years:
-        description: 'Years to advance this existing world'
-        required: true
-        default: '1000'
-      reset:
-        description: 'Start a fresh canonical world instead of restoring the latest checkpoint'
-        required: true
-        type: boolean
-        default: false
-
-concurrency:
-  group: canonical-endurance
-  cancel-in-progress: false
+  push:
+    branches:
+      - sol-stage-0-5-endurance-1000b
 
 jobs:
-  advance-world:
+  validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
     env:
       PYTHONPATH: .:simulation
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-      - name: Restore latest canonical checkpoint
-        if: ${{ !inputs.reset }}
-        uses: actions/cache/restore@v4
-        with:
-          path: canonical.ate
-          key: canonical-endurance-${{ github.run_id }}
-          restore-keys: |
-            canonical-endurance-
-      - name: Advance authoritative world
-        shell: bash
+          python-version: "3.12"
+      - name: Run 1000-year persistence validation
         run: |
-          if [ -f canonical.ate ] && [ '${{ inputs.reset }}' != 'true' ]; then
-            mv canonical.ate previous.ate
-            python simulation/endurance.py --checkpoint previous.ate --years '${{ inputs.years }}' --out canonical.ate --report endurance-report.json
-          else
-            python simulation/endurance.py --seed 843000 --years '${{ inputs.years }}' --out canonical.ate --report endurance-report.json
-          fi
-      - name: Save canonical checkpoint for next increment
-        uses: actions/cache/save@v4
-        with:
-          path: canonical.ate
-          key: canonical-endurance-${{ github.run_id }}
-      - name: Retain checkpoint and longitudinal report
-        uses: actions/upload-artifact@v4
-        with:
-          name: canonical-endurance-${{ github.run_number }}
-          path: |
-            canonical.ate
-            endurance-report.json
-          retention-days: 90
+          python simulation/persistence_p5_long_validation.py \
+            --seed 843000 \
+            --milestones 100 250 500 1000 \
+            --bootstrap-year 3 \
+            --workdir stage-0-5-endurance-1000b \
+            --output stage-0-5-endurance-1000b.json \
+            --product-sha "$GITHUB_SHA" \
+            --workflow-sha "$GITHUB_SHA"
+      - name: Print compact metrics
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("stage-0-5-endurance-1000b.json").read_text())
+          print("CONTROL", data["control_wall_seconds"])
+          for year,row in sorted(data["p4"].items(), key=lambda item:int(item[0])):
+              print(
+                  year,
+                  "matches_control", row["matches_control"],
+                  "simulation_seconds", row["simulation_seconds"],
+                  "payload_reads", row["simulation_io"]["payload_reads"],
+                  "save_seconds", row["save_seconds"],
+                  "reopen_digest_seconds", row["reopen_digest_seconds"],
+              )
+          print("PASSED", data["passed"])
+          PY
