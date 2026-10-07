@@ -669,6 +669,19 @@ class _RootList(list):
         self._kind = kind
 
     def append(self, value):
+        if (
+            self._namespace == AGENCY_ACTIONS_NAMESPACE
+            and self._kind == PACKED_LIST_KIND
+        ):
+            owner = (self._namespace, PACKED_LIST_KEY)
+            wrapped = self._session._prepare_nested(
+                value, {owner}, allow_existing=True
+            )
+            list.append(self, wrapped)
+            self._session._changed_member_work += 1
+            self._session._mark_storage_only(owner)
+            self._session._manifest_dirty = True
+            return
         index = len(self)
         owner = (self._namespace, index)
         wrapped = self._session._prepare_nested(value, {owner})
@@ -691,6 +704,21 @@ class _RootList(list):
             return
         if index < 0:
             index += len(self)
+        if (
+            self._namespace == AGENCY_ACTIONS_NAMESPACE
+            and self._kind == PACKED_LIST_KIND
+        ):
+            owner = (self._namespace, PACKED_LIST_KEY)
+            old = self[index]
+            wrapped = self._session._prepare_nested(
+                value, {owner}, allow_existing=True
+            )
+            list.__setitem__(self, index, wrapped)
+            if old is not wrapped:
+                self._session._discard_owner_binding(old, owner)
+            self._session._changed_member_work += 1
+            self._session._mark_storage_only(owner)
+            return
         owner = (self._namespace, index)
         old = self[index]
         wrapped = self._session._prepare_nested(value, {owner})
@@ -712,11 +740,13 @@ class _RootList(list):
             start, stop, step = index.indices(len(self))
             if step == 1 and start == 0 and stop > 0:
                 self._session._ensure_mutation_allowed()
+                owner = (self._namespace, PACKED_LIST_KEY)
+                removed = tuple(self[start:stop])
                 list.__delitem__(self, slice(start, stop, step))
+                for value in removed:
+                    self._session._discard_owner_binding(value, owner)
                 self._kind = PACKED_LIST_KIND
-                self._session._mark(
-                    (self._namespace, PACKED_LIST_KEY)
-                )
+                self._session._mark_storage_only(owner)
                 self._session._changed_member_work += 1
                 self._session._manifest_dirty = True
                 return
@@ -1355,8 +1385,24 @@ class IncrementalWorldSession:
         if expected == "list":
             wrapped = _RootList()
             wrapped._setup(self, namespace, stored_kind)
-            for i, item in enumerate(value):
-                list.append(wrapped, self._bind_nested(item, {(namespace, i)}, initial=True))
+            if (
+                namespace == AGENCY_ACTIONS_NAMESPACE
+                and stored_kind == PACKED_LIST_KIND
+            ):
+                owner = (namespace, PACKED_LIST_KEY)
+                for item in value:
+                    list.append(
+                        wrapped,
+                        self._bind_nested(item, {owner}, initial=True),
+                    )
+            else:
+                for i, item in enumerate(value):
+                    list.append(
+                        wrapped,
+                        self._bind_nested(
+                            item, {(namespace, i)}, initial=True
+                        ),
+                    )
             self._root_containers[namespace] = wrapped
             return wrapped
         if expected == "set":
@@ -1645,6 +1691,12 @@ class IncrementalWorldSession:
                 elif expected == "events" and self._cold_mode:
                     yield from iter_mutable_event_owners(value)
                 elif expected in ("list", "events"):
+                    if (
+                        expected == "list"
+                        and namespace == AGENCY_ACTIONS_NAMESPACE
+                        and self._description(namespace)[0] == PACKED_LIST_KIND
+                    ):
+                        continue
                     for i, child in enumerate(value):
                         yield (
                             (namespace, i),
@@ -1723,9 +1775,10 @@ class IncrementalWorldSession:
             key=lambda owner: (owner[0], self.codec.encode(owner[1])),
         )
         for owner in owners:
-            # Packed agency history is one logical storage value. Its marker is
-            # not a list-member owner and therefore has no identity path to
-            # refresh. ActionRecord entries are immutable historical values.
+            # Packed agency history is one logical storage value. Its member
+            # records remain mutable for compatibility, but their fields are
+            # value state inside the packed record rather than independent
+            # cross-record identity owners.
             if owner == (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY):
                 continue
             value = None if owner in self._deleted else self._owner_value(owner)
