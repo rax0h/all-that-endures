@@ -1,0 +1,122 @@
+name: Diagnose first post-250 digest split
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-diagnose-260
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compare exact P5 cadence through first digest split
+        run: |
+          python - <<'PY'
+          import hashlib, json, tempfile
+          from dataclasses import fields
+          from pathlib import Path
+
+          from ate_sim.core import World, _canonical
+          from ate_sim.engine import Simulation
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.worldgen import generate_world
+
+          SEED=843000
+          RULES="stage-0-5-diagnose-first-digest-split"
+
+          def field_hash(value):
+              payload=repr(_canonical(value)).encode("utf-8")
+              return hashlib.sha256(payload).hexdigest()
+
+          def diff_fields(a,b):
+              rows=[]
+              for f in fields(World):
+                  av=getattr(a,f.name); bv=getattr(b,f.name)
+                  ah=field_hash(av); bh=field_hash(bv)
+                  if ah!=bh:
+                      alen=len(av) if hasattr(av,"__len__") else None
+                      blen=len(bv) if hasattr(bv,"__len__") else None
+                      rows.append((f.name,alen,blen,ah,bh))
+              return rows
+
+          def event_token(e):
+              return (
+                  e.id,e.year,e.kind,e.layer.value,
+                  tuple((r.kind,r.id) for r in e.actors),
+                  None if e.location is None else (e.location.kind,e.location.id),
+                  e.causes,repr(e.data),
+              )
+
+          control=generate_world(SEED)
+          sim=Simulation(control)
+          sim.run(100)
+          control100=control.digest()
+          sim.run(150)
+          control250=control.digest()
+          print("CONTROL_100",control100,flush=True)
+          print("CONTROL_250",control250,flush=True)
+
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td); cold=td/"cold.sqlite"; lazy=td/"lazy.sqlite"
+              source=generate_world(SEED)
+              Simulation(source).run(3)
+              write_cold_snapshot(source,cold,rules_id=RULES)
+              convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+              session=open_lazy_world_session(lazy,rules_id=RULES)
+              try:
+                  Simulation(session.world).run(97)
+                  session.save()
+                  session.close()
+                  session=open_lazy_world_session(lazy,rules_id=RULES)
+                  d100=session.world.digest()
+                  print("LAZY_100",d100,"MATCH",d100==control100,flush=True)
+
+                  Simulation(session.world).run(150)
+                  pre250=session.world.digest()
+                  print("LAZY_250_PRE_SAVE",pre250,"MATCH",pre250==control250,flush=True)
+                  if pre250!=control250:
+                      print("DIFF_250_PRE_SAVE",diff_fields(control,session.world),flush=True)
+                  session.save()
+                  session.close()
+                  session=open_lazy_world_session(lazy,rules_id=RULES)
+                  post250=session.world.digest()
+                  print("LAZY_250_REOPEN",post250,"MATCH",post250==control250,flush=True)
+                  if post250!=control250:
+                      print("DIFF_250_REOPEN",diff_fields(control,session.world),flush=True)
+
+                  for year in range(251,261):
+                      cb=len(control.events); lb=len(session.world.events)
+                      Simulation(control).run(1)
+                      Simulation(session.world).run(1)
+                      cd=control.digest(); ld=session.world.digest()
+                      print("YEAR",year,"MATCH",cd==ld,"CONTROL",cd,"LAZY",ld,flush=True)
+                      if cd!=ld:
+                          print("FIRST_DIGEST_SPLIT",year,flush=True)
+                          print("DIFF_FIELDS",diff_fields(control,session.world),flush=True)
+                          ce=tuple(event_token(control.events[i]) for i in range(cb,len(control.events)))
+                          le=tuple(event_token(session.world.events[i]) for i in range(lb,len(session.world.events)))
+                          if ce!=le:
+                              for i,(a,b) in enumerate(zip(ce,le)):
+                                  if a!=b:
+                                      print("FIRST_EVENT_DIFF",i,a,b,flush=True)
+                                      break
+                              if len(ce)!=len(le):
+                                  print("EVENT_COUNT_DIFF",len(ce),len(le),flush=True)
+                          else:
+                              print("EVENTS_THIS_YEAR_MATCH",len(ce),flush=True)
+                          a=control.agency.actions; b=session.world.agency.actions
+                          print("AGENCY_LENGTHS",len(a),len(b),flush=True)
+                          print("AGENCY_HEAD",repr(a[:3]),repr(b[:3]),flush=True)
+                          print("AGENCY_TAIL",repr(a[-3:]),repr(b[-3:]),flush=True)
+                          break
+              finally:
+                  session.close()
+          PY
