@@ -3,6 +3,7 @@ import pytest
 from ate_sim import checkpoint
 from ate_sim.core import World
 from ate_sim.persistence_lazy import (
+    WALLET_NAMESPACE,
     LazyCurrencyBucketTable,
     LazyTrackedDict,
     convert_cold_to_lazy,
@@ -64,6 +65,23 @@ def test_currency_open_loads_zero_buckets_and_point_read_is_lazy(tmp_path):
         assert wallet["iron"] == 300 % 11
         assert state.wallets.diagnostics()["bucket_payload_loads"] == 1
         assert state.treasuries.diagnostics()["bucket_payload_loads"] == 0
+
+
+def test_currency_identity_reconcile_does_not_scan_all_live_bindings(tmp_path):
+    destination = converted(tmp_path, 300, name="owner-scoped-reconcile")
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        wallet = session.world.currency.wallets[1]
+        for pid in range(2, 280):
+            session.world.currency.wallets[pid]
+
+        def forbidden():
+            raise AssertionError("currency reconcile scanned global live bindings")
+
+        session._registry.live_bindings = forbidden
+        labels = session._currency_incarnation_labels(
+            WALLET_NAMESPACE, 1, wallet
+        )
+        assert () in labels
 
 
 def test_shared_wallet_identity_survives_lazy_load_save_and_reopen(tmp_path):
