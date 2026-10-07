@@ -53,7 +53,16 @@ jobs:
               return out
 
           def event_token(e):
-              return (e.id,e.year,e.kind,e.actor,e.target,e.causes,repr(e.data))
+              return (
+                  e.id,
+                  e.year,
+                  e.kind,
+                  e.layer.value,
+                  tuple((ref.kind, ref.id) for ref in e.actors),
+                  None if e.location is None else (e.location.kind, e.location.id),
+                  e.causes,
+                  repr(e.data),
+              )
 
           control=generate_world(SEED)
           Simulation(control).run(250)
