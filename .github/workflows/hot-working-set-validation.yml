@@ -87,7 +87,7 @@ jobs:
         run: |
           python simulation/persistence_p5_long_validation.py \
             --seed 843000 \
-            --milestones 25 50 100 \
+            --milestones 25 50 100 105 \
             --bootstrap-year 3 \
             --workdir p5-hot-medium \
             --output p5-hot-medium.json \
