@@ -1,0 +1,26 @@
+name: Playground person explorer
+
+on:
+  push:
+    branches:
+      - playground/person-explorer
+
+jobs:
+  explore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Generate year 250 and meet one random living person
+        run: |
+          python simulation/explore_person.py \
+            --seed 843000 \
+            --years 250 \
+            --roll 1 \
+            --mode random \
+            --timeline 18
