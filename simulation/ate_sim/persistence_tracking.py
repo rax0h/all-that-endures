@@ -701,6 +701,25 @@ class _RootList(list):
         self._session._mark(owner)
 
     def __delitem__(self, index):
+        # Agency actions are immutable append-only history and are persisted as
+        # one packed record. A rolling-prefix trim therefore changes one packed
+        # logical value, not the identity/ownership of 50k surviving entries.
+        # Avoid manufacturing per-index detach/rebind work for that family.
+        if (
+            self._namespace == AGENCY_ACTIONS_NAMESPACE
+            and isinstance(index, slice)
+        ):
+            start, stop, step = index.indices(len(self))
+            if step == 1 and start == 0 and stop > 0:
+                self._session._ensure_mutation_allowed()
+                list.__delitem__(self, slice(start, stop, step))
+                self._kind = PACKED_LIST_KIND
+                self._session._mark(
+                    (self._namespace, PACKED_LIST_KEY)
+                )
+                self._session._changed_member_work += 1
+                self._session._manifest_dirty = True
+                return
         trial = list(self)
         list.__delitem__(trial, index)
         self._replace_from(trial)
