@@ -1,8 +1,10 @@
+from dataclasses import FrozenInstanceError
 import hashlib
 
 import pytest
 
 from ate_sim import Simulation, checkpoint, generate_world
+from ate_sim.agency import ActionRecord
 from ate_sim.core import Person, World
 from ate_sim.incremental_store import (
     StoreConflictError,
@@ -104,6 +106,16 @@ def test_open_lazy_world_decodes_zero_people_until_requested(tmp_path):
         assert diag.payload_reads == 1
         assert people.diagnostics()["person_payload_loads"] == 1
         assert people.diagnostics()["resident_people"] == 1
+
+
+def test_action_record_is_immutable_historical_value():
+    action = ActionRecord(7, 3, "work", "wealth", 0.5, None)
+    try:
+        action.strength = 0.75
+    except FrozenInstanceError:
+        pass
+    else:
+        raise AssertionError("ActionRecord must remain append-only immutable history")
 
 
 def test_lazy_alive_query_matches_eager_id_order_not_storage_order(tmp_path):
