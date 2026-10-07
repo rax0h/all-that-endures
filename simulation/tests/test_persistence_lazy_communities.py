@@ -128,3 +128,33 @@ def test_community_membership_materializing_detach_restores_plain_dict(tmp_path)
         2: 0.4,
         3: 0.55,
     }
+
+
+def test_community_membership_query_order_is_semantic_not_storage_order(tmp_path):
+    world = World(861002)
+    c3 = world.communities.create("c3", 0, 1)
+    while world.communities.next_community <= 13:
+        world.communities.create(
+            f"c{world.communities.next_community}", 0, 1
+        )
+    # Deliberately write in the same kind of non-canonical order that exposed
+    # the year-251 post-reopen transmission drift.
+    world.communities.join(1, 13, 0.7)
+    world.communities.join(1, c3.id, 0.9)
+    world.communities.join(1, 6, 0.8)
+    assert list(world.communities.memberships_for(1)) == [1, 6, 13]
+
+    cold = tmp_path / "community-order-cold.sqlite"
+    lazy = tmp_path / "community-order-lazy.sqlite"
+    write_cold_snapshot(world, cold, rules_id=RULES)
+    convert_cold_to_lazy(cold, lazy, rules_id=RULES)
+
+    with open_lazy_world_session(lazy, rules_id=RULES) as session:
+        assert list(session.world.communities.memberships_for(1)) == [1, 6, 13]
+        inherited = session.world.communities.inherit(2, (1,), weight=0.5)
+        assert list(inherited) == [1, 6, 13]
+        session.save()
+
+    with open_lazy_world_session(lazy, rules_id=RULES) as reopened:
+        assert list(reopened.world.communities.memberships_for(1)) == [1, 6, 13]
+        assert list(reopened.world.communities.memberships_for(2)) == [1, 6, 13]
