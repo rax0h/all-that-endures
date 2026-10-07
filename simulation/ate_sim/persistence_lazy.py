@@ -8091,12 +8091,30 @@ class LazyAdvancementPathTable(LazyRecordTable):
             )
         if not dict.__contains__(self, key):
             self[key]
-        path = dict.__getitem__(self, key)
-        rebound, _labels = self._session._reconcile_advancement_graph(
-            key, path
-        )
-        if rebound is not path:
-            dict.__setitem__(self, key, rebound)
+        # Most advancement writes are scalar progress/rank/training updates.
+        # Rewalking and reattaching the entire nested identity graph for those
+        # cannot change identity topology and becomes quadratic at mature-world
+        # scale. Reconcile only when a container/object-valued field can replace
+        # or restructure mutable identity, or when a tracked container mutation
+        # reports no field (field=None).
+        identity_fields = {
+            "base_essences",
+            "abilities",
+            "response_model",
+            "understanding",
+            "evidence",
+            "applications",
+            "transfers",
+            "samples",
+            "coefficients",
+        }
+        if field is None or field in identity_fields:
+            path = dict.__getitem__(self, key)
+            rebound, _labels = self._session._reconcile_advancement_graph(
+                key, path
+            )
+            if rebound is not path:
+                dict.__setitem__(self, key, rebound)
         self._dirty.add(key)
         self._lru.pop(key, None)
         self._session.world.advancement._invalidate_rank(key)
@@ -11043,18 +11061,24 @@ class LazyWorldSession:
         # between lazy buckets within one generation; leaving the old
         # occurrence attached would resurrect a stale identity link.
         current_paths = set(labels)
-        owner = (namespace, key)
-        for incarnation, _obj in self._registry.live_bindings():
-            for occurrence in self._registry.occurrences_for_incarnation(
-                incarnation
-            ):
-                if (
-                    occurrence.owner == owner
-                    and occurrence.path not in current_paths
-                ):
-                    self._registry.detach_occurrence(
-                        occurrence, expected=incarnation
-                    )
+        # Occurrences are already indexed by owner. Scanning every live
+        # incarnation here made one wallet/treasury mutation proportional to
+        # the entire session identity graph. Reconcile only this bucket.
+        for occurrence in self._registry.occurrences_for_owner(
+            namespace, key
+        ):
+            if occurrence.path in current_paths:
+                continue
+            incarnation = self._registry.incarnation_for_occurrence(
+                occurrence
+            )
+            if incarnation is None:
+                raise StoreIntegrityError(
+                    "currency owner occurrence lost its incarnation"
+                )
+            self._registry.detach_occurrence(
+                occurrence, expected=incarnation
+            )
         return labels
 
     def _bind_assigned_currency_bucket(
