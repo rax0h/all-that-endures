@@ -135,12 +135,12 @@ def test_community_membership_query_order_is_semantic_not_storage_order(tmp_path
     while world.communities.next_community <= 13:
         cid = world.communities.next_community
         world.communities.create(f"c{cid}", 0, 1)
-    # Deliberately write in the same non-canonical order that exposed the
-    # year-251 post-reopen transmission drift.
+    # Deliberately use non-sorted insertion order. Eager insertion order is
+    # canonical behavior; lazy persistence must reproduce it after reopen.
     world.communities.join(1, 13, 0.7)
     world.communities.join(1, 3, 0.9)
     world.communities.join(1, 6, 0.8)
-    assert list(world.communities.memberships_for(1)) == [3, 6, 13]
+    assert list(world.communities.memberships_for(1)) == [13, 3, 6]
 
     cold = tmp_path / "community-order-cold.sqlite"
     lazy = tmp_path / "community-order-lazy.sqlite"
@@ -148,11 +148,11 @@ def test_community_membership_query_order_is_semantic_not_storage_order(tmp_path
     convert_cold_to_lazy(cold, lazy, rules_id=RULES)
 
     with open_lazy_world_session(lazy, rules_id=RULES) as session:
-        assert list(session.world.communities.memberships_for(1)) == [3, 6, 13]
+        assert list(session.world.communities.memberships_for(1)) == [13, 3, 6]
         inherited = session.world.communities.inherit(2, (1,), weight=0.5)
-        assert list(inherited) == [3, 6, 13]
+        assert list(inherited) == [13, 3, 6]
         session.save()
 
     with open_lazy_world_session(lazy, rules_id=RULES) as reopened:
-        assert list(reopened.world.communities.memberships_for(1)) == [3, 6, 13]
-        assert list(reopened.world.communities.memberships_for(2)) == [3, 6, 13]
+        assert list(reopened.world.communities.memberships_for(1)) == [13, 3, 6]
+        assert list(reopened.world.communities.memberships_for(2)) == [13, 3, 6]
