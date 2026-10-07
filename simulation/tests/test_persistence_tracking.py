@@ -4,7 +4,11 @@ import pytest
 
 from ate_sim import Simulation, generate_world
 from ate_sim.core import World, Person
-from ate_sim.persistence_adapters import write_snapshot, read_snapshot
+from ate_sim.agency import ActionRecord
+from ate_sim.persistence_adapters import (
+    AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY,
+    write_snapshot, read_snapshot,
+)
 from ate_sim.persistence_tracking import bind_snapshot, TrackedDict, TrackedList, TrackedSet
 from ate_sim.incremental_store import StoreError
 from ate_sim.magic_resources import MagicResource
@@ -216,6 +220,27 @@ def test_lost_ack_is_resolved_without_duplicate_generation(tmp_path, monkeypatch
         monkeypatch.setattr(session.store, "_phase_hook", original)
         assert session.save() == 2
     assert read_snapshot(path, rules_id=RULES).currency.wallets[1]["iron"] == 9
+
+
+def test_packed_agency_prefix_trim_is_one_logical_change(tmp_path):
+    w = World(10)
+    w.agency.actions = [
+        ActionRecord(i, i + 1, "work", "wealth", 0.5, None)
+        for i in range(12)
+    ]
+    path = snap(tmp_path, w)
+    with bind_snapshot(w, path, rules_id=RULES) as session:
+        session.reset_diagnostics()
+        del w.agency.actions[:-5]
+        assert [a.year for a in w.agency.actions] == [7, 8, 9, 10, 11]
+        assert session.dirty == {
+            (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY)
+        }
+        assert session._changed_member_work == 1
+        session.save()
+
+    restored = read_snapshot(path, rules_id=RULES)
+    assert [a.year for a in restored.agency.actions] == [7, 8, 9, 10, 11]
 
 
 def test_one_real_year_incremental_save_restores_identical_world_and_continues(tmp_path):
