@@ -1,4 +1,3 @@
-from dataclasses import FrozenInstanceError
 import hashlib
 
 import pytest
@@ -108,14 +107,10 @@ def test_open_lazy_world_decodes_zero_people_until_requested(tmp_path):
         assert people.diagnostics()["resident_people"] == 1
 
 
-def test_action_record_is_immutable_historical_value():
+def test_action_record_remains_mutable_for_p2b_compatibility():
     action = ActionRecord(7, 3, "work", "wealth", 0.5, None)
-    try:
-        action.strength = 0.75
-    except FrozenInstanceError:
-        pass
-    else:
-        raise AssertionError("ActionRecord must remain append-only immutable history")
+    action.strength = 0.75
+    assert action.strength == 0.75
 
 
 def test_lazy_packed_agency_trim_saves_and_reopens(tmp_path):
@@ -132,10 +127,16 @@ def test_lazy_packed_agency_trim_saves_and_reopens(tmp_path):
     with open_lazy_world_session(destination, rules_id=RULES) as session:
         del session.world.agency.actions[:-5]
         assert [a.year for a in session.world.agency.actions] == [7, 8, 9, 10, 11]
+        # The rolling packed trim must not rely on immutable records. A
+        # surviving ActionRecord remains mutable under the accepted P2B
+        # compatibility contract, and that mutation must publish with the
+        # packed logical value.
+        session.world.agency.actions[0].strength = 0.75
         session.save()
 
     with open_lazy_world_session(destination, rules_id=RULES) as session:
         assert [a.year for a in session.world.agency.actions] == [7, 8, 9, 10, 11]
+        assert session.world.agency.actions[0].strength == 0.75
 
 
 def test_lazy_alive_query_matches_eager_id_order_not_storage_order(tmp_path):
