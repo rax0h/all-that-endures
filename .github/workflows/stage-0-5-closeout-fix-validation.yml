@@ -1,0 +1,65 @@
+name: Stage 0.5 closeout fix validation
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-closeout-fixes
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - name: Run focused compatibility regressions
+        run: |
+          python -m pytest -q             simulation/tests/test_community_index.py             simulation/tests/test_persistence_lazy_communities.py             simulation/tests/test_persistence_p2b_review_regressions.py
+      - name: Prove year-251 continuation
+        run: |
+          python - <<'PY'
+          import tempfile
+          from pathlib import Path
+          from ate_sim.engine import Simulation
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.worldgen import generate_world
+
+          SEED=843000
+          RULES="closeout-fix-251"
+
+          control=generate_world(SEED)
+          sim=Simulation(control)
+          sim.run(250)
+          d250=control.digest()
+          sim.run(1)
+          d251=control.digest()
+
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td); cold=td/"cold.sqlite"; lazy=td/"lazy.sqlite"
+              source=generate_world(SEED)
+              Simulation(source).run(3)
+              write_cold_snapshot(source,cold,rules_id=RULES)
+              convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+              session=open_lazy_world_session(lazy,rules_id=RULES)
+              try:
+                  Simulation(session.world).run(247)
+                  assert session.world.digest()==d250
+                  session.save()
+                  session.close()
+                  session=open_lazy_world_session(lazy,rules_id=RULES)
+                  assert session.world.digest()==d250
+                  Simulation(session.world).run(1)
+                  got=session.world.digest()
+                  print("CONTROL_251",d251,flush=True)
+                  print("LAZY_251",got,flush=True)
+                  print("MATCH_251",got==d251,flush=True)
+                  assert got==d251
+              finally:
+                  session.close()
+          PY
