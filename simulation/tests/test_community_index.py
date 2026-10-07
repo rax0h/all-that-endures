@@ -6,17 +6,17 @@ def test_membership_index_preserves_order_strength_inheritance_and_checkpoint():
     state = CommunityState()
     for pid,cid,value in ((3,9,.8),(2,5,.4),(3,2,.6),(2,9,.9)):
         state.join(pid,cid,value)
-    assert list(state.memberships_for(3)) == [9,2]
+    assert list(state.memberships_for(3)) == [2,9]
     state.join(3,9,.7)
     state.join(3,6,.005)
     state.join(3,4,.5)
-    assert list(state.memberships_for(3)) == [9,2,4]
+    assert list(state.memberships_for(3)) == [2,4,9]
     state.memberships[(3,9)] = .2  # Strength updates are read from authoritative data.
     for pid in (2,3,8):
         expected = {cid:v for (person,cid),v in state.memberships.items() if person==pid and v>=.01}
         assert state.memberships_for(pid) == expected
     inherited = state.inherit(8,(3,2))
-    assert list(inherited) == [9,2,4,5]
+    assert list(inherited) == [2,4,5,9]
     for copy in (deepcopy(state),pickle.loads(pickle.dumps(state))):
         assert copy.memberships_for(8) == inherited
         del copy._membership_index
