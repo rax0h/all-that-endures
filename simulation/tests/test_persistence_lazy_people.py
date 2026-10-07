@@ -106,6 +106,32 @@ def test_open_lazy_world_decodes_zero_people_until_requested(tmp_path):
         assert people.diagnostics()["resident_people"] == 1
 
 
+def test_lazy_alive_query_matches_eager_id_order_not_storage_order(tmp_path):
+    world = people_world(0)
+    # Deliberately make dictionary/storage order differ from RecordTable's
+    # alive-query contract.
+    for person_id in (10, 2, 11, 1):
+        world.people[person_id] = Person(
+            person_id,
+            0,
+            1,
+            1,
+            alive=True,
+            age=20,
+        )
+    source = tmp_path / "alive-order-cold.sqlite"
+    destination = tmp_path / "alive-order-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    eager = indexed(world, "people").ids("alive", True)
+    assert eager == (1, 2, 10, 11)
+
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        assert session.world.people.ids("alive", True) == eager
+        assert tuple(p.id for p in session.world.current_people()) == eager
+
+
 def test_lazy_people_iteration_preserves_source_dictionary_order(tmp_path):
     world = people_world(275, active=9)
     source = tmp_path / "cold.sqlite"
