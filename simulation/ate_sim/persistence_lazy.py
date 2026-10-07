@@ -3077,7 +3077,11 @@ class LazyRecordTable(RecordTable):
             record = dict.__getitem__(self, key)
             if bool(record.alive) == desired:
                 baseline.add(key)
-        return tuple(sorted(baseline, key=self._current_ordinal))
+        # Match RecordTable.ids exactly. The live simulation's current_people()
+        # contract is stable increasing person ID, independent of persistence
+        # insertion/structural ordinals. Reopen must not change floating-point
+        # aggregation order or deterministic history.
+        return tuple(sorted(baseline))
 
     def select(self, fields, *values):
         return [self[key] for key in self.ids(fields, *values)]
