@@ -1,0 +1,71 @@
+name: Profile late-world persistence around year 400 after institution index
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-profile-late-400b
+
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Profile years 401-410 after real P5 checkpoint cadence
+        run: |
+          python - <<'PY'
+          import cProfile, pstats, tempfile, time
+          from pathlib import Path
+          from ate_sim.engine import Simulation
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.worldgen import generate_world
+
+          SEED=843000
+          RULES="profile-late-400b"
+
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td); cold=td/"cold.sqlite"; lazy=td/"lazy.sqlite"
+              source=generate_world(SEED)
+              Simulation(source).run(3)
+              write_cold_snapshot(source,cold,rules_id=RULES)
+              convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+
+              session=open_lazy_world_session(lazy,rules_id=RULES)
+              try:
+                  Simulation(session.world).run(97)
+                  session.save(); session.close()
+                  session=open_lazy_world_session(lazy,rules_id=RULES)
+
+                  Simulation(session.world).run(150)
+                  session.save(); session.close()
+                  session=open_lazy_world_session(lazy,rules_id=RULES)
+
+                  started=time.perf_counter()
+                  Simulation(session.world).run(150)
+                  print("PREPROFILE_250_TO_400_SECONDS",time.perf_counter()-started,flush=True)
+
+                  session.store.reset_diagnostics()
+                  before=session.institution_applications.diagnostics()["overlay_query_checks"]
+                  prof=cProfile.Profile()
+                  started=time.perf_counter()
+                  prof.enable()
+                  Simulation(session.world).run(10)
+                  prof.disable()
+                  elapsed=time.perf_counter()-started
+                  diag=session.store.diagnostics()
+                  after=session.institution_applications.diagnostics()["overlay_query_checks"]
+                  print("PROFILE_401_410_SECONDS",elapsed,flush=True)
+                  print("PROFILE_PAYLOAD_READS",diag.payload_reads,flush=True)
+                  print("PROFILE_QUERY_ROWS",diag.query_rows,flush=True)
+                  print("PROFILE_PAYLOAD_CHECK_READS",diag.payload_check_reads,flush=True)
+                  print("APPLICATION_OVERLAY_QUERY_CHECKS",after-before,flush=True)
+                  pstats.Stats(prof).strip_dirs().sort_stats("cumtime").print_stats(80)
+              finally:
+                  session.close()
+          PY
