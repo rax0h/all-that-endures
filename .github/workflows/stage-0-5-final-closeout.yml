@@ -6,7 +6,27 @@ on:
       - sol-stage-0-5-final-closeout
 
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Run closeout compatibility preflight
+        run: |
+          python -m pytest -q \
+            simulation/tests/test_community_index.py::test_membership_index_preserves_order_strength_inheritance_and_checkpoint \
+            simulation/tests/test_persistence_p2b_review_regressions.py::test_r2_rejected_nested_cycle_and_extended_slice_leave_tracking_intact \
+            simulation/tests/test_persistence_lazy_people.py::test_lazy_packed_agency_trim_saves_and_reopens
+
   full-suite:
+    needs: preflight
     runs-on: ubuntu-latest
     timeout-minutes: 360
     env:
@@ -22,6 +42,7 @@ jobs:
         run: python -m pytest -q simulation/tests
 
   short-closeout:
+    needs: preflight
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
