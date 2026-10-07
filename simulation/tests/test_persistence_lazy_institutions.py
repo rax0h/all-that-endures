@@ -163,3 +163,53 @@ def test_institution_noop_and_materializing_detach_are_portable(tmp_path):
     restored = checkpoint.loads(checkpoint.dumps(detached))
     assert restored.digest() == detached.digest()
     assert [row.id for row in restored.institutions.active_notices()] == [1, 2]
+
+
+def test_institution_application_overlay_query_checks_only_matching_candidates(tmp_path):
+    path = converted(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        table = session.world.institutions.applications
+        start = session.institution_applications.diagnostics()[
+            "overlay_query_checks"
+        ]
+        for offset in range(1000):
+            aid = 1000 + offset
+            table[aid] = SocietyApplication(
+                aid,
+                "magic_society",
+                10000 + offset,
+                1,
+                10,
+                True,
+                stage="screening",
+                passed=None,
+            )
+
+        target = 10999
+        assert session.world.institutions.has_application(
+            target, "magic_society"
+        )
+        after = session.institution_applications.diagnostics()[
+            "overlay_query_checks"
+        ]
+        assert after - start == 1
+
+        application = table[1999]
+        application.passed = True
+        assert session.world.institutions.has_application(
+            target, "magic_society", qualified=True
+        )
+        qualified_after = session.institution_applications.diagnostics()[
+            "overlay_query_checks"
+        ]
+        assert qualified_after - after <= 2
+
+        session.save()
+        assert session.institution_applications.diagnostics()[
+            "touched_membership_buckets"
+        ] == 0
+
+    with open_lazy_world_session(path, rules_id=RULES) as reopened:
+        assert reopened.world.institutions.has_application(
+            target, "magic_society", qualified=True
+        )
