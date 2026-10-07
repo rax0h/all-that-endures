@@ -24,7 +24,7 @@ jobs:
         run: python -m pip install pytest
       - name: Focused store and lazy regressions
         run: |
-          python -m pytest -q             simulation/tests/test_persistence_lazy_store.py             simulation/tests/test_persistence_lazy_store_failures.py             simulation/tests/test_persistence_lazy_people.py             simulation/tests/test_persistence_lazy_social.py             simulation/tests/test_persistence_lazy_materials.py             simulation/tests/test_persistence_lazy_currency.py             simulation/tests/test_persistence_lazy_identity.py
+          python -m pytest -q             simulation/tests/test_persistence_lazy_store.py             simulation/tests/test_persistence_lazy_store_failures.py             simulation/tests/test_persistence_lazy_people.py             simulation/tests/test_persistence_lazy_social.py             simulation/tests/test_persistence_lazy_materials.py             simulation/tests/test_persistence_lazy_currency.py             simulation/tests/test_persistence_lazy_identity.py             simulation/tests/test_persistence_lazy_advancement.py
       - name: Profile integrated lazy simulation
         run: |
           python - <<'PY'
