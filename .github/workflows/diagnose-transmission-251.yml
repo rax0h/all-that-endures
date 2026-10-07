@@ -1,0 +1,139 @@
+name: Diagnose transmission divergence at year 251
+
+on:
+  push:
+    branches:
+      - sol-stage-0-5-diagnose-transmission-251
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compare first differing transmission
+        run: |
+          python - <<'PY'
+          import tempfile
+          from pathlib import Path
+
+          from ate_sim.engine import Simulation
+          from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
+          from ate_sim.persistence_session import write_cold_snapshot
+          from ate_sim.worldgen import generate_world
+
+          SEED=843000
+          RULES="diag-transmission-251"
+
+          control=generate_world(SEED)
+          cs=Simulation(control)
+          cs.run(100)
+          cs.run(150)
+
+          with tempfile.TemporaryDirectory() as td:
+              td=Path(td); cold=td/"cold.sqlite"; lazy=td/"lazy.sqlite"
+              source=generate_world(SEED)
+              Simulation(source).run(3)
+              write_cold_snapshot(source,cold,rules_id=RULES)
+              convert_cold_to_lazy(cold,lazy,rules_id=RULES)
+
+              session=open_lazy_world_session(lazy,rules_id=RULES)
+              try:
+                  Simulation(session.world).run(97)
+                  session.save()
+                  session.close()
+                  session=open_lazy_world_session(lazy,rules_id=RULES)
+                  Simulation(session.world).run(150)
+                  assert session.world.digest()==control.digest()
+                  session.save()
+                  session.close()
+                  session=open_lazy_world_session(lazy,rules_id=RULES)
+                  assert session.world.digest()==control.digest()
+
+                  control_before=control.transmission.next_id
+                  lazy_before=session.world.transmission.next_id
+                  print("NEXT_BEFORE",control_before,lazy_before,flush=True)
+
+                  Simulation(control).run(1)
+                  Simulation(session.world).run(1)
+
+                  print(
+                      "NEXT_AFTER",
+                      control.transmission.next_id,
+                      session.world.transmission.next_id,
+                      flush=True,
+                  )
+                  print(
+                      "LENGTHS",
+                      len(control.transmission.records),
+                      len(session.world.transmission.records),
+                      flush=True,
+                  )
+
+                  first=None
+                  keys=sorted(
+                      set(control.transmission.records)
+                      | set(session.world.transmission.records)
+                  )
+                  for key in keys:
+                      a=control.transmission.records.get(key)
+                      b=session.world.transmission.records.get(key)
+                      if a != b:
+                          first=key
+                          print("FIRST_TRANSMISSION_DIFF_ID",key,flush=True)
+                          print("CONTROL_RECORD",repr(a),flush=True)
+                          print("LAZY_RECORD",repr(b),flush=True)
+                          break
+
+                  if first is not None:
+                      records=[
+                          r for r in (
+                              control.transmission.records.get(first),
+                              session.world.transmission.records.get(first),
+                          )
+                          if r is not None
+                      ]
+                      child_ids=sorted({
+                          r.target_id for r in records
+                          if r.target_kind=="person"
+                      })
+                      for child in child_ids:
+                          cp=control.people.get(child)
+                          lp=session.world.people.get(child)
+                          print("CHILD",child,"CONTROL_PARENTS",None if cp is None else cp.parents,
+                                "LAZY_PARENTS",None if lp is None else lp.parents,flush=True)
+                          if cp is not None:
+                              for parent in cp.parents:
+                                  print(
+                                      "CONTROL_MEMBERSHIPS",
+                                      parent,
+                                      list(control.communities.memberships_for(parent).items()),
+                                      flush=True,
+                                  )
+                          if lp is not None:
+                              for parent in lp.parents:
+                                  print(
+                                      "LAZY_MEMBERSHIPS",
+                                      parent,
+                                      list(session.world.communities.memberships_for(parent).items()),
+                                      flush=True,
+                                  )
+
+                  new_control=[
+                      control.transmission.records[i]
+                      for i in range(control_before, control.transmission.next_id)
+                  ]
+                  new_lazy=[
+                      session.world.transmission.records[i]
+                      for i in range(lazy_before, session.world.transmission.next_id)
+                  ]
+                  print("NEW_CONTROL_HEAD",repr(new_control[:12]),flush=True)
+                  print("NEW_LAZY_HEAD",repr(new_lazy[:12]),flush=True)
+              finally:
+                  session.close()
+          PY
