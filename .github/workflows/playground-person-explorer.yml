@@ -22,5 +22,5 @@ jobs:
             --seed 843000 \
             --years 250 \
             --roll 1 \
-            --mode random \
+            --mode interesting \
             --timeline 18
