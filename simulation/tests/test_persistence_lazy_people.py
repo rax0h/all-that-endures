@@ -118,6 +118,26 @@ def test_action_record_is_immutable_historical_value():
         raise AssertionError("ActionRecord must remain append-only immutable history")
 
 
+def test_lazy_packed_agency_trim_saves_and_reopens(tmp_path):
+    world = people_world(0)
+    world.agency.actions = [
+        ActionRecord(i, i + 1, "work", "wealth", 0.5, None)
+        for i in range(12)
+    ]
+    source = tmp_path / "agency-packed-cold.sqlite"
+    destination = tmp_path / "agency-packed-lazy.sqlite"
+    write_cold_snapshot(world, source, rules_id=RULES)
+    convert_cold_to_lazy(source, destination, rules_id=RULES)
+
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        del session.world.agency.actions[:-5]
+        assert [a.year for a in session.world.agency.actions] == [7, 8, 9, 10, 11]
+        session.save()
+
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        assert [a.year for a in session.world.agency.actions] == [7, 8, 9, 10, 11]
+
+
 def test_lazy_alive_query_matches_eager_id_order_not_storage_order(tmp_path):
     world = people_world(0)
     # Deliberately make dictionary/storage order differ from RecordTable's
