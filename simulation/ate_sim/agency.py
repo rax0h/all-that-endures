@@ -49,5 +49,5 @@ def agency_step(world,rng):
   elif action=='prepare':world.households[p.household].preparedness=min(1.,world.households[p.household].preparedness+.002*strength)
   elif action=='work':p.wealth+=.03*strength
   world.agency.actions.append(ActionRecord(world.year,p.id,action,motive,strength,None if event is None else event.id))
- if len(world.agency.actions)>50000:world.agency.actions=world.agency.actions[-50000:]
+ if len(world.agency.actions)>50000:del world.agency.actions[:-50000]
  rank_ecology_step(world,rng)
