@@ -1723,6 +1723,11 @@ class IncrementalWorldSession:
             key=lambda owner: (owner[0], self.codec.encode(owner[1])),
         )
         for owner in owners:
+            # Packed agency history is one logical storage value. Its marker is
+            # not a list-member owner and therefore has no identity path to
+            # refresh. ActionRecord entries are immutable historical values.
+            if owner == (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY):
+                continue
             value = None if owner in self._deleted else self._owner_value(owner)
             removed, added = self._identity_index.refresh(
                 owner, value, self._owner_path(owner)
