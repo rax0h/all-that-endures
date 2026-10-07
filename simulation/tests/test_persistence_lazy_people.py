@@ -124,7 +124,7 @@ def test_lazy_alive_query_matches_eager_id_order_not_storage_order(tmp_path):
     write_cold_snapshot(world, source, rules_id=RULES)
     convert_cold_to_lazy(source, destination, rules_id=RULES)
 
-    eager = indexed(world, "people").ids("alive", True)
+    eager = RecordTable(world.people).ids("alive", True)
     assert eager == (1, 2, 10, 11)
 
     with open_lazy_world_session(destination, rules_id=RULES) as session:
