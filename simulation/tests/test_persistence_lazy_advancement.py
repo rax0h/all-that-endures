@@ -2,6 +2,7 @@ import pytest
 
 from ate_sim import checkpoint
 from ate_sim.core import World
+from ate_sim.advancement import Understanding
 from ate_sim.incremental_store import StoreConflictError
 from ate_sim.persistence_lazy import (
     ADVANCEMENT_NAMESPACE,
@@ -71,6 +72,30 @@ def test_advancement_open_zero_payloads_and_point_access_one_path(tmp_path):
         assert path is paths[200]
         assert paths.diagnostics()["advancement_payload_loads"] == 1
         assert paths.diagnostics()["resident_advancement_paths"] == 1
+
+
+def test_scalar_advancement_writes_skip_identity_graph_reconcile(tmp_path):
+    destination = converted(tmp_path, 4, name="scalar-reconcile")
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        path = session.world.advancement.path(1)
+        ability = path.abilities[0]
+        original = session._reconcile_advancement_graph
+        calls = []
+
+        def counted(key, value):
+            calls.append(key)
+            return original(key, value)
+
+        session._reconcile_advancement_graph = counted
+        ability.progress += .1
+        ability.rank = 2
+        ability.level = 3
+        assert calls == []
+
+        # Replacing a mutable identity-bearing child still reconciles now.
+        ability.understanding = Understanding()
+        assert calls == [1]
+        session.save()
 
 
 def test_advancement_nested_mutations_save_and_reopen(tmp_path):
