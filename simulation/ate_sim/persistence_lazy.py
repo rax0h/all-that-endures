@@ -9608,7 +9608,14 @@ class LazyWorldSession:
             tracker._merge_identity_patch(removed, added)
         if tracker._pending_identity_current:
             raise StoreIntegrityError(
-                "paged household binding changed persisted current-link authority"
+                "paged household binding changed persisted current-link authority: "
+                + repr({
+                    "pending": tracker._pending_identity_current,
+                    "committed": tracker._committed_identity_targets,
+                    "live": tracker._live_identity_targets,
+                    "links": self._cross_boundary_links,
+                    "residents": {k: (id(h.members), len(h.members)) for k, h in self.world.households.items()},
+                })[:4500]
             )
         self._household_paging_active = True
         tracker._paged_household_members = True
