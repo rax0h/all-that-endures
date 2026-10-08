@@ -47,7 +47,11 @@ def test_unpaged_legacy_store_opens_by_default_and_explicitly(tmp_path):
         with open_lazy_world_session(
             legacy, rules_id=RULES, paged_household_members=requested_mode
         ) as session:
-            assert type(session.world.households[1].members) is list
+            members = session.world.households[1].members
+            # Legacy eager lists are intentionally wrapped in TrackedList
+            # so ordinary in-place mutations remain persistence-visible.
+            assert isinstance(members, list)
+            assert not getattr(members, "_ate_household_page_sequence", False)
             assert session.world.digest() == world.digest()
     with pytest.raises(StoreFormatError):
         open_lazy_world_session(legacy, rules_id=RULES, paged_household_members=True)
