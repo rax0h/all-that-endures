@@ -94,6 +94,8 @@ def bootstrap_household_members(store, generation, owners):
 
 
 class LazyHouseholdMembers(MutableSequence):
+    _ate_household_page_sequence = True
+
     """Mutable list semantics backed by checked, bounded-size versioned pages.
 
     A retained instance preserves the caller's alias. An owner guard is
