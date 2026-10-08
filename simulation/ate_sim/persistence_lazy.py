@@ -1003,8 +1003,8 @@ def _insert_lazy_material_lot(
         )
 
 
-def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=False):
-    """Explicit checked P3B cold -> P4 conversion into a new destination."""
+def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True):
+    """Explicit checked P3B cold -> P4 conversion. New Worlds use bounded household pages."""
     source, destination = _preflight_conversion_paths(source, destination)
     codec = WorldCodec(identity_links_recorded=True)
     source_store = TransactionalStore.open(
@@ -15988,7 +15988,7 @@ def _begin_matching_snapshot(store, pin):
     return head
 
 
-def open_lazy_world_session(path, *, rules_id, paged_household_members=False):
+def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
     """Open P4 lazy World without decoding migrated record families."""
     path = Path(path)
     store = LazyRecordStore.open(
@@ -16031,9 +16031,16 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=False):
                     HOUSEHOLD_LENGTH_NAMESPACE, head.generation
                 ) is not None
             )
-            if member_pages_present != bool(paged_household_members):
+            if paged_household_members is None:
+                # Stored checked namespace authority selects the format, so
+                # default opens page new Worlds without breaking legacy P4
+                # saves written before the bounded member migration.
+                paged_household_members = member_pages_present
+            elif type(paged_household_members) is not bool:
+                raise TypeError("paged_household_members must be bool or None")
+            elif member_pages_present != paged_household_members:
                 raise StoreFormatError(
-                    "household members storage mode mismatch; explicit paged flag required"
+                    "household members storage mode mismatch"
                 )
             metadata_rows = store.read_records(
                 META, expected_record_schema=RECORD_SCHEMA
