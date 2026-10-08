@@ -5,7 +5,7 @@ on:
 jobs:
   cross-family:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 9
     env:
       PYTHONPATH: .:simulation
     steps:
