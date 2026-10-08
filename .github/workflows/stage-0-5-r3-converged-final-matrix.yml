@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - sim/stage-0-5-r3-converged-validation
+      - sim/stage-0-5-r3-release-candidate
   workflow_dispatch:
 
 jobs:
