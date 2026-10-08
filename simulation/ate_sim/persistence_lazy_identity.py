@@ -97,8 +97,13 @@ class LazyIdentityRegistry:
         store_identity: str,
         *,
         next_incarnation: int = 1,
+        prune_dead_occurrences: bool = False,
     ):
         self.store_identity = store_identity
+        # Standalone registries retain logical placement by default (P4.2
+        # contract). A World registry may prune runtime-only placements when
+        # the checked on-disk occurrence index remains authoritative.
+        self._prune_dead_occurrences = prune_dead_occurrences
         self.allocator = IncarnationAllocator(store_identity, next_incarnation)
         self._by_incarnation: dict[IncarnationId, weakref.ReferenceType[Any]] = {}
         self._by_object_id: dict[
@@ -145,6 +150,8 @@ class LazyIdentityRegistry:
         forward = self._by_incarnation.get(incarnation)
         if forward is reference:
             self._by_incarnation.pop(incarnation, None)
+            if not self._prune_dead_occurrences:
+                return
             # Runtime occurrences exist to route writes from *live* aliases.
             # Once an incarnation has no live object, its loaded placements
             # can be reconstructed from checked store authority on demand.

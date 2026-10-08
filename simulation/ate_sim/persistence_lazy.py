@@ -9255,6 +9255,7 @@ class LazyWorldSession:
         self._registry = LazyIdentityRegistry(
             store.store_identity,
             next_incarnation=next_incarnation,
+            prune_dead_occurrences=True,
         )
         self.people = LazyRecordTable(self)
         object.__setattr__(world, "people", self.people)
