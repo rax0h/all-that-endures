@@ -1028,8 +1028,24 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     "convert_cold_to_lazy requires P3B cold event storage"
                 )
             capture = _capture_cold_world(source_store)
-            # Experimental cross-owner identity probe; revert unless all
-            # P2C alias, digest and hybrid-save checks pass.
+            if paged_household_members:
+                for target_path, owner_path in capture.identity_links:
+                    a = _household_member_path(target_path)
+                    b = _household_member_path(owner_path)
+                    if a == b:
+                        continue
+                    paged_path = target_path if a else owner_path
+                    other_path = owner_path if a else target_path
+                    other = _lazy_occurrence_from_path(other_path)
+                    if (
+                        len(paged_path) != 3
+                        or other is None
+                        or other[0] not in (WALLET_NAMESPACE, TREASURY_NAMESPACE)
+                        or not other[2]
+                    ):
+                        raise StoreError(
+                            "paged household cross-family identity requires supported lazy wallet/treasury list"
+                        )
             source_head = source_store.db.execute(
                 "SELECT generation,parent_generation,simulation_position,seed,"
                 "next_ids,namespace_inventory,namespace_counts,head_checksum "
