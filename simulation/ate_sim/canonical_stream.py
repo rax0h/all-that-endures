@@ -1,5 +1,6 @@
 """Stream the established canonical JSON bytes without expanding cold history."""
 from dataclasses import is_dataclass
+from collections.abc import MutableSequence
 from enum import Enum
 from json.encoder import encode_basestring
 import hashlib
@@ -33,7 +34,7 @@ def digest(value,canonical,field_names):
                 if i:yield ','
                 yield encode_basestring(repr(key));yield ':';yield from pieces(v[key])
             yield '}'
-        elif isinstance(v,(list,tuple,EventLog,set,frozenset)):
+        elif isinstance(v,(list,tuple,EventLog,set,frozenset,MutableSequence)):
             values=sorted(v,key=lambda x:repr(canonical(x))) if isinstance(v,(set,frozenset)) else v
             yield '['
             for i,item in enumerate(values):
