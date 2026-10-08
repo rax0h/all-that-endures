@@ -17,3 +17,5 @@ jobs:
       - run: python -m pytest -sv -q simulation/tests/test_stage_0_5_household_sequence.py simulation/tests/test_stage_0_5_paged_household_world.py
 
 # Recheck rollback, generations and page deletion
+
+# Gate opt-in World projection after future-import fix
