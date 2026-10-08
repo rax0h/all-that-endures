@@ -1,0 +1,25 @@
+name: stage-0-5-r1-r2-final-short-gate
+on:
+  push:
+    branches: [sim/stage-0-5-r1r2-final-short-gate]
+
+jobs:
+  repair-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - name: R1-R2 closeout regressions excluding known R3 red blocker
+        run: python -m pytest -q simulation/tests/test_stage_0_5_closeout.py -k "not r3"
+      - name: Directly affected people identity lifecycle and families
+        run: python -m pytest -q simulation/tests/test_persistence_lazy_people.py simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_persistence_lazy_genealogy.py simulation/tests/test_persistence_lazy_currency.py simulation/tests/test_persistence_lazy_social.py simulation/tests/test_persistence_lifecycle.py
+      - name: P5 short independent eager-lazy-checkpoint continuation
+        run: python simulation/persistence_p5_validation.py --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --output /tmp/stage-0-5-r1r2-short.json
+      - name: Canonical 10-year smoke
+        run: python simulation/specific_test.py --seed 843000 --years 10 --section all
