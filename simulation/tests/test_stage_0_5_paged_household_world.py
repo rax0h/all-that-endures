@@ -153,3 +153,39 @@ def test_r3_new_household_publishes_compact_owner_and_pages(tmp_path):
     ) as reopened:
         assert reopened.world.digest() == original.digest()
         assert reopened.world.households[2].members == [9, 9, 11]
+
+
+def test_r3_deleted_household_owner_retained_alias_is_detached(tmp_path):
+    original, path = make(tmp_path, 1000)
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as session:
+        old_members = session.world.households[1].members
+        del session.world.households[1]
+        del original.households[1]
+        # Stale aliases remain their own mutable values and cannot resurrect
+        # deleted canonical household members.
+        old_members.append(12345)
+        before = session.pin.captured_head
+        assert session.save() == before + 1
+        assert session.world.digest() == original.digest()
+        assert old_members[-1] == 12345
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as reopened:
+        assert not reopened.world.households
+        assert reopened.world.digest() == original.digest()
+
+
+def test_r3_replaced_household_same_id_preserves_old_alias_detachment(tmp_path):
+    original, path = make(tmp_path, 1000)
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as session:
+        old_members = session.world.households[1].members
+        replacement = Household(1, 1, [42, 42, 7], food=25.0)
+        session.world.households[1] = replacement
+        original.households[1] = Household(1, 1, [42, 42, 7], food=25.0)
+        old_members.append(99999)
+        prior = session.pin.captured_head
+        assert session.save() == prior + 1
+        assert session.world.households[1].members == [42, 42, 7]
+        assert old_members[-1] == 99999
+        assert session.world.digest() == original.digest()
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as reopened:
+        assert reopened.world.digest() == original.digest()
+        assert reopened.world.households[1].members == [42, 42, 7]
