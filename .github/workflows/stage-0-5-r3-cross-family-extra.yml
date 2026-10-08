@@ -1,0 +1,17 @@
+name: stage-0-5-r3-cross-family-extra
+on:
+  push:
+    branches: [sim/stage-0-5-r3-cross-family-gate]
+jobs:
+  cross-family:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - run: python -m pytest -vv -q simulation/tests/test_stage_0_5_r3_cross_family_extra.py
