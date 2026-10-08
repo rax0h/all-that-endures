@@ -9550,7 +9550,9 @@ class LazyWorldSession:
             existing = (
                 seen_lists.get(label[0]) if label is not None else None
             )
-            if existing is None:
+            if existing is None and label is None:
+                # A checked incarnation, when present, is authoritative;
+                # physical compact placeholders may have aliased at capture.
                 existing = seen_objects.get(id(original))
             if existing is None:
                 existing = self._make_paged_household_sequence(key, household)
@@ -9706,6 +9708,47 @@ class LazyWorldSession:
             change for sequence in unique_sequences.values()
             for change in sequence.pending_changes()
         )
+
+    def _household_member_identity_changes(self):
+        """Version checked nested member incarnations with the same save pin.
+
+        A household may replace or split a shared member list without changing
+        the outer household ID. P2C links track *current* sharing, but the
+        checked per-occurrence incarnation also has to advance atomically.
+        """
+        if not self._household_paging_active:
+            return ()
+        path = (("field", "members"),)
+        encoded_path = self.store.codec.encode(path)
+        current = self.world.households
+        changes = []
+        keys = sorted(set(current) | set(self._deleted_paged_household_members))
+        for key in keys:
+            occurrence = Occurrence("world.households", key, path)
+            row = self.store._visible_identity_occurrence(
+                self.pin.captured_head,
+                "world.households",
+                self.store.codec.encode(key),
+                encoded_path,
+            )
+            if key not in current:
+                if row is not None:
+                    changes.append(IdentityOccurrenceChange(
+                        "world.households", key, path, delete=True,
+                    ))
+                self._registry.detach_occurrence(occurrence)
+                continue
+            sequence = self._paged_household_members[key]
+            incarnation = self._registry.incarnation_for_object(sequence)
+            if incarnation is None:
+                incarnation = self._registry.bind(sequence)
+            self._registry.attach_occurrence(sequence, occurrence)
+            if row is None or row[0] != incarnation.value:
+                changes.append(IdentityOccurrenceChange(
+                    "world.households", key, path,
+                    incarnation_id=incarnation.value,
+                ))
+        return tuple(changes)
 
     def _ensure_active(self):
         if not self._active:
@@ -12642,6 +12685,7 @@ class LazyWorldSession:
             touched_keys,
             structural_keys,
         ) = self.people.prepare_save_changes()
+        identity_changes += self._household_member_identity_changes()
         (
             aspiration_version_changes,
             aspiration_identity_changes,
