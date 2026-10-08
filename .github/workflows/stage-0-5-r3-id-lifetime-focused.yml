@@ -1,0 +1,18 @@
+name: stage-0-5-r3-id-lifetime-focused
+on:
+  push:
+    branches: [sim/stage-0-5-r3-id-lifetime-fix]
+jobs:
+  household-identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - name: Specific saved split/reopen and shared-member regressions
+        run: python -m pytest -q simulation/tests/test_stage_0_5_paged_household_world.py -k "shared_member or new_household"
