@@ -17,4 +17,4 @@ jobs:
       - name: Bounded R1/R2 repaired regressions and identity/lifecycle
         run: |
           python -m pytest -q simulation/tests/test_stage_0_5_closeout.py -k 'not r3'
-          python -m pytest -q simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_persistence_lifecycle.py
+          python -m pytest -q simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_persistence_lifecycle.py simulation/tests/test_persistence_lazy_people.py simulation/tests/test_persistence_lazy_genealogy.py
