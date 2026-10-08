@@ -2954,6 +2954,13 @@ class LazyRecordTable(RecordTable):
     def _ensure_mutation(self):
         self._session._ensure_people_mutation_allowed()
 
+    def preflight_shared_record(self, record):
+        self._session._shared_object_routes(record)
+
+    def shared_record_changed(self, record):
+        for table, key in self._session._shared_object_routes(record):
+            table.changed(key)
+
     def _baseline_exists(self, key):
         # Membership lookups without a resident/dirty owner are one-shot
         # checked projections: do not cache either positive history or misses.
@@ -3903,7 +3910,28 @@ class LazyTrackedDict(dict):
                 raise StoreIntegrityError(
                     "tracked currency dict retained a non-current owner"
                 )
-        return bindings
+        # An unloaded current alias has no wrapper callback yet. Rehydrate
+        # only this incarnation's peer owners before editing, then resample
+        # the callbacks they attach to this same mutable object.
+        sessions = {id(table._session): table._session for table, _ in bindings}
+        routes = {}
+        for session in sessions.values():
+            for table, key in session._shared_object_routes(self):
+                routes[(id(table), key)] = (table, key)
+        for table, key in self._bindings():
+            routes[(id(table), key)] = (table, key)
+        return tuple(routes.values())
+
+    @staticmethod
+    def _replacement_changed(before, value):
+        if before is value:
+            return False
+        if (
+            not _cross_boundary_field_value_is_immutable(before)
+            or not _cross_boundary_field_value_is_immutable(value)
+        ):
+            return True
+        return before != value
 
     @staticmethod
     def _touch(bindings):
@@ -3914,7 +3942,7 @@ class LazyTrackedDict(dict):
         bindings = self._guard()
         before = self.get(key, object())
         dict.__setitem__(self, key, value)
-        if before != value:
+        if self._replacement_changed(before, value):
             self._touch(bindings)
 
     def __delitem__(self, key):
@@ -3956,7 +3984,7 @@ class LazyTrackedDict(dict):
         incoming = dict(*args, **kwargs)
         bindings = self._guard()
         changed = any(
-            key not in self or self[key] != value
+            key not in self or self._replacement_changed(self[key], value)
             for key, value in incoming.items()
         )
         dict.update(self, incoming)
@@ -9870,6 +9898,67 @@ class LazyWorldSession:
     def _ensure_active(self):
         if not self._active:
             raise StoreError("lazy World session is closed")
+
+    def _shared_object_routes(self, obj):
+        """Check and load only current owners of one live incarnation.
+
+        Loading a peer binds its mutable paths to the existing object, before
+        an edit can leave its separately encoded payload copy stale. Current
+        placement overrides persisted labels after replacement or deletion.
+        This uses the existing registry; bounded cold group discovery is a
+        separate repair, not an excuse to scan all live bindings here.
+        """
+        self._ensure_people_mutation_allowed()
+        incarnation = self._registry.incarnation_for_object(obj)
+        if incarnation is None:
+            return ()
+        tables = {
+            PEOPLE_NAMESPACE: self.people,
+            ASPIRATION_NAMESPACE: self.aspirations,
+            RESOURCE_NAMESPACE: self.resources,
+            OWNER_INDEX_NAMESPACE: self.owner_index,
+            MATERIAL_LOT_NAMESPACE: self.material_lots,
+            MATERIAL_ITEM_NAMESPACE: self.material_items,
+            MATERIAL_LOT_INDEX_NAMESPACE: self.material_lot_index,
+            MATERIAL_ACTIVE_INDEX_NAMESPACE: self.material_active_index,
+            WALLET_NAMESPACE: self.wallets,
+            TREASURY_NAMESPACE: self.treasuries,
+            SOUL_NAMESPACE: self.souls,
+            ADVANCEMENT_NAMESPACE: self.advancement_paths,
+            INSTITUTION_MAGIC_RECORD_NAMESPACE: self.institution_magic_records,
+            INSTITUTION_NOTICE_NAMESPACE: self.institution_notices,
+            INSTITUTION_APPLICATION_NAMESPACE: self.institution_applications,
+            TRANSMISSION_NAMESPACE: self.transmissions,
+            MOTIVE_NAMESPACE: self.motives,
+            SOCIAL_EDGE_NAMESPACE: self.social_edges,
+            SOCIAL_ADJACENCY_NAMESPACE: self.social_adjacency,
+            SKILL_NAMESPACE: self.skills,
+            LINEAGE_NODE_NAMESPACE: self.lineage_nodes,
+            LINEAGE_CHILD_NAMESPACE: self.lineage_children,
+            GENEALOGY_CHILD_NAMESPACE: self.genealogy_children,
+        }
+        routes = {}
+        for occurrence in self._registry.occurrences_for_incarnation(incarnation):
+            table = tables.get(occurrence.owner_namespace)
+            key = occurrence.owner_key
+            if table is None or not table._visible(key):
+                continue
+            # A record may already be live through a nested alias while its
+            # top-level table entry is still cold. Its checked incarnation
+            # callback can rehydrate that entry without a redundant decode.
+            owner = (
+                obj if not occurrence.path and isinstance(obj, IndexedRecord)
+                else table[key]
+            )
+            try:
+                current = _relative_get(owner, occurrence.path)
+            except (KeyError, IndexError, AttributeError, TypeError):
+                # A dirty owner can have removed this placement before its
+                # checked occurrence tombstone is prepared for publication.
+                continue
+            if current is obj:
+                routes[(id(table), key)] = (table, key)
+        return tuple(routes.values())
 
     def _ensure_people_mutation_allowed(self):
         self._ensure_active()

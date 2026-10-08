@@ -1,0 +1,13 @@
+# Identity implementation brief
+
+Read `../STAGE_0_5_CONTINUOUS_REPAIR_SPEC.md`. Work only in identity-work. No child agents, GitHub writes, full suite or endurance. Write a unit design/plan first, then TDD and complete the implementation. Commit locally; report commit IDs, test commands/results, measurements and remaining concerns in `STAGE_0_5_CURRENT_IDENTITY_VALIDATION.md`.
+
+Implement your investigated design: incarnation-leading checked reverse occurrence index/API, versioned P2C link authority for pinned exact target reads, requested-owner scoped discovery, no global current-link open/save inventory, bounded discovered metadata with weak cleanup, and affected-group-only reconciliation/publication. Preserve genuine legacy restoration and require an explicit source-preserving upgrade where new authority/index is absent.
+
+Fix all three reproduced correctness cases: unloaded shared-wallet peer, nested Person/wallet owner, and equal distinct replacement. Regression file `test_stage_0_5_unloaded_alias_routing.py` is already copied into this worktree and observed red at base. Add both mutation/reopen orders and inspect every stored owner copy. Preflight routes before edits and before payload preparation. Replacement/deletion placement overlays override disk occurrence labels; eviction does not imply deletion. Descendant changes dirty every containing payload owner. Shared scalar record owners must remain the same object and notify every owner.
+
+Generation, transaction and recovery requirements: pin-specific P2C witnesses; old pin discovers untouched group after competitor changes it; pending payload/occurrence/link actions frozen together; failed/lost-ack publication keeps retry evidence; normal success updates only affected group baselines. Avoid full live-binding/target-map scans and preserve retained child rehydration.
+
+H=1k/10k independent two-wallet groups; fixed K=4 accesses. Open 0 wallet loads, 0 cold links/occurrences retained; current base currency fixture has 33 non-link payload reads. Four first-side loads exactly4; ≤4 group baselines/links and8 occurrences. One mutation loads ≤1 additional peer and dirties both only. No-op0 discovery/refresh/writes and unchanged generation. Small save ≤8 payloads and16KiB, no unchanged-sharing P2C writes; counts same at both H. Post-pressure metadata bounded by current clean/dirty/external live groups; retained growth≤64KiB. Prove SQL uses reverse index.
+
+Own reverse-identity store API. Coordinate format floor5 with event_id_design and nested-child API with institution_divinity_design. Other unit adapters are integrated later by root; do not extend their namespaces here unless required for generic routing.

@@ -86,6 +86,48 @@ def test_format3_is_explicit_and_legacy_format2_is_rejected_both_ways(tmp_path):
         open_store(p1)
 
 
+def test_bounded_authority_floor_is_supported_and_never_downgraded(tmp_path):
+    import simulation.ate_sim.persistence_lazy_store as lazy_store
+    assert getattr(lazy_store, "BOUNDED_AUTHORITY_FORMAT_VERSION", None) == 5
+    path = tmp_path / "floor5.sqlite"
+    with make_store(path) as store:
+        pin = store.capture_pin()
+        first = store.commit(
+            pin, commit_token="floor5", version_changes=(),
+            changes=(RecordChange("people", 1, "one"),), new_segments=(),
+            metadata=metadata(1), required_format_version=5,
+        )
+        assert store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone() == ("5",)
+        store.commit(
+            first.pin, commit_token="floor4", version_changes=(),
+            changes=(RecordChange("people", 1, "two"),), new_segments=(),
+            metadata=metadata(2), required_format_version=4,
+        )
+        assert store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone() == ("5",)
+    with open_store(path) as store:
+        assert store.read_record("people", 1) == "two"
+
+
+def test_bounded_authority_floor_rolls_back_with_payload(tmp_path):
+    path = tmp_path / "floor5-rollback.sqlite"
+    with make_store(path) as store:
+        pin = store.capture_pin()
+        def fail(phase):
+            if phase == "before_commit":
+                raise RuntimeError("rollback capability floor")
+        store._phase_hook = fail
+        with pytest.raises(RuntimeError, match="rollback capability floor"):
+            store.commit(
+                pin, commit_token="floor5", version_changes=(),
+                changes=(RecordChange("people", 1, "one"),), new_segments=(),
+                metadata=metadata(1), required_format_version=5,
+            )
+        assert store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone() == ("3",)
+        assert store.generation == 0
+        with pytest.raises(KeyError):
+            store.read_record("people", 1)
+
+
 def test_validated_head_decode_cache_still_detects_live_raw_corruption(tmp_path):
     with make_store(tmp_path / "head-cache-corrupt.sqlite") as store:
         # Prime the semantic validation cache.

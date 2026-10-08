@@ -1,0 +1,11 @@
+# Remaining scalar/history implementation brief
+
+Read `../STAGE_0_5_CONTINUOUS_REPAIR_SPEC.md`. Work only in cold-record-work. No childagents, GitHubwrites, fullsuite/endurance. Design/plan, redtests, implementation, focusedchecks, localcommits and `STAGE_0_5_COLD_RECORD_VALIDATION.md`.
+
+Use lazy scalarrecord/indexpattern for conflict(status), inquiry(status,status_branch), threat(status,status_location), community(kind_origin andkind_parent_origin) and resurrectiontoken(person_consumed_year); independentresolution int->intmappointauthority. Community/Token becomeIndexedRecordwithoutfieldchanges. Preserve queryselectionorder, communityminrecord.idwith insertiontie and tokenstablesortrecord.id; keyneednotequalrecordID. Importedsharedrecordsremainshared withgenericidentityroutes.
+
+Repair inquiryclose branch/passed query by persistent `branch_passed` applicationmemberships and boundedatleast5checkedpredicate; eagerfallbacksame `len(ids(...))>=5`. Hfailedapplicationhistory doesnotjustify allIDs. AtD1≤6checkedqueryrows,0applicationpayloads. Sharedlimitedquerymembership API in spec is ownedhouseholdunit; coordinate exactsignature. Explicit oldapplication indexupgrade orlegacycheckedfallback, never absentindex=>empty. Prune obsoletetouchedmembershipbuckets with repeatedD1edits.
+
+Infrastructureallassetsdecay genuinecurrentstock; do notretirezero-conditionassets. Pageprovenance viagenerictypedlist frominstitution_divinity_design; conditionedit0historypages,append1page+boundedmetadata. Preserve assetinsertion/lastmatchingfarmselection. Allconverter/count/occurrence/type/open/tracker/session/saveplan/layout/commit/recovery/accept/detach/diagnosticseams and legacyauthority detection required.
+
+H1k/10k closed/consumedhistory fixed8active,D1:0openfamilyloads/queryrows/residents;point1payload;active≤8;resolution8lookups≤8;onependingtokenloads1;onecommunitycandidate1;threshold≤6queries0payloads;noop0;onescalaredit1version0unrelated;clean256rows/sidecars/touchedcurrentwidth. Threat3processingcapdoesnotboundactive8querybelow8. Provenance4pages512,append≤1page+metadata. Directfieldmutation,duplicateIDties/order,replacement/sharing/retainedeviction,legacy,missingmembership,rollback/lostack/stale/close/detach and exactshorteagerlazybehavior tests.

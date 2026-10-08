@@ -1,0 +1,9 @@
+# Economy/culture implementation brief
+
+Read `../STAGE_0_5_CONTINUOUS_REPAIR_SPEC.md`. Work only in economy-culture-work. No child agents, GitHub writes or long runs. Unit design/plan, red regressions, complete integration, focused gates, local commits and `STAGE_0_5_ECONOMY_CULTURE_VALIDATION.md` required.
+
+Migrate beliefs `(person,claim)->numeric` using scalar membership-table shape; lazy practices with tracked traits and assignment hooks; lazy adoption scalars with persistent exact settlement/predicate memberships; property indexed owner headers with provenance and ownership in common incarnation-owned typed pages. Institution/divinity agent provides nested primitive; proceed with beliefs/practices/adoption while that interface is prepared. Never encode long histories during one transfer or header edit.
+
+Exact thresholds: local>.01, domainbalance>.008, migration>.22, trade>.35, institutionalstrong>.62. Preserve dictionary insertion order, delete/reinsert and snapshot timing (trade beforeupdates; local beforeinnovation; domain afterinnovation). Property owner query sortedpropertyID. Preserve transfer year default=p.created. Propertylabels(),provenance,ownership;Practice(),traits. Scalarcellsnoincarnations. Explicit newauthoritydetect/legacyrestore, all open exclusions/saveplan/counts/ack/recovery/identity/detach seams required.
+
+H1k/10k fixed8matching/active:0 scopedopenpayloads/pages/ordinals/memo; teach≤2loads and1beliefwrite; ownerquery8headers,0pages,≤16lengthreads; adoption8rows≤8practices nodormant. BothpropertylistslengthH onetransfer≤2oldpages,2dirtypages,5familypayloads; total≤20writes<32KiBwritten<64KiBread, countsequal. Clean≤256rowsperfamily/sidecars;4×128pagesperlist; no-op0writesunchangedgen. Test strictedges,order/digest/RNG,equalreplacement,sharing,retainedalias,recovery,legacyanddetach.

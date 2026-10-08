@@ -37,6 +37,10 @@ from .incremental_store import (
 
 FORMAT_VERSION = 3
 PAGED_REFERENCE_FORMAT_VERSION = 4
+BOUNDED_AUTHORITY_FORMAT_VERSION = 5
+SUPPORTED_FORMAT_VERSIONS = (
+    FORMAT_VERSION, PAGED_REFERENCE_FORMAT_VERSION, BOUNDED_AUTHORITY_FORMAT_VERSION
+)
 MAX_PINS = 64
 MAX_PAGE_SIZE = 128
 
@@ -557,7 +561,7 @@ class LazyRecordStore:
         try:
             cls._configure_open(db)
             rows = dict(db.execute("SELECT key,value FROM store_metadata"))
-            if int(rows.get("format_version", -1)) not in (FORMAT_VERSION, PAGED_REFERENCE_FORMAT_VERSION):
+            if int(rows.get("format_version", -1)) not in SUPPORTED_FORMAT_VERSIONS:
                 raise StoreFormatError("unsupported persistence format")
             if int(rows.get("codec_version", -1)) != codec.version:
                 raise StoreFormatError("unsupported codec version")
@@ -2346,7 +2350,7 @@ class LazyRecordStore:
         required_format_version: int = FORMAT_VERSION,
     ) -> CommitResult:
         self._ensure_open()
-        if required_format_version not in (FORMAT_VERSION, PAGED_REFERENCE_FORMAT_VERSION):
+        if required_format_version not in SUPPORTED_FORMAT_VERSIONS:
             raise StoreFormatError("unsupported required persistence format")
         if pin.token in self._recovery_required:
             raise StoreConflictError("pin has unresolved commit acknowledgement")
@@ -2559,13 +2563,24 @@ class LazyRecordStore:
             self._pin_rows += 2
             floor = self._validated_retention_floor(new_generation)
             self._cleanup_expired(floor)
-            if required_format_version == PAGED_REFERENCE_FORMAT_VERSION:
-                # Publish the reader capability requirement with the data.
-                # Older readers must reject, rather than interpret compact
-                # incarnation references as legacy owner-local placeholders.
+            format_row = self.db.execute(
+                "SELECT value FROM store_metadata WHERE key='format_version'"
+            ).fetchone()
+            if format_row is None:
+                raise StoreIntegrityError("missing persistence format requirement")
+            try:
+                current_format = int(format_row[0])
+            except (TypeError, ValueError) as exc:
+                raise StoreFormatError("invalid persistence format requirement") from exc
+            if current_format not in SUPPORTED_FORMAT_VERSIONS:
+                raise StoreFormatError("unsupported persistence format requirement")
+            published_format = max(current_format, required_format_version)
+            if published_format != current_format:
+                # Publish capability requirements atomically with their data.
+                # Later saves using older features must never downgrade them.
                 self.db.execute(
                     "UPDATE store_metadata SET value=? WHERE key='format_version'",
-                    (str(PAGED_REFERENCE_FORMAT_VERSION),),
+                    (str(published_format),),
                 )
             self._phase_hook("before_commit")
             try:
