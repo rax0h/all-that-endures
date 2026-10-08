@@ -1,0 +1,20 @@
+name: stage-0-5-r3-identity-publication-regressions
+on:
+  push:
+    branches: [sim/stage-0-5-r3-identity-publication-fix]
+jobs:
+  targeted:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - name: Split P2C shared household list save/reopen
+        run: python -m pytest -q simulation/tests/test_stage_0_5_paged_household_world.py::test_r3_split_shared_member_list_on_one_household
+      - name: Cross-family shared list, lost acknowledgement, identity and deletion
+        run: python -m pytest -q simulation/tests/test_stage_0_5_r3_cross_family_extra.py simulation/tests/test_stage_0_5_r3_recovery_extra.py simulation/tests/test_stage_0_5_paged_household_world.py -k "not test_r3_split_shared_member_list_on_one_household"
