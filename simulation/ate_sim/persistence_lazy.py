@@ -9411,27 +9411,48 @@ class LazyWorldSession:
         )
         self._install_cross_boundary_tracker_baseline()
         self._paged_household_members = {}
+        self._paged_household_records = {}
+        self._deleted_paged_household_members = {}
         self._household_paging_active = False
 
         self._lifetime = _LazyLifetime(self)
         object.__setattr__(world, "_ate_persistence_lifetime", self._lifetime)
         world.events._ate_persistence_lifetime = self._lifetime
 
+    def _make_paged_household_sequence(
+        self, key, household, *, initial_values=None, baseline_length=None
+    ):
+        binding = {}
+        def guard(owner=key, record=household):
+            sequence = binding["sequence"]
+            # A previously retained member alias becomes detached as soon as
+            # the current household/field no longer owns it. It must not be
+            # rebound to another incarnation occupying the same integer key.
+            if (
+                self.world.households.get(owner) is not record
+                or self._paged_household_members.get(owner) is not sequence
+                or record.members is not sequence
+            ):
+                sequence.detach_to_memory()
+                return
+            self._ensure_people_mutation_allowed()
+        sequence = LazyHouseholdMembers(
+            self.store, self.pin, key,
+            guard=guard,
+            initial_values=initial_values,
+            baseline_length=baseline_length,
+        )
+        binding["sequence"] = sequence
+        object.__setattr__(household, "members", sequence)
+        self._paged_household_members[key] = sequence
+        self._paged_household_records[key] = household
+        return sequence
+
     def _activate_household_pages(self):
-        if self._paged_household_members:
+        if self._household_paging_active:
             raise StoreError("household member pages already active")
         for key, household in self.world.households.items():
-            def guard(owner=key, record=household):
-                self._ensure_people_mutation_allowed()
-                if self.world.households.get(owner) is not record:
-                    raise StoreError("retained household member alias has obsolete owner")
-                if self._paged_household_members.get(owner) is not record.members:
-                    raise StoreError("retained household member alias was replaced")
-            sequence = LazyHouseholdMembers(
-                self.store, self.pin, key, guard=guard,
-            )
-            object.__setattr__(household, "members", sequence)
-            self._paged_household_members[key] = sequence
+            self._make_paged_household_sequence(key, household)
         self._household_paging_active = True
         self._eager_tracker._paged_household_members = True
 
@@ -9440,31 +9461,53 @@ class LazyWorldSession:
             return ()
         current = set(self.world.households)
         registered = set(self._paged_household_members)
-        if registered - current:
-            raise StoreError(
-                "paged household pilot requires deleted owner identity integration"
-            )
-        # The existing eager RecordTable binds a newly inserted Household.
-        # Only its members require promotion into checked auxiliary authority.
-        for key in current - registered:
+        # Keep deleted-owner tombstones across a rolled-back save attempt;
+        # they are only retired after the combined durable generation
+        # publishes and the runtime acknowledges it.
+        for key in registered - current:
+            old = self._paged_household_members.pop(key)
+            old.detach_to_memory()
+            self._paged_household_records.pop(key, None)
+            self._deleted_paged_household_members[key] = old
+        for key in current:
             household = self.world.households[key]
-            original = tuple(household.members)
-            def guard(owner=key, record=household):
-                self._ensure_people_mutation_allowed()
-                if self.world.households.get(owner) is not record:
-                    raise StoreError("retained household member alias has obsolete owner")
-                if self._paged_household_members.get(owner) is not record.members:
-                    raise StoreError("retained household member alias was replaced")
-            sequence = LazyHouseholdMembers(
-                self.store, self.pin, key,
-                guard=guard, initial_values=original,
-            )
-            object.__setattr__(household, "members", sequence)
-            self._paged_household_members[key] = sequence
-        for key, sequence in self._paged_household_members.items():
-            if self.world.households[key].members is not sequence:
-                raise StoreError("household members were replaced without page binding")
-        return tuple(
+            old = self._paged_household_members.get(key)
+            if old is not None and self._paged_household_records[key] is household:
+                if household.members is not old:
+                    # A new list assigned to the same Household is a distinct
+                    # mutable incarnation, not an invitation to rewrite the
+                    # old external alias. Preserve existing persisted pages.
+                    original = tuple(household.members)
+                    old.detach_to_memory()
+                    self._make_paged_household_sequence(
+                        key, household,
+                        initial_values=original,
+                        baseline_length=None if old._new_owner else old._base_length,
+                    )
+                continue
+            if old is not None:
+                old.detach_to_memory()
+                self._paged_household_members.pop(key)
+                self._paged_household_records.pop(key, None)
+                self._deleted_paged_household_members[key] = old
+            if key not in self._paged_household_members:
+                original = tuple(household.members)
+                retired = self._deleted_paged_household_members.pop(key, None)
+                self._make_paged_household_sequence(
+                    key, household,
+                    initial_values=original,
+                    baseline_length=(
+                        None if retired is None or retired._new_owner
+                        else retired._base_length
+                    ),
+                )
+        deletions = tuple(
+            change
+            for key, retired in self._deleted_paged_household_members.items()
+            if key not in current
+            for change in retired.deleted_owner_changes()
+        )
+        return deletions + tuple(
             change for sequence in self._paged_household_members.values()
             for change in sequence.pending_changes()
         )
@@ -14364,6 +14407,7 @@ class LazyWorldSession:
         self.community_memberships.accept_save(plan, result.pin)
         for sequence in self._paged_household_members.values():
             sequence.accept_save(result.pin)
+        self._deleted_paged_household_members.clear()
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
