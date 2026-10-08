@@ -280,7 +280,9 @@ class LazyHouseholdMembers(MutableSequence):
         if self._detached_values is not None:
             return value in self._detached_values
         if type(value) is not int or value <= 0:
-            return False
+            # Preserve Python list equality, e.g. 1.0 or True matching
+            # stored ID 1. Such unusual probes are explicit full operations.
+            return any(member == value for member in self)
         for page in self._dirty_pages.values():
             if value in page:
                 return True
