@@ -65,6 +65,7 @@ class IdentityOccurrenceIndex:
         cls = type(value)
         return (
             isinstance(value, (dict, list, set, EventLog))
+            or getattr(value, "_ate_household_page_sequence", False) is True
             or (is_dataclass(value) and not cls.__dataclass_params__.frozen)
         )
 
@@ -88,6 +89,11 @@ class IdentityOccurrenceIndex:
         ident = id(value)
         if ident in active:
             raise ValueError("cycle in bound World identity graph")
+        if getattr(value, "_ate_household_page_sequence", False) is True:
+            # List-valued identity leaf: its checked ID pages do not contain
+            # mutable child objects and are never scanned for alias links.
+            out.append((ident, value, path))
+            return
         record = is_dataclass(value)
         if self._mutable(value):
             out.append((ident, value, path))

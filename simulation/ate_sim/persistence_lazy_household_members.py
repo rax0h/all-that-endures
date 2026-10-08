@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from collections.abc import MutableSequence
-from .incremental_store import StoreError, StoreIntegrityError, StoreFormatError
+from .incremental_store import Membership, StoreError, StoreIntegrityError, StoreFormatError
 from .persistence_lazy_store import (
-    VersionChange, _namespace_checksum, _order_checksum, _version_checksum,
+    VersionChange, _namespace_checksum, _order_checksum, _query_checksum, _version_checksum,
 )
 from .incremental_store import _framed_sha
 
@@ -32,7 +32,12 @@ def _insert_version(store, generation, namespace, key, value, ordinal):
     codec = store.codec
     typed_key = codec.encode(key)
     payload = codec.encode(value)
-    memberships = codec.encode(())
+    page_members = (
+        tuple(("member", member_id, offset)
+              for offset, member_id in enumerate(value))
+        if namespace == PAGE_NAMESPACE else ()
+    )
+    memberships = codec.encode(page_members)
     store.db.execute(
         "INSERT INTO lazy_record_versions("
         "namespace,typed_key,valid_from,valid_to,payload,payload_checksum,"
@@ -52,6 +57,19 @@ def _insert_version(store, generation, namespace, key, value, ordinal):
         (namespace, typed_key, ordinal, generation,
          _order_checksum(namespace, typed_key, ordinal, generation, None)),
     )
+    for index_name, member, offset in page_members:
+        encoded_value = codec.encode(member)
+        store.db.execute(
+            "INSERT INTO lazy_query_versions("
+            "namespace,index_name,index_value,record_key,ordinal,"
+            "valid_from,valid_to,row_checksum"
+            ") VALUES (?,?,?,?,?,?,NULL,?)",
+            (namespace, index_name, encoded_value, typed_key, offset,
+             generation, _query_checksum(
+                 namespace, index_name, encoded_value, typed_key,
+                 offset, generation, None
+             )),
+        )
 
 
 def bootstrap_household_members(store, generation, owners):
@@ -94,6 +112,8 @@ def bootstrap_household_members(store, generation, owners):
 
 
 class LazyHouseholdMembers(MutableSequence):
+    _ate_household_page_sequence = True
+
     """Mutable list semantics backed by checked, bounded-size versioned pages.
 
     A retained instance preserves the caller's alias. An owner guard is
@@ -101,7 +121,7 @@ class LazyHouseholdMembers(MutableSequence):
     and active lifecycle operations before any mutation.
     """
 
-    def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES):
+    def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES, initial_values=None, baseline_length=None):
         _member_id(owner)
         self._store = store
         self._pin = pin
@@ -112,6 +132,24 @@ class LazyHouseholdMembers(MutableSequence):
             raise ValueError("cache_pages must be positive")
         self._cache = OrderedDict()
         self._dirty_pages = {}
+        # P2C current links, not this set, are the sharing authority.
+        # This is the derived set of owners currently sharing one live list.
+        self._related_owners = {owner}
+        self._detached_values = None
+        self._new_owner = initial_values is not None and baseline_length is None
+        if initial_values is not None:
+            if baseline_length is not None and (
+                type(baseline_length) is not int or baseline_length < 0
+            ):
+                raise ValueError("invalid replacement baseline length")
+            self._length = 0
+            self._base_length = 0 if baseline_length is None else baseline_length
+            if baseline_length is None:
+                for value in tuple(_member_id(v) for v in initial_values):
+                    self._append(value)
+            else:
+                self._replace_all(initial_values)
+            return
         if getattr(store, "_active_read_transaction", False):
             # The P4 open already owns a checked, generation-matched snapshot.
             # Do not start a nested SQLite BEGIN while binding proxies.
@@ -139,7 +177,46 @@ class LazyHouseholdMembers(MutableSequence):
         self._base_length = length
 
     def _ensure(self):
-        self._store._ensure_open()
+        if self._detached_values is None:
+            self._store._ensure_open()
+
+    def detach_to_memory(self):
+        """Keep a formerly canonical external alias independent of its owner."""
+        if self._detached_values is not None:
+            return
+        values = list(self)
+        self._detached_values = values
+        self._dirty_pages.clear()
+        self._cache.clear()
+        self._guard = None
+        self._length = len(values)
+
+    def deleted_owner_changes(self, owner=None):
+        """Explicit whole-owner deletion may touch its entire page history."""
+        if self._new_owner:
+            return ()
+        key = self._owner if owner is None else owner
+        return (
+            VersionChange(
+                LENGTH_NAMESPACE, key, delete=True,
+                record_schema=RECORD_SCHEMA,
+            ),
+        ) + tuple(
+            VersionChange(
+                PAGE_NAMESPACE, (key, page), delete=True,
+                record_schema=RECORD_SCHEMA,
+            )
+            for page in range((self._base_length + PAGE_SIZE - 1) // PAGE_SIZE)
+        )
+
+    def retire_related_owner(self, key):
+        """Retire one sharing path without detaching remaining current aliases."""
+        self._related_owners.discard(key)
+        if not self._related_owners:
+            self.detach_to_memory()
+        elif self._owner == key:
+            self._owner = min(self._related_owners)
+            self._cache.clear()
 
     def _mutation(self):
         self._ensure()
@@ -187,17 +264,47 @@ class LazyHouseholdMembers(MutableSequence):
 
     def __len__(self):
         self._ensure()
-        return self._length
+        return len(self._detached_values) if self._detached_values is not None else self._length
 
     def __getitem__(self, index):
         self._ensure()
+        if self._detached_values is not None:
+            return self._detached_values[index]
         if isinstance(index, slice):
             return [self[i] for i in range(*index.indices(self._length))]
         index = self._normalize(index)
         return self._read_page(index // PAGE_SIZE)[index % PAGE_SIZE]
 
+    def __contains__(self, value):
+        self._ensure()
+        if self._detached_values is not None:
+            return value in self._detached_values
+        if type(value) is not int or value <= 0:
+            # Preserve Python list equality, e.g. 1.0 or True matching
+            # stored ID 1. Such unusual probes are explicit full operations.
+            return any(member == value for member in self)
+        for page in self._dirty_pages.values():
+            if value in page:
+                return True
+        # A checked index query scales with actual occurrences, not with
+        # all historical member IDs. Dirty pages override their old snapshot
+        # memberships, so skip those candidates.
+        for owner, number in self._store.query_keys(
+            self._pin, PAGE_NAMESPACE, "member", value
+        ):
+            if owner == self._owner and number not in self._dirty_pages:
+                return True
+        return False
+
     def __setitem__(self, index, value):
         self._mutation()
+        if self._detached_values is not None:
+            if isinstance(index, slice):
+                self._detached_values[index] = [_member_id(x) for x in value]
+            else:
+                self._detached_values[index] = _member_id(value)
+            self._length = len(self._detached_values)
+            return
         if isinstance(index, slice):
             new = list(self)
             replacement = [_member_id(x) for x in value]
@@ -209,6 +316,10 @@ class LazyHouseholdMembers(MutableSequence):
 
     def __delitem__(self, index):
         self._mutation()
+        if self._detached_values is not None:
+            del self._detached_values[index]
+            self._length = len(self._detached_values)
+            return
         if isinstance(index, slice):
             new = list(self)
             del new[index]
@@ -220,6 +331,10 @@ class LazyHouseholdMembers(MutableSequence):
     def insert(self, index, value):
         self._mutation()
         _member_id(value)
+        if self._detached_values is not None:
+            self._detached_values.insert(index, value)
+            self._length = len(self._detached_values)
+            return
         if type(index) is not int:
             raise TypeError("household member insertion index must be int")
         if index < 0:
@@ -230,6 +345,10 @@ class LazyHouseholdMembers(MutableSequence):
         self._replace_all(list(self[:index]) + [value] + list(self[index:]))
 
     def _append(self, value):
+        if self._detached_values is not None:
+            self._detached_values.append(value)
+            self._length = len(self._detached_values)
+            return
         page_index = self._length // PAGE_SIZE
         page = self._page(page_index)
         if len(page) != self._length % PAGE_SIZE:
@@ -251,6 +370,10 @@ class LazyHouseholdMembers(MutableSequence):
 
     def _replace_all(self, values):
         values = tuple(_member_id(v) for v in values)
+        if self._detached_values is not None:
+            self._detached_values[:] = values
+            self._length = len(values)
+            return
         previous_page_count = (self._length + PAGE_SIZE - 1) // PAGE_SIZE
         next_page_count = (len(values) + PAGE_SIZE - 1) // PAGE_SIZE
         for number in range(max(previous_page_count, next_page_count)):
@@ -286,10 +409,12 @@ class LazyHouseholdMembers(MutableSequence):
     def pending_changes(self):
         """Return only changed bounded pages and length, never all history."""
         self._ensure()
+        if self._detached_values is not None:
+            return ()
         result = []
         base_pages = (self._base_length + PAGE_SIZE - 1) // PAGE_SIZE
         final_pages = (self._length + PAGE_SIZE - 1) // PAGE_SIZE
-        if self._length != self._base_length:
+        if self._new_owner or self._length != self._base_length:
             result.append(VersionChange(
                 LENGTH_NAMESPACE, self._owner, self._length,
                 record_schema=RECORD_SCHEMA,
@@ -311,8 +436,31 @@ class LazyHouseholdMembers(MutableSequence):
                 continue
             result.append(VersionChange(
                 PAGE_NAMESPACE, key, value, record_schema=RECORD_SCHEMA,
+                memberships=tuple(
+                    Membership("member", member, offset)
+                    for offset, member in enumerate(value)
+                ),
             ))
-        return tuple(result)
+        # A P2C sharing group has one live list and a checked owner-local
+        # physical projection for every linked household. Replicate only
+        # the changed bounded pages to every current owner.
+        owners = tuple(sorted(self._related_owners))
+        if owners == (self._owner,):
+            return tuple(result)
+        expanded = []
+        for change in result:
+            for owner in owners:
+                if change.namespace == LENGTH_NAMESPACE:
+                    key = owner
+                else:
+                    key = (owner, change.key[1])
+                expanded.append(VersionChange(
+                    change.namespace, key, change.value,
+                    record_schema=change.record_schema,
+                    delete=change.delete,
+                    memberships=change.memberships,
+                ))
+        return tuple(expanded)
 
     def _read_baseline_page(self, number):
         checked = self._store.read_version(
@@ -323,8 +471,11 @@ class LazyHouseholdMembers(MutableSequence):
 
     def accept_save(self, pin):
         """Advance to the committed generation only after combined publication."""
+        if self._detached_values is not None:
+            return
         self._pin = pin
         self._base_length = self._length
+        self._new_owner = False
         self._dirty_pages.clear()
         self._cache.clear()
 

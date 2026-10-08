@@ -131,7 +131,7 @@ def _run_unbound(seed, years):
     return world
 
 
-def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id):
+def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id, paged_households=False):
     total_years = pre_years + continuation_years
     final_years = total_years + reopen_years
     workdir = Path(workdir)
@@ -171,10 +171,10 @@ def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id):
     cold_result = write_cold_snapshot(cold_source, cold, rules_id=rules_id)
     if cold_source.digest() != pre_digest:
         raise AssertionError("cold bootstrap mutated its source World")
-    conversion_result = convert_cold_to_lazy(cold, lazy, rules_id=rules_id)
+    conversion_result = convert_cold_to_lazy(cold, lazy, rules_id=rules_id, paged_household_members=paged_households)
     timings["fixture_creation_seconds"] = time.perf_counter() - started
 
-    with open_lazy_world_session(lazy, rules_id=rules_id) as session:
+    with open_lazy_world_session(lazy, rules_id=rules_id, paged_household_members=paged_households) as session:
         open_io = _io(session.store.diagnostics())
         _warm_queries(session.world)
         session.store.reset_diagnostics()
@@ -197,7 +197,7 @@ def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id):
 
         session.store.backup(relocated)
 
-    with open_lazy_world_session(lazy, rules_id=rules_id) as reopened:
+    with open_lazy_world_session(lazy, rules_id=rules_id, paged_household_members=paged_households) as reopened:
         reopened_total = _authority(reopened.world)
         _assert_authority("lazy reopen", reopened_total, control_total)
 
@@ -228,7 +228,7 @@ def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id):
         control_final,
     )
 
-    with open_lazy_world_session(relocated, rules_id=rules_id) as backup:
+    with open_lazy_world_session(relocated, rules_id=rules_id, paged_household_members=paged_households) as backup:
         backup_total = _authority(backup.world)
         _assert_authority("relocated backup", backup_total, control_total)
 
@@ -281,6 +281,7 @@ def main():
     parser.add_argument("--rules-id", default=DEFAULT_RULES)
     parser.add_argument("--workdir")
     parser.add_argument("--output")
+    parser.add_argument("--paged-households", action="store_true")
     args = parser.parse_args()
 
     if min(args.pre_years, args.continuation_years, args.reopen_years) < 0:
@@ -294,6 +295,7 @@ def main():
             args.reopen_years,
             args.workdir,
             args.rules_id,
+            paged_households=args.paged_households,
         )
     else:
         with tempfile.TemporaryDirectory(prefix="ate-p5-") as directory:
@@ -304,6 +306,7 @@ def main():
                 args.reopen_years,
                 directory,
                 args.rules_id,
+                paged_households=args.paged_households,
             )
 
     rendered = json.dumps(summary, indent=2, sort_keys=True)

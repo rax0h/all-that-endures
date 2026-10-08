@@ -8,6 +8,7 @@ slice after the open/query proof gate.
 from __future__ import annotations
 
 from collections import OrderedDict
+import copy
 from collections.abc import ItemsView, KeysView, ValuesView
 from dataclasses import dataclass, is_dataclass, replace
 import os
@@ -17,7 +18,8 @@ import uuid
 import weakref
 from typing import Any, Iterator
 
-from .core import Person, World
+from .core import Person, Household, World
+from .incremental_store import _record_checksum
 from .magic_resources import MagicAspiration, MagicResource
 from .materials import MaterialLot, CraftedItem
 from .metaphysics import SoulState
@@ -29,6 +31,11 @@ from .agency import MotiveState
 from .social import Relationship
 from .skills import SkillHistory
 from .lineage import LineageNode
+from .persistence_lazy_household_members import (
+    LENGTH_NAMESPACE as HOUSEHOLD_LENGTH_NAMESPACE,
+    LazyHouseholdMembers,
+    bootstrap_household_members,
+)
 from .persistence_lazy_lineage_children import (
     LINEAGE_CHILD_NAMESPACE,
     LINEAGE_CHILD_EDGE_NAMESPACE,
@@ -996,7 +1003,7 @@ def _insert_lazy_material_lot(
         )
 
 
-def convert_cold_to_lazy(source, destination, *, rules_id):
+def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=False):
     """Explicit checked P3B cold -> P4 conversion into a new destination."""
     source, destination = _preflight_conversion_paths(source, destination)
     codec = WorldCodec(identity_links_recorded=True)
@@ -1022,6 +1029,37 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     "convert_cold_to_lazy requires P3B cold event storage"
                 )
             capture = _capture_cold_world(source_store)
+            if paged_household_members:
+                for target_path, owner_path in capture.identity_links:
+                    a = _household_member_path(target_path)
+                    b = _household_member_path(owner_path)
+                    if a == b:
+                        continue
+                    paged_path = target_path if a else owner_path
+                    other_path = owner_path if a else target_path
+                    other = _lazy_occurrence_from_path(other_path)
+                    if (
+                        len(paged_path) != 3
+                        or other is None
+                        or other[0] not in (WALLET_NAMESPACE, TREASURY_NAMESPACE)
+                        or not other[2]
+                    ):
+                        raise StoreError(
+                            "paged household cross-family identity requires supported lazy wallet/treasury list"
+                        )
+            cross_family_member_paths = {}
+            if paged_household_members:
+                for target_path, owner_path in capture.identity_links:
+                    if _household_member_path(target_path) == _household_member_path(owner_path):
+                        continue
+                    foreign = owner_path if _household_member_path(target_path) else target_path
+                    lazy_owner = _lazy_occurrence_from_path(foreign)
+                    if lazy_owner is None or lazy_owner[0] not in (WALLET_NAMESPACE, TREASURY_NAMESPACE):
+                        raise StoreError("unsupported foreign household members identity")
+                    namespace, owner_key, relative, _ = lazy_owner
+                    cross_family_member_paths.setdefault(
+                        (namespace, codec.encode(owner_key)), set()
+                    ).add(relative)
             source_head = source_store.db.execute(
                 "SELECT generation,parent_generation,simulation_position,seed,"
                 "next_ids,namespace_inventory,namespace_counts,head_checksum "
@@ -1151,6 +1189,21 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             GENEALOGY_CHILD_NAMESPACE,
                             COMMUNITY_MEMBERSHIP_NAMESPACE,
                         ):
+                            if paged_household_members and namespace == "world.households":
+                                envelope = codec.decode(payload)
+                                if type(envelope) is not tuple or len(envelope) != 2:
+                                    raise StoreFormatError("invalid household envelope")
+                                ordinal, household = envelope
+                                if not isinstance(household, Household):
+                                    raise StoreFormatError("invalid household record")
+                                compact = replace(household, members=[])
+                                payload = codec.encode((ordinal, compact))
+                                checksum = _record_checksum(
+                                    namespace, typed_key, record_schema,
+                                    codec_version, changed_generation, payload,
+                                )
+                                row = (namespace, typed_key, payload, checksum,
+                                       codec_version, record_schema, changed_generation)
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
                                 row,
@@ -1316,6 +1369,18 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                                 raise StoreFormatError(
                                     "invalid wallet source envelope"
                                 )
+                            compact_paths = cross_family_member_paths.get(
+                                (namespace, typed_key), ()
+                            )
+                            if compact_paths:
+                                value = copy.deepcopy(value)
+                                for relative in compact_paths:
+                                    members = _relative_get(value, relative)
+                                    if type(members) is not list:
+                                        raise StoreFormatError(
+                                            "cross-family household member alias is not a list"
+                                        )
+                                    _relative_set(value, relative, [])
                             _insert_lazy_plain_record(
                                 target,
                                 namespace=WALLET_NAMESPACE,
@@ -1334,6 +1399,18 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                                 raise StoreFormatError(
                                     "invalid treasury source envelope"
                                 )
+                            compact_paths = cross_family_member_paths.get(
+                                (namespace, typed_key), ()
+                            )
+                            if compact_paths:
+                                value = copy.deepcopy(value)
+                                for relative in compact_paths:
+                                    members = _relative_get(value, relative)
+                                    if type(members) is not list:
+                                        raise StoreFormatError(
+                                            "cross-family household member alias is not a list"
+                                        )
+                                    _relative_set(value, relative, [])
                             _insert_lazy_plain_record(
                                 target,
                                 namespace=TREASURY_NAMESPACE,
@@ -1943,6 +2020,12 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             ),
                         )
 
+                    if paged_household_members:
+                        bootstrap_household_members(
+                            target, generation,
+                            ((hid, household.members)
+                             for hid, household in capture.world.households.items()),
+                        )
                     target.db.execute("DELETE FROM lazy_identity_state")
                     for namespace, key, path, incarnation_id in identity_rows:
                         encoded_key = codec.encode(key)
@@ -2035,6 +2118,15 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
         if capture is not None:
             capture.prefix.close()
         source_store.close()
+
+
+def _household_member_path(path) -> bool:
+    return (
+        len(path) >= 3
+        and path[0] == ("field", "households")
+        and path[1][0] == "key"
+        and path[2] == ("field", "members")
+    )
 
 
 def _path_under_people(path) -> bool:
@@ -2316,10 +2408,10 @@ def _lazy_occurrence_from_path(path):
         )
     wallet = _currency_occurrence_from_path(path, "wallets")
     if wallet is not None:
-        return WALLET_NAMESPACE, wallet[0], wallet[1], dict
+        return WALLET_NAMESPACE, wallet[0], wallet[1], (dict, list, LazyHouseholdMembers) if wallet[1] else dict
     treasury = _currency_occurrence_from_path(path, "treasuries")
     if treasury is not None:
-        return TREASURY_NAMESPACE, treasury[0], treasury[1], dict
+        return TREASURY_NAMESPACE, treasury[0], treasury[1], (dict, list, LazyHouseholdMembers) if treasury[1] else dict
     soul = _soul_occurrence_from_path(path)
     if soul is not None:
         relative = soul[1]
@@ -2487,6 +2579,17 @@ def _seed_cross_boundary_lazy_identity(session, links):
             target_lazy if target_lazy is not None else owner_lazy
         )
         eager_path = owner if target_lazy is not None else target
+        if (
+            _household_member_path(eager_path)
+            and session.store._namespace_state_at(
+                HOUSEHOLD_LENGTH_NAMESPACE, generation
+            ) is not None
+        ):
+            # The historical eager field is a compact physical placeholder.
+            # Defer its P2C incarnation registration until the checked pager
+            # replaces that placeholder.
+            cross.append((target, owner))
+            continue
         encoded_key = session.store.codec.encode(key)
         encoded_path = session.store.codec.encode(relative)
         row = session.store._visible_identity_occurrence(
@@ -2801,6 +2904,7 @@ class LazyPeopleSavePlan:
     community_membership_touched_keys: tuple[Any, ...]
     community_membership_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
+    household_member_version_changes: tuple[VersionChange, ...] = ()
 
 
 class LazyRecordTable(RecordTable):
@@ -7311,7 +7415,18 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
         return dict(self._baseline_identity_labels[key])
 
     def _plain(self, value):
-        return dict(value)
+        def compact(child):
+            if isinstance(child, LazyHouseholdMembers):
+                return []
+            if isinstance(child, dict):
+                return {key: compact(item) for key, item in child.items()}
+            if isinstance(child, list):
+                return [compact(item) for item in child]
+            if isinstance(child, tuple):
+                return tuple(compact(item) for item in child)
+            return child
+
+        return compact(dict(value))
 
     def _valid_plain(self, value):
         return type(value) is dict
@@ -9239,6 +9354,7 @@ class LazyWorldSession:
         prefix_descriptor,
         tail_descriptor,
         commit_descriptor,
+        paged_household_members=False,
     ):
         self.store = store
         self.pin = pin
@@ -9357,8 +9473,15 @@ class LazyWorldSession:
         self.skills = LazySkillTable(self)
         object.__setattr__(world.skills, "skills", self.skills)
 
+        self._deferred_household_cross_links = tuple(
+            link for link in links
+            if paged_household_members
+            and (_household_member_path(link[0]) or _household_member_path(link[1]))
+            and (_path_under_lazy(link[0]) or _path_under_lazy(link[1]))
+        )
+        deferred = set(self._deferred_household_cross_links)
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
-            self, links
+            self, tuple(link for link in links if link not in deferred)
         )
         self._eager_tracker = _initialize_eager_tracker(
             self,
@@ -9369,10 +9492,220 @@ class LazyWorldSession:
             commit_descriptor=commit_descriptor,
         )
         self._install_cross_boundary_tracker_baseline()
+        self._paged_household_members = {}
+        self._paged_household_records = {}
+        self._deleted_paged_household_members = {}
+        self._household_paging_active = False
 
         self._lifetime = _LazyLifetime(self)
         object.__setattr__(world, "_ate_persistence_lifetime", self._lifetime)
         world.events._ate_persistence_lifetime = self._lifetime
+
+    def _make_paged_household_sequence(
+        self, key, household, *, initial_values=None, baseline_length=None
+    ):
+        binding = {}
+        def guard(owner=key, record=household):
+            sequence = binding["sequence"]
+            # A previously retained member alias becomes detached as soon as
+            # the current household/field no longer owns it. It must not be
+            # rebound to another incarnation occupying the same integer key.
+            if not any(
+                self.world.households.get(other) is self._paged_household_records.get(other)
+                and self._paged_household_members.get(other) is sequence
+                and self.world.households[other].members is sequence
+                for other in sequence._related_owners
+            ):
+                sequence.detach_to_memory()
+                return
+            self._ensure_people_mutation_allowed()
+        sequence = LazyHouseholdMembers(
+            self.store, self.pin, key,
+            guard=guard,
+            initial_values=initial_values,
+            baseline_length=baseline_length,
+        )
+        binding["sequence"] = sequence
+        object.__setattr__(household, "members", sequence)
+        self._paged_household_members[key] = sequence
+        self._paged_household_records[key] = household
+        return sequence
+
+    def _activate_household_pages(self):
+        if self._household_paging_active:
+            raise StoreError("household member pages already active")
+        seen_lists = {}
+        seen_objects = {}
+        for key, household in self.world.households.items():
+            # Checked incarnation IDs are authoritative for converted owners.
+            # Later-created eager households can have valid paged length/page
+            # rows without a lazy identity-occurrence label; those fall back
+            # to the source's restored P2C shared-object placement.
+            original = household.members
+            label = self.store._visible_identity_occurrence(
+                self.pin.captured_head, "world.households",
+                self.store.codec.encode(key),
+                self.store.codec.encode((("field", "members"),)),
+            )
+            existing = (
+                seen_lists.get(label[0]) if label is not None else None
+            )
+            if existing is None:
+                existing = seen_objects.get(id(original))
+            if existing is None:
+                existing = self._make_paged_household_sequence(key, household)
+            else:
+                existing._related_owners.add(key)
+                object.__setattr__(household, "members", existing)
+                self._paged_household_members[key] = existing
+                self._paged_household_records[key] = household
+            seen_objects[id(original)] = existing
+            if label is not None:
+                previous = seen_lists.setdefault(label[0], existing)
+                if previous is not existing:
+                    raise StoreIntegrityError(
+                        "paged household checked incarnation splits live alias"
+                    )
+                incarnation = IncarnationId(
+                    self.store.store_identity, label[0]
+                )
+                self._registry.bind(existing, incarnation=incarnation)
+                self._registry.attach_existing(
+                    incarnation,
+                    Occurrence("world.households", key, (("field", "members"),)),
+                )
+        # An excluded lazy owner can be the P2C canonical anchor. Register
+        # its checked alias path against the same in-memory page proxy before
+        # refreshing eager households, so the eager identity index sees the
+        # full alias group rather than inventing household-to-household links.
+        tracker = self._eager_tracker
+        self._synthetic_household_alias_owners = {}
+        for target, owner in self._deferred_household_cross_links:
+            household_path = target if _household_member_path(target) else owner
+            foreign_path = owner if household_path is target else target
+            household_key = household_path[1][1]
+            proxy = self._paged_household_members[household_key]
+            synthetic = ("aux.lazy.paged.household.alias", foreign_path)
+            previous = self._synthetic_household_alias_owners.get(synthetic)
+            if previous is not None:
+                if previous is not proxy:
+                    raise StoreIntegrityError(
+                        "cross-family link joins different member incarnations"
+                    )
+                continue
+            self._synthetic_household_alias_owners[synthetic] = proxy
+            removed, added = tracker._identity_index.refresh(
+                synthetic, proxy, foreign_path
+            )
+            tracker._merge_identity_patch(removed, added)
+        # The eager tracker initially indexed compact source placeholder lists.
+        # Relabel only resident household owners using checked P2C aliases.
+        for key, household in self.world.households.items():
+            owner = ("world.households", key)
+            removed, added = tracker._identity_index.refresh(
+                owner, household, tracker._owner_path(owner)
+            )
+            tracker._merge_identity_patch(removed, added)
+        if tracker._pending_identity_current:
+            raise StoreIntegrityError(
+                "paged household binding changed persisted current-link authority"
+            )
+        self._household_paging_active = True
+        tracker._paged_household_members = True
+        self._bind_paged_cross_family_aliases()
+
+    def _bind_paged_cross_family_aliases(self):
+        for target, owner in self._cross_boundary_links:
+            from_household = _household_member_path(target)
+            to_household = _household_member_path(owner)
+            if from_household == to_household:
+                continue
+            eager_path = target if from_household else owner
+            lazy_path = owner if from_household else target
+            if len(eager_path) != 3:
+                raise StoreError("nested household member identity is unsupported")
+            lazy = _lazy_occurrence_from_path(lazy_path)
+            if lazy is None:
+                raise StoreIntegrityError("shared household member link lost lazy occurrence")
+            namespace, key, relative, _expected = lazy
+            household_id = eager_path[1][1]
+            seq = self.world.households[household_id].members
+            # The open caller holds a generation-matched read snapshot.
+            row = self.store._visible_identity_occurrence(
+                self.pin.captured_head,
+                namespace,
+                self.store.codec.encode(key),
+                self.store.codec.encode(relative),
+            )
+            if row is None:
+                raise StoreIntegrityError("shared household member alias has no checked incarnation")
+            incarnation = IncarnationId(
+                self.store.store_identity, int(row[0])
+            )
+            self._registry.bind(seq, incarnation=incarnation)
+            self._registry.attach_existing(
+                incarnation, Occurrence(namespace, key, relative)
+            )
+
+    def _household_page_changes(self):
+        if not self._household_paging_active:
+            return ()
+        current = set(self.world.households)
+        registered = set(self._paged_household_members)
+        # Keep deleted-owner tombstones across a rolled-back save attempt;
+        # they are only retired after the combined durable generation
+        # publishes and the runtime acknowledges it.
+        for key in registered - current:
+            old = self._paged_household_members.pop(key)
+            old.retire_related_owner(key)
+            self._paged_household_records.pop(key, None)
+            self._deleted_paged_household_members[key] = old
+        for key in current:
+            household = self.world.households[key]
+            old = self._paged_household_members.get(key)
+            if old is not None and self._paged_household_records[key] is household:
+                if household.members is not old:
+                    # A new list assigned to the same Household is a distinct
+                    # mutable incarnation, not an invitation to rewrite the
+                    # old external alias. Preserve existing persisted pages.
+                    original = tuple(household.members)
+                    old.retire_related_owner(key)
+                    self._make_paged_household_sequence(
+                        key, household,
+                        initial_values=original,
+                        baseline_length=None if old._new_owner else old._base_length,
+                    )
+                continue
+            if old is not None:
+                old.retire_related_owner(key)
+                self._paged_household_members.pop(key)
+                self._paged_household_records.pop(key, None)
+                self._deleted_paged_household_members[key] = old
+            if key not in self._paged_household_members:
+                original = tuple(household.members)
+                retired = self._deleted_paged_household_members.pop(key, None)
+                self._make_paged_household_sequence(
+                    key, household,
+                    initial_values=original,
+                    baseline_length=(
+                        None if retired is None or retired._new_owner
+                        else retired._base_length
+                    ),
+                )
+        deletions = tuple(
+            change
+            for key, retired in self._deleted_paged_household_members.items()
+            if key not in current
+            for change in retired.deleted_owner_changes(key)
+        )
+        unique_sequences = {
+            id(sequence): sequence
+            for sequence in self._paged_household_members.values()
+        }
+        return deletions + tuple(
+            change for sequence in unique_sequences.values()
+            for change in sequence.pending_changes()
+        )
 
     def _ensure_active(self):
         if not self._active:
@@ -12302,6 +12635,7 @@ class LazyWorldSession:
 
 
     def _prepare_hybrid_save(self):
+        household_member_version_changes = self._household_page_changes()
         (
             version_changes,
             identity_changes,
@@ -12461,7 +12795,8 @@ class LazyWorldSession:
         ) = self.community_memberships.prepare_save_changes()
 
         lazy_effective = bool(
-            version_changes
+            household_member_version_changes
+            or version_changes
             or identity_changes
             or aspiration_version_changes
             or aspiration_identity_changes
@@ -13027,6 +13362,7 @@ class LazyWorldSession:
                 community_membership_structural_keys
             ),
             layout_value=layout_value,
+            household_member_version_changes=household_member_version_changes,
         )
 
 
@@ -14264,6 +14600,9 @@ class LazyWorldSession:
         self.genealogy_parents.accept_save(plan, result.pin)
         self.genealogy_children.accept_save(plan, result.pin)
         self.community_memberships.accept_save(plan, result.pin)
+        for sequence in self._paged_household_members.values():
+            sequence.accept_save(result.pin)
+        self._deleted_paged_household_members.clear()
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -14348,6 +14687,7 @@ class LazyWorldSession:
                     + plan.genealogy_parent_version_changes
                     + plan.genealogy_child_version_changes
                     + plan.community_membership_version_changes
+                    + plan.household_member_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -14948,6 +15288,16 @@ class LazyWorldSession:
             if replacement is None:
                 replacement = dict(bucket)
                 replacements[id(bucket)] = replacement
+            # A paged member list shared with a separate lazy owner becomes
+            # one ordinary list during explicit materialization, without
+            # leaving that other owner's alias attached to the closed store.
+            for nested_key, nested_value in tuple(replacement.items()):
+                if isinstance(nested_value, LazyHouseholdMembers):
+                    plain = replacements.get(id(nested_value))
+                    if plain is None:
+                        plain = list(nested_value)
+                        replacements[id(nested_value)] = plain
+                    replacement[nested_key] = plain
             detached[key] = replacement
         if len(detached) != expected:
             raise StoreIntegrityError(
@@ -15594,7 +15944,7 @@ def _begin_matching_snapshot(store, pin):
     return head
 
 
-def open_lazy_world_session(path, *, rules_id):
+def open_lazy_world_session(path, *, rules_id, paged_household_members=False):
     """Open P4 lazy World without decoding migrated record families."""
     path = Path(path)
     store = LazyRecordStore.open(
@@ -15632,6 +15982,15 @@ def open_lazy_world_session(path, *, rules_id):
                     "open_lazy_world_session requires converted cold P4 storage"
                 )
 
+            member_pages_present = (
+                store._namespace_state_at(
+                    HOUSEHOLD_LENGTH_NAMESPACE, head.generation
+                ) is not None
+            )
+            if member_pages_present != bool(paged_household_members):
+                raise StoreFormatError(
+                    "household members storage mode mismatch; explicit paged flag required"
+                )
             metadata_rows = store.read_records(
                 META, expected_record_schema=RECORD_SCHEMA
             )
@@ -15812,7 +16171,19 @@ def open_lazy_world_session(path, *, rules_id):
                 prefix_descriptor=prefix_descriptor,
                 tail_descriptor=tail_descriptor,
                 commit_descriptor=commit_descriptor,
+                paged_household_members=paged_household_members,
             )
+            if paged_household_members:
+                if session._deferred_household_cross_links:
+                    session._cross_boundary_links += (
+                        session._deferred_household_cross_links
+                    )
+                    session._install_cross_boundary_tracker_baseline()
+                session._activate_household_pages()
+                if session._deferred_household_cross_links:
+                    _seed_cross_boundary_lazy_identity(
+                        session, session._deferred_household_cross_links
+                    )
             prefix = None
             pin = None
             return session

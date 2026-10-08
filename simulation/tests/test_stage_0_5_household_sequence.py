@@ -230,3 +230,42 @@ def test_shrink_deletes_expired_pages_and_reopen(tmp_path):
     finally:
         store.release_pin(pin)
         store.close()
+
+
+@pytest.mark.parametrize("count", [1000, 10000])
+def test_indexed_member_queries_remain_bounded_for_fixed_result(tmp_path, count):
+    store = make_store(tmp_path, count)
+    pin = store.capture_pin()
+    try:
+        seq = LazyHouseholdMembers(store, pin, 1)
+        store.reset_diagnostics()
+        assert 1 in seq
+        assert count in seq
+        assert count + 1 not in seq
+        info = store.diagnostics()
+        print("R3 member query", count, info.query_rows, info.payload_reads)
+        assert info.query_rows <= 3
+        assert info.payload_reads == 0
+        assert seq.diagnostics()["cached_member_ids"] == 0
+        # Local overlays negate the baseline query and support new members.
+        seq[0] = count + 1
+        assert 1 not in seq
+        assert count + 1 in seq
+        generation = pin.captured_head
+        result = store.commit(
+            pin, commit_token=("membership", count),
+            version_changes=seq.pending_changes(),
+            changes=(), new_segments=(),
+            metadata=store.checked_head().metadata,
+        )
+        assert result.outcome == "committed"
+        pin = result.pin
+        seq.accept_save(pin)
+        reopened = LazyHouseholdMembers(store, pin, 1)
+        assert 1 not in reopened
+        assert count + 1 in reopened
+        assert count in reopened
+        assert store.verify_all()
+    finally:
+        store.release_pin(pin)
+        store.close()

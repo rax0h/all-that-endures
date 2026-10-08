@@ -195,6 +195,14 @@ def _stage_plain_graph(
     index_rebindings = []
 
     def stage(value):
+        from .persistence_lazy_household_members import LazyHouseholdMembers
+        if isinstance(value, LazyHouseholdMembers):
+            ident = id(value)
+            if ident in memo:
+                return memo[ident]
+            result = list(value)
+            memo[ident] = result
+            return result
         cls = type(value)
         if value is None or cls in (bool, int, float, str, bytes):
             return value

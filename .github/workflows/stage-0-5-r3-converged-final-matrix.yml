@@ -1,0 +1,53 @@
+name: stage-0-5-r3-converged-final-matrix
+on:
+  push:
+    branches:
+      - sim/stage-0-5-r3-converged-validation
+  workflow_dispatch:
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - name: R3 standalone, combined World, cross-family identity, recovery
+        run: python -m pytest -q simulation/tests/test_stage_0_5_household_sequence.py simulation/tests/test_stage_0_5_paged_household_world.py simulation/tests/test_stage_0_5_r3_cross_family_extra.py simulation/tests/test_stage_0_5_r3_recovery_extra.py
+      - name: R1/R2 closeout and lazy family regressions
+        run: python -m pytest -q simulation/tests/test_stage_0_5_closeout.py -k "not r3"
+
+  affected:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - name: Affected families, P2C identity, currency and lifecycle
+        run: python -m pytest -q simulation/tests/test_persistence_lazy_people.py simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_persistence_lazy_genealogy.py simulation/tests/test_persistence_lazy_currency.py simulation/tests/test_persistence_lazy_social.py simulation/tests/test_persistence_lifecycle.py
+      - name: Independent paged P5 continuation
+        run: python simulation/persistence_p5_validation.py --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --paged-households --output /tmp/stage-0-5-r3-converged-p5.json
+
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - name: Complete simulation test suite
+        run: python -m pytest -q simulation/tests

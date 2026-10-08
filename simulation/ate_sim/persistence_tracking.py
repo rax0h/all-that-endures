@@ -2068,6 +2068,12 @@ class IncrementalWorldSession:
         if memo is None:
             memo = {}
         cls = type(value)
+        if getattr(self, "_paged_household_members", False):
+            from .persistence_lazy_household_members import LazyHouseholdMembers
+            if isinstance(value, LazyHouseholdMembers):
+                # Checked member entries have separate versioned authority;
+                # ordinary household records only store scalar state.
+                return []
         if value is None or cls in (bool, int, float, str, bytes) or cls in (FrozenDict, FrozenList):
             return value
         if cls is tuple:
