@@ -17,9 +17,52 @@ from .incremental_store import _framed_sha
 
 LENGTH_NAMESPACE = "aux.lazy.household.member_lengths"
 PAGE_NAMESPACE = "aux.lazy.household.member_pages"
+BACKING_NAMESPACE = "aux.lazy.household.member_backings"
+BACKING_TAG = "paged-members/v1"
 RECORD_SCHEMA = 1
 PAGE_SIZE = 128
 CACHE_PAGES = 4
+
+
+def backing_token(value):
+    return (isinstance(value, (list, tuple)) and len(value) == 2
+            and value[0] == BACKING_TAG
+            and type(value[1]) is int and value[1] > 0)
+
+
+def read_backing(store, pin, incarnation, *, required=False):
+    """Read within the caller's checked open snapshot, or a checked read API."""
+    if getattr(store, "_active_read_transaction", False):
+        if store._require_pin(pin) != pin.captured_head:
+            raise StoreIntegrityError("household backing pin moved")
+        key = store.codec.encode(incarnation)
+        row = store._visible_record_row(pin.captured_head, BACKING_NAMESPACE, key)
+        if row is None:
+            if required:
+                raise StoreIntegrityError("household member backing is absent")
+            return None
+        value, schema, *_ = store._check_record_row(BACKING_NAMESPACE, key, row, decode=True)
+        if schema != RECORD_SCHEMA:
+            raise StoreFormatError("household member backing schema mismatch")
+    else:
+        try:
+            value = store.read_version(pin, BACKING_NAMESPACE, incarnation,
+                                       expected_record_schema=RECORD_SCHEMA).value
+        except KeyError as exc:
+            if required:
+                raise StoreIntegrityError("household member backing is absent") from exc
+            return None
+    if not (type(value) is int and value > 0) and not backing_token(value):
+        raise StoreFormatError("invalid household member backing")
+    return value
+
+
+def stored_members(sequence):
+    if sequence._detached_values is not None:
+        return list(sequence)
+    if not (sequence._descriptor_present or sequence._descriptor_pending):
+        return []
+    return [BACKING_TAG, sequence._incarnation_value]
 
 
 def _member_id(value):
@@ -122,7 +165,11 @@ class LazyHouseholdMembers(MutableSequence):
     """
 
     def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES, initial_values=None, baseline_length=None):
-        _member_id(owner)
+        if not (type(owner) is int and owner > 0) and not (
+            type(owner) is tuple and len(owner) == 2
+            and owner[0] == BACKING_TAG and type(owner[1]) is int and owner[1] > 0
+        ):
+            raise ValueError("invalid household member backing key")
         self._store = store
         self._pin = pin
         self._owner = owner
@@ -374,7 +421,7 @@ class LazyHouseholdMembers(MutableSequence):
             self._detached_values[:] = values
             self._length = len(values)
             return
-        previous_page_count = (self._length + PAGE_SIZE - 1) // PAGE_SIZE
+        previous_page_count = (max(self._length, self._base_length) + PAGE_SIZE - 1) // PAGE_SIZE
         next_page_count = (len(values) + PAGE_SIZE - 1) // PAGE_SIZE
         for number in range(max(previous_page_count, next_page_count)):
             start = number * PAGE_SIZE
@@ -399,9 +446,29 @@ class LazyHouseholdMembers(MutableSequence):
             yield self[index]
 
     def __eq__(self, other):
-        if isinstance(other, (list, tuple, MutableSequence)):
+        if isinstance(other, (list, LazyHouseholdMembers)):
             return list(self) == list(other)
         return NotImplemented
+
+    def __add__(self, other):
+        if not isinstance(other, (list, LazyHouseholdMembers)):
+            return NotImplemented
+        return list(self) + list(other)
+
+    def __radd__(self, other):
+        if not isinstance(other, list):
+            return NotImplemented
+        return other + list(self)
+
+    def __mul__(self, count):
+        return list(self) * count
+
+    __rmul__ = __mul__
+
+    def __imul__(self, count):
+        self._mutation()
+        self._replace_all(list(self) * count)
+        return self
 
     def __repr__(self):
         return f"LazyHouseholdMembers(owner={self._owner}, length={self._length})"
@@ -444,6 +511,10 @@ class LazyHouseholdMembers(MutableSequence):
         # A P2C sharing group has one live list and a checked owner-local
         # physical projection for every linked household. Replicate only
         # the changed bounded pages to every current owner.
+        # Session-owned sequences have one stable physical authority. Legacy
+        # standalone sequences retain the original projection behavior.
+        if hasattr(self, "_incarnation_value"):
+            return tuple(result)
         owners = tuple(sorted(self._related_owners))
         if owners == (self._owner,):
             return tuple(result)
@@ -487,3 +558,4 @@ class LazyHouseholdMembers(MutableSequence):
             "cached_member_ids": sum(len(p) for p in self._cache.values()),
             "dirty_member_ids": sum(len(p) for p in self._dirty_pages.values()),
         }
+

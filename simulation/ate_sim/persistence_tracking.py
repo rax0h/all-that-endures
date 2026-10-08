@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import fields, is_dataclass
 import weakref
 
-from .core import World, Event
+from .core import World, Event, Household
 from .event_log import EventLog, FrozenDict, FrozenList
 from .record_index import RecordTable, IndexedRecord
 from .incremental_store import (
@@ -210,9 +210,13 @@ class _ObjectBinding:
                 return ("root_scalar", namespace, getattr(obj, name))
             return self.session._prepare_root_assignment(namespace, getattr(obj, name), value, kind)
         owners = frozenset(self.owners)
-        wrapped = self.session._prepare_nested(
-            value, owners, preflight=False
-        )
+        prepare_members = getattr(self.session, "_prepare_paged_members", None)
+        if prepare_members is not None and isinstance(obj, Household) and name == "members":
+            wrapped = prepare_members(obj, value, owners)
+        else:
+            wrapped = self.session._prepare_nested(
+                value, owners, preflight=False
+            )
         return ("owned", getattr(obj, name), owners, wrapped)
 
     def after_assignment(self, obj, name, value, token):
@@ -1538,9 +1542,13 @@ class IncrementalWorldSession:
             self._remember_memo(value, value)
             for name in RECORD_FIELDS[type(value)]:
                 child = getattr(value, name)
-                replacement = self._bind_nested(
-                    child, owners, initial=initial, allow_existing=allow_existing
-                )
+                prepare_members = getattr(self, "_prepare_paged_members", None)
+                if prepare_members is not None and isinstance(value, Household) and name == "members":
+                    replacement = prepare_members(value, child, owners)
+                else:
+                    replacement = self._bind_nested(
+                        child, owners, initial=initial, allow_existing=allow_existing
+                    )
                 if replacement is not child:
                     object.__setattr__(value, name, replacement)
             return value
@@ -2069,11 +2077,11 @@ class IncrementalWorldSession:
             memo = {}
         cls = type(value)
         if getattr(self, "_paged_household_members", False):
-            from .persistence_lazy_household_members import LazyHouseholdMembers
+            from .persistence_lazy_household_members import LazyHouseholdMembers, stored_members
             if isinstance(value, LazyHouseholdMembers):
                 # Checked member entries have separate versioned authority;
                 # ordinary household records only store scalar state.
-                return []
+                return stored_members(value)
         if value is None or cls in (bool, int, float, str, bytes) or cls in (FrozenDict, FrozenList):
             return value
         if cls is tuple:
@@ -2503,3 +2511,4 @@ def bind_snapshot(world, path, *, rules_id):
     finally:
         probe.close()
     return IncrementalWorldSession(world, path, rules_id=rules_id)
+

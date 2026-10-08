@@ -36,6 +36,7 @@ from .incremental_store import (
 )
 
 FORMAT_VERSION = 3
+PAGED_REFERENCE_FORMAT_VERSION = 4
 MAX_PINS = 64
 MAX_PAGE_SIZE = 128
 
@@ -556,7 +557,7 @@ class LazyRecordStore:
         try:
             cls._configure_open(db)
             rows = dict(db.execute("SELECT key,value FROM store_metadata"))
-            if int(rows.get("format_version", -1)) != FORMAT_VERSION:
+            if int(rows.get("format_version", -1)) not in (FORMAT_VERSION, PAGED_REFERENCE_FORMAT_VERSION):
                 raise StoreFormatError("unsupported persistence format")
             if int(rows.get("codec_version", -1)) != codec.version:
                 raise StoreFormatError("unsupported codec version")
@@ -2342,8 +2343,11 @@ class LazyRecordStore:
         metadata: Mapping[str, Any],
         identity_changes: Iterable[IdentityOccurrenceChange] = (),
         next_incarnation_id: int | None = None,
+        required_format_version: int = FORMAT_VERSION,
     ) -> CommitResult:
         self._ensure_open()
+        if required_format_version not in (FORMAT_VERSION, PAGED_REFERENCE_FORMAT_VERSION):
+            raise StoreFormatError("unsupported required persistence format")
         if pin.token in self._recovery_required:
             raise StoreConflictError("pin has unresolved commit acknowledgement")
         encoded_commit_token = self.codec.encode(commit_token)
@@ -2555,6 +2559,14 @@ class LazyRecordStore:
             self._pin_rows += 2
             floor = self._validated_retention_floor(new_generation)
             self._cleanup_expired(floor)
+            if required_format_version == PAGED_REFERENCE_FORMAT_VERSION:
+                # Publish the reader capability requirement with the data.
+                # Older readers must reject, rather than interpret compact
+                # incarnation references as legacy owner-local placeholders.
+                self.db.execute(
+                    "UPDATE store_metadata SET value=? WHERE key='format_version'",
+                    (str(PAGED_REFERENCE_FORMAT_VERSION),),
+                )
             self._phase_hook("before_commit")
             try:
                 self._commit_sqlite()
@@ -3163,6 +3175,13 @@ class LazyRecordStore:
             )
             new_store.db.execute("BEGIN IMMEDIATE")
             try:
+                source_format = source_store.db.execute(
+                    "SELECT value FROM store_metadata WHERE key='format_version'"
+                ).fetchone()[0]
+                new_store.db.execute(
+                    "UPDATE store_metadata SET value=? WHERE key='format_version'",
+                    (source_format,),
+                )
                 new_store.db.execute("DELETE FROM save_head")
                 new_store.db.execute(
                     "INSERT INTO save_head VALUES (1,?,?,?,?,?,?,?,?)",
@@ -3241,3 +3260,4 @@ class LazyRecordStore:
 
     def __exit__(self, *args: Any) -> None:
         self.close()
+
