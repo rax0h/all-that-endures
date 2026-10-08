@@ -23,3 +23,5 @@ jobs:
 # World open checked snapshot reuse
 
 # Atomic household scalar, detach and stale-writer gate
+      - name: Independent P5 short paged-household continuation
+        run: python simulation/persistence_p5_validation.py --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --paged-households --output /tmp/p5-r3-short.json
