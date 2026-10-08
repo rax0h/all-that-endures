@@ -1,5 +1,5 @@
-from collections.abc import MutableSequence
 from __future__ import annotations
+from collections.abc import MutableSequence
 from dataclasses import dataclass, field, asdict, is_dataclass, fields
 from enum import Enum
 from bisect import bisect_left, bisect_right
