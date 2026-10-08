@@ -31,6 +31,9 @@ from .agency import MotiveState
 from .social import Relationship
 from .skills import SkillHistory
 from .lineage import LineageNode
+from .warfare import Conflict
+from .society_accountability import Inquiry
+from .threat_ecology import MagicalThreat
 from .persistence_lazy_household_members import (
     LENGTH_NAMESPACE as HOUSEHOLD_LENGTH_NAMESPACE,
     BACKING_NAMESPACE as HOUSEHOLD_BACKING_NAMESPACE,
@@ -176,6 +179,49 @@ LAZY_GENEALOGY_CHILD_SCHEMA = 1
 LAZY_COMMUNITY_MEMBERSHIP_SCHEMA = 1
 CLEAN_GROUP_LIMIT = 256
 
+# Concrete scalar families share the checked indexed-record machinery. The
+# description tag distinguishes complete empty authority from a legacy field.
+SCALAR_RECORD_KINDS = {'dict-scalar/v1': 'dict', 'RecordTable-scalar/v1': 'RecordTable'}
+SCALAR_RECORD_SPECS = {
+    'world.warfare.conflicts': (Conflict, {('status',): 'status'}),
+    'world.society_accountability.inquiries': (Inquiry, {
+        ('status',): 'status', ('status', 'branch'): 'status_branch',
+    }),
+    'world.threat_ecology.threats': (MagicalThreat, {
+        ('status',): 'status', ('status', 'location'): 'status_location',
+    }),
+}
+SCALAR_MAP_SPECS = {
+    'world.threat_ecology.resolutions': (int, (int,)),
+    'world.knowledge.beliefs': (tuple, (int, float)),
+}
+SCALAR_NAMESPACES = (*SCALAR_RECORD_SPECS, *SCALAR_MAP_SPECS)
+
+
+def _valid_scalar_map_key(namespace, key):
+    key_type, _value_types = SCALAR_MAP_SPECS[namespace]
+    if key_type is tuple:
+        return type(key) is tuple and len(key) == 2 and all(type(part) is int for part in key)
+    return type(key) is key_type
+
+
+def _scalar_authorities(store, manifest, generation):
+    active = set()
+    for namespace in SCALAR_NAMESPACES:
+        description = manifest['collections'][namespace]
+        state = store._namespace_state_at(namespace, generation)
+        if description[0] not in SCALAR_RECORD_KINDS:
+            if state is not None:
+                raise StoreIntegrityError('unmarked scalar namespace authority')
+            continue
+        floor = int(store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
+        if floor < 5:
+            raise StoreFormatError('scalar authority requires reader capability 5')
+        if state is None or state[0] != description[1]:
+            raise StoreIntegrityError('scalar namespace authority missing or count mismatch')
+        active.add(namespace)
+    return active
+
 
 class _StepAwareLRU(OrderedDict):
     """LRU that records the clean working set touched by one simulation step."""
@@ -237,6 +283,7 @@ def _cross_boundary_field_value_is_immutable(value) -> bool:
 
 def _base_kind(kind: str) -> str:
     return {
+        **SCALAR_RECORD_KINDS,
         APPLICATION_QUERY_KIND: 'RecordTable',
         "dict-stable/v1": "dict",
         "RecordTable-stable/v1": "RecordTable",
@@ -419,7 +466,22 @@ def _application_predicate_value(field, value):
     return value
 
 
+def _scalar_predicate_value(value):
+    # RecordTable indexes use Python hash/equality, while the codec preserves
+    # numeric representatives. Canonicalize only the checked index projection.
+    if type(value) in (bool, int) or type(value) is float and value.is_integer():
+        return int(value)
+    return value
+
+
 def _institution_memberships(namespace, record, ordinal):
+    if namespace in SCALAR_RECORD_SPECS:
+        expected, fields = SCALAR_RECORD_SPECS[namespace]
+        if not isinstance(record, expected):
+            raise TypeError('wrong scalar family record type')
+        return tuple((name, _scalar_predicate_value(getattr(record, names[0])) if len(names) == 1
+                      else tuple(_scalar_predicate_value(getattr(record, field)) for field in names), ordinal)
+                     for names, name in fields.items())
     if namespace == SOCIAL_EDGE_NAMESPACE:
         if not isinstance(record, Relationship):
             raise TypeError("expected Relationship")
@@ -1066,7 +1128,7 @@ def _convert_event_id_range(target, capture, source_head, authority):
     target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
 
 
-def _declare_application_queries(target):
+def _declare_bounded_collections(target):
     from .persistence_adapters import COLLECTION_LAYOUT
     key = target.codec.encode(COLLECTION_LAYOUT)
     row = target.db.execute('SELECT payload,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?', (META, key)).fetchone()
@@ -1079,6 +1141,12 @@ def _declare_application_queries(target):
         value = layout = target.codec.decode(row[0])
     old = layout[INSTITUTION_APPLICATION_NAMESPACE]
     layout[INSTITUTION_APPLICATION_NAMESPACE] = (APPLICATION_QUERY_KIND, old[1], old[2])
+    for namespace in SCALAR_NAMESPACES:
+        old = layout[namespace]
+        base = _base_kind(old[0])
+        if base not in ('dict', 'RecordTable'):
+            raise StoreFormatError('invalid scalar family collection description')
+        layout[namespace] = (base + '-scalar/v1', old[1], old[2])
     payload = target.codec.encode(value)
     _old_payload, codec_version, schema, generation = row
     target.db.execute('UPDATE records SET payload=?,payload_checksum=? WHERE namespace=? AND typed_key=?', (payload, _record_checksum(META, key, schema, codec_version, generation, payload), META, key))
@@ -1184,6 +1252,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         source_head,
                     )
 
+                    scalar_counts = {namespace: [0, 0] for namespace in SCALAR_NAMESPACES}
                     people_count = 0
                     next_ordinal = 0
                     aspiration_count = 0
@@ -1262,6 +1331,31 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             payload = codec.encode((ordinal, value))
                             checksum = _record_checksum(namespace, typed_key, record_schema, codec_version, changed_generation, payload)
                             row = (namespace, typed_key, payload, checksum, codec_version, record_schema, changed_generation)
+                        if namespace in SCALAR_MAP_SPECS:
+                            ordinal, value = codec.decode(payload)
+                            key = codec.decode(typed_key)
+                            _key_type, value_types = SCALAR_MAP_SPECS[namespace]
+                            if type(ordinal) is not int or ordinal < 0 or not _valid_scalar_map_key(namespace, key) or type(value) not in value_types:
+                                raise StoreFormatError('invalid scalar map envelope')
+                            _insert_lazy_plain_record(
+                                target, namespace=namespace, generation=generation,
+                                typed_key=typed_key, ordinal=ordinal, value=value, record_schema=1,
+                            )
+                            scalar_counts[namespace][0] += 1
+                            scalar_counts[namespace][1] = max(scalar_counts[namespace][1], ordinal + 1)
+                            continue
+                        if namespace in SCALAR_RECORD_SPECS:
+                            ordinal, value = codec.decode(payload)
+                            expected, _fields = SCALAR_RECORD_SPECS[namespace]
+                            if type(ordinal) is not int or ordinal < 0 or not isinstance(value, expected):
+                                raise StoreFormatError('invalid scalar family envelope')
+                            _insert_lazy_indexed_record(
+                                target, namespace=namespace, generation=generation,
+                                typed_key=typed_key, ordinal=ordinal, value=value, record_schema=1,
+                            )
+                            scalar_counts[namespace][0] += 1
+                            scalar_counts[namespace][1] = max(scalar_counts[namespace][1], ordinal + 1)
+                            continue
                         if namespace not in (
                             PEOPLE_NAMESPACE,
                             ASPIRATION_NAMESPACE,
@@ -1865,6 +1959,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         "SELECT namespace,index_name,index_value,record_key,"
                         "ordinal,generation FROM query_membership"
                     ):
+                        if row[0] in SCALAR_NAMESPACES:
+                            continue
                         if row[0] not in (
                             PEOPLE_NAMESPACE,
                             ASPIRATION_NAMESPACE,
@@ -2123,6 +2219,12 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             ),
                         )
 
+                    for namespace, (count, next_ord) in scalar_counts.items():
+                        target.db.execute(
+                            'INSERT INTO lazy_namespace_state VALUES (?,?,NULL,?,?,?)',
+                            (namespace, generation, count, next_ord,
+                             _namespace_checksum(namespace, count, next_ord, generation, None)),
+                        )
                     if paged_household_members:
                         bootstrap_household_members(
                             target, generation,
@@ -2170,7 +2272,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         _convert_event_id_range(target, capture, source_head, event_id_authority)
                     elif event_id_alias_paths:
                         target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
-                    _declare_application_queries(target)
+                    _declare_bounded_collections(target)
                     target.db.commit()
                     target.verify_all()
                     target.close()
@@ -2432,7 +2534,14 @@ def _scalar_archive_occurrence_from_path(path):
     return None
 
 
-def _lazy_occurrence_from_path(path):
+def _lazy_occurrence_from_path(path, scalar_namespaces=None):
+    if type(path) is tuple and len(path) >= 3:
+        for namespace, (record_type, _fields) in SCALAR_RECORD_SPECS.items():
+            prefix = _namespace_path(namespace)
+            if path[:2] == prefix and type(path[2]) is tuple and len(path[2]) == 2 and path[2][0] == 'key':
+                if scalar_namespaces is not None and namespace not in scalar_namespaces:
+                    return None
+                return namespace, path[2][1], tuple(path[3:]), record_type
     people = _people_occurrence_from_path(path)
     if people is not None:
         return PEOPLE_NAMESPACE, people[0], people[1], Person
@@ -2593,8 +2702,8 @@ def _lazy_occurrence_from_path(path):
     return None
 
 
-def _path_under_lazy(path) -> bool:
-    return _lazy_occurrence_from_path(path) is not None
+def _path_under_lazy(path, scalar_namespaces=None) -> bool:
+    return _lazy_occurrence_from_path(path, scalar_namespaces) is not None
 
 
 def _relative_get(root, path):
@@ -2648,8 +2757,8 @@ def _seed_cross_boundary_lazy_identity(session, links):
     cross = []
     generation = session.pin.captured_head
     for target, owner in links:
-        target_lazy = _lazy_occurrence_from_path(target)
-        owner_lazy = _lazy_occurrence_from_path(owner)
+        target_lazy = _lazy_occurrence_from_path(target, session._scalar_tables)
+        owner_lazy = _lazy_occurrence_from_path(owner, session._scalar_tables)
         if target_lazy is None and owner_lazy is None:
             continue
 
@@ -2804,6 +2913,7 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 INSTITUTION_APPLICATION_NAMESPACE: session.institution_applications,
                 TRANSMISSION_NAMESPACE: session.transmissions,
                 MOTIVE_NAMESPACE: session.motives,
+                **session._scalar_tables,
                 SOCIAL_EDGE_NAMESPACE: session.social_edges,
             }.get(namespace)
             if table is None:
@@ -2870,6 +2980,7 @@ def _initialize_eager_tracker(
         GENEALOGY_CHILD_NAMESPACE,
         COMMUNITY_MEMBERSHIP_NAMESPACE,
     }
+    tracker._excluded_namespaces.update(session._scalar_tables)
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     try:
         tracker.generation = session.pin.captured_head
@@ -3015,6 +3126,16 @@ class LazyPeopleSavePlan:
     community_membership_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
     household_member_version_changes: tuple[VersionChange, ...] = ()
+    scalar_record_plans: tuple[ScalarRecordSavePlan, ...] = ()
+
+
+@dataclass(frozen=True)
+class ScalarRecordSavePlan:
+    namespace: str
+    version_changes: tuple[VersionChange, ...]
+    identity_changes: tuple[IdentityOccurrenceChange, ...]
+    touched_keys: tuple[Any, ...]
+    structural_keys: tuple[Any, ...]
 
 
 class LazyRecordTable(RecordTable):
@@ -5567,12 +5688,14 @@ class LazySocialPartnershipTable(LazyRecordTable):
 class LazyCommunityMembershipTable(LazyRecordTable):
     """Bounded lazy (person, community) -> strength authority."""
 
-    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
+    _touched_attr = 'community_membership_touched_keys'
+
+    def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT, namespace=COMMUNITY_MEMBERSHIP_NAMESPACE):
         dict.__init__(self)
         self._session = session
         self._store = session.store
         self._pin = session.pin
-        self._namespace = COMMUNITY_MEMBERSHIP_NAMESPACE
+        self._namespace = namespace
         self._clean_limit = clean_limit
         self._lru = _StepAwareLRU(session)
         self._loads = 0
@@ -5622,7 +5745,7 @@ class LazyCommunityMembershipTable(LazyRecordTable):
             key,
             expected_record_schema=LAZY_COMMUNITY_MEMBERSHIP_SCHEMA,
         )
-        if type(checked.value) not in (int, float):
+        if not self._valid_value(checked.value):
             raise StoreFormatError(
                 "lazy community membership payload is not numeric"
             )
@@ -5639,12 +5762,7 @@ class LazyCommunityMembershipTable(LazyRecordTable):
 
     def __setitem__(self, key, strength):
         self._ensure_mutation()
-        if (
-            type(key) is not tuple
-            or len(key) != 2
-            or any(type(part) is not int for part in key)
-            or type(strength) not in (int, float)
-        ):
+        if not self._valid_key(key) or not self._valid_value(strength):
             raise TypeError(
                 "community memberships require (int,int) -> numeric strength"
             )
@@ -5664,6 +5782,14 @@ class LazyCommunityMembershipTable(LazyRecordTable):
                 self._next_overlay_ordinal += 1
         self._dirty.add(key)
         self._lru.pop(key, None)
+
+    @staticmethod
+    def _valid_key(key):
+        return type(key) is tuple and len(key) == 2 and all(type(part) is int for part in key)
+
+    @staticmethod
+    def _valid_value(value):
+        return type(value) in (int, float)
 
     def __delitem__(self, key):
         self._ensure_mutation()
@@ -5778,7 +5904,7 @@ class LazyCommunityMembershipTable(LazyRecordTable):
             self._namespace, new_pin.captured_head
         )
         self._next_overlay_ordinal = 0 if state is None else state[1]
-        for key in plan.community_membership_touched_keys:
+        for key in getattr(plan, self._touched_attr):
             visible = self._visible(key)
             self._baseline_presence[key] = visible
             if visible:
@@ -6821,6 +6947,47 @@ class _LazyInstitutionRecordTable(_LazySimpleMaterialObjectTable):
             raise StoreError(
                 f"unsupported {self._label} membership query: {normalized!r}"
             ) from exc
+
+
+class LazyScalarMapTable(LazyCommunityMembershipTable):
+    """Concrete immutable scalar map; values are independent authority."""
+
+    _touched_attr = 'touched_keys'
+
+    def __init__(self, session, namespace, *, clean_limit=CLEAN_GROUP_LIMIT):
+        self._key_type, self._value_types = SCALAR_MAP_SPECS[namespace]
+        super().__init__(session, namespace=namespace, clean_limit=clean_limit)
+
+    def _valid_key(self, key):
+        return _valid_scalar_map_key(self._namespace, key)
+
+    def _valid_value(self, value):
+        return type(value) in self._value_types
+
+    @staticmethod
+    def _memberships(key, ordinal):
+        return ()
+
+    def diagnostics(self):
+        return {
+            'logical_records': self._baseline_count - len(self._removed) + len(self._new_keys),
+            'resident_records': dict.__len__(self),
+            'clean_cache_entries': len(self._lru), 'clean_cache_limit': self._clean_limit,
+            'payload_loads': self._loads, 'dirty_records': len(self._dirty),
+        }
+
+
+class LazyScalarRecordTable(_LazyInstitutionRecordTable):
+    _record_schema = 1
+    _touched_attr = 'touched_keys'
+
+    def __init__(self, session, namespace, *, clean_limit=CLEAN_GROUP_LIMIT):
+        self._record_type, self._index_fields = SCALAR_RECORD_SPECS[namespace]
+        self._label = namespace
+        super().__init__(session, namespace, clean_limit=clean_limit)
+
+    def ids(self, fields, *values):
+        return super().ids(fields, *(_scalar_predicate_value(value) for value in values))
 
 
 class LazyInstitutionMagicRecordTable(_LazyInstitutionRecordTable):
@@ -9484,7 +9651,7 @@ class _LazyLifetime:
         session._hot_run_depth = 0
         # A run may retain an active working set larger than the ordinary
         # point-query cache, but that residency must not escape the run.
-        for value in tuple(session.__dict__.values()):
+        for value in tuple(session.__dict__.values()) + tuple(session._scalar_tables.values()):
             if isinstance(value, LazyRecordTable):
                 value._evict_clean()
 
@@ -9508,7 +9675,7 @@ class _LazyLifetime:
             if not session._eager_tracker._cold_step_depth:
                 epoch = getattr(session, "_hot_step_epoch", 0)
                 retain_hot = bool(getattr(session, "_hot_run_depth", 0))
-                for value in tuple(session.__dict__.values()):
+                for value in tuple(session.__dict__.values()) + tuple(session._scalar_tables.values()):
                     if isinstance(value, LazyRecordTable):
                         value._finish_simulation_step(
                             epoch, retain_hot=retain_hot
@@ -9672,11 +9839,19 @@ class LazyWorldSession:
         self.skills = LazySkillTable(self)
         object.__setattr__(world.skills, "skills", self.skills)
 
+        self._scalar_tables = {}
+        for namespace in _scalar_authorities(store, manifest, pin.captured_head):
+            table_type = LazyScalarRecordTable if namespace in SCALAR_RECORD_SPECS else LazyScalarMapTable
+            table = table_type(self, namespace)
+            self._scalar_tables[namespace] = table
+            owner = _at_path(world, _namespace_path(namespace)[:-1])
+            object.__setattr__(owner, namespace.rsplit('.', 1)[1], table)
+
         self._deferred_household_cross_links = tuple(
             link for link in links
             if paged_household_members
             and (_household_member_path(link[0]) or _household_member_path(link[1]))
-            and (_path_under_lazy(link[0]) or _path_under_lazy(link[1]))
+            and (_path_under_lazy(link[0], self._scalar_tables) or _path_under_lazy(link[1], self._scalar_tables))
         )
         deferred = set(self._deferred_household_cross_links)
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
@@ -9924,7 +10099,7 @@ class LazyWorldSession:
             lazy_path = owner if from_household else target
             if len(eager_path) != 3:
                 raise StoreError("nested household member identity is unsupported")
-            lazy = _lazy_occurrence_from_path(lazy_path)
+            lazy = _lazy_occurrence_from_path(lazy_path, self._scalar_tables)
             if lazy is None:
                 raise StoreIntegrityError("shared household member link lost lazy occurrence")
             namespace, key, relative, _expected = lazy
@@ -10096,6 +10271,7 @@ class LazyWorldSession:
             INSTITUTION_APPLICATION_NAMESPACE: self.institution_applications,
             TRANSMISSION_NAMESPACE: self.transmissions,
             MOTIVE_NAMESPACE: self.motives,
+            **self._scalar_tables,
             SOCIAL_EDGE_NAMESPACE: self.social_edges,
             SOCIAL_ADJACENCY_NAMESPACE: self.social_adjacency,
             SKILL_NAMESPACE: self.skills,
@@ -10225,8 +10401,8 @@ class LazyWorldSession:
                     (target, owner)
                     for target, owner
                     in self._eager_tracker._live_identity_targets.items()
-                    if _path_under_lazy(target)
-                    or _path_under_lazy(owner)
+                    if _path_under_lazy(target, self._scalar_tables)
+                    or _path_under_lazy(owner, self._scalar_tables)
                 ),
                 key=self.store.codec.encode,
             )
@@ -10262,8 +10438,8 @@ class LazyWorldSession:
         for link in tuple(self._cross_boundary_links):
             target, owner = link
             lazy_side = (
-                _lazy_occurrence_from_path(target)
-                or _lazy_occurrence_from_path(owner)
+                _lazy_occurrence_from_path(target, self._scalar_tables)
+                or _lazy_occurrence_from_path(owner, self._scalar_tables)
             )
             if lazy_side is None:
                 raise StoreIntegrityError(
@@ -10306,6 +10482,7 @@ class LazyWorldSession:
                     INSTITUTION_APPLICATION_NAMESPACE,
                     TRANSMISSION_NAMESPACE,
                     MOTIVE_NAMESPACE,
+                    *self._scalar_tables,
                     SOCIAL_EDGE_NAMESPACE,
                     SOCIAL_ADJACENCY_NAMESPACE,
                     SKILL_NAMESPACE,
@@ -10346,6 +10523,7 @@ class LazyWorldSession:
                     INSTITUTION_APPLICATION_NAMESPACE,
                     TRANSMISSION_NAMESPACE,
                     MOTIVE_NAMESPACE,
+                    *self._scalar_tables,
                     SOCIAL_EDGE_NAMESPACE,
                     SOCIAL_ADJACENCY_NAMESPACE,
                     LINEAGE_NODE_NAMESPACE,
@@ -10410,8 +10588,8 @@ class LazyWorldSession:
             )
             desired_cross.extend(
                 link for link in desired_all
-                if _path_under_lazy(link[0])
-                or _path_under_lazy(link[1])
+                if _path_under_lazy(link[0], self._scalar_tables)
+                or _path_under_lazy(link[1], self._scalar_tables)
             )
 
         remove_map = {
@@ -11302,6 +11480,7 @@ class LazyWorldSession:
             INSTITUTION_APPLICATION_NAMESPACE: self.institution_applications,
             TRANSMISSION_NAMESPACE: self.transmissions,
             MOTIVE_NAMESPACE: self.motives,
+            **self._scalar_tables,
             LINEAGE_NODE_NAMESPACE: self.lineage_nodes,
         }.get(namespace)
         if table is None:
@@ -11330,6 +11509,7 @@ class LazyWorldSession:
                 INSTITUTION_APPLICATION_NAMESPACE,
                 TRANSMISSION_NAMESPACE,
                 MOTIVE_NAMESPACE,
+                *self._scalar_tables,
                 LINEAGE_NODE_NAMESPACE,
             }
             and item != occurrence
@@ -11858,6 +12038,7 @@ class LazyWorldSession:
             INSTITUTION_APPLICATION_NAMESPACE: self.institution_applications,
             TRANSMISSION_NAMESPACE: self.transmissions,
             MOTIVE_NAMESPACE: self.motives,
+            **self._scalar_tables,
             SOCIAL_EDGE_NAMESPACE: self.social_edges,
         }
         owners = []
@@ -13084,6 +13265,10 @@ class LazyWorldSession:
 
 
     def _prepare_hybrid_save(self):
+        scalar_record_plans = tuple(
+            ScalarRecordSavePlan(namespace, *table.prepare_save_changes())
+            for namespace, table in sorted(self._scalar_tables.items())
+        )
         household_member_version_changes = self._household_page_changes()
         (
             version_changes,
@@ -13245,7 +13430,8 @@ class LazyWorldSession:
         ) = self.community_memberships.prepare_save_changes()
 
         lazy_effective = bool(
-            household_member_version_changes
+            any(unit.version_changes or unit.identity_changes for unit in scalar_record_plans)
+            or household_member_version_changes
             or version_changes
             or identity_changes
             or aspiration_version_changes
@@ -13303,7 +13489,8 @@ class LazyWorldSession:
 
         prior_manifest_dirty = self._eager_tracker._manifest_dirty
         structural_dirty = bool(
-            structural_keys
+            any(unit.structural_keys for unit in scalar_record_plans)
+            or structural_keys
             or aspiration_structural_keys
             or resource_structural_keys
             or owner_index_structural_keys
@@ -13517,6 +13704,10 @@ class LazyWorldSession:
                 "community memberships",
             ),
         )
+        layout_updates += tuple(
+            (unit.namespace, self._scalar_tables[unit.namespace], unit.structural_keys, unit.namespace)
+            for unit in scalar_record_plans
+        )
         changed_layout = [
             (namespace, table, label)
             for namespace, table, structural, label in layout_updates
@@ -13575,6 +13766,7 @@ class LazyWorldSession:
             cold_plan.expected_namespace_counts
         )
         for namespace, size in (
+            *((namespace, len(table)) for namespace, table in self._scalar_tables.items()),
             (PEOPLE_NAMESPACE, len(self.people)),
             (ASPIRATION_NAMESPACE, len(self.aspirations)),
             (RESOURCE_NAMESPACE, len(self.resources)),
@@ -13631,6 +13823,7 @@ class LazyWorldSession:
         return LazyPeopleSavePlan(
             token=token,
             target_generation=cold_plan.target_generation,
+            scalar_record_plans=scalar_record_plans,
             version_changes=version_changes,
             identity_changes=identity_changes,
             aspiration_version_changes=aspiration_version_changes,
@@ -14409,6 +14602,10 @@ class LazyWorldSession:
                 "motive",
             ),
         )
+        specs += tuple(
+            (unit.version_changes, unit.identity_changes, unit.namespace, 1, unit.namespace)
+            for unit in plan.scalar_record_plans
+        )
         for versions, identities, namespace, expected_schema, label in specs:
             for change in versions:
                 typed_key = self.store.codec.encode(change.key)
@@ -14946,6 +15143,8 @@ class LazyWorldSession:
         self.institution_applications._pin = result.pin
         self.transmissions._pin = result.pin
         self.motives._pin = result.pin
+        for table in self._scalar_tables.values():
+            table._pin = result.pin
         self.social_edges._pin = result.pin
         self.social_adjacency._pin = result.pin
         self.social_partnerships._pin = result.pin
@@ -15041,6 +15240,8 @@ class LazyWorldSession:
         self.institution_applications.accept_save(plan, result.pin)
         self.transmissions.accept_save(plan, result.pin)
         self.motives.accept_save(plan, result.pin)
+        for unit in plan.scalar_record_plans:
+            self._scalar_tables[unit.namespace].accept_save(unit, result.pin)
         self.social_edges.accept_save(plan, result.pin)
         self.social_adjacency.accept_save(plan, result.pin)
         self.social_partnerships.accept_save(plan, result.pin)
@@ -15070,8 +15271,8 @@ class LazyWorldSession:
         )
         self._cross_boundary_links = tuple(
             link for link in self.identity_links
-            if _path_under_lazy(link[0])
-            or _path_under_lazy(link[1])
+            if _path_under_lazy(link[0], self._scalar_tables)
+            or _path_under_lazy(link[1], self._scalar_tables)
         )
         self._pending_save = None
         self._state = "active"
@@ -15134,6 +15335,7 @@ class LazyWorldSession:
                     + plan.institution_application_version_changes
                     + plan.transmission_version_changes
                     + plan.motive_version_changes
+                    + tuple(change for unit in plan.scalar_record_plans for change in unit.version_changes)
                     + plan.social_edge_version_changes
                     + plan.social_adjacency_version_changes
                     + plan.social_partnership_version_changes
@@ -15164,6 +15366,7 @@ class LazyWorldSession:
                     + plan.institution_application_identity_changes
                     + plan.transmission_identity_changes
                     + plan.motive_identity_changes
+                    + tuple(change for unit in plan.scalar_record_plans for change in unit.identity_changes)
                     + plan.social_edge_identity_changes
                     + plan.social_adjacency_identity_changes
                     + plan.social_partnership_identity_changes
@@ -15727,7 +15930,9 @@ class LazyWorldSession:
                 raise StoreIntegrityError(
                     f"lazy detach encountered wrong {label} value"
                 )
-            detached[key] = record
+            # Staging must not redirect a retained record's mutation callback.
+            # Rebindings are prepared and published only after staging succeeds.
+            dict.__setitem__(detached, key, record)
         if len(detached) != expected:
             raise StoreIntegrityError(
                 f"lazy detach {label} count mismatch"
@@ -15915,6 +16120,7 @@ class LazyWorldSession:
         assignments,
         cache_removals,
         index_rebindings,
+        detached_scalar_tables,
     ):
         """Publish a fully staged portable graph; remaining work is teardown."""
         tracker = self._eager_tracker
@@ -16027,6 +16233,7 @@ class LazyWorldSession:
         self.institution_applications = detached_institution_applications
         self.transmissions = detached_transmissions
         self.motives = detached_motives
+        self._scalar_tables = detached_scalar_tables
         self.social_edges = detached_social_edges
         self.social_adjacency = detached_social_adjacency
         self.social_partnerships = detached_social_partnerships
@@ -16061,6 +16268,11 @@ class LazyWorldSession:
             new_log = lifecycle._standalone_log(old_log, self)
             lifecycle._lifecycle_phase("after_history", self)
 
+            detached_scalar_tables = {
+                namespace: (self._stage_detached_institution_table(table, table._record_type, namespace)
+                            if namespace in SCALAR_RECORD_SPECS else dict(table.items()))
+                for namespace, table in self._scalar_tables.items()
+            }
             detached_people = self._stage_detached_people()
             detached_aspirations = self._stage_detached_aspirations()
             mutable_replacements = {}
@@ -16235,6 +16447,7 @@ class LazyWorldSession:
                         id(self.community_memberships): (
                             detached_community_memberships
                         ),
+                        **{id(self._scalar_tables[ns]): table for ns, table in detached_scalar_tables.items()},
                         **mutable_replacements,
                     },
                 )
@@ -16256,9 +16469,11 @@ class LazyWorldSession:
                 detached_institution_applications,
                 detached_transmissions,
                 detached_motives,
+                *detached_scalar_tables.values(),
             ):
                 for key, record in dict.items(table):
-                    index_rebindings.append((record, table, key))
+                    if isinstance(record, IndexedRecord):
+                        index_rebindings.append((record, table, key))
 
             lifecycle._lifecycle_phase("before_publish", self)
             world = self._publish_materialized_detach(
@@ -16294,6 +16509,7 @@ class LazyWorldSession:
                 assignments,
                 cache_removals,
                 index_rebindings,
+                detached_scalar_tables,
             )
             published = True
             return world
@@ -16306,6 +16522,7 @@ class LazyWorldSession:
         tracker = self._eager_tracker
         return {
             "state": self._state,
+            "scalar_records": {ns: table.diagnostics() for ns, table in self._scalar_tables.items()},
             "people": self.people.diagnostics(),
             "aspirations": self.aspirations.diagnostics(),
             "resources": self.resources.diagnostics(),
@@ -16497,11 +16714,13 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
                 raise StoreIntegrityError(
                     "cold commit generation disagrees with lazy head"
                 )
+            scalar_namespaces = _scalar_authorities(store, manifest, head.generation)
             links = _read_current_identity_links(store)
             baseline_ordinals = _capture_cold_baseline_ordinals(
                 store,
                 manifest,
                 excluded_namespaces={
+                    *scalar_namespaces,
                     PEOPLE_NAMESPACE,
                     ASPIRATION_NAMESPACE,
                     RESOURCE_NAMESPACE,
@@ -16574,7 +16793,7 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
                     namespace = root + "." + name
                     if kind == "state":
                         value = objects[namespace]
-                    elif namespace in (
+                    elif namespace in scalar_namespaces or namespace in (
                         PEOPLE_NAMESPACE,
                         ASPIRATION_NAMESPACE,
                         RESOURCE_NAMESPACE,
@@ -16625,8 +16844,8 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
             resident_links = [
                 link
                 for link in links
-                if not _path_under_lazy(link[0])
-                and not _path_under_lazy(link[1])
+                if not _path_under_lazy(link[0], scalar_namespaces)
+                and not _path_under_lazy(link[1], scalar_namespaces)
             ]
             _restore_identity(
                 world,

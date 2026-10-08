@@ -1,0 +1,13 @@
+# Scalar record family integration
+
+Execute inline under continuous repair Task6, with one final combined reviewer. First integrate conflict, inquiry and magical-threat records using the existing bounded indexed-record implementation. A concrete namespace registry selects record types and predicates; additional family plans are frozen and folded into the existing single hybrid transaction, successor evidence and acknowledgement. No family commits independently.
+
+Explicit conversion alone creates complete checked namespace/query/identity authority, including empty families, and marks collection descriptions with reader capability5. Ordinary open selects the new authority from that description, checks the namespace count and retains eager legacy behavior when absent. It never manufactures an empty namespace in place of missing authority.
+
+The same frozen family-plan registry also admits concrete immutable scalar maps:independent threat resolutions(int->int) and beliefs((person,claim)->numeric). These have no value incarnation or derived replacement authority. Reuse the checked scalar-cell mutation/save logic, with explicit exact key/value validation for each admitted domain. Teaching must read at most the teacher and existing student belief, write only the changed belief, and preserve its native clamp/default behavior. These maps detach to ordinary dicts. No claim that this is the generic typed nested-map primitive of Task5.
+
+Include all open/restore/tracker exclusions, identity paths and shared-owner routes, structural layout/count updates, no-op detection, commit/recovery/publication, clean-cache eviction, diagnostics and portable detach. Preserve native key-sorted active-query behavior, genuine active growth and each immutable payload field. Separate resolutions, community/token selection and infrastructure histories remain later integrations.
+
+Red gates:1k/10k closed history with8 active records, zero family payload loads on open,8 loads for actual active queries, one changed version and zero unrelated family versions, indexed field changes, delete/reinsert order, shared wallet aliases, rollback/lost acknowledgement and portable detach. Also validate checked missing authority and legacy source preservation. Continue after this checkpoint into the remaining migrations.
+
+Additional red gates:8 resolution probes at1k/10k decode8 scalar cells without any related threat record; no-op replacement must retain the generation. Belief teaching at1k/10k writes exactly one version with an old pin retained, portable detach preserves order/value/digest, and rollback/lost acknowledgement resolves through the same hybrid plan. Failure of detach staging must retain existing record mutation authority.
