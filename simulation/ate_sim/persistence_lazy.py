@@ -9411,6 +9411,7 @@ class LazyWorldSession:
         )
         self._install_cross_boundary_tracker_baseline()
         self._paged_household_members = {}
+        self._household_paging_active = False
 
         self._lifetime = _LazyLifetime(self)
         object.__setattr__(world, "_ate_persistence_lifetime", self._lifetime)
@@ -9431,15 +9432,35 @@ class LazyWorldSession:
             )
             object.__setattr__(household, "members", sequence)
             self._paged_household_members[key] = sequence
+        self._household_paging_active = True
         self._eager_tracker._paged_household_members = True
 
     def _household_page_changes(self):
-        if not self._paged_household_members:
+        if not self._household_paging_active:
             return ()
-        if set(self.world.households) != set(self._paged_household_members):
+        current = set(self.world.households)
+        registered = set(self._paged_household_members)
+        if registered - current:
             raise StoreError(
-                "paged household pilot requires new/deleted household owner integration"
+                "paged household pilot requires deleted owner identity integration"
             )
+        # The existing eager RecordTable binds a newly inserted Household.
+        # Only its members require promotion into checked auxiliary authority.
+        for key in current - registered:
+            household = self.world.households[key]
+            original = tuple(household.members)
+            def guard(owner=key, record=household):
+                self._ensure_people_mutation_allowed()
+                if self.world.households.get(owner) is not record:
+                    raise StoreError("retained household member alias has obsolete owner")
+                if self._paged_household_members.get(owner) is not record.members:
+                    raise StoreError("retained household member alias was replaced")
+            sequence = LazyHouseholdMembers(
+                self.store, self.pin, key,
+                guard=guard, initial_values=original,
+            )
+            object.__setattr__(household, "members", sequence)
+            self._paged_household_members[key] = sequence
         for key, sequence in self._paged_household_members.items():
             if self.world.households[key].members is not sequence:
                 raise StoreError("household members were replaced without page binding")
