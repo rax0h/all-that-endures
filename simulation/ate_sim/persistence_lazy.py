@@ -2529,6 +2529,17 @@ def _seed_cross_boundary_lazy_identity(session, links):
             target_lazy if target_lazy is not None else owner_lazy
         )
         eager_path = owner if target_lazy is not None else target
+        if (
+            _household_member_path(eager_path)
+            and session.store._namespace_state_at(
+                HOUSEHOLD_LENGTH_NAMESPACE, generation
+            ) is not None
+        ):
+            # The historical eager field is a compact physical placeholder.
+            # Defer its P2C incarnation registration until the checked pager
+            # replaces that placeholder.
+            cross.append((target, owner))
+            continue
         encoded_key = session.store.codec.encode(key)
         encoded_path = session.store.codec.encode(relative)
         row = session.store._visible_identity_occurrence(
@@ -9488,6 +9499,34 @@ class LazyWorldSession:
             )
         self._household_paging_active = True
         tracker._paged_household_members = True
+        self._bind_paged_cross_family_aliases()
+
+    def _bind_paged_cross_family_aliases(self):
+        for target, owner in self._cross_boundary_links:
+            from_household = _household_member_path(target)
+            to_household = _household_member_path(owner)
+            if from_household == to_household:
+                continue
+            eager_path = target if from_household else owner
+            lazy_path = owner if from_household else target
+            if len(eager_path) != 3:
+                raise StoreError("nested household member identity is unsupported")
+            lazy = _lazy_occurrence_from_path(lazy_path)
+            if lazy is None:
+                raise StoreIntegrityError("shared household member link lost lazy occurrence")
+            namespace, key, relative, _expected = lazy
+            household_id = eager_path[1][1]
+            seq = self.world.households[household_id].members
+            identity = self.store.read_identity_occurrence(
+                self.pin, namespace, key, relative
+            )
+            incarnation = IncarnationId(
+                self.store.store_identity, identity.incarnation_id
+            )
+            self._registry.bind(seq, incarnation=incarnation)
+            self._registry.attach_existing(
+                incarnation, Occurrence(namespace, key, relative)
+            )
 
     def _household_page_changes(self):
         if not self._household_paging_active:
