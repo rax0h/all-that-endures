@@ -1,3 +1,4 @@
+from collections.abc import MutableSequence
 from __future__ import annotations
 from dataclasses import dataclass, field, asdict, is_dataclass, fields
 from enum import Enum
@@ -67,7 +68,7 @@ def _canonical(value):
  if isinstance(value,Enum):return value.value
  if is_dataclass(value):return {key:_canonical(getattr(value,name)) for key,name in _canonical_fields(type(value))}
  if isinstance(value,dict):return {repr(k):_canonical(v) for k,v in sorted(value.items(),key=lambda kv:repr(kv[0]))}
- if isinstance(value,(list,tuple,EventLog)) or isinstance(value,__import__('collections').abc.MutableSequence):return [_canonical(v) for v in value]
+ if isinstance(value,(list,tuple,EventLog)) or isinstance(value,MutableSequence):return [_canonical(v) for v in value]
  if isinstance(value,(set,frozenset)):return sorted((_canonical(v) for v in value),key=repr)
  return value
 @dataclass
