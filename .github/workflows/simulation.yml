@@ -11,9 +11,6 @@ concurrency:
 
 jobs:
   test:
-    # Temporary: prevent the main PR workflow from launching the long
-    # canonical endurance job while bounded Stage 0.5 repairs are probed.
-    if: github.head_ref != 'sim/stage-0-5-stabilization'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
