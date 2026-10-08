@@ -144,3 +144,87 @@ def test_guard_and_corruption_reject_before_mutating(tmp_path):
     finally:
         store.release_pin(pin)
         store.close()
+
+
+def test_transaction_failure_keeps_old_page_and_dirty_overlay(tmp_path, monkeypatch):
+    store = make_store(tmp_path, members=[1, 2, 3])
+    pin = store.capture_pin()
+    try:
+        seq = LazyHouseholdMembers(store, pin, 1)
+        seq.append(4)
+        changes = seq.pending_changes()
+        def fail(phase):
+            if phase == "before_commit":
+                raise RuntimeError("before-commit fault")
+        monkeypatch.setattr(store, "_phase_hook", fail)
+        with pytest.raises(RuntimeError, match="before-commit fault"):
+            store.commit(
+                pin, commit_token="attempt-before-commit",
+                version_changes=changes, changes=(), new_segments=(),
+                metadata=store.checked_head().metadata,
+            )
+        # The original pin still selects the durable pre-save sequence;
+        # the user's mutable overlay has not silently vanished.
+        assert LazyHouseholdMembers(store, pin, 1) == [1, 2, 3]
+        assert seq == [1, 2, 3, 4]
+        assert seq.pending_changes() == changes
+        monkeypatch.setattr(store, "_phase_hook", lambda _phase: None)
+        result = store.commit(
+            pin, commit_token="retry-after-rollback",
+            version_changes=seq.pending_changes(), changes=(), new_segments=(),
+            metadata=store.checked_head().metadata,
+        )
+        assert result.outcome == "committed"
+        pin = result.pin
+        seq.accept_save(pin)
+        assert LazyHouseholdMembers(store, pin, 1) == [1, 2, 3, 4]
+    finally:
+        store.release_pin(pin)
+        store.close()
+
+
+def test_old_pin_reads_old_members_after_new_publication(tmp_path):
+    store = make_store(tmp_path, members=[1, 1, 3])
+    old_pin = store.capture_pin()
+    writer_pin = store.capture_pin()
+    try:
+        seq = LazyHouseholdMembers(store, writer_pin, 1)
+        seq.append(4)
+        result = store.commit(
+            writer_pin, commit_token="new-member-epoch",
+            version_changes=seq.pending_changes(), changes=(), new_segments=(),
+            metadata=store.checked_head().metadata,
+        )
+        assert result.outcome == "committed"
+        writer_pin = result.pin
+        seq.accept_save(writer_pin)
+        assert LazyHouseholdMembers(store, old_pin, 1) == [1, 1, 3]
+        assert LazyHouseholdMembers(store, writer_pin, 1) == [1, 1, 3, 4]
+    finally:
+        store.release_pin(old_pin)
+        store.release_pin(writer_pin)
+        store.close()
+
+
+def test_shrink_deletes_expired_pages_and_reopen(tmp_path):
+    store = make_store(tmp_path, count=260)
+    pin = store.capture_pin()
+    try:
+        seq = LazyHouseholdMembers(store, pin, 1)
+        del seq[1:]
+        assert seq == [1]
+        changes = seq.pending_changes()
+        assert any(c.delete for c in changes)
+        result = store.commit(
+            pin, commit_token="shrink",
+            version_changes=changes, changes=(), new_segments=(),
+            metadata=store.checked_head().metadata,
+        )
+        pin = result.pin
+        seq.accept_save(pin)
+        assert LazyHouseholdMembers(store, pin, 1) == [1]
+        assert not store.contains_lazy_key(pin, PAGE_NAMESPACE, (1, 1))
+        assert not store.contains_lazy_key(pin, PAGE_NAMESPACE, (1, 2))
+    finally:
+        store.release_pin(pin)
+        store.close()
