@@ -84,3 +84,50 @@ semantics. Only then integrate cold conversion, World adapters and combined
 save/lifecycle. Run focused then affected tests and short independent
 continuation. If a complete gate fails, retain **R3 BLOCKED** and do not
 declare Stage 0.5 accepted, schedule endurance, merge or enter Stage 1.
+
+
+## 2026-10-08 execution update: checked page foundation landed
+
+A standalone, **not yet World-integrated**, R3 storage primitive now exists at
+`ate_sim/persistence_lazy_household_members.py` with focused tests at
+`tests/test_stage_0_5_household_sequence.py`. This addition does not alter the
+current lazy World storage mode or claim R3 closure.
+
+The original focused foundation test run
+[37732587525](https://github.com/rax0h/all-that-endures/actions/runs/37732587525)
+passed **6/6 in 0.63s**. It covered 1k and 10k historical member IDs,
+generation-pinned checked pages, bounded four-page read caching, duplicate
+and positional edit behavior, corruption and mutation-guard rejection,
+and a single append that wrote exactly **two lazy payload records**
+(length + bounded tail) at each historical size. Observed write payload
+bytes were **1,497 at 1k** and **283 at 10k**; the differing bytes reflect
+the current partial tail and are not an O(history) cost.
+
+After adding failure, old-generation and shrink tests, a later focused
+job [37733205786](https://github.com/rax0h/all-that-endures/actions/runs/37733205786)
+reported **9 standalone cases passing**; its **overall job failed**
+because one of the opt-in World pilot tests expected births to be forbidden
+inside `current_people_scope`. That expectation was wrong and has been
+corrected on the isolated pilot branch. The standalone failed-attempt test
+was also corrected to use accepted explicit `resolve_commit` semantics
+before retrying. Never present the pilot job as all-green.
+
+An isolated opt-in World conversion/save pilot (development branch
+`sim/stage-0-5-r3-implementation`) has been built but **not promoted**:
+its cold-to-P4 conversion physically projects compact household records,
+installs checked member pages under auxiliary namespaces, binds the
+public sequence, includes canonical-digest streaming, and publishes page
+changes in the same hybrid generation. It has passed the original 1k/10k
+World digest/append/reopen checks but is still undergoing additional
+alias, lifetime, new-household, detach, and recovery validation.
+
+**Unresolved acceptance work:** support newly created/deleted/replaced
+households and shared/cross-owner member-list aliases with unchanged
+identity and detached-alias semantics; validate true short independent
+simulation and failures; re-inventory other nested eager histories.
+The pilot refuses shared source member-list links and late new-owner saves
+rather than silently corrupting them. Those refusals are fail-safe
+development limits, **not accepted final behavior**.
+
+No endurance or replacement late-fixture capture is authorized or
+performed. Stage 0.5 remains blocked.
