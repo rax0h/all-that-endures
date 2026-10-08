@@ -2354,10 +2354,14 @@ def _lazy_occurrence_from_path(path):
         )
     wallet = _currency_occurrence_from_path(path, "wallets")
     if wallet is not None:
-        return WALLET_NAMESPACE, wallet[0], wallet[1], dict
+        return WALLET_NAMESPACE, wallet[0], wallet[1], (
+            dict if not wallet[1] else object
+        )
     treasury = _currency_occurrence_from_path(path, "treasuries")
     if treasury is not None:
-        return TREASURY_NAMESPACE, treasury[0], treasury[1], dict
+        return TREASURY_NAMESPACE, treasury[0], treasury[1], (
+            dict if not treasury[1] else object
+        )
     soul = _soul_occurrence_from_path(path)
     if soul is not None:
         relative = soul[1]
@@ -2560,6 +2564,12 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 and type(eager_object) is dict
             ):
                 eager_object = LazyTrackedDict(eager_object)
+                _relative_set(session.world, eager_path, eager_object)
+            elif (
+                namespace in {WALLET_NAMESPACE, TREASURY_NAMESPACE}
+                and type(eager_object) is list
+            ):
+                eager_object = LazySoulTrackedList(eager_object)
                 _relative_set(session.world, eager_path, eager_object)
             elif namespace == SOUL_NAMESPACE and relative:
                 if relative in (
