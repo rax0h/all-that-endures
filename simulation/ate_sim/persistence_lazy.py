@@ -9469,8 +9469,22 @@ class LazyWorldSession:
                 object.__setattr__(household, "members", existing)
                 self._paged_household_members[key] = existing
                 self._paged_household_records[key] = household
+        # The eager tracker initially indexed the compact source placeholder
+        # lists. Relabel only resident household owners to the new shared
+        # sequence objects; the P2C target/owner paths remain unchanged.
+        tracker = self._eager_tracker
+        for key, household in self.world.households.items():
+            owner = ("world.households", key)
+            removed, added = tracker._identity_index.refresh(
+                owner, household, tracker._owner_path(owner)
+            )
+            tracker._merge_identity_patch(removed, added)
+        if tracker._pending_identity_current:
+            raise StoreIntegrityError(
+                "paged household binding changed persisted current-link authority"
+            )
         self._household_paging_active = True
-        self._eager_tracker._paged_household_members = True
+        tracker._paged_household_members = True
 
     def _household_page_changes(self):
         if not self._household_paging_active:
