@@ -21,3 +21,5 @@ jobs:
 # Owner deletion/replacement alias regression gate
 
 # P2C shared-household member identity and World diff gate
+
+# P2C current-link leaf reindex checkpoint
