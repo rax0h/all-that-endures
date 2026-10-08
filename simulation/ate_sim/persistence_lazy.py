@@ -15175,6 +15175,16 @@ class LazyWorldSession:
             if replacement is None:
                 replacement = dict(bucket)
                 replacements[id(bucket)] = replacement
+            # A paged member list shared with a separate lazy owner becomes
+            # one ordinary list during explicit materialization, without
+            # leaving that other owner's alias attached to the closed store.
+            for nested_key, nested_value in tuple(replacement.items()):
+                if isinstance(nested_value, LazyHouseholdMembers):
+                    plain = replacements.get(id(nested_value))
+                    if plain is None:
+                        plain = list(nested_value)
+                        replacements[id(nested_value)] = plain
+                    replacement[nested_key] = plain
             detached[key] = replacement
         if len(detached) != expected:
             raise StoreIntegrityError(
