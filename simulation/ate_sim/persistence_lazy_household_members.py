@@ -101,7 +101,7 @@ class LazyHouseholdMembers(MutableSequence):
     and active lifecycle operations before any mutation.
     """
 
-    def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES, initial_values=None):
+    def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES, initial_values=None, baseline_length=None):
         _member_id(owner)
         self._store = store
         self._pin = pin
@@ -112,12 +112,20 @@ class LazyHouseholdMembers(MutableSequence):
             raise ValueError("cache_pages must be positive")
         self._cache = OrderedDict()
         self._dirty_pages = {}
-        self._new_owner = initial_values is not None
-        if self._new_owner:
+        self._detached_values = None
+        self._new_owner = initial_values is not None and baseline_length is None
+        if initial_values is not None:
+            if baseline_length is not None and (
+                type(baseline_length) is not int or baseline_length < 0
+            ):
+                raise ValueError("invalid replacement baseline length")
             self._length = 0
-            self._base_length = 0
-            for value in tuple(_member_id(v) for v in initial_values):
-                self._append(value)
+            self._base_length = 0 if baseline_length is None else baseline_length
+            if baseline_length is None:
+                for value in tuple(_member_id(v) for v in initial_values):
+                    self._append(value)
+            else:
+                self._replace_all(initial_values)
             return
         if getattr(store, "_active_read_transaction", False):
             # The P4 open already owns a checked, generation-matched snapshot.
@@ -146,7 +154,36 @@ class LazyHouseholdMembers(MutableSequence):
         self._base_length = length
 
     def _ensure(self):
-        self._store._ensure_open()
+        if self._detached_values is None:
+            self._store._ensure_open()
+
+    def detach_to_memory(self):
+        """Keep a formerly canonical external alias independent of its owner."""
+        if self._detached_values is not None:
+            return
+        values = list(self)
+        self._detached_values = values
+        self._dirty_pages.clear()
+        self._cache.clear()
+        self._guard = None
+        self._length = len(values)
+
+    def deleted_owner_changes(self):
+        """Explicit whole-owner deletion may touch its entire page history."""
+        if self._new_owner:
+            return ()
+        return (
+            VersionChange(
+                LENGTH_NAMESPACE, self._owner, delete=True,
+                record_schema=RECORD_SCHEMA,
+            ),
+        ) + tuple(
+            VersionChange(
+                PAGE_NAMESPACE, (self._owner, page), delete=True,
+                record_schema=RECORD_SCHEMA,
+            )
+            for page in range((self._base_length + PAGE_SIZE - 1) // PAGE_SIZE)
+        )
 
     def _mutation(self):
         self._ensure()
@@ -194,10 +231,12 @@ class LazyHouseholdMembers(MutableSequence):
 
     def __len__(self):
         self._ensure()
-        return self._length
+        return len(self._detached_values) if self._detached_values is not None else self._length
 
     def __getitem__(self, index):
         self._ensure()
+        if self._detached_values is not None:
+            return self._detached_values[index]
         if isinstance(index, slice):
             return [self[i] for i in range(*index.indices(self._length))]
         index = self._normalize(index)
@@ -205,6 +244,13 @@ class LazyHouseholdMembers(MutableSequence):
 
     def __setitem__(self, index, value):
         self._mutation()
+        if self._detached_values is not None:
+            if isinstance(index, slice):
+                self._detached_values[index] = [_member_id(x) for x in value]
+            else:
+                self._detached_values[index] = _member_id(value)
+            self._length = len(self._detached_values)
+            return
         if isinstance(index, slice):
             new = list(self)
             replacement = [_member_id(x) for x in value]
@@ -216,6 +262,10 @@ class LazyHouseholdMembers(MutableSequence):
 
     def __delitem__(self, index):
         self._mutation()
+        if self._detached_values is not None:
+            del self._detached_values[index]
+            self._length = len(self._detached_values)
+            return
         if isinstance(index, slice):
             new = list(self)
             del new[index]
@@ -227,6 +277,10 @@ class LazyHouseholdMembers(MutableSequence):
     def insert(self, index, value):
         self._mutation()
         _member_id(value)
+        if self._detached_values is not None:
+            self._detached_values.insert(index, value)
+            self._length = len(self._detached_values)
+            return
         if type(index) is not int:
             raise TypeError("household member insertion index must be int")
         if index < 0:
@@ -237,6 +291,10 @@ class LazyHouseholdMembers(MutableSequence):
         self._replace_all(list(self[:index]) + [value] + list(self[index:]))
 
     def _append(self, value):
+        if self._detached_values is not None:
+            self._detached_values.append(value)
+            self._length = len(self._detached_values)
+            return
         page_index = self._length // PAGE_SIZE
         page = self._page(page_index)
         if len(page) != self._length % PAGE_SIZE:
@@ -258,6 +316,10 @@ class LazyHouseholdMembers(MutableSequence):
 
     def _replace_all(self, values):
         values = tuple(_member_id(v) for v in values)
+        if self._detached_values is not None:
+            self._detached_values[:] = values
+            self._length = len(values)
+            return
         previous_page_count = (self._length + PAGE_SIZE - 1) // PAGE_SIZE
         next_page_count = (len(values) + PAGE_SIZE - 1) // PAGE_SIZE
         for number in range(max(previous_page_count, next_page_count)):
@@ -293,6 +355,8 @@ class LazyHouseholdMembers(MutableSequence):
     def pending_changes(self):
         """Return only changed bounded pages and length, never all history."""
         self._ensure()
+        if self._detached_values is not None:
+            return ()
         result = []
         base_pages = (self._base_length + PAGE_SIZE - 1) // PAGE_SIZE
         final_pages = (self._length + PAGE_SIZE - 1) // PAGE_SIZE
@@ -330,6 +394,8 @@ class LazyHouseholdMembers(MutableSequence):
 
     def accept_save(self, pin):
         """Advance to the committed generation only after combined publication."""
+        if self._detached_values is not None:
+            return
         self._pin = pin
         self._base_length = self._length
         self._new_owner = False
