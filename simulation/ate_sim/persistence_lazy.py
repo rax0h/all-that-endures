@@ -8,6 +8,7 @@ slice after the open/query proof gate.
 from __future__ import annotations
 
 from collections import OrderedDict
+import copy
 from collections.abc import ItemsView, KeysView, ValuesView
 from dataclasses import dataclass, is_dataclass, replace
 import os
@@ -1046,6 +1047,19 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         raise StoreError(
                             "paged household cross-family identity requires supported lazy wallet/treasury list"
                         )
+            cross_family_member_paths = {}
+            if paged_household_members:
+                for target_path, owner_path in capture.identity_links:
+                    if _household_member_path(target_path) == _household_member_path(owner_path):
+                        continue
+                    foreign = owner_path if _household_member_path(target_path) else target_path
+                    lazy_owner = _lazy_occurrence_from_path(foreign)
+                    if lazy_owner is None or lazy_owner[0] not in (WALLET_NAMESPACE, TREASURY_NAMESPACE):
+                        raise StoreError("unsupported foreign household members identity")
+                    namespace, owner_key, relative, _ = lazy_owner
+                    cross_family_member_paths.setdefault(
+                        (namespace, codec.encode(owner_key)), set()
+                    ).add(relative)
             source_head = source_store.db.execute(
                 "SELECT generation,parent_generation,simulation_position,seed,"
                 "next_ids,namespace_inventory,namespace_counts,head_checksum "
@@ -1355,6 +1369,18 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                                 raise StoreFormatError(
                                     "invalid wallet source envelope"
                                 )
+                            compact_paths = cross_family_member_paths.get(
+                                (namespace, typed_key), ()
+                            )
+                            if compact_paths:
+                                value = copy.deepcopy(value)
+                                for relative in compact_paths:
+                                    members = _relative_get(value, relative)
+                                    if type(members) is not list:
+                                        raise StoreFormatError(
+                                            "cross-family household member alias is not a list"
+                                        )
+                                    _relative_set(value, relative, [])
                             _insert_lazy_plain_record(
                                 target,
                                 namespace=WALLET_NAMESPACE,
@@ -1373,6 +1399,18 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                                 raise StoreFormatError(
                                     "invalid treasury source envelope"
                                 )
+                            compact_paths = cross_family_member_paths.get(
+                                (namespace, typed_key), ()
+                            )
+                            if compact_paths:
+                                value = copy.deepcopy(value)
+                                for relative in compact_paths:
+                                    members = _relative_get(value, relative)
+                                    if type(members) is not list:
+                                        raise StoreFormatError(
+                                            "cross-family household member alias is not a list"
+                                        )
+                                    _relative_set(value, relative, [])
                             _insert_lazy_plain_record(
                                 target,
                                 namespace=TREASURY_NAMESPACE,
@@ -7377,7 +7415,18 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
         return dict(self._baseline_identity_labels[key])
 
     def _plain(self, value):
-        return dict(value)
+        def compact(child):
+            if isinstance(child, LazyHouseholdMembers):
+                return []
+            if isinstance(child, dict):
+                return {key: compact(item) for key, item in child.items()}
+            if isinstance(child, list):
+                return [compact(item) for item in child]
+            if isinstance(child, tuple):
+                return tuple(compact(item) for item in child)
+            return child
+
+        return compact(dict(value))
 
     def _valid_plain(self, value):
         return type(value) is dict
