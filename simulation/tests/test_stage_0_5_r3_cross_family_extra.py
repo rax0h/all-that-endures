@@ -22,6 +22,8 @@ def test_paged_household_members_shared_with_wallet_roundtrips_identity(tmp_path
         destination, rules_id=RULES, paged_household_members=True
     ) as session:
         primary = session.world.households[1].members
+        print("PRIMARY INC", session._registry.incarnation_for_object(primary))
+        print("INC KEYS", sorted((x.value for x in session._registry._by_incarnation)))
         from ate_sim.persistence_lazy import WALLET_NAMESPACE
         from ate_sim.persistence_lazy_identity import IncarnationId
         for ident_path in ((("key", "members"),), ()):
