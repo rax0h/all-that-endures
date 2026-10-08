@@ -191,22 +191,32 @@ class LazyHouseholdMembers(MutableSequence):
         self._guard = None
         self._length = len(values)
 
-    def deleted_owner_changes(self):
+    def deleted_owner_changes(self, owner=None):
         """Explicit whole-owner deletion may touch its entire page history."""
         if self._new_owner:
             return ()
+        key = self._owner if owner is None else owner
         return (
             VersionChange(
-                LENGTH_NAMESPACE, self._owner, delete=True,
+                LENGTH_NAMESPACE, key, delete=True,
                 record_schema=RECORD_SCHEMA,
             ),
         ) + tuple(
             VersionChange(
-                PAGE_NAMESPACE, (self._owner, page), delete=True,
+                PAGE_NAMESPACE, (key, page), delete=True,
                 record_schema=RECORD_SCHEMA,
             )
             for page in range((self._base_length + PAGE_SIZE - 1) // PAGE_SIZE)
         )
+
+    def retire_related_owner(self, key):
+        """Retire one sharing path without detaching remaining current aliases."""
+        self._related_owners.discard(key)
+        if not self._related_owners:
+            self.detach_to_memory()
+        elif self._owner == key:
+            self._owner = min(self._related_owners)
+            self._cache.clear()
 
     def _mutation(self):
         self._ensure()
