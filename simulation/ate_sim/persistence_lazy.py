@@ -9178,15 +9178,12 @@ class _LazyLifetime:
 
     def begin_operation(self, operation, *, allow_stale=False):
         session = self._session()
-        if session._state == "stale" and not allow_stale:
-            raise StoreConflictError("lazy World session is stale")
-        if session._state not in ("active", "stale"):
-            raise StoreError(
-                f"lazy World cannot {operation} while {session._state}"
-            )
+        # Public World.digest/archive must acquire the same lifecycle guard as
+        # explicit P3B operations, before traversing any mutable World state.
+        session._begin_lifecycle_operation(operation, allow_stale=allow_stale)
 
     def end_operation(self, operation):
-        self._session()
+        self._session()._end_lifecycle_operation(operation)
 
     def close(self):
         self.closed = True
@@ -9364,6 +9361,9 @@ class LazyWorldSession:
 
     def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
         self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
         if self._lifecycle_operation is not None:
             raise StoreError(
                 f"reentrant lazy session {operation} is not allowed"
@@ -15505,6 +15505,17 @@ class LazyWorldSession:
     def close(self):
         if not self._active:
             return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
         if self._state == "recovery-required":
             raise StoreError(
                 "resolve uncertain lazy save before closing the session"
