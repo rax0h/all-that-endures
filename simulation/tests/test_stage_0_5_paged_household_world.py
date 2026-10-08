@@ -83,7 +83,8 @@ def test_r3_eager_household_scalar_edit_and_member_append_share_save(tmp_path):
         original.households[1].food += 7.5
         original.households[1].members.append(1001)
         assert session.world.digest() == original.digest()
-        assert session.save() == session.pin.captured_head + 1
+        prior = session.pin.captured_head
+        assert session.save() == prior + 1
     with open_lazy_world_session(
         path, rules_id=RULES, paged_household_members=True
     ) as reopened:
@@ -115,7 +116,8 @@ def test_r3_stale_second_writer_cannot_publish_members(tmp_path):
     try:
         winner.world.households[1].members.append(1001)
         loser.world.households[1].members.append(2001)
-        assert winner.save() == winner.pin.captured_head + 1
+        prior = winner.pin.captured_head
+        assert winner.save() == prior + 1
         with pytest.raises(StoreConflictError):
             loser.save()
         assert loser.world.households[1].members[-1] == 2001
