@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from collections.abc import MutableSequence
-from .incremental_store import StoreError, StoreIntegrityError, StoreFormatError
+from .incremental_store import Membership, StoreError, StoreIntegrityError, StoreFormatError
 from .persistence_lazy_store import (
-    VersionChange, _namespace_checksum, _order_checksum, _version_checksum,
+    VersionChange, _namespace_checksum, _order_checksum, _query_checksum, _version_checksum,
 )
 from .incremental_store import _framed_sha
 
@@ -32,7 +32,12 @@ def _insert_version(store, generation, namespace, key, value, ordinal):
     codec = store.codec
     typed_key = codec.encode(key)
     payload = codec.encode(value)
-    memberships = codec.encode(())
+    page_members = (
+        tuple(("member", member_id, offset)
+              for offset, member_id in enumerate(value))
+        if namespace == PAGE_NAMESPACE else ()
+    )
+    memberships = codec.encode(page_members)
     store.db.execute(
         "INSERT INTO lazy_record_versions("
         "namespace,typed_key,valid_from,valid_to,payload,payload_checksum,"
@@ -52,6 +57,19 @@ def _insert_version(store, generation, namespace, key, value, ordinal):
         (namespace, typed_key, ordinal, generation,
          _order_checksum(namespace, typed_key, ordinal, generation, None)),
     )
+    for index_name, member, offset in page_members:
+        encoded_value = codec.encode(member)
+        store.db.execute(
+            "INSERT INTO lazy_query_versions("
+            "namespace,index_name,index_value,record_key,ordinal,"
+            "valid_from,valid_to,row_checksum"
+            ") VALUES (?,?,?,?,?,?,NULL,?)",
+            (namespace, index_name, encoded_value, typed_key, offset,
+             generation, _query_checksum(
+                 namespace, index_name, encoded_value, typed_key,
+                 offset, generation, None
+             )),
+        )
 
 
 def bootstrap_household_members(store, generation, owners):
@@ -247,6 +265,25 @@ class LazyHouseholdMembers(MutableSequence):
         index = self._normalize(index)
         return self._read_page(index // PAGE_SIZE)[index % PAGE_SIZE]
 
+    def __contains__(self, value):
+        self._ensure()
+        if self._detached_values is not None:
+            return value in self._detached_values
+        if type(value) is not int or value <= 0:
+            return False
+        for page in self._dirty_pages.values():
+            if value in page:
+                return True
+        # A checked index query scales with actual occurrences, not with
+        # all historical member IDs. Dirty pages override their old snapshot
+        # memberships, so skip those candidates.
+        for owner, number in self._store.query_keys(
+            self._pin, PAGE_NAMESPACE, "member", value
+        ):
+            if owner == self._owner and number not in self._dirty_pages:
+                return True
+        return False
+
     def __setitem__(self, index, value):
         self._mutation()
         if self._detached_values is not None:
@@ -387,6 +424,10 @@ class LazyHouseholdMembers(MutableSequence):
                 continue
             result.append(VersionChange(
                 PAGE_NAMESPACE, key, value, record_schema=RECORD_SCHEMA,
+                memberships=tuple(
+                    Membership("member", member, offset)
+                    for offset, member in enumerate(value)
+                ),
             ))
         # A P2C sharing group has one live list and a checked owner-local
         # physical projection for every linked household. Replicate only
@@ -405,6 +446,7 @@ class LazyHouseholdMembers(MutableSequence):
                     change.namespace, key, change.value,
                     record_schema=change.record_schema,
                     delete=change.delete,
+                    memberships=change.memberships,
                 ))
         return tuple(expanded)
 
