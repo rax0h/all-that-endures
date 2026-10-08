@@ -1030,8 +1030,13 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
             capture = _capture_cold_world(source_store)
             if paged_household_members:
                 for target_path, owner_path in capture.identity_links:
-                    if _household_member_path(target_path) or _household_member_path(owner_path):
-                        raise StoreError("paged household conversion requires shared members identity integration")
+                    if (
+                        _household_member_path(target_path)
+                        != _household_member_path(owner_path)
+                    ):
+                        raise StoreError(
+                            "paged household conversion requires cross-family members identity integration"
+                        )
             source_head = source_store.db.execute(
                 "SELECT generation,parent_generation,simulation_position,seed,"
                 "next_ids,namespace_inventory,namespace_counts,head_checksum "
@@ -9428,10 +9433,11 @@ class LazyWorldSession:
             # A previously retained member alias becomes detached as soon as
             # the current household/field no longer owns it. It must not be
             # rebound to another incarnation occupying the same integer key.
-            if (
-                self.world.households.get(owner) is not record
-                or self._paged_household_members.get(owner) is not sequence
-                or record.members is not sequence
+            if not any(
+                self.world.households.get(other) is self._paged_household_records.get(other)
+                and self._paged_household_members.get(other) is sequence
+                and self.world.households[other].members is sequence
+                for other in sequence._related_owners
             ):
                 sequence.detach_to_memory()
                 return
@@ -9451,8 +9457,18 @@ class LazyWorldSession:
     def _activate_household_pages(self):
         if self._household_paging_active:
             raise StoreError("household member pages already active")
+        seen_lists = {}
         for key, household in self.world.households.items():
-            self._make_paged_household_sequence(key, household)
+            original = household.members
+            existing = seen_lists.get(id(original))
+            if existing is None:
+                existing = self._make_paged_household_sequence(key, household)
+                seen_lists[id(original)] = existing
+            else:
+                existing._related_owners.add(key)
+                object.__setattr__(household, "members", existing)
+                self._paged_household_members[key] = existing
+                self._paged_household_records[key] = household
         self._household_paging_active = True
         self._eager_tracker._paged_household_members = True
 
@@ -9507,8 +9523,12 @@ class LazyWorldSession:
             if key not in current
             for change in retired.deleted_owner_changes()
         )
+        unique_sequences = {
+            id(sequence): sequence
+            for sequence in self._paged_household_members.values()
+        }
         return deletions + tuple(
-            change for sequence in self._paged_household_members.values()
+            change for sequence in unique_sequences.values()
             for change in sequence.pending_changes()
         )
 
