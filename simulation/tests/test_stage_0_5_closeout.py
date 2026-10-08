@@ -77,3 +77,124 @@ def test_r3_household_history_not_loaded_as_full_eager_list(tmp_path, count):
         assert len(members) == count
         assert members[0] == 1 and members[-1] == count
         assert sys.getsizeof(members) < 1024
+
+
+@pytest.mark.parametrize("count", [1000, 10000])
+def test_r1_retained_history_sidecars_and_reactivation_across_boundaries(
+    tmp_path, count
+):
+    world = people_world(count, active=8)
+    path = _converted(tmp_path, world, f"r1-history-{count}")
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        people = session.world.people
+        assert not people._baseline_payload
+        for person_id in range(1, count + 1):
+            assert people[person_id].id == person_id
+
+        def checked_bound():
+            gc.collect()
+            assert len(people._baseline_payload) <= 256
+            assert len(people._baseline_presence) <= 256
+            assert len(people._baseline_incarnation) <= 256
+            assert len(people._baseline_ordinal) <= 256
+            registry = session._registry
+            assert len(registry._occurrences) <= 256
+            assert len(registry._occurrences_by_owner) <= 256
+            assert sum(map(len, people._baseline_payload.values())) <= 200000
+
+        checked_bound()
+        for person_id in range(1, count + 1):
+            assert person_id in people
+        for person_id in range(count + 1, count + 4001):
+            assert person_id not in people
+        checked_bound()
+
+        for person_id in range(1, count + 1):
+            assert people[person_id].id == person_id
+        checked_bound()
+
+        generation = session.pin.captured_head
+        session.store.reset_diagnostics()
+        assert session.save() == generation
+        assert session.store.diagnostics().payload_writes == 0
+        checked_bound()
+
+        # An explicit full digest is an allowed proportional traversal, but
+        # discarded clean historical metadata must not survive that boundary.
+        before_digest = session.world.digest()
+        assert before_digest == world.digest()
+        checked_bound()
+
+        people[1].wealth += 3.25
+        assert session.save() == generation + 1
+        checked_bound()
+        after_digest = session.world.digest()
+        assert after_digest != before_digest
+        checked_bound()
+
+    with open_lazy_world_session(path, rules_id=RULES) as reopened:
+        assert reopened.world.people[1].wealth == world.people[1].wealth + 3.25
+        assert reopened.world.digest() == after_digest
+
+
+def test_r2_public_lifecycle_rejects_reentrancy_then_recovers(
+    tmp_path, monkeypatch
+):
+    from ate_sim.history_archive import export_archive
+
+    path = _converted(tmp_path, people_world(12), "r2-nested")
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        person = session.world.people[1]
+        before = person.wealth
+        calls = []
+        original = core._digest_world_unchecked
+
+        def adversarial(_world):
+            calls.append("entered")
+            for action in (
+                lambda: setattr(person, "wealth", before + 1),
+                lambda: session.close(),
+                lambda: session.save(),
+                lambda: session.detach(materialize_history=True),
+                lambda: session.world.digest(),
+            ):
+                with pytest.raises(StoreError):
+                    action()
+            raise RuntimeError("digest fault")
+
+        monkeypatch.setattr(core, "_digest_world_unchecked", adversarial)
+        with pytest.raises(RuntimeError, match="digest fault"):
+            session.world.digest()
+        assert calls == ["entered"]
+        assert person.wealth == before
+        assert session._lifecycle_operation is None
+
+        archive = tmp_path / "blocked-archive.sqlite"
+        with session.world.current_people_scope():
+            with pytest.raises(StoreError):
+                export_archive(session.world, archive, digest="trusted")
+        assert not archive.exists()
+
+        monkeypatch.setattr(core, "_digest_world_unchecked", original)
+        assert isinstance(session.world.digest(), str)
+        assert session._lifecycle_operation is None
+
+
+def test_r2_closed_store_public_digest_preflights_callback(
+    tmp_path, monkeypatch
+):
+    path = _converted(tmp_path, people_world(12), "r2-closed-store")
+    session = open_lazy_world_session(path, rules_id=RULES)
+    try:
+        called = []
+        monkeypatch.setattr(
+            core, "_digest_world_unchecked", lambda _world: called.append("ran")
+        )
+        session.store.close()
+        with pytest.raises(StoreError, match="closed"):
+            session.world.digest()
+        assert not called
+    finally:
+        # Direct store closure is intentionally adversarial; the session no
+        # longer owns a live underlying pin to release.
+        session._active = False
