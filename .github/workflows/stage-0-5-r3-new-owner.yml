@@ -19,3 +19,5 @@ jobs:
       - run: python -m pytest -q simulation/tests/test_stage_0_5_household_sequence.py simulation/tests/test_stage_0_5_paged_household_world.py
 
 # Owner deletion/replacement alias regression gate
+
+# P2C shared-household member identity and World diff gate
