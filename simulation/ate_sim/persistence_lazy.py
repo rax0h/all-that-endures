@@ -2841,6 +2841,7 @@ class LazyPeopleSavePlan:
     community_membership_touched_keys: tuple[Any, ...]
     community_membership_structural_keys: tuple[Any, ...]
     layout_value: dict[str, Any] | None
+    household_member_version_changes: tuple[VersionChange, ...] = ()
 
 
 class LazyRecordTable(RecordTable):
@@ -9409,10 +9410,43 @@ class LazyWorldSession:
             commit_descriptor=commit_descriptor,
         )
         self._install_cross_boundary_tracker_baseline()
+        self._paged_household_members = {}
 
         self._lifetime = _LazyLifetime(self)
         object.__setattr__(world, "_ate_persistence_lifetime", self._lifetime)
         world.events._ate_persistence_lifetime = self._lifetime
+
+    def _activate_household_pages(self):
+        if self._paged_household_members:
+            raise StoreError("household member pages already active")
+        for key, household in self.world.households.items():
+            def guard(owner=key, record=household):
+                self._ensure_people_mutation_allowed()
+                if self.world.households.get(owner) is not record:
+                    raise StoreError("retained household member alias has obsolete owner")
+                if self._paged_household_members.get(owner) is not record.members:
+                    raise StoreError("retained household member alias was replaced")
+            sequence = LazyHouseholdMembers(
+                self.store, self.pin, key, guard=guard,
+            )
+            object.__setattr__(household, "members", sequence)
+            self._paged_household_members[key] = sequence
+        self._eager_tracker._paged_household_members = True
+
+    def _household_page_changes(self):
+        if not self._paged_household_members:
+            return ()
+        if set(self.world.households) != set(self._paged_household_members):
+            raise StoreError(
+                "paged household pilot requires new/deleted household owner integration"
+            )
+        for key, sequence in self._paged_household_members.items():
+            if self.world.households[key].members is not sequence:
+                raise StoreError("household members were replaced without page binding")
+        return tuple(
+            change for sequence in self._paged_household_members.values()
+            for change in sequence.pending_changes()
+        )
 
     def _ensure_active(self):
         if not self._active:
@@ -12342,6 +12376,7 @@ class LazyWorldSession:
 
 
     def _prepare_hybrid_save(self):
+        household_member_version_changes = self._household_page_changes()
         (
             version_changes,
             identity_changes,
@@ -12501,7 +12536,8 @@ class LazyWorldSession:
         ) = self.community_memberships.prepare_save_changes()
 
         lazy_effective = bool(
-            version_changes
+            household_member_version_changes
+            or version_changes
             or identity_changes
             or aspiration_version_changes
             or aspiration_identity_changes
@@ -13067,6 +13103,7 @@ class LazyWorldSession:
                 community_membership_structural_keys
             ),
             layout_value=layout_value,
+            household_member_version_changes=household_member_version_changes,
         )
 
 
@@ -14304,6 +14341,8 @@ class LazyWorldSession:
         self.genealogy_parents.accept_save(plan, result.pin)
         self.genealogy_children.accept_save(plan, result.pin)
         self.community_memberships.accept_save(plan, result.pin)
+        for sequence in self._paged_household_members.values():
+            sequence.accept_save(result.pin)
         self.prefix = self.world.events._disk_prefix
         self._head = head
         self.identity_links = tuple(
@@ -14388,6 +14427,7 @@ class LazyWorldSession:
                     + plan.genealogy_parent_version_changes
                     + plan.genealogy_child_version_changes
                     + plan.community_membership_version_changes
+                    + plan.household_member_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes
@@ -15634,7 +15674,7 @@ def _begin_matching_snapshot(store, pin):
     return head
 
 
-def open_lazy_world_session(path, *, rules_id):
+def open_lazy_world_session(path, *, rules_id, paged_household_members=False):
     """Open P4 lazy World without decoding migrated record families."""
     path = Path(path)
     store = LazyRecordStore.open(
@@ -15672,6 +15712,15 @@ def open_lazy_world_session(path, *, rules_id):
                     "open_lazy_world_session requires converted cold P4 storage"
                 )
 
+            member_pages_present = (
+                store._namespace_state_at(
+                    HOUSEHOLD_LENGTH_NAMESPACE, head.generation
+                ) is not None
+            )
+            if member_pages_present != bool(paged_household_members):
+                raise StoreFormatError(
+                    "household members storage mode mismatch; explicit paged flag required"
+                )
             metadata_rows = store.read_records(
                 META, expected_record_schema=RECORD_SCHEMA
             )
@@ -15853,6 +15902,8 @@ def open_lazy_world_session(path, *, rules_id):
                 tail_descriptor=tail_descriptor,
                 commit_descriptor=commit_descriptor,
             )
+            if paged_household_members:
+                session._activate_household_pages()
             prefix = None
             pin = None
             return session
