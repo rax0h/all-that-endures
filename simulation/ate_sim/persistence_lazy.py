@@ -9473,18 +9473,51 @@ class LazyWorldSession:
     def _activate_household_pages(self):
         if self._household_paging_active:
             raise StoreError("household member pages already active")
+        # All eager household placeholders do not necessarily share object
+        # identity: if the P2C canonical owner is a lazy wallet, the resident
+        # subset has no direct household-to-household link. Recover the common
+        # checked incarnation before constructing bounded page proxies.
+        household_labels = {}
+        for target, owner in self._cross_boundary_links:
+            path = target if _household_member_path(target) else (
+                owner if _household_member_path(owner) else None
+            )
+            if path is None:
+                continue
+            counterpart = owner if path is target else target
+            lazy = _lazy_occurrence_from_path(counterpart)
+            if lazy is None:
+                continue
+            namespace, lazy_key, relative, _kind = lazy
+            label = self._registry.incarnation_for_occurrence(
+                Occurrence(namespace, lazy_key, relative)
+            )
+            key = path[1][1]
+            previous = household_labels.setdefault(key, label)
+            if previous != label or label is None:
+                raise StoreIntegrityError(
+                    "inconsistent cross-family member incarnation"
+                )
         seen_lists = {}
+        sequences_by_incarnation = {}
         for key, household in self.world.households.items():
             original = household.members
+            label = household_labels.get(key)
             existing = seen_lists.get(id(original))
+            if existing is None and label is not None:
+                existing = sequences_by_incarnation.get(label)
             if existing is None:
                 existing = self._make_paged_household_sequence(key, household)
-                seen_lists[id(original)] = existing
             else:
                 existing._related_owners.add(key)
                 object.__setattr__(household, "members", existing)
                 self._paged_household_members[key] = existing
                 self._paged_household_records[key] = household
+            seen_lists[id(original)] = existing
+            if label is not None:
+                previous = sequences_by_incarnation.setdefault(label, existing)
+                if previous is not existing:
+                    raise StoreIntegrityError("conflicting shared member identity")
         # A cross-family link's persisted incarnation belongs to the single
         # member sequence, never to the compact source placeholder or an
         # independent eager copy of another lazy family's payload.
