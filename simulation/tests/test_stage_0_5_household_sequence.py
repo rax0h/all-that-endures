@@ -169,6 +169,8 @@ def test_transaction_failure_keeps_old_page_and_dirty_overlay(tmp_path, monkeypa
         assert seq == [1, 2, 3, 4]
         assert seq.pending_changes() == changes
         monkeypatch.setattr(store, "_phase_hook", lambda _phase: None)
+        resolved = store.resolve_commit(pin, "attempt-before-commit")
+        assert resolved.outcome == "not_committed"
         result = store.commit(
             pin, commit_token="retry-after-rollback",
             version_changes=seq.pending_changes(), changes=(), new_segments=(),
