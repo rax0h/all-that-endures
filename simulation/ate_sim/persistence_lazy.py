@@ -9550,7 +9550,9 @@ class LazyWorldSession:
             existing = (
                 seen_lists.get(label[0]) if label is not None else None
             )
-            if existing is None:
+            if existing is None and label is None:
+                # Persisted incarnation identity overrides compact placeholder
+                # object sharing. Fall back only for unlabeled new owners.
                 existing = seen_objects.get(id(original))
             if existing is None:
                 existing = self._make_paged_household_sequence(key, household)
