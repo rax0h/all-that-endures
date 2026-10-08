@@ -357,11 +357,13 @@ class LazyLineageChildrenTable(dict):
         self._session._ensure_people_mutation_allowed()
 
     def _baseline_exists(self, key):
-        if key not in self._baseline_presence:
-            self._baseline_presence[key] = self._store.contains_lazy_key(
-                self._pin, self._namespace, key
-            )
-        return self._baseline_presence[key]
+        # A checked one-off lookup must not turn all visited lineage parents
+        # into a permanent membership cache.
+        if key in self._baseline_presence:
+            return self._baseline_presence[key]
+        return self._store.contains_lazy_key(
+            self._pin, self._namespace, key
+        )
 
     def _persisted_ordinal(self, key):
         if key not in self._baseline_ordinal:
@@ -458,6 +460,15 @@ class LazyLineageChildrenTable(dict):
                 continue
             if dict.__contains__(self, key):
                 dict.__delitem__(self, key)
+            # Current-link/edge authority survives in durable checked storage
+            # and retained external aliases remain in the runtime registry.
+            for cache in (
+                self._baseline_payload,
+                self._baseline_presence,
+                self._baseline_incarnation,
+                self._baseline_ordinal,
+            ):
+                cache.pop(key, None)
 
     def _baseline_bucket_count(self, key):
         return int(self._store.codec.decode(self._baseline_bytes(key)))

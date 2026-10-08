@@ -2847,15 +2847,14 @@ class LazyRecordTable(RecordTable):
         self._session._ensure_people_mutation_allowed()
 
     def _baseline_exists(self, key):
-        if key not in self._baseline_presence:
-            present = self._store.contains_lazy_key(
-                self._pin, self._namespace, key
-            )
-            # One-off history misses must not accumulate indefinitely.
-            if present:
-                self._baseline_presence[key] = True
-            return present
-        return self._baseline_presence[key]
+        # Membership lookups without a resident/dirty owner are one-shot
+        # checked projections: do not cache either positive history or misses.
+        # __getitem__ and save pin the necessary working-state sidecars.
+        if key in self._baseline_presence:
+            return self._baseline_presence[key]
+        return self._store.contains_lazy_key(
+            self._pin, self._namespace, key
+        )
 
     def _persisted_ordinal(self, key):
         if key not in self._baseline_ordinal:
