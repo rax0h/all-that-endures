@@ -112,13 +112,31 @@ class LazyHouseholdMembers(MutableSequence):
             raise ValueError("cache_pages must be positive")
         self._cache = OrderedDict()
         self._dirty_pages = {}
-        checked = store.read_version(
-            pin, LENGTH_NAMESPACE, owner, expected_record_schema=RECORD_SCHEMA
-        )
-        if type(checked.value) is not int or checked.value < 0:
+        if getattr(store, "_active_read_transaction", False):
+            # The P4 open already owns a checked, generation-matched snapshot.
+            # Do not start a nested SQLite BEGIN while binding proxies.
+            if store._require_pin(pin) != pin.captured_head:
+                raise StoreIntegrityError("household member open pin moved")
+            typed_key = store.codec.encode(owner)
+            row = store._visible_record_row(
+                pin.captured_head, LENGTH_NAMESPACE, typed_key
+            )
+            if row is None:
+                raise StoreIntegrityError("household member length is absent")
+            length, schema, *_ = store._check_record_row(
+                LENGTH_NAMESPACE, typed_key, row, decode=True
+            )
+            if schema != RECORD_SCHEMA:
+                raise StoreFormatError("household member length schema mismatch")
+        else:
+            checked = store.read_version(
+                pin, LENGTH_NAMESPACE, owner, expected_record_schema=RECORD_SCHEMA
+            )
+            length = checked.value
+        if type(length) is not int or length < 0:
             raise StoreFormatError("invalid household member sequence length")
-        self._length = checked.value
-        self._base_length = checked.value
+        self._length = length
+        self._base_length = length
 
     def _ensure(self):
         self._store._ensure_open()
