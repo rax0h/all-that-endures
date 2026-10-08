@@ -197,7 +197,8 @@ def _stage_plain_graph(
 
     def stage(value):
         from .persistence_lazy_household_members import LazyHouseholdMembers
-        if isinstance(value, LazyHouseholdMembers):
+        from .persistence_lazy_nested_history import LazyHistoryList
+        if isinstance(value, (LazyHouseholdMembers, LazyHistoryList)):
             ident = id(value)
             if ident in memo:
                 return memo[ident]

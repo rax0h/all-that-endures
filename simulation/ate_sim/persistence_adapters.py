@@ -14,6 +14,7 @@ import zlib
 from .core import World, Event, Layer
 from .event_log import EventLog, FrozenDict, FrozenList
 from .persistence_event_ids import EventIdSet, RANGE_TAG
+from .persistence_lazy_nested_history import LazyHistoryList, HistoryReference, REFERENCE_TAG, reference as history_reference
 from .persistence_identity import iter_mutable_event_items
 from .record_index import RecordTable, IndexedRecord
 from .incremental_store import (
@@ -90,6 +91,10 @@ class WorldCodec(TypedCodec):
 
     def _encode_value(self, value, active, seen_mutable):
         cls = type(value)
+        if cls is HistoryReference:
+            if not history_reference(value):
+                raise CodecError('invalid typed history reference')
+            return [REFERENCE_TAG, value.kind, value.incarnation]
         # Only a full snapshot with an explicit identity manifest may encode
         # repeated values. P1 and standalone WorldCodec remain strict. Cycles
         # are still rejected through the shared active recursion set.
@@ -107,6 +112,12 @@ class WorldCodec(TypedCodec):
                 raise CodecError('invalid event sealed flag')
             return ['ate_event/v1', present, sealed,
                     super()._encode_value(value, active, seen_mutable)]
+        if cls is LazyHistoryList:
+            self._enter(value, active, seen_mutable, mutable=True)
+            try:
+                return ['list', [self._encode_value(item, active, seen_mutable) for item in value]]
+            finally:
+                active.remove(id(value))
         if cls is EventIdSet:
             self._enter(value, active, seen_mutable, mutable=True)
             try:
@@ -130,6 +141,10 @@ class WorldCodec(TypedCodec):
 
     def _decode_value(self, node):
         if isinstance(node, list) and node:
+            if node[0] == REFERENCE_TAG:
+                if len(node) != 3 or node[1] != 'list' or type(node[2]) is not int or node[2] <= 0:
+                    raise CodecError('invalid typed history reference')
+                return HistoryReference(node[1], node[2])
             if node[0] == 'ate_event/v1':
                 if len(node) != 4 or type(node[1]) is not bool or type(node[2]) is not bool:
                     raise CodecError('invalid event envelope')
@@ -176,7 +191,7 @@ def _audit(value, path, seen, active, links):
     if id(value) in active:
         raise CodecError(f'cycle at {path}')
     record = is_dataclass(value)
-    mutable = cls in (dict, list, set, EventIdSet, RecordTable, EventLog) or (record and not cls.__dataclass_params__.frozen)
+    mutable = cls in (dict, list, set, EventIdSet, LazyHistoryList, RecordTable, EventLog) or (record and not cls.__dataclass_params__.frozen)
     if mutable and id(value) in seen:
         links.append((path, seen[id(value)][0]))
         return
@@ -194,7 +209,7 @@ def _audit(value, path, seen, active, links):
             for k, v in value.items():
                 _audit(k, path + (('map_key', k),), seen, active, links)
                 _audit(v, path + (('key', k),), seen, active, links)
-        elif cls in (list, tuple, set, EventIdSet, frozenset, FrozenList, EventLog):
+        elif cls in (list, LazyHistoryList, tuple, set, EventIdSet, frozenset, FrozenList, EventLog):
             if cls is EventLog:
                 expected_state = {
                     '_disk_prefix', '_disk_count', '_chunks', '_tail', '_count',
@@ -539,7 +554,7 @@ def _complete_identity_groups(
     if ident in active:
         raise StoreIntegrityError('cycle in restored identity graph')
     record = is_dataclass(value)
-    mutable = cls in (dict, list, set, EventIdSet, RecordTable, EventLog) or (
+    mutable = cls in (dict, list, set, EventIdSet, LazyHistoryList, RecordTable, EventLog) or (
         record and not cls.__dataclass_params__.frozen
     )
     if mutable:
@@ -586,7 +601,7 @@ def _complete_identity_groups(
                     active,
                     mutable_event_tail_only=mutable_event_tail_only,
                 )
-        elif cls in (set, EventIdSet, frozenset):
+        elif cls in (set, EventIdSet, LazyHistoryList, frozenset):
             return groups
     finally:
         active.remove(ident)

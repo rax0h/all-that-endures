@@ -1171,7 +1171,9 @@ class IncrementalWorldSession:
         self._cold_persisted_keys = keys
 
     def _is_mutable(self, value):
-        return isinstance(value, _NestedMixin) or type(value) in (dict, list, set, RecordTable, EventLog) or _mutable_record(value)
+        from .persistence_event_ids import EventIdSet
+        from .persistence_lazy_nested_history import LazyHistoryList
+        return isinstance(value, _NestedMixin) or type(value) in (dict, list, set, RecordTable, EventLog, EventIdSet, LazyHistoryList) or _mutable_record(value)
 
     def _register_binding(self, value, binding):
         ident = id(value)
@@ -1566,7 +1568,8 @@ class IncrementalWorldSession:
     def _bind_nested(self, value, owners, *, initial, allow_existing=False):
         cls = type(value)
         from .persistence_event_ids import EventIdSet
-        if cls is EventIdSet:
+        from .persistence_lazy_nested_history import LazyHistoryList
+        if cls in (EventIdSet, LazyHistoryList):
             binding = _binding(value)
             if binding is None:
                 self._register_binding(value, _ObjectBinding(self, owners))
@@ -2179,6 +2182,9 @@ class IncrementalWorldSession:
             memo = {}
         cls = type(value)
         from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
+        from .persistence_lazy_nested_history import LazyHistoryList
+        if cls is LazyHistoryList:
+            return value.storage_reference()
         if cls is EventIdSet and value is self.world.event_ids:
             return AUTHORITY_REFERENCE
         if getattr(self, "_paged_household_members", False):

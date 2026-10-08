@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
+from .record_index import IndexedRecord
 
 @dataclass
-class Infrastructure:
+class Infrastructure(IndexedRecord):
     id:int
     kind:str
     settlements:tuple[int,...]
