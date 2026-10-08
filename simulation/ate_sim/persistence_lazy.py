@@ -9487,11 +9487,22 @@ class LazyWorldSession:
             raise StoreError("household member pages already active")
         seen_lists = {}
         for key, household in self.world.households.items():
-            original = household.members
-            existing = seen_lists.get(id(original))
+            # P2C's checked incarnation identity, not physical placeholder
+            # object identity, is authoritative when a shared list's canonical
+            # link owner belongs to another lazy family.
+            try:
+                label = self.store.read_identity_occurrence(
+                    self.pin, "world.households", key,
+                    (("field", "members"),),
+                )
+            except KeyError as exc:
+                raise StoreIntegrityError(
+                    "paged household member occurrence label is missing"
+                ) from exc
+            existing = seen_lists.get(label.incarnation_id)
             if existing is None:
                 existing = self._make_paged_household_sequence(key, household)
-                seen_lists[id(original)] = existing
+                seen_lists[label.incarnation_id] = existing
             else:
                 existing._related_owners.add(key)
                 object.__setattr__(household, "members", existing)
