@@ -74,7 +74,8 @@ P5 final control digest:
 `3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
 The harness compares an unbound eager control, continued persistent world,
 reopen, relocated backup, materialized detach, and checkpoint roundtrip.
-No millennium/endurance was launched. No final whole-suite result is asserted.
+No millennium/endurance was launched. These are historical pre-closeout gates;
+the final exact-candidate full-suite result is recorded in the closeout below.
 
 The new 1,000/10,000-member surviving-wallet test asserts zero cached member IDs
 on first open of that alias, <=512 cached IDs, <10,000 payload bytes read and
@@ -136,8 +137,8 @@ does not change the frozen tested implementation or promote it to production.
 
 ## Remaining release blockers
 
-1. Ownership repair's exact-candidate test gate is closed by the run below.
-   Architect acceptance of the repair remains separate from this test result.
+1. Architect acceptance of the ownership repair. Its exact-candidate test gate
+   is closed by the run above.
 2. B4 from the [independent review](https://github.com/rax0h/all-that-endures/blob/c29e3d06a0c9d219235e2b3f0390271bd1245aea/simulation/STAGE_0_5_REPAIRED_CANDIDATE_REVIEW.md):
    eager event-ID set, eager current-link inventory, history-growing household
    records/settlement IDs, and ordinary living-member queries loading dead history.
