@@ -9517,11 +9517,17 @@ class LazyWorldSession:
             namespace, key, relative, _expected = lazy
             household_id = eager_path[1][1]
             seq = self.world.households[household_id].members
-            identity = self.store.read_identity_occurrence(
-                self.pin, namespace, key, relative
+            # The open caller holds a generation-matched read snapshot.
+            row = self.store._visible_identity_occurrence(
+                self.pin.captured_head,
+                namespace,
+                self.store.codec.encode(key),
+                self.store.codec.encode(relative),
             )
+            if row is None:
+                raise StoreIntegrityError("shared household member alias has no checked incarnation")
             incarnation = IncarnationId(
-                self.store.store_identity, identity.incarnation_id
+                self.store.store_identity, int(row[0])
             )
             self._registry.bind(seq, incarnation=incarnation)
             self._registry.attach_existing(
