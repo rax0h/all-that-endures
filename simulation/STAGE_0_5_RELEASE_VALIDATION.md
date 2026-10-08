@@ -1,5 +1,11 @@
 # Stage 0.5 release validation
 
+> Final architect review (2026-10-08): **blocked; do not merge**. See
+> [STAGE_0_5_FINAL_ARCHITECT_REVIEW.md](STAGE_0_5_FINAL_ARCHITECT_REVIEW.md)
+> for three reproduced architectural defects, verified final CI evidence,
+> the late-fixture retention gap, and the bounded Sol repair assignment.
+> The earlier candidate/status below is historical, not final acceptance.
+
 **Status:** P5 short integrated validation preparation.  
 **P4 implementation candidate:** `14f178623a6ef6e0d915fb4fe061079f54b15c21`.
 
