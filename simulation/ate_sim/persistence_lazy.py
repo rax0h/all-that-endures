@@ -9552,8 +9552,18 @@ class LazyWorldSession:
             )
             tracker._merge_identity_patch(removed, added)
         if tracker._pending_identity_current:
-            raise StoreIntegrityError(
-                "paged household binding changed persisted current-link authority"
+            if not household_labels:
+                raise StoreIntegrityError(
+                    "paged household binding changed persisted current-link authority"
+                )
+            # The original current-link authority may have chosen an unloaded
+            # wallet as its canonical owner, so the eager-only refresh sees a
+            # different temporary owner (another household). It is a
+            # representation change, not a World mutation. Preserve checked
+            # cold current links; cross-boundary reconcile runs at save.
+            tracker._pending_identity_current.clear()
+            tracker._live_identity_targets = dict(
+                tracker._committed_identity_targets
             )
         self._household_paging_active = True
         tracker._paged_household_members = True
@@ -15197,7 +15207,10 @@ class LazyWorldSession:
                 )
             replacement = replacements.get(id(bucket))
             if replacement is None:
-                replacement = dict(bucket)
+                replacement = {
+                    name: replacements.get(id(child), child)
+                    for name, child in bucket.items()
+                }
                 replacements[id(bucket)] = replacement
             detached[key] = replacement
         if len(detached) != expected:
@@ -15476,6 +15489,11 @@ class LazyWorldSession:
             detached_people = self._stage_detached_people()
             detached_aspirations = self._stage_detached_aspirations()
             mutable_replacements = {}
+            if self._household_paging_active:
+                for sequence in self._paged_household_members.values():
+                    mutable_replacements.setdefault(
+                        id(sequence), list(sequence)
+                    )
             (
                 detached_resources,
                 mutable_replacements,
