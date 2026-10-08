@@ -1,0 +1,19 @@
+name: stage-0-5-r3-new-household-owner
+on:
+  push:
+    branches: [sim/stage-0-5-r3-implementation]
+    paths:
+      - .github/workflows/stage-0-5-r3-new-owner.yml
+jobs:
+  new-owner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - run: python -m pytest -q simulation/tests/test_stage_0_5_household_sequence.py simulation/tests/test_stage_0_5_paged_household_world.py
