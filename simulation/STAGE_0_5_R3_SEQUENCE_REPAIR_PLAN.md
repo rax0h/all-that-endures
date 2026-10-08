@@ -131,3 +131,35 @@ development limits, **not accepted final behavior**.
 
 No endurance or replacement late-fixture capture is authorized or
 performed. Stage 0.5 remains blocked.
+
+
+## Opt-in World pilot completed after foundation (not yet accepted)
+
+GitHub Actions [37733325600](https://github.com/rax0h/all-that-endures/actions/runs/37733325600)
+completed successfully on isolated pilot head
+`c72f34b6206c8faff338ce65b73b9fd7f99e73ae`:
+**15 passed in 42.26s**. This comprises 9 standalone checked-sequence
+regressions and 6 World integration cases, including 1k/10k source-preserving
+cold conversion, canonical digest parity, one append, save/reopen, household
+scalar edit alongside member append, portable materializing detach/checkpoint,
+no-op save, current_people_scope semantics, and stale competing writer.
+
+Measured **combined World append save** payload writes:
+- 1k historical members: **4 payload writes / 1,643 bytes**;
+- 10k historical members: **4 payload writes / 429 bytes**.
+Both runs restored exact logical sequences and digests. The differential
+bytes depend on whether the last fixed page is nearly full and do not scale
+with full household history. Standalone sequence append had 2 version writes.
+
+The isolated pilot deliberately requires an explicit
+`paged_household_members=True` flag for conversion/open and refuses
+shared source `Household.members` identity links or newly created/deleted
+household owners until their identity/sequence adapters are complete. Existing
+default P4 behavior is unchanged. These gates are still blocking
+production integration and Stage 0.5 completion.
+
+Next bounded implementation: resolve new/replaced/deleted household owners,
+in-place list replacement, retained nested/cross-owner aliases and their
+P2C link identity, then exercise a **real independently generated P5 short
+continuation** and a fresh affected failure/lifecycle matrix. Do not
+merge or launch another millennium/endurance run.
