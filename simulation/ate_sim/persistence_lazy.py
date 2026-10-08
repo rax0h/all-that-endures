@@ -9535,36 +9535,45 @@ class LazyWorldSession:
         if self._household_paging_active:
             raise StoreError("household member pages already active")
         seen_lists = {}
+        seen_objects = {}
         for key, household in self.world.households.items():
-            # P2C's checked incarnation identity, not physical placeholder
-            # object identity, is authoritative when a shared list's canonical
-            # link owner belongs to another lazy family.
+            # Checked incarnation IDs are authoritative for converted owners.
+            # Later-created eager households can have valid paged length/page
+            # rows without a lazy identity-occurrence label; those fall back
+            # to the source's restored P2C shared-object placement.
+            original = household.members
             label = self.store._visible_identity_occurrence(
                 self.pin.captured_head, "world.households",
                 self.store.codec.encode(key),
                 self.store.codec.encode((("field", "members"),)),
             )
-            if label is None:
-                raise StoreIntegrityError(
-                    "paged household member occurrence label is missing"
-                )
-            existing = seen_lists.get(label[0])
+            existing = (
+                seen_lists.get(label[0]) if label is not None else None
+            )
+            if existing is None:
+                existing = seen_objects.get(id(original))
             if existing is None:
                 existing = self._make_paged_household_sequence(key, household)
-                seen_lists[label[0]] = existing
             else:
                 existing._related_owners.add(key)
                 object.__setattr__(household, "members", existing)
                 self._paged_household_members[key] = existing
                 self._paged_household_records[key] = household
-            incarnation = IncarnationId(
-                self.store.store_identity, label[0]
-            )
-            self._registry.bind(existing, incarnation=incarnation)
-            self._registry.attach_existing(
-                incarnation,
-                Occurrence("world.households", key, (("field", "members"),)),
-            )
+            seen_objects[id(original)] = existing
+            if label is not None:
+                previous = seen_lists.setdefault(label[0], existing)
+                if previous is not existing:
+                    raise StoreIntegrityError(
+                        "paged household checked incarnation splits live alias"
+                    )
+                incarnation = IncarnationId(
+                    self.store.store_identity, label[0]
+                )
+                self._registry.bind(existing, incarnation=incarnation)
+                self._registry.attach_existing(
+                    incarnation,
+                    Occurrence("world.households", key, (("field", "members"),)),
+                )
         # An excluded lazy owner can be the P2C canonical anchor. Register
         # its checked alias path against the same in-memory page proxy before
         # refreshing eager households, so the eager identity index sees the
