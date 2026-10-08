@@ -223,3 +223,11 @@ splits/deletions are proven only for the exercised fixtures.
 The 5,124,976,640-byte year-1000 restore artifact is **still not verified as
 durably retained**. No new endurance run was launched. Do not merge or begin
 Stage 1 on this partial evidence.
+
+### Follow-up cross-family pilot (experimental, not promoted)
+
+A separate test-only/experimental branch `sim/stage-0-5-r3-cross-family-gate` now explores P2C sharing between `Household.members` and a nested wallet list. Its first end-to-end regression passed **1/1** at [run 37735001550](https://github.com/rax0h/all-that-endures/actions/runs/37735001550), after deferring incarnation registration until page activation and preserving the identical plain-list alias during materializing detach. This is **not** broad acceptance; the branch was then tightened to avoid changing unrelated wallet/treasury type rules and to refuse unsupported sharing shapes.
+
+The current wider follow-up is [run 37735167457](https://github.com/rax0h/all-that-endures/actions/runs/37735167457), helper head `b36ccdb82e9122c8ca9045b2b672153808fdfdb6`. It exercises 1k/10k three-owner sharing (two households and one wallet), bounded writes and full verification, affected identity/currency/household tests, and independent P5 continuation. It was **in progress** when handed off; no passing result may be inferred. No experimental cross-family product patch has been promoted to the PR implementation branch or the Stage 0.5 branch.
+
+Even a green helper run requires architect review of stored current-link authority, persistence of non-household owner values, unsupported nested/cross-family aliases and untested failure paths before declaring R3 closed. Do not launch endurance or merge.
