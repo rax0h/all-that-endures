@@ -9516,10 +9516,32 @@ class LazyWorldSession:
                 incarnation,
                 Occurrence("world.households", key, (("field", "members"),)),
             )
-        # The eager tracker initially indexed the compact source placeholder
-        # lists. Relabel only resident household owners to the new shared
-        # sequence objects; the P2C target/owner paths remain unchanged.
+        # An excluded lazy owner can be the P2C canonical anchor. Register
+        # its checked alias path against the same in-memory page proxy before
+        # refreshing eager households, so the eager identity index sees the
+        # full alias group rather than inventing household-to-household links.
         tracker = self._eager_tracker
+        self._synthetic_household_alias_owners = {}
+        for target, owner in self._deferred_household_cross_links:
+            household_path = target if _household_member_path(target) else owner
+            foreign_path = owner if household_path is target else target
+            household_key = household_path[1][1]
+            proxy = self._paged_household_members[household_key]
+            synthetic = ("aux.lazy.paged.household.alias", foreign_path)
+            previous = self._synthetic_household_alias_owners.get(synthetic)
+            if previous is not None:
+                if previous is not proxy:
+                    raise StoreIntegrityError(
+                        "cross-family link joins different member incarnations"
+                    )
+                continue
+            self._synthetic_household_alias_owners[synthetic] = proxy
+            removed, added = tracker._identity_index.refresh(
+                synthetic, proxy, foreign_path
+            )
+            tracker._merge_identity_patch(removed, added)
+        # The eager tracker initially indexed compact source placeholder lists.
+        # Relabel only resident household owners using checked P2C aliases.
         for key, household in self.world.households.items():
             owner = ("world.households", key)
             removed, added = tracker._identity_index.refresh(
@@ -16094,12 +16116,16 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=False):
                 paged_household_members=paged_household_members,
             )
             if paged_household_members:
-                session._activate_household_pages()
                 if session._deferred_household_cross_links:
-                    session._cross_boundary_links += _seed_cross_boundary_lazy_identity(
-                        session, session._deferred_household_cross_links
+                    session._cross_boundary_links += (
+                        session._deferred_household_cross_links
                     )
                     session._install_cross_boundary_tracker_baseline()
+                session._activate_household_pages()
+                if session._deferred_household_cross_links:
+                    _seed_cross_boundary_lazy_identity(
+                        session, session._deferred_household_cross_links
+                    )
             prefix = None
             pin = None
             return session
