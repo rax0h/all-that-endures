@@ -23,3 +23,5 @@ jobs:
 # P2C shared-household member identity and World diff gate
 
 # P2C current-link leaf reindex checkpoint
+
+# Shared group delete/split plus checked membership index
