@@ -141,3 +141,17 @@ magic, run millennium/endurance, or claim final Stage 0.5
 architectural acceptance. The next allowed implementation work is
 only the bounded R3 sequence integration and remaining R1/R2
 regression findings, followed by short independent final-code gates.
+
+
+## Follow-up: R3 bounded checked-page foundation
+
+New standalone production primitive and focused regression tests were added
+after this earlier blocked closeout report. See
+`STAGE_0_5_R3_SEQUENCE_REPAIR_PLAN.md` for the exact 1k/10k read/append
+measurements, completed run links, and remaining World-level failures.
+
+This is a **bounded foundation**, not completed R3. PR #14's existing World
+open/save path remains unchanged and eager for household member lists; the
+optional integration prototype remains isolated on
+`sim/stage-0-5-r3-implementation` until the ownership/identity, lifecycle
+and independent continuation gates succeed. Stage 0.5 remains blocked.
