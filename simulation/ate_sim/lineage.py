@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from .record_index import IndexedRecord
 
 @dataclass
-class LineageNode:
+class LineageNode(IndexedRecord):
     kind:str
     id:int
     parents:tuple[tuple[str,int],...]=()
@@ -18,7 +19,10 @@ class LineageState:
         key=(kind,entity_id)
         node=LineageNode(kind,entity_id,tuple(parents),origin_event,origin_year)
         self.nodes[key]=node
-        for parent in node.parents:self.children.setdefault(parent,set()).add(key)
+        add_child=getattr(self.children,"add_child",None)
+        for parent in node.parents:
+            if add_child is None:self.children.setdefault(parent,set()).add(key)
+            else:add_child(parent,key)
         return node
 
     def ancestors(self,kind:str,entity_id:int,depth=16):

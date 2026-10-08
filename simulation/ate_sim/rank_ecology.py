@@ -1,6 +1,8 @@
 from __future__ import annotations
 from .core_types import layer_ref
+from .magic_progression import practice_ability,record_body_transition
 from .magic_resources import _aspiration
+from .mastery_training import mastery_training_step
 
 ACTION_FUNCTIONS={
  'secure_food':{'creation','control','support','detection','recovery'},
@@ -12,7 +14,7 @@ ACTION_FUNCTIONS={
  'build':{'creation','enhancement','control','transformation'},
 }
 
-def _career_training(world,p,path,asp,member,strength):
+def _career_training(world,p,path,asp,member,strength,body_rank=None):
  """Return (candidates_mode, exposure, uses, purposeful_reflection).
 
  Full-time adventurers do not stop training after Bronze. Their annual tick represents a
@@ -22,7 +24,7 @@ def _career_training(world,p,path,asp,member,strength):
  effort; Gold->Diamond is an exceptional multi-decade/century pursuit whose revelation
  gate must also be satisfied. This creates opportunity for Diamond without guaranteeing it.
  """
- rank=world.advancement.rank(p.id);complete=len(path.abilities)==20
+ rank=world.advancement.rank(p.id) if body_rank is None else body_rank;complete=len(path.abilities)==20
  dedicated=complete and (member or asp.adventurer_aspiration)
  if not dedicated:return None
  ambition=max(0.,min(1.,.45*asp.drive+.30*asp.urgency+.25*p.curiosity))
@@ -35,9 +37,10 @@ def _career_training(world,p,path,asp,member,strength):
   # Gold adventurers need both institutional/field continuity and exceptional personal
   # commitment. The Diamond gate is still enforced in AdvancementState.practice.
   if not member or ambition<.56:return None
-  # Diamond remains attainable, but Gold training is intentionally much slower than the
-  # earlier ranks so a living population does not accumulate dozens of near-routine Diamonds.
-  return ('all',.72+.25*strength+.30*ambition,20,.72+.28*p.curiosity)
+  # Independent Gold problems consume a finite professional year. Commitment
+  # permits nine to fourteen focused sessions, not twenty full annual allocations.
+  # Each ability still needs its own mastery proofs; no body-rank shortcut.
+  return ('focused',.72+.25*strength+.30*ambition,9+int(5*ambition),.72+.28*p.curiosity)
  return None
 
 def rank_ecology_step(world,rng):
@@ -51,14 +54,19 @@ def rank_ecology_step(world,rng):
   path=world.advancement.path(p.id)
   if path is None or not path.abilities:continue
   rec=latest.get(p.id);action='work' if rec is None else rec.action;strength=.35 if rec is None else rec.strength;relevant=ACTION_FUNCTIONS.get(action,set())
-  indexed=list(enumerate(path.abilities));weakest=min((a.rank,a.level,a.progress) for _,a in indexed);asp=_aspiration(world,p);member=p.id in members
-  career=_career_training(world,p,path,asp,member,strength)
+  asp=_aspiration(world,p);member=p.id in members
+  session=world.advancement.practice_batch(p.id);before=session.rank
+  ceiling=min(5,max(1,before)+1)
+  if all(a.rank>=ceiling for a in path.abilities):continue
+  indexed=list(enumerate(path.abilities));weakest=min((a.rank,a.level,a.progress) for _,a in indexed)
+  career=_career_training(world,p,path,asp,member,strength,before)
   purposeful_reflection=None
   if career is not None:
-   _,exposure,uses,purposeful_reflection=career
+   mode,exposure,uses,purposeful_reflection=career
    # Deliberate rank training targets the weakest links first, but a full professional
    # year is broad enough to exercise the entire configuration.
    candidates=sorted(indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))
+   if mode=='focused':candidates=[x for x in candidates if x[1].rank<=before][:uses]
   elif member:
    candidates=[x for x in indexed if (x[1].rank,x[1].level,x[1].progress)<=weakest]
    if len(candidates)<4:candidates=sorted(indexed,key=lambda x:(x[1].rank,x[1].level,x[1].progress))[:8]
@@ -66,9 +74,10 @@ def rank_ecology_step(world,rng):
   else:
    candidates=[x for x in indexed if x[1].function in relevant] or indexed
    exposure=.16+.20*strength;uses=min(len(candidates),4)
-  rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates);before=world.advancement.rank(p.id)
+  rr=rng.stream('rank_ecology',world.year,p.id);rr.shuffle(candidates)
   for i,a in candidates[:uses]:
    reflection=purposeful_reflection if purposeful_reflection is not None else ((.45+.55*p.curiosity) if action in ('learn','teach','socialize') else .10*p.curiosity)
-   world.advancement.practice(p.id,i,exposure*(.8+.4*rr.random()),reflection)
-  after=world.advancement.rank(p.id);p.rank=after
-  if after>before:world.emit('rank_advanced',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),from_rank=before,to_rank=after,practice_context=action,dedicated_training=career is not None or member)
+   practice_ability(world,p,i,exposure*(.8+.4*rr.random()),reflection,context=action,session=session)
+  if len(path.abilities)==20 and (member or action in ('work','learn','teach','build','prepare')):
+   mastery_training_step(world,p,path,rng.stream('mastery_training',world.year,p.id))
+  record_body_transition(world,p,before,context=action)

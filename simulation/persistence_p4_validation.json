@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "candidate_sha": "14f178623a6ef6e0d915fb4fe061079f54b15c21",
+  "final_residual_run": 37513319855,
+  "residual": {
+    "1000": {
+      "payload_reads": 1033,
+      "payload_read_bytes": 250424,
+      "identity_live": 0,
+      "agency_actions": {
+        "rows": 1000,
+        "payload_bytes": 233676
+      }
+    },
+    "10000": {
+      "payload_reads": 10033,
+      "payload_read_bytes": 2383458,
+      "identity_live": 0,
+      "agency_actions": {
+        "rows": 10000,
+        "payload_bytes": 2366678
+      }
+    }
+  },
+  "capped_residuals": {
+    "world.agency.actions": {
+      "cap": 50000
+    }
+  },
+  "p4_14": {
+    "focused": {
+      "run": 37507068538,
+      "passed": 10,
+      "seconds": 4.19
+    },
+    "scaling": {
+      "run": 37507255485,
+      "open_reads_1000": 33,
+      "open_reads_10000": 33,
+      "add_point_payload_reads": 1,
+      "save_payload_writes": 4
+    },
+    "overlay_regression": {
+      "run": 37510624230,
+      "passed": 13,
+      "seconds": 6.72
+    },
+    "affected": {
+      "run": 37510836757,
+      "passed": 319,
+      "seconds": 351.07
+    }
+  },
+  "integrated_full_suite": {
+    "run": 37513490616,
+    "status": "pending"
+  }
+}

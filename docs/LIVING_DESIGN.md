@@ -1,7 +1,7 @@
 # ALL THAT ENDURES — Living Design Document
 
 **Status:** Living design authority for new simulation direction.  
-**Last cohesive update:** 2026-09-30  
+**Last cohesive update:** 2026-10-06  
 **Purpose:** Preserve design decisions as they become coherent. Before replacing an existing system, inspect the repository and extend shared causal primitives where possible.
 
 > **North star:** Not simulated stories. Simulated people whose lives become stories.
@@ -189,6 +189,33 @@ Vice/appetite can include alcohol-equivalents, gambling, intoxicants, status, sp
 Community mixing events matter: births, weddings, funerals, markets, festivals, religious observances, competitions, harvests, taverns, public events, neighborhood disputes, children playing.
 
 Culture emerges from repeated local conditions and transmission. **Culture creates pressure, not destiny.** Migration moves people, skills, wealth, genes, culture, religion, rumors, grievances, disease, and magical traditions.
+
+
+### Material life and quiet economic pressure
+
+A character's material circumstances must have causal weight even when scarcity is not the plot. Money is only one part of this. Food, housing, time, transport, tools, repairs, debt, family obligations, employment, magical access, social position and simple exhaustion all constrain what a person can attempt and what they must postpone.
+
+Do not reduce people to poverty flags or prosperity scores. Let limitation appear through specific choices and habits: checking stores before deciding a meal, repairing rather than replacing, choosing the slower route to avoid a toll, declining an invitation because missing a shift matters, keeping a damaged tool because replacement is expensive, or selling something valuable because winter changed the household's priorities. Most of these moments should remain ambient rather than becoming quests.
+
+Material pressure must coexist with full personhood. Scarcity does not erase competence, humor, pride, generosity, pettiness, desire, intelligence, craft, romance or ambition. Do not turn constrained people into victims, saints or exposition devices. Likewise, wealth should alter available options and assumptions without becoming a personality trait: wealthy people can buy time, replace rather than repair, absorb mistakes and pursue opportunities that others cannot afford to attempt.
+
+Economic class and magical opportunity must interact causally. Two equally talented people can face radically different paths to awakening because one has family resources, tutors, travel, equipment and time while the other would have to sacrifice wages, household labor, debt capacity or a dependent's needs. Advancement should therefore change lives beyond rank statistics: income, obligations, family expectations, resentment, mobility, status and future choices can all shift.
+
+The meaning of a material event is relative to the life receiving it. Ten coins, a destroyed cart, a lost week's wages or a free meal should not produce universal relationship or emotion values. Agency and memory should interpret the event against the person's current resources, obligations, expectations, values and alternatives. A small transfer can become a formative memory for one household and background noise for another.
+
+This principle should generate situations rather than designer-authored moral lessons. A missed apprenticeship, late order, broken roof, unpaid debt, sick parent or scarce awakening stone may create competing legitimate pressures among several people. Nobody needs to be evil, and there need not be a clean solution. The player encounters lives already in motion.
+
+Performance remains bounded. Do not individually simulate every loaf of bread, trivial purchase or moment of budgeting. Use household/material state, aggregated routine consumption and production, bounded current pressures, and individuated consequential transactions/events where they affect agency, memory, relationships, provenance, opportunity or player interaction.
+
+Three recurring design tests:
+
+> **What does this cost this person?**
+>
+> **What do they have that they refuse to reduce to a cost?**
+>
+> **Would someone who actually has to think about resources recognize this life?**
+
+The goal is not a world where everyone struggles constantly. The goal is a world where nobody lives in a frictionless narrative vacuum.
 
 ## 16. Education, knowledge transmission, schools, and mentorship
 
@@ -1301,6 +1328,111 @@ A person's magical identity emerges from their Essence combination, Confluence, 
 Two people at the same rank should be capable of fighting, traveling, working, solving problems, and experiencing the world in radically different ways.
 
 Combat and world systems must therefore reason about **capabilities**, not predefined classes.
+
+### Rank expressions change capability, not merely magnitude
+
+Rank advancement must be capable of changing **what an ability can do**, not merely how large its numbers become.
+
+The intended conceptual structure is:
+
+**ability identity -> capability primitives -> rank expressions -> interactions -> emergent uses**
+
+An ability keeps a persistent identity across ranks, but each rank may expand the ways that identity can be expressed. Increased damage, range, duration, efficiency, or resistance may be part of advancement, but they should not be the only form of advancement.
+
+A perception ability might begin by seeing through darkness, later sense magic, later interpret auras, and eventually affect some aspect of what it previously only perceived. A movement ability might begin with short-range relocation and later develop regional, continental, or even global applications if that growth follows naturally from the underlying ability.
+
+There is no universal rule that every Iron, Bronze, Silver, Gold, or Diamond ability gains the same category of improvement. Rank expression belongs to the individual ability.
+
+#### Mastery stages are not rank expressions
+
+The four mastery stages within a rank measure progress through that rank. They do not substitute for the qualitative change that may occur when the ability crosses into a new rank.
+
+Thus:
+
+**stage progression = growing mastery of the current rank expression**
+
+**rank progression = potential expansion or transformation of what the ability can do**
+
+This preserves the existing progression curve while giving rank advancement genuine systemic meaning.
+
+#### Twenty abilities form a capability ecology
+
+A complete essence user still possesses twenty essence abilities, but those abilities must not be treated as twenty isolated buttons.
+
+Together they form a person's magical capability ecology.
+
+Abilities may create conditions other abilities exploit; movement opportunities; defensive interactions; information another ability can use; resources another ability consumes; summons or familiars that extend other powers; environmental changes; healing or survivability interactions; aura interactions; counters and vulnerabilities; and logistical, professional, social, investigative or economic possibilities.
+
+The architecture should favor interaction through shared world state rather than large numbers of bespoke pairwise combo rules.
+
+Do not implement `Ability A + Ability B = Special Combo 17` when the same result can emerge because Ability A changes a real state that Ability B legitimately interacts with.
+
+Bleeding should matter because bleeding exists as meaningful state. Portals should matter because location and space matter. Strength should matter because force, load, posture, movement and physical interaction matter. Perception should matter because information matters.
+
+This allows combinations nobody explicitly authored to become useful.
+
+#### Builds are networks, not classes
+
+A person's magical identity emerges from their three essences, confluence essence, twenty awakened abilities, each ability's current rank expression and mastery, training, experience, equipment, physiology, knowledge, personal technique, circumstances and interactions between abilities.
+
+Two people with the same essence combination should therefore not automatically become functionally identical. Different awakening stones, acquisition histories, mentors, professions, discoveries and personal techniques can produce substantially different magical lives.
+
+ATE should continue reasoning about capabilities rather than predefined classes.
+
+#### Complexity is earned by history
+
+Not every essence user should become mechanically enormous.
+
+A newly ranked Iron can have a relatively understandable toolkit. An ordinary farmer, fisher, craftsperson, guard, healer, merchant or adventurer may live an entire life with twenty coherent, comparatively straightforward abilities. That is not a lesser character.
+
+At the opposite extreme, an ancient or historically extraordinary person may accumulate centuries of technique, specialized equipment, magical transformations, familiars, artifacts, soul abilities, institutional privileges, divine interactions, unusual physiology, dimensional capabilities or other exceptional systems.
+
+Their character representation may become enormous because things actually happened to them.
+
+> **Complexity is historical accumulation, not a default character-generation requirement.**
+
+The architecture must be capable of representing extremely complicated individuals without forcing every person in the world to carry the machinery of an extremely complicated individual.
+
+#### Essence abilities and exceptional powers are separate layers
+
+The normal twenty-ability essence path remains the magical foundation of a ranked essence user.
+
+Other capabilities may exist outside that foundation: soul-derived abilities, artifacts, divine gifts or burdens, unusual physiological capabilities, resurrection mechanisms, dimensional or astral powers, institutional powers, magical offices, contracts, independently capable familiars, transformations, and unique historical phenomena.
+
+These systems must not be silently folded into the twenty essence abilities merely because an extraordinary person possesses both.
+
+A person only receives such a layer if something in the world actually grants, creates, teaches, transforms or causes it. Exceptional capability modules should be attached only where they exist rather than instantiated as dormant machinery on everyone.
+
+#### Upper-complexity reference
+
+Jason Asano's later *He Who Fights With Monsters* character sheet is a useful upper-complexity reference specimen for this architecture, not the target complexity of an average essence user.
+
+The useful lesson is structural: the ordinary essence framework remains recognizable underneath a large accumulation of extraordinary capabilities. His twenty essence abilities continue developing qualitatively through rank while separate systems produced by his unusual history exist alongside them.
+
+ATE should be capable of representing a person of comparable systemic complexity without having been specifically constructed around that individual.
+
+That creates an architectural stress test:
+
+> **Could this system represent an extraordinarily complicated person without requiring every person to be extraordinarily complicated?**
+
+If yes, the architecture is probably flexible enough.
+
+#### Ability-architecture design test
+
+For every magical ability, ask:
+
+1. What is this ability fundamentally capable of affecting?
+2. How does its expression change through rank?
+3. Which changes are simple improvements and which create genuinely new possibilities?
+4. What real world state does it interact with?
+5. Can other abilities interact with that state without bespoke pairing code?
+6. What non-combat consequences follow from the capability?
+7. What can training and personal technique change without altering the underlying ability?
+8. Does the system still work when combined with abilities its designer did not specifically anticipate?
+
+The goal is not twenty impressive combat attacks.
+
+> **The goal is twenty pieces of magic that together become a life.**
 
 ### Magic should alter causes, not merely numbers
 

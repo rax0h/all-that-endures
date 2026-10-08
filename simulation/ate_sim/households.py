@@ -38,7 +38,8 @@ def partnership_step(world,rng):
                 he=world.emit("household_formed",Layer.SOCIETY,(Ref("person",a.id),Ref("person",b.id)),Ref("settlement",sid),(e.id,),household=nhid);world.lineage.register("household",nhid,tuple(("household",x) for x in parent_households),he.id,world.year);prop=world.economy.create("dwelling",sid,"household",nhid,max(5.,share*.5),world.year,he.id);world.lineage.register("property",prop.id,(("household",nhid),),he.id,world.year)
 
 def household_split_step(world,rng):
-    for hid,h in list(world.households.items()):
+    for h in world.occupied_households():
+        hid=h.id
         if len(h.members)<8:continue
         living=[world.people[p] for p in h.members if world.people[p].alive];adults=[p for p in living if p.age>=18]
         if len(living)<8 or len(adults)<3:continue
@@ -51,15 +52,17 @@ def household_split_step(world,rng):
         e=world.emit("household_split",Layer.SOCIETY,tuple(Ref("person",p.id) for p in movers),Ref("settlement",h.settlement),origin_household=hid,new_household=nhid);world.lineage.register("household",nhid,(("household",hid),),e.id,world.year);prop=world.economy.create("dwelling",h.settlement,"household",nhid,max(5.,share*.5),world.year,e.id);world.lineage.register("property",prop.id,(("household",nhid),),e.id,world.year)
 
 def inheritance_property_step(world):
-    for prop in world.economy.property.values():
-        if prop.owner_kind!="household":continue
-        h=world.households.get(prop.owner_id)
-        if h and h.alive:continue
-        heirs=[]
-        if h:
-            for pid in h.members:heirs.extend(world.genealogy.children.get(pid,[]))
-        heirs=[pid for pid in heirs if pid in world.people and world.people[pid].alive]
-        if heirs:
-            heir=min(heirs);e=world.emit("property_inherited",Layer.SOCIETY,(Ref("person",heir),),Ref("settlement",prop.settlement),property=prop.id);world.economy.transfer(prop.id,"person",heir,e.id,world.year)
+    # Start from actual living heirs. Dead estates without a living heir need
+    # no annual work; their identities/property remain in the archive.
+    heirs={}
+    for child in world.current_people():
+        for pid in world.genealogy.parents.get(child.id,()):
+            parent=world.people.get(pid)
+            h=None if parent is None else world.households.get(parent.household)
+            if h and not h.alive and pid in h.members:
+                heirs[h.id]=min(heirs.get(h.id,child.id),child.id)
+    pending=[(prop,heir) for hid,heir in heirs.items() for prop in world.economy.owned('household',hid)]
+    for prop,heir in sorted(pending,key=lambda pair:pair[0].id):
+        e=world.emit("property_inherited",Layer.SOCIETY,(Ref("person",heir),),Ref("settlement",prop.settlement),property=prop.id);world.economy.transfer(prop.id,"person",heir,e.id,world.year)
 
 def household_step(world,rng):partnership_step(world,rng);household_split_step(world,rng);inheritance_property_step(world)

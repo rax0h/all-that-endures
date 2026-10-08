@@ -1,13 +1,15 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from .record_index import IndexedRecord, indexed
 
 @dataclass
-class Property:
+class Property(IndexedRecord):
     id:int; kind:str; settlement:int; owner_kind:str; owner_id:int; value:float; created:int; provenance:list[int]=field(default_factory=list); ownership:list[tuple[int,str,int,int|None]]=field(default_factory=list)
 
 @dataclass
 class Economy:
     property:dict[int,Property]=field(default_factory=dict); next_property:int=1
+    def owned(self,kind,owner):return indexed(self,'property').select(('owner_kind','owner_id'),kind,owner)
     def create(self,kind,settlement,owner_kind,owner_id,value,year,event_id=None):
         i=self.next_property; self.next_property+=1; p=Property(i,kind,settlement,owner_kind,owner_id,value,year,[] if event_id is None else [event_id],[(year,owner_kind,owner_id,event_id)]); self.property[i]=p; return p
     def transfer(self,pid,owner_kind,owner_id,event_id,year=None):

@@ -34,7 +34,11 @@ class CommunityState:
             self._membership_index.setdefault(pid,{})[cid]=None
 
     def memberships_for(self,person_id,minimum=.01):
-        # IDs retain archive insertion order; strengths remain authoritative there.
+        query=getattr(self.memberships,'for_person',None)
+        if query is not None:
+            return {cid:v for cid,v in query(person_id).items() if v>=minimum}
+        # Eager worlds retain insertion order through the archive-derived index.
+        # Persistence must reproduce that order; it must not redefine it.
         if not hasattr(self,'_membership_index'):self.rebuild_membership_index()
         return {cid:v for cid in self._membership_index.get(person_id,()) if (v:=self.memberships[(person_id,cid)])>=minimum}
 

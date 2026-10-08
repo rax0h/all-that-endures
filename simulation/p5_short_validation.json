@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "run_id": 37514431256,
+  "seed": 843000,
+  "pre_years": 3,
+  "continuation_years": 4,
+  "reopen_years": 3,
+  "total_year": 7,
+  "final_year": 10,
+  "checkpoint_schema": 8,
+  "rules_id": "stage-0-5-p5-validation",
+  "control_total_digest": "b31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387",
+  "control_final_digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e",
+  "events_total": 439,
+  "last_event_id": 439,
+  "source_preserved": true,
+  "first_continuation_simulation_seconds": 3.0579612740000073,
+  "first_save_io": {
+    "payload_reads": 102,
+    "payload_read_bytes": 36805,
+    "payload_writes": 2143,
+    "payload_write_bytes": 642542
+  },
+  "second_continuation_simulation_seconds": 2.314013533999997,
+  "second_save_io": {
+    "payload_reads": 7,
+    "payload_read_bytes": 516,
+    "payload_writes": 1713,
+    "payload_write_bytes": 549086
+  },
+  "first_full_audit_io": {
+    "payload_reads": 1490,
+    "payload_read_bytes": 394425,
+    "payload_writes": 0,
+    "payload_write_bytes": 0
+  },
+  "second_full_audit_io": {
+    "payload_reads": 1089,
+    "payload_read_bytes": 325110,
+    "payload_writes": 0,
+    "payload_write_bytes": 0
+  },
+  "files": {
+    "cold": {
+      "bytes": 1916928,
+      "sha256": "67877c90fe91e42a6c698d62bae10def404d83ae04c5a856877ee5c7940ffebe"
+    },
+    "lazy": {
+      "bytes": 12881920,
+      "sha256": "2ee91ff9934d96efc917af2e008e878d8468e1561ee19a35992120096152c087"
+    },
+    "relocated": {
+      "bytes": 11333632,
+      "sha256": "73bdcec7e7c41e9faf7e65f63d9eb68986c0e6846cb7c4ab4ac442c9a6cd4526"
+    }
+  },
+  "passed": true
+}

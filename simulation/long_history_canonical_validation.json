@@ -1,0 +1,71 @@
+{
+  "commit": "1eb87335c92c2ee5276f25b01aa41da08ee6ca51",
+  "ci_run": "https://github.com/rax0h/all-that-endures/actions/runs/36261595896",
+  "tests": 178,
+  "benchmark": {
+    "diagnostic_seconds": 127.67201991499996,
+    "digest": "d2e8c476174d5497da24dfe6fa79ed6ad94fb22b3b3b2e1b15f9f5064a630584",
+    "digest_seconds": 69.511488773,
+    "initialization": "mature",
+    "max_seconds": null,
+    "performance_passed": null,
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "profile_tail_requested": 0,
+    "python_version": "3.12.14",
+    "record": "benchmark",
+    "seed": 843000,
+    "simulation_seconds": 283.98287179000005,
+    "validation_seconds": 17.711005728999908,
+    "years": 1000
+  },
+  "archive": {
+    "archive_bytes": 1567444992,
+    "archive_seconds": 284.260549493,
+    "logical_sha256": "6e70d81037460d67c5c5abc69bd35f192b18dc310ee518f239cdc4813a435d55",
+    "path": "/tmp/ate-canonical.sqlite",
+    "record": "archive"
+  },
+  "snapshot": {
+    "year": 1000,
+    "alive": 1500,
+    "people_total": 17159,
+    "essence_users_living": 691,
+    "completed_loadouts": 209,
+    "essence_user_ranks": {
+      "0": 482,
+      "1": 42,
+      "2": 3,
+      "3": 43,
+      "4": 121
+    },
+    "species_population": {
+      "celestine": 41,
+      "draconian": 586,
+      "elf": 172,
+      "human": 482,
+      "leonid": 161,
+      "runic": 58
+    },
+    "magic_resources_total": 94850,
+    "magic_resources_available": 17986,
+    "adventure_notices": 3038,
+    "adventure_notice_status": {
+      "assigned": 6,
+      "open": 3,
+      "resolved": 3029
+    },
+    "events_total": 1004423,
+    "material_lots_total": 104326
+  },
+  "audit": {
+    "valid": true,
+    "violations": [],
+    "living_ranks": {
+      "bronze": 3,
+      "gold": 121,
+      "iron": 42,
+      "silver": 43,
+      "unranked": 1291
+    }
+  }
+}

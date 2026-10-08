@@ -44,4 +44,6 @@ def test_indexed_population_matches_archive_scan_simulation():
     indexed=Simulation(generate_world(843000)).run(100)
     with patch.object(World,'current_people',lambda w:tuple(p for p in w.people.values() if p.alive)):
         reference=Simulation(generate_world(843000)).run(100)
-    assert indexed.digest()==reference.digest()=='f6e25615b33e2203af1f9dda4c05079ec880c92fe3a418685ccc86e78d54d42e'
+    # Stable-ID material selection fixes checkpoint-dependent set ordering.
+    # Population indexing must still match a full archival scan exactly.
+    assert indexed.digest()==reference.digest()=='df38fe532db745b33d2e4bc36b45bd509273083f7b64e0311b88eeb9e5fba300'

@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from .record_index import IndexedRecord, indexed
 
 @dataclass
-class Transmission:
+class Transmission(IndexedRecord):
     id:int
     year:int
     kind:str
@@ -27,5 +28,7 @@ class TransmissionState:
         self.records[tid]=t
         return t
 
+    def table(self): return indexed(self,'records')
+
     def history(self,item_kind,item_id):
-        return [t for t in self.records.values() if t.item_kind==item_kind and t.item_id==item_id]
+        return self.table().select(('item_kind','item_id'),item_kind,item_id)
