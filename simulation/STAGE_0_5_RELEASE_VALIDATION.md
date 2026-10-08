@@ -4,6 +4,8 @@
 > [STAGE_0_5_FINAL_ARCHITECT_REVIEW.md](STAGE_0_5_FINAL_ARCHITECT_REVIEW.md)
 > for three reproduced architectural defects, verified final CI evidence,
 > the late-fixture retention gap, and the bounded Sol repair assignment.
+> Bounded R1/R2 repairs and **unresolved R3** are documented in
+> [STAGE_0_5_FINAL_REPAIR_CLOSEOUT.md](STAGE_0_5_FINAL_REPAIR_CLOSEOUT.md).
 > The earlier candidate/status below is historical, not final acceptance.
 
 **Status:** P5 short integrated validation preparation.  

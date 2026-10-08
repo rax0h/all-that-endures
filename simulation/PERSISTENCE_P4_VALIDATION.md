@@ -1,5 +1,15 @@
 # P4 validation — Stage 0.5 persistence architecture
 
+> **2026-10-08 final-architect correction:** The root-row residual inventory
+> below was too narrow. It did not measure nested historical
+> `Household.members` payloads and therefore does not prove bounded
+> ordinary-open residency. R3 remains blocked. R1 and R2 were also
+> reproduced and have bounded repairs under testing. See
+> [STAGE_0_5_FINAL_ARCHITECT_REVIEW.md](STAGE_0_5_FINAL_ARCHITECT_REVIEW.md)
+> and [STAGE_0_5_FINAL_REPAIR_CLOSEOUT.md](STAGE_0_5_FINAL_REPAIR_CLOSEOUT.md).
+> The earlier run results remain historical evidence, not final acceptance.
+
+
 **Implementation candidate SHA:** `14f178623a6ef6e0d915fb4fe061079f54b15c21`  
 **Branch:** `sim/stage-0-5-stabilization`  
 **Scope:** P4 versioned lazy current-state persistence and measured archive-family migration.  
