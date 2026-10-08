@@ -9536,6 +9536,7 @@ class LazyWorldSession:
             raise StoreError("household member pages already active")
         seen_lists = {}
         seen_objects = {}
+        debug_bindings = []
         for key, household in self.world.households.items():
             # Checked incarnation IDs are authoritative for converted owners.
             # Later-created eager households can have valid paged length/page
@@ -9547,6 +9548,7 @@ class LazyWorldSession:
                 self.store.codec.encode(key),
                 self.store.codec.encode((("field", "members"),)),
             )
+            debug_bindings.append((key, id(original), label))
             existing = (
                 seen_lists.get(label[0]) if label is not None else None
             )
@@ -9616,6 +9618,7 @@ class LazyWorldSession:
                     "committed": tracker._committed_identity_targets,
                     "live": tracker._live_identity_targets,
                     "links": self._cross_boundary_links,
+                    "before": debug_bindings,
                     "residents": {k: (id(h.members), len(h.members)) for k, h in self.world.households.items()},
                 })[:4500]
             )
