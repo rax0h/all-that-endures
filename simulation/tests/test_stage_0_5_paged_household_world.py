@@ -66,10 +66,13 @@ def test_r3_mutation_scope_and_noop_saves(tmp_path):
         assert session.save() == generation
         assert session.store.diagnostics().payload_writes == 0
         with session.world.current_people_scope():
+            # Births happen inside this scope; mutation is valid, but
+            # a save/digest lifecycle operation cannot run mid-scope.
+            seq.append(251)
             from ate_sim.incremental_store import StoreError
             with pytest.raises(StoreError):
-                seq.append(251)
-        assert len(seq)==250
+                session.save()
+        assert len(seq)==251
 
 
 def test_r3_eager_household_scalar_edit_and_member_append_share_save(tmp_path):
