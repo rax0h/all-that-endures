@@ -9551,7 +9551,13 @@ class LazyWorldSession:
                 seen_lists.get(label[0]) if label is not None else None
             )
             if existing is None:
-                existing = seen_objects.get(id(original))
+                # The compact source list may be replaced by its page proxy
+                # during this loop. Retain the original object, not only
+                # id(original): CPython can otherwise reuse its freed address
+                # for an unrelated later household's compact placeholder.
+                seen = seen_objects.get(id(original))
+                if seen is not None and seen[0] is original:
+                    existing = seen[1]
             if existing is None:
                 existing = self._make_paged_household_sequence(key, household)
             else:
@@ -9559,7 +9565,9 @@ class LazyWorldSession:
                 object.__setattr__(household, "members", existing)
                 self._paged_household_members[key] = existing
                 self._paged_household_records[key] = household
-            seen_objects[id(original)] = existing
+            # Holding a strong reference through activation prevents object
+            # identity reuse and keeps P2C fallback tied to the real list.
+            seen_objects[id(original)] = (original, existing)
             if label is not None:
                 previous = seen_lists.setdefault(label[0], existing)
                 if previous is not existing:
