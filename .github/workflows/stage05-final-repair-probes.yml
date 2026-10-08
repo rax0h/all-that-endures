@@ -1,0 +1,18 @@
+name: stage-0-5-bounded-repair-probes
+on:
+  push:
+    branches: [sim/stage-0-5-stabilization]
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: Bounded R1-R3 reproductions
+        run: python -m pytest -q simulation/tests/test_stage_0_5_closeout.py
