@@ -2370,10 +2370,10 @@ def _lazy_occurrence_from_path(path):
         )
     wallet = _currency_occurrence_from_path(path, "wallets")
     if wallet is not None:
-        return WALLET_NAMESPACE, wallet[0], wallet[1], dict
+        return WALLET_NAMESPACE, wallet[0], wallet[1], (dict, list, LazyHouseholdMembers) if wallet[1] else dict
     treasury = _currency_occurrence_from_path(path, "treasuries")
     if treasury is not None:
-        return TREASURY_NAMESPACE, treasury[0], treasury[1], dict
+        return TREASURY_NAMESPACE, treasury[0], treasury[1], (dict, list, LazyHouseholdMembers) if treasury[1] else dict
     soul = _soul_occurrence_from_path(path)
     if soul is not None:
         relative = soul[1]
@@ -9305,6 +9305,7 @@ class LazyWorldSession:
         prefix_descriptor,
         tail_descriptor,
         commit_descriptor,
+        paged_household_members=False,
     ):
         self.store = store
         self.pin = pin
@@ -9423,8 +9424,15 @@ class LazyWorldSession:
         self.skills = LazySkillTable(self)
         object.__setattr__(world.skills, "skills", self.skills)
 
+        self._deferred_household_cross_links = tuple(
+            link for link in links
+            if paged_household_members
+            and (_household_member_path(link[0]) or _household_member_path(link[1]))
+            and (_path_under_lazy(link[0]) or _path_under_lazy(link[1]))
+        )
+        deferred = set(self._deferred_household_cross_links)
         self._cross_boundary_links = _seed_cross_boundary_lazy_identity(
-            self, links
+            self, tuple(link for link in links if link not in deferred)
         )
         self._eager_tracker = _initialize_eager_tracker(
             self,
@@ -16064,9 +16072,15 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=False):
                 prefix_descriptor=prefix_descriptor,
                 tail_descriptor=tail_descriptor,
                 commit_descriptor=commit_descriptor,
+                paged_household_members=paged_household_members,
             )
             if paged_household_members:
                 session._activate_household_pages()
+                if session._deferred_household_cross_links:
+                    session._cross_boundary_links += _seed_cross_boundary_lazy_identity(
+                        session, session._deferred_household_cross_links
+                    )
+                    session._install_cross_boundary_tracker_baseline()
             prefix = None
             pin = None
             return session
