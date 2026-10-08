@@ -40,3 +40,54 @@ def test_paged_household_members_shared_with_wallet_roundtrips_identity(tmp_path
     portable = checkpoint.loads(checkpoint.dumps(detached))
     assert portable.households[1].members is portable.currency.wallets[99]["members"]
     assert portable.digest() == world.digest()
+
+
+import pytest
+
+
+@pytest.mark.parametrize("count", [1000, 10000])
+def test_three_owner_shared_members_are_bounded_and_portable(tmp_path, count):
+    from ate_sim import checkpoint
+    world = people_world(count, active=8)
+    shared = list(range(1, count + 1))
+    world.households[1] = Household(1, 1, shared)
+    world.households[2] = Household(2, 1, shared)
+    world.currency.wallets[99] = {"members": shared}
+    world.next_household = 3
+    cold = tmp_path / "cold.sqlite"
+    path = tmp_path / "paged.sqlite"
+    write_cold_snapshot(world, cold, rules_id=RULES)
+    convert_cold_to_lazy(cold, path, rules_id=RULES, paged_household_members=True)
+
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as session:
+        left = session.world.households[1].members
+        assert left is session.world.households[2].members
+        assert left is session.world.currency.wallets[99]["members"]
+        assert session.world.digest() == world.digest()
+        session.store.reset_diagnostics()
+        left.append(count + 1)
+        shared.append(count + 1)
+        assert session.save() > 0
+        d = session.store.diagnostics()
+        print("CROSS-OWNER WRITES", count, d.payload_writes, d.payload_write_bytes)
+        assert d.payload_writes < 20
+        assert d.payload_write_bytes < 8000
+        assert session.store.verify_all()
+        assert session.world.digest() == world.digest()
+
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as reopened:
+        shared_alias = reopened.world.currency.wallets[99]["members"]
+        assert shared_alias is reopened.world.households[1].members
+        assert shared_alias is reopened.world.households[2].members
+        shared_alias.append(count + 2)
+        shared.append(count + 2)
+        reopened.save()
+        assert reopened.world.digest() == world.digest()
+        detached = reopened.detach(materialize_history=True)
+
+    assert type(detached.households[1].members) is list
+    assert detached.households[1].members is detached.households[2].members
+    assert detached.households[1].members is detached.currency.wallets[99]["members"]
+    portable = checkpoint.loads(checkpoint.dumps(detached))
+    assert portable.households[1].members is portable.currency.wallets[99]["members"]
+    assert portable.digest() == world.digest()
