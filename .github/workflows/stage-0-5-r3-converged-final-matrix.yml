@@ -4,6 +4,7 @@ on:
     branches:
       - sim/stage-0-5-r3-converged-validation
       - sim/stage-0-5-r3-release-candidate
+      - sim/stage-0-5-r3-repaired-candidate
   workflow_dispatch:
 
 jobs:
