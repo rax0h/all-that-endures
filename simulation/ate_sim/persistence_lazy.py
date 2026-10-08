@@ -1028,15 +1028,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     "convert_cold_to_lazy requires P3B cold event storage"
                 )
             capture = _capture_cold_world(source_store)
-            if paged_household_members:
-                for target_path, owner_path in capture.identity_links:
-                    if (
-                        _household_member_path(target_path)
-                        != _household_member_path(owner_path)
-                    ):
-                        raise StoreError(
-                            "paged household conversion requires cross-family members identity integration"
-                        )
+            # A paged sequence can be the shared, checked identity authority
+            # for an occurrence in a separate lazy family. Bind it after the
+            # eager household proxies exist; never materialize at open.
             source_head = source_store.db.execute(
                 "SELECT generation,parent_generation,simulation_position,seed,"
                 "next_ids,namespace_inventory,namespace_counts,head_checksum "
@@ -2361,10 +2355,10 @@ def _lazy_occurrence_from_path(path):
         )
     wallet = _currency_occurrence_from_path(path, "wallets")
     if wallet is not None:
-        return WALLET_NAMESPACE, wallet[0], wallet[1], dict
+        return WALLET_NAMESPACE, wallet[0], wallet[1], dict if not wallet[1] else object
     treasury = _currency_occurrence_from_path(path, "treasuries")
     if treasury is not None:
-        return TREASURY_NAMESPACE, treasury[0], treasury[1], dict
+        return TREASURY_NAMESPACE, treasury[0], treasury[1], dict if not treasury[1] else object
     soul = _soul_occurrence_from_path(path)
     if soul is not None:
         relative = soul[1]
@@ -2494,6 +2488,28 @@ def _seed_cross_boundary_lazy_identity(session, links):
         target_lazy = _lazy_occurrence_from_path(target)
         owner_lazy = _lazy_occurrence_from_path(owner)
         if target_lazy is None and owner_lazy is None:
+            continue
+        if (
+            (target_lazy is None) != (owner_lazy is None)
+            and (_household_member_path(target) or _household_member_path(owner))
+        ):
+            namespace, key, relative, _expected_type = (
+                target_lazy if target_lazy is not None else owner_lazy
+            )
+            encoded_key = session.store.codec.encode(key)
+            encoded_path = session.store.codec.encode(relative)
+            row = session.store._visible_identity_occurrence(
+                generation, namespace, encoded_key, encoded_path
+            )
+            if row is None:
+                raise StoreIntegrityError(
+                    "cross-family household sequence lacks checked incarnation"
+                )
+            session._registry.attach_existing(
+                IncarnationId(session.store.store_identity, int(row[0])),
+                Occurrence(namespace, key, relative),
+            )
+            cross.append((target, owner))
             continue
 
         if target_lazy is not None and owner_lazy is not None:
@@ -9469,6 +9485,29 @@ class LazyWorldSession:
                 object.__setattr__(household, "members", existing)
                 self._paged_household_members[key] = existing
                 self._paged_household_records[key] = household
+        # A cross-family link's persisted incarnation belongs to the single
+        # member sequence, never to the compact source placeholder or an
+        # independent eager copy of another lazy family's payload.
+        for target, owner in self._cross_boundary_links:
+            household_path = (
+                target if _household_member_path(target)
+                else owner if _household_member_path(owner) else None
+            )
+            if household_path is None:
+                continue
+            lazy_path = owner if household_path is target else target
+            lazy = _lazy_occurrence_from_path(lazy_path)
+            if lazy is None:
+                continue
+            namespace, lazy_key, relative, _expected_type = lazy
+            household_key = household_path[1][1]
+            sequence = self._paged_household_members[household_key]
+            label = self._registry.incarnation_for_occurrence(
+                Occurrence(namespace, lazy_key, relative)
+            )
+            if label is None:
+                raise StoreIntegrityError("unlabeled cross-family member sequence")
+            self._registry.bind(sequence, incarnation=label)
         # The eager tracker initially indexed the compact source placeholder
         # lists. Relabel only resident household owners to the new shared
         # sequence objects; the P2C target/owner paths remain unchanged.
