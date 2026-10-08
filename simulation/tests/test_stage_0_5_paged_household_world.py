@@ -70,3 +70,59 @@ def test_r3_mutation_scope_and_noop_saves(tmp_path):
             with pytest.raises(StoreError):
                 seq.append(251)
         assert len(seq)==250
+
+
+def test_r3_eager_household_scalar_edit_and_member_append_share_save(tmp_path):
+    original, path = make(tmp_path, 1000)
+    with open_lazy_world_session(
+        path, rules_id=RULES, paged_household_members=True
+    ) as session:
+        h = session.world.households[1]
+        h.food += 7.5
+        h.members.append(1001)
+        original.households[1].food += 7.5
+        original.households[1].members.append(1001)
+        assert session.world.digest() == original.digest()
+        assert session.save() == session.pin.captured_head + 1
+    with open_lazy_world_session(
+        path, rules_id=RULES, paged_household_members=True
+    ) as reopened:
+        assert reopened.world.digest() == original.digest()
+        assert reopened.world.households[1].food == original.households[1].food
+
+
+def test_r3_materializing_detach_restores_real_list_and_checkpoint(tmp_path):
+    from ate_sim import checkpoint
+    original, path = make(tmp_path, 1000)
+    session = open_lazy_world_session(
+        path, rules_id=RULES, paged_household_members=True
+    )
+    detached = session.detach(materialize_history=True)
+    assert type(detached.households[1].members) is list
+    assert detached.digest() == original.digest()
+    assert checkpoint.loads(checkpoint.dumps(detached)).digest() == original.digest()
+
+
+def test_r3_stale_second_writer_cannot_publish_members(tmp_path):
+    from ate_sim.incremental_store import StoreConflictError
+    original, path = make(tmp_path, 1000)
+    winner = open_lazy_world_session(
+        path, rules_id=RULES, paged_household_members=True
+    )
+    loser = open_lazy_world_session(
+        path, rules_id=RULES, paged_household_members=True
+    )
+    try:
+        winner.world.households[1].members.append(1001)
+        loser.world.households[1].members.append(2001)
+        assert winner.save() == winner.pin.captured_head + 1
+        with pytest.raises(StoreConflictError):
+            loser.save()
+        assert loser.world.households[1].members[-1] == 2001
+    finally:
+        winner.close()
+        loser.close()
+    with open_lazy_world_session(
+        path, rules_id=RULES, paged_household_members=True
+    ) as reopened:
+        assert reopened.world.households[1].members[-1] == 1001
