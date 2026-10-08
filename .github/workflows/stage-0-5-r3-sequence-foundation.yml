@@ -19,3 +19,5 @@ jobs:
 # Recheck rollback, generations and page deletion
 
 # Gate opt-in World projection after future-import fix
+
+# World open checked snapshot reuse
