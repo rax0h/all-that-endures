@@ -1,4 +1,4 @@
-name: Playground person explorer
+name: Playground story mine year 500
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - playground/person-explorer
 
 jobs:
-  explore:
+  mine:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -16,11 +16,74 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Generate year 250 and meet one random living person
+      - name: Mine contrasting lives from year 500
         run: |
-          python simulation/explore_person.py \
-            --seed 843000 \
-            --years 250 \
-            --roll 1 \
-            --mode interesting \
-            --timeline 18
+          python - <<'PY'
+          from collections import Counter, defaultdict
+          from ate_sim.engine import Simulation
+          from ate_sim.worldgen import generate_world
+          from simulation.explore_person import dossier
+
+          world=generate_world(843000)
+          Simulation(world).run(500)
+          living=sorted(p.id for p in world.current_people())
+
+          event_counts=Counter()
+          for e in world.events:
+              seen=set()
+              for ref in e.actors:
+                  if ref.kind=="person":
+                      seen.add(ref.id)
+              for pid in seen:
+                  event_counts[pid]+=1
+
+          apps=defaultdict(list)
+          for app in world.institutions.applications.values():
+              apps[app.person].append(app)
+
+          def rank_key(pid):
+              path=world.advancement.path(pid)
+              return (
+                  world.advancement.rank(pid),
+                  0 if path is None else len(path.abilities),
+                  event_counts[pid],
+                  world.people[pid].age,
+              )
+
+          oldest=max(living,key=lambda pid:(world.people[pid].age,pid))
+          magic=max(living,key=rank_key)
+          eventful=max(living,key=lambda pid:(event_counts[pid],world.people[pid].age,pid))
+          family=max(living,key=lambda pid:(len(world.genealogy.children.get(pid,())),world.people[pid].age,pid))
+
+          reversal_candidates=[]
+          for pid in living:
+              seq=sorted(apps.get(pid,()),key=lambda a:(a.applied_year,a.id))
+              vals=[a.passed for a in seq if a.passed is not None]
+              if True in vals and False in vals:
+                  reversal_candidates.append(pid)
+          reversal=max(
+              reversal_candidates or living,
+              key=lambda pid:(len(apps.get(pid,())),event_counts[pid],world.people[pid].age,pid)
+          )
+
+          picks=[]
+          for label,pid in [
+              ("OLDEST_LIVING",oldest),
+              ("DEEPEST_MAGIC",magic),
+              ("MOST_EVENTFUL",eventful),
+              ("BIGGEST_FAMILY",family),
+              ("SOCIETY_REVERSAL",reversal),
+          ]:
+              if pid not in [x[1] for x in picks]:
+                  picks.append((label,pid))
+
+          print("WORLD_YEAR",world.year)
+          print("LIVING",len(living))
+          print("PICKS",picks)
+          print()
+          for label,pid in picks:
+              print("#"*78)
+              print("STORY_SLOT",label)
+              print("#"*78)
+              dossier(world,pid,label,0,30)
+          PY
