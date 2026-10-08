@@ -145,6 +145,14 @@ class LazyIdentityRegistry:
         forward = self._by_incarnation.get(incarnation)
         if forward is reference:
             self._by_incarnation.pop(incarnation, None)
+            # Runtime occurrences exist to route writes from *live* aliases.
+            # Once an incarnation has no live object, its loaded placements
+            # can be reconstructed from checked store authority on demand.
+            # Keeping them here would retain every clean owner ever visited.
+            for occurrence in tuple(
+                self._occurrences_by_incarnation.get(incarnation, ())
+            ):
+                self.detach_occurrence(occurrence, expected=incarnation)
 
     def _install(
         self, obj: Any, incarnation: IncarnationId
