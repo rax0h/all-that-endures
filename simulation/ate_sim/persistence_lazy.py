@@ -9508,6 +9508,14 @@ class LazyWorldSession:
                 object.__setattr__(household, "members", existing)
                 self._paged_household_members[key] = existing
                 self._paged_household_records[key] = household
+            incarnation = IncarnationId(
+                self.store.store_identity, label[0]
+            )
+            self._registry.bind(existing, incarnation=incarnation)
+            self._registry.attach_existing(
+                incarnation,
+                Occurrence("world.households", key, (("field", "members"),)),
+            )
         # The eager tracker initially indexed the compact source placeholder
         # lists. Relabel only resident household owners to the new shared
         # sequence objects; the P2C target/owner paths remain unchanged.
