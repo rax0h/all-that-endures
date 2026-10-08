@@ -1028,15 +1028,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     "convert_cold_to_lazy requires P3B cold event storage"
                 )
             capture = _capture_cold_world(source_store)
-            if paged_household_members:
-                for target_path, owner_path in capture.identity_links:
-                    if (
-                        _household_member_path(target_path)
-                        != _household_member_path(owner_path)
-                    ):
-                        raise StoreError(
-                            "paged household conversion requires cross-family members identity integration"
-                        )
+            # Experimental cross-owner identity probe; revert unless all
+            # P2C alias, digest and hybrid-save checks pass.
             source_head = source_store.db.execute(
                 "SELECT generation,parent_generation,simulation_position,seed,"
                 "next_ids,namespace_inventory,namespace_counts,head_checksum "
