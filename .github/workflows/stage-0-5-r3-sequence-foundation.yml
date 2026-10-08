@@ -21,3 +21,5 @@ jobs:
 # Gate opt-in World projection after future-import fix
 
 # World open checked snapshot reuse
+
+# Atomic household scalar, detach and stale-writer gate
