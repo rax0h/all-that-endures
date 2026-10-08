@@ -131,3 +131,25 @@ def test_r3_stale_second_writer_cannot_publish_members(tmp_path):
         path, rules_id=RULES, paged_household_members=True
     ) as reopened:
         assert reopened.world.households[1].members[-1] == 1001
+
+
+def test_r3_new_household_publishes_compact_owner_and_pages(tmp_path):
+    original, path = make(tmp_path, 1000)
+    with open_lazy_world_session(
+        path, rules_id=RULES, paged_household_members=True
+    ) as session:
+        added = Household(2, 1, [9, 9, 11])
+        session.world.households[2] = added
+        session.world.next_household = 3
+        original.households[2] = Household(2, 1, [9, 9, 11])
+        original.next_household = 3
+        assert session.world.digest() == original.digest()
+        prior = session.pin.captured_head
+        assert session.save() == prior + 1
+        assert list(session.world.households[2].members) == [9, 9, 11]
+        assert session.world.digest() == original.digest()
+    with open_lazy_world_session(
+        path, rules_id=RULES, paged_household_members=True
+    ) as reopened:
+        assert reopened.world.digest() == original.digest()
+        assert reopened.world.households[2].members == [9, 9, 11]
