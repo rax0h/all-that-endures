@@ -242,6 +242,11 @@ CREATE INDEX lazy_identity_occurrence_lookup
     ON lazy_identity_occurrence_versions(
         owner_namespace, owner_key, occurrence_path, valid_from, valid_to
     );
+CREATE INDEX lazy_identity_incarnation_visible
+    ON lazy_identity_occurrence_versions(
+        incarnation_id, valid_from, valid_to, owner_namespace,
+        owner_key, occurrence_path, row_checksum
+    );
 CREATE INDEX lazy_identity_occurrence_current
     ON lazy_identity_occurrence_versions(
         owner_namespace, owner_key, occurrence_path, incarnation_id
@@ -1654,6 +1659,96 @@ class LazyRecordStore:
                         "identity occurrence path is not a tuple"
                     )
                 out.append((decoded_path, int(incarnation_id)))
+            return tuple(out)
+        finally:
+            self._read_snapshot_end()
+
+    def identity_occurrences_for_incarnation(
+        self, pin: GenerationPin, incarnation_id: int,
+    ) -> tuple[tuple[str, Any, tuple[Any, ...]], ...]:
+        """Read one checked identity group at the pin, without an owner scan.
+
+        Legacy stores must be explicitly copied/upgraded to obtain the
+        incarnation-leading index. Ordinary open and this query never build
+        an archive-sized index as a hidden side effect.
+        """
+        self._ensure_open()
+        if type(incarnation_id) is not int or incarnation_id <= 0:
+            raise ValueError("incarnation_id must be a positive int")
+        generation = self._read_snapshot_start(pin)
+        try:
+            columns = self.db.execute(
+                "PRAGMA index_info('lazy_identity_incarnation_visible')"
+            ).fetchall()
+            self._metadata_rows += len(columns)
+            if tuple(row[2] for row in columns) != (
+                "incarnation_id", "valid_from", "valid_to", "owner_namespace",
+                "owner_key", "occurrence_path", "row_checksum",
+            ):
+                raise StoreFormatError(
+                    "reverse identity lookup requires an explicit current-head copy upgrade"
+                )
+            next_id = self._identity_state_at(generation)[0]
+            rows = self.db.execute(
+                "SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,"
+                "valid_from,valid_to,row_checksum "
+                "FROM lazy_identity_occurrence_versions "
+                "INDEXED BY lazy_identity_incarnation_visible "
+                "WHERE incarnation_id=? AND valid_from<=? "
+                "AND (valid_to IS NULL OR ?<valid_to) "
+                "ORDER BY owner_namespace,owner_key,occurrence_path",
+                (incarnation_id, generation, generation),
+            ).fetchall()
+            self._metadata_rows += len(rows)
+            seen = set()
+            out = []
+            for namespace, key, path, identity, start, end, checksum in rows:
+                if (
+                    type(identity) is not int or not 0 < identity < next_id
+                    or type(start) is not int or not 0 <= start <= generation
+                    or (end is not None and (
+                        type(end) is not int or end <= generation or end <= start
+                    ))
+                    or checksum != _identity_occurrence_checksum(
+                        namespace, key, path, identity, start, end,
+                    )
+                ):
+                    raise StoreIntegrityError("lazy identity occurrence checksum or interval mismatch")
+                try:
+                    checked_namespace = _validate_namespace(namespace)
+                    decoded_key = self.codec.decode(key)
+                    decoded_path = self.codec.decode(path)
+                except (TypeError, ValueError, StoreError) as exc:
+                    raise StoreIntegrityError("invalid reverse identity occurrence encoding") from exc
+                if (
+                    checked_namespace != namespace or type(decoded_path) is not tuple
+                    or self.codec.encode(decoded_key) != key
+                    or self.codec.encode(decoded_path) != path
+                ):
+                    raise StoreIntegrityError("invalid reverse identity occurrence path or key")
+                if any(
+                    type(component) is not tuple or len(component) != 2
+                    or component[0] not in ("field", "key", "index")
+                    or (component[0] == "field" and (
+                        type(component[1]) is not str or not component[1]
+                    ))
+                    or (component[0] == "index" and (
+                        type(component[1]) is not int or component[1] < 0
+                    ))
+                    for component in decoded_path
+                ):
+                    raise StoreIntegrityError("invalid reverse identity occurrence path component")
+                marker = (namespace, key, path)
+                if marker in seen:
+                    raise StoreIntegrityError("overlapping visible identity occurrence versions")
+                seen.add(marker)
+                # An overlapping placement in another incarnation is also
+                # invalid; check just this exact indexed owner/path, not all
+                # occurrences belonging to that owner or the whole archive.
+                checked = self._visible_identity_occurrence(generation, namespace, key, path)
+                if checked is None or checked[0] != identity:
+                    raise StoreIntegrityError("reverse identity occurrence disagrees with owner authority")
+                out.append((namespace, decoded_key, decoded_path))
             return tuple(out)
         finally:
             self._read_snapshot_end()

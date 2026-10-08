@@ -1,3 +1,5 @@
+import pytest
+
 from ate_sim import checkpoint
 from ate_sim.core import World
 from ate_sim.institutions import (
@@ -93,6 +95,70 @@ def test_institution_records_open_and_query_lazily(tmp_path):
         )
         assert latest.id == 2
         assert session.institution_applications.diagnostics()["payload_loads"] == 1
+
+
+@pytest.mark.parametrize("edits", [1_000, 10_000])
+def test_one_dirty_record_does_not_retain_obsolete_membership_buckets(tmp_path, edits):
+    path = converted(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        table = session.institution_notices
+        notice = table[1]
+        for value in range(edits):
+            notice.status = f"historical-status-{value}"
+        expected = {(member.index_name, member.value) for member in table._memberships(notice, 0)}
+        assert table._dirty == {1}
+        assert set(table._touched_membership_index) == expected
+        assert all(keys == {1} for keys in table._touched_membership_index.values())
+        assert table.ids("status", "historical-status-0") == ()
+        assert table.ids("status", f"historical-status-{edits - 1}") == (1,)
+        session.save()
+        assert table._touched_membership_index == {}
+        assert table._touched_memberships_by_key == {}
+        notice.status = "open"
+        del table[1]
+        assert table._touched_membership_index == {}
+        assert table._touched_memberships_by_key == {}
+
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        assert session.institution_notices[1].status == f"historical-status-{edits - 1}"
+
+
+def test_pruning_one_record_preserves_other_current_candidates(tmp_path):
+    path = converted(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        table = session.institution_notices
+        first, second = table[1], table[2]
+        first.status = second.status = "shared-current"
+        assert table.ids("status", "shared-current") == (1, 2)
+        first.status = "replacement-current"
+        assert table._touched_membership_index[("status", "shared-current")] == {2}
+        del table[1]
+        assert table.ids("status", "shared-current") == (2,)
+        assert ("status", "replacement-current") not in table._touched_membership_index
+
+
+def test_failed_save_keeps_current_membership_overlay_for_retry(tmp_path):
+    path = converted(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        table = session.institution_notices
+        table[1].status = "retry-current"
+        expected = {marker: set(keys) for marker, keys in table._touched_membership_index.items()}
+        before = session.pin.captured_head
+
+        def fail(phase):
+            if phase == "before_commit":
+                raise OSError("membership fault")
+
+        session.store._phase_hook = fail
+        with pytest.raises(OSError, match="membership fault"):
+            session.save()
+        session.store._phase_hook = lambda phase: None
+        assert session.resolve_save() == before
+        assert table._touched_membership_index == expected
+        assert table.ids("status", "retry-current") == (1,)
+        assert session.save() == before + 1
+        assert table._touched_membership_index == {}
+        assert table._touched_memberships_by_key == {}
 
 
 def test_institution_membership_overlay_save_and_reopen(tmp_path):

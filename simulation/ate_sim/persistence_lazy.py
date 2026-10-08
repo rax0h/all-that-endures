@@ -6597,14 +6597,28 @@ class _LazyInstitutionRecordTable(_LazySimpleMaterialObjectTable):
         # touched records that could match instead of rebuilding memberships
         # for every touched record on every query.
         self._touched_membership_index = {}
+        self._touched_memberships_by_key = {}
         self._overlay_query_checks = 0
 
     def _index_touched_memberships(self, key, record):
-        for member in self._memberships(record, 0):
-            bucket = self._touched_membership_index.setdefault(
-                (member.index_name, member.value), set()
-            )
-            bucket.add(key)
+        current = (
+            set() if record is None else {
+                (member.index_name, member.value)
+                for member in self._memberships(record, 0)
+            }
+        )
+        previous = self._touched_memberships_by_key.get(key, set())
+        for marker in previous - current:
+            bucket = self._touched_membership_index[marker]
+            bucket.discard(key)
+            if not bucket:
+                del self._touched_membership_index[marker]
+        for marker in current - previous:
+            self._touched_membership_index.setdefault(marker, set()).add(key)
+        if current:
+            self._touched_memberships_by_key[key] = current
+        else:
+            self._touched_memberships_by_key.pop(key, None)
 
     def ids(self, fields, *values):
         self._ensure()
@@ -6650,6 +6664,11 @@ class _LazyInstitutionRecordTable(_LazySimpleMaterialObjectTable):
     def accept_save(self, plan, new_pin):
         super().accept_save(plan, new_pin)
         self._touched_membership_index.clear()
+        self._touched_memberships_by_key.clear()
+
+    def __delitem__(self, key):
+        super().__delitem__(key)
+        self._index_touched_memberships(key, None)
 
     def diagnostics(self):
         result = super().diagnostics()

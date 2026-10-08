@@ -33,6 +33,16 @@ Tasks1–6 were dispatched to isolated worktrees. Workers became unavailable aft
 
 Task1 correctness slice: shared-owner routing repaired. Nineteen regressions green;111 affected tests plus2 subtests green; P5 3+4+3 seed843000 passed. See STAGE_0_5_SHARED_OWNER_ROUTING_VALIDATION.md. Bounded discovery/versioned P2C witness work remains pending.
 
+Published checkpoint: fa86f8e1e2ef9c17ee63ee2d67f91c9086c617e6, exact tree5518c99be866de8f6dd1f5c1d716617e7549b9c8 (matches local ddf4c99). All17 modified/new blobs and the full tree were compared exactly before a leased update of the repair branch. CLI push lacked credentials; the configured GitHub connection published the same checked source. PR#14 remains c29e3d06a0c9d219235e2b3f0390271bd1245aea.
+
+Task1 reverse lookup foundation: implemented checked covering index/API, explicit source-preserving copy upgrade, old-pin and corruption validation. Reverse/store/failure gate:64 passed in5.86s. See STAGE_0_5_REVERSE_IDENTITY_VALIDATION.md. This is not yet ordinary-open/save integration.
+
 Task2 foundation: monotonic floor5 support repaired and51 store/failure tests green. See STAGE_0_5_FORMAT_FLOOR_VALIDATION.md. Compact event-ID authority remains pending.
 
-Tasks3–6: design complete, implementation pending. Task7: final integrated source, final architectural review and full-suite launch pending. No production promotion or long run performed.
+Task2 runtime component: concrete EventIdSet facade implemented;47 protocol/component cases cover exact range proof, fallback representatives, native conversions/operators, guarded changes, failing iterable partial mutation, iterator size changes, materialization memo and500 deterministic mixed operations. See STAGE_0_5_EVENT_ID_FACADE_VALIDATION.md. World disk/tracker/codec/save/recovery integration is still pending; existing Worlds have not switched representations.
+
+Task6 correctness slice: current touched-membership candidates now replace obsolete per-key markers and prune empty buckets, rather than retaining lifetime status edits. Scaling1k/10k edits atD=1, shared candidate buckets, delete and failure/retry verified. See STAGE_0_5_TOUCHED_MEMBERSHIP_VALIDATION.md. Application bounded threshold and remaining scalar families are still pending.
+
+Latest slice combined gate:143 passed in10.30s across facade, institution/scalar, unloaded alias, reverse identity, store and store failures. Latest P5 seed843000,3+4+3 paged households passed=true; finalyear10/events439 and exact control finaldigest3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e. Raw evidence continuous-repair-p5-final-slice.json retained for later CI upload. Diff whitespace check clean. No full-suite launch or final architecture sign-off yet.
+
+Tasks3–5 and remaining Task6 migrations: design complete, implementation pending. Task7: final integrated source, final architectural review and full-suite launch pending. No production promotion or long run performed. Resume inline implementation from these exact checkpoints; do not repeat completed investigations or initial green ownership CI.
