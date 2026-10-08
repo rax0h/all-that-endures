@@ -14,4 +14,9 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install -q pytest
-      - run: python -m pytest -vv -q simulation/tests/test_stage_0_5_r3_cross_family_extra.py
+      - name: Three-owner cross-family alias, 1k/10k, detach and portability
+        run: python -m pytest -vv -q simulation/tests/test_stage_0_5_r3_cross_family_extra.py
+      - name: Affected household, currency and P2C identity tests
+        run: python -m pytest -q simulation/tests/test_stage_0_5_household_sequence.py simulation/tests/test_stage_0_5_paged_household_world.py simulation/tests/test_persistence_lazy_currency.py simulation/tests/test_persistence_lazy_identity.py
+      - name: Independent 3+4+3 year paged P5 continuation
+        run: python simulation/persistence_p5_validation.py --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --paged-households --output /tmp/p5-r3-cross-family.json
