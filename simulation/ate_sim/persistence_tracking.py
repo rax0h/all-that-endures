@@ -1214,6 +1214,7 @@ class IncrementalWorldSession:
     @staticmethod
     def _base_kind(kind):
         return {
+            'RecordTable-branch-passed/v1': 'RecordTable',
             "dict-stable/v1": "dict",
             "RecordTable-stable/v1": "RecordTable",
             "set-stable/v1": "set",

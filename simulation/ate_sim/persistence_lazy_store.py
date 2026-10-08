@@ -1374,10 +1374,24 @@ class LazyRecordStore:
     def query_keys(
         self, pin: GenerationPin, namespace: str, index_name: str, value: Any
     ) -> tuple[Any, ...]:
+        return tuple(key for key, _ordinal in self.query_memberships(pin, namespace, index_name, value))
+
+    def query_memberships(
+        self, pin: GenerationPin, namespace: str, index_name: str, value: Any,
+        *, limit: int | None = None, exclude_keys=(),
+    ) -> tuple[tuple[Any, int], ...]:
+        """Checked ordered occurrence positions, with SQL-side limit/exclusion."""
         self._ensure_open()
         _validate_namespace(namespace)
         if not isinstance(index_name, str) or not index_name or "\x00" in index_name:
             raise ValueError("index_name must be non-empty text")
+        if limit is not None and (type(limit) is not int or limit < 0):
+            raise ValueError('limit must be an exact nonnegative int or None')
+        excluded = tuple(sorted({self.codec.encode(key) for key in exclude_keys}))
+        exclusion_sql = (' AND record_key NOT IN (' + ','.join('?' for _ in excluded) + ')'
+                         if excluded else '')
+        limit_sql = '' if limit is None else ' LIMIT ?'
+        suffix_args = excluded + (() if limit is None else (limit,))
         encoded_value = self.codec.encode(value)
         generation = self._read_snapshot_start(pin)
         try:
@@ -1387,8 +1401,8 @@ class LazyRecordStore:
                     "SELECT record_key,ordinal,valid_from,valid_to,row_checksum "
                     "FROM lazy_query_versions INDEXED BY lazy_query_current "
                     "WHERE namespace=? AND index_name=? AND index_value=? AND valid_to IS NULL "
-                    "ORDER BY ordinal,record_key",
-                    (namespace, index_name, encoded_value),
+                    + exclusion_sql + " ORDER BY ordinal,record_key" + limit_sql,
+                    (namespace, index_name, encoded_value) + suffix_args,
                 ).fetchall()
             else:
                 open_rows = self.db.execute(
@@ -1396,21 +1410,23 @@ class LazyRecordStore:
                     "FROM lazy_query_versions INDEXED BY lazy_query_open_generation "
                     "WHERE namespace=? AND index_name=? AND index_value=? "
                     "AND valid_to IS NULL AND valid_from<=? "
-                    "ORDER BY ordinal,record_key",
-                    (namespace, index_name, encoded_value, generation),
+                    + exclusion_sql + " ORDER BY ordinal,record_key" + limit_sql,
+                    (namespace, index_name, encoded_value, generation) + suffix_args,
                 ).fetchall()
                 closed_rows = self.db.execute(
                     "SELECT record_key,ordinal,valid_from,valid_to,row_checksum "
                     "FROM lazy_query_versions INDEXED BY lazy_query_closed_generation "
                     "WHERE namespace=? AND index_name=? AND index_value=? AND valid_to=? "
-                    "ORDER BY ordinal,record_key",
-                    (namespace, index_name, encoded_value, generation + 1),
+                    + exclusion_sql + " ORDER BY ordinal,record_key" + limit_sql,
+                    (namespace, index_name, encoded_value, generation + 1) + suffix_args,
                 ).fetchall()
                 rows = sorted(
                     open_rows + closed_rows,
                     key=lambda row: (int(row[1]), row[0]),
                 )
             self._query_rows += len(rows)
+            if limit is not None:
+                rows = rows[:limit]
             out = []
             seen = set()
             decoded_value = self.codec.decode(encoded_value)
@@ -1430,6 +1446,17 @@ class LazyRecordStore:
                 )
                 if checksum != expected:
                     raise StoreIntegrityError("lazy query checksum mismatch")
+                if limit is not None:
+                    witnesses = self.db.execute(
+                        'SELECT valid_from,valid_to FROM lazy_query_versions '
+                        'WHERE namespace=? AND index_name=? AND index_value=? '
+                        'AND record_key=? AND ordinal=? AND valid_from<=? '
+                        'AND (valid_to IS NULL OR ?<valid_to) LIMIT 2',
+                        (namespace, index_name, encoded_value, record_key, ordinal, generation, generation),
+                    ).fetchall()
+                    self._metadata_rows += len(witnesses)
+                    if len(witnesses) != 1:
+                        raise StoreIntegrityError('overlapping visible lazy query membership')
                 record = self._visible_record_row(generation, namespace, record_key)
                 if record is None:
                     raise StoreIntegrityError("query membership has no visible owner")
@@ -1441,7 +1468,7 @@ class LazyRecordStore:
                     raise StoreIntegrityError(
                         "query membership is absent from owner metadata"
                     )
-                out.append(self.codec.decode(record_key))
+                out.append((self.codec.decode(record_key), int(ordinal)))
             return tuple(out)
         finally:
             self._read_snapshot_end()

@@ -769,7 +769,7 @@ def _capture_successor(session, plan, *, full_evidence):
             planned_layout = (plan.layout_value if plan.layout_value is not None
                               else session._manifest['collections'])
             expected_ids = planned_layout['world.event_ids']
-            if expected_ids[0] == RANGE_TAG:
+            if expected_ids[0] == RANGE_TAG and any(evidence.namespace == 'world.event_ids' for evidence in plan.record_evidence):
                 actual_ids = _read_cold_manifest(session.store)['collections']['world.event_ids']
                 if actual_ids != expected_ids:
                     raise StoreIntegrityError('event-ID successor layout mismatch')

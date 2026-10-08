@@ -1,0 +1,9 @@
+# Bounded failed-application inquiry predicate
+
+Parent spec/plan: continuous repair Tasks3/6. Execute inline, no per-unit reviewer. The SQL API returns checked `(record_key, occurrence_ordinal)` pairs in persisted order with optional exact nonnegative limit and SQL-side dirty-owner exclusion; `query_keys` remains a compatibility wrapper. Preserve repeated occurrence positions and pinned generations. No payload decode for a threshold.
+
+The application collection description will declare `RecordTable-branch-passed/v1` only in an explicit conversion, with reader capability 5. Its checked owner/query memberships include `(branch,passed)`. This distinguishes complete empty predicate authority from a legacy collection lacking the index. Ordinary open never upgrades historical memberships. Legacy calls use checked `passed` candidates and inspect branch values, with their eager cost disclosed; absence of the new tag never means an empty result.
+
+`LazyInstitutionApplicationTable.at_least(fields,*values,count=5)` excludes all touched owners from persisted candidates, requests only the still-needed count, and includes current matching overlay candidates. Inquiry close calls this concrete method when available; eager RecordTable keeps the same `len(ids(...))>=5` behavior. Dirty replacements/deletes/field edits, no-op, failed save/retry, old pins and reopen remain exact. The marker must survive structural layout updates and hybrid publication.
+
+Steps: observe API numerical/protocol failures; implement checked limited reads and compatibility; observe actual inquiry and overlay failures; add conversion authority and native/eager/lazy consumer seam; verify 1k/10k at fixed current D, legacy behavior, corruption, failure/retry and existing store/institution/accountability tests; record evidence and publish a checkpoint. This unit does not claim the remaining scalar family migrations complete.

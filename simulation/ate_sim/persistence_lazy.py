@@ -138,6 +138,7 @@ ADVANCEMENT_NAMESPACE = "world.advancement.paths"
 INSTITUTION_MAGIC_RECORD_NAMESPACE = "world.institutions.magic_records"
 INSTITUTION_NOTICE_NAMESPACE = "world.institutions.notices"
 INSTITUTION_APPLICATION_NAMESPACE = "world.institutions.applications"
+APPLICATION_QUERY_KIND = 'RecordTable-branch-passed/v1'
 TRANSMISSION_NAMESPACE = "world.transmission.records"
 MOTIVE_NAMESPACE = "world.agency.motives"
 SOCIAL_EDGE_NAMESPACE = "world.social.edges"
@@ -236,6 +237,7 @@ def _cross_boundary_field_value_is_immutable(value) -> bool:
 
 def _base_kind(kind: str) -> str:
     return {
+        APPLICATION_QUERY_KIND: 'RecordTable',
         "dict-stable/v1": "dict",
         "RecordTable-stable/v1": "RecordTable",
         "set-stable/v1": "set",
@@ -408,6 +410,15 @@ def _insert_lazy_plain_record(
     )
 
 
+def _application_predicate_value(field, value):
+    if type(value) in (bool, int, float):
+        if field == 'passed' and value in (0, 1):
+            return bool(value)
+        if field == 'branch' and (type(value) in (bool, int) or value.is_integer()):
+            return int(value)
+    return value
+
+
 def _institution_memberships(namespace, record, ordinal):
     if namespace == SOCIAL_EDGE_NAMESPACE:
         if not isinstance(record, Relationship):
@@ -454,12 +465,15 @@ def _institution_memberships(namespace, record, ordinal):
     if namespace == INSTITUTION_APPLICATION_NAMESPACE:
         if not isinstance(record, SocietyApplication):
             raise TypeError("expected SocietyApplication")
+        passed = _application_predicate_value('passed', record.passed)
+        branch = _application_predicate_value('branch', record.branch)
         return (
-            ("passed", record.passed, ordinal),
+            ("branch_passed", (branch, passed), ordinal),
+            ("passed", passed, ordinal),
             ("person_society", (record.person, record.society), ordinal),
             (
                 "person_society_passed",
-                (record.person, record.society, record.passed),
+                (record.person, record.society, passed),
                 ordinal,
             ),
         )
@@ -1049,6 +1063,25 @@ def _convert_event_id_range(target, capture, source_head, authority):
     head[7] = _head_checksum(*head[:7])
     target.db.execute('DELETE FROM save_head')
     target.db.execute('INSERT INTO save_head VALUES (1,?,?,?,?,?,?,?,?)', head)
+    target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+
+
+def _declare_application_queries(target):
+    from .persistence_adapters import COLLECTION_LAYOUT
+    key = target.codec.encode(COLLECTION_LAYOUT)
+    row = target.db.execute('SELECT payload,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?', (META, key)).fetchone()
+    if row is None:
+        key = target.codec.encode('manifest')
+        row = target.db.execute('SELECT payload,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?', (META, key)).fetchone()
+        value = target.codec.decode(row[0])
+        layout = value['collections']
+    else:
+        value = layout = target.codec.decode(row[0])
+    old = layout[INSTITUTION_APPLICATION_NAMESPACE]
+    layout[INSTITUTION_APPLICATION_NAMESPACE] = (APPLICATION_QUERY_KIND, old[1], old[2])
+    payload = target.codec.encode(value)
+    _old_payload, codec_version, schema, generation = row
+    target.db.execute('UPDATE records SET payload=?,payload_checksum=? WHERE namespace=? AND typed_key=?', (payload, _record_checksum(META, key, schema, codec_version, generation, payload), META, key))
     target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
 
 
@@ -2137,6 +2170,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         _convert_event_id_range(target, capture, source_head, event_id_authority)
                     elif event_id_alias_paths:
                         target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+                    _declare_application_queries(target)
                     target.db.commit()
                     target.verify_all()
                     target.close()
@@ -6830,6 +6864,7 @@ class LazyInstitutionApplicationTable(_LazyInstitutionRecordTable):
     _touched_attr = "institution_application_touched_keys"
     _label = "institution application"
     _index_fields = {
+        ("branch", "passed"): "branch_passed",
         ("passed",): "passed",
         ("person", "society"): "person_society",
         ("person", "society", "passed"): "person_society_passed",
@@ -6841,6 +6876,43 @@ class LazyInstitutionApplicationTable(_LazyInstitutionRecordTable):
             INSTITUTION_APPLICATION_NAMESPACE,
             clean_limit=clean_limit,
         )
+        description = session.manifest['collections'][INSTITUTION_APPLICATION_NAMESPACE]
+        self._branch_query_authority = description[0] == APPLICATION_QUERY_KIND
+        if self._branch_query_authority:
+            floor = int(self._store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
+            if floor < 5:
+                raise StoreFormatError('branch/passed authority requires reader capability 5')
+
+    def ids(self, fields, *values):
+        normalized = (fields,) if isinstance(fields, str) else tuple(fields)
+        values = tuple(_application_predicate_value(normalized[i], value) if i < len(normalized) else value for i, value in enumerate(values))
+        if normalized == ('branch', 'passed') and not self._branch_query_authority:
+            # Legacy checked passed index is still authority. Inspect branch
+            # payloads explicitly; do not interpret a missing index as empty.
+            branch, passed = values
+            return tuple(key for key in super().ids('passed', passed) if self[key].branch == branch)
+        return super().ids(fields, *values)
+
+    def at_least(self, fields, *values, count=5):
+        self._ensure()
+        if type(count) is not int or count < 0:
+            raise ValueError('count must be an exact nonnegative int')
+        if count == 0:
+            return True
+        if not self._branch_query_authority:
+            return len(self.ids(fields, *values)) >= count
+        normalized = (fields,) if isinstance(fields, str) else tuple(fields)
+        values = tuple(_application_predicate_value(normalized[i], value) if i < len(normalized) else value for i, value in enumerate(values))
+        index_name = self._index_name(fields)
+        index_value = values[0] if len(values) == 1 else tuple(values)
+        touched = self._effective_touched()
+        candidates = self._touched_membership_index.get((index_name, index_value), ())
+        overlay = sum(1 for key in candidates if key in touched and self._visible(key))
+        needed = count - overlay
+        if needed <= 0:
+            return True
+        baseline = self._store.query_memberships(self._pin, self._namespace, index_name, index_value, limit=needed, exclude_keys=touched)
+        return len(baseline) >= needed
 
 
 class LazyTransmissionRecordTable(_LazyInstitutionRecordTable):

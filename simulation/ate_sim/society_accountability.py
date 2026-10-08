@@ -18,9 +18,9 @@ def _open(world,branch,trigger,severity):
 
 def _close(world,q):
  branch=world.institutions.branches[q.branch];recent=[e for e in world.events_between(q.opened_year-4,world.year) if e.location and e.location.kind=='settlement' and e.location.id==branch.settlement]
- deaths=sum(1 for e in recent if e.kind=='death' and e.data.get('cause') in ('war','monster','dangerous_magic'));failed=len(world.institutions.table('applications').ids(('branch','passed'),branch.id,False));findings=[]
+ deaths=sum(1 for e in recent if e.kind=='death' and e.data.get('cause') in ('war','monster','dangerous_magic'));applications=world.institutions.table('applications');threshold=getattr(applications,'at_least',None);failed=(threshold(('branch','passed'),branch.id,False,count=5) if threshold is not None else len(applications.ids(('branch','passed'),branch.id,False))>=5);findings=[]
  if deaths>=4:findings.append('inadequate_public_safety')
- if failed>=5:findings.append('training_or_selection_failure')
+ if failed:findings.append('training_or_selection_failure')
  if branch.authority<.4:findings.append('weak_branch_governance')
  if q.trigger_kind in ('dangerous_magic','missing_person'):findings.append('incident_response_failure')
  if not findings:findings.append('no_systemic_breach_found')

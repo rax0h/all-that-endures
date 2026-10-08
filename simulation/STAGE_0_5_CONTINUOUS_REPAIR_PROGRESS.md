@@ -52,3 +52,7 @@ Task2 storage integration checkpoint: compact conversion/open/tracker/save/recov
 Task2 final checkpoint combined verification: 162 passed in 36.52s across event-ID integration/facade, adapters, tracking, currency, lifecycle and unloaded alias routing. P5 rerun after conversion report correction passed with destination format 5 and the same exact control digests. No full-suite or final reviewer invoked.
 
 Tasks3–5 and remaining Task6 migrations: design complete, implementation pending. Task7: final integrated source, final architectural review and full-suite launch pending. No production promotion or long run performed. Resume inline implementation from these exact checkpoints; do not repeat completed investigations or initial green ownership CI.
+
+Published event-ID checkpoint:`3cf9f5ec8f16e8af7a9d280fc8faa79c31fd5ea3`, exact tree`1ed0261b59eb6b64f45eb744271eb7797d569cc3`, matching local`e715f8d`. Fourteen blobs and the full tree were checked before a leased repair-branch update; PR#14 remained unchanged.
+
+Task6 application predicate checkpoint:checked limited occurrence queries, complete converted branch/passed authority, bounded actual inquiry consumer and explicit legacy fallback are implemented. Current-source focused gate155 passed in37.99s; P5 seed8430003+4+3 passed with the exact eager-control digests. See`STAGE_0_5_BOUNDED_APPLICATION_QUERY_VALIDATION.md`. Current-source final full suite and final reviewer remain pending. Continue inline with remaining scalar families and nested-history integration.

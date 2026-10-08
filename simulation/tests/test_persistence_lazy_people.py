@@ -67,7 +67,7 @@ def test_cold_to_lazy_conversion_preserves_source_and_current_authority(tmp_path
     assert digest_file(source) == before
     assert result["source_preserved"] is True
     assert result["people"] == 25
-    assert result["destination_format"] == 3
+    assert result["destination_format"] == 5
 
     with TransactionalStore.open(
         source,
@@ -76,7 +76,9 @@ def test_cold_to_lazy_conversion_preserves_source_and_current_authority(tmp_path
         expected_rules_id=RULES,
     ) as cold, open_p4(destination) as lazy:
         assert cold.checked_head().metadata == lazy.checked_head().metadata
-        assert cold.checked_head().namespace_counts == lazy.checked_head().namespace_counts
+        expected_counts = dict(cold.checked_head().namespace_counts)
+        expected_counts['world.event_ids'] = (1, 0)
+        assert expected_counts == lazy.checked_head().namespace_counts
         assert lazy.db.execute(
             "SELECT COUNT(*) FROM records WHERE namespace=?",
             (PEOPLE_NAMESPACE,),
