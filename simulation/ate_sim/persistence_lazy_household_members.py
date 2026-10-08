@@ -1,0 +1,338 @@
+"""P4 checked, generation-pinned household member sequence authority.
+
+This is an auxiliary storage primitive. The canonical Household.members value
+remains an ordered mutable sequence, never an abbreviated logical history.
+Pages are bounded independently of historical household size; only explicit
+whole-sequence operations traverse the complete history.
+"""
+from __future__ import annotations
+
+from collections import OrderedDict
+from collections.abc import MutableSequence
+from .incremental_store import StoreError, StoreIntegrityError, StoreFormatError
+from .persistence_lazy_store import (
+    VersionChange, _namespace_checksum, _order_checksum, _version_checksum,
+)
+from .incremental_store import _framed_sha
+
+LENGTH_NAMESPACE = "aux.lazy.household.member_lengths"
+PAGE_NAMESPACE = "aux.lazy.household.member_pages"
+RECORD_SCHEMA = 1
+PAGE_SIZE = 128
+CACHE_PAGES = 4
+
+
+def _member_id(value):
+    if type(value) is not int or value <= 0:
+        raise TypeError("household member IDs must be positive integers")
+    return value
+
+
+def _insert_version(store, generation, namespace, key, value, ordinal):
+    codec = store.codec
+    typed_key = codec.encode(key)
+    payload = codec.encode(value)
+    memberships = codec.encode(())
+    store.db.execute(
+        "INSERT INTO lazy_record_versions("
+        "namespace,typed_key,valid_from,valid_to,payload,payload_checksum,"
+        "codec_version,record_schema,memberships,row_checksum"
+        ") VALUES (?,?,?,NULL,?,?,?,?,?,?)",
+        (namespace, typed_key, generation, payload,
+         _framed_sha(b"lazy-payload-v1", payload), codec.version, RECORD_SCHEMA,
+         memberships, _version_checksum(
+             namespace, typed_key, RECORD_SCHEMA, codec.version,
+             generation, None, memberships, payload,
+         )),
+    )
+    store.db.execute(
+        "INSERT INTO lazy_order_versions("
+        "namespace,typed_key,ordinal,valid_from,valid_to,row_checksum"
+        ") VALUES (?,?,?,?,NULL,?)",
+        (namespace, typed_key, ordinal, generation,
+         _order_checksum(namespace, typed_key, ordinal, generation, None)),
+    )
+
+
+def bootstrap_household_members(store, generation, owners):
+    """Insert into a private, active conversion transaction only.
+
+    owners: ordered pairs (household_id, ordered member IDs). This is an
+    explicit O(history) conversion, never an ordinary open or save path.
+    """
+    length_rows = []
+    page_rows = []
+    seen = set()
+    for owner, members in owners:
+        _member_id(owner)
+        if owner in seen:
+            raise StoreIntegrityError("duplicate household member owner")
+        seen.add(owner)
+        size = len(members)
+        _insert_version(
+            store, generation, LENGTH_NAMESPACE, owner, size,
+            len(length_rows),
+        )
+        length_rows.append(owner)
+        for offset in range(0, size, PAGE_SIZE):
+            page = tuple(_member_id(x) for x in members[offset:offset+PAGE_SIZE])
+            key = (owner, offset // PAGE_SIZE)
+            _insert_version(store, generation, PAGE_NAMESPACE, key,
+                            page, len(page_rows))
+            page_rows.append(key)
+    for namespace, rows in (
+        (LENGTH_NAMESPACE, length_rows), (PAGE_NAMESPACE, page_rows)
+    ):
+        store.db.execute(
+            "INSERT INTO lazy_namespace_state("
+            "namespace,valid_from,valid_to,member_count,next_ordinal,row_checksum"
+            ") VALUES (?,?,NULL,?,?,?)",
+            (namespace, generation, len(rows), len(rows),
+             _namespace_checksum(namespace, len(rows), len(rows),
+                                 generation, None)),
+        )
+
+
+class LazyHouseholdMembers(MutableSequence):
+    """Mutable list semantics backed by checked, bounded-size versioned pages.
+
+    A retained instance preserves the caller's alias. An owner guard is
+    supplied by World/session integration; it must reject obsolete ownership
+    and active lifecycle operations before any mutation.
+    """
+
+    def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES):
+        _member_id(owner)
+        self._store = store
+        self._pin = pin
+        self._owner = owner
+        self._guard = guard
+        self._cache_pages = cache_pages
+        if type(cache_pages) is not int or cache_pages <= 0:
+            raise ValueError("cache_pages must be positive")
+        self._cache = OrderedDict()
+        self._dirty_pages = {}
+        if getattr(store, "_active_read_transaction", False):
+            # The P4 open already owns a checked, generation-matched snapshot.
+            # Do not start a nested SQLite BEGIN while binding proxies.
+            if store._require_pin(pin) != pin.captured_head:
+                raise StoreIntegrityError("household member open pin moved")
+            typed_key = store.codec.encode(owner)
+            row = store._visible_record_row(
+                pin.captured_head, LENGTH_NAMESPACE, typed_key
+            )
+            if row is None:
+                raise StoreIntegrityError("household member length is absent")
+            length, schema, *_ = store._check_record_row(
+                LENGTH_NAMESPACE, typed_key, row, decode=True
+            )
+            if schema != RECORD_SCHEMA:
+                raise StoreFormatError("household member length schema mismatch")
+        else:
+            checked = store.read_version(
+                pin, LENGTH_NAMESPACE, owner, expected_record_schema=RECORD_SCHEMA
+            )
+            length = checked.value
+        if type(length) is not int or length < 0:
+            raise StoreFormatError("invalid household member sequence length")
+        self._length = length
+        self._base_length = length
+
+    def _ensure(self):
+        self._store._ensure_open()
+
+    def _mutation(self):
+        self._ensure()
+        if self._guard is not None:
+            self._guard()
+
+    def _normalize(self, index):
+        if type(index) is not int:
+            raise TypeError("household member index must be int")
+        if index < 0:
+            index += self._length
+        if not 0 <= index < self._length:
+            raise IndexError("household member index out of range")
+        return index
+
+    def _read_page(self, number):
+        if number in self._dirty_pages:
+            return self._dirty_pages[number]
+        if number in self._cache:
+            self._cache.move_to_end(number)
+            return self._cache[number]
+        checked = self._store.read_version(
+            self._pin, PAGE_NAMESPACE, (self._owner, number),
+            expected_record_schema=RECORD_SCHEMA,
+        )
+        value = checked.value
+        expected = min(PAGE_SIZE, max(0, self._base_length - PAGE_SIZE * number))
+        if (type(value) is not tuple or len(value) != expected
+                or any(type(x) is not int or x <= 0 for x in value)):
+            raise StoreIntegrityError("invalid household member sequence page")
+        self._cache[number] = value
+        while len(self._cache) > self._cache_pages:
+            self._cache.popitem(last=False)
+        return value
+
+    def _page(self, number):
+        if number in self._dirty_pages:
+            return self._dirty_pages[number]
+        if number * PAGE_SIZE >= self._base_length:
+            page = []
+        else:
+            page = list(self._read_page(number))
+        self._dirty_pages[number] = page
+        return page
+
+    def __len__(self):
+        self._ensure()
+        return self._length
+
+    def __getitem__(self, index):
+        self._ensure()
+        if isinstance(index, slice):
+            return [self[i] for i in range(*index.indices(self._length))]
+        index = self._normalize(index)
+        return self._read_page(index // PAGE_SIZE)[index % PAGE_SIZE]
+
+    def __setitem__(self, index, value):
+        self._mutation()
+        if isinstance(index, slice):
+            new = list(self)
+            replacement = [_member_id(x) for x in value]
+            new[index] = replacement
+            self._replace_all(new)
+            return
+        index = self._normalize(index)
+        self._page(index // PAGE_SIZE)[index % PAGE_SIZE] = _member_id(value)
+
+    def __delitem__(self, index):
+        self._mutation()
+        if isinstance(index, slice):
+            new = list(self)
+            del new[index]
+            self._replace_all(new)
+            return
+        index = self._normalize(index)
+        self._replace_all(list(self[:index]) + list(self[index+1:]))
+
+    def insert(self, index, value):
+        self._mutation()
+        _member_id(value)
+        if type(index) is not int:
+            raise TypeError("household member insertion index must be int")
+        if index < 0:
+            index = max(0, index + self._length)
+        if index >= self._length:
+            self._append(value)
+            return
+        self._replace_all(list(self[:index]) + [value] + list(self[index:]))
+
+    def _append(self, value):
+        page_index = self._length // PAGE_SIZE
+        page = self._page(page_index)
+        if len(page) != self._length % PAGE_SIZE:
+            raise StoreIntegrityError("household member append page is inconsistent")
+        page.append(value)
+        self._length += 1
+
+    def append(self, value):
+        self._mutation()
+        self._append(_member_id(value))
+
+    def extend(self, values):
+        self._mutation()
+        # Consume iterables before modifying the sequence; failed input
+        # validation must not partially publish a caller mutation.
+        values = tuple(_member_id(v) for v in values)
+        for value in values:
+            self._append(value)
+
+    def _replace_all(self, values):
+        values = tuple(_member_id(v) for v in values)
+        previous_page_count = (self._length + PAGE_SIZE - 1) // PAGE_SIZE
+        next_page_count = (len(values) + PAGE_SIZE - 1) // PAGE_SIZE
+        for number in range(max(previous_page_count, next_page_count)):
+            start = number * PAGE_SIZE
+            self._dirty_pages[number] = list(values[start:start+PAGE_SIZE])
+        self._length = len(values)
+        self._cache.clear()
+
+    def reverse(self):
+        self._mutation()
+        self._replace_all(list(reversed(list(self))))
+
+    def sort(self, *, key=None, reverse=False):
+        self._mutation()
+        self._replace_all(sorted(self, key=key, reverse=reverse))
+
+    def copy(self):
+        return list(self)
+
+    def __iter__(self):
+        # One checked page at a time. No implicit archive-sized tuple.
+        for index in range(len(self)):
+            yield self[index]
+
+    def __eq__(self, other):
+        if isinstance(other, (list, tuple, MutableSequence)):
+            return list(self) == list(other)
+        return NotImplemented
+
+    def __repr__(self):
+        return f"LazyHouseholdMembers(owner={self._owner}, length={self._length})"
+
+    def pending_changes(self):
+        """Return only changed bounded pages and length, never all history."""
+        self._ensure()
+        result = []
+        base_pages = (self._base_length + PAGE_SIZE - 1) // PAGE_SIZE
+        final_pages = (self._length + PAGE_SIZE - 1) // PAGE_SIZE
+        if self._length != self._base_length:
+            result.append(VersionChange(
+                LENGTH_NAMESPACE, self._owner, self._length,
+                record_schema=RECORD_SCHEMA,
+            ))
+        for number, page in sorted(self._dirty_pages.items()):
+            key = (self._owner, number)
+            if number >= final_pages:
+                if number < base_pages:
+                    result.append(VersionChange(
+                        PAGE_NAMESPACE, key, delete=True,
+                        record_schema=RECORD_SCHEMA,
+                    ))
+                continue
+            value = tuple(page)
+            expected_len = min(PAGE_SIZE, self._length - number * PAGE_SIZE)
+            if len(value) != expected_len:
+                raise StoreIntegrityError("incomplete household member page")
+            if number < base_pages and value == tuple(self._read_baseline_page(number)):
+                continue
+            result.append(VersionChange(
+                PAGE_NAMESPACE, key, value, record_schema=RECORD_SCHEMA,
+            ))
+        return tuple(result)
+
+    def _read_baseline_page(self, number):
+        checked = self._store.read_version(
+            self._pin, PAGE_NAMESPACE, (self._owner, number),
+            expected_record_schema=RECORD_SCHEMA,
+        )
+        return checked.value
+
+    def accept_save(self, pin):
+        """Advance to the committed generation only after combined publication."""
+        self._pin = pin
+        self._base_length = self._length
+        self._dirty_pages.clear()
+        self._cache.clear()
+
+    def diagnostics(self):
+        return {
+            "owner": self._owner, "length": self._length,
+            "base_length": self._base_length, "resident_cached_pages": len(self._cache),
+            "dirty_pages": len(self._dirty_pages),
+            "cached_member_ids": sum(len(p) for p in self._cache.values()),
+            "dirty_member_ids": sum(len(p) for p in self._dirty_pages.values()),
+        }
