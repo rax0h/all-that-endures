@@ -17,7 +17,8 @@ import uuid
 import weakref
 from typing import Any, Iterator
 
-from .core import Person, World
+from .core import Person, Household, World
+from .incremental_store import _record_checksum
 from .magic_resources import MagicAspiration, MagicResource
 from .materials import MaterialLot, CraftedItem
 from .metaphysics import SoulState
@@ -29,6 +30,11 @@ from .agency import MotiveState
 from .social import Relationship
 from .skills import SkillHistory
 from .lineage import LineageNode
+from .persistence_lazy_household_members import (
+    LENGTH_NAMESPACE as HOUSEHOLD_LENGTH_NAMESPACE,
+    LazyHouseholdMembers,
+    bootstrap_household_members,
+)
 from .persistence_lazy_lineage_children import (
     LINEAGE_CHILD_NAMESPACE,
     LINEAGE_CHILD_EDGE_NAMESPACE,
@@ -996,7 +1002,7 @@ def _insert_lazy_material_lot(
         )
 
 
-def convert_cold_to_lazy(source, destination, *, rules_id):
+def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=False):
     """Explicit checked P3B cold -> P4 conversion into a new destination."""
     source, destination = _preflight_conversion_paths(source, destination)
     codec = WorldCodec(identity_links_recorded=True)
@@ -1022,6 +1028,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                     "convert_cold_to_lazy requires P3B cold event storage"
                 )
             capture = _capture_cold_world(source_store)
+            if paged_household_members:
+                for target_path, owner_path in capture.identity_links:
+                    if _household_member_path(target_path) or _household_member_path(owner_path):
+                        raise StoreError("paged household conversion requires shared members identity integration")
             source_head = source_store.db.execute(
                 "SELECT generation,parent_generation,simulation_position,seed,"
                 "next_ids,namespace_inventory,namespace_counts,head_checksum "
@@ -1151,6 +1161,21 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             GENEALOGY_CHILD_NAMESPACE,
                             COMMUNITY_MEMBERSHIP_NAMESPACE,
                         ):
+                            if paged_household_members and namespace == "world.households":
+                                envelope = codec.decode(payload)
+                                if type(envelope) is not tuple or len(envelope) != 2:
+                                    raise StoreFormatError("invalid household envelope")
+                                ordinal, household = envelope
+                                if not isinstance(household, Household):
+                                    raise StoreFormatError("invalid household record")
+                                compact = replace(household, members=[])
+                                payload = codec.encode((ordinal, compact))
+                                checksum = _record_checksum(
+                                    namespace, typed_key, record_schema,
+                                    codec_version, changed_generation, payload,
+                                )
+                                row = (namespace, typed_key, payload, checksum,
+                                       codec_version, record_schema, changed_generation)
                             target.db.execute(
                                 "INSERT INTO records VALUES (?,?,?,?,?,?,?)",
                                 row,
@@ -1943,6 +1968,12 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
                             ),
                         )
 
+                    if paged_household_members:
+                        bootstrap_household_members(
+                            target, generation,
+                            ((hid, household.members)
+                             for hid, household in capture.world.households.items()),
+                        )
                     target.db.execute("DELETE FROM lazy_identity_state")
                     for namespace, key, path, incarnation_id in identity_rows:
                         encoded_key = codec.encode(key)
@@ -2035,6 +2066,15 @@ def convert_cold_to_lazy(source, destination, *, rules_id):
         if capture is not None:
             capture.prefix.close()
         source_store.close()
+
+
+def _household_member_path(path) -> bool:
+    return (
+        len(path) >= 3
+        and path[0] == ("field", "households")
+        and path[1][0] == "key"
+        and path[2] == ("field", "members")
+    )
 
 
 def _path_under_people(path) -> bool:
