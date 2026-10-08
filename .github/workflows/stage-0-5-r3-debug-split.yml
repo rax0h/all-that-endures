@@ -15,3 +15,4 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install -q pytest
       - run: python -m pytest -vv -q simulation/tests/test_stage_0_5_paged_household_world.py::test_r3_split_shared_member_list_on_one_household
+# retest checked incarnation precedence
