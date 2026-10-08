@@ -220,3 +220,54 @@ def test_r3_two_households_shared_member_list_reopen_and_dirty_both(tmp_path):
         portable = checkpoint.loads(checkpoint.dumps(detached))
         assert portable.households[1].members is portable.households[2].members
         assert portable.digest() == world.digest()
+
+
+def shared_household_store(tmp_path):
+    world = people_world(350, active=8)
+    members = list(range(1, 351))
+    world.households[1] = Household(1, 1, members)
+    world.households[2] = Household(2, 1, members)
+    world.next_household = 3
+    cold = tmp_path / "shared-cold.sqlite"
+    path = tmp_path / "shared-paged.sqlite"
+    write_cold_snapshot(world, cold, rules_id=RULES)
+    convert_cold_to_lazy(cold, path, rules_id=RULES, paged_household_members=True)
+    return world, path
+
+
+def test_r3_delete_one_member_sharing_owner_keeps_other_current(tmp_path):
+    original, path = shared_household_store(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as session:
+        retained = session.world.households[1].members
+        assert session.world.households[2].members is retained
+        del session.world.households[1]
+        del original.households[1]
+        retained.append(351)
+        original.households[2].members.append(351)
+        before = session.pin.captured_head
+        assert session.save() == before + 1
+        assert session.world.households[2].members is retained
+        assert session.world.digest() == original.digest()
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as reopened:
+        assert list(reopened.world.households) == [2]
+        assert reopened.world.households[2].members[-1] == 351
+        assert reopened.world.digest() == original.digest()
+
+
+def test_r3_split_shared_member_list_on_one_household(tmp_path):
+    original, path = shared_household_store(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as session:
+        retained = session.world.households[1].members
+        session.world.households[2].members = [11, 11, 4]
+        original.households[2].members = [11, 11, 4]
+        retained.append(351)
+        original.households[1].members.append(351)
+        before = session.pin.captured_head
+        assert session.save() == before + 1
+        assert session.world.households[1].members is retained
+        assert session.world.households[2].members != retained
+        assert session.world.digest() == original.digest()
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as reopened:
+        assert reopened.world.households[1].members[-1] == 351
+        assert reopened.world.households[2].members == [11, 11, 4]
+        assert reopened.world.digest() == original.digest()
