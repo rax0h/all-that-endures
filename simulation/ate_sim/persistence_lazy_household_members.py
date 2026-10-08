@@ -101,7 +101,7 @@ class LazyHouseholdMembers(MutableSequence):
     and active lifecycle operations before any mutation.
     """
 
-    def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES):
+    def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES, initial_values=None):
         _member_id(owner)
         self._store = store
         self._pin = pin
@@ -112,6 +112,13 @@ class LazyHouseholdMembers(MutableSequence):
             raise ValueError("cache_pages must be positive")
         self._cache = OrderedDict()
         self._dirty_pages = {}
+        self._new_owner = initial_values is not None
+        if self._new_owner:
+            self._length = 0
+            self._base_length = 0
+            for value in tuple(_member_id(v) for v in initial_values):
+                self._append(value)
+            return
         if getattr(store, "_active_read_transaction", False):
             # The P4 open already owns a checked, generation-matched snapshot.
             # Do not start a nested SQLite BEGIN while binding proxies.
@@ -289,7 +296,7 @@ class LazyHouseholdMembers(MutableSequence):
         result = []
         base_pages = (self._base_length + PAGE_SIZE - 1) // PAGE_SIZE
         final_pages = (self._length + PAGE_SIZE - 1) // PAGE_SIZE
-        if self._length != self._base_length:
+        if self._new_owner or self._length != self._base_length:
             result.append(VersionChange(
                 LENGTH_NAMESPACE, self._owner, self._length,
                 record_schema=RECORD_SCHEMA,
@@ -325,6 +332,7 @@ class LazyHouseholdMembers(MutableSequence):
         """Advance to the committed generation only after combined publication."""
         self._pin = pin
         self._base_length = self._length
+        self._new_owner = False
         self._dirty_pages.clear()
         self._cache.clear()
 
