@@ -112,6 +112,9 @@ class LazyHouseholdMembers(MutableSequence):
             raise ValueError("cache_pages must be positive")
         self._cache = OrderedDict()
         self._dirty_pages = {}
+        # P2C current links, not this set, are the sharing authority.
+        # This is the derived set of owners currently sharing one live list.
+        self._related_owners = {owner}
         self._detached_values = None
         self._new_owner = initial_values is not None and baseline_length is None
         if initial_values is not None:
@@ -383,7 +386,25 @@ class LazyHouseholdMembers(MutableSequence):
             result.append(VersionChange(
                 PAGE_NAMESPACE, key, value, record_schema=RECORD_SCHEMA,
             ))
-        return tuple(result)
+        # A P2C sharing group has one live list and a checked owner-local
+        # physical projection for every linked household. Replicate only
+        # the changed bounded pages to every current owner.
+        owners = tuple(sorted(self._related_owners))
+        if owners == (self._owner,):
+            return tuple(result)
+        expanded = []
+        for change in result:
+            for owner in owners:
+                if change.namespace == LENGTH_NAMESPACE:
+                    key = owner
+                else:
+                    key = (owner, change.key[1])
+                expanded.append(VersionChange(
+                    change.namespace, key, change.value,
+                    record_schema=change.record_schema,
+                    delete=change.delete,
+                ))
+        return tuple(expanded)
 
     def _read_baseline_page(self, number):
         checked = self._store.read_version(
