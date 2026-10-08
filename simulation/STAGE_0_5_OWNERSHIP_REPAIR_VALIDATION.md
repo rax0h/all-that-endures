@@ -1,6 +1,7 @@
 # Paged ownership repair candidate — 2026-10-08
 
-Status: implemented and short-gate validated; **Stage 0.5 remains BLOCKED** on
+Status: implemented; exact-candidate focused, P5 and full-suite gates passed;
+**Stage 0.5 remains BLOCKED** on
 remaining bounded-storage work and durable endurance evidence. No production
 promotion, merge, broad migration, or endurance run is authorized by this file.
 
@@ -88,9 +89,55 @@ being mistaken for a live household placement after reopen; its focused
 regression now passes. This records findings addressed, not a blanket claim that
 an independent reviewer approved every final byte.
 
+## Exact-candidate gate closeout — 2026-10-08
+
+Frozen tested implementation:
+`171b18397b7f0ecb4ebfb218e60729308120c264`, root tree
+`e31341d62c2dde5c106994d9dea78fd13fb7d4e4`.
+
+- Exact handoff focused command: **177 passed, 2 subtests passed in 107.04s**.
+- Independent paged-households P5 control, seed 843000, 3+4+3 years:
+  **passed true**, process wall time **9.53s**.
+- One full simulation suite: **907 passed, 2 subtests passed in 2512.22s
+  (41m52s)**; exit code **0**, first run attempt.
+- [Full-suite run 37822170654](https://github.com/rax0h/all-that-endures/actions/runs/37822170654),
+  job `113465715437`, completed successfully.
+- Helper commit `4c825f9f0a86e406211cb3b82fd98f8fb2a88bbb`, tree
+  `c795d268aaa5d39eb85512d3682c9cecf8666b44`, has the frozen implementation as
+  its sole parent. Its only changed file is
+  `.github/workflows/stage-0-5-ownership-full-suite.yml`.
+- CI verified the candidate tree, workflow-only difference, exact simulation,
+  implementation and test subtree equality, focused evidence hashes and P5
+  success before running the full suite. No implementation repair was required.
+
+The helper run was deliberately launched by publishing that isolated workflow;
+its branch-specific push trigger ran exactly one full-suite job. No endurance
+harness was invoked and no long-job polling was performed.
+
+Retained evidence:
+
+- [Complete evidence artifact 11571189473](https://github.com/rax0h/all-that-endures/actions/runs/37822170654/artifacts/11571189473):
+  full pytest log, focused log, P5 log/JSON, original source index and provenance
+  manifest with exact source/tree/workflow, commands, environments and hashes.
+  ZIP size **17,867 bytes**, SHA-256
+  `329a7a77a67e1f2a51e4c9276d59471cb47a8c2cebfca41f8127f85e631f09cd`.
+- [Preflight artifact 11570006007](https://github.com/rax0h/all-that-endures/actions/runs/37822170654/artifacts/11570006007):
+  evidence retained before the full suite; ZIP size **17,171 bytes**, SHA-256
+  `7657779a06a1ec1f266a4108df09d29000a967aba7509fa972fe3dcdceff8ab2`.
+- Both uploads succeeded and are currently unexpired; configured retention is
+  90 days, with reported expiry **2027-01-06**. Artifact upload and metadata were
+  verified; this closeout does not claim an independent artifact download/restore.
+
+This closes the repair's exact-source validation gate. It does not establish
+architect acceptance or resolve the historical storage and late-world backup
+blockers below. PR #14 remains at
+`c29e3d06a0c9d219235e2b3f0390271bd1245aea`. This documentation-only closeout
+does not change the frozen tested implementation or promote it to production.
+
 ## Remaining release blockers
 
-1. Final exact-commit CI gate for this repair; see the bounded Sol assignment.
+1. Ownership repair's exact-candidate test gate is closed by the run below.
+   Architect acceptance of the repair remains separate from this test result.
 2. B4 from the [independent review](https://github.com/rax0h/all-that-endures/blob/c29e3d06a0c9d219235e2b3f0390271bd1245aea/simulation/STAGE_0_5_REPAIRED_CANDIDATE_REVIEW.md):
    eager event-ID set, eager current-link inventory, history-growing household
    records/settlement IDs, and ordinary living-member queries loading dead history.
