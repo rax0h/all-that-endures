@@ -644,8 +644,10 @@ def _verify_old_state(session, plan, head, prefix, tail, commit):
     )
 
 
-def _verify_successor_records(session, plan):
+def _verify_successor_records(session, plan, *, namespace=None):
     for evidence in plan.record_evidence:
+        if namespace is not None and evidence.namespace != namespace:
+            continue
         try:
             value = session.store.read_record(
                 evidence.namespace,
@@ -757,6 +759,21 @@ def _capture_successor(session, plan, *, full_evidence):
             if full_evidence:
                 _verify_successor_records(session, plan)
                 _verify_successor_segments(session, plan)
+            else:
+                # A compact authority cannot be acknowledged from counts
+                # alone: a valid checked row may still contradict the frozen
+                # descriptor. Validate changed event-ID bytes before adoption.
+                _verify_successor_records(session, plan, namespace='world.event_ids')
+            from .persistence_adapters import _read_cold_manifest, _restore_collection
+            from .persistence_event_ids import RANGE_TAG
+            planned_layout = (plan.layout_value if plan.layout_value is not None
+                              else session._manifest['collections'])
+            expected_ids = planned_layout['world.event_ids']
+            if expected_ids[0] == RANGE_TAG:
+                actual_ids = _read_cold_manifest(session.store)['collections']['world.event_ids']
+                if actual_ids != expected_ids:
+                    raise StoreIntegrityError('event-ID successor layout mismatch')
+                _restore_collection(session.store, 'world.event_ids', 'set', actual_ids)
 
             prefix_reader = SealedEventPrefix.from_active_read_transaction(
                 session.store

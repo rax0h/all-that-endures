@@ -32,6 +32,7 @@ from .currency import RankedCurrencyState
 from .threat_ecology import ThreatEcologyState
 from .record_index import IndexedRecord, indexed
 from .event_log import EventLog, freeze
+from .persistence_event_ids import EventIdSet
 class Layer(str,Enum): REALITY='reality'; SOCIETY='society'; KNOWLEDGE='knowledge'; NARRATIVE='narrative'
 @dataclass(frozen=True)
 class Ref: kind:str; id:int
@@ -69,7 +70,7 @@ def _canonical(value):
  if is_dataclass(value):return {key:_canonical(getattr(value,name)) for key,name in _canonical_fields(type(value))}
  if isinstance(value,dict):return {repr(k):_canonical(v) for k,v in sorted(value.items(),key=lambda kv:repr(kv[0]))}
  if isinstance(value,(list,tuple,EventLog)) or isinstance(value,MutableSequence):return [_canonical(v) for v in value]
- if isinstance(value,(set,frozenset)):return sorted((_canonical(v) for v in value),key=repr)
+ if isinstance(value,(set,frozenset,EventIdSet)):return sorted((_canonical(v) for v in value),key=repr)
  return value
 @dataclass
 class World:

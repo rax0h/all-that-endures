@@ -253,6 +253,8 @@ def _namespace_path(namespace: str) -> tuple[tuple[str, Any], ...]:
 def _owner_path(manifest, owner) -> tuple[tuple[str, Any], ...]:
     namespace, key = owner
     base = _namespace_path(namespace)
+    if namespace == 'world.event_ids':
+        return base
     description = manifest["collections"].get(namespace)
     if type(description) is not tuple or len(description) != 3:
         raise StoreFormatError(f"missing collection description: {namespace}")
@@ -287,6 +289,8 @@ def _iter_identity_owners(world, manifest):
                     owner = (namespace, index)
                     yield owner, child, _owner_path(manifest, owner)
             elif expected == "set":
+                if namespace == 'world.event_ids':
+                    yield (namespace, 0), value, _namespace_path(namespace)
                 continue
 
 
@@ -1005,6 +1009,49 @@ def _insert_lazy_material_lot(
         )
 
 
+def _convert_event_id_range(target, capture, source_head, authority):
+    """Publish independently proved range authority in the private conversion."""
+    from .incremental_store import _counts_blob, _namespace_counts, _head_checksum
+    from .persistence_adapters import COLLECTION_LAYOUT, RECORD_SCHEMA
+    from .persistence_event_ids import RANGE_TAG
+
+    generation = int(source_head[0])
+    namespace = 'world.event_ids'
+    key = target.codec.encode(0)
+    payload = target.codec.encode((0, authority.descriptor()))
+    target.db.execute('INSERT INTO records VALUES (?,?,?,?,?,?,?)', (
+        namespace, key, payload,
+        _record_checksum(namespace, key, RECORD_SCHEMA, target.codec.version, generation, payload),
+        target.codec.version, RECORD_SCHEMA, generation,
+    ))
+    layout = dict(capture.manifest['collections'])
+    layout[namespace] = (RANGE_TAG, authority.range_end, 0)
+    layout_key = target.codec.encode(COLLECTION_LAYOUT)
+    exists = target.db.execute('SELECT 1 FROM records WHERE namespace=? AND typed_key=?', (META, layout_key)).fetchone()
+    if exists:
+        value = layout
+    else:
+        layout_key = target.codec.encode('manifest')
+        value = target.codec.decode(target.db.execute(
+            'SELECT payload FROM records WHERE namespace=? AND typed_key=?',
+            (META, layout_key),
+        ).fetchone()[0])
+        value['collections'] = layout
+    payload = target.codec.encode(value)
+    target.db.execute('UPDATE records SET payload=?,payload_checksum=?,last_changed_generation=? WHERE namespace=? AND typed_key=?', (
+        payload, _record_checksum(META, layout_key, RECORD_SCHEMA, target.codec.version, generation, payload),
+        generation, META, layout_key,
+    ))
+    head = list(source_head)
+    counts = _namespace_counts(target.codec, head[6])
+    counts[namespace] = (1, 0)
+    head[6] = _counts_blob(target.codec, counts)
+    head[7] = _head_checksum(*head[:7])
+    target.db.execute('DELETE FROM save_head')
+    target.db.execute('INSERT INTO save_head VALUES (1,?,?,?,?,?,?,?,?)', head)
+    target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+
+
 def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True):
     """Explicit checked P3B cold -> P4 conversion. New Worlds use bounded household pages."""
     source, destination = _preflight_conversion_paths(source, destination)
@@ -1031,6 +1078,9 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     "convert_cold_to_lazy requires P3B cold event storage"
                 )
             capture = _capture_cold_world(source_store)
+            from .persistence_event_ids import EventIdSet
+            event_id_authority = EventIdSet.from_checked_values(capture.world.event_ids)
+            from .persistence_event_ids import AUTHORITY_REFERENCE
             if paged_household_members:
                 for target_path, owner_path in capture.identity_links:
                     a = _household_member_path(target_path)
@@ -1076,6 +1126,12 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                 capture.identity_links,
                 codec,
             )
+            root_label = next(row[3] for row in identity_rows
+                              if row[:3] == ('world.event_ids', 0, ()))
+            event_id_alias_paths = {}
+            for ns, owner_key, relative, incarnation in identity_rows:
+                if incarnation == root_label and ns != 'world.event_ids':
+                    event_id_alias_paths.setdefault((ns, codec.encode(owner_key)), []).append(relative)
 
             with tempfile.TemporaryDirectory(
                 prefix=".ate-p4-convert-", dir=destination.parent
@@ -1163,6 +1219,16 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             record_schema,
                             changed_generation,
                         ) = row
+                        if namespace == 'world.event_ids' and event_id_authority.range_end is not None:
+                            continue
+                        alias_paths = event_id_alias_paths.get((namespace, typed_key), ())
+                        if alias_paths:
+                            ordinal, value = codec.decode(payload)
+                            for relative in alias_paths:
+                                value = _relative_set(value, relative, AUTHORITY_REFERENCE)
+                            payload = codec.encode((ordinal, value))
+                            checksum = _record_checksum(namespace, typed_key, record_schema, codec_version, changed_generation, payload)
+                            row = (namespace, typed_key, payload, checksum, codec_version, record_schema, changed_generation)
                         if namespace not in (
                             PEOPLE_NAMESPACE,
                             ASPIRATION_NAMESPACE,
@@ -2067,6 +2133,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             ),
                         ),
                     )
+                    if event_id_authority.range_end is not None:
+                        _convert_event_id_range(target, capture, source_head, event_id_authority)
+                    elif event_id_alias_paths:
+                        target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
                     target.db.commit()
                     target.verify_all()
                     target.close()
@@ -2085,7 +2155,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
             summary = check.verify_all()
             return {
                 "source_format": "p3b-cold/current-links",
-                "destination_format": 3,
+                "destination_format": int(check.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0]),
                 "generation": summary["generation"],
                 "people": people_count,
                 "aspirations": aspiration_count,
@@ -2412,10 +2482,12 @@ def _lazy_occurrence_from_path(path):
         )
     wallet = _currency_occurrence_from_path(path, "wallets")
     if wallet is not None:
-        return WALLET_NAMESPACE, wallet[0], wallet[1], (dict, list, LazyHouseholdMembers) if wallet[1] else dict
+        from .persistence_event_ids import EventIdSet
+        return WALLET_NAMESPACE, wallet[0], wallet[1], (dict, list, set, EventIdSet, LazyHouseholdMembers) if wallet[1] else dict
     treasury = _currency_occurrence_from_path(path, "treasuries")
     if treasury is not None:
-        return TREASURY_NAMESPACE, treasury[0], treasury[1], (dict, list, LazyHouseholdMembers) if treasury[1] else dict
+        from .persistence_event_ids import EventIdSet
+        return TREASURY_NAMESPACE, treasury[0], treasury[1], (dict, list, set, EventIdSet, LazyHouseholdMembers) if treasury[1] else dict
     soul = _soul_occurrence_from_path(path)
     if soul is not None:
         relative = soul[1]
@@ -7467,6 +7539,9 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
 
     def _plain(self, value):
         def compact(child):
+            from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
+            if type(child) is EventIdSet and child is self._session.world.event_ids:
+                return AUTHORITY_REFERENCE
             if isinstance(child, LazyHouseholdMembers):
                 return stored_members(child)
             if isinstance(child, dict):
@@ -11924,6 +11999,14 @@ class LazyWorldSession:
             existing = self._registry.object_for_incarnation(
                 incarnation
             )
+            from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
+            if type(existing) is EventIdSet:
+                if current is not existing and (type(current) is not tuple or current != AUTHORITY_REFERENCE):
+                    raise StoreIntegrityError('invalid event-ID authority reference')
+                if existing is not self.world.event_ids:
+                    raise StoreIntegrityError('event-ID reference has wrong incarnation')
+            elif type(current) is tuple and current == AUTHORITY_REFERENCE:
+                raise StoreIntegrityError('event-ID reference lacks checked live authority')
             if isinstance(existing, LazyHouseholdMembers):
                 self._validate_paged_payload(existing, incarnation, current)
             if existing is None:
@@ -11932,6 +12015,9 @@ class LazyWorldSession:
                 _relative_set(wrapper, path, existing)
                 current = existing
             if existing is None:
+                if type(current) is dict:
+                    current = LazyTrackedDict(current)
+                    _relative_set(wrapper, path, current)
                 try:
                     self._registry.bind(
                         current,
@@ -11949,6 +12035,8 @@ class LazyWorldSession:
                 incarnation,
                 self._currency_occurrence(namespace, key, path),
             )
+            if isinstance(current, LazyTrackedDict):
+                current._attach(table, key)
 
         actual = self._currency_incarnation_labels(
             namespace, key, wrapper
@@ -15015,7 +15103,7 @@ class LazyWorldSession:
                     + plan.community_membership_identity_changes
                 ),
                 next_incarnation_id=self._registry.next_incarnation,
-                required_format_version=(4 if any(
+                required_format_version=(5 if self._eager_tracker._description('world.event_ids')[0] == 'event-ids-range/v1' else 4 if any(
                     change.namespace == HOUSEHOLD_BACKING_NAMESPACE
                     for change in plan.household_member_version_changes
                 ) else 3),
@@ -15350,7 +15438,8 @@ class LazyWorldSession:
             )
             return plain
 
-        if isinstance(value, set):
+        from .persistence_event_ids import EventIdSet
+        if isinstance(value, (set, EventIdSet)):
             plain = set(value)
             memo[ident] = plain
             replacements[ident] = plain
@@ -15575,6 +15664,30 @@ class LazyWorldSession:
 
 
     def _stage_detached_currency_table(self, table, replacements=None):
+        from .persistence_event_ids import EventIdSet
+        def stage_ids(value):
+            if id(value) in replacements:
+                return replacements[id(value)]
+            if type(value) is EventIdSet:
+                if id(value) not in replacements:
+                    replacements[id(value)] = set(value)
+                return replacements[id(value)]
+            if isinstance(value, dict):
+                staged = {key: stage_ids(child) for key, child in value.items()}
+                if any(staged[key] is not child for key, child in value.items()):
+                    replacements[id(value)] = staged
+                    return staged
+                return value
+            if isinstance(value, list):
+                staged = [stage_ids(child) for child in value]
+                if any(a is not b for a, b in zip(staged, value)):
+                    replacements[id(value)] = staged
+                    return staged
+                return value
+            if type(value) is tuple:
+                staged = tuple(stage_ids(child) for child in value)
+                return staged if any(a is not b for a, b in zip(staged, value)) else value
+            return value
         expected = len(table)
         detached = {}
         if replacements is None:
@@ -15593,6 +15706,9 @@ class LazyWorldSession:
             # one ordinary list during explicit materialization, without
             # leaving that other owner's alias attached to the closed store.
             for nested_key, nested_value in tuple(replacement.items()):
+                staged = stage_ids(nested_value)
+                if staged is not nested_value:
+                    replacement[nested_key] = staged
                 if isinstance(nested_value, LazyHouseholdMembers):
                     plain = replacements.get(id(nested_value))
                     if plain is None:
@@ -16424,6 +16540,12 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
                             kind,
                             manifest["collections"][namespace],
                         )
+                        if namespace == 'world.event_ids':
+                            from .persistence_event_ids import EventIdSet
+                            if type(value) is not EventIdSet:
+                                facade = EventIdSet()
+                                facade._end, facade._exact = None, value
+                                value = facade
                     object.__setattr__(obj, name, value)
             world = objects["world"]
 

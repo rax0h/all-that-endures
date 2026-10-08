@@ -62,9 +62,10 @@ class IdentityOccurrenceIndex:
 
     @staticmethod
     def _mutable(value):
+        from .persistence_event_ids import EventIdSet
         cls = type(value)
         return (
-            isinstance(value, (dict, list, set, EventLog))
+            isinstance(value, (dict, list, set, EventLog, EventIdSet))
             or getattr(value, "_ate_household_page_sequence", False) is True
             or (is_dataclass(value) and not cls.__dataclass_params__.frozen)
         )

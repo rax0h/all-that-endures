@@ -12,6 +12,7 @@ import sys
 
 
 RANGE_TAG = "event-ids-range/v1"
+AUTHORITY_REFERENCE = ('event-id-authority-ref/v1',)
 
 
 class EventIdSet(MutableSet):

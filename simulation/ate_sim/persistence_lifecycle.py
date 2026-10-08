@@ -13,6 +13,7 @@ from .incremental_store import StoreError, StoreIntegrityError
 from .persistence_events import CHUNK_SIZE, _validate_sealed_event
 from .persistence_session import _validate_suffix_event
 from .record_index import RecordTable
+from .persistence_event_ids import EventIdSet
 
 
 def _lifecycle_phase(_phase, _session):
@@ -248,7 +249,7 @@ def _stage_plain_graph(
             memo[ident] = result
             result.extend(stage(child) for child in value)
             return result
-        if isinstance(value, (TrackedSet, _RootSet)):
+        if isinstance(value, (TrackedSet, _RootSet, EventIdSet)):
             result = set()
             memo[ident] = result
             result.update(stage(child) for child in value)

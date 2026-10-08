@@ -13,6 +13,7 @@ import zlib
 
 from .core import World, Event, Layer
 from .event_log import EventLog, FrozenDict, FrozenList
+from .persistence_event_ids import EventIdSet, RANGE_TAG
 from .persistence_identity import iter_mutable_event_items
 from .record_index import RecordTable, IndexedRecord
 from .incremental_store import (
@@ -106,6 +107,14 @@ class WorldCodec(TypedCodec):
                 raise CodecError('invalid event sealed flag')
             return ['ate_event/v1', present, sealed,
                     super()._encode_value(value, active, seen_mutable)]
+        if cls is EventIdSet:
+            self._enter(value, active, seen_mutable, mutable=True)
+            try:
+                encoded = [self._encode_value(v, active, seen_mutable) for v in value]
+                encoded.sort(key=self._node_sort_key)
+                return ['set', encoded]
+            finally:
+                active.remove(id(value))
         if cls in (FrozenDict, FrozenList):
             self._enter(value, active, seen_mutable, mutable=False)
             try:
@@ -167,7 +176,7 @@ def _audit(value, path, seen, active, links):
     if id(value) in active:
         raise CodecError(f'cycle at {path}')
     record = is_dataclass(value)
-    mutable = cls in (dict, list, set, RecordTable, EventLog) or (record and not cls.__dataclass_params__.frozen)
+    mutable = cls in (dict, list, set, EventIdSet, RecordTable, EventLog) or (record and not cls.__dataclass_params__.frozen)
     if mutable and id(value) in seen:
         links.append((path, seen[id(value)][0]))
         return
@@ -185,7 +194,7 @@ def _audit(value, path, seen, active, links):
             for k, v in value.items():
                 _audit(k, path + (('map_key', k),), seen, active, links)
                 _audit(v, path + (('key', k),), seen, active, links)
-        elif cls in (list, tuple, set, frozenset, FrozenList, EventLog):
+        elif cls in (list, tuple, set, EventIdSet, frozenset, FrozenList, EventLog):
             if cls is EventLog:
                 expected_state = {
                     '_disk_prefix', '_disk_count', '_chunks', '_tail', '_count',
@@ -240,11 +249,11 @@ def _roots(world):
 
 def _kind(value, expected):
     cls = type(value)
-    choices = {'dict': (dict, RecordTable), 'list': (list,), 'set': (set,),
+    choices = {'dict': (dict, RecordTable), 'list': (list,), 'set': (set, EventIdSet),
                'int': (int,), 'events': (list, EventLog)}
     if cls not in choices[expected]:
         raise CodecError(f'expected {expected}, found {cls.__name__}')
-    return cls.__name__
+    return 'set' if cls is EventIdSet else cls.__name__
 
 
 def _write_snapshot(world, path, *, rules_id, legacy_identity=False):
@@ -356,6 +365,25 @@ def _restore_collection(store, namespace, expected, description):
     if type(description) is not tuple or len(description) != 3:
         raise StoreFormatError(f'invalid collection description: {namespace}')
     kind, size, chunks = description
+    if kind == RANGE_TAG:
+        if (namespace != 'world.event_ids' or expected != 'set'
+                or type(size) is not int or size < 0
+                or type(chunks) is not int or chunks != 0):
+            raise StoreFormatError('invalid event-ID range description')
+        floor = store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()
+        if floor is None or int(floor[0]) < 5:
+            raise StoreFormatError('event-ID range requires reader capability 5')
+        rows = store.read_records(namespace, expected_record_schema=RECORD_SCHEMA)
+        if len(rows) != 1:
+            raise StoreIntegrityError('missing/extra event-ID authority rows')
+        key, envelope, _schema = rows[0]
+        if (type(key) is not int or key != 0 or type(envelope) is not tuple
+                or len(envelope) != 2 or type(envelope[0]) is not int
+                or envelope[0] != 0 or type(envelope[1]) is not tuple
+                or len(envelope[1]) != 2 or envelope[1][0] != RANGE_TAG
+                or type(envelope[1][1]) is not int or envelope[1][1] != size):
+            raise StoreIntegrityError('event-ID authority disagrees with layout')
+        return EventIdSet.from_range_descriptor(size)
     allowed = {'dict': ('dict', 'RecordTable', 'dict-stable/v1', 'RecordTable-stable/v1'),
                'list': ('list', PACKED_LIST_KIND), 'set': ('set', 'set-stable/v1'),
                'events': ('list', 'EventLog'), 'int': ('int',)}[expected]
@@ -511,7 +539,7 @@ def _complete_identity_groups(
     if ident in active:
         raise StoreIntegrityError('cycle in restored identity graph')
     record = is_dataclass(value)
-    mutable = cls in (dict, list, set, RecordTable, EventLog) or (
+    mutable = cls in (dict, list, set, EventIdSet, RecordTable, EventLog) or (
         record and not cls.__dataclass_params__.frozen
     )
     if mutable:
@@ -558,7 +586,7 @@ def _complete_identity_groups(
                     active,
                     mutable_event_tail_only=mutable_event_tail_only,
                 )
-        elif cls in (set, frozenset):
+        elif cls in (set, EventIdSet, frozenset):
             return groups
     finally:
         active.remove(ident)
@@ -1002,6 +1030,15 @@ def _restore_identity(world, links, *, mutable_event_tail_only=False):
         if not target or target == owner or target in targets:
             raise StoreIntegrityError('duplicate/invalid identity target')
         targets.add(target)
+        from .persistence_event_ids import AUTHORITY_REFERENCE
+        event_id_root = (('field', 'event_ids'),)
+        if event_id_root in (target, owner) and type(world.event_ids) is EventIdSet:
+            foreign = owner if target == event_id_root else target
+            copy = _at_path(world, foreign, mutable_event_tail_only=mutable_event_tail_only)
+            if type(copy) is tuple and copy == AUTHORITY_REFERENCE:
+                boundary = _identity_assignment_boundary(world, foreign, mutable_event_tail_only=mutable_event_tail_only)
+                assignments.append((foreign, event_id_root, boundary))
+                continue
 
         old = _at_path(
             world, target,

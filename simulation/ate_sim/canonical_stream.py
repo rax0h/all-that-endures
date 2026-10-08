@@ -6,6 +6,7 @@ from json.encoder import encode_basestring
 import hashlib
 import json
 from .event_log import EventLog
+from .persistence_event_ids import EventIdSet
 
 
 def digest(value,canonical,field_names):
@@ -34,8 +35,8 @@ def digest(value,canonical,field_names):
                 if i:yield ','
                 yield encode_basestring(repr(key));yield ':';yield from pieces(v[key])
             yield '}'
-        elif isinstance(v,(list,tuple,EventLog,set,frozenset,MutableSequence)):
-            values=sorted(v,key=lambda x:repr(canonical(x))) if isinstance(v,(set,frozenset)) else v
+        elif isinstance(v,(list,tuple,EventLog,set,frozenset,EventIdSet,MutableSequence)):
+            values=sorted(v,key=lambda x:repr(canonical(x))) if isinstance(v,(set,frozenset,EventIdSet)) else v
             yield '['
             for i,item in enumerate(values):
                 if i:yield ','

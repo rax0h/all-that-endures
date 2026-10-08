@@ -874,7 +874,7 @@ class _RootSet(set):
             self.discard(value)
 
     def symmetric_difference_update(self, other):
-        for value in list(other):
+        for value in set(other):
             if value in self:
                 self.discard(value)
             else:
@@ -1150,6 +1150,11 @@ class IncrementalWorldSession:
         for namespace, container in self._root_containers.items():
             if namespace == "world.events" or namespace in self._excluded_namespaces:
                 continue
+            from .persistence_event_ids import EventIdSet
+            if type(container) is EventIdSet:
+                keys[namespace] = ({0} if container.range_end is not None
+                                   else set(container._exact._by_ordinal))
+                continue
             kind = self._base_kind(self._description(namespace)[0])
             if kind in ("dict", "RecordTable"):
                 keys[namespace] = set(container)
@@ -1364,6 +1369,8 @@ class IncrementalWorldSession:
             self._root_containers[namespace] = wrapped
             return wrapped
         if expected == "set":
+            if namespace == 'world.event_ids' and self._cold_mode:
+                return self._bind_event_ids(namespace, value, stored_kind, ordinals)
             wrapped = _RootSet(value)
             wrapped._setup(self, namespace, stored_kind, ordinals)
             self._root_containers[namespace] = wrapped
@@ -1392,6 +1399,73 @@ class IncrementalWorldSession:
             self._root_containers[namespace] = wrapped
             return wrapped
         raise StoreFormatError(f"unsupported bound collection kind: {stored_kind}")
+
+    def _bind_event_ids(self, namespace, value, stored_kind, ordinals):
+        from .persistence_event_ids import EventIdSet, RANGE_TAG
+
+        if type(value) is EventIdSet:
+            facade = value
+        else:
+            # Legacy member rows remain exact resident authority. Compacting
+            # them is an explicit conversion, never work hidden in open.
+            facade = EventIdSet()
+            facade._end, facade._exact = None, set(value)
+        delegate = None
+        if facade.range_end is None:
+            delegate = _RootSet(facade._exact)
+            delegate._setup(self, namespace, stored_kind, ordinals)
+            facade._exact = delegate
+        state = [delegate]
+
+        def changed():
+            binding = _binding(facade)
+            if binding is not None:
+                self._mark_many(binding.owners)
+            previous = state[0]
+            if facade.range_end is not None and previous is None:
+                self._mark((namespace, 0))
+                self._manifest_dirty = True
+                return
+            if facade.range_end is None and facade._exact is previous:
+                # Point edits already used the stable ordinal delegate.
+                return
+            # A whole-set operation or range/fallback transition is explicit
+            # history work. Coalesce old/new actions through the owner journal;
+            # key zero may replace the descriptor with the first member.
+            old_keys = set(self._cold_persisted_keys.get(namespace, ()))
+            if previous is not None:
+                old_keys.update(previous._by_ordinal)
+            old_keys.update(key for ns, key in self._dirty if ns == namespace)
+            for key in old_keys:
+                self._delete((namespace, key))
+            if facade.range_end is not None:
+                state[0] = None
+                self._mark((namespace, 0))
+            else:
+                values = facade._exact
+                next_ordinal = previous._next_ordinal if previous is not None else 0
+                new_ordinals = {}
+                representatives = ({v: v for v in previous}
+                                   if previous is not None else {})
+                missing = object()
+                for item in values:
+                    if representatives.get(item, missing) is item:
+                        ordinal = previous._ordinals[item]
+                    else:
+                        ordinal = next_ordinal
+                        next_ordinal += 1
+                    new_ordinals[item] = ordinal
+                replacement = _RootSet(values)
+                replacement._setup(self, namespace, 'set-stable/v1', new_ordinals)
+                replacement._next_ordinal = max(replacement._next_ordinal, next_ordinal)
+                state[0] = facade._exact = replacement
+                for ordinal in replacement._by_ordinal:
+                    self._mark((namespace, ordinal))
+            self._manifest_dirty = True
+
+        facade.bind(self._ensure_mutation_allowed, changed)
+        self._root_containers[namespace] = facade
+        return facade
 
     def _validate_incoming(self, value, owners, *, allow_existing=False, active=None):
         if active is None:
@@ -1488,6 +1562,16 @@ class IncrementalWorldSession:
 
     def _bind_nested(self, value, owners, *, initial, allow_existing=False):
         cls = type(value)
+        from .persistence_event_ids import EventIdSet
+        if cls is EventIdSet:
+            binding = _binding(value)
+            if binding is None:
+                self._register_binding(value, _ObjectBinding(self, owners))
+            elif binding.session is not self:
+                raise StoreError('cross-session event-ID alias')
+            else:
+                binding.add_owners(owners)
+            return value
         if value is None or cls in (bool, int, float, str, bytes):
             return value
         if cls in (FrozenDict, FrozenList) or cls is frozenset:
@@ -1660,6 +1744,8 @@ class IncrementalWorldSession:
                             self._owner_path((namespace, i)),
                         )
                 elif expected == "set":
+                    if namespace == 'world.event_ids':
+                        yield (namespace, 0), value, self._namespace_path(namespace)
                     continue
 
     def _bootstrap_identity_index(self):
@@ -1731,6 +1817,9 @@ class IncrementalWorldSession:
             key=lambda owner: (owner[0], self.codec.encode(owner[1])),
         )
         for owner in owners:
+            if owner[0] == 'world.event_ids':
+                # Integer edits retain the root facade's identity.
+                continue
             # Packed agency history is one logical storage value. Its marker is
             # not a list-member owner and therefore has no identity path to
             # refresh. ActionRecord entries are immutable historical values.
@@ -1754,6 +1843,11 @@ class IncrementalWorldSession:
         container = self._root_containers.get(namespace)
         if container is None:
             return None
+        from .persistence_event_ids import EventIdSet
+        if type(container) is EventIdSet:
+            if container.range_end is not None:
+                return container.descriptor()
+            return container._exact._by_ordinal.get(key)
         kind = self._base_kind(self._description(namespace)[0])
         try:
             if kind in ("dict", "RecordTable"):
@@ -1822,6 +1916,8 @@ class IncrementalWorldSession:
             self._remove_owner_recursive(value, owner)
 
     def _prepare_root_assignment(self, namespace, old, value, kind):
+        if value is old:
+            return None
         # indexed(owner, name) performs an exact dict -> RecordTable runtime
         # normalization. Accept it only when keys/order and record identities
         # are unchanged; this is rebuildable query behavior, not persisted data.
@@ -2060,6 +2156,9 @@ class IncrementalWorldSession:
         value = self._root_containers.get(namespace)
         if value is None:
             return current
+        from .persistence_event_ids import EventIdSet, RANGE_TAG
+        if type(value) is EventIdSet:
+            return (RANGE_TAG if value.range_end is not None else 'set-stable/v1', len(value), 0)
         if type(value) is EventLog:
             if self._cold_mode:
                 sealed = value._disk_count + len(value._chunks) * value.chunk_size
@@ -2076,6 +2175,9 @@ class IncrementalWorldSession:
         if memo is None:
             memo = {}
         cls = type(value)
+        from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
+        if cls is EventIdSet and value is self.world.event_ids:
+            return AUTHORITY_REFERENCE
         if getattr(self, "_paged_household_members", False):
             from .persistence_lazy_household_members import LazyHouseholdMembers, stored_members
             if isinstance(value, LazyHouseholdMembers):
@@ -2122,6 +2224,11 @@ class IncrementalWorldSession:
             obj, name = self._scalar_fields[namespace]
             return (0, getattr(obj, name))
         container = self._root_containers[namespace]
+        from .persistence_event_ids import EventIdSet
+        if type(container) is EventIdSet:
+            if container.range_end is not None:
+                return (0, container.descriptor())
+            return (key, container._exact.value_for_ordinal(key))
         kind = self._base_kind(self._description(namespace)[0])
         if kind in ("dict", "RecordTable"):
             return (container.ordinal(key), container[key])

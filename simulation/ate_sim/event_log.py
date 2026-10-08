@@ -25,10 +25,11 @@ class FrozenList(list):
 
 
 def freeze(value):
+    from .persistence_event_ids import EventIdSet
     if isinstance(value,dict):return FrozenDict((k,freeze(v)) for k,v in value.items())
     if isinstance(value,list):return FrozenList(freeze(v) for v in value)
     if isinstance(value,tuple):return tuple(freeze(v) for v in value)
-    if isinstance(value,set):return frozenset(freeze(v) for v in value)
+    if isinstance(value,(set,EventIdSet)):return frozenset(freeze(v) for v in value)
     return value
 
 

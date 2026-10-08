@@ -221,8 +221,8 @@ def _validate_head_inventory(head, manifest, links, event_records):
             )
         expected_records = (
             1
-            if namespace == AGENCY_ACTIONS_NAMESPACE
-            and _kind == PACKED_LIST_KIND
+            if (namespace == AGENCY_ACTIONS_NAMESPACE and _kind == PACKED_LIST_KIND)
+            or (namespace == 'world.event_ids' and _kind == 'event-ids-range/v1')
             else size
         )
         if (records, segments) != (expected_records, 0):
