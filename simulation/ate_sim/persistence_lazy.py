@@ -9496,7 +9496,7 @@ class LazyWorldSession:
         # publishes and the runtime acknowledges it.
         for key in registered - current:
             old = self._paged_household_members.pop(key)
-            old.detach_to_memory()
+            old.retire_related_owner(key)
             self._paged_household_records.pop(key, None)
             self._deleted_paged_household_members[key] = old
         for key in current:
@@ -9508,7 +9508,7 @@ class LazyWorldSession:
                     # mutable incarnation, not an invitation to rewrite the
                     # old external alias. Preserve existing persisted pages.
                     original = tuple(household.members)
-                    old.detach_to_memory()
+                    old.retire_related_owner(key)
                     self._make_paged_household_sequence(
                         key, household,
                         initial_values=original,
@@ -9516,7 +9516,7 @@ class LazyWorldSession:
                     )
                 continue
             if old is not None:
-                old.detach_to_memory()
+                old.retire_related_owner(key)
                 self._paged_household_members.pop(key)
                 self._paged_household_records.pop(key, None)
                 self._deleted_paged_household_members[key] = old
@@ -9535,7 +9535,7 @@ class LazyWorldSession:
             change
             for key, retired in self._deleted_paged_household_members.items()
             if key not in current
-            for change in retired.deleted_owner_changes()
+            for change in retired.deleted_owner_changes(key)
         )
         unique_sequences = {
             id(sequence): sequence
