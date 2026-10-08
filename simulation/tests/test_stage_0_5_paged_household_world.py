@@ -189,3 +189,34 @@ def test_r3_replaced_household_same_id_preserves_old_alias_detachment(tmp_path):
     with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as reopened:
         assert reopened.world.digest() == original.digest()
         assert reopened.world.households[1].members == [42, 42, 7]
+
+
+def test_r3_two_households_shared_member_list_reopen_and_dirty_both(tmp_path):
+    from ate_sim import checkpoint
+    from ate_sim.persistence_lazy_store import LazyRecordStore
+    world = people_world(600, active=8)
+    shared = list(range(1, 601))
+    world.households[1] = Household(1, 1, shared)
+    world.households[2] = Household(2, 1, shared)
+    world.next_household = 3
+    cold = tmp_path / "shared-cold.sqlite"
+    path = tmp_path / "shared-paged.sqlite"
+    write_cold_snapshot(world, cold, rules_id=RULES)
+    convert_cold_to_lazy(cold, path, rules_id=RULES, paged_household_members=True)
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as session:
+        members = session.world.households[1].members
+        assert session.world.households[2].members is members
+        assert session.world.digest() == world.digest()
+        members.append(601)
+        shared.append(601)
+        assert session.world.households[2].members[-1] == 601
+        assert session.world.digest() == world.digest()
+        assert session.save() > 0
+    with open_lazy_world_session(path, rules_id=RULES, paged_household_members=True) as restored:
+        assert restored.world.households[1].members is restored.world.households[2].members
+        assert restored.world.digest() == world.digest()
+        detached = restored.detach(materialize_history=True)
+        assert detached.households[1].members is detached.households[2].members
+        portable = checkpoint.loads(checkpoint.dumps(detached))
+        assert portable.households[1].members is portable.households[2].members
+        assert portable.digest() == world.digest()
