@@ -22,22 +22,6 @@ def test_paged_household_members_shared_with_wallet_roundtrips_identity(tmp_path
         destination, rules_id=RULES, paged_household_members=True
     ) as session:
         primary = session.world.households[1].members
-        print("PRIMARY INC", session._registry.incarnation_for_object(primary))
-        print("INC KEYS", sorted((x.value for x in session._registry._by_incarnation)))
-        from ate_sim.persistence_lazy import WALLET_NAMESPACE
-        from ate_sim.persistence_lazy_identity import IncarnationId
-        for ident_path in ((("key", "members"),), ()):
-            try:
-                row = session.store.read_identity_occurrence(
-                    session.pin, WALLET_NAMESPACE, 99, ident_path
-                )
-                print("CROSS LABEL", ident_path, row.incarnation_id)
-                print("LIVE", session._registry.object_for_incarnation(
-                    IncarnationId(session.store.store_identity, row.incarnation_id)
-                ))
-            except KeyError:
-                print("CROSS LABEL ABSENT", ident_path)
-        print("DEFERRED", session._deferred_household_cross_links)
         related = session.world.currency.wallets[99]["members"]
         assert primary is related
         assert session.world.digest() == world.digest()
