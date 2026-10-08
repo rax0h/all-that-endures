@@ -163,3 +163,15 @@ in-place list replacement, retained nested/cross-owner aliases and their
 P2C link identity, then exercise a **real independently generated P5 short
 continuation** and a fresh affected failure/lifecycle matrix. Do not
 merge or launch another millennium/endurance run.
+
+## Independent release-gate probes (2026-10-08)
+
+The opt-in World pilot remains isolated and Stage 0.5 is **not accepted**.
+
+- [R3 P5 independent gate 37734166438](https://github.com/rax0h/all-that-endures/actions/runs/37734166438), helper source `992d66817c3d0da40969e6abb2af566ebc227f08`: 3+4+3-year independent seed-843000 continuation/checkpoint/cold conversion/paged lazy save/reopen/relocation/materializing detach passed. The affected people/identity/lifecycle/household matrix passed **77/77 in 75.05 s**. Final year-10 events **439**. This tested pilot source, not all subsequent P2C sharing changes.
+- [R3 recovery gate 37734309129](https://github.com/rax0h/all-that-endures/actions/runs/37734309129), helper source `53abeea77edb40146b114b5a0239d9a9d2539ff4`: **3/3 in 3.67 s**, exercising before-commit rollback and retained alias, lost after-commit acknowledgement and idempotent resolve/no-op, and stale competing writer/durable isolation.
+- [R3 shared-household P2C gate 37734274901](https://github.com/rax0h/all-that-endures/actions/runs/37734274901), pilot head `f59b7df2e57922fa528e69e565e44d9fadc9627a`: **19/19 in 53.87 s**, including household-to-household shared-member alias identity. Later P2C occurrence-index patches must be revalidated separately.
+- [Cross-family red 37734421814](https://github.com/rax0h/all-that-endures/actions/runs/37734421814), independent helper `88e0b72cc38d78d274dd7e6e375ed33f8ff7b240`: source P2C link between `Household.members` and a nested currency-wallet member list is refused at cold-to-paged conversion. This is a **known functional blocker**, not an unrelated fixture.
+- Exploratory [cross-family follow-up 37734616261](https://github.com/rax0h/all-that-endures/actions/runs/37734616261) on a disposable helper branch removed only that refusal and relaxed nested wallet type handling; it still failed because nested mutable list identity was not weak-referenceable in currency registry. Those **experimental product edits were not promoted** and must not be treated as an accepted repair.
+
+Remaining acceptance gate: true cross-family P2C sharing and owner mutation routing; final current-head affected tests including exceptional publication/identity; fresh independent P5 evidence on exact frozen product bytes; truthful residual nested inventory. The unavailable 5.13-GB year-1000 restore fixture remains a separate release deliverable, not grounds for an unauthorized endurance rerun.
