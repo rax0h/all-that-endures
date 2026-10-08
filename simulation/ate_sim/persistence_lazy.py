@@ -2848,9 +2848,13 @@ class LazyRecordTable(RecordTable):
 
     def _baseline_exists(self, key):
         if key not in self._baseline_presence:
-            self._baseline_presence[key] = self._store.contains_lazy_key(
+            present = self._store.contains_lazy_key(
                 self._pin, self._namespace, key
             )
+            # One-off history misses must not accumulate indefinitely.
+            if present:
+                self._baseline_presence[key] = True
+            return present
         return self._baseline_presence[key]
 
     def _persisted_ordinal(self, key):
@@ -2973,7 +2977,12 @@ class LazyRecordTable(RecordTable):
             rows = self._store.query_keys(
                 self._pin, self._namespace, index_name, value
             )
-        cache[cache_key] = rows
+        # A single huge historical query result can evade the count cap.
+        # Live positive-alive results are proportionate to actual active state.
+        if len(rows) <= self._clean_limit or (
+            index_name == "alive" and value is True
+        ):
+            cache[cache_key] = rows
         return rows
 
     def _prune_query_caches(self, epoch=None, *, retain_hot=False):
@@ -2993,6 +3002,25 @@ class LazyRecordTable(RecordTable):
             if epoch is not None:
                 cache.finish_step(epoch)
 
+    def _discard_clean_baseline(self, key):
+        """Release historical sidecars once a clean record is no longer hot.
+
+        The checked persisted link/incarnation authority is not modified.
+        Retained external aliases keep live runtime incarnations registered.
+        """
+        if key in self._dirty or key in self._new_keys or key in self._reinserted:
+            return
+        for name in (
+            "_baseline_payload",
+            "_baseline_presence",
+            "_baseline_incarnation",
+            "_baseline_ordinal",
+            "_baseline_identity_labels",
+        ):
+            cache = getattr(self, name, None)
+            if cache is not None:
+                cache.pop(key, None)
+
     def _evict_clean(self):
         tracker = getattr(self._session, "_eager_tracker", None)
         if tracker is not None and tracker._cold_step_depth:
@@ -3007,6 +3035,7 @@ class LazyRecordTable(RecordTable):
                 continue
             if dict.__contains__(self, key):
                 dict.__delitem__(self, key)
+            self._discard_clean_baseline(key)
         self._prune_query_caches()
 
     def _finish_simulation_step(self, epoch, *, retain_hot):
@@ -3030,6 +3059,7 @@ class LazyRecordTable(RecordTable):
                 continue
             if dict.__contains__(self, key):
                 dict.__delitem__(self, key)
+            self._discard_clean_baseline(key)
         self._last_step_hot_entries = len(touched) if retain_hot else 0
         self._lru.finish_step(epoch)
         self._prune_query_caches(epoch, retain_hot=retain_hot)
@@ -3382,6 +3412,9 @@ class LazyRecordTable(RecordTable):
         self._new_keys.clear()
         self._reinserted.clear()
         self._overlay_ordinals.clear()
+        for key in plan.touched_keys:
+            if self._baseline_presence.get(key) is False:
+                self._discard_clean_baseline(key)
         self._lru.clear()
         for key in list(dict.keys(self)):
             self._lru[key] = None
