@@ -175,3 +175,51 @@ The opt-in World pilot remains isolated and Stage 0.5 is **not accepted**.
 - Exploratory [cross-family follow-up 37734616261](https://github.com/rax0h/all-that-endures/actions/runs/37734616261) on a disposable helper branch removed only that refusal and relaxed nested wallet type handling; it still failed because nested mutable list identity was not weak-referenceable in currency registry. Those **experimental product edits were not promoted** and must not be treated as an accepted repair.
 
 Remaining acceptance gate: true cross-family P2C sharing and owner mutation routing; final current-head affected tests including exceptional publication/identity; fresh independent P5 evidence on exact frozen product bytes; truthful residual nested inventory. The unavailable 5.13-GB year-1000 restore fixture remains a separate release deliverable, not grounds for an unauthorized endurance rerun.
+
+
+## Further isolated R3 validation (2026-10-08)
+
+The experimental integration remains isolated at
+`sim/stage-0-5-r3-implementation`; these green pilot results are not
+production or Stage 0.5 acceptance.
+
+- [37733701964](https://github.com/rax0h/all-that-endures/actions/runs/37733701964):
+  **16 focused passed** and independent seed-843000 **3+4+3 P5
+  continuation passed**. The control/final digest was
+  `3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`,
+  with 439 ordered events, exact restore/checkpoint parity and source-preserving
+  conversion. This also covered the newly added household-owner publication.
+- [37734020969](https://github.com/rax0h/all-that-endures/actions/runs/37734020969):
+  **18 focused passed** after adding deleted/replaced owner tests. Retained
+  old member aliases were proven to stay detached rather than mutate a later
+  occupant of the same household ID.
+- [37734351028](https://github.com/rax0h/all-that-endures/actions/runs/37734351028):
+  **19 focused passed** after source-time P2C sharing between two household
+  member lists was preserved, including exact identity after save/reopen,
+  materializing detach and checkpoint. Matching P5 short run
+  [37734351001](https://github.com/rax0h/all-that-endures/actions/runs/37734351001)
+  also completed successfully.
+- [37734565139](https://github.com/rax0h/all-that-endures/actions/runs/37734565139):
+  **23 focused passed in 31.17s**, including P2C shared-list owner delete/split
+  and checked `member` query presence at fixed results across 1k/10k
+  histories. The separately launched P5 workflow for that candidate is
+  [37734565161](https://github.com/rax0h/all-that-endures/actions/runs/37734565161);
+  do not assert its conclusion without recorded result.
+
+As before, the opt-in World pilot does not replace the current default.
+The checked member index is an additional storage projection maintained with
+bounded page changes and checked generation visibility. The unbounded explicit
+whole-sequence operations remain intentionally proportional.
+
+**Release blockers still to be closed before promotion:** cross-family member
+aliases (e.g. an eager or separately lazy owner that shares the exact list),
+dynamic group merges and replacements with full P2C identity verification,
+uncovered direct mutable list operators; comprehensive lost-acknowledgement and
+transactional failure matrices on the combined new storage mode; final
+independent/affected matrix on exact promoted source; and nested eager-field
+residual inventory. Source-time household-to-household sharing and group
+splits/deletions are proven only for the exercised fixtures.
+
+The 5,124,976,640-byte year-1000 restore artifact is **still not verified as
+durably retained**. No new endurance run was launched. Do not merge or begin
+Stage 1 on this partial evidence.
