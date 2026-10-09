@@ -20,6 +20,8 @@ PAGE_NAMESPACE = "aux.lazy.household.member_pages"
 BACKING_NAMESPACE = "aux.lazy.household.member_backings"
 BACKING_TAG = "paged-members/v1"
 RECORD_SCHEMA = 1
+INDEXED_LENGTH_SCHEMA = 2
+OWNER_MEMBER_INDEX = "owner_member"
 PAGE_SIZE = 128
 CACHE_PAGES = 4
 
@@ -75,11 +77,17 @@ def _insert_version(store, generation, namespace, key, value, ordinal):
     codec = store.codec
     typed_key = codec.encode(key)
     payload = codec.encode(value)
-    page_members = (
-        tuple(("member", member_id, offset)
-              for offset, member_id in enumerate(value))
-        if namespace == PAGE_NAMESPACE else ()
-    )
+    page_members = ()
+    if namespace == PAGE_NAMESPACE:
+        owner, _number = key
+        page_members = tuple(
+            ("member", member_id, offset)
+            for offset, member_id in enumerate(value)
+        ) + tuple(
+            (OWNER_MEMBER_INDEX, (owner, member_id), offset)
+            for offset, member_id in enumerate(value)
+        )
+    schema = INDEXED_LENGTH_SCHEMA if namespace == LENGTH_NAMESPACE else RECORD_SCHEMA
     memberships = codec.encode(page_members)
     store.db.execute(
         "INSERT INTO lazy_record_versions("
@@ -87,9 +95,9 @@ def _insert_version(store, generation, namespace, key, value, ordinal):
         "codec_version,record_schema,memberships,row_checksum"
         ") VALUES (?,?,?,NULL,?,?,?,?,?,?)",
         (namespace, typed_key, generation, payload,
-         _framed_sha(b"lazy-payload-v1", payload), codec.version, RECORD_SCHEMA,
+         _framed_sha(b"lazy-payload-v1", payload), codec.version, schema,
          memberships, _version_checksum(
-             namespace, typed_key, RECORD_SCHEMA, codec.version,
+             namespace, typed_key, schema, codec.version,
              generation, None, memberships, payload,
          )),
     )
@@ -184,6 +192,8 @@ class LazyHouseholdMembers(MutableSequence):
         self._related_owners = {owner}
         self._detached_values = None
         self._new_owner = initial_values is not None and baseline_length is None
+        # Schema-1 legacy lengths never claim complete owner-index coverage.
+        self._owner_indexed = self._new_owner
         if initial_values is not None:
             if baseline_length is not None and (
                 type(baseline_length) is not int or baseline_length < 0
@@ -211,13 +221,23 @@ class LazyHouseholdMembers(MutableSequence):
             length, schema, *_ = store._check_record_row(
                 LENGTH_NAMESPACE, typed_key, row, decode=True
             )
-            if schema != RECORD_SCHEMA:
+            if schema not in (RECORD_SCHEMA, INDEXED_LENGTH_SCHEMA):
                 raise StoreFormatError("household member length schema mismatch")
         else:
-            checked = store.read_version(
-                pin, LENGTH_NAMESPACE, owner, expected_record_schema=RECORD_SCHEMA
-            )
+            try:
+                checked = store.read_version(
+                    pin, LENGTH_NAMESPACE, owner,
+                    expected_record_schema=INDEXED_LENGTH_SCHEMA,
+                )
+                schema = INDEXED_LENGTH_SCHEMA
+            except StoreFormatError:
+                checked = store.read_version(
+                    pin, LENGTH_NAMESPACE, owner,
+                    expected_record_schema=RECORD_SCHEMA,
+                )
+                schema = RECORD_SCHEMA
             length = checked.value
+        self._owner_indexed = schema == INDEXED_LENGTH_SCHEMA
         if type(length) is not int or length < 0:
             raise StoreFormatError("invalid household member sequence length")
         self._length = length
@@ -246,7 +266,8 @@ class LazyHouseholdMembers(MutableSequence):
         return (
             VersionChange(
                 LENGTH_NAMESPACE, key, delete=True,
-                record_schema=RECORD_SCHEMA,
+                record_schema=(INDEXED_LENGTH_SCHEMA if self._owner_indexed
+                               else RECORD_SCHEMA),
             ),
         ) + tuple(
             VersionChange(
@@ -336,8 +357,10 @@ class LazyHouseholdMembers(MutableSequence):
         # A checked index query scales with actual occurrences, not with
         # all historical member IDs. Dirty pages override their old snapshot
         # memberships, so skip those candidates.
+        index = OWNER_MEMBER_INDEX if self._owner_indexed else "member"
+        lookup_value = (self._owner, value) if self._owner_indexed else value
         for owner, number in self._store.query_keys(
-            self._pin, PAGE_NAMESPACE, "member", value
+            self._pin, PAGE_NAMESPACE, index, lookup_value
         ):
             if owner == self._owner and number not in self._dirty_pages:
                 return True
@@ -369,9 +392,11 @@ class LazyHouseholdMembers(MutableSequence):
                 if position < self._length and member in wanted:
                     positions.append((position, member))
 
+        index = OWNER_MEMBER_INDEX if self._owner_indexed else "member"
         for member in wanted:
+            lookup_value = (self._owner, member) if self._owner_indexed else member
             for page_key, offset in self._store.query_memberships(
-                self._pin, PAGE_NAMESPACE, "member", member,
+                self._pin, PAGE_NAMESPACE, index, lookup_value,
             ):
                 if type(page_key) is not tuple or len(page_key) != 2:
                     raise StoreIntegrityError("malformed household member page key")
@@ -533,7 +558,8 @@ class LazyHouseholdMembers(MutableSequence):
         if self._new_owner or self._length != self._base_length:
             result.append(VersionChange(
                 LENGTH_NAMESPACE, self._owner, self._length,
-                record_schema=RECORD_SCHEMA,
+                record_schema=(INDEXED_LENGTH_SCHEMA if self._owner_indexed
+                               else RECORD_SCHEMA),
             ))
         for number, page in sorted(self._dirty_pages.items()):
             key = (self._owner, number)
@@ -552,9 +578,16 @@ class LazyHouseholdMembers(MutableSequence):
                 continue
             result.append(VersionChange(
                 PAGE_NAMESPACE, key, value, record_schema=RECORD_SCHEMA,
-                memberships=tuple(
-                    Membership("member", member, offset)
-                    for offset, member in enumerate(value)
+                memberships=(
+                    tuple(
+                        Membership("member", member, offset)
+                        for offset, member in enumerate(value)
+                    ) + (
+                        tuple(
+                            Membership(OWNER_MEMBER_INDEX, (self._owner, member), offset)
+                            for offset, member in enumerate(value)
+                        ) if self._owner_indexed else ()
+                    )
                 ),
             ))
         # A P2C sharing group has one live list and a checked owner-local
