@@ -1,0 +1,96 @@
+name: Stage 0.5 bounded household tail delete
+'on':
+  push:
+    branches:
+      - sim/stage-0-5-household-tail-delete
+    paths:
+      - .github/workflows/stage-0-5-household-tail-delete.yml
+      - simulation/ate_sim/persistence_lazy_household_members.py
+      - simulation/tests/test_stage_0_5_household_tail_delete.py
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pytest
+        run: python -m pip install -q pytest
+      - name: Indexed tail and current living consumer regressions
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q --tb=short \
+            simulation/tests/test_stage_0_5_household_tail_delete.py \
+            simulation/tests/test_stage_0_5_living_consumer_closeout.py \
+            simulation/tests/test_stage_0_5_household_scoped_index.py \
+            simulation/tests/test_stage_0_5_household_living_selection.py \
+            simulation/tests/test_stage_0_5_household_sequence.py \
+            simulation/tests/test_stage_0_5_paged_household_world.py > household-tail-focused.log 2>&1
+          FOCUSED_RC=$?
+          cat household-tail-focused.log
+          python simulation/persistence_p5_validation.py \
+            --seed 843000 --pre-years 3 --continuation-years 4 \
+            --reopen-years 3 --paged-households \
+            --output household-tail-p5.json > household-tail-p5.log 2>&1
+          P5_RC=$?
+          cat household-tail-p5.log
+          echo "FOCUSED_RC=$FOCUSED_RC" >> "$GITHUB_ENV"
+          echo "P5_RC=$P5_RC" >> "$GITHUB_ENV"
+          exit 0
+      - name: Preserve exact logs and portable continuation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: household-tail-bounded-evidence
+          retention-days: 30
+          path: |
+            household-tail-focused.log
+            household-tail-p5.log
+            household-tail-p5.json
+          if-no-files-found: warn
+      - name: Publish tested-source results
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          focus=Path("household-tail-focused.log").read_text()
+          try:
+              p5=json.loads(Path("household-tail-p5.json").read_text())
+          except (ValueError,OSError):
+              p5=None
+          result={
+              "tested_commit":os.environ["GITHUB_SHA"],
+              "workflow_run":os.environ["GITHUB_RUN_ID"],
+              "focused_exit_code":int(os.environ["FOCUSED_RC"]),
+              "focused_summary":focus.strip().splitlines()[-1] if focus.strip() else "",
+              "p5_exit_code":int(os.environ["P5_RC"]),
+              "p5_passed":bool(isinstance(p5,dict) and p5.get("passed") is True),
+              "p5_final_year":p5.get("final_year") if isinstance(p5,dict) else None,
+              "note":"This is an affected focused/P5 gate; no final integrated full suite."
+          }
+          Path("simulation/household_tail_ci_result.json").write_text(
+              json.dumps(result,sort_keys=True,indent=2)+"\n"
+          )
+          print(result)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add simulation/household_tail_ci_result.json
+          git commit -m "ci: retain bounded tail deletion source proof [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          python - <<'PY'
+          import json,sys
+          from pathlib import Path
+          r=json.loads(Path("simulation/household_tail_ci_result.json").read_text())
+          if r["focused_exit_code"] or r["p5_exit_code"] or not r["p5_passed"]:
+              sys.exit("household tail candidate failed focused or P5 gate")
+          PY
