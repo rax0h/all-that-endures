@@ -108,7 +108,9 @@ def test_scoped_dirty_pages_override_pinned_index(tmp_path):
             store.db.rollback()
             raise
         pin = store.capture_pin()
+        old_pin = store.capture_pin()
         try:
+            old_reader = LazyHouseholdMembers(store, old_pin, 1)
             seq = LazyHouseholdMembers(store, pin, 1)
             seq[0] = 5
             seq[2] = 7
@@ -121,11 +123,13 @@ def test_scoped_dirty_pages_override_pinned_index(tmp_path):
                 metadata=store.checked_head().metadata,
             )
             assert outcome.outcome == "committed"
+            # A previous generation pin must retain its exact old placements.
+            assert old_reader.matching_member_ids([4, 5, 7]) == [4, 5, 4]
             seq.accept_save(outcome.pin)
             assert seq.matching_member_ids([4, 5, 7]) == [5, 5, 7, 5]
             reopened = LazyHouseholdMembers(store, outcome.pin, 1)
             assert reopened.matching_member_ids([4, 5, 7]) == [5, 5, 7, 5]
         finally:
-            pass
+            store.release_pin(old_pin)
     finally:
         store.close()
