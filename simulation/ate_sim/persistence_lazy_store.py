@@ -1257,7 +1257,7 @@ class LazyRecordStore:
         from .persistence_lazy_identity_catalog import IdentityCatalog
         return IdentityCatalog(self).read_identity_links(pin, incarnation_id)
 
-    def _interval_rows(self, table, columns, keys, values, generation, index, *, order=None, limit=None):
+    def _interval_rows(self, table, columns, keys, values, generation, index, *, order=None, limit=None, stream=False):
         """Exclude expired backlog by key/valid_to seeks, preserving overlap checks.
 
         Internal schema literals only; no user SQL identifiers enter here.
@@ -1266,15 +1266,17 @@ class LazyRecordStore:
         where = ' AND '.join(f'{key}=?' for key in keys) or '1'
         suffix = (f' ORDER BY {order}' if order else '') + (f' LIMIT {limit}' if limit is not None else '')
         if index not in self._interval_indexes:
-            return self.db.execute(f'SELECT {columns} FROM {table} WHERE {where} '
+            cursor = self.db.execute(f'SELECT {columns} FROM {table} WHERE {where} '
                 'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)' + suffix,
-                tuple(values) + (generation, generation)).fetchall()
-        return self.db.execute(
+                tuple(values) + (generation, generation))
+            return cursor if stream else cursor.fetchall()
+        cursor = self.db.execute(
             f'SELECT {columns} FROM {table} INDEXED BY {index} WHERE {where} '
             'AND valid_to IS NULL AND valid_from<=? UNION ALL '
             f'SELECT {columns} FROM {table} INDEXED BY {index} WHERE {where} '
             'AND valid_to>? AND valid_from<=?' + suffix,
-            tuple(values) + (generation,) + tuple(values) + (generation, generation)).fetchall()
+            tuple(values) + (generation,) + tuple(values) + (generation, generation))
+        return cursor if stream else cursor.fetchall()
 
     def _visible_record_row(self, generation: int, namespace: str, typed_key: bytes) -> tuple[Any, ...] | None:
         rows = self._interval_rows('lazy_record_versions',
@@ -1551,6 +1553,51 @@ class LazyRecordStore:
         finally:
             self._read_snapshot_end()
 
+    def iter_query_memberships(self, pin, namespace, index_name, value):
+        """Stream a checked projection without retaining all returned metadata.
+
+        Ordering is deliberately unspecified; callers requiring canonical order
+        use a bounded checked spill. Exact witnesses reject overlapping rows.
+        """
+        self._ensure_open()
+        _validate_namespace(namespace)
+        if type(index_name) is not str or not index_name or '\x00' in index_name:
+            raise ValueError('invalid membership index name')
+        encoded = self.codec.encode(value)
+        generation = self._read_snapshot_start(pin)
+        rows = None
+        try:
+            rows = self._interval_rows('lazy_query_versions',
+                'record_key,ordinal,valid_from,valid_to,row_checksum',
+                ('namespace', 'index_name', 'index_value'), (namespace, index_name, encoded),
+                generation, 'lazy_query_interval', stream=True)
+            for key, ordinal, start, end, checksum in rows:
+                self._query_rows += 1
+                if (type(ordinal) is not int or ordinal < 0 or type(start) is not int or not 0 <= start <= generation
+                    or (end is not None and (type(end) is not int or end <= generation or end <= start))
+                    or checksum != _query_checksum(namespace, index_name, encoded, key, ordinal, start, end)):
+                    raise StoreIntegrityError('streamed membership checksum/interval mismatch')
+                witnesses = self._interval_rows('lazy_query_versions', 'valid_from,valid_to',
+                    ('namespace', 'index_name', 'index_value', 'record_key', 'ordinal'),
+                    (namespace, index_name, encoded, key, ordinal), generation, 'lazy_query_interval', limit=2)
+                self._metadata_rows += len(witnesses)
+                if len(witnesses) != 1:
+                    raise StoreIntegrityError('overlapping streamed membership')
+                record = self._visible_record_row(generation, namespace, key)
+                if record is None:
+                    raise StoreIntegrityError('streamed membership has no owner')
+                memberships = self._check_record_row(namespace, key, record, decode=False)[4]
+                if (index_name, value, ordinal) not in memberships:
+                    raise StoreIntegrityError('streamed membership disagrees with owner')
+                decoded_key = self.codec.decode(key)
+                if self.codec.encode(decoded_key) != key:
+                    raise StoreIntegrityError('noncanonical streamed membership key')
+                yield decoded_key, ordinal
+        finally:
+            if rows is not None:
+                rows.close()
+            self._read_snapshot_end()
+
     def _decode_memberships(self, blob: bytes) -> tuple[tuple[str, Any, int], ...]:
         raw = self.codec.decode(blob)
         if type(raw) is not tuple:
@@ -1750,9 +1797,14 @@ class LazyRecordStore:
         finally:
             self._read_snapshot_end()
 
-    def identity_occurrences_for_incarnation(
+    def identity_occurrences_for_incarnation(self, pin, incarnation_id):
+        """Materializing compatibility API; checked catalogs use the iterator."""
+        return tuple(sorted(self.iter_identity_occurrences_for_incarnation(pin, incarnation_id),
+            key=lambda row: (row[0], self.codec.encode(row[1]), self.codec.encode(row[2]))))
+
+    def iter_identity_occurrences_for_incarnation(
         self, pin: GenerationPin, incarnation_id: int,
-    ) -> tuple[tuple[str, Any, tuple[Any, ...]], ...]:
+    ):
         """Read one checked identity group at the pin, without an owner scan.
 
         Legacy stores must be explicitly copied/upgraded to obtain the
@@ -1763,6 +1815,7 @@ class LazyRecordStore:
         if type(incarnation_id) is not int or incarnation_id <= 0:
             raise ValueError("incarnation_id must be a positive int")
         generation = self._read_snapshot_start(pin)
+        rows = None
         try:
             columns = self.db.execute(
                 "PRAGMA index_info('lazy_identity_incarnation_visible')"
@@ -1779,11 +1832,9 @@ class LazyRecordStore:
             rows = self._interval_rows('lazy_identity_occurrence_versions',
                 'owner_namespace,owner_key,occurrence_path,incarnation_id,valid_from,valid_to,row_checksum',
                 ('incarnation_id',), (incarnation_id,), generation,
-                'lazy_identity_incarnation_interval', order='owner_namespace,owner_key,occurrence_path')
-            self._metadata_rows += len(rows)
-            seen = set()
-            out = []
+                'lazy_identity_incarnation_interval', stream=True)
             for namespace, key, path, identity, start, end, checksum in rows:
+                self._metadata_rows += 1
                 if (
                     type(identity) is not int or not 0 < identity < next_id
                     or type(start) is not int or not 0 <= start <= generation
@@ -1819,19 +1870,16 @@ class LazyRecordStore:
                     for component in decoded_path
                 ):
                     raise StoreIntegrityError("invalid reverse identity occurrence path component")
-                marker = (namespace, key, path)
-                if marker in seen:
-                    raise StoreIntegrityError("overlapping visible identity occurrence versions")
-                seen.add(marker)
                 # An overlapping placement in another incarnation is also
                 # invalid; check just this exact indexed owner/path, not all
                 # occurrences belonging to that owner or the whole archive.
                 checked = self._visible_identity_occurrence(generation, namespace, key, path)
                 if checked is None or checked[0] != identity:
                     raise StoreIntegrityError("reverse identity occurrence disagrees with owner authority")
-                out.append((namespace, decoded_key, decoded_path))
-            return tuple(out)
+                yield namespace, decoded_key, decoded_path
         finally:
+            if rows is not None:
+                rows.close()
             self._read_snapshot_end()
 
     def _prepare_identity_changes(

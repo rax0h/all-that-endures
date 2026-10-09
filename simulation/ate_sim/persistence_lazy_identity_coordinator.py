@@ -14,6 +14,7 @@ from .persistence_lazy_identity import IncarnationId, Occurrence
 from .persistence_lazy_identity_catalog import IdentityCatalog, CheckedIdentityGroup
 from .persistence_lazy_store import IdentityOccurrenceChange
 from .persistence_lazy_families import ParticipantDelta
+from .persistence_lazy_spill import CheckedSpool
 
 
 @dataclass(frozen=True)
@@ -30,6 +31,8 @@ def _heap_size(value, seen=None):
     if id(value) in seen:
         return 0
     seen.add(id(value))
+    if isinstance(value, CheckedSpool):
+        return value.resident_bytes
     size = sys.getsizeof(value)
     if type(value) in (tuple, list):
         size += sum(_heap_size(v, seen) for v in value)
@@ -44,7 +47,7 @@ class IdentityCoordinator:
         if type(occurrence_limit) is not int or occurrence_limit < 1 or type(byte_limit) is not int or byte_limit < 1:
             raise ValueError('identity cache budgets must be positive exact integers')
         self.store, self.pin, self.registry = store, pin, registry
-        self.catalog = IdentityCatalog(store)
+        self.catalog = IdentityCatalog(store, occurrence_limit=occurrence_limit, byte_limit=byte_limit)
         with store.read_snapshot(pin):
             self._baseline_allocator = self.catalog._descriptor(pin)[2]
         registry.allocator.next_value = max(registry.next_incarnation, self._baseline_allocator)
@@ -106,14 +109,25 @@ class IdentityCoordinator:
         return group
 
     def _current_placements(self, group):
-        out = {self._marker((ns, key), path): (ns, key, path) for ns, key, path in group.occurrences}
-        for marker in self._by_incarnation.get(group.incarnation_id, ()):
-            change = self.placement_overlay[marker]
-            if change.delete or change.incarnation_id != group.incarnation_id:
-                out.pop(marker, None)
-            else:
-                out[marker] = change.owner_namespace, change.owner_key, change.occurrence_path
-        return tuple(out.values())
+        out = CheckedSpool(self.store.codec, entry_limit=self.occurrence_limit,
+                           byte_limit=self.byte_limit, unique=True)
+        try:
+            for ns, key, path in group.occurrences:
+                marker = self._marker((ns, key), path)
+                change = self.placement_overlay.get(marker)
+                if change is None or (not change.delete and change.incarnation_id == group.incarnation_id):
+                    out.add((ns, key, path))
+            # Only final additions not already belonging to this pinned group
+            # are appended. Overlay indexes carry D; no set of all G is needed.
+            for marker in self._by_incarnation.get(group.incarnation_id, ()):
+                change = self.placement_overlay[marker]
+                if (not change.delete and change.incarnation_id == group.incarnation_id
+                        and self._original.get(marker) != group.incarnation_id):
+                    out.add((change.owner_namespace, change.owner_key, change.occurrence_path))
+            return out.freeze()
+        except BaseException:
+            out.close()
+            raise
 
     def routes_for_mutation(self, obj):
         self.preflight()
@@ -130,6 +144,7 @@ class IdentityCoordinator:
             return ()  # Retained, unowned alias: never resurrect its old owners.
         self._routing.add(incarnation.value)
         owners = []
+        owner_keys = set()
         try:
             installations = []
             for namespace, key, path in placements:
@@ -140,8 +155,9 @@ class IdentityCoordinator:
                     if self.store.codec.encode(current) != self.store.codec.encode(obj):
                         raise StoreIntegrityError('checked shared placement payload copies disagree')
                     installations.append((owner, path))
-                if owner not in owners:
+                if owner not in owner_keys:
                     owners.append(owner)
+                    owner_keys.add(owner)
             # Validate the entire requested closure before stitching any copy.
             for owner, path in installations:
                 self.install_path(owner, path, obj)
@@ -283,7 +299,11 @@ class IdentityCoordinator:
             if key[1] in self.dirty_incarnations:
                 dirty_n += count
                 dirty_bytes += size
-        return {'discovered_groups': len(self.discovered_groups),
+        spilled = [value for group in self.discovered_groups.values()
+                   for value in (group.occurrences, group.links) if isinstance(value, CheckedSpool)]
+        return {'spilled_group_bytes': sum(value.disk_bytes for value in spilled),
+                'spill_sqlite_cache_limit_bytes': len(spilled) * 128 * 1024,
+                'discovered_groups': len(self.discovered_groups),
                 'discovered_occurrences': self._cache_occurrences,
                 'identity_cache_python_bytes': self._cache_bytes,
                 'clean_occurrences': self._cache_occurrences - dirty_n,

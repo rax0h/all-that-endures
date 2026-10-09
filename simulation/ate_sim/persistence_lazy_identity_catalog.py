@@ -7,9 +7,14 @@ one exact placement without enumerating a large owner's other identities.
 """
 from __future__ import annotations
 from dataclasses import dataclass
+from collections import OrderedDict
+from contextlib import closing
+import hashlib
 from .incremental_store import Membership, StoreIntegrityError, StoreFormatError, StoreConflictError, _framed_sha, _record_checksum
 from .persistence_lazy_store import VersionChange
 from .persistence_lazy_families import FAMILIES, ParticipantDelta
+from .persistence_lazy_budget import resident_bytes
+from .persistence_lazy_spill import CheckedSpool
 from .persistence_lazy_identity_retired import RetiredIdentityRanges, EMPTY_HEADER, checked_header, NODE_NAMESPACE as RETIRED_NODE_NAMESPACE
 
 CATALOG_NAMESPACE = 'aux.lazy.identity.catalog'
@@ -27,7 +32,13 @@ FEATURES = LEGACY_FEATURES + ('retired-intervals/v1',)
 
 
 def digest(codec, domain, values):
-    return _framed_sha(domain, *(sorted(codec.encode(v) for v in values)))
+    encoded = values.encoded_sorted() if isinstance(values, CheckedSpool) else sorted(codec.encode(v) for v in values)
+    h = hashlib.sha256()
+    for part in (domain,):
+        h.update(len(part).to_bytes(8, 'big')); h.update(part)
+    for part in encoded:
+        h.update(len(part).to_bytes(8, 'big')); h.update(part)
+    return h.hexdigest()
 
 
 def placement_path(namespace, key, path):
@@ -198,9 +209,13 @@ class CheckedOwnerIdentity:
 
 
 class IdentityCatalog:
-    def __init__(self, store):
+    def __init__(self, store, *, occurrence_limit=4096, byte_limit=2 * 1024 * 1024):
+        if (type(occurrence_limit) is not int or occurrence_limit <= 0
+                or type(byte_limit) is not int or byte_limit <= 0):
+            raise ValueError('identity membership budgets must be positive integers')
         self.store = store
         self.codec = store.codec
+        self.occurrence_limit, self.byte_limit = occurrence_limit, byte_limit
 
     def _read(self, pin, namespace, key):
         try:
@@ -406,33 +421,68 @@ class IdentityCatalog:
                 or header[1] != 'mutable' or type(header[2]) is not int or header[2] < 0
                 or type(header[4]) is not int or header[4] != max(0, header[2] - 1)):
                 raise StoreIntegrityError('identity group header schema/count mismatch')
-            occurrences = self.store.identity_occurrences_for_incarnation(pin, incarnation_id)
-            if len(occurrences) != header[2] or digest(self.codec, b'identity-group-occurrences-v1', occurrences) != header[3]:
-                raise StoreIntegrityError('identity group count/digest completeness mismatch')
-            paths = sorted((placement_path(*o) for o in occurrences), key=self.codec.encode)
-            anchor = paths[0] if paths else None
-            expected = tuple((target, anchor) for target in paths[1:])
-            if anchor != header[6] or digest(self.codec, b'identity-group-links-v1', expected) != header[5]:
-                raise StoreIntegrityError('identity group P2C commitment mismatch')
-            owner_headers = {}
-            for namespace, key, path in occurrences:
-                owner = namespace, key
-                marker = namespace, self.codec.encode(key)
-                if marker not in owner_headers:
-                    owner_headers[marker] = self._owner(pin, owner)
-                self._point(pin, owner, path, incarnation_id, owner_headers[marker])
-            projected = self.store.query_memberships(pin, LINK_NAMESPACE, 'incarnation', incarnation_id)
-            if len(projected) != len(expected) or len({self.codec.encode(target) for target, _ in projected}) != len(expected):
-                raise StoreIntegrityError('identity link projection count/completeness mismatch')
-            actual = []
-            for target, _ordinal in projected:
-                value = self._read(pin, LINK_NAMESPACE, target)
-                if value != ('identity-link/v1', incarnation_id, anchor):
-                    raise StoreIntegrityError('identity P2C link owner/incarnation disagreement')
-                actual.append((target, value[2]))
-            if sorted(actual, key=self.codec.encode) != sorted(expected, key=self.codec.encode):
-                raise StoreIntegrityError('identity P2C links disagree with current placements')
-            return CheckedIdentityGroup(incarnation_id, tuple(occurrences), tuple(expected), anchor)
+            # Four private buffers plus one bounded owner-header LRU share the
+            # transient Python budget. Large groups never bypass it by becoming
+            # an archive-sized Python tuple, dict or sorted list.
+            portion = max(1, self.byte_limit // 5)
+            buffers = []
+            def buffer(order):
+                result = CheckedSpool(self.codec, entry_limit=self.occurrence_limit,
+                                      byte_limit=portion, order=order, unique=True)
+                buffers.append(result)
+                return result
+            keep = ()
+            try:
+                occurrence_buffer, path_buffer = buffer('placement'), buffer('encoded')
+                owner_headers = OrderedDict()
+                owner_bytes = 0
+                with closing(self.store.iter_identity_occurrences_for_incarnation(pin, incarnation_id)) as source_rows:
+                    for namespace, key, path in source_rows:
+                        occurrence_buffer.add((namespace, key, path))
+                        path_buffer.add(placement_path(namespace, key, path))
+                        owner = namespace, key
+                        marker = namespace, self.codec.encode(key)
+                        cached = owner_headers.pop(marker, None)
+                        if cached is None:
+                            owner_header = self._owner(pin, owner)
+                            weight = resident_bytes((marker, owner_header)) + 64
+                            if weight <= portion:
+                                owner_headers[marker] = owner_header, weight
+                                owner_bytes += weight
+                        else:
+                            owner_header, weight = cached
+                            owner_headers[marker] = cached
+                        while len(owner_headers) > 256 or owner_bytes > portion:
+                            _, (_, removed) = owner_headers.popitem(last=False)
+                            owner_bytes -= removed
+                        self._point(pin, owner, path, incarnation_id, owner_header)
+                occurrences, paths = occurrence_buffer.freeze(), path_buffer.freeze()
+                if len(occurrences) != header[2] or digest(self.codec, b'identity-group-occurrences-v1', occurrences) != header[3]:
+                    raise StoreIntegrityError('identity group count/digest completeness mismatch')
+                anchor = paths[0] if paths else None
+                expected_buffer = buffer('ordinal')
+                for offset, target in enumerate(paths):
+                    if offset:
+                        expected_buffer.add((target, anchor))
+                expected = expected_buffer.freeze()
+                if anchor != header[6] or digest(self.codec, b'identity-group-links-v1', expected) != header[5]:
+                    raise StoreIntegrityError('identity group P2C commitment mismatch')
+                actual_buffer = buffer('ordinal')
+                with closing(self.store.iter_query_memberships(pin, LINK_NAMESPACE, 'incarnation', incarnation_id)) as projected_rows:
+                    for target, _ordinal in projected_rows:
+                        value = self._read(pin, LINK_NAMESPACE, target)
+                        if value != ('identity-link/v1', incarnation_id, anchor):
+                            raise StoreIntegrityError('identity P2C link owner/incarnation disagreement')
+                        actual_buffer.add((target, value[2]))
+                actual = actual_buffer.freeze()
+                if len(actual) != len(expected) or digest(self.codec, b'identity-group-links-v1', actual) != header[5]:
+                    raise StoreIntegrityError('identity link projection count/digest completeness mismatch')
+                keep = tuple(value for value in (occurrences, expected) if isinstance(value, CheckedSpool))
+                return CheckedIdentityGroup(incarnation_id, occurrences, expected, anchor)
+            finally:
+                for value in buffers:
+                    if all(value is not retained for retained in keep):
+                        value.close()
 
     def read_identity_links(self, pin, incarnation_id):
         return self.read_identity_group(pin, incarnation_id).links

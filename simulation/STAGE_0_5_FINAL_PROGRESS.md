@@ -445,6 +445,45 @@ nested closure/exceptional EventIdSet, exact pressure and migration remain.
 Independent P5, stable final full suite and architectural review are not run.
 Stage 0.5 is neither implementation complete, candidate validated nor accepted.
 
+## 2026-10-09 checked identity membership streaming/spill
+
+Resumed at public `14b278ca667c6ab468e338e5c833909bda16488f`, local
+`f8789fec8c90639f083473ad1a80885f4a5b7fa8`, exact matching tree
+`e8359f9c0b4e14b35ad05c61f3958b79b4c687c5`. PR14 remains untouched.
+
+Checked reverse and link-projection iterators now close captured snapshots on
+normal completion, explicit close and validation failure. Catalog readers
+stream complete count/digest, owner/radix and exact occurrence proofs before
+returning a group. Oversized captured membership, digest sorting and links use
+private immutable checked SQLite spill buffers, whose checksums and captured
+order/count seals reject later damage. These files are replay storage only;
+the pinned catalog remains authority and the existing registry remains the
+sole live-object identity registry. Small groups preserve native tuple results.
+
+Coordinator membership overlays now replay captured placements and indexed
+final additions without building an additional resident G-sized membership
+dictionary. Output owners and actual unsaved peer installations remain G work;
+dirty witnesses and external group references are separately retained. Each
+spill database has a declared 128-KiB native SQLite page-cache limit, reported
+separately from estimated Python residency. This is not an overall RSS bound.
+Catalog publication preparation still builds affected dirty deltas; this change
+does not claim that all large-group save preparation is bounded in memory.
+
+Focused final source gate (unchanged implementation during run):
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q simulation/tests/test_stage_0_5_final_identity_spill.py simulation/tests/test_stage_0_5_final_identity_catalog.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_retired_identity.py simulation/tests/test_stage_0_5_final_maintenance.py simulation/tests/test_persistence_lazy_store_failures.py simulation/tests/test_persistence_lazy_identity_reverse.py`
+— **110 passed in 64.27s**. Counts overlap earlier gates. Permanent regressions
+cover missing occurrences, missing projection rows, recomputed spill row
+checksums, partial-read snapshot closure, old pins and current reanchoring,
+replacement filtering, exact representatives and final-reference file cleanup.
+Initial missing-module/iterator/budget tests were RED. Two test-fixture errors
+(list weak-reference eligibility and an unsupported list subclass) were repaired
+using the existing registered Box record; registry/codec checks were preserved.
+
+Next: integrate immutable family participants into the World hybrid save and
+recovery path, then catalog/coordinator and household/settlement headers.
+Capability6 is not emitted. Integrated H1k/H10k evidence, P5, final full suite,
+independent architecture acceptance and production decisions remain pending.
+
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.
