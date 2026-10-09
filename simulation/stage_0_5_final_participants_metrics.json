@@ -1,0 +1,124 @@
+{
+  "scope": "legacy World scalar edit + immutable participant integration; not final acceptance",
+  "limitations": [
+    "No claim about global identity discovery, households, nested closure or pressure.",
+    "Fixture has no cross-family sharing placements; separate alias tests cover compatibility.",
+    "SQL examined rows and total process RSS are not measured.",
+    "tracemalloc excludes fixture construction and native SQLite memory."
+  ],
+  "source_sha256": {
+    "ate_sim/persistence_lazy.py": "dfe56c1ba9bd980e03b11effb15bc3fc98217fe416270d9c3a31131575cc2cb5",
+    "ate_sim/persistence_lazy_families.py": "26f15d81c7cb8fe89f3f387f52537307ce61005210dfb20052675027a71a0fcb",
+    "ate_sim/persistence_lazy_participants.py": "76a5a2c4940d206a13bf3ce460fe4c8bfd4b6c7e8def2a40ccd7870c4411fd88",
+    "ate_sim/persistence_lazy_store.py": "9d3edceaf1c9320bbb01c8c969e0b8f00dd0a08bfa4f07cae2967825b75c2f71",
+    "measure_stage_0_5_participants.py": "0fec2175257de3da8c65f73c5244cd4349de90b0a0c318514e38f871f6ada073"
+  },
+  "results": [
+    {
+      "history_owners": 1000,
+      "live_candidates": 8,
+      "edits": 1,
+      "seconds": 0.11243632400010029,
+      "traced_python_retained_bytes": 341145,
+      "traced_python_peak_bytes": 449555,
+      "frozen": {
+        "bytes": 4595,
+        "participants": 2,
+        "namespaces": [
+          "world.people",
+          "world_event_storage"
+        ]
+      },
+      "save": {
+        "payload_reads": 7,
+        "payload_read_bytes": 505,
+        "payload_check_reads": 9,
+        "payload_check_bytes": 1747,
+        "payload_writes": 3,
+        "payload_write_bytes": 767,
+        "metadata_rows": 190,
+        "query_rows": 4,
+        "pin_rows": 242,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0,
+        "sql_rows_examined": null
+      },
+      "subsequent_noop": {
+        "payload_reads": 3,
+        "payload_read_bytes": 217,
+        "payload_check_reads": 3,
+        "payload_check_bytes": 217,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 35,
+        "query_rows": 0,
+        "pin_rows": 0,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0,
+        "checked_control_reads": [
+          [
+            "ordinary-bulk",
+            "world_event_storage",
+            null
+          ]
+        ]
+      },
+      "old_pin_exact": true
+    },
+    {
+      "history_owners": 10000,
+      "live_candidates": 8,
+      "edits": 1,
+      "seconds": 0.0645186100000501,
+      "traced_python_retained_bytes": 46454,
+      "traced_python_peak_bytes": 154268,
+      "frozen": {
+        "bytes": 4596,
+        "participants": 2,
+        "namespaces": [
+          "world.people",
+          "world_event_storage"
+        ]
+      },
+      "save": {
+        "payload_reads": 7,
+        "payload_read_bytes": 505,
+        "payload_check_reads": 9,
+        "payload_check_bytes": 1747,
+        "payload_writes": 3,
+        "payload_write_bytes": 767,
+        "metadata_rows": 190,
+        "query_rows": 4,
+        "pin_rows": 242,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0,
+        "sql_rows_examined": null
+      },
+      "subsequent_noop": {
+        "payload_reads": 3,
+        "payload_read_bytes": 217,
+        "payload_check_reads": 3,
+        "payload_check_bytes": 217,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 35,
+        "query_rows": 0,
+        "pin_rows": 0,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0,
+        "checked_control_reads": [
+          [
+            "ordinary-bulk",
+            "world_event_storage",
+            null
+          ]
+        ]
+      },
+      "old_pin_exact": true
+    }
+  ]
+}

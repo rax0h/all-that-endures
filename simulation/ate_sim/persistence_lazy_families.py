@@ -353,7 +353,8 @@ class ParticipantDelta:
         versions = tuple(codec.encode((v.namespace, v.key, v.value, v.record_schema,
             v.delete, tuple((m.index_name, m.value, m.ordinal) for m in v.memberships),
             v.reinsertion)) for v in version_changes)
-        records = tuple(codec.encode((r.namespace, r.key, r.value, r.record_schema, r.delete))
+        records = tuple(codec.encode((r.namespace, r.key, r.value, r.record_schema, r.delete,
+            tuple((m.index_name, m.value, m.ordinal) for m in r.memberships)))
                         for r in ordinary_changes)
         identities = tuple(codec.encode((i.owner_namespace, i.owner_key,
             i.occurrence_path, i.incarnation_id, i.delete)) for i in identity_changes)
@@ -367,7 +368,12 @@ class ParticipantDelta:
             ns, key, value, schema, delete, memberships, reinsert = codec.decode(payload)
             versions.append(VersionChange(ns, key, value, schema, delete,
                                           tuple(Membership(*m) for m in memberships), reinsert))
-        return (tuple(versions), tuple(RecordChange(*codec.decode(b)) for b in self.ordinary_bytes),
+        records = []
+        for payload in self.ordinary_bytes:
+            ns, key, value, schema, delete, memberships = codec.decode(payload)
+            records.append(RecordChange(ns, key, value, schema, delete,
+                                       tuple(Membership(*m) for m in memberships)))
+        return (tuple(versions), tuple(records),
                 tuple(IdentityOccurrenceChange(*codec.decode(b)) for b in self.identity_bytes))
 
 

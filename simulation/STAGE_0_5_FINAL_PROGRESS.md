@@ -484,6 +484,103 @@ recovery path, then catalog/coordinator and household/settlement headers.
 Capability6 is not emitted. Integrated H1k/H10k evidence, P5, final full suite,
 independent architecture acceptance and production decisions remain pending.
 
+## 2026-10-09 immutable World hybrid participants and receipt recovery
+
+Continued from public `148b25a455da3198eecffb636bda35ae972f9cb0`, local
+`0e689502107f77d68107aae2ac381771b8474104`, matching tree
+`0858f6f23cf7b07b0f15155ed44168f4eb558663`. This checkpoint integrates
+`persistence_lazy_participants.py` into actual World preparation, the existing
+single store commit, checked acknowledgement and `resolve_save`.
+
+Each changed namespace has a concrete participant holding immutable source
+bytes. Prepared values and commit arguments are fresh detached decodes;
+publication and retries replay those bytes, including eager writes, ordinary
+query memberships, identity deltas, nested/auxiliary writes, event segments,
+head metadata, layouts, allocator and reader floor. An explicit source-field
+inventory rejects future omitted save fields. Namespace and source deltas
+share immutable payload bytes. Pending-plan diagnostics report frozen bytes;
+these are unsaved costs, not charged to clean caches or claimed as total RSS.
+
+Common version/identity row proofs are consolidated in participants. Existing
+specialized minimum/adoption/scalar-child checks and frozen cold event protocol
+remain. Event controls join that existing descriptor/token proof before any
+participant accepts; they are not redundantly reread or given another commit
+path. Central publication still clears the existing runtime family journals
+only after checked acknowledgement. No capability6, hidden open migration,
+production branch modification or event-authority change is introduced.
+
+RED evidence: ordinary ParticipantDelta discarded query memberships; World
+plans had no participants and Person values still aliased live records.
+New tests verify detached replay, immutable metadata, lost acknowledgement,
+wrong delta/pin rejection and exhaustive source coverage. The initial combined
+gate found duplicate proofs exceeding the unchanged H1k/H10k read-check limit
+(12 then 11 checks versus <=10); consolidating common proofs and joining the
+cold descriptor proof restored 9 checks. Nested corruption still raises the
+existing diagnostic. A nonexistent lazy-cold-save test filename collected no
+tests and was corrected; no passing result is attributed to that command.
+
+Broader affected integration gate before the final receipt-exception correction:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q simulation/tests/test_stage_0_5_final_contracts.py simulation/tests/test_stage_0_5_final_world_participants.py simulation/tests/test_persistence_lazy_people.py simulation/tests/test_stage_0_5_paged_household_world.py simulation/tests/test_persistence_lazy_typed_property_histories.py simulation/tests/test_persistence_cold_save.py simulation/tests/test_persistence_lifecycle.py simulation/tests/test_stage_0_5_r3_recovery_extra.py simulation/tests/test_persistence_lazy_cold_scalar_families.py simulation/tests/test_persistence_lazy_typed_institution_divinity.py simulation/tests/test_persistence_lazy_social.py simulation/tests/test_persistence_lazy_resources.py simulation/tests/test_persistence_lazy_materials.py`
+— **153 passed in 193.74s**. This is affected evidence, not the final full suite.
+
+Further adversarial REDs exposed postcommit exception-class handling that could
+discard a durably committed plan on StoreConflictError or GenerationPressureError,
+and a superseded-successor acknowledgement remaining recovery-required.
+Exception handling now consults the durable matching attempt before classifying
+any error (pending/committed/acknowledged preserves the plan). A genuinely newer
+head marks the acknowledged session stale before participant acceptance.
+The earlier supersede fixture accidentally reused a stale peer and was corrected
+to open the peer after the first commit; the callback exception case became its
+own permanent regression. Final changed-path gate:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q simulation/tests/test_stage_0_5_final_world_participants.py simulation/tests/test_stage_0_5_final_contracts.py simulation/tests/test_persistence_lazy_people.py simulation/tests/test_stage_0_5_r3_recovery_extra.py simulation/tests/test_persistence_lifecycle.py`
+— **62 passed in 39.09s**. Counts overlap the 153-test gate.
+
+Final contract consumers gate on unchanged executable source:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q simulation/tests/test_stage_0_5_final_identity_catalog.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_sequence.py simulation/tests/test_stage_0_5_final_sequence_compat.py`
+— **71 passed in 154.94s**. Counts overlap prior component gates.
+
+Reproduce focused metrics:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/measure_stage_0_5_participants.py --output simulation/stage_0_5_final_participants_metrics.json`.
+Source SHA-256 values match the final source. Eight live candidates and one
+Person scalar edit are fixed. This fixture has no cross-family sharing; alias
+compatibility is covered by affected gates, not claimed by these numbers.
+
+| Metric | H1k | H10k |
+| --- | ---: | ---: |
+| Frozen source payload bytes | 4,595 | 4,596 |
+| Changed namespace participants | 2 | 2 |
+| Payload reads / bytes | 7 / 505 | 7 / 505 |
+| Checked payload reads / bytes | 9 / 1,747 | 9 / 1,747 |
+| Payload writes / bytes | 3 / 767 | 3 / 767 |
+| Metadata / returned query rows | 190 / 4 | 190 / 4 |
+| Traced Python peak bytes during save | 449,555 | 154,268 |
+| Save seconds, single observation | 0.1124 | 0.0645 |
+
+First-use imports are included in the first traced peak; these observations are
+not an RSS or latency guarantee. Fixture construction/native SQLite memory are
+excluded. SQL rows examined remain unknown. Captured old-pin Person values
+remain exact. Subsequent no-op writes zero payload rows; the legacy cold checker
+reads three event-control descriptors (217 bytes), reported in full and traced
+to `read_records(world_event_storage)`, with no fixture archive payload reads.
+The original metrics assertion incorrectly equated all payload counters with
+archive reads; it was corrected to trace both ordinary bulk/point and version
+read APIs and retain the total counters, not hide the control reads.
+
+Artifact manifest: new participant module, permanent World participant tests,
+ordinary-membership contract regression, World integration changes,
+`measure_stage_0_5_participants.py`, source-hashed JSON metrics and this ledger.
+Resume by verifying `git log -1 --format='%H %T'` and the public branch ref; local
+and API commit SHAs differ while their trees must match. No long Actions run
+or endurance run is outstanding.
+
+Next critical work: concrete runtime family adapters and World catalog/coordinator
+integration; lazy Household headers and Settlement counted sequences; remaining
+nested histories and exceptional EventIdSet; shared record budget and lifetime/
+retirement closure; exact pressure and explicit copy upgrade. Then integrated
+H1k/H10k/fault evidence, independent P5, one stable final full suite and final
+independent architecture review. No routine package review is required.
+Stage 0.5 remains implementation in progress, not candidate validated or accepted.
+
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.

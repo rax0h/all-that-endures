@@ -3263,6 +3263,7 @@ class LazyPeopleSavePlan:
     scalar_index_version_changes: tuple[VersionChange, ...] = ()
     nested_history_version_changes: tuple[VersionChange, ...] = ()
     nested_history_identity_changes: tuple[IdentityOccurrenceChange, ...] = ()
+    publication: Any = None
 
 
 @dataclass(frozen=True)
@@ -14276,7 +14277,7 @@ class LazyWorldSession:
                 self.store.codec, expected_counts
             ),
         )
-        return LazyPeopleSavePlan(
+        plan = LazyPeopleSavePlan(
             token=token,
             target_generation=cold_plan.target_generation,
             scalar_record_plans=scalar_record_plans,
@@ -14466,6 +14467,13 @@ class LazyWorldSession:
             layout_value=layout_value,
             household_member_version_changes=household_member_version_changes,
         )
+        from .persistence_lazy_participants import freeze_hybrid_publication
+        publication = freeze_hybrid_publication(self.store, self.pin, plan,
+            next_incarnation=self._registry.next_incarnation,
+            required_format_version=(5 if self._eager_tracker._description('world.event_ids')[0] == 'event-ids-range/v1'
+                else 4 if any(change.namespace == HOUSEHOLD_BACKING_NAMESPACE
+                              for change in plan.household_member_version_changes) else 3))
+        return publication.replay_plan(plan)
 
 
     def _validate_people_successor(self, plan, generation):
@@ -15661,26 +15669,11 @@ class LazyWorldSession:
                         raise StoreIntegrityError('saved adoption query evidence mismatch')
 
     def _validate_nested_history_successor(self, plan, generation):
-        for change in plan.nested_history_identity_changes:
-            row = self.store._visible_identity_occurrence(generation, change.owner_namespace,
-                self.store.codec.encode(change.owner_key), self.store.codec.encode(change.occurrence_path))
-            if (row is not None) if change.delete else (row is None or row[0] != change.incarnation_id):
-                raise StoreIntegrityError('saved eager nested identity evidence mismatch')
-        for change in plan.nested_history_version_changes + plan.scalar_index_version_changes:
-            key = self.store.codec.encode(change.key)
-            row = self.store._visible_record_row(generation, change.namespace, key)
+        # Common row/identity proofs belong to immutable family participants.
+        # Scalar child projections still require their domain-specific checks.
+        for change in plan.nested_history_version_changes:
             if change.namespace == NESTED_ENTRY_NAMESPACE:
                 checked_scalar_entry(self.store, self.pin, change.key[0], change.key[1])
-            if change.delete:
-                if row is not None:
-                    raise StoreIntegrityError('deleted nested authority remains visible')
-                continue
-            if row is None:
-                raise StoreIntegrityError('saved nested authority is absent')
-            _value, schema, _start, _end, memberships = self.store._check_record_row(change.namespace, key, row, decode=False)
-            expected_memberships = tuple((member.index_name, member.value, member.ordinal) for member in change.memberships)
-            if schema != 1 or memberships != expected_memberships or row[2] != self.store.codec.encode(change.value):
-                raise StoreIntegrityError('saved nested authority evidence mismatch')
 
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
@@ -15694,6 +15687,17 @@ class LazyWorldSession:
         tracker._cold_state = "recovery-required"
 
     def _publish_committed_hybrid(self, plan, result):
+        if plan.publication is None:
+            raise StoreIntegrityError('hybrid acknowledgement lacks immutable participants')
+        tracker = self._eager_tracker
+        replay = plan.publication.replay_plan(plan)
+        if tracker._cold_plan is plan.cold_plan:
+            # Preserve the existing recovery phase while refreshing its values
+            # from the same captured bytes, including a partial-publication retry.
+            tracker._cold_plan = replay.cold_plan
+        elif tracker._cold_plan is not None:
+            raise StoreIntegrityError('hybrid cold publication plan changed')
+        self._pending_save = plan = replay
         # The durable pin has already moved with the commit. Advance runtime
         # pin references immediately so recovery/stale close can release the
         # correct generation even if later publication checks fail.
@@ -15729,58 +15733,18 @@ class LazyWorldSession:
         for proxy in tuple(self._nested_lists.values()):
             proxy._pin = result.pin
         self._arm_cold_publication(plan)
+        try:
+            for participant in plan.publication.participants:
+                participant.validate_publication(participant.delta, result.pin)
+        except StoreConflictError:
+            self._state = tracker._cold_state = 'stale'
+            raise
         self._validate_nested_history_successor(plan, result.generation)
         self._validate_adoption_successor(plan, result.generation)
         self._validate_minimum_successor(plan, result.generation)
         tracker = self._eager_tracker
-        self._validate_people_successor(
-            plan, result.generation
-        )
-        self._validate_aspiration_successor(
-            plan, result.generation
-        )
-        self._validate_resource_successor(
-            plan, result.generation
-        )
-        self._validate_owner_index_successor(
-            plan, result.generation
-        )
-        self._validate_material_successor(
-            plan, result.generation
-        )
-        self._validate_currency_successor(
-            plan, result.generation
-        )
-        self._validate_soul_successor(
-            plan, result.generation
-        )
-        self._validate_advancement_successor(
-            plan, result.generation
-        )
-        self._validate_institution_successor(
-            plan, result.generation
-        )
-        self._validate_social_successor(
-            plan, result.generation
-        )
-        self._validate_skill_successor(
-            plan, result.generation
-        )
-        self._validate_lineage_node_successor(
-            plan, result.generation
-        )
-        self._validate_lineage_child_successor(
-            plan, result.generation
-        )
-        self._validate_genealogy_parent_successor(
-            plan, result.generation
-        )
-        self._validate_genealogy_child_successor(
-            plan, result.generation
-        )
-        self._validate_community_membership_successor(
-            plan, result.generation
-        )
+        if self.store._identity_state_at(result.generation)[0] != plan.publication.next_incarnation:
+            raise StoreIntegrityError('saved incarnation allocator state mismatch')
         status, head, replacement_prefix = _capture_successor(
             tracker, plan.cold_plan, full_evidence=False
         )
@@ -15797,6 +15761,8 @@ class LazyWorldSession:
                 "committed hybrid successor was not visible"
             )
         tracker._cold_head = head
+        for participant in plan.publication.participants:
+            participant.confirm_cold_publication(participant.delta, result.pin, plan.cold_plan, head)
         publish_cold_save(
             tracker, plan.cold_plan, replacement_prefix
         )
@@ -15863,6 +15829,8 @@ class LazyWorldSession:
             if _path_under_lazy(link[0], self._scalar_tables)
             or _path_under_lazy(link[1], self._scalar_tables)
         )
+        for participant in plan.publication.participants:
+            participant.accept_delta(participant.delta, result.pin)
         self._pending_save = None
         self._state = "active"
         return result.generation
@@ -15903,101 +15871,23 @@ class LazyWorldSession:
         tracker._cold_publication_phase = "prepared"
         tracker._cold_state = "preparing"
         try:
-            result = self.store.commit(
-                self.pin,
-                commit_token=plan.token,
-                version_changes=(
-                    plan.version_changes
-                    + plan.aspiration_version_changes
-                    + plan.resource_version_changes
-                    + plan.owner_index_version_changes
-                    + plan.material_lot_version_changes
-                    + plan.material_item_version_changes
-                    + plan.material_lot_index_version_changes
-                    + plan.material_active_index_version_changes
-                    + plan.wallet_version_changes
-                    + plan.treasury_version_changes
-                    + plan.soul_version_changes
-                    + plan.advancement_version_changes
-                    + plan.institution_magic_record_version_changes
-                    + plan.institution_notice_version_changes
-                    + plan.institution_application_version_changes
-                    + plan.transmission_version_changes
-                    + plan.motive_version_changes
-                    + tuple(change for unit in plan.scalar_record_plans for change in unit.version_changes)
-                    + plan.social_edge_version_changes
-                    + plan.social_adjacency_version_changes
-                    + plan.social_partnership_version_changes
-                    + plan.skill_version_changes
-                    + plan.lineage_node_version_changes
-                    + plan.lineage_child_version_changes
-                    + plan.lineage_child_edge_version_changes
-                    + plan.genealogy_parent_version_changes
-                    + plan.genealogy_child_version_changes
-                    + plan.community_membership_version_changes
-                    + plan.household_member_version_changes
-                    + plan.nested_history_version_changes
-                    + plan.scalar_index_version_changes
-                ),
-                identity_changes=(
-                    plan.identity_changes
-                    + plan.aspiration_identity_changes
-                    + plan.resource_identity_changes
-                    + plan.owner_index_identity_changes
-                    + plan.material_lot_identity_changes
-                    + plan.material_item_identity_changes
-                    + plan.material_lot_index_identity_changes
-                    + plan.material_active_index_identity_changes
-                    + plan.wallet_identity_changes
-                    + plan.treasury_identity_changes
-                    + plan.soul_identity_changes
-                    + plan.advancement_identity_changes
-                    + plan.institution_magic_record_identity_changes
-                    + plan.institution_notice_identity_changes
-                    + plan.institution_application_identity_changes
-                    + plan.transmission_identity_changes
-                    + plan.motive_identity_changes
-                    + tuple(change for unit in plan.scalar_record_plans for change in unit.identity_changes)
-                    + plan.social_edge_identity_changes
-                    + plan.social_adjacency_identity_changes
-                    + plan.social_partnership_identity_changes
-                    + plan.skill_identity_changes
-                    + plan.lineage_node_identity_changes
-                    + plan.lineage_child_identity_changes
-                    + plan.genealogy_parent_identity_changes
-                    + plan.genealogy_child_identity_changes
-                    + plan.community_membership_identity_changes
-                    + plan.nested_history_identity_changes
-                ),
-                next_incarnation_id=self._registry.next_incarnation,
-                required_format_version=(5 if self._eager_tracker._description('world.event_ids')[0] == 'event-ids-range/v1' else 4 if any(
-                    change.namespace == HOUSEHOLD_BACKING_NAMESPACE
-                    for change in plan.household_member_version_changes
-                ) else 3),
-                changes=plan.cold_plan.changes,
-                new_segments=plan.cold_plan.new_segments,
-                metadata=plan.cold_plan.metadata,
-            )
-        except GenerationPressureError:
-            self._reset_uncommitted_plan()
-            raise
-        except StoreConflictError:
-            tracker._cold_state = "stale"
-            tracker._cold_plan = None
-            tracker._cold_publication_phase = None
-            self._pending_save = None
-            self._state = "stale"
-            raise
-        except Exception:
+            result = self.store.commit(self.pin,
+                **plan.publication.commit_arguments(plan))
+        except Exception as error:
             encoded = self.store.codec.encode(plan.token)
             attempt = self.store._attempt_row(self.pin.token)
             if (
                 attempt is not None
                 and attempt[0] == encoded
-                and attempt[2] in {"pending", "committed"}
+                and attempt[2] in {"pending", "committed", "acknowledged"}
             ):
                 self._state = "recovery-required"
                 tracker._cold_state = "recovery-required"
+            elif isinstance(error, StoreConflictError) and not isinstance(error, GenerationPressureError):
+                tracker._cold_state = self._state = 'stale'
+                tracker._cold_plan = None
+                tracker._cold_publication_phase = None
+                self._pending_save = None
             else:
                 self._reset_uncommitted_plan()
             raise
@@ -17127,6 +17017,10 @@ class LazyWorldSession:
         return {
             "state": self._state,
             "history_cache": self._history_cache_budget.diagnostics(),
+            "frozen_save": (None if self._pending_save is None else {
+                "participants": len(self._pending_save.publication.participants),
+                "payload_bytes": self._pending_save.publication.frozen_bytes,
+            }),
             "scalar_records": {ns: table.diagnostics() for ns, table in self._scalar_tables.items()},
             "people": self.people.diagnostics(),
             "aspirations": self.aspirations.diagnostics(),

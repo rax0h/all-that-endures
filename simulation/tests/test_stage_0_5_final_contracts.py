@@ -84,3 +84,10 @@ def test_measurement_records_real_store_io_and_does_not_claim_examined_sql_rows(
         assert measured["payload_write_bytes"] > 0
         assert measured["sql_rows_examined"] is None
         assert measured["metadata_rows"] > 0
+
+
+def test_ordinary_participant_preserves_query_memberships():
+    member = Membership('scope', ('settlement', 2), 7)
+    delta = families().ParticipantDelta.freeze(codec(), 'ordinary', ordinary_changes=(
+        RecordChange('eager', 1, [True, 1.0], memberships=(member,)),))
+    assert delta.decode(codec())[1][0].memberships == (member,)
