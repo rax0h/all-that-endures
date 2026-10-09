@@ -247,6 +247,13 @@ class LazyHouseholdMembers(MutableSequence):
         if self._detached_values is None:
             self._store._ensure_open()
 
+    def _current_pin(self):
+        # Canonical session-owned proxies follow the most recently accepted
+        # generation, even if an unrelated owner's save did not touch them.
+        # Standalone/pinned readers deliberately retain their original pin.
+        source = getattr(self, "_pin_source", None)
+        return self._pin if source is None else source.pin
+
     def detach_to_memory(self):
         """Keep a formerly canonical external alias independent of its owner."""
         if self._detached_values is not None:
@@ -307,7 +314,7 @@ class LazyHouseholdMembers(MutableSequence):
             self._cache.move_to_end(number)
             return self._cache[number]
         checked = self._store.read_version(
-            self._pin, PAGE_NAMESPACE, (self._owner, number),
+            self._current_pin(), PAGE_NAMESPACE, (self._owner, number),
             expected_record_schema=RECORD_SCHEMA,
         )
         value = checked.value
@@ -360,7 +367,7 @@ class LazyHouseholdMembers(MutableSequence):
         index = OWNER_MEMBER_INDEX if self._owner_indexed else "member"
         lookup_value = (self._owner, value) if self._owner_indexed else value
         for owner, number in self._store.query_keys(
-            self._pin, PAGE_NAMESPACE, index, lookup_value
+            self._current_pin(), PAGE_NAMESPACE, index, lookup_value
         ):
             if owner == self._owner and number not in self._dirty_pages:
                 return True
@@ -396,7 +403,7 @@ class LazyHouseholdMembers(MutableSequence):
         for member in wanted:
             lookup_value = (self._owner, member) if self._owner_indexed else member
             for page_key, offset in self._store.query_memberships(
-                self._pin, PAGE_NAMESPACE, index, lookup_value,
+                self._current_pin(), PAGE_NAMESPACE, index, lookup_value,
             ):
                 if type(page_key) is not tuple or len(page_key) != 2:
                     raise StoreIntegrityError("malformed household member page key")
@@ -485,7 +492,7 @@ class LazyHouseholdMembers(MutableSequence):
         name = OWNER_MEMBER_INDEX if self._owner_indexed else "member"
         lookup = (self._owner, value) if self._owner_indexed else value
         for page_key, offset in self._store.query_memberships(
-            self._pin, PAGE_NAMESPACE, name, lookup,
+            self._current_pin(), PAGE_NAMESPACE, name, lookup,
         ):
             if type(page_key) is not tuple or len(page_key) != 2:
                 raise StoreIntegrityError("malformed household member page key")
@@ -687,7 +694,7 @@ class LazyHouseholdMembers(MutableSequence):
 
     def _read_baseline_page(self, number):
         checked = self._store.read_version(
-            self._pin, PAGE_NAMESPACE, (self._owner, number),
+            self._current_pin(), PAGE_NAMESPACE, (self._owner, number),
             expected_record_schema=RECORD_SCHEMA,
         )
         return checked.value
