@@ -607,11 +607,23 @@ class LazyHouseholdMembers(MutableSequence):
                     key = owner
                 else:
                     key = (owner, change.key[1])
+                memberships = change.memberships
+                if (change.namespace == PAGE_NAMESPACE and self._owner_indexed
+                        and not change.delete):
+                    memberships = tuple(
+                        Membership(
+                            entry.index_name,
+                            (owner, entry.value[1]) if entry.index_name == OWNER_MEMBER_INDEX
+                            else entry.value,
+                            entry.ordinal,
+                        )
+                        for entry in change.memberships
+                    )
                 expanded.append(VersionChange(
                     change.namespace, key, change.value,
                     record_schema=change.record_schema,
                     delete=change.delete,
-                    memberships=change.memberships,
+                    memberships=memberships,
                 ))
         return tuple(expanded)
 
