@@ -1,0 +1,10 @@
+{
+  "focused_exit_code": 0,
+  "focused_summary": "44 passed in 135.28s (0:02:15)",
+  "note": "This is an affected focused/P5 gate; no final integrated full suite.",
+  "p5_exit_code": 0,
+  "p5_final_year": 10,
+  "p5_passed": true,
+  "tested_commit": "7917a27498d927b5ad314c33f81e58bb2a622684",
+  "workflow_run": "37873256590"
+}
