@@ -1,0 +1,10 @@
+{
+  "focused_exit_code": 0,
+  "focused_summary": "63 passed in 122.02s (0:02:02)",
+  "note": "Tests apply to tested_commit only; independent full-suite gate remains pending.",
+  "p5_exit_code": 0,
+  "p5_final_year": 10,
+  "p5_passed": true,
+  "tested_commit": "63400fb02841434c1d7b0e96fcc0d0e5cc4fb595",
+  "workflow_run": "37871823902"
+}
