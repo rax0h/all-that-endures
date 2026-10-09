@@ -166,6 +166,47 @@ frozen participant integration; lazy household headers and settlement fields.
 Do not emit capability6 until complete authority/feature markers and explicit
 checked copy upgrade are ready. Final P5/full suite/review remain pending.
 
+## Sequence compatibility checkpoint (October 9, 2026)
+
+Eager-owner checkpoint published as `5681038d8a7cb63ed84a9681d762ea4cde5e73cf`,
+tree `ebca0eee46a82ed8d40bae725f8947f1dcc24933`; matches local
+`f8ae0d0f295947ecf81ecc30bcf56eb3453406d7`.
+
+Added an explicit native immutable-value mode to the counted sequence. Its
+versioned descriptor preserves the mode; the original positive integer-ID
+descriptor and element guard remain compatible. Integer membership indexes
+include equal bool/float representatives while leaves retain their actual
+types. Unsupported indexed probes use the native equality compatibility path.
+Assignments between equal values of different types preserve the newly assigned
+representative. Compact HistoryReference('sequence', incarnation), codec/frozen
+snapshot handling, memoized portable materialization and frozen-plan save
+acceptance are now available as integration interfaces.
+
+RED: five focused compatibility tests initially failed on the missing value-mode
+argument. Verified focused GREEN: **5 passed in 5.08s**. A previous redirected
+invocation produced an empty log and was not treated as evidence; the foreground
+rerun above is the verified result.
+
+Affected exact-source gate:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_sequence.py simulation/tests/test_stage_0_5_final_sequence_compat.py simulation/tests/test_persistence_lazy_nested_history.py simulation/tests/test_persistence_lazy_cold_scalar_families.py simulation/tests/test_persistence_event_log.py simulation/tests/test_persistence_lifecycle.py`
+— **99 passed in 147.91s**. This includes the three sequence subprocess-death
+tests. Counts overlap earlier gates and are not final integrated acceptance.
+Implementation source was unchanged throughout this gate.
+
+Pending: World runtime sequence binders and owner callbacks, capability6 feature
+markers and source-copy upgrade, household/settlement integration, and shared
+cache/lifetime budgets. This checkpoint does not replace live household or
+settlement fields. Native mode supports immutable schema values; it does not
+claim closure over arbitrary mutable imported list elements or external NaN
+identity after eviction. Those cases require explicit compatibility proof in
+the integrated inventory. Earlier sequence measurements describe their recorded
+source; the updated implementation needs new integrated measurements.
+
+Next action: checked retirement ranges/large-group handling and runtime
+catalog/coordinator/sequence participant integration. Final independent P5,
+stable full simulation suite and architectural review remain pending. PR14 has
+not changed, and no new endurance run or production promotion was started.
+
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.

@@ -27,8 +27,9 @@ class FrozenList(list):
 def freeze(value):
     from .persistence_event_ids import EventIdSet
     from .persistence_lazy_nested_history import LazyHistoryList, LazyHistoryMap, LazyHistorySet
+    from .persistence_lazy_sequence import LazyOrderedSequence
     if isinstance(value,(dict,LazyHistoryMap)):return FrozenDict((k,freeze(v)) for k,v in value.items())
-    if isinstance(value,(list,LazyHistoryList)):return FrozenList(freeze(v) for v in value)
+    if isinstance(value,(list,LazyHistoryList,LazyOrderedSequence)):return FrozenList(freeze(v) for v in value)
     if isinstance(value,tuple):return tuple(freeze(v) for v in value)
     if isinstance(value,(set,EventIdSet,LazyHistorySet)):return frozenset(freeze(v) for v in value)
     return value

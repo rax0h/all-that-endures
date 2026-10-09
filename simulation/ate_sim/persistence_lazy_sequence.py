@@ -14,7 +14,6 @@ import sys
 
 from .incremental_store import StoreConflictError, StoreIntegrityError, _framed_sha
 from .persistence_lazy_store import VersionChange
-from .persistence_lazy_families import ParticipantDelta
 
 DESCRIPTOR_NAMESPACE = 'aux.lazy.sequence.descriptors'
 NODE_NAMESPACE = 'aux.lazy.sequence.nodes'
@@ -78,9 +77,10 @@ class LazyOrderedSequence(MutableSequence):
     save prohibits further edits until that exact plan is acknowledged.
     """
     __hash__ = None
+    _kind = 'sequence'
 
     def __init__(self, store, pin, incarnation, *, initial_values=None,
-                 guard=None, changed=None, read_guard=None):
+                 guard=None, changed=None, read_guard=None, value_mode=None):
         if not _positive(incarnation):
             raise ValueError('invalid sequence incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
@@ -90,6 +90,10 @@ class LazyOrderedSequence(MutableSequence):
         self._dirty, self._baseline = {}, {}
         self._prepared = self._accepted = None
         self._new = initial_values is not None
+        if value_mode not in (None, 'integer_ids', 'native'):
+            raise ValueError('invalid sequence value mode')
+        self._value_mode = value_mode or 'integer_ids'
+        self._requested_value_mode = value_mode
         self._next_node = self._next_occurrence = 1
         self._length = self._revision = 0
         self._root = self._directory = None
@@ -118,24 +122,53 @@ class LazyOrderedSequence(MutableSequence):
         self._store._require_pin(self._pin)
 
     def _validate(self, value):
-        if not _positive(value):
+        if not self._valid_value(value):
+            if self._value_mode == 'native':
+                raise TypeError('sequence values must be immutable schema values')
             raise TypeError('sequence IDs must be positive integers')
         return value
 
+    def _valid_value(self, value):
+        if self._value_mode == 'integer_ids':
+            return _positive(value)
+        from .persistence_lazy_nested_history import immutable_value
+        return immutable_value(value)
+
+    @staticmethod
+    def _member_key(value):
+        if _positive(value):
+            return value
+        if type(value) is bool:
+            return 1 if value else None
+        if type(value) is float and value > 0 and value.is_integer():
+            return int(value)
+        return None
+
     def _descriptor(self):
-        return ('ordered-sequence/v1', self._incarnation, self._root, self._length,
-                self._next_occurrence, self._next_node, self._revision, self._directory)
+        fields = (self._incarnation, self._root, self._length,
+                  self._next_occurrence, self._next_node, self._revision, self._directory)
+        if self._value_mode == 'integer_ids':
+            return ('ordered-sequence/v1', *fields)
+        return ('ordered-sequence/v2', *fields, 'native')
 
     def _load_descriptor(self, value):
-        if (type(value) is not tuple or len(value) != 8 or value[0] != 'ordered-sequence/v1'
-            or type(value[1]) is not int or value[1] != self._incarnation or not _link(value[2])
+        if (type(value) is not tuple or not (
+            (len(value) == 8 and value[0] == 'ordered-sequence/v1')
+            or (len(value) == 9 and value[0] == 'ordered-sequence/v2' and value[8] == 'native'))):
+            raise StoreIntegrityError('invalid counted sequence descriptor kind')
+        mode = 'integer_ids' if len(value) == 8 else 'native'
+        if self._requested_value_mode is not None and self._requested_value_mode != mode:
+            raise StoreIntegrityError('sequence descriptor disagrees with required value mode')
+        if (type(value[1]) is not int or value[1] != self._incarnation or not _link(value[2])
             or type(value[3]) is not int or value[3] < 0 or value[2][1] != value[3]
             or not _positive(value[4]) or not _positive(value[5])
             or value[2][0] >= value[5] or type(value[6]) is not int or value[6] < 0
             or (value[7] is not None and not _directory_link(value[7]))
-            or (value[3] == 0) != (value[7] is None)):
+            or (value[3] == 0 and value[7] is not None)
+            or (mode == 'integer_ids' and value[3] > 0 and value[7] is None)):
             raise StoreIntegrityError('invalid counted sequence descriptor')
-        self._root, self._length, self._next_occurrence, self._next_node, self._revision, self._directory = value[2:]
+        self._value_mode = mode
+        self._root, self._length, self._next_occurrence, self._next_node, self._revision, self._directory = value[2:8]
 
     @contextmanager
     def _mutation(self):
@@ -224,7 +257,7 @@ class LazyOrderedSequence(MutableSequence):
         entries = value[1]
         if value[0] == 'leaf':
             if (len(entries) > LEAF_SIZE or any(type(e) is not tuple or len(e) != 2
-                or not _positive(e[0]) or e[0] >= self._next_occurrence or not _positive(e[1]) for e in entries)
+                or not _positive(e[0]) or e[0] >= self._next_occurrence or not self._valid_value(e[1]) for e in entries)
                 or len({e[0] for e in entries}) != len(entries)):
                 raise StoreIntegrityError('invalid sequence leaf occurrences')
             count, height = len(entries), 0
@@ -307,7 +340,9 @@ class LazyOrderedSequence(MutableSequence):
         self._set_root(level[0])
         members = defaultdict(list)
         for occurrence, value in entries:
-            members[value].append(occurrence)
+            key = self._member_key(value)
+            if key is not None:
+                members[key].append(occurrence)
         for value, occurrences in members.items():
             def build(start, end):
                 if start == end:
@@ -422,7 +457,9 @@ class LazyOrderedSequence(MutableSequence):
         roots = edit(self._root, rank, (None, 0))
         root = roots[0] if len(roots) == 1 else self._nwrite(self._allocate_node(), 'branch', roots)
         self._set_root(root)
-        self._dreplace(value, self._minsert(self._dget(value), occurrence, value))
+        key = self._member_key(value)
+        if key is not None:
+            self._dreplace(key, self._minsert(self._dget(key), occurrence, key))
 
     def insert(self, index, value):
         value = self._validate(value)
@@ -472,7 +509,9 @@ class LazyOrderedSequence(MutableSequence):
 
     def _delete(self, rank):
         occurrence, value = self._locate(rank)[2]
-        self._dreplace(value, self._mdelete(self._dget(value), occurrence, value))
+        key = self._member_key(value)
+        if key is not None:
+            self._dreplace(key, self._mdelete(self._dget(key), occurrence, key))
         def edit(link, offset, parent):
             kind, entries = self._nread(link, parent)
             entries = list(entries)
@@ -503,9 +542,11 @@ class LazyOrderedSequence(MutableSequence):
 
     def _assign(self, rank, value):
         link, slot, (occurrence, old) = self._locate(rank)
-        if old == value:
+        if type(old) is type(value) and (old is value or old == value):
             return
-        self._dreplace(old, self._mdelete(self._dget(old), occurrence, old))
+        old_key, new_key = self._member_key(old), self._member_key(value)
+        if old_key is not None:
+            self._dreplace(old_key, self._mdelete(self._dget(old_key), occurrence, old_key))
         def edit(link, offset, parent):
             kind, entries = self._nread(link, parent)
             entries = list(entries)
@@ -518,7 +559,8 @@ class LazyOrderedSequence(MutableSequence):
                 entries[position] = edit(entries[position], offset, (link[0], position))
             return self._nwrite(link[0], kind, entries)
         self._set_root(edit(self._root, rank, (None, 0)))
-        self._dreplace(value, self._minsert(self._dget(value), occurrence, value))
+        if new_key is not None:
+            self._dreplace(new_key, self._minsert(self._dget(new_key), occurrence, new_key))
 
     def __setitem__(self, index, value):
         values = tuple(self._validate(v) for v in value) if isinstance(index, slice) else (self._validate(value),)
@@ -584,7 +626,7 @@ class LazyOrderedSequence(MutableSequence):
     def __eq__(self, other):
         if not isinstance(other, (list, LazyOrderedSequence)):
             return False
-        return len(self) == len(other) and all(a == b for a, b in zip(self, other))
+        return len(self) == len(other) and all(a is b or a == b for a, b in zip(self, other))
 
     def copy(self):
         return list(self)
@@ -818,7 +860,7 @@ class LazyOrderedSequence(MutableSequence):
         self._ensure()
         with self._store.read_snapshot(self._pin):
             if not _positive(value):
-                return tuple(rank for rank, item in enumerate(self) if item == value)
+                return tuple(rank for rank, item in enumerate(self) if item is value or item == value)
             ranks = []
             seen = set()
             def visit(link, lower, upper):
@@ -844,12 +886,13 @@ class LazyOrderedSequence(MutableSequence):
     def remove(self, value):
         with self._mutation():
             rank = self._first(value) if _positive(value) else next(
-                (rank for rank, item in enumerate(self) if item == value), None)
+                (rank for rank, item in enumerate(self) if item is value or item == value), None)
             if rank is None:
                 raise ValueError('list.remove(x): x not in list')
             self._delete(rank)
 
     def prepare_delta(self, context=None):
+        from .persistence_lazy_families import ParticipantDelta
         self._ensure()
         if self._prepared is not None:
             return self._prepared[0]
@@ -904,6 +947,30 @@ class LazyOrderedSequence(MutableSequence):
                     + sum(_resident(k) + _resident(v) for k, v in self._baseline.items()),
                 'tree_height': self.tree_height, 'length': self._length}
 
+    def storage_reference(self):
+        from .persistence_lazy_nested_history import HistoryReference
+        return HistoryReference('sequence', self._incarnation)
+
+    def materialize(self, memo=None):
+        memo = {} if memo is None else memo
+        if id(self) not in memo:
+            memo[id(self)] = list(self)
+        return memo[id(self)]
+
+    def pending_changes(self):
+        return self.prepare_delta().decode(self._store.codec)[0]
+
+    def accept_save(self, pin):
+        if self._prepared is not None:
+            self.accept_delta(self._prepared[0], pin)
+        else:
+            if self._dirty or self._new or self._store.codec.encode(self._descriptor()) != self._base_descriptor:
+                raise StoreConflictError('dirty sequence has no frozen acknowledged plan')
+            self._store._require_pin(pin)
+            self._pin = pin
+            self._cache.clear()
+            self._cache_bytes = 0
+
     def scrub(self):
         """Explicit full-history validation, including orphan/extra projections."""
         self._ensure()
@@ -927,7 +994,9 @@ class LazyOrderedSequence(MutableSequence):
                         if occurrence in occurrences:
                             raise StoreIntegrityError('duplicate main sequence occurrence')
                         occurrences[occurrence] = len(occurrences), value
-                        members[value].append(occurrence)
+                        member_key = self._member_key(value)
+                        if member_key is not None:
+                            members[member_key].append(occurrence)
                         expected[LOCATOR_NAMESPACE].add((self._incarnation, occurrence))
                         if self._read(LOCATOR_NAMESPACE, (self._incarnation, occurrence)) != (link[0], slot):
                             raise StoreIntegrityError('sequence scrub locator disagreement')

@@ -15,6 +15,7 @@ from .core import World, Event, Layer
 from .event_log import EventLog, FrozenDict, FrozenList
 from .persistence_event_ids import EventIdSet, RANGE_TAG
 from .persistence_lazy_nested_history import LazyHistoryList, LazyHistoryMap, LazyHistorySet, HISTORY_TYPES, HistoryReference, REFERENCE_TAG, reference as history_reference
+from .persistence_lazy_sequence import LazyOrderedSequence
 from .persistence_identity import iter_mutable_event_items
 from .record_index import RecordTable, IndexedRecord
 from .incremental_store import (
@@ -112,7 +113,7 @@ class WorldCodec(TypedCodec):
                 raise CodecError('invalid event sealed flag')
             return ['ate_event/v1', present, sealed,
                     super()._encode_value(value, active, seen_mutable)]
-        if cls is LazyHistoryList:
+        if cls in (LazyHistoryList, LazyOrderedSequence):
             self._enter(value, active, seen_mutable, mutable=True)
             try:
                 return ['list', [self._encode_value(item, active, seen_mutable) for item in value]]
@@ -152,7 +153,7 @@ class WorldCodec(TypedCodec):
     def _decode_value(self, node):
         if isinstance(node, list) and node:
             if node[0] == REFERENCE_TAG:
-                if len(node) != 3 or node[1] not in ('list', 'map', 'set') or type(node[2]) is not int or node[2] <= 0:
+                if len(node) != 3 or node[1] not in ('list', 'map', 'set', 'sequence') or type(node[2]) is not int or node[2] <= 0:
                     raise CodecError('invalid typed history reference')
                 return HistoryReference(node[1], node[2])
             if node[0] == 'ate_event/v1':
@@ -219,7 +220,7 @@ def _audit(value, path, seen, active, links):
             for k, v in value.items():
                 _audit(k, path + (('map_key', k),), seen, active, links)
                 _audit(v, path + (('key', k),), seen, active, links)
-        elif cls in (list, LazyHistoryList, tuple, set, LazyHistorySet, EventIdSet, frozenset, FrozenList, EventLog):
+        elif cls in (list, LazyHistoryList, LazyOrderedSequence, tuple, set, LazyHistorySet, EventIdSet, frozenset, FrozenList, EventLog):
             if cls is EventLog:
                 expected_state = {
                     '_disk_prefix', '_disk_count', '_chunks', '_tail', '_count',

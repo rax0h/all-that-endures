@@ -23,12 +23,12 @@ class HistoryReference:
     incarnation: int
 
     def __post_init__(self):
-        if self.kind not in ('list', 'map', 'set') or type(self.incarnation) is not int or self.incarnation <= 0:
+        if self.kind not in ('list', 'map', 'set', 'sequence') or type(self.incarnation) is not int or self.incarnation <= 0:
             raise ValueError('invalid typed history reference')
 
 
 def reference(value):
-    return (type(value) is HistoryReference and value.kind in ('list', 'map', 'set')
+    return (type(value) is HistoryReference and value.kind in ('list', 'map', 'set', 'sequence')
             and type(value.incarnation) is int and value.incarnation > 0)
 
 
@@ -911,5 +911,8 @@ class LazyHistorySet(_ScalarHistory, MutableSet):
         return memo[id(self)]
 
 
-HISTORY_CLASSES = {'list': LazyHistoryList, 'map': LazyHistoryMap, 'set': LazyHistorySet}
+from .persistence_lazy_sequence import LazyOrderedSequence
+
+HISTORY_CLASSES = {'list': LazyHistoryList, 'map': LazyHistoryMap, 'set': LazyHistorySet,
+                   'sequence': LazyOrderedSequence}
 HISTORY_TYPES = tuple(HISTORY_CLASSES.values())
