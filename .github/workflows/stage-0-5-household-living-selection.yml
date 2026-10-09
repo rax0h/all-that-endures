@@ -1,0 +1,44 @@
+name: Stage 0.5 checked household living selection
+'on':
+  push:
+    branches:
+      - sim/stage-0-5-household-living-selection
+    paths:
+      - .github/workflows/stage-0-5-household-living-selection.yml
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pytest
+        run: python -m pip install -q pytest
+      - name: Validate living selection, paged operations and existing people adapters
+        run: |
+          python -m pytest -q --tb=short \
+            simulation/tests/test_stage_0_5_household_living_selection.py \
+            simulation/tests/test_stage_0_5_household_sequence.py \
+            simulation/tests/test_stage_0_5_paged_household_world.py \
+            simulation/tests/test_persistence_lazy_people.py
+      - name: Independent short continued-world control
+        run: |
+          python simulation/persistence_p5_validation.py \
+            --seed 843000 --pre-years 3 --continuation-years 4 \
+            --reopen-years 3 --paged-households \
+            --output household-living-p5.json
+      - name: Retain checked focused/P5 provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: household-living-selection-evidence
+          retention-days: 30
+          path: household-living-p5.json
+          if-no-files-found: warn
