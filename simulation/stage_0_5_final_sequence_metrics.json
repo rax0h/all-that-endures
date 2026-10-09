@@ -1,0 +1,636 @@
+{
+  "scope": "standalone primitive, excludes explicit conversion; no World/identity/event gate",
+  "python_residency": "estimated recursive cache sizes and actual tracemalloc; process RSS not measured",
+  "results": [
+    {
+      "H": 1000,
+      "fixture": "eight_candidates",
+      "operation": "insert",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 349,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 349,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 152,
+        "payload_read_bytes": 92001,
+        "payload_check_reads": 152,
+        "payload_check_bytes": 92001,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 307,
+        "query_rows": 0,
+        "pin_rows": 621,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 5,
+        "clean_bytes": 16749,
+        "dirty_entries": 133,
+        "dirty_bytes": 217695,
+        "tree_height": 1,
+        "length": 1001
+      },
+      "tracemalloc_current_bytes": 131357,
+      "tracemalloc_peak_bytes": 417066,
+      "sql_rows_examined": null,
+      "prepare_io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 0,
+        "query_rows": 0,
+        "pin_rows": 1,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "main_node_writes": 2,
+      "locator_changes": 126,
+      "member_node_changes": 2,
+      "total_version_changes": 134,
+      "commit_io": {
+        "payload_reads": 134,
+        "payload_read_bytes": 46105,
+        "payload_check_reads": 266,
+        "payload_check_bytes": 91956,
+        "payload_writes": 134,
+        "payload_write_bytes": 46105,
+        "metadata_rows": 826,
+        "query_rows": 0,
+        "pin_rows": 563,
+        "maintenance_rows": 274,
+        "temporary_keys_peak": 0
+      },
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "H": 1000,
+      "fixture": "eight_candidates",
+      "operation": "delete",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 349,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 349,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 148,
+        "payload_read_bytes": 86882,
+        "payload_check_reads": 148,
+        "payload_check_bytes": 86882,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 297,
+        "query_rows": 0,
+        "pin_rows": 597,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 0,
+        "clean_bytes": 0,
+        "dirty_entries": 131,
+        "dirty_bytes": 214984,
+        "tree_height": 1,
+        "length": 999
+      },
+      "tracemalloc_current_bytes": 122713,
+      "tracemalloc_peak_bytes": 375400,
+      "sql_rows_examined": null,
+      "prepare_io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 0,
+        "query_rows": 0,
+        "pin_rows": 1,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "main_node_writes": 2,
+      "locator_changes": 125,
+      "member_node_changes": 1,
+      "total_version_changes": 132,
+      "commit_io": {
+        "payload_reads": 129,
+        "payload_read_bytes": 45365,
+        "payload_check_reads": 261,
+        "payload_check_bytes": 91223,
+        "payload_writes": 129,
+        "payload_write_bytes": 45365,
+        "metadata_rows": 823,
+        "query_rows": 0,
+        "pin_rows": 555,
+        "maintenance_rows": 280,
+        "temporary_keys_peak": 0
+      },
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "H": 1000,
+      "fixture": "eight_candidates",
+      "operation": "candidates",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 349,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 349,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 36,
+        "payload_read_bytes": 47670,
+        "payload_check_reads": 36,
+        "payload_check_bytes": 47670,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 81,
+        "query_rows": 0,
+        "pin_rows": 188,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 37,
+        "clean_bytes": 114076,
+        "dirty_entries": 0,
+        "dirty_bytes": 0,
+        "tree_height": 1,
+        "length": 1000
+      },
+      "tracemalloc_current_bytes": 64795,
+      "tracemalloc_peak_bytes": 310770,
+      "sql_rows_examined": null,
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "H": 1000,
+      "fixture": "eight_candidates",
+      "operation": "stream",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 349,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 349,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 18,
+        "payload_read_bytes": 42525,
+        "payload_check_reads": 18,
+        "payload_check_bytes": 42525,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 45,
+        "query_rows": 0,
+        "pin_rows": 1110,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 19,
+        "clean_bytes": 129562,
+        "dirty_entries": 0,
+        "dirty_bytes": 0,
+        "tree_height": 1,
+        "length": 1000
+      },
+      "tracemalloc_current_bytes": 81951,
+      "tracemalloc_peak_bytes": 147228,
+      "sql_rows_examined": null,
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "H": 1000,
+      "fixture": "duplicates",
+      "operation": "first_remove",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 390,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 390,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 169,
+        "payload_read_bytes": 36591,
+        "payload_check_reads": 169,
+        "payload_check_bytes": 36591,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 339,
+        "query_rows": 0,
+        "pin_rows": 681,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 0,
+        "clean_bytes": 0,
+        "dirty_entries": 138,
+        "dirty_bytes": 120783,
+        "tree_height": 1,
+        "length": 999
+      },
+      "tracemalloc_current_bytes": 45798,
+      "tracemalloc_peak_bytes": 115009,
+      "sql_rows_examined": null,
+      "prepare_io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 0,
+        "query_rows": 0,
+        "pin_rows": 1,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "main_node_writes": 2,
+      "locator_changes": 125,
+      "member_node_changes": 10,
+      "total_version_changes": 139,
+      "commit_io": {
+        "payload_reads": 137,
+        "payload_read_bytes": 13250,
+        "payload_check_reads": 276,
+        "payload_check_bytes": 26751,
+        "payload_writes": 137,
+        "payload_write_bytes": 13250,
+        "metadata_rows": 864,
+        "query_rows": 0,
+        "pin_rows": 583,
+        "maintenance_rows": 292,
+        "temporary_keys_peak": 0
+      },
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "H": 10000,
+      "fixture": "eight_candidates",
+      "operation": "insert",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 354,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 354,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 180,
+        "payload_read_bytes": 110606,
+        "payload_check_reads": 180,
+        "payload_check_bytes": 110606,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 363,
+        "query_rows": 0,
+        "pin_rows": 733,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 8,
+        "clean_bytes": 25319,
+        "dirty_entries": 89,
+        "dirty_bytes": 210173,
+        "tree_height": 2,
+        "length": 10001
+      },
+      "tracemalloc_current_bytes": 138587,
+      "tracemalloc_peak_bytes": 437284,
+      "sql_rows_examined": null,
+      "prepare_io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 0,
+        "query_rows": 0,
+        "pin_rows": 1,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "main_node_writes": 3,
+      "locator_changes": 81,
+      "member_node_changes": 2,
+      "total_version_changes": 90,
+      "commit_io": {
+        "payload_reads": 90,
+        "payload_read_bytes": 51602,
+        "payload_check_reads": 178,
+        "payload_check_bytes": 102947,
+        "payload_writes": 90,
+        "payload_write_bytes": 51602,
+        "metadata_rows": 562,
+        "query_rows": 0,
+        "pin_rows": 387,
+        "maintenance_rows": 186,
+        "temporary_keys_peak": 0
+      },
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "H": 10000,
+      "fixture": "eight_candidates",
+      "operation": "delete",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 354,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 354,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 177,
+        "payload_read_bytes": 104074,
+        "payload_check_reads": 177,
+        "payload_check_bytes": 104074,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 355,
+        "query_rows": 0,
+        "pin_rows": 713,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 0,
+        "clean_bytes": 0,
+        "dirty_entries": 88,
+        "dirty_bytes": 210592,
+        "tree_height": 2,
+        "length": 9999
+      },
+      "tracemalloc_current_bytes": 129046,
+      "tracemalloc_peak_bytes": 403075,
+      "sql_rows_examined": null,
+      "prepare_io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 0,
+        "query_rows": 0,
+        "pin_rows": 1,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "main_node_writes": 3,
+      "locator_changes": 80,
+      "member_node_changes": 1,
+      "total_version_changes": 89,
+      "commit_io": {
+        "payload_reads": 85,
+        "payload_read_bytes": 51706,
+        "payload_check_reads": 174,
+        "payload_check_bytes": 104109,
+        "payload_writes": 85,
+        "payload_write_bytes": 51706,
+        "metadata_rows": 566,
+        "query_rows": 0,
+        "pin_rows": 383,
+        "maintenance_rows": 196,
+        "temporary_keys_peak": 0
+      },
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "H": 10000,
+      "fixture": "eight_candidates",
+      "operation": "candidates",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 354,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 354,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 41,
+        "payload_read_bytes": 92655,
+        "payload_check_reads": 41,
+        "payload_check_bytes": 92655,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 91,
+        "query_rows": 0,
+        "pin_rows": 208,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 42,
+        "clean_bytes": 199597,
+        "dirty_entries": 0,
+        "dirty_bytes": 0,
+        "tree_height": 2,
+        "length": 10000
+      },
+      "tracemalloc_current_bytes": 110289,
+      "tracemalloc_peak_bytes": 322330,
+      "sql_rows_examined": null,
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "H": 10000,
+      "fixture": "eight_candidates",
+      "operation": "stream",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 354,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 354,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 166,
+        "payload_read_bytes": 436383,
+        "payload_check_reads": 166,
+        "payload_check_bytes": 436383,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 415,
+        "query_rows": 0,
+        "pin_rows": 10998,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 64,
+        "clean_bytes": 498724,
+        "dirty_entries": 0,
+        "dirty_bytes": 0,
+        "tree_height": 2,
+        "length": 10000
+      },
+      "tracemalloc_current_bytes": 403788,
+      "tracemalloc_peak_bytes": 505616,
+      "sql_rows_examined": null,
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "H": 10000,
+      "fixture": "duplicates",
+      "operation": "first_remove",
+      "open": {
+        "payload_reads": 1,
+        "payload_read_bytes": 394,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 394,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3,
+        "query_rows": 0,
+        "pin_rows": 9,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "operation_io": {
+        "payload_reads": 213,
+        "payload_read_bytes": 64181,
+        "payload_check_reads": 213,
+        "payload_check_bytes": 64181,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 427,
+        "query_rows": 0,
+        "pin_rows": 857,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "cache": {
+        "clean_entries": 0,
+        "clean_bytes": 0,
+        "dirty_entries": 145,
+        "dirty_bytes": 137322,
+        "tree_height": 2,
+        "length": 9999
+      },
+      "tracemalloc_current_bytes": 62741,
+      "tracemalloc_peak_bytes": 137123,
+      "sql_rows_examined": null,
+      "prepare_io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 0,
+        "query_rows": 0,
+        "pin_rows": 1,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "main_node_writes": 3,
+      "locator_changes": 127,
+      "member_node_changes": 14,
+      "total_version_changes": 146,
+      "commit_io": {
+        "payload_reads": 144,
+        "payload_read_bytes": 17306,
+        "payload_check_reads": 290,
+        "payload_check_bytes": 34863,
+        "payload_writes": 144,
+        "payload_write_bytes": 17306,
+        "metadata_rows": 906,
+        "query_rows": 0,
+        "pin_rows": 611,
+        "maintenance_rows": 306,
+        "temporary_keys_peak": 0
+      },
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    }
+  ]
+}

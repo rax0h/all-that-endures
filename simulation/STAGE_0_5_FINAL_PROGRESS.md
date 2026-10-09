@@ -52,6 +52,80 @@ Still required before Package 2 completion: full World converter/open/binders/sa
 
 Next action: counted order-tree primitive and checked occurrence projections, with local edit/split/merge differential regressions; then household/settlement and catalog/coordinator runtime integration. Existing source/checkpoints and old compatibility mode remain intact. Final suite/review/endurance have not started.
 
+## Counted sequence checkpoint (October 9, 2026)
+
+Added `persistence_lazy_sequence.py`: counted B+ main tree (leaf128/fanout32),
+stable MVCC node/occurrence IDs, checked reciprocal parents and occurrence
+locators, per-value relative-order AVL trees and an authenticated compressed
+membership-root directory. Ordinary rank edits rebalance local paths. Explicit
+conversion and bulk edits may visit affected history. Streaming holds a bounded
+leaf and depth stack and follows native list iterator ranks after a mutation.
+The central store commit remains the sole publisher; immutable prepared bytes
+and dirty state survive failed/lost acknowledgements and clear only on exact
+checked acknowledgement. Clean payloads and sidecars share a 64-entry/8MiB
+budget; dirty journal costs and tracemalloc observations are separate.
+
+RED: 18 initial tests failed with the missing module. Two later permanent REDs
+exposed silent repair of corrupted moved locators and child-parent projections.
+Both now validate affected projections before overwriting them. Fixture
+corrections: a no-op still performs its required pin check (archive counters
+remain unchanged); the store requires a new attempt token after a resolved
+non-commit, even when retrying identical frozen participant bytes.
+
+Checked primitive gate: same interpreter/environment as earlier gates,
+`pytest -q --tb=short simulation/tests/test_stage_0_5_final_sequence.py` —
+**31 passed in 86.44s**. Combined affected gate: that file plus final identity
+coordinator/catalog/contracts, lazy identity reverse, store and store failures
+— **123 passed in 115.40s**. Subsequently added separate SIGKILL tests during
+version writes, before commit and after commit — **3 passed in 1.08s**; old or
+fully new authority was recovered and fully scrubbed. These scopes overlap;
+this is not the final integrated simulation suite.
+
+Implementation blob: `775c61b58bb75bac1d508509adb46a3aef71c487`.
+Expanded test blob: `9e79cbef3ec84204ef90799734de7aee891b1ad8`.
+Harness blob: `5ce6fa8ba3a354e0af8fd8e1a18a76c61938c016`.
+Measurement blob: `e0e375f1c1030ca1340f5686b97749f3d5e80a03`.
+The code blob is identical across the combined gate, death tests and final
+measurement run. Later changes to these primitives require new evidence.
+
+Reproducible command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/measure_stage_0_5_sequence.py --output simulation/stage_0_5_final_sequence_metrics.json`.
+Explicit conversion is excluded; eight candidate values and one edit are fixed.
+The long duplicate history is a separate fixture. These are sequence-only
+measurements, not an integrated World/identity/event bound.
+
+| Ordinary operation | H1k payload reads / bytes | H10k payload reads / bytes | H1k / H10k main-node writes | H1k / H10k total version changes |
+| --- | ---: | ---: | ---: | ---: |
+| Midpoint insert | 152 / 92,001 | 180 / 110,606 | 2 / 3 | 134 / 90 |
+| Midpoint delete | 148 / 86,882 | 177 / 104,074 | 2 / 3 | 132 / 89 |
+| First-equal remove, duplicate history | 169 / 36,591 | 213 / 64,181 | 2 / 3 | 139 / 146 |
+| Eight candidate lookups | 36 / 47,670 | 41 / 92,655 | 0 / 0 | 0 / 0 |
+
+Insert commit payload writes/bytes: 134/46,105 at H1k and 90/51,602 at H10k.
+Delete commit payload writes/bytes: 129/45,365 and 85/51,706 (retirements account
+for the difference from total version changes). First removal: 137/13,250 and
+144/17,306. Midpoint physical slots differ; bounded locator movement is 126/81
+for insertion, 125/80 for deletion, not a suffix rewrite. Formula gate checks
+main writes <=3L+3, locators <=256 and total changes <400.
+
+Cold full streaming is explicitly O(H): 18 payloads/42,525 bytes at H1k and
+166/436,383 at H10k. Its measured tracemalloc peak is 147,228/505,616 bytes.
+Insert dirty estimated bytes are 217,695/210,173; tracemalloc peak
+417,066/437,284. Recursive residency estimates are conservative and are not
+process RSS. The JSON contains all preparation/commit/query/metadata/cache
+counters. EXPLAIN reports indexed namespace/key/version lookup; actual SQL
+rows examined remain unknown. Churn with future bounded cleanup still needs a
+separate query-plan/scan gate; returned rows do not prove that bound.
+
+Still pending: typed references and numeric/import compatibility for settlement
+lists, household headers/selectors, catalog/coordinator integration, retirement
+leases/reclamation, shared cross-family budgets and the full integration matrix.
+The primitive currently preserves the existing positive-integer household
+element guard; it is not yet a replacement for unrestricted settlement lists.
+Capability6 is still not emitted. No production ref changed, final review or
+endurance started. Continue through the integration packages, not a green-test
+stop or routine Astra implementation request.
+
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.
