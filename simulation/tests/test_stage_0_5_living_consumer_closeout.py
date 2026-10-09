@@ -76,7 +76,8 @@ def test_demography_deactivates_households_without_scanning_dead_members(
         assert session.world.households[1].alive is False
         _page_bound(session, history)
         assert session.world.digest() == expected.digest()
-        assert session.save() == session.pin.captured_head + 1
+        previous = session.pin.captured_head
+        assert session.save() == previous + 1
     with open_lazy_world_session(
         path, rules_id=RULES, paged_household_members=True
     ) as reopened:
