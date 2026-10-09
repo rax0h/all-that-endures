@@ -1,0 +1,94 @@
+name: Stage 0.5 living household consumer closeout
+'on':
+  push:
+    branches:
+      - sim/stage-0-5-living-consumer-closeout
+    paths:
+      - .github/workflows/stage-0-5-living-consumer-closeout.yml
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pytest
+        run: python -m pip install -q pytest
+      - name: Focused ordinary-living and prior household/people regressions
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q --tb=short \
+            simulation/tests/test_stage_0_5_living_consumer_closeout.py \
+            simulation/tests/test_stage_0_5_household_scoped_index.py \
+            simulation/tests/test_stage_0_5_household_living_selection.py \
+            simulation/tests/test_stage_0_5_household_sequence.py \
+            simulation/tests/test_stage_0_5_paged_household_world.py \
+            simulation/tests/test_persistence_lazy_people.py > living-consumer-focused.log 2>&1
+          FOCUSED_RC=$?
+          cat living-consumer-focused.log
+          python simulation/persistence_p5_validation.py \
+            --seed 843000 --pre-years 3 --continuation-years 4 \
+            --reopen-years 3 --paged-households \
+            --output living-consumer-p5.json > living-consumer-p5.log 2>&1
+          P5_RC=$?
+          cat living-consumer-p5.log
+          echo "FOCUSED_RC=$FOCUSED_RC" >> "$GITHUB_ENV"
+          echo "P5_RC=$P5_RC" >> "$GITHUB_ENV"
+          exit 0
+      - name: Retain proof logs and continuation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage-0-5-living-consumer-proof
+          retention-days: 30
+          path: |
+            living-consumer-focused.log
+            living-consumer-p5.log
+            living-consumer-p5.json
+          if-no-files-found: warn
+      - name: Publish exact-source test outcome
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          log=Path("living-consumer-focused.log").read_text()
+          try:
+              p5=json.loads(Path("living-consumer-p5.json").read_text())
+          except (ValueError, OSError):
+              p5=None
+          record={
+              "tested_commit":os.environ["GITHUB_SHA"],
+              "workflow_run":os.environ["GITHUB_RUN_ID"],
+              "focused_exit_code":int(os.environ["FOCUSED_RC"]),
+              "focused_summary":log.strip().splitlines()[-1] if log.strip() else "",
+              "p5_exit_code":int(os.environ["P5_RC"]),
+              "p5_passed":bool(isinstance(p5,dict) and p5.get("passed") is True),
+              "p5_final_year":p5.get("final_year") if isinstance(p5,dict) else None,
+              "note":"Focused/P5 outcomes certify tested_commit, not later heads or the full suite."
+          }
+          Path("simulation/living_consumer_ci_result.json").write_text(
+              json.dumps(record,sort_keys=True,indent=2)+"\n"
+          )
+          print(record)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add simulation/living_consumer_ci_result.json
+          git commit -m "ci: record exact living consumer focused proof [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          python - <<'PY'
+          import json,sys
+          from pathlib import Path
+          result=json.loads(Path("simulation/living_consumer_ci_result.json").read_text())
+          if result["focused_exit_code"] or result["p5_exit_code"] or not result["p5_passed"]:
+              sys.exit("Stage 0.5 living consumer focused/P5 failed")
+          PY
