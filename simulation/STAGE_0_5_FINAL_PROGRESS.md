@@ -581,6 +581,19 @@ H1k/H10k/fault evidence, independent P5, one stable final full suite and final
 independent architecture review. No routine package review is required.
 Stage 0.5 remains implementation in progress, not candidate validated or accepted.
 
+## Published immutable participant source checkpoint
+
+Public implementation commit: `b4174345acaa0a315e4b01e8a27b002d8c3457ba`.
+Local implementation commit: `edaf40032aaa67397bc5d1bd3ffe3027fe163c57`.
+Matching implementation tree: `c3cd5822b75740ee3fa447db124001ed900ae91d`.
+Public branch: `sol/stage-0-5-complete-closeout`. These source commits contain
+both the implementation and the source-hashed measurement artifact above.
+The following ledger-only commit changes no executable source or tests.
+PR14 ref remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+All locally launched focused gates above have completed; no test/Actions job
+is running. Resume with the next critical work listed above, preserving this
+checkpoint and the accepted legacy behavior. No routine Astra approval is needed.
+
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.
