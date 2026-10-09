@@ -78,7 +78,7 @@ def main():
     parser.add_argument('--output', required=True)
     args = parser.parse_args()
     simulation = Path(__file__).resolve().parent
-    sources = ('ate_sim/persistence_lazy.py', 'ate_sim/persistence_lazy_budget.py',
+    sources = ('ate_sim/persistence_lazy.py', 'ate_sim/persistence_tracking.py', 'ate_sim/persistence_lazy_budget.py',
                'ate_sim/persistence_lazy_families.py', 'ate_sim/persistence_lazy_lineage_children.py',
                'measure_stage_0_5_record_budget.py')
     with tempfile.TemporaryDirectory(prefix='ate-record-budget-') as directory:

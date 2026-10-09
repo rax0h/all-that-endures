@@ -80,3 +80,106 @@ def test_cold_skill_child_alias_routes_before_mutation(tmp_path):
     with open_lazy_world_session(path, rules_id=RULES) as session:
         assert session.skills[1, 'craft'].provenance == [101, 102]
         assert session.wallets[1]['alias'] is session.skills[1, 'craft']
+
+
+@pytest.mark.parametrize('kind,child', [('skill', False), ('skill', True), ('lineage', False)])
+def test_eager_settlement_record_alias_reuses_concrete_lazy_authority(tmp_path, kind, child):
+    from ate_sim.core import Settlement
+    world = World(843000)
+    if kind == 'skill':
+        key, record, attribute = (1, 'craft'), SkillHistory(1, 'craft', provenance=[101]), 'skills'
+        field, updated = 'level', .75
+        world.skills.skills[key] = record
+    else:
+        key, record, attribute = ('person', 1), LineageNode('person', 1, 101, 2), 'lineage_nodes'
+        field, updated = 'origin_year', 9
+        world.lineage.nodes[key] = record
+    world.settlements[1] = Settlement(1, 0, 0, memory={'alias': record})
+    path = converted(tmp_path, world)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        alias = session.world.settlements[1].memory['alias']
+        table = getattr(session, attribute)
+        assert alias.__dict__['_index_table']() is table
+        if child:
+            alias.provenance.append(102)
+        else:
+            setattr(alias, field, updated)
+        assert table[key] is alias and key in table._dirty
+        session.save()
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        alias = session.world.settlements[1].memory['alias']
+        assert getattr(session, attribute)[key] is alias
+        if child:
+            assert alias.provenance == [101, 102]
+        else:
+            assert getattr(alias, field) == updated
+
+
+def test_direct_eager_skill_child_alias_partial_extend_is_saved(tmp_path):
+    from ate_sim.core import Settlement
+    world = World(843000)
+    child = [101]
+    world.skills.skills[1, 'craft'] = SkillHistory(1, 'craft', provenance=child)
+    world.settlements[1] = Settlement(1, 0, 0, memory={'alias': child})
+    path = converted(tmp_path, world)
+    def broken():
+        yield 102
+        raise ValueError('iterator failed')
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        alias = session.world.settlements[1].memory['alias']
+        with pytest.raises(ValueError, match='iterator failed'):
+            alias.extend(broken())
+        assert alias == [101, 102]
+        assert (1, 'craft') in session.skills._dirty
+        session.save()
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        assert session.skills[1, 'craft'].provenance == [101, 102]
+        assert session.world.settlements[1].memory['alias'] is session.skills[1, 'craft'].provenance
+
+
+def test_direct_eager_skill_child_alias_retired_placement_does_not_return(tmp_path):
+    from ate_sim.core import Settlement
+    from ate_sim.incremental_store import StoreError
+    world = World(843000)
+    child = [101]
+    world.skills.skills[1, 'craft'] = SkillHistory(1, 'craft', provenance=child)
+    world.settlements[1] = Settlement(1, 0, 0, memory={'alias': child})
+    path = converted(tmp_path, world)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        alias = session.world.settlements[1].memory.pop('alias')
+        session.save()
+        alias.append(102)
+        session.save()
+        assert 'alias' not in session.world.settlements[1].memory
+    with pytest.raises(StoreError):
+        alias.append(103)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        assert session.skills[1, 'craft'].provenance == [101, 102]
+        assert 'alias' not in session.world.settlements[1].memory
+
+
+@pytest.mark.parametrize('method,value,expected', [
+    ('update', 'second', {'first', 'second'}),
+    ('difference_update', 'first', set()),
+])
+def test_direct_eager_soul_child_partial_set_mutation_is_saved(tmp_path, method, value, expected):
+    from ate_sim.core import Settlement
+    from ate_sim.metaphysics import SoulState
+    world = World(843000)
+    child = {'first'}
+    world.metaphysics.souls[1] = SoulState(1, marks=child)
+    world.settlements[1] = Settlement(1, 0, 0, memory={'alias': child})
+    path = converted(tmp_path, world)
+    def broken():
+        yield value
+        raise ValueError('iterator failed')
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        alias = session.world.settlements[1].memory['alias']
+        with pytest.raises(ValueError, match='iterator failed'):
+            getattr(alias, method)(broken())
+        assert alias == expected
+        assert 1 in session.souls._dirty
+        session.save()
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        assert session.souls[1].marks == expected
+        assert session.world.settlements[1].memory['alias'] is session.souls[1].marks

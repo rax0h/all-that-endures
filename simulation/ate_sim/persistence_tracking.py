@@ -1569,7 +1569,7 @@ class IncrementalWorldSession:
         cls = type(value)
         from .persistence_event_ids import EventIdSet
         from .persistence_lazy_nested_history import HISTORY_TYPES
-        if cls in (EventIdSet, *HISTORY_TYPES):
+        if cls in (EventIdSet, *HISTORY_TYPES, *getattr(self, '_foreign_child_types', ())):
             binding = _binding(value)
             if binding is None:
                 self._register_binding(value, _ObjectBinding(self, owners))

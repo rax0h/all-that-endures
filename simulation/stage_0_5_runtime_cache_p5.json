@@ -2,14 +2,14 @@
   "checkpoint_bytes": 310819,
   "checkpoint_schema": 8,
   "cold_file_bytes": 1916928,
-  "cold_sha256": "1f0148a169a821eb221340c8f451f682d086b0f74d4ca54c90b851940337d32d",
+  "cold_sha256": "3893824241652a4636d3df2313ee05c68e5c41cff4158ec39d35580b11898c79",
   "continuation_years": 4,
   "control_final_digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e",
   "control_total_digest": "b31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387",
   "detached_checkpoint_bytes": 538526,
   "events_total": 439,
   "final_year": 10,
-  "first_continuation_simulation_seconds": 11.163629491000393,
+  "first_continuation_simulation_seconds": 7.135485718999917,
   "first_full_audit_io": {
     "payload_read_bytes": 420434,
     "payload_reads": 1951,
@@ -24,7 +24,7 @@
   },
   "fixture_creation": {
     "cold": {
-      "commit_token": "1bb986ed800f477cb79b9ae2d059a0b1",
+      "commit_token": "ec38e05ab79747bf85f7b4ba8ba91d30",
       "deleted_event_rows": 0,
       "disk_events": 0,
       "disk_segments": 0,
@@ -96,13 +96,20 @@
       "wallets": 0
     }
   },
+  "forced_pressure_regression": {
+    "cases": 5,
+    "file": "tests/test_stage_0_5_final_pressure_arithmetic.py",
+    "scope": "Exact native ordered sum, duplicate/extinct occurrences, repeated edits, shared list replacement, reopen, float.hex counterexamples and identical forced RNG calls"
+  },
   "last_event_id": 439,
   "lazy_file_bytes": 20828160,
-  "lazy_sha256": "e39e178faf098bde3807463a90785ec3aedddfe3c0d077387018e067c6e3adb3",
+  "lazy_sha256": "7cdfe6a6a23a343f15b3e3be74a9146c70bf15c95a6bafd55adffbb18a34bb2c",
   "limitations": [
-    "Checked catalog/coordinator and capability6 are not activated in World.",
-    "Temporary P5 restore files were validated, then removed by the harness; retrievable final-source restore artifacts remain a release requirement.",
-    "Forced-pressure float.hex counterexamples are not part of this checkpoint."
+    "Checked catalog/coordinator is not yet activated in ordinary World open/save.",
+    "Household headers and Settlement.households are not yet counted-sequence backed.",
+    "Forced-pressure regression protects arithmetic; checked scalar streaming/cache revisions and cold-miss H measurements remain pending.",
+    "P5 temporary verified SQLite files were deleted; final retrievable restore artifacts remain pending.",
+    "This is not final integrated architecture review, final full suite, endurance or production acceptance."
   ],
   "open_io": {
     "payload_read_bytes": 505504,
@@ -113,10 +120,11 @@
   "passed": true,
   "pre_years": 3,
   "relocated_file_bytes": 18124800,
-  "relocated_sha256": "acf024e8dec7bb63861a9a3414fb8b4bcfb54f7e2b743d6b1c86fce7bcfb6304",
+  "relocated_sha256": "b57e47a89c21abd526e523a273cdb20fbdf0c9128e3408b1c9228cfd9bfcc042",
   "reopen_years": 3,
   "rules_id": "stage-0-5-p5-validation",
-  "second_continuation_simulation_seconds": 8.359953947000577,
+  "scope": "Independent eager-control compatibility runtime P5 after eager/lazy child alias fixes; not final capability6 acceptance",
+  "second_continuation_simulation_seconds": 6.557502802000272,
   "second_full_audit_io": {
     "payload_read_bytes": 345452,
     "payload_reads": 1441,
@@ -131,18 +139,20 @@
   },
   "seed": 843000,
   "source_sha256": {
-    "ate_sim/persistence_lazy.py": "3bacb8d1188c50a371b0eb8780b9f1ef282650ab521cc5df38e003a7fe97e7b3",
+    "ate_sim/engine.py": "1a451f38bc08060c92d1be372374a08fedf0a99f3b7ec46750ccd3e9b7ffd728",
+    "ate_sim/persistence_lazy.py": "3b6f51a48ebf8f3d58e156a765e0a69d6c6214d16dbaaa5e87377931f9da1d3d",
     "ate_sim/persistence_lazy_budget.py": "0f5ea4bd091d323c9a231e63cfa83a93915d93aa43f1e70f53920b452e30e490",
     "ate_sim/persistence_lazy_families.py": "3275abd616b16b0a01264cd02a49b1aaf1db9c9803f62ea26f59670001044b08",
     "ate_sim/persistence_lazy_lineage_children.py": "24214b874a8ae6daca0fbb3aaeef8ea65cef1b2c95f647695c476af8944faf0e",
-    "persistence_p5_validation.py": "80ad1cc6baa0225412afa09595efa274804ab0ad8c6311fd8737b9f736e0a9f8"
+    "ate_sim/persistence_tracking.py": "24dcc5b724f2df9da071cf68fc43305ca16d2934b44c3400f44d122969797cf0",
+    "persistence_p5_validation.py": "80ad1cc6baa0225412afa09595efa274804ab0ad8c6311fd8737b9f736e0a9f8",
+    "tests/test_stage_0_5_final_pressure_arithmetic.py": "51caa94ee75cf2b515e52f4c29fc1899c8b57c7cb06fe99585d67a4ab572dd78"
   },
   "timings": {
-    "checkpoint_lane_seconds": 0.42299640700002783,
-    "control_final_seconds": 0.5595066580008279,
-    "control_total_seconds": 0.4412436180000441,
-    "fixture_creation_seconds": 3.416497351000544
+    "checkpoint_lane_seconds": 0.26235636599994905,
+    "control_final_seconds": 0.1710155479995592,
+    "control_total_seconds": 0.14020671700018283,
+    "fixture_creation_seconds": 2.320721869999943
   },
-  "total_year": 7,
-  "validation_scope": "Compatibility runtime checkpoint: concrete family bindings and shared record-cache bytes. Not final Stage 0.5 acceptance."
+  "total_year": 7
 }

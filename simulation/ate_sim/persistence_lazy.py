@@ -2826,6 +2826,8 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             SKILL_NAMESPACE: SkillHistory,
             LINEAGE_NODE_NAMESPACE: LineageNode,
         }[namespace]
+        if namespace == SKILL_NAMESPACE and relative in LazySkillTable._nested_paths.values():
+            expected = list
         return namespace, key, relative, expected
     social_edge = _social_occurrence_from_path(path, "edges")
     if social_edge is not None:
@@ -2990,6 +2992,11 @@ def _seed_cross_boundary_lazy_identity(session, links):
             ):
                 eager_object = LazyTrackedDict(eager_object)
                 _relative_set(session.world, eager_path, eager_object)
+            elif namespace == SKILL_NAMESPACE and relative in LazySkillTable._nested_paths.values():
+                if type(eager_object) is list:
+                    eager_object = LazySoulTrackedList(eager_object)
+                    eager_object._attach(session.skills, key, relative[0][1])
+                    _relative_set(session.world, eager_path, eager_object)
             elif namespace == SOUL_NAMESPACE and relative:
                 if relative in (
                     (("field", "authorities"),),
@@ -3009,6 +3016,8 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 ):
                     eager_object = LazySoulTrackedList(eager_object)
                     _relative_set(session.world, eager_path, eager_object)
+                if isinstance(eager_object, (LazySoulTrackedList, LazySoulTrackedSet)):
+                    eager_object._attach(session.souls, key, relative[0][1])
             elif (
                 namespace == LINEAGE_CHILD_NAMESPACE
                 and not relative
@@ -3033,6 +3042,8 @@ def _seed_cross_boundary_lazy_identity(session, links):
                 elif type(eager_object) is set:
                     eager_object = LazySoulTrackedSet(eager_object)
                     _relative_set(session.world, eager_path, eager_object)
+                if isinstance(eager_object, (LazySoulTrackedList, LazySoulTrackedSet)):
+                    eager_object._attach(session.advancement_paths, key, None)
             if not isinstance(eager_object, expected_type):
                 raise StoreIntegrityError(
                     "cross-boundary lazy identity resolves to wrong type"
@@ -3045,22 +3056,7 @@ def _seed_cross_boundary_lazy_identity(session, links):
             Occurrence(namespace, key, relative),
         )
         if not relative and isinstance(eager_object, IndexedRecord):
-            table = {
-                PEOPLE_NAMESPACE: session.people,
-                ASPIRATION_NAMESPACE: session.aspirations,
-                RESOURCE_NAMESPACE: session.resources,
-                MATERIAL_LOT_NAMESPACE: session.material_lots,
-                MATERIAL_ITEM_NAMESPACE: session.material_items,
-                SOUL_NAMESPACE: session.souls,
-                ADVANCEMENT_NAMESPACE: session.advancement_paths,
-                INSTITUTION_MAGIC_RECORD_NAMESPACE: session.institution_magic_records,
-                INSTITUTION_NOTICE_NAMESPACE: session.institution_notices,
-                INSTITUTION_APPLICATION_NAMESPACE: session.institution_applications,
-                TRANSMISSION_NAMESPACE: session.transmissions,
-                MOTIVE_NAMESPACE: session.motives,
-                **session._scalar_tables,
-                SOCIAL_EDGE_NAMESPACE: session.social_edges,
-            }.get(namespace)
+            table = session._family_bindings.indexed_tables.get(namespace)
             if table is None:
                 raise StoreIntegrityError(
                     "indexed lazy occurrence has no owning table"
@@ -3127,6 +3123,7 @@ def _initialize_eager_tracker(
     }
     tracker._excluded_namespaces.update(session._scalar_tables)
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
+    tracker._foreign_child_types = (LazySoulTrackedList, LazySoulTrackedSet)
     try:
         tracker.generation = session.pin.captured_head
         tracker._manifest = session.manifest
@@ -3335,7 +3332,11 @@ class LazyRecordTable(RecordTable):
 
     def shared_record_changed(self, record):
         for table, key in self._session._shared_object_routes(record):
-            table.changed(key)
+            # IndexedRecord already delivered its exact field notification to
+            # this owner. Repeating it with field=None would turn a scalar
+            # advancement write into a full identity-graph reconciliation.
+            if table is not self or key != record.__dict__.get('_index_key'):
+                table.changed(key)
 
     def _retain_dirty_owner(self, key):
         # Called after a mutation notification. Dirty residency is an actual
@@ -8608,6 +8609,10 @@ class _LazySoulBindingMixin:
         self._soul_bindings.pop((id(table), key, field), None)
 
     def _guard(self):
+        from .persistence_tracking import _binding
+        eager = _binding(self)
+        if eager is not None:
+            eager.session._ensure_mutation_allowed()
         bindings = self._bindings()
         for table, key, _field in bindings:
             table._ensure_mutation()
@@ -8629,10 +8634,13 @@ class _LazySoulBindingMixin:
                         if marker not in bound)
         return tuple(bindings)
 
-    @staticmethod
-    def _touch(bindings):
+    def _touch(self, bindings):
         for table, key, field in bindings:
             table.changed(key, field)
+        from .persistence_tracking import _binding
+        eager = _binding(self)
+        if eager is not None:
+            eager.session._mark_many(eager.owners)
 
 
 class LazySoulTrackedSet(_LazySoulBindingMixin, set):
@@ -8671,33 +8679,33 @@ class LazySoulTrackedSet(_LazySoulBindingMixin, set):
             set.clear(self)
             self._touch(bindings)
 
-    def update(self, *others):
+    def _update_set(self, name, *others):
         bindings = self._guard()
         before = set(self)
-        set.update(self, *others)
-        if self != before:
-            self._touch(bindings)
+        representatives = {value: value for value in before}
+        missing = object()
+        try:
+            getattr(set, name)(self, *others)
+        finally:
+            # Native update/difference can consume and mutate before an
+            # iterable raises. Intersection can also replace equal values'
+            # representatives. Both are real writes requiring publication.
+            if self != before or any(
+                representatives.get(value, missing) is not value for value in self
+            ):
+                self._touch(bindings)
+
+    def update(self, *others):
+        self._update_set('update', *others)
 
     def intersection_update(self, *others):
-        bindings = self._guard()
-        before = set(self)
-        set.intersection_update(self, *others)
-        if self != before:
-            self._touch(bindings)
+        self._update_set('intersection_update', *others)
 
     def difference_update(self, *others):
-        bindings = self._guard()
-        before = set(self)
-        set.difference_update(self, *others)
-        if self != before:
-            self._touch(bindings)
+        self._update_set('difference_update', *others)
 
     def symmetric_difference_update(self, other):
-        bindings = self._guard()
-        before = set(self)
-        set.symmetric_difference_update(self, other)
-        if self != before:
-            self._touch(bindings)
+        self._update_set('symmetric_difference_update', other)
 
     def __ior__(self, other):
         self.update(other)
@@ -8728,9 +8736,12 @@ class LazySoulTrackedList(_LazySoulBindingMixin, list):
 
     def extend(self, values):
         bindings = self._guard()
-        list.extend(self, values)
-        if values:
-            self._touch(bindings)
+        before = len(self)
+        try:
+            list.extend(self, values)
+        finally:
+            if len(self) != before:
+                self._touch(bindings)
 
     def insert(self, index, value):
         bindings = self._guard()
@@ -10707,30 +10718,7 @@ class LazyWorldSession:
             incarnation
             for incarnation in live_by_incarnation
             if any(
-                occurrence.owner_namespace in {
-                    PEOPLE_NAMESPACE,
-                    ASPIRATION_NAMESPACE,
-                    RESOURCE_NAMESPACE,
-                    MATERIAL_LOT_NAMESPACE,
-                    MATERIAL_ITEM_NAMESPACE,
-                    MATERIAL_LOT_INDEX_NAMESPACE,
-                    MATERIAL_ACTIVE_INDEX_NAMESPACE,
-                    WALLET_NAMESPACE,
-                    TREASURY_NAMESPACE,
-                    SOUL_NAMESPACE,
-                    ADVANCEMENT_NAMESPACE,
-                    INSTITUTION_MAGIC_RECORD_NAMESPACE,
-                    INSTITUTION_NOTICE_NAMESPACE,
-                    INSTITUTION_APPLICATION_NAMESPACE,
-                    TRANSMISSION_NAMESPACE,
-                    MOTIVE_NAMESPACE,
-                    *self._scalar_tables,
-                    SOCIAL_EDGE_NAMESPACE,
-                    SOCIAL_ADJACENCY_NAMESPACE,
-                    SKILL_NAMESPACE,
-                    LINEAGE_NODE_NAMESPACE,
-                    GENEALOGY_CHILD_NAMESPACE,
-                }
+                occurrence.owner_namespace in self._family_bindings.tables
                 for occurrence in
                 self._registry.occurrences_for_incarnation(incarnation)
             )
@@ -10748,29 +10736,7 @@ class LazyWorldSession:
                 occurrence
                 for occurrence
                 in self._registry.occurrences_for_incarnation(incarnation)
-                if occurrence.owner_namespace in {
-                    PEOPLE_NAMESPACE,
-                    ASPIRATION_NAMESPACE,
-                    RESOURCE_NAMESPACE,
-                    MATERIAL_LOT_NAMESPACE,
-                    MATERIAL_ITEM_NAMESPACE,
-                    MATERIAL_LOT_INDEX_NAMESPACE,
-                    MATERIAL_ACTIVE_INDEX_NAMESPACE,
-                    WALLET_NAMESPACE,
-                    TREASURY_NAMESPACE,
-                    SOUL_NAMESPACE,
-                    ADVANCEMENT_NAMESPACE,
-                    INSTITUTION_MAGIC_RECORD_NAMESPACE,
-                    INSTITUTION_NOTICE_NAMESPACE,
-                    INSTITUTION_APPLICATION_NAMESPACE,
-                    TRANSMISSION_NAMESPACE,
-                    MOTIVE_NAMESPACE,
-                    *self._scalar_tables,
-                    SOCIAL_EDGE_NAMESPACE,
-                    SOCIAL_ADJACENCY_NAMESPACE,
-                    LINEAGE_NODE_NAMESPACE,
-                    GENEALOGY_CHILD_NAMESPACE,
-                }
+                if occurrence.owner_namespace in self._family_bindings.tables
             )
             lazy_paths = {
                 self._absolute_lazy_occurrence_path(occurrence)
