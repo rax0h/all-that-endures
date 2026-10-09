@@ -83,7 +83,11 @@ def test_cold_to_lazy_conversion_preserves_source_and_current_authority(tmp_path
             "SELECT COUNT(*) FROM records WHERE namespace=?",
             (PEOPLE_NAMESPACE,),
         ).fetchone() == (0,)
-        assert lazy.storage_metrics()["lazy_record_versions"] == 25
+        assert lazy.db.execute('SELECT COUNT(*) FROM lazy_record_versions WHERE namespace=?',
+                               (PEOPLE_NAMESPACE,)).fetchone() == (25,)
+        assert lazy.db.execute('SELECT COUNT(*) FROM lazy_record_versions WHERE namespace=?',
+                               ('aux.lazy.adoption.buckets',)).fetchone() == (5,)
+        assert lazy.storage_metrics()["lazy_record_versions"] == 30
         assert lazy.verify_all()["identity_occurrences"] >= 25
 
 

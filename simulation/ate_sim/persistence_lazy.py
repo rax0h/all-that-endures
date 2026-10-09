@@ -63,6 +63,8 @@ from .persistence_lazy_lineage_children import (
     insert_lineage_child_edge,
 )
 
+from .persistence_lazy_adoption import (AdoptionQueries, ADOPTION_NAMESPACE, BUCKET_NAMESPACE as ADOPTION_BUCKET_NAMESPACE, SCOPE_NAMESPACE as ADOPTION_SCOPE_NAMESPACE, memberships as adoption_memberships, initial_buckets)
+
 from .event_log import EventLog, FrozenDict, FrozenList
 from .incremental_store import (
     Membership,
@@ -75,6 +77,8 @@ from .incremental_store import (
 )
 from .persistence_adapters import (
     COLLECTION_LAYOUT,
+    AGENCY_ACTIONS_NAMESPACE,
+    PACKED_LIST_KEY,
     IDENTITY_LINKS,
     META,
     RECORD_SCHEMA,
@@ -233,6 +237,7 @@ NESTED_FIELD_KINDS = {
     ('world.divinity.churches', 'doctrine_claims'): 'set',
 }
 SCALAR_MAP_SPECS = {
+    ADOPTION_NAMESPACE: (tuple, (int, float)),
     'world.threat_ecology.resolutions': (int, (int,)),
     'world.knowledge.beliefs': (tuple, (int, float)),
 }
@@ -1314,6 +1319,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     )
 
                     scalar_counts = {namespace: [0, 0] for namespace in SCALAR_NAMESPACES}
+                    adoption_values = []
                     people_count = 0
                     next_ordinal = 0
                     aspiration_count = 0
@@ -1409,7 +1415,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             _insert_lazy_plain_record(
                                 target, namespace=namespace, generation=generation,
                                 typed_key=typed_key, ordinal=ordinal, value=value, record_schema=1,
+                                memberships=tuple((m.index_name, m.value, m.ordinal) for m in adoption_memberships(key, value, ordinal)) if namespace == ADOPTION_NAMESPACE else (),
                             )
+                            if namespace == ADOPTION_NAMESPACE:
+                                adoption_values.append((key, value))
                             scalar_counts[namespace][0] += 1
                             scalar_counts[namespace][1] = max(scalar_counts[namespace][1], ordinal + 1)
                             continue
@@ -2311,6 +2320,19 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             (namespace, generation, count, next_ord,
                              _namespace_checksum(namespace, count, next_ord, generation, None)),
                         )
+                    adoption_counts, adoption_scopes = initial_buckets(adoption_values)
+                    for namespace, entries in (
+                        (ADOPTION_BUCKET_NAMESPACE, adoption_counts.items()),
+                        (ADOPTION_SCOPE_NAMESPACE, ((sid, ('settlement', sid)) for sid in sorted(adoption_scopes))),
+                    ):
+                        count = 0
+                        for key, value in entries:
+                            _insert_lazy_plain_record(target, namespace=namespace, generation=generation,
+                                typed_key=codec.encode(key), ordinal=count, value=value, record_schema=1)
+                            count += 1
+                        target.db.execute('INSERT INTO lazy_namespace_state VALUES (?,?,NULL,?,?,?)',
+                            (namespace, generation, count, count,
+                             _namespace_checksum(namespace, count, count, generation, None)))
                     if paged_household_members:
                         bootstrap_household_members(
                             target, generation,
@@ -3216,6 +3238,7 @@ class LazyPeopleSavePlan:
     layout_value: dict[str, Any] | None
     household_member_version_changes: tuple[VersionChange, ...] = ()
     scalar_record_plans: tuple[ScalarRecordSavePlan, ...] = ()
+    scalar_index_version_changes: tuple[VersionChange, ...] = ()
     nested_history_version_changes: tuple[VersionChange, ...] = ()
     nested_history_identity_changes: tuple[IdentityOccurrenceChange, ...] = ()
 
@@ -5902,6 +5925,9 @@ class LazyCommunityMembershipTable(LazyRecordTable):
     def _memberships(key, ordinal):
         return (Membership("person", key[0], ordinal),)
 
+    def _value_memberships(self, key, value, ordinal):
+        return self._memberships(key, ordinal)
+
     def keys_for_person(self, person):
         self._ensure()
         # query_keys is already ordered by the persisted membership ordinal,
@@ -5972,7 +5998,7 @@ class LazyCommunityMembershipTable(LazyRecordTable):
                         key,
                         strength,
                         record_schema=LAZY_COMMUNITY_MEMBERSHIP_SCHEMA,
-                        memberships=self._memberships(key, ordinal),
+                        memberships=self._value_memberships(key, strength, ordinal),
                         reinsertion=reinsertion,
                     )
                 )
@@ -7070,6 +7096,10 @@ class LazyScalarMapTable(LazyCommunityMembershipTable):
             'clean_cache_entries': len(self._lru), 'clean_cache_limit': self._clean_limit,
             'payload_loads': self._loads, 'dirty_records': len(self._dirty),
         }
+
+
+class LazyAdoptionTable(AdoptionQueries, LazyScalarMapTable):
+    pass
 
 
 class LazyScalarRecordTable(_LazyInstitutionRecordTable):
@@ -10003,7 +10033,7 @@ class LazyWorldSession:
         self._eager_nested_labels = {}
         self._scalar_tables = {}
         for namespace in _scalar_authorities(store, manifest, pin.captured_head):
-            table_type = LazyScalarRecordTable if namespace in SCALAR_RECORD_SPECS else LazyScalarMapTable
+            table_type = LazyScalarRecordTable if namespace in SCALAR_RECORD_SPECS else (LazyAdoptionTable if namespace == ADOPTION_NAMESPACE else LazyScalarMapTable)
             table = table_type(self, namespace)
             self._scalar_tables[namespace] = table
             owner = _at_path(world, _namespace_path(namespace)[:-1])
@@ -11801,10 +11831,17 @@ class LazyWorldSession:
         for owner in sorted(tracker._dirty | tracker._deleted, key=self.store.codec.encode):
             if owner[0] in tracker._excluded_namespaces:
                 continue
+            if owner == (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY):
+                # This is the whole packed storage marker, not an element
+                # occurrence. The eager tracker publishes its logical value.
+                continue
             before = self._eager_nested_labels.get(owner, {})
             current = {}
             if owner not in tracker._deleted:
-                value = self._eager_nested_owner_value(owner)
+                # Rolling trims can leave dirty callback owners at their old
+                # positions. The tracker resolves absent logical owners to
+                # None while its packed save retains surviving object edits.
+                value = tracker._owner_value(owner)
                 for path, proxy in self._nested_leaves(value):
                     if type(proxy) in HISTORY_TYPES:
                         current[path] = self._registry.incarnation_for_object(proxy).value
@@ -13639,6 +13676,11 @@ class LazyWorldSession:
             ScalarRecordSavePlan(namespace, *table.prepare_save_changes())
             for namespace, table in sorted(self._scalar_tables.items())
         )
+        scalar_index_version_changes = tuple(
+            change for unit in scalar_record_plans
+            if hasattr(self._scalar_tables[unit.namespace], 'prepare_index_changes')
+            for change in self._scalar_tables[unit.namespace].prepare_index_changes(unit.version_changes)
+        )
         nested_changes = []
         for incarnation, proxy in sorted(self._nested_dirty.items()):
             if not (self._registry.occurrences_for_incarnation(IncarnationId(self.store.store_identity, incarnation)) or self._nested_eager_owners(proxy)):
@@ -13812,6 +13854,7 @@ class LazyWorldSession:
 
         lazy_effective = bool(
             any(unit.version_changes or unit.identity_changes for unit in scalar_record_plans)
+            or scalar_index_version_changes
             or nested_history_version_changes
             or nested_history_identity_changes
             or household_member_version_changes
@@ -14207,6 +14250,7 @@ class LazyWorldSession:
             token=token,
             target_generation=cold_plan.target_generation,
             scalar_record_plans=scalar_record_plans,
+            scalar_index_version_changes=scalar_index_version_changes,
             nested_history_version_changes=nested_history_version_changes,
             nested_history_identity_changes=nested_history_identity_changes,
             version_changes=version_changes,
@@ -15495,13 +15539,38 @@ class LazyWorldSession:
                 )
 
 
+    def _validate_adoption_successor(self, plan, generation):
+        for unit in plan.scalar_record_plans:
+            if unit.namespace != ADOPTION_NAMESPACE:
+                continue
+            for change in unit.version_changes:
+                key = self.store.codec.encode(change.key)
+                if change.delete:
+                    dangling = self.store.db.execute(
+                        'SELECT 1 FROM lazy_query_versions WHERE namespace=? AND record_key=? '
+                        'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 1',
+                        (unit.namespace, key, generation, generation)).fetchone()
+                    if dangling:
+                        raise StoreIntegrityError('deleted adoption retains query authority')
+                for member in change.memberships:
+                    value = self.store.codec.encode(member.value)
+                    rows = self.store.db.execute(
+                        'SELECT valid_from,valid_to,row_checksum FROM lazy_query_versions '
+                        'WHERE namespace=? AND record_key=? AND index_name=? AND index_value=? AND ordinal=? '
+                        'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2',
+                        (unit.namespace, key, member.index_name, value, member.ordinal, generation, generation)).fetchall()
+                    self.store._metadata_rows += len(rows)
+                    if len(rows) != 1 or rows[0][2] != _query_checksum(unit.namespace,
+                            member.index_name, value, key, member.ordinal, rows[0][0], rows[0][1]):
+                        raise StoreIntegrityError('saved adoption query evidence mismatch')
+
     def _validate_nested_history_successor(self, plan, generation):
         for change in plan.nested_history_identity_changes:
             row = self.store._visible_identity_occurrence(generation, change.owner_namespace,
                 self.store.codec.encode(change.owner_key), self.store.codec.encode(change.occurrence_path))
             if (row is not None) if change.delete else (row is None or row[0] != change.incarnation_id):
                 raise StoreIntegrityError('saved eager nested identity evidence mismatch')
-        for change in plan.nested_history_version_changes:
+        for change in plan.nested_history_version_changes + plan.scalar_index_version_changes:
             key = self.store.codec.encode(change.key)
             row = self.store._visible_record_row(generation, change.namespace, key)
             if change.namespace == NESTED_ENTRY_NAMESPACE:
@@ -15565,6 +15634,7 @@ class LazyWorldSession:
             proxy._pin = result.pin
         self._arm_cold_publication(plan)
         self._validate_nested_history_successor(plan, result.generation)
+        self._validate_adoption_successor(plan, result.generation)
         tracker = self._eager_tracker
         self._validate_people_successor(
             plan, result.generation
@@ -15770,6 +15840,7 @@ class LazyWorldSession:
                     + plan.community_membership_version_changes
                     + plan.household_member_version_changes
                     + plan.nested_history_version_changes
+                    + plan.scalar_index_version_changes
                 ),
                 identity_changes=(
                     plan.identity_changes

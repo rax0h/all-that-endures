@@ -25,11 +25,15 @@ def seed_practices(world,state):
   p=pressures(world,sid);sig=_signature(p)
   for domain,name,fit in [("construction","drainage",p["wet"]),("construction","timber_joinery",p["forest"]),("food","preservation",.35+p["scarcity"]*.5),("defense","fortification",p["hazard"]),("agriculture","water_management",p["fertility"]*.6+p["wet"]*.2)]:
    pid=state.next_practice;state.next_practice+=1;traits={"fitness":min(1.,fit),"refinement":.1,**sig};state.practices[pid]=Practice(pid,domain,name,world.year,sid,traits);state.adoption[(sid,pid)]=max(.05,min(.8,fit*.55))
+def adoption_items_above(adoption, threshold, settlement=None):
+ query=getattr(adoption,"items_above",None)
+ if query is not None:return query(threshold,settlement)
+ return [(key,value) for key,value in adoption.items() if value>threshold and (settlement is None or key[0]==settlement)]
 def cultural_step(world,state,rng):
  from .core import Layer,Ref
  institution_support={(inst.settlement,pid):max(.15,inst.legitimacy) for inst in state.institutions.values() for pid in inst.practices}
  for sid in world.settlements:
-  p=pressures(world,sid);local_items=[(pid,a) for (place,pid),a in state.adoption.items() if place==sid and a>.01];active_count=len(local_items)
+  p=pressures(world,sid);local_items=[(pid,a) for (place,pid),a in adoption_items_above(state.adoption,.01,sid)];active_count=len(local_items)
   for pid,adopt in list(local_items):
    pr=state.practices[pid];rr=rng.stream("culture",world.year,sid*100000+pid);pressure={"construction":max(p["wet"],p["forest"]),"food":max(.12,p["scarcity"]),"defense":max(.12,p["defense_need"]),"agriculture":p["fertility"]}.get(pr.domain,.2);support=institution_support.get((sid,pid),0.);fit=_local_fit(pr,p);retention=.0015*support+.0008*fit;decay=.0032*max(0.,.38-pressure)*(1-support*.6)+.0022*max(0.,.58-fit)
    if pr.origin_settlement!=sid:decay+=.0009*(1-fit)
@@ -40,8 +44,8 @@ def cultural_step(world,state,rng):
    if new>.44 and rr.random()<.00075*(1+novelty)*saturation:
     nid=state.next_practice;state.next_practice+=1;traits=dict(pr.traits);traits["refinement"]=max(0.,min(1.,pr.traits.get("refinement",.1)+rr.uniform(-.06,.09)));state.practices[nid]=Practice(nid,pr.domain,pr.name+" variant",world.year,sid,traits,pid);state.adoption[(sid,nid)]=.055;e=world.emit("practice_innovated",Layer.SOCIETY,location=Ref("settlement",sid),parent=pid,practice=nid,domain=pr.domain);world.lineage.register("practice",nid,(("practice",pid),),e.id,world.year);world.transmission.record(world.year,"innovation","practice",nid,"practice",pid,"settlement",sid,e.id,reliability=1.0,mutation=abs(traits["refinement"]-pr.traits.get("refinement",.1)))
   domains={}
-  for (place,pid),a in list(state.adoption.items()):
-   if place==sid and a>.008:domains.setdefault(state.practices[pid].domain,[]).append((pid,a))
+  for (place,pid),a in adoption_items_above(state.adoption,.008,sid):
+   domains.setdefault(state.practices[pid].domain,[]).append((pid,a))
   for domain,items in domains.items():
    total=sum(a for _,a in items);cap=1.55+sum(institution_support.get((sid,pid),0.)*.12 for pid,_ in items)
    if total>cap:

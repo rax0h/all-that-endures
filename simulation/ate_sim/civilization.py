@@ -1,7 +1,7 @@
 from __future__ import annotations
 from math import hypot
 from .core import Layer, Ref, TradeRoute
-from .culture import Institution, Law
+from .culture import Institution, Law, adoption_items_above
 from .species import habitat_suitability
 
 def _distance(world,a:int,b:int)->float:
@@ -22,9 +22,8 @@ def _move_household(world,hid:int,destination:int,cause:int|None=None):
     world.settlements[destination].households.append(hid);h.settlement=destination;living=_household_living(world,hid)
     for p in living:p.settlement=destination
     causes=() if cause is None else (cause,);event=world.emit("household_migrated",Layer.SOCIETY,tuple(Ref("person",p.id) for p in living),Ref("settlement",destination),causes,household=hid,origin=origin,destination=destination,habitat_fit=round(_household_habitat_fit(world,living,destination),3))
-    for (sid,pid),adoption in list(world.culture.adoption.items()):
-        if sid==origin and adoption>.22:
-            value=max(world.culture.adoption.get((destination,pid),0.),adoption*.22);world.culture.adoption[(destination,pid)]=value;world.transmission.record(world.year,"migration","practice",pid,"settlement",origin,"settlement",destination,event.id,reliability=value)
+    for (sid,pid),adoption in adoption_items_above(world.culture.adoption,.22,origin):
+        value=max(world.culture.adoption.get((destination,pid),0.),adoption*.22);world.culture.adoption[(destination,pid)]=value;world.transmission.record(world.year,"migration","practice",pid,"settlement",origin,"settlement",destination,event.id,reliability=value)
     roots={}
     for p in living:
         memberships=world.communities.memberships_for(p.id)
@@ -63,8 +62,8 @@ def trade_step(world,rng):
     for p in world.current_people():
         if p.alive:living_by_settlement[p.settlement].append(p)
     adopted_by_settlement={sid:[] for sid in ids}
-    for (sid,pid),adoption in world.culture.adoption.items():
-        if adoption>.35:adopted_by_settlement.setdefault(sid,[]).append((pid,adoption))
+    for (sid,pid),adoption in adoption_items_above(world.culture.adoption,.35):
+        adopted_by_settlement.setdefault(sid,[]).append((pid,adoption))
     for i,a in enumerate(ids):
         for b in ids[i+1:]:
             sa,sb=world.settlements[a],world.settlements[b];distance=_distance(world,a,b);key=(a,b);route=world.trade_routes.get(key);base_connectivity=(sa.roads+sb.roads+.20)/(distance**.75)
@@ -84,7 +83,7 @@ def trade_step(world,rng):
 
 def institution_step(world,rng):
     for sid,s in world.settlements.items():
-        existing=[i for i in world.culture.institutions.values() if i.settlement==sid];strong=[pid for (place,pid),adopt in world.culture.adoption.items() if place==sid and adopt>.62];rr=rng.stream("institutions",world.year,sid)
+        existing=[i for i in world.culture.institutions.values() if i.settlement==sid];strong=[pid for (place,pid),adopt in adoption_items_above(world.culture.adoption,.62,sid)];rr=rng.stream("institutions",world.year,sid)
         if strong and len(existing)<4 and rr.random()<.006*(1+s.prosperity):
             institution_kind=world.culture.practices[strong[0]].domain+" guild";iid=world.culture.next_institution;world.culture.next_institution+=1;inst=Institution(iid,sid,institution_kind,world.year,set(strong[:4]),authority=.18+s.prosperity*.25,assets=20+s.prosperity*80,legitimacy=.45);world.culture.institutions[iid]=inst;e=world.emit("institution_founded",Layer.SOCIETY,location=Ref("settlement",sid),institution=iid,institution_kind=institution_kind);world.lineage.register("institution",iid,tuple(("practice",pid) for pid in strong[:4]),e.id,world.year);existing.append(inst)
         for inst in existing:
