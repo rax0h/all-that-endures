@@ -1,14 +1,16 @@
 """Checked incarnation-owned typed history; publication belongs to the session."""
 from collections import OrderedDict
-from collections.abc import MutableSequence
+from collections.abc import MutableSequence, MutableMapping, MutableSet, Mapping, Set
 from dataclasses import dataclass
 import operator
+import weakref
 
-from .incremental_store import StoreFormatError, StoreIntegrityError
-from .persistence_lazy_store import VersionChange
+from .incremental_store import StoreFormatError, StoreIntegrityError, Membership
+from .persistence_lazy_store import VersionChange, _query_checksum
 
 DESCRIPTOR_NAMESPACE = 'aux.lazy.nested.descriptors'
 PAGE_NAMESPACE = 'aux.lazy.nested.list_pages'
+ENTRY_NAMESPACE = 'aux.lazy.nested.entries'
 REFERENCE_TAG = 'typed-history/v1'
 RECORD_SCHEMA = 1
 PAGE_SIZE = 128
@@ -21,12 +23,12 @@ class HistoryReference:
     incarnation: int
 
     def __post_init__(self):
-        if self.kind != 'list' or type(self.incarnation) is not int or self.incarnation <= 0:
+        if self.kind not in ('list', 'map', 'set') or type(self.incarnation) is not int or self.incarnation <= 0:
             raise ValueError('invalid typed history reference')
 
 
 def reference(value):
-    return (type(value) is HistoryReference and value.kind == 'list'
+    return (type(value) is HistoryReference and value.kind in ('list', 'map', 'set')
             and type(value.incarnation) is int and value.incarnation > 0)
 
 
@@ -95,6 +97,7 @@ class LazyHistoryList(MutableSequence):
     """Typed list with bounded point/tail operations and explicit whole edits."""
 
     __hash__ = None
+    _kind = 'list'
 
     def __init__(self, store, pin, incarnation, *, guard=None, changed=None, initial_values=None):
         if type(incarnation) is not int or incarnation <= 0:
@@ -399,3 +402,514 @@ class LazyHistoryList(MutableSequence):
         return {'length': self._length, 'page_loads': self._page_loads,
                 'cached_pages': len(self._cache), 'dirty_pages': len(self._dirty_pages),
                 'cached_values': sum(len(page) for page in self._cache.values())}
+
+
+def equality_key(value):
+    """Canonical storage key for native equality, preserving payload keys."""
+    if not immutable_value(value):
+        raise TypeError('typed history keys must be immutable schema values')
+    hash(value)
+    if type(value) is bool:
+        return int(value)
+    if type(value) is float and value.is_integer():
+        return int(value)
+    if type(value) is tuple:
+        return tuple(equality_key(item) for item in value)
+    if type(value) is frozenset:
+        return frozenset(equality_key(item) for item in value)
+    return value
+
+
+def initial_scalar_changes(incarnation, kind, values, codec):
+    if kind not in ('map', 'set'):
+        raise ValueError('invalid scalar history kind')
+    values = dict(values) if kind == 'map' else {key: None for key in values}
+    changes = [VersionChange(DESCRIPTOR_NAMESPACE, incarnation, (kind, len(values), len(values)), record_schema=RECORD_SCHEMA)]
+    for ordinal, (key, value) in enumerate(values.items()):
+        canonical = equality_key(key)
+        if not immutable_value(value):
+            raise TypeError('typed history values must be immutable schema values')
+        codec.encode((canonical, key, value))
+        changes.append(VersionChange(ENTRY_NAMESPACE, (incarnation, canonical), (ordinal, key, value),
+            record_schema=RECORD_SCHEMA, memberships=(Membership('incarnation', incarnation, ordinal),)))
+    return tuple(changes)
+
+
+def checked_scalar_entry(store, pin, incarnation, canonical):
+    owns_snapshot = not getattr(store, '_active_read_transaction', False)
+    generation = store._read_snapshot_start(pin) if owns_snapshot else pin.captured_head
+    key = store.codec.encode((incarnation, canonical))
+    try:
+        row = store._visible_record_row(generation, ENTRY_NAMESPACE, key)
+        order = store._visible_order(ENTRY_NAMESPACE, key, generation)
+        if row is None:
+            dangling = store.db.execute('SELECT 1 FROM lazy_query_versions WHERE namespace=? AND record_key=? '
+                'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 1',
+                (ENTRY_NAMESPACE, key, generation, generation)).fetchone()
+            store._metadata_rows += int(dangling is not None)
+            if order is not None or dangling:
+                raise StoreIntegrityError('nested scalar absence has dangling authority')
+            return None
+        value, schema, *_rest, memberships = store._check_record_row(ENTRY_NAMESPACE, key, row, decode=True)
+        if (schema != RECORD_SCHEMA or order is None or type(value) is not tuple or len(value) != 3
+                or type(value[0]) is not int or value[0] < 0 or not immutable_value(value[1])
+                or not immutable_value(value[2]) or store.codec.encode(equality_key(value[1])) != store.codec.encode(canonical)
+                or memberships != (('incarnation', incarnation, value[0]),)):
+            raise StoreIntegrityError('invalid nested scalar entry')
+        encoded_incarnation = store.codec.encode(incarnation)
+        rows = store.db.execute('SELECT valid_from,valid_to,row_checksum FROM lazy_query_versions '
+            'WHERE namespace=? AND index_name=? AND index_value=? AND record_key=? AND ordinal=? '
+            'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2',
+            (ENTRY_NAMESPACE, 'incarnation', encoded_incarnation, key, value[0], generation, generation)).fetchall()
+        store._metadata_rows += len(rows)
+        if len(rows) != 1 or rows[0][2] != _query_checksum(ENTRY_NAMESPACE, 'incarnation', encoded_incarnation,
+                key, value[0], rows[0][0], rows[0][1]):
+            raise StoreIntegrityError('invalid nested scalar membership witness')
+        return value
+    finally:
+        if owns_snapshot:
+            store._read_snapshot_end()
+
+
+class _HistoryIterator:
+    def __init__(self, history, entries, *, reverse=False):
+        self._history = history
+        keys = [entry[1] for entry in entries]
+        self._state = dict.fromkeys(keys) if history._kind == 'map' else set(keys)
+        self._iterator = reversed(self._state) if reverse else iter(self._state)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        self._history._ensure()
+        return next(self._iterator)
+
+    def added(self, key):
+        if self._history._kind == 'map':
+            self._state[key] = None
+        else:
+            self._state.add(key)
+
+    def removed(self, key):
+        if self._history._kind == 'map':
+            del self._state[key]
+        else:
+            self._state.remove(key)
+
+
+class _ScalarHistory:
+    _kind = None
+    __hash__ = None
+
+    def __init__(self, store, pin, incarnation, *, initial_values=None):
+        if type(incarnation) is not int or incarnation <= 0:
+            raise ValueError('invalid nested history incarnation')
+        self._store, self._pin, self._incarnation = store, pin, incarnation
+        self._guard = self._changed = self._read_guard = None
+        self._cache = OrderedDict()
+        self._iterators = weakref.WeakSet()
+        self._dirty_entries, self._baseline_bytes = {}, {}
+        self._entry_loads = self._structure_revision = 0
+        self._new = initial_values is not None
+        if self._new:
+            self._count = self._base_count = self._next_ordinal = self._base_next = 0
+            values = dict(initial_values) if self._kind == 'map' else {key: None for key in initial_values}
+            for key, value in values.items():
+                self._set(key, value)
+        else:
+            value = checked_value(store, pin, DESCRIPTOR_NAMESPACE, incarnation)
+            if (type(value) is not tuple or len(value) != 3 or value[0] != self._kind
+                    or type(value[1]) is not int or value[1] < 0 or type(value[2]) is not int
+                    or value[2] < value[1]):
+                raise StoreIntegrityError('invalid nested scalar descriptor')
+            _, self._count, self._next_ordinal = value
+            self._base_count, self._base_next = self._count, self._next_ordinal
+
+    def bind(self, guard, changed, read_guard=None):
+        self._guard, self._changed, self._read_guard = guard, changed, read_guard
+        return self
+
+    def storage_reference(self):
+        return HistoryReference(self._kind, self._incarnation)
+
+    def _ensure(self):
+        self._store._ensure_open()
+        if self._read_guard is not None:
+            self._read_guard()
+
+    def _mutation(self):
+        self._ensure()
+        if self._guard is not None:
+            self._guard()
+
+    def _notify(self):
+        if self._changed is not None:
+            self._changed()
+
+    def _canonical(self, key):
+        key = equality_key(key)
+        self._store.codec.encode(key)
+        return key
+
+    def _baseline(self, canonical):
+        if canonical in self._cache:
+            self._cache.move_to_end(canonical)
+            return self._cache[canonical]
+        value = None if self._new else checked_scalar_entry(self._store, self._pin, self._incarnation, canonical)
+        if value is not None:
+            if value[0] >= self._base_next or (self._kind == 'set' and value[2] is not None):
+                raise StoreIntegrityError('nested scalar entry exceeds descriptor')
+            self._entry_loads += 1
+        self._cache[canonical] = value
+        while len(self._cache) > 256:
+            self._cache.popitem(last=False)
+        return value
+
+    def _entry(self, canonical):
+        return self._dirty_entries[canonical] if canonical in self._dirty_entries else self._baseline(canonical)
+
+    def _remember_baseline(self, canonical):
+        if canonical not in self._baseline_bytes:
+            baseline = self._baseline(canonical)
+            self._baseline_bytes[canonical] = None if baseline is None else self._store.codec.encode(baseline)
+
+    def _journal(self, canonical, entry):
+        encoded = None if entry is None else self._store.codec.encode(entry)
+        if encoded == self._baseline_bytes[canonical]:
+            self._dirty_entries.pop(canonical, None)
+            self._baseline_bytes.pop(canonical, None)
+        else:
+            self._dirty_entries[canonical] = entry
+
+    def _set(self, key, value):
+        canonical = self._canonical(key)
+        if not immutable_value(value):
+            raise TypeError('typed history values must be immutable schema values')
+        self._store.codec.encode(value)
+        old = self._entry(canonical)
+        self._remember_baseline(canonical)
+        if old is None:
+            entry = (self._next_ordinal, key, value)
+            self._next_ordinal += 1
+            self._count += 1
+            self._structure_revision += 1
+            for iterator in self._iterators:
+                iterator.added(key)
+        else:
+            entry = (old[0], old[1], value)
+        self._journal(canonical, entry)
+
+    def _delete(self, key):
+        canonical = self._canonical(key)
+        old = self._entry(canonical)
+        if old is None:
+            raise KeyError(key)
+        self._remember_baseline(canonical)
+        self._journal(canonical, None)
+        self._count -= 1
+        self._structure_revision += 1
+        for iterator in self._iterators:
+            iterator.removed(old[1])
+        # Reclaim only unpublished trailing ordinals, including add/remove.
+        self._next_ordinal = max((entry[0] + 1 for entry in self._dirty_entries.values() if entry is not None), default=self._base_next)
+        self._next_ordinal = max(self._base_next, self._next_ordinal)
+        return old
+
+    def __len__(self):
+        self._ensure()
+        return self._count
+
+    def __contains__(self, key):
+        self._ensure()
+        return self._entry(self._canonical(key)) is not None
+
+    def _ordered_entries(self):
+        self._ensure()
+        rows = () if self._new else self._store.query_memberships(self._pin, ENTRY_NAMESPACE, 'incarnation', self._incarnation,
+            exclude_keys=((self._incarnation, key) for key in self._dirty_entries))
+        entries = []
+        for key, ordinal in rows:
+            if type(key) is not tuple or len(key) != 2 or key[0] != self._incarnation:
+                raise StoreIntegrityError('nested scalar membership addresses wrong child')
+            entry = self._entry(key[1])
+            if entry is None or entry[0] != ordinal:
+                raise StoreIntegrityError('nested scalar membership disagrees with entry')
+            entries.append(entry)
+        entries.extend(entry for entry in self._dirty_entries.values() if entry is not None)
+        if len(entries) != self._count or len({entry[0] for entry in entries}) != len(entries):
+            raise StoreIntegrityError('nested scalar descriptor count/order mismatch')
+        return sorted(entries, key=lambda entry: entry[0])
+
+    def __iter__(self):
+        iterator = _HistoryIterator(self, self._ordered_entries())
+        self._iterators.add(iterator)
+        return iterator
+
+    def pending_changes(self):
+        self._ensure()
+        changes = []
+        if self._new or (self._count, self._next_ordinal) != (self._base_count, self._base_next):
+            changes.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, (self._kind, self._count, self._next_ordinal), record_schema=RECORD_SCHEMA))
+        for canonical, entry in sorted(self._dirty_entries.items(), key=lambda item: self._store.codec.encode(item[0])):
+            changes.append(VersionChange(ENTRY_NAMESPACE, (self._incarnation, canonical), entry, record_schema=RECORD_SCHEMA,
+                delete=entry is None, memberships=() if entry is None else (Membership('incarnation', self._incarnation, entry[0]),)))
+        return tuple(changes)
+
+    def accept_save(self, pin):
+        self._pin = pin
+        self._base_count, self._base_next = self._count, self._next_ordinal
+        self._new = False
+        self._dirty_entries.clear()
+        self._baseline_bytes.clear()
+        self._cache.clear()
+
+    def diagnostics(self):
+        return {'length': self._count, 'entry_loads': self._entry_loads,
+                'cached_entries': len(self._cache), 'dirty_entries': len(self._dirty_entries)}
+
+
+class LazyHistoryMap(_ScalarHistory, MutableMapping):
+    _kind = 'map'
+    __hash__ = None
+
+    def __getitem__(self, key):
+        self._ensure()
+        entry = self._entry(self._canonical(key))
+        if entry is None:
+            raise KeyError(key)
+        return entry[2]
+
+    def __setitem__(self, key, value):
+        self._mutation()
+        self._set(key, value)
+        self._notify()
+
+    def __delitem__(self, key):
+        self._mutation()
+        self._delete(key)
+        self._notify()
+
+    def copy(self):
+        return dict(self.items())
+
+    @classmethod
+    def fromkeys(cls, iterable, value=None):
+        return dict.fromkeys(iterable, value)
+
+    def update(self, *args, **kwargs):
+        self._mutation()
+        super().update(*args, **kwargs)
+
+    def pop(self, key, *default):
+        self._mutation()
+        if len(default) > 1:
+            raise TypeError('pop expected at most 2 arguments')
+        try:
+            value = self[key]
+        except KeyError:
+            if default:
+                return default[0]
+            raise
+        del self[key]
+        return value
+
+    def setdefault(self, key, default=None):
+        self._mutation()
+        try:
+            return self[key]
+        except KeyError:
+            self[key] = default
+            return default
+
+    def clear(self):
+        self._mutation()
+        for key in list(self):
+            del self[key]
+
+    def popitem(self):
+        self._mutation()
+        entries = self._ordered_entries()
+        if not entries:
+            raise KeyError('popitem(): dictionary is empty')
+        key = entries[-1][1]
+        return key, self.pop(key)
+
+    def __reversed__(self):
+        iterator = _HistoryIterator(self, self._ordered_entries(), reverse=True)
+        self._iterators.add(iterator)
+        return iterator
+
+    def __or__(self, other):
+        if not isinstance(other, Mapping):
+            return NotImplemented
+        return self.copy() | dict(other)
+
+    def __ror__(self, other):
+        if not isinstance(other, Mapping):
+            return NotImplemented
+        return dict(other) | self.copy()
+
+    def __ior__(self, other):
+        self._mutation()
+        self.update(other)
+        return self
+
+    def materialize(self, memo=None):
+        memo = {} if memo is None else memo
+        if id(self) not in memo:
+            memo[id(self)] = self.copy()
+        return memo[id(self)]
+
+
+class LazyHistorySet(_ScalarHistory, MutableSet):
+    _kind = 'set'
+    __hash__ = None
+
+    @classmethod
+    def _from_iterable(cls, values):
+        return set(values)
+
+    def add(self, value):
+        self._mutation()
+        hash(value)
+        self._set(value, None)
+        self._notify()
+
+    def discard(self, value):
+        self._mutation()
+        if type(value) is set:
+            value = frozenset(value)
+        if value in self:
+            self._delete(value)
+        self._notify()
+
+    def remove(self, value):
+        self._mutation()
+        if type(value) is set:
+            value = frozenset(value)
+        self._delete(value)
+        self._notify()
+
+    def __and__(self, other):
+        if not isinstance(other, Set):
+            return NotImplemented
+        if len(self) < len(other):
+            return {value for value in self if value in other}
+        return {value for value in other if value in self}
+
+    __rand__ = __and__
+
+    def __contains__(self, value):
+        if type(value) is set:
+            value = frozenset(value)
+        return super().__contains__(value)
+
+    def pop(self):
+        self._mutation()
+        try:
+            value = next(iter(self))
+        except StopIteration:
+            raise KeyError('pop from an empty set') from None
+        self.remove(value)
+        return value
+
+    def clear(self):
+        self._mutation()
+        for value in list(self):
+            self.remove(value)
+
+    def __ior__(self, other):
+        self._mutation()
+        if not isinstance(other, Set):
+            return NotImplemented
+        self.update(other)
+        return self
+
+    def __isub__(self, other):
+        self._mutation()
+        if not isinstance(other, Set):
+            return NotImplemented
+        self.difference_update(other)
+        return self
+
+    def __iand__(self, other):
+        self._mutation()
+        if not isinstance(other, Set):
+            return NotImplemented
+        self.intersection_update(other)
+        return self
+
+    def __ixor__(self, other):
+        self._mutation()
+        if not isinstance(other, Set):
+            return NotImplemented
+        self.symmetric_difference_update(other)
+        return self
+
+    def intersection(self, *others):
+        if not others:
+            return set(self)
+        result = self & others[0] if isinstance(others[0], Set) else {value for value in others[0] if value in self}
+        for other in others[1:]:
+            result.intersection_update(other)
+        return result
+
+    def update(self, *others):
+        self._mutation()
+        for values in others:
+            for value in values:
+                self.add(value)
+
+    def difference_update(self, *others):
+        self._mutation()
+        for values in others:
+            for value in values:
+                self.discard(value)
+
+    def intersection_update(self, *others):
+        self._mutation()
+        remaining = self.intersection(*others)
+        for value in list(self):
+            if value not in remaining:
+                self.discard(value)
+
+    def symmetric_difference_update(self, other):
+        self._mutation()
+        for value in set(other):
+            if value in self:
+                self.remove(value)
+            else:
+                self.add(value)
+
+    def union(self, *others):
+        result = set(self)
+        result.update(*others)
+        return result
+
+    def difference(self, *others):
+        result = set(self)
+        result.difference_update(*others)
+        return result
+
+    def symmetric_difference(self, other):
+        return set(self).symmetric_difference(other)
+
+    def issubset(self, other):
+        return set(self).issubset(other)
+
+    def issuperset(self, other):
+        return all(value in self for value in other)
+
+    def copy(self):
+        return set(self)
+
+    def materialize(self, memo=None):
+        memo = {} if memo is None else memo
+        if id(self) not in memo:
+            memo[id(self)] = set(self)
+        return memo[id(self)]
+
+
+HISTORY_CLASSES = {'list': LazyHistoryList, 'map': LazyHistoryMap, 'set': LazyHistorySet}
+HISTORY_TYPES = tuple(HISTORY_CLASSES.values())

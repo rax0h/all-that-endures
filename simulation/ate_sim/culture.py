@@ -1,7 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
+from .record_index import IndexedRecord
 @dataclass
-class Practice: id:int; domain:str; name:str; origin_year:int; origin_settlement:int; traits:dict[str,float]=field(default_factory=dict); parent:int|None=None
+class Practice(IndexedRecord): id:int; domain:str; name:str; origin_year:int; origin_settlement:int; traits:dict[str,float]=field(default_factory=dict); parent:int|None=None
 @dataclass
 class Institution: id:int; settlement:int; kind:str; founded:int; practices:set[int]=field(default_factory=set); authority:float=.2; assets:float=0.; legitimacy:float=.5
 @dataclass

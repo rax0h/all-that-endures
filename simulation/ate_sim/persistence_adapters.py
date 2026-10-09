@@ -14,7 +14,7 @@ import zlib
 from .core import World, Event, Layer
 from .event_log import EventLog, FrozenDict, FrozenList
 from .persistence_event_ids import EventIdSet, RANGE_TAG
-from .persistence_lazy_nested_history import LazyHistoryList, HistoryReference, REFERENCE_TAG, reference as history_reference
+from .persistence_lazy_nested_history import LazyHistoryList, LazyHistoryMap, LazyHistorySet, HISTORY_TYPES, HistoryReference, REFERENCE_TAG, reference as history_reference
 from .persistence_identity import iter_mutable_event_items
 from .record_index import RecordTable, IndexedRecord
 from .incremental_store import (
@@ -118,6 +118,16 @@ class WorldCodec(TypedCodec):
                 return ['list', [self._encode_value(item, active, seen_mutable) for item in value]]
             finally:
                 active.remove(id(value))
+        if cls in (LazyHistoryMap, LazyHistorySet):
+            self._enter(value, active, seen_mutable, mutable=True)
+            try:
+                if cls is LazyHistoryMap:
+                    return ['dict', [[self._encode_value(key, active, seen_mutable), self._encode_value(item, active, seen_mutable)] for key, item in value.items()]]
+                encoded = [self._encode_value(item, active, seen_mutable) for item in value]
+                encoded.sort(key=self._node_sort_key)
+                return ['set', encoded]
+            finally:
+                active.remove(id(value))
         if cls is EventIdSet:
             self._enter(value, active, seen_mutable, mutable=True)
             try:
@@ -142,7 +152,7 @@ class WorldCodec(TypedCodec):
     def _decode_value(self, node):
         if isinstance(node, list) and node:
             if node[0] == REFERENCE_TAG:
-                if len(node) != 3 or node[1] != 'list' or type(node[2]) is not int or node[2] <= 0:
+                if len(node) != 3 or node[1] not in ('list', 'map', 'set') or type(node[2]) is not int or node[2] <= 0:
                     raise CodecError('invalid typed history reference')
                 return HistoryReference(node[1], node[2])
             if node[0] == 'ate_event/v1':
@@ -191,7 +201,7 @@ def _audit(value, path, seen, active, links):
     if id(value) in active:
         raise CodecError(f'cycle at {path}')
     record = is_dataclass(value)
-    mutable = cls in (dict, list, set, EventIdSet, LazyHistoryList, RecordTable, EventLog) or (record and not cls.__dataclass_params__.frozen)
+    mutable = cls in (dict, list, set, EventIdSet, *HISTORY_TYPES, RecordTable, EventLog) or (record and not cls.__dataclass_params__.frozen)
     if mutable and id(value) in seen:
         links.append((path, seen[id(value)][0]))
         return
@@ -203,13 +213,13 @@ def _audit(value, path, seen, active, links):
             _check_record(value)
             for name in RECORD_FIELDS[cls]:
                 _audit(getattr(value, name), path + (('field', name),), seen, active, links)
-        elif cls in (dict, FrozenDict, RecordTable):
+        elif cls in (dict, LazyHistoryMap, FrozenDict, RecordTable):
             if cls is RecordTable and set(vars(value)) - {'_indexes'}:
                 raise CodecError(f'unclassified RecordTable state: {path}')
             for k, v in value.items():
                 _audit(k, path + (('map_key', k),), seen, active, links)
                 _audit(v, path + (('key', k),), seen, active, links)
-        elif cls in (list, LazyHistoryList, tuple, set, EventIdSet, frozenset, FrozenList, EventLog):
+        elif cls in (list, LazyHistoryList, tuple, set, LazyHistorySet, EventIdSet, frozenset, FrozenList, EventLog):
             if cls is EventLog:
                 expected_state = {
                     '_disk_prefix', '_disk_count', '_chunks', '_tail', '_count',
@@ -554,11 +564,13 @@ def _complete_identity_groups(
     if ident in active:
         raise StoreIntegrityError('cycle in restored identity graph')
     record = is_dataclass(value)
-    mutable = cls in (dict, list, set, EventIdSet, LazyHistoryList, RecordTable, EventLog) or (
+    mutable = cls in (dict, list, set, EventIdSet, *HISTORY_TYPES, RecordTable, EventLog) or (
         record and not cls.__dataclass_params__.frozen
     )
     if mutable:
         groups.setdefault(ident, []).append(path)
+    if cls in HISTORY_TYPES:
+        return groups
     active.add(ident)
     try:
         if record:

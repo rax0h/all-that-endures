@@ -1172,8 +1172,8 @@ class IncrementalWorldSession:
 
     def _is_mutable(self, value):
         from .persistence_event_ids import EventIdSet
-        from .persistence_lazy_nested_history import LazyHistoryList
-        return isinstance(value, _NestedMixin) or type(value) in (dict, list, set, RecordTable, EventLog, EventIdSet, LazyHistoryList) or _mutable_record(value)
+        from .persistence_lazy_nested_history import HISTORY_TYPES
+        return isinstance(value, _NestedMixin) or type(value) in (dict, list, set, RecordTable, EventLog, EventIdSet, *HISTORY_TYPES) or _mutable_record(value)
 
     def _register_binding(self, value, binding):
         ident = id(value)
@@ -1568,8 +1568,8 @@ class IncrementalWorldSession:
     def _bind_nested(self, value, owners, *, initial, allow_existing=False):
         cls = type(value)
         from .persistence_event_ids import EventIdSet
-        from .persistence_lazy_nested_history import LazyHistoryList
-        if cls in (EventIdSet, LazyHistoryList):
+        from .persistence_lazy_nested_history import HISTORY_TYPES
+        if cls in (EventIdSet, *HISTORY_TYPES):
             binding = _binding(value)
             if binding is None:
                 self._register_binding(value, _ObjectBinding(self, owners))
@@ -2182,8 +2182,8 @@ class IncrementalWorldSession:
             memo = {}
         cls = type(value)
         from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
-        from .persistence_lazy_nested_history import LazyHistoryList
-        if cls is LazyHistoryList:
+        from .persistence_lazy_nested_history import HISTORY_TYPES
+        if cls in HISTORY_TYPES:
             return value.storage_reference()
         if cls is EventIdSet and value is self.world.event_ids:
             return AUTHORITY_REFERENCE

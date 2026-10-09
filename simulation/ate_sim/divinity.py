@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
+from .record_index import IndexedRecord
 
 GOD_DEFINITIONS={
  'knowledge':('Knowledge',('knowledge','truth','learning')),
@@ -26,13 +27,13 @@ GREAT_ASTRAL_BEINGS={
  'builder':('Builder',('creation','construction','worlds')),
 }
 @dataclass
-class God:
+class God(IndexedRecord):
  id:str;name:str;domains:tuple[str,...];ontology:str='god';transcendent:bool=True;manifestations:list[int]=field(default_factory=list);relationships:dict[int,float]=field(default_factory=dict)
 @dataclass
-class GreatAstralBeing:
+class GreatAstralBeing(IndexedRecord):
  id:str;name:str;authorities:tuple[str,...];ontology:str='great_astral_being';transcendent:bool=True;interventions:list[int]=field(default_factory=list);relationships:dict[int,float]=field(default_factory=dict)
 @dataclass
-class Church:
+class Church(IndexedRecord):
  id:int;god:str;settlement:int;founded_year:int;origin_event:int;clergy:set[int]=field(default_factory=set);followers:set[int]=field(default_factory=set);authority:float=.25;wealth:float=0.;doctrine_claims:set[int]=field(default_factory=set)
 @dataclass
 class DivineState:

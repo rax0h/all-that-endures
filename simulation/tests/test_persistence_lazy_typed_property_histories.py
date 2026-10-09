@@ -23,9 +23,8 @@ def converted(tmp_path, history, alias=False, eager_alias=False, property_count=
     if record_alias:
         world.currency.wallets[11] = {'property': world.economy.property[1]}
     if eager_alias:
-        from ate_sim.divinity import God
-        world.divinity.gods['knowledge'] = God('knowledge', 'Knowledge', ('knowledge',),
-            manifestations=world.economy.property[1].provenance)
+        from ate_sim.core import Settlement
+        world.settlements[1] = Settlement(1, 0, 0, households=world.economy.property[1].provenance)
         world.currency.wallets[12] = {'literal': ('typed-history/v1', 'list', 999)}
     source, path = tmp_path / 'cold.sqlite', tmp_path / 'lazy.sqlite'
     write_cold_snapshot(world, source, rules_id=RULES)
@@ -189,38 +188,38 @@ def test_checked_descriptor_cannot_silently_drop_complete_tail_page(tmp_path):
 def test_typed_history_eager_alias_survives_removal_of_all_lazy_placements(tmp_path):
     path = converted(tmp_path, 1000, eager_alias=True)
     with open_lazy_world_session(path, rules_id=RULES) as session:
-        history = session.world.divinity.gods['knowledge'].manifestations
+        history = session.world.settlements[1].households
         assert session.wallets[12]['literal'] == ('typed-history/v1', 'list', 999)
         assert history is session.world.economy.property[1].provenance
         session.world.economy.property[1].provenance = [9]
         history.append(1002)
         session.save()
     with open_lazy_world_session(path, rules_id=RULES) as session:
-        history = session.world.divinity.gods['knowledge'].manifestations
+        history = session.world.settlements[1].households
         assert history[-1] == 1002
         assert history.diagnostics()['page_loads'] == 1
         history.append(1003)
         session.save()
         detached = session.detach(materialize_history=True)
-        assert type(detached.divinity.gods['knowledge'].manifestations) is list
-        assert detached.divinity.gods['knowledge'].manifestations[-1] == 1003
+        assert type(detached.settlements[1].households) is list
+        assert detached.settlements[1].households[-1] == 1003
     with open_lazy_world_session(path, rules_id=RULES) as session:
-        assert session.world.divinity.gods['knowledge'].manifestations[-1] == 1003
+        assert session.world.settlements[1].households[-1] == 1003
 
 
 def test_replaced_eager_history_does_not_dirty_replacement(tmp_path):
     path = converted(tmp_path, 5, eager_alias=True)
     with open_lazy_world_session(path, rules_id=RULES) as session:
-        god = session.world.divinity.gods['knowledge']
-        old = god.manifestations
-        god.manifestations = [20]
+        settlement = session.world.settlements[1]
+        old = settlement.households
+        settlement.households = [20]
         session.save()
         old.append(30)
-        assert god.manifestations == [20]
-        assert ('world.divinity.gods', 'knowledge') not in session._eager_tracker._dirty
+        assert settlement.households == [20]
+        assert ('world.settlements', 1) not in session._eager_tracker._dirty
         session.save()
     with open_lazy_world_session(path, rules_id=RULES) as session:
-        assert session.world.divinity.gods['knowledge'].manifestations == [20]
+        assert session.world.settlements[1].households == [20]
         assert session.world.economy.property[1].provenance[-1] == 30
 
 
@@ -252,16 +251,16 @@ def test_typed_history_old_pin_noop_and_retained_child_after_owner_eviction(tmp_
 
 
 def test_eager_history_introduced_after_open_has_checked_labels_on_reopen(tmp_path):
-    from ate_sim.divinity import God
+    from ate_sim.core import Settlement
     path = converted(tmp_path, 5)
     with open_lazy_world_session(path, rules_id=RULES) as session:
         history = session.world.economy.property[1].provenance
-        session.world.divinity.gods['knowledge'] = God('knowledge', 'Knowledge', ('knowledge',), manifestations=history)
+        session.world.settlements[1] = Settlement(1, 0, 0, households=history)
         history.append(10)
         session.save()
     with open_lazy_world_session(path, rules_id=RULES) as session:
-        assert session.world.divinity.gods['knowledge'].manifestations is session.world.economy.property[1].provenance
-        assert session.world.divinity.gods['knowledge'].manifestations[-1] == 10
+        assert session.world.settlements[1].households is session.world.economy.property[1].provenance
+        assert session.world.settlements[1].households[-1] == 10
 
 
 def test_normal_acknowledgement_checks_exact_nested_page_evidence(tmp_path):
@@ -304,7 +303,7 @@ def test_eager_only_history_missing_occurrence_fails_closed(tmp_path):
         session.world.economy.property[1].provenance = [9]
         session.save()
     with LazyRecordStore.open(path, codec=WorldCodec(identity_links_recorded=True), expected_simulation_schema=SCHEMA, expected_rules_id=RULES) as store:
-        store.db.execute("DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace='world.divinity.gods' AND occurrence_path=?", (store.codec.encode((("field", "manifestations"),)),))
+        store.db.execute("DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace='world.settlements' AND occurrence_path=?", (store.codec.encode((("field", "households"),)),))
         store.db.commit()
     with pytest.raises(StoreIntegrityError, match='eager nested reference lacks matching incarnation label'):
         open_lazy_world_session(path, rules_id=RULES)

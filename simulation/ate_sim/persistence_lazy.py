@@ -36,10 +36,14 @@ from .society_accountability import Inquiry
 from .threat_ecology import MagicalThreat
 from .economy import Property
 from .infrastructure import Infrastructure
+from .culture import Practice
+from .divinity import God, GreatAstralBeing, Church
+from .institutions import Institution, Branch
 from .persistence_lazy_nested_history import (
     LazyHistoryList, DESCRIPTOR_NAMESPACE as NESTED_DESCRIPTOR_NAMESPACE,
     PAGE_NAMESPACE as NESTED_PAGE_NAMESPACE, reference as nested_reference,
-    initial_list_changes, HistoryReference,
+    initial_list_changes, initial_scalar_changes, checked_scalar_entry, HistoryReference, HISTORY_CLASSES, HISTORY_TYPES,
+    ENTRY_NAMESPACE as NESTED_ENTRY_NAMESPACE,
 )
 from .persistence_lazy_household_members import (
     LENGTH_NAMESPACE as HOUSEHOLD_LENGTH_NAMESPACE,
@@ -190,6 +194,12 @@ CLEAN_GROUP_LIMIT = 256
 # description tag distinguishes complete empty authority from a legacy field.
 SCALAR_RECORD_KINDS = {'dict-scalar/v1': 'dict', 'RecordTable-scalar/v1': 'RecordTable'}
 SCALAR_RECORD_SPECS = {
+    'world.culture.practices': (Practice, {}),
+    'world.institutions.institutions': (Institution, {}),
+    'world.institutions.branches': (Branch, {}),
+    'world.divinity.gods': (God, {}),
+    'world.divinity.great_astral_beings': (GreatAstralBeing, {}),
+    'world.divinity.churches': (Church, {}),
     'world.economy.property': (Property, {('owner_kind', 'owner_id'): 'owner'}),
     'world.infrastructure.assets': (Infrastructure, {}),
     'world.warfare.conflicts': (Conflict, {('status',): 'status'}),
@@ -201,8 +211,26 @@ SCALAR_RECORD_SPECS = {
     }),
 }
 NESTED_RECORD_FIELDS = {
+    'world.culture.practices': ('traits',),
+    'world.institutions.institutions': ('branches', 'members'),
+    'world.institutions.branches': ('records', 'notices', 'trainees'),
+    'world.divinity.gods': ('manifestations', 'relationships'),
+    'world.divinity.great_astral_beings': ('interventions', 'relationships'),
+    'world.divinity.churches': ('clergy', 'followers', 'doctrine_claims'),
     'world.economy.property': ('provenance', 'ownership'),
     'world.infrastructure.assets': ('provenance',),
+}
+NESTED_FIELD_KINDS = {
+    ('world.culture.practices', 'traits'): 'map',
+    ('world.institutions.institutions', 'members'): 'set',
+    ('world.institutions.branches', 'records'): 'set',
+    ('world.institutions.branches', 'notices'): 'set',
+    ('world.institutions.branches', 'trainees'): 'map',
+    ('world.divinity.gods', 'relationships'): 'map',
+    ('world.divinity.great_astral_beings', 'relationships'): 'map',
+    ('world.divinity.churches', 'clergy'): 'set',
+    ('world.divinity.churches', 'followers'): 'set',
+    ('world.divinity.churches', 'doctrine_claims'): 'set',
 }
 SCALAR_MAP_SPECS = {
     'world.threat_ecology.resolutions': (int, (int,)),
@@ -421,10 +449,11 @@ def _insert_lazy_plain_record(
     ordinal: int,
     value: Any,
     record_schema: int,
+    memberships: tuple = (),
 ) -> None:
     codec = destination.codec
     payload = codec.encode(value)
-    memberships_blob = codec.encode(())
+    memberships_blob = codec.encode(memberships)
     payload_checksum = __import__(
         "ate_sim.incremental_store", fromlist=["_framed_sha"]
     )._framed_sha(b"lazy-payload-v1", payload)
@@ -454,6 +483,13 @@ def _insert_lazy_plain_record(
             ),
         ),
     )
+    for index_name, index_value, member_ordinal in memberships:
+        encoded_value = codec.encode(index_value)
+        destination.db.execute(
+            'INSERT INTO lazy_query_versions VALUES (?,?,?,?,?,?,NULL,?)',
+            (namespace, index_name, encoded_value, typed_key, member_ordinal, generation,
+             _query_checksum(namespace, index_name, encoded_value, typed_key, member_ordinal, generation, None)),
+        )
     destination.db.execute(
         "INSERT INTO lazy_order_versions("
         "namespace,typed_key,ordinal,valid_from,valid_to,row_checksum"
@@ -1244,9 +1280,10 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
             for namespace, owner_key, relative, incarnation in identity_rows:
                 if namespace in NESTED_RECORD_FIELDS and relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS[namespace]):
                     values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
-                    if type(values) is not list:
-                        raise StoreFormatError('typed list source has wrong type')
-                    nested_children.setdefault(incarnation, values)
+                    kind = NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')
+                    if type(values) is not {'list': list, 'map': dict, 'set': set}[kind]:
+                        raise StoreFormatError('typed history source has wrong type')
+                    nested_children.setdefault(incarnation, (kind, values))
             nested_alias_paths = {}
             for namespace, owner_key, relative, incarnation in identity_rows:
                 if incarnation in nested_children:
@@ -1351,7 +1388,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         if child_paths:
                             ordinal, value = codec.decode(payload)
                             for relative, incarnation in child_paths:
-                                value = _relative_set(value, relative, HistoryReference('list', incarnation))
+                                value = _relative_set(value, relative, HistoryReference(nested_children[incarnation][0], incarnation))
                             payload = codec.encode((ordinal, value))
                             checksum = _record_checksum(namespace, typed_key, record_schema, codec_version, changed_generation, payload)
                             row = (namespace, typed_key, payload, checksum, codec_version, record_schema, changed_generation)
@@ -2251,13 +2288,15 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             ),
                         )
 
-                    nested_counts = {NESTED_DESCRIPTOR_NAMESPACE: 0, NESTED_PAGE_NAMESPACE: 0}
-                    for incarnation, values in sorted(nested_children.items()):
-                        for change in initial_list_changes(incarnation, values, codec):
+                    nested_counts = {NESTED_DESCRIPTOR_NAMESPACE: 0, NESTED_PAGE_NAMESPACE: 0, NESTED_ENTRY_NAMESPACE: 0}
+                    for incarnation, (kind, values) in sorted(nested_children.items()):
+                        changes = initial_list_changes(incarnation, values, codec) if kind == 'list' else initial_scalar_changes(incarnation, kind, values, codec)
+                        for change in changes:
                             _insert_lazy_plain_record(
                                 target, namespace=change.namespace, generation=generation,
                                 typed_key=codec.encode(change.key), ordinal=nested_counts[change.namespace],
                                 value=change.value, record_schema=1,
+                                memberships=tuple((member.index_name, member.value, member.ordinal) for member in change.memberships),
                             )
                             nested_counts[change.namespace] += 1
                     for namespace, count in nested_counts.items():
@@ -2590,7 +2629,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
                     return None
                 relative = tuple(path[3:])
                 if relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS.get(namespace, ())):
-                    record_type = LazyHistoryList
+                    record_type = HISTORY_CLASSES[NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')]
                 return namespace, path[2][1], relative, record_type
     people = _people_occurrence_from_path(path)
     if people is not None:
@@ -7897,7 +7936,7 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
             from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
             if type(child) is EventIdSet and child is self._session.world.event_ids:
                 return AUTHORITY_REFERENCE
-            if type(child) is LazyHistoryList:
+            if type(child) in HISTORY_TYPES:
                 return child.storage_reference()
             if is_dataclass(child):
                 return self._session._eager_tracker._plain(child)
@@ -11614,19 +11653,24 @@ class LazyWorldSession:
             )
         return table
 
-    def _bind_history_list(self, value, occurrence, incarnation=None):
+    def _bind_history_list(self, value, occurrence, incarnation=None, kind=None):
+        if kind is None:
+            kind = value.kind if nested_reference(value) else value._kind if type(value) in HISTORY_TYPES else {list: 'list', dict: 'map', set: 'set'}.get(type(value))
+        if kind not in HISTORY_CLASSES:
+            raise TypeError('invalid typed history kind')
+        history_class = HISTORY_CLASSES[kind]
         if incarnation is not None:
-            if not (nested_reference(value) and value.incarnation == incarnation.value) and not (
-                type(value) is LazyHistoryList and value._incarnation == incarnation.value
+            if not (nested_reference(value) and value.kind == kind and value.incarnation == incarnation.value) and not (
+                type(value) is history_class and value._incarnation == incarnation.value
             ):
                 raise StoreIntegrityError('nested reference disagrees with owner incarnation')
             proxy = self._registry.object_for_incarnation(incarnation)
             if proxy is None:
-                proxy = LazyHistoryList(self.store, self.pin, incarnation.value)
+                proxy = history_class(self.store, self.pin, incarnation.value)
                 self._registry.bind(proxy, incarnation=incarnation)
-            elif type(proxy) is not LazyHistoryList:
+            elif type(proxy) is not history_class:
                 raise StoreIntegrityError('nested list incarnation has wrong live type')
-        elif type(value) is LazyHistoryList:
+        elif type(value) is history_class:
             proxy = value
             if proxy._store is not self.store:
                 raise StoreError('cross-session nested history')
@@ -11634,10 +11678,10 @@ class LazyWorldSession:
             if incarnation is None:
                 raise StoreIntegrityError('nested history lacks current incarnation')
         else:
-            if type(value) is not list:
-                raise TypeError('nested list field must be a list')
+            if type(value) is not {'list': list, 'map': dict, 'set': set}[kind]:
+                raise TypeError('nested history field has wrong type')
             incarnation = self._registry.allocator.allocate()
-            proxy = LazyHistoryList(self.store, self.pin, incarnation.value, initial_values=value)
+            proxy = history_class(self.store, self.pin, incarnation.value, initial_values=value)
             self._registry.bind(proxy, incarnation=incarnation)
             self._nested_dirty[incarnation.value] = proxy
         old = self._registry.incarnation_for_occurrence(occurrence)
@@ -11686,7 +11730,7 @@ class LazyWorldSession:
                 yield owner, value, _owner_path(self.manifest, owner)
 
     def _nested_leaves(self, value, path=()):
-        if nested_reference(value) or type(value) is LazyHistoryList:
+        if nested_reference(value) or type(value) in HISTORY_TYPES:
             yield path, value
         elif is_dataclass(value):
             for field in RECORD_FIELDS.get(type(value), ()):
@@ -11704,7 +11748,7 @@ class LazyWorldSession:
             for relative, child in tuple(self._nested_leaves(value)):
                 row = self.store._visible_identity_occurrence(self.pin.captured_head,
                     owner[0], self.store.codec.encode(owner[1]), self.store.codec.encode(relative))
-                child_incarnation = child._incarnation if type(child) is LazyHistoryList else child.incarnation
+                child_incarnation = child._incarnation if type(child) in HISTORY_TYPES else child.incarnation
                 if row is None or row[0] != child_incarnation:
                     raise StoreIntegrityError('eager nested reference lacks matching incarnation label')
                 labels[relative] = row[0]
@@ -11762,7 +11806,7 @@ class LazyWorldSession:
             if owner not in tracker._deleted:
                 value = self._eager_nested_owner_value(owner)
                 for path, proxy in self._nested_leaves(value):
-                    if type(proxy) is LazyHistoryList:
+                    if type(proxy) in HISTORY_TYPES:
                         current[path] = self._registry.incarnation_for_object(proxy).value
             for path in before.keys() | current.keys():
                 if before.get(path) == current.get(path):
@@ -11780,7 +11824,7 @@ class LazyWorldSession:
         for field in NESTED_RECORD_FIELDS[table._namespace]:
             value = getattr(record, field)
             occurrence = Occurrence(table._namespace, key, (("field", field),))
-            proxy = self._bind_history_list(value, occurrence)
+            proxy = self._bind_history_list(value, occurrence, kind=NESTED_FIELD_KINDS.get((table._namespace, field), 'list'))
             if proxy is not value:
                 object.__setattr__(record, field, proxy)
 
@@ -11806,7 +11850,7 @@ class LazyWorldSession:
         for field in fields:
             path = (("field", field),)
             proxy = self._bind_history_list(getattr(result, field), Occurrence(table._namespace, key, path),
-                incarnation=IncarnationId(self.store.store_identity, labels[path]))
+                incarnation=IncarnationId(self.store.store_identity, labels[path]), kind=NESTED_FIELD_KINDS.get((table._namespace, field), 'list'))
             object.__setattr__(result, field, proxy)
         table._baseline_identity_labels[key] = labels
         table._baseline_incarnation[key] = incarnation.value
@@ -12575,7 +12619,7 @@ class LazyWorldSession:
             existing = self._registry.object_for_incarnation(
                 incarnation
             )
-            if nested_reference(current) or type(existing) is LazyHistoryList:
+            if nested_reference(current) or type(existing) in HISTORY_TYPES:
                 existing = self._bind_history_list(current, self._currency_occurrence(namespace, key, path), incarnation)
             from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
             if type(existing) is EventIdSet:
@@ -15460,6 +15504,8 @@ class LazyWorldSession:
         for change in plan.nested_history_version_changes:
             key = self.store.codec.encode(change.key)
             row = self.store._visible_record_row(generation, change.namespace, key)
+            if change.namespace == NESTED_ENTRY_NAMESPACE:
+                checked_scalar_entry(self.store, self.pin, change.key[0], change.key[1])
             if change.delete:
                 if row is not None:
                     raise StoreIntegrityError('deleted nested authority remains visible')
@@ -15467,7 +15513,8 @@ class LazyWorldSession:
             if row is None:
                 raise StoreIntegrityError('saved nested authority is absent')
             _value, schema, _start, _end, memberships = self.store._check_record_row(change.namespace, key, row, decode=False)
-            if schema != 1 or memberships or row[2] != self.store.codec.encode(change.value):
+            expected_memberships = tuple((member.index_name, member.value, member.ordinal) for member in change.memberships)
+            if schema != 1 or memberships != expected_memberships or row[2] != self.store.codec.encode(change.value):
                 raise StoreIntegrityError('saved nested authority evidence mismatch')
 
     def _arm_cold_publication(self, plan):
@@ -16326,7 +16373,7 @@ class LazyWorldSession:
                 if id(value) not in replacements:
                     replacements[id(value)] = set(value)
                 return replacements[id(value)]
-            if type(value) is LazyHistoryList:
+            if type(value) in HISTORY_TYPES:
                 return value.materialize(replacements)
             if isinstance(value, dict):
                 staged = {key: stage_ids(child) for key, child in value.items()}

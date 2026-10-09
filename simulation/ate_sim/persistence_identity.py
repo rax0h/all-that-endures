@@ -90,8 +90,8 @@ class IdentityOccurrenceIndex:
         ident = id(value)
         if ident in active:
             raise ValueError("cycle in bound World identity graph")
-        from .persistence_lazy_nested_history import LazyHistoryList
-        if type(value) is LazyHistoryList or getattr(value, "_ate_household_page_sequence", False) is True:
+        from .persistence_lazy_nested_history import HISTORY_TYPES
+        if type(value) in HISTORY_TYPES or getattr(value, "_ate_household_page_sequence", False) is True:
             # List-valued identity leaf: its checked ID pages do not contain
             # mutable child objects and are never scanned for alias links.
             out.append((ident, value, path))

@@ -7,6 +7,7 @@ import hashlib
 import json
 from .event_log import EventLog
 from .persistence_event_ids import EventIdSet
+from .persistence_lazy_nested_history import LazyHistoryMap, LazyHistorySet
 
 
 def digest(value,canonical,field_names):
@@ -29,14 +30,14 @@ def digest(value,canonical,field_names):
                 if i:yield ','
                 yield encode_basestring(key);yield ':';yield from pieces(getattr(v,name))
             yield '}'
-        elif isinstance(v,dict):
+        elif isinstance(v,(dict,LazyHistoryMap)):
             yield '{'
             for i,key in enumerate(sorted(v,key=repr)):
                 if i:yield ','
                 yield encode_basestring(repr(key));yield ':';yield from pieces(v[key])
             yield '}'
-        elif isinstance(v,(list,tuple,EventLog,set,frozenset,EventIdSet,MutableSequence)):
-            values=sorted(v,key=lambda x:repr(canonical(x))) if isinstance(v,(set,frozenset,EventIdSet)) else v
+        elif isinstance(v,(list,tuple,EventLog,set,frozenset,EventIdSet,LazyHistorySet,MutableSequence)):
+            values=sorted(v,key=lambda x:repr(canonical(x))) if isinstance(v,(set,frozenset,EventIdSet,LazyHistorySet)) else v
             yield '['
             for i,item in enumerate(values):
                 if i:yield ','

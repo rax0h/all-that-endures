@@ -4,10 +4,10 @@ from .core_types import layer_ref
 from .record_index import IndexedRecord, indexed
 
 @dataclass
-class Institution:
+class Institution(IndexedRecord):
  id:int;kind:str;name:str;founded_year:int;origin_event:int|None;branches:list[int]=field(default_factory=list);members:set[int]=field(default_factory=set)
 @dataclass
-class Branch:
+class Branch(IndexedRecord):
  id:int;institution:int;settlement:int;founded_year:int;origin_event:int|None;authority:float=.5;records:set[int]=field(default_factory=set);notices:set[int]=field(default_factory=set)
  trainees:dict[int,int]=field(default_factory=dict)  # active person -> enrollment event; history stays in events
 @dataclass
