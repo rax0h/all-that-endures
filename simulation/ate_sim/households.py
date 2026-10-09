@@ -1,5 +1,6 @@
 from __future__ import annotations
 from .core import Household, Layer, Ref
+from .household_queries import living_household_members
 
 def partnership_step(world,rng):
     adults=[p for p in world.current_people() if p.alive and p.age>=18];by_settlement={}
@@ -41,7 +42,7 @@ def household_split_step(world,rng):
     for h in world.occupied_households():
         hid=h.id
         if len(h.members)<8:continue
-        living=[world.people[p] for p in h.members if world.people[p].alive];adults=[p for p in living if p.age>=18]
+        living=living_household_members(world,hid);adults=[p for p in living if p.age>=18]
         if len(living)<8 or len(adults)<3:continue
         rr=rng.stream("household_split",world.year,hid)
         if rr.random()>.012:continue
