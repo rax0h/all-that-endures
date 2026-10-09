@@ -10088,6 +10088,11 @@ class LazyWorldSession:
         self._paged_household_members = {}
         self._paged_household_records = {}
         self._deleted_paged_household_members = {}
+        # A save visits only changed owning households and their current/old
+        # member incarnations. Pending journals survive failed publication.
+        self._paged_dirty_incarnations = set()
+        self._paged_candidates_for_save = ()
+        self._paged_member_owner_keys_for_save = set()
         self._household_paging_active = False
 
         self._lifetime = _LazyLifetime(self)
@@ -10108,9 +10113,12 @@ class LazyWorldSession:
             baseline_length=baseline_length,
         )
         binding["sequence"] = sequence
+        sequence._pin_source = self
         sequence._related_owners = set() if key is None else {key}
         incarnation = self._registry.bind(sequence, incarnation=incarnation)
         sequence._incarnation_value = incarnation.value
+        if initial_values is not None:
+            self._paged_dirty_incarnations.add(incarnation.value)
         sequence._descriptor_present = descriptor_present
         sequence._descriptor_pending = False
         sequence._retirement_published = False
@@ -10127,6 +10135,7 @@ class LazyWorldSession:
             sequence.detach_to_memory()
             return
         self._ensure_people_mutation_allowed()
+        self._paged_dirty_incarnations.add(sequence._incarnation_value)
         for hid in owners:
             self._eager_tracker._mark(("world.households", hid))
         for table, foreign_key in foreign:
