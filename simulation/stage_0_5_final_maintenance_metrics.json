@@ -1,0 +1,420 @@
+{
+  "scope": "store maintenance and backlog reads; not World or pressure acceptance",
+  "fixture": "genuine MVCC versions with cleanup suspended during construction only",
+  "source_sha256": {
+    "persistence_lazy_store.py": "00afa5f0fe36a89110a00918268418e2e3e706a344fe5244b48cdd0df6d510a7",
+    "persistence_lazy_identity_catalog.py": "01d125f5fbe15f260bc70d6e7ba146ad9d285225c52fe6bd83a06633fc9dbdbb"
+  },
+  "measurements": [
+    {
+      "H": 1000,
+      "reads": {
+        "checked_record": {
+          "sqlite_vm_steps": 120,
+          "seconds": 0.0001445280004190863,
+          "io": {
+            "payload_reads": 1,
+            "payload_read_bytes": 14,
+            "payload_check_reads": 1,
+            "payload_check_bytes": 14,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 2,
+            "query_rows": 0,
+            "pin_rows": 4,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "order": {
+          "sqlite_vm_steps": 39,
+          "seconds": 2.9754999559372663e-05,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 0,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "namespace": {
+          "sqlite_vm_steps": 36,
+          "seconds": 2.4497000595147256e-05,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 0,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "allocator": {
+          "sqlite_vm_steps": 32,
+          "seconds": 3.0496000363200437e-05,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 0,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "occurrence": {
+          "sqlite_vm_steps": 43,
+          "seconds": 2.614999993966194e-05,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 0,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "reverse_group": {
+          "sqlite_vm_steps": 260,
+          "seconds": 0.0004566689995044726,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 11,
+            "query_rows": 0,
+            "pin_rows": 4,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "owner": {
+          "sqlite_vm_steps": 159,
+          "seconds": 0.00016558999959670473,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 2,
+            "query_rows": 0,
+            "pin_rows": 4,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "limited_query": {
+          "sqlite_vm_steps": 288,
+          "seconds": 0.0003094569992754259,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 1,
+            "payload_check_bytes": 14,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 4,
+            "query_rows": 1,
+            "pin_rows": 4,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        }
+      },
+      "ordinary_scalar_commit": {
+        "sqlite_vm_steps": 19005,
+        "seconds": 0.016622345000541827,
+        "io": {
+          "payload_reads": 0,
+          "payload_read_bytes": 0,
+          "payload_check_reads": 1,
+          "payload_check_bytes": 14,
+          "payload_writes": 1,
+          "payload_write_bytes": 14,
+          "metadata_rows": 13,
+          "query_rows": 4,
+          "pin_rows": 22,
+          "maintenance_rows": 512,
+          "temporary_keys_peak": 0,
+          "maintenance_removed_rows": 256
+        },
+        "tracemalloc_current_bytes": 4773,
+        "tracemalloc_peak_bytes": 12987
+      },
+      "expired_rows_before_commit": 5995,
+      "expired_rows_after_commit": 5742,
+      "explicit_maintenance": {
+        "row_budget": 64,
+        "removed": 64,
+        "io": {
+          "payload_reads": 0,
+          "payload_read_bytes": 0,
+          "payload_check_reads": 0,
+          "payload_check_bytes": 0,
+          "payload_writes": 0,
+          "payload_write_bytes": 0,
+          "metadata_rows": 1,
+          "query_rows": 0,
+          "pin_rows": 3,
+          "maintenance_rows": 128,
+          "temporary_keys_peak": 0,
+          "maintenance_removed_rows": 64
+        }
+      },
+      "point_query_plan": [
+        "COMPOUND QUERY",
+        "LEFT-MOST SUBQUERY",
+        "SEARCH lazy_record_versions USING COVERING INDEX lazy_record_interval (namespace=? AND typed_key=? AND valid_to=? AND valid_from<?)",
+        "UNION ALL",
+        "SEARCH lazy_record_versions USING COVERING INDEX lazy_record_interval (namespace=? AND typed_key=? AND valid_to>?)"
+      ],
+      "sql_rows_examined": null
+    },
+    {
+      "H": 10000,
+      "reads": {
+        "checked_record": {
+          "sqlite_vm_steps": 120,
+          "seconds": 0.0001177180001832312,
+          "io": {
+            "payload_reads": 1,
+            "payload_read_bytes": 15,
+            "payload_check_reads": 1,
+            "payload_check_bytes": 15,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 2,
+            "query_rows": 0,
+            "pin_rows": 4,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "order": {
+          "sqlite_vm_steps": 39,
+          "seconds": 1.9099000382993836e-05,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 0,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "namespace": {
+          "sqlite_vm_steps": 36,
+          "seconds": 1.5883999367360957e-05,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 0,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "allocator": {
+          "sqlite_vm_steps": 32,
+          "seconds": 2.0731999939016532e-05,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 0,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "occurrence": {
+          "sqlite_vm_steps": 43,
+          "seconds": 1.6474999938509427e-05,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 0,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "reverse_group": {
+          "sqlite_vm_steps": 260,
+          "seconds": 0.00019383200014999602,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 11,
+            "query_rows": 0,
+            "pin_rows": 4,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "owner": {
+          "sqlite_vm_steps": 159,
+          "seconds": 9.185900034935912e-05,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 2,
+            "query_rows": 0,
+            "pin_rows": 4,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        },
+        "limited_query": {
+          "sqlite_vm_steps": 288,
+          "seconds": 0.00020844500068051275,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 1,
+            "payload_check_bytes": 15,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 4,
+            "query_rows": 1,
+            "pin_rows": 4,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 0
+          },
+          "sql_rows_examined": null
+        }
+      },
+      "ordinary_scalar_commit": {
+        "sqlite_vm_steps": 19005,
+        "seconds": 0.011190899000212085,
+        "io": {
+          "payload_reads": 0,
+          "payload_read_bytes": 0,
+          "payload_check_reads": 1,
+          "payload_check_bytes": 15,
+          "payload_writes": 1,
+          "payload_write_bytes": 15,
+          "metadata_rows": 13,
+          "query_rows": 4,
+          "pin_rows": 22,
+          "maintenance_rows": 512,
+          "temporary_keys_peak": 0,
+          "maintenance_removed_rows": 256
+        },
+        "tracemalloc_current_bytes": 7359,
+        "tracemalloc_peak_bytes": 15668
+      },
+      "expired_rows_before_commit": 59995,
+      "expired_rows_after_commit": 59742,
+      "explicit_maintenance": {
+        "row_budget": 64,
+        "removed": 64,
+        "io": {
+          "payload_reads": 0,
+          "payload_read_bytes": 0,
+          "payload_check_reads": 0,
+          "payload_check_bytes": 0,
+          "payload_writes": 0,
+          "payload_write_bytes": 0,
+          "metadata_rows": 1,
+          "query_rows": 0,
+          "pin_rows": 3,
+          "maintenance_rows": 128,
+          "temporary_keys_peak": 0,
+          "maintenance_removed_rows": 64
+        }
+      },
+      "point_query_plan": [
+        "COMPOUND QUERY",
+        "LEFT-MOST SUBQUERY",
+        "SEARCH lazy_record_versions USING COVERING INDEX lazy_record_interval (namespace=? AND typed_key=? AND valid_to=? AND valid_from<?)",
+        "UNION ALL",
+        "SEARCH lazy_record_versions USING COVERING INDEX lazy_record_interval (namespace=? AND typed_key=? AND valid_to>?)"
+      ],
+      "sql_rows_examined": null
+    }
+  ]
+}

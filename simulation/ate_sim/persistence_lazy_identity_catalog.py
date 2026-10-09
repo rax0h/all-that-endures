@@ -250,9 +250,9 @@ class IdentityCatalog:
         # Old ordinary payload authority remains unavailable through this API.
         rows = None
         if header[2] == 'lazy':
-            rows = self.store.db.execute('SELECT valid_from,record_schema,payload_checksum FROM lazy_record_versions '
-                'WHERE namespace=? AND typed_key=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2',
-                (owner[0], self.codec.encode(owner[1]), pin.captured_head, pin.captured_head)).fetchall()
+            rows = self.store._interval_rows('lazy_record_versions', 'valid_from,record_schema,payload_checksum',
+                ('namespace', 'typed_key'), (owner[0], self.codec.encode(owner[1])), pin.captured_head,
+                'lazy_record_interval', limit=2)
         elif pin.captured_head == int(self.store._checked_head_row()[0]):
             rows = self.store.db.execute('SELECT last_changed_generation,record_schema,payload_checksum FROM records '
                 'WHERE namespace=? AND typed_key=?', (owner[0], self.codec.encode(owner[1]))).fetchall()
@@ -269,7 +269,12 @@ class IdentityCatalog:
         return header
 
     def _has_source(self, pin, owner):
-        if self.store._visible_record_row(pin.captured_head, owner[0], self.codec.encode(owner[1])) is not None:
+        sources = self.store._interval_rows('lazy_record_versions', 'valid_from', ('namespace', 'typed_key'),
+            (owner[0], self.codec.encode(owner[1])), pin.captured_head, 'lazy_record_interval', limit=2)
+        self.store._metadata_rows += len(sources)
+        if len(sources) > 1:
+            raise StoreIntegrityError('overlapping identity owner source versions')
+        if sources:
             return True
         rows = self.store.db.execute('SELECT last_changed_generation FROM records WHERE namespace=? AND typed_key=?',
                                      (owner[0], self.codec.encode(owner[1]))).fetchall()
@@ -278,10 +283,8 @@ class IdentityCatalog:
             return True
         # A lost body/witness cannot turn a still-placed owner into a new one.
         # This is an indexed existence probe, not an inventory of its paths.
-        placed = self.store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions '
-            'WHERE owner_namespace=? AND owner_key=? AND valid_from<=? '
-            'AND (valid_to IS NULL OR ?<valid_to) LIMIT 1',
-            (owner[0], self.codec.encode(owner[1]), pin.captured_head, pin.captured_head)).fetchall()
+        placed = self.store._interval_rows('lazy_identity_occurrence_versions', '1', ('owner_namespace', 'owner_key'),
+            (owner[0], self.codec.encode(owner[1])), pin.captured_head, 'lazy_identity_owner_interval', limit=1)
         self.store._metadata_rows += len(placed)
         return bool(placed)
 

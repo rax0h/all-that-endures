@@ -285,6 +285,87 @@ stream/spill and World catalog/coordinator/frozen participant integration.
 Household/settlement and nested-history integration, final P5/full suite/review,
 release pressure decision and production acceptance remain outstanding.
 
+## Bounded maintenance checkpoint (October 9, 2026)
+
+Retirement published as `e48a41616b1059b6d4ff1f3ef30b3f4c7fd6bb4c`, tree
+`62ad988962b2faa876cc69ad95d9ac84debc91ea`; matches local
+`fbdbc1918bfaf75d4afa9ebf279b4434549362b2` (two coherent local commits).
+
+Replaced the six drain loops with one shared <=256 physical eligible-row
+removal budget. Selection uses each table's expiry index; ordinary commit and
+pin release invoke it once. Explicit maintenance(row_budget=0..256) performs
+one checked transaction with bounded reclamation, preserving head, live pins
+and operational receipts. There is no hidden drain. Diagnostics now report
+maintenance_removed_rows separately from inspected/deleted-row work.
+
+Full verification reports expired_rows_pending_maintenance instead of rejecting
+a legitimate backlog. Its existing all-row checksum/structural verification
+remains active, including expired payloads, as a permanent corruption test
+confirms. Precommit maintenance failure rolls back the rows and leaves receipts
+resolvable. Fixed one-record churn drains a prior bulk backlog incrementally;
+old pins retain payload/identity authority and prevent premature removal.
+
+Added interval-leading indexes for key/owner/group/allocator/query point reads
+on newly created stores and explicit copy upgrades. Reads seek current or
+not-yet-expired intervals instead of walking all old versions to find a second
+visible row. Overlap detection remains checked. Open only inspects index layout;
+genuine legacy layouts stay unchanged and use their documented compatibility
+query path. Final capability6 must require these indexes; it is not emitted yet.
+
+Permanent REDs: pin release removed 2,002 eligible rows in one operation;
+record lookup executed 7,025/70,025 SQLite instructions with H1k/H10k expired
+versions; limited-query membership proof still scanned old rows; owner-witness
+source probe took 7,180 instructions at H1k. Further measurement found ordinary
+publication's SELECT DISTINCT namespace walked namespace history even with no
+ordinary changes. Its H10k regression failed at 31,567 instructions with cleanup
+suspended. Ordinary publication now checks only affected namespace declarations
+by indexed existence probes and still rejects historical authority switches.
+Fixture reinsertion flags now apply only after initial insertion, preserving the
+store's existing reinsertion contract.
+
+Affected gate (same interpreter and PYTHONPATH as above): maintenance,
+retirement, final catalog/coordinator/contracts, lazy identity reverse, store and
+store failures — **128 passed in 54.50s**. The subsequently added fixed-work churn
+test passed separately (**1 passed in 0.43s**) on identical implementation.
+Final focused maintenance gate, including that churn test:
+`simulation/tests/test_stage_0_5_final_maintenance.py` — **11 passed in 13.06s**.
+Existing World compatibility gate: lazy identity/currency, unloaded alias
+routing, lifecycle, paged household World and household scoped index —
+**73 passed in 55.20s** after the final namespace fix. Earlier sequence plus
+World gate was **112 passed in 162.44s** before that fix; it is scoped historical
+evidence, not the final integrated suite. Counts overlap and are not summed.
+
+Reproduce store metrics:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/measure_stage_0_5_maintenance.py --output simulation/stage_0_5_final_maintenance_metrics.json`.
+Fixture construction suspends cleanup only to create valid checksummed expired
+versions. Real bounded cleanup is restored for measured ordinary publication.
+Source hashes are embedded; final implementation stayed unchanged throughout
+these gates and measurements.
+
+| Measured operation | SQLite instructions H1k | H10k |
+| --- | ---: | ---: |
+| Checked record read | 120 | 120 |
+| Order / namespace / allocator point | 39 / 36 / 32 | 39 / 36 / 32 |
+| Exact identity occurrence | 43 | 43 |
+| Reverse group / owner | 260 / 159 | 260 / 159 |
+| Limited query with checked witness | 288 | 288 |
+| Scalar commit including 256 removals | 19,005 | 19,005 |
+
+Both ordinary commits removed exactly 256 rows; each explicit maintenance call
+removed 64. Commit payload writes are one scalar, 14/15 bytes. Separate observed
+tracemalloc peaks are 12,987/15,668 bytes; instrumented commit durations
+0.0166/0.0112s are observations, not a latency guarantee. Remaining expired rows
+5,742/59,742 are reported rather than hidden. VM instructions are distinct from
+returned rows and actual SQL rows examined (still unknown). This is a store
+backlog fixture, not integrated World or pressure acceptance. Prior retirement
+JSON retains its source-pinned pre-budget counters as historical evidence.
+
+Next: shared cache/lifetime budget integration, large-group stream/spill and
+World catalog/coordinator/frozen participant integration. Retired backing-tree
+leases/GC remain separate unfinished work. Household/settlement integration,
+nested closure, exact pressure path, migration, independent P5/full suite/review
+and production acceptance are still outstanding. No production ref changed.
+
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.

@@ -125,9 +125,40 @@ class LazyStoreDiagnostics:
     pin_rows: int
     maintenance_rows: int
     temporary_keys_peak: int
+    maintenance_removed_rows: int = 0
 
 
 AUXILIARY_NAMESPACE_PREFIX = "aux.lazy."
+MAINTENANCE_TABLES = (
+    ('lazy_query_versions', 'lazy_query_expiry'),
+    ('lazy_order_versions', 'lazy_order_expiry'),
+    ('lazy_record_versions', 'lazy_record_expiry'),
+    ('lazy_namespace_state', 'lazy_namespace_expiry'),
+    ('lazy_identity_occurrence_versions', 'lazy_identity_occurrence_expiry'),
+    ('lazy_identity_state', 'lazy_identity_state_expiry'),
+)
+INTERVAL_INDEXES = {
+    'lazy_record_interval': ('namespace', 'typed_key', 'valid_to', 'valid_from'),
+    'lazy_order_interval': ('namespace', 'typed_key', 'valid_to', 'valid_from'),
+    'lazy_namespace_interval': ('namespace', 'valid_to', 'valid_from'),
+    'lazy_query_interval': ('namespace', 'index_name', 'index_value', 'record_key', 'ordinal', 'valid_to', 'valid_from'),
+    'lazy_query_owner_interval': ('namespace', 'record_key', 'valid_to', 'valid_from'),
+    'lazy_identity_occurrence_interval': ('owner_namespace', 'owner_key', 'occurrence_path', 'valid_to', 'valid_from'),
+    'lazy_identity_owner_interval': ('owner_namespace', 'owner_key', 'valid_to', 'valid_from', 'occurrence_path'),
+    'lazy_identity_incarnation_interval': ('incarnation_id', 'valid_to', 'valid_from', 'owner_namespace', 'owner_key', 'occurrence_path'),
+    'lazy_identity_state_interval': ('valid_to', 'valid_from'),
+}
+INTERVAL_TABLES = {
+    'lazy_record_interval': 'lazy_record_versions',
+    'lazy_order_interval': 'lazy_order_versions',
+    'lazy_namespace_interval': 'lazy_namespace_state',
+    'lazy_query_interval': 'lazy_query_versions',
+    'lazy_query_owner_interval': 'lazy_query_versions',
+    'lazy_identity_occurrence_interval': 'lazy_identity_occurrence_versions',
+    'lazy_identity_owner_interval': 'lazy_identity_occurrence_versions',
+    'lazy_identity_incarnation_interval': 'lazy_identity_occurrence_versions',
+    'lazy_identity_state_interval': 'lazy_identity_state',
+}
 
 def _auxiliary_namespace(namespace: str) -> bool:
     return namespace.startswith(AUXILIARY_NAMESPACE_PREFIX)
@@ -479,6 +510,14 @@ class LazyRecordStore:
         # row and verifies its checksum before this cache is considered.
         self._validated_head_row_cache: tuple[Any, ...] | None = None
         self.reset_diagnostics()
+        # New stores/copy upgrades create these indexes. Ordinary open only
+        # inspects them; genuine older stores retain their compatibility path.
+        self._interval_indexes = set()
+        for name, expected in INTERVAL_INDEXES.items():
+            columns = self.db.execute(f'PRAGMA index_info({name})').fetchall()
+            self._metadata_rows += len(columns)
+            if tuple(row[2] for row in columns) == expected:
+                self._interval_indexes.add(name)
 
     @classmethod
     def create(
@@ -502,6 +541,8 @@ class LazyRecordStore:
             cls._configure(db)
             db.executescript(P1_DDL)
             db.executescript(P4_DDL)
+            for name, columns in INTERVAL_INDEXES.items():
+                db.execute(f'CREATE INDEX {name} ON {INTERVAL_TABLES[name]}({",".join(columns)})')
             store_identity = str(uuid.uuid4())
             rows = {
                 "store_uuid": store_identity,
@@ -636,6 +677,7 @@ class LazyRecordStore:
         self._query_rows = 0
         self._pin_rows = 0
         self._maintenance_rows = 0
+        self._maintenance_removed_rows = 0
         self._temporary_keys_peak = 0
 
     def diagnostics(self) -> LazyStoreDiagnostics:
@@ -651,6 +693,7 @@ class LazyRecordStore:
             self._pin_rows,
             self._maintenance_rows,
             self._temporary_keys_peak,
+            self._maintenance_removed_rows,
         )
 
     def _checked_head_row(self) -> tuple[Any, ...]:
@@ -1214,13 +1257,29 @@ class LazyRecordStore:
         from .persistence_lazy_identity_catalog import IdentityCatalog
         return IdentityCatalog(self).read_identity_links(pin, incarnation_id)
 
+    def _interval_rows(self, table, columns, keys, values, generation, index, *, order=None, limit=None):
+        """Exclude expired backlog by key/valid_to seeks, preserving overlap checks.
+
+        Internal schema literals only; no user SQL identifiers enter here.
+        Legacy stores use their existing query until explicit copy upgrade.
+        """
+        where = ' AND '.join(f'{key}=?' for key in keys) or '1'
+        suffix = (f' ORDER BY {order}' if order else '') + (f' LIMIT {limit}' if limit is not None else '')
+        if index not in self._interval_indexes:
+            return self.db.execute(f'SELECT {columns} FROM {table} WHERE {where} '
+                'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)' + suffix,
+                tuple(values) + (generation, generation)).fetchall()
+        return self.db.execute(
+            f'SELECT {columns} FROM {table} INDEXED BY {index} WHERE {where} '
+            'AND valid_to IS NULL AND valid_from<=? UNION ALL '
+            f'SELECT {columns} FROM {table} INDEXED BY {index} WHERE {where} '
+            'AND valid_to>? AND valid_from<=?' + suffix,
+            tuple(values) + (generation,) + tuple(values) + (generation, generation)).fetchall()
+
     def _visible_record_row(self, generation: int, namespace: str, typed_key: bytes) -> tuple[Any, ...] | None:
-        rows = self.db.execute(
-            "SELECT valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum "
-            "FROM lazy_record_versions WHERE namespace=? AND typed_key=? AND valid_from<=? "
-            "AND (valid_to IS NULL OR ?<valid_to) ORDER BY valid_from DESC LIMIT 2",
-            (namespace, typed_key, generation, generation),
-        ).fetchall()
+        rows = self._interval_rows('lazy_record_versions',
+            'valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum',
+            ('namespace', 'typed_key'), (namespace, typed_key), generation, 'lazy_record_interval', limit=2)
         self._metadata_rows += len(rows)
         if len(rows) > 1:
             raise StoreIntegrityError("overlapping visible record versions")
@@ -1268,17 +1327,10 @@ class LazyRecordStore:
         try:
             row = self._visible_record_row(generation, namespace, typed_key)
             if row is None:
-                dangling_order = self.db.execute(
-                    "SELECT 1 FROM lazy_order_versions WHERE namespace=? AND typed_key=? AND valid_from<=? "
-                    "AND (valid_to IS NULL OR ?<valid_to) LIMIT 1",
-                    (namespace, typed_key, generation, generation),
-                ).fetchone()
-                dangling_query = self.db.execute(
-                    "SELECT 1 FROM lazy_query_versions WHERE namespace=? AND record_key=? AND valid_from<=? "
-                    "AND (valid_to IS NULL OR ?<valid_to) LIMIT 1",
-                    (namespace, typed_key, generation, generation),
-                ).fetchone()
-                self._metadata_rows += int(dangling_order is not None) + int(dangling_query is not None)
+                dangling_order = self._visible_order(namespace, typed_key, generation)
+                dangling_query = self._interval_rows('lazy_query_versions', '1', ('namespace', 'record_key'),
+                    (namespace, typed_key), generation, 'lazy_query_owner_interval', limit=1)
+                self._metadata_rows += len(dangling_query)
                 if dangling_order or dangling_query:
                     raise StoreIntegrityError("membership/order points to absent lazy record")
                 raise KeyError((namespace, key))
@@ -1476,13 +1528,10 @@ class LazyRecordStore:
                 if checksum != expected:
                     raise StoreIntegrityError("lazy query checksum mismatch")
                 if limit is not None:
-                    witnesses = self.db.execute(
-                        'SELECT valid_from,valid_to FROM lazy_query_versions '
-                        'WHERE namespace=? AND index_name=? AND index_value=? '
-                        'AND record_key=? AND ordinal=? AND valid_from<=? '
-                        'AND (valid_to IS NULL OR ?<valid_to) LIMIT 2',
-                        (namespace, index_name, encoded_value, record_key, ordinal, generation, generation),
-                    ).fetchall()
+                    witnesses = self._interval_rows('lazy_query_versions', 'valid_from,valid_to',
+                        ('namespace', 'index_name', 'index_value', 'record_key', 'ordinal'),
+                        (namespace, index_name, encoded_value, record_key, ordinal), generation,
+                        'lazy_query_interval', limit=2)
                     self._metadata_rows += len(witnesses)
                     if len(witnesses) != 1:
                         raise StoreIntegrityError('overlapping visible lazy query membership')
@@ -1574,13 +1623,8 @@ class LazyRecordStore:
     def _identity_state_at(
         self, generation: int
     ) -> tuple[int, int, int | None]:
-        rows = self.db.execute(
-            "SELECT next_incarnation_id,valid_from,valid_to,row_checksum "
-            "FROM lazy_identity_state WHERE valid_from<=? "
-            "AND (valid_to IS NULL OR ?<valid_to) "
-            "ORDER BY valid_from DESC LIMIT 2",
-            (generation, generation),
-        ).fetchall()
+        rows = self._interval_rows('lazy_identity_state', 'next_incarnation_id,valid_from,valid_to,row_checksum',
+            (), (), generation, 'lazy_identity_state_interval', limit=2)
         self._metadata_rows += len(rows)
         if len(rows) != 1:
             raise StoreIntegrityError(
@@ -1603,20 +1647,10 @@ class LazyRecordStore:
         owner_key: bytes,
         occurrence_path: bytes,
     ) -> tuple[int, int, int | None, str] | None:
-        rows = self.db.execute(
-            "SELECT incarnation_id,valid_from,valid_to,row_checksum "
-            "FROM lazy_identity_occurrence_versions "
-            "WHERE owner_namespace=? AND owner_key=? AND occurrence_path=? "
-            "AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) "
-            "ORDER BY valid_from DESC LIMIT 2",
-            (
-                owner_namespace,
-                owner_key,
-                occurrence_path,
-                generation,
-                generation,
-            ),
-        ).fetchall()
+        rows = self._interval_rows('lazy_identity_occurrence_versions',
+            'incarnation_id,valid_from,valid_to,row_checksum',
+            ('owner_namespace', 'owner_key', 'occurrence_path'), (owner_namespace, owner_key, occurrence_path),
+            generation, 'lazy_identity_occurrence_interval', limit=2)
         self._metadata_rows += len(rows)
         if len(rows) > 1:
             raise StoreIntegrityError(
@@ -1688,13 +1722,10 @@ class LazyRecordStore:
         encoded_key = self.codec.encode(owner_key)
         generation = self._read_snapshot_start(pin)
         try:
-            rows = self.db.execute(
-                "SELECT occurrence_path,incarnation_id,valid_from,valid_to,row_checksum "
-                "FROM lazy_identity_occurrence_versions "
-                "WHERE owner_namespace=? AND owner_key=? AND valid_from<=? "
-                "AND (valid_to IS NULL OR ?<valid_to) ORDER BY occurrence_path",
-                (namespace, encoded_key, generation, generation),
-            ).fetchall()
+            rows = self._interval_rows('lazy_identity_occurrence_versions',
+                'occurrence_path,incarnation_id,valid_from,valid_to,row_checksum',
+                ('owner_namespace', 'owner_key'), (namespace, encoded_key), generation,
+                'lazy_identity_owner_interval', order='occurrence_path')
             self._metadata_rows += len(rows)
             out = []
             for path, incarnation_id, valid_from, valid_to, checksum in rows:
@@ -1745,16 +1776,10 @@ class LazyRecordStore:
                     "reverse identity lookup requires an explicit current-head copy upgrade"
                 )
             next_id = self._identity_state_at(generation)[0]
-            rows = self.db.execute(
-                "SELECT owner_namespace,owner_key,occurrence_path,incarnation_id,"
-                "valid_from,valid_to,row_checksum "
-                "FROM lazy_identity_occurrence_versions "
-                "INDEXED BY lazy_identity_incarnation_visible "
-                "WHERE incarnation_id=? AND valid_from<=? "
-                "AND (valid_to IS NULL OR ?<valid_to) "
-                "ORDER BY owner_namespace,owner_key,occurrence_path",
-                (incarnation_id, generation, generation),
-            ).fetchall()
+            rows = self._interval_rows('lazy_identity_occurrence_versions',
+                'owner_namespace,owner_key,occurrence_path,incarnation_id,valid_from,valid_to,row_checksum',
+                ('incarnation_id',), (incarnation_id,), generation,
+                'lazy_identity_incarnation_interval', order='owner_namespace,owner_key,occurrence_path')
             self._metadata_rows += len(rows)
             seen = set()
             out = []
@@ -1909,12 +1934,9 @@ class LazyRecordStore:
         return tuple(prepared)
 
     def _namespace_state_at(self, namespace: str, generation: int) -> tuple[int, int, int, int | None] | None:
-        rows = self.db.execute(
-            "SELECT member_count,next_ordinal,valid_from,valid_to,row_checksum FROM lazy_namespace_state "
-            "WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) "
-            "ORDER BY valid_from DESC LIMIT 2",
-            (namespace, generation, generation),
-        ).fetchall()
+        rows = self._interval_rows('lazy_namespace_state',
+            'member_count,next_ordinal,valid_from,valid_to,row_checksum', ('namespace',), (namespace,),
+            generation, 'lazy_namespace_interval', limit=2)
         self._metadata_rows += len(rows)
         if len(rows) > 1:
             raise StoreIntegrityError("overlapping namespace state versions")
@@ -1941,12 +1963,8 @@ class LazyRecordStore:
         return row
 
     def _visible_order(self, namespace: str, typed_key: bytes, generation: int) -> tuple[Any, ...] | None:
-        rows = self.db.execute(
-            "SELECT ordinal,valid_from,valid_to,row_checksum FROM lazy_order_versions "
-            "WHERE namespace=? AND typed_key=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) "
-            "ORDER BY valid_from DESC LIMIT 2",
-            (namespace, typed_key, generation, generation),
-        ).fetchall()
+        rows = self._interval_rows('lazy_order_versions', 'ordinal,valid_from,valid_to,row_checksum',
+            ('namespace', 'typed_key'), (namespace, typed_key), generation, 'lazy_order_interval', limit=2)
         self._metadata_rows += len(rows)
         if len(rows) > 1:
             raise StoreIntegrityError("overlapping order versions")
@@ -1971,11 +1989,8 @@ class LazyRecordStore:
         return ordinal
 
     def _close_queries(self, namespace: str, typed_key: bytes, generation: int) -> None:
-        rows = self.db.execute(
-            "SELECT index_name,index_value,ordinal,valid_from FROM lazy_query_versions "
-            "WHERE namespace=? AND record_key=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
-            (namespace, typed_key, generation - 1, generation - 1),
-        ).fetchall()
+        rows = self._interval_rows('lazy_query_versions', 'index_name,index_value,ordinal,valid_from',
+            ('namespace', 'record_key'), (namespace, typed_key), generation - 1, 'lazy_query_owner_interval')
         self._query_rows += len(rows)
         for index_name, index_value, ordinal, valid_from in rows:
             checksum = _query_checksum(
@@ -2005,12 +2020,9 @@ class LazyRecordStore:
             (name, self.codec.encode(value), typed_key, ordinal)
             for name, value, ordinal in memberships
         }
-        rows = self.db.execute(
-            "SELECT index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum "
-            "FROM lazy_query_versions WHERE namespace=? AND record_key=? AND valid_from<=? "
-            "AND (valid_to IS NULL OR ?<valid_to)",
-            (namespace, typed_key, generation, generation),
-        ).fetchall()
+        rows = self._interval_rows('lazy_query_versions',
+            'index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum',
+            ('namespace', 'record_key'), (namespace, typed_key), generation, 'lazy_query_owner_interval')
         self._query_rows += len(rows)
         actual = set()
         for index_name, index_value, record_key, ordinal, valid_from, valid_to, checksum in rows:
@@ -2366,16 +2378,21 @@ class LazyRecordStore:
         counts: dict[str, tuple[int, int]],
     ) -> tuple[int, int]:
         writes = deletes = 0
-        lazy_namespaces = {
-            row[0] for row in self.db.execute("SELECT DISTINCT namespace FROM lazy_namespace_state")
-        }
-        self._metadata_rows += len(lazy_namespaces)
+        checked_namespaces = set()
         for item in prepared:
             change: RecordChange = item["change"]
             namespace = item["namespace"]
             typed_key = item["typed_key"]
-            if namespace in lazy_namespaces:
-                raise StoreConflictError("ordinary record change targets a declared lazy namespace")
+            if namespace not in checked_namespaces:
+                # Historical declaration still forbids an authority switch.
+                # Probe only affected namespaces; DISTINCT over namespace
+                # history scans an expired backlog even for no ordinary writes.
+                declared = self.db.execute('SELECT 1 FROM lazy_namespace_state WHERE namespace=? LIMIT 1',
+                                           (namespace,)).fetchone()
+                self._metadata_rows += int(declared is not None)
+                if declared is not None:
+                    raise StoreConflictError('ordinary record change targets a declared lazy namespace')
+                checked_namespaces.add(namespace)
             existed = self.db.execute(
                 "SELECT 1 FROM records WHERE namespace=? AND typed_key=?", (namespace, typed_key)
             ).fetchone() is not None
@@ -2458,34 +2475,42 @@ class LazyRecordStore:
             self._payload_write_bytes += len(payload)
         return writes
 
-    def _cleanup_expired(self, floor: int, *, batch_size: int = 4096) -> int:
+    def _cleanup_expired(self, floor: int, *, row_budget: int = 256) -> int:
+        if type(row_budget) is not int or not 0 <= row_budget <= 256:
+            raise ValueError('maintenance row budget must be in 0..256')
         removed = 0
-        for table in (
-            "lazy_query_versions",
-            "lazy_order_versions",
-            "lazy_record_versions",
-            "lazy_namespace_state",
-            "lazy_identity_occurrence_versions",
-            "lazy_identity_state",
-        ):
-            while True:
-                rowids = [
-                    row[0]
-                    for row in self.db.execute(
-                        f"SELECT rowid FROM {table} WHERE valid_to IS NOT NULL AND valid_to<=? LIMIT ?",
-                        (floor, batch_size),
-                    )
-                ]
-                self._maintenance_rows += len(rowids)
-                if not rowids:
-                    break
-                placeholders = ",".join("?" for _ in rowids)
-                self.db.execute(f"DELETE FROM {table} WHERE rowid IN ({placeholders})", rowids)
+        for table, index in MAINTENANCE_TABLES:
+            remaining = row_budget - removed
+            if remaining == 0: break
+            rowids = [row[0] for row in self.db.execute(
+                f'SELECT rowid FROM {table} INDEXED BY {index} '
+                'WHERE valid_to IS NOT NULL AND valid_to<=? ORDER BY valid_to LIMIT ?', (floor, remaining))]
+            self._maintenance_rows += len(rowids)
+            if rowids:
+                placeholders = ','.join('?' for _ in rowids)
+                self.db.execute(f'DELETE FROM {table} WHERE rowid IN ({placeholders})', rowids)
                 removed += len(rowids)
                 self._maintenance_rows += len(rowids)
-                if len(rowids) < batch_size:
-                    break
+                self._maintenance_removed_rows += len(rowids)
         return removed
+
+    def maintenance(self, *, row_budget=256):
+        """One explicit bounded reclamation operation; preserves head/receipts."""
+        self._ensure_open()
+        if type(row_budget) is not int or not 0 <= row_budget <= 256:
+            raise ValueError('maintenance row budget must be in 0..256')
+        if self.db.in_transaction or self._active_read_transaction:
+            raise StoreConflictError('maintenance cannot run inside another operation')
+        self.db.execute('BEGIN IMMEDIATE')
+        try:
+            head = int(self._checked_head_row()[0])
+            floor = self._validated_retention_floor(head)
+            removed = self._cleanup_expired(floor, row_budget=row_budget)
+            self._commit_sqlite()
+            return removed
+        except BaseException:
+            if self.db.in_transaction: self.db.rollback()
+            raise
 
     def commit(
         self,
@@ -3028,20 +3053,13 @@ class LazyRecordStore:
         ordinary_counts, ordinary_records, segments = self._verify_ordinary(inventory)
         retained = self._retained_generations(head_generation)
         floor = retained[0]
-        for table in (
-            "lazy_query_versions",
-            "lazy_order_versions",
-            "lazy_record_versions",
-            "lazy_namespace_state",
-            "lazy_identity_occurrence_versions",
-            "lazy_identity_state",
-        ):
+        expired_pending = 0
+        for table, _index in MAINTENANCE_TABLES:
             obsolete = self.db.execute(
-                f"SELECT 1 FROM {table} WHERE valid_to IS NOT NULL AND valid_to<=? LIMIT 1",
+                f"SELECT count(*) FROM {table} WHERE valid_to IS NOT NULL AND valid_to<=?",
                 (floor,),
             ).fetchone()
-            if obsolete is not None:
-                raise StoreIntegrityError("expired lazy versions remain below the retention floor")
+            expired_pending += int(obsolete[0])
         current_lazy_counts: dict[str, int] = {}
         current_identity_occurrences = 0
         for generation in retained:
@@ -3177,6 +3195,7 @@ class LazyRecordStore:
             "next_incarnation_id": self._identity_state_at(
                 head_generation
             )[0],
+            'expired_rows_pending_maintenance': expired_pending,
         }
 
     def storage_metrics(self) -> dict[str, int]:
