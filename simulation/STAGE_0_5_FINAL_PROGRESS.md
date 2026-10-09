@@ -597,3 +597,117 @@ checkpoint and the accepted legacy behavior. No routine Astra approval is needed
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.
+
+## Concrete runtime bindings and shared record bytes checkpoint (October 9, 2026)
+
+Implementation local commit `23ee53eea937f14476fd38b726bd2849a051f5db`,
+public commit `0d06148e8f03a993b194ae7e24dc2644000f43d3`, matching tree
+`f620d0f6c84d97dd453bed1b39a7e598a54b32e9`. Native API publication explains
+SHA differences; trees are verified identical. The live closeout branch had
+not moved since the previous checkpoint. PR14 remains exactly
+`c29e3d06a0c9d219235e2b3f0390271bd1245aea`; no production update, Actions,
+endurance run or architectural-review request was made.
+
+`RuntimeFamilyBindings` now binds concrete session/root authorities once,
+without owner traversal or payload reads. Both shared-object routing and
+IndexedRecord alias callbacks use its immutable maps. It includes skill and
+lineage record authorities that the former callback map omitted. Scalar map
+families are routing authorities, not falsely classified as record callbacks.
+Wallet-first skill and soul children use their existing unrestricted
+multi-owner adapters; this does not introduce a second live identity registry.
+Child mutation resamples callbacks after binding cold current peer owners.
+
+Permanent REDs: a lineage alias had no authoritative callback; a wallet-first
+skill alias failed on its native nested list; a cold skill child mutation left
+its authoritative table clean. These now preserve canonical identity through
+mutation, save and reopen. Other legacy unsupported native nested containers
+have not been claimed to be closed by this targeted change.
+
+Every concrete lazy record family, including the separate lineage-child table,
+and hot query LRUs now joins one shared 32MiB byte budget. Weights include
+resident schema values and checked baseline payload/presence/incarnation/order/
+identity sidecars. Python estimates avoid lazy readers and history iteration;
+page-backed reference objects are charged here and their clean pages remain
+in the existing shared history budget. Dirty owners are excluded from clean
+admission. Eviction releases sidecars and weak budget metadata, and does not
+retire persisted occurrences or detach a retained external canonical alias.
+Oversized reads return their requested live object without retaining it as
+clean. Budget eviction also removes step-touch metadata.
+
+A second RED matrix exposed an oversized owner being evicted again during its
+post-mutation rehydration. Eight scalar/history cases failed across skills,
+souls, social edges and property. Actual mutation notifications now pin the
+owner as dirty before checked loading, retaining exact dirty state on failures.
+Tests also cover tiny-budget precommit rollback/lost acknowledgement,
+resolve_save, accept-once/no-op and retained identity. A fixture correction in
+the earlier retained-alias test adds ordinary people churn: rejecting oversized
+skill entries correctly does not evict a smaller existing entry by itself.
+
+Compatibility is explicit: format3/4/5 behavior and the accepted 400-current-
+people hot-step regression remain. The shared byte budget applies inside steps;
+the strict <=256 per-family clean count during new-format steps remains to be
+activated with the complete capability6 runtime. Query budgets and ordinary
+per-family count eviction retain existing interfaces. No capability6 floor or
+feature marker is emitted; no hidden open-time migration occurs.
+
+Final changed-source focused gate (counts overlap with previous gates):
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_record_budget.py simulation/tests/test_stage_0_5_final_runtime_families.py simulation/tests/test_stage_0_5_final_world_participants.py simulation/tests/test_persistence_lazy_people.py simulation/tests/test_persistence_lazy_skills.py simulation/tests/test_persistence_lazy_lineage.py simulation/tests/test_stage_0_5_r3_recovery_extra.py simulation/tests/test_persistence_lifecycle.py`
+— **92 passed in 54.31s**, `final-runtime-cache-final-recovery.log`.
+
+Final cross-family/household gate on the same implementation:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_persistence_lazy_typed_property_histories.py simulation/tests/test_persistence_lazy_typed_institution_divinity.py simulation/tests/test_persistence_lazy_materials.py simulation/tests/test_persistence_lazy_resources.py simulation/tests/test_persistence_lazy_social.py simulation/tests/test_persistence_lazy_souls.py simulation/tests/test_persistence_lazy_currency.py simulation/tests/test_stage_0_5_r3_cross_family_extra.py simulation/tests/test_stage_0_5_paged_household_world.py`
+— **96 passed in 185.98s**, `final-runtime-cache-final-families.log`.
+Earlier 72/98/47 gates cover intermediate source, not additional final acceptance.
+One intermediate command named a nonexistent recovery file and collected no
+cases; it was corrected before the recorded gates. `git diff --check` passed.
+
+Independent eager-control compatibility P5:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/persistence_p5_validation.py --paged-households --output simulation/stage_0_5_runtime_cache_p5.json`
+— **passed**, seed843000, 3-year prehistory +4 continuation +3 after reopen,
+439 exact events, final digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
+Checks include reopen, relocated backup and portable detach/checkpoint lanes.
+This is an independent-control run for the compatibility runtime, not final
+new-format acceptance. JSON records exact source hashes. Forced-pressure
+float.hex/identity closure still require the final integrated acceptance matrix.
+The harness verified then removed temporary restore files: retrievable final
+restore artifacts remain outstanding, rather than being falsely declared saved.
+
+Reproducible measurement:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/measure_stage_0_5_record_budget.py --output simulation/stage_0_5_final_record_budget_metrics.json`.
+Eight live candidates, one scalar edit and two sharing placements are fixed.
+Old pins retain the exact previous payload; retained aliases remain canonical.
+Explicit archival cache churn is a separate O(H) read, not counted as the edit.
+
+| Measurement | H1k | H10k |
+| --- | ---: | ---: |
+| Edit payload reads / bytes | 7 / 505 | 7 / 505 |
+| Edit checked payloads / bytes | 11 / 3,047 | 11 / 3,047 |
+| Edit writes / bytes | 4 / 1,417 | 4 / 1,417 |
+| Edit metadata / returned query rows | 201 / 4 | 201 / 4 |
+| Clean after edit: entries / Python bytes | 9 / 21,373 | 9 / 21,373 |
+| Clean after explicit churn: entries / Python bytes | 257 / 610,406 | 257 / 610,662 |
+| Clean manager metadata after churn | 122,464 | 122,464 |
+
+The churn entries comprise <=256 people plus the wallet, not 257 in one family.
+Budget byte evictions are separately tested with small limits across families,
+inside simulation steps and with oversized query results. Native SQLite/RSS
+and total dirty/registry/callback memory are not inferred from these estimates;
+the JSON separately reports traced peaks and the two edited payload objects.
+The source hashes match exactly. SQL examined rows remain unknown. Subsequent
+no-op still honestly reports three checked event-control descriptor reads,
+217bytes, zero writes, and no archive payload reads. Open remains the legacy
+P2C path; these measurements do not assert a new-format global-scan bound.
+
+**Assignment remains implementation-in-progress, not candidate validated or
+production accepted.** Continue through the complete architecture: checked
+catalog/coordinator activation and immutable owner publication; lazy household
+headers and counted household/settlement histories; nested-history and
+exceptional event-ID closure; exact pressure scalars/cache revisions; strict
+new-format counts, detached alias leases and retired backing-tree reclamation;
+complete capability6 source-copy upgrade; actual writer/guard inventory;
+integrated corruption/recovery/H1k/H10k matrix; final-source independent P5 and
+one final applicable full suite; final independent architectural review and
+retrievable restore artifacts. Pressure latency/arithmetic, endurance policy
+and production promotion remain separately owner-controlled release decisions.
+No routine Astra approval is needed to implement the next package.
