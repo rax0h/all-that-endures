@@ -96,9 +96,11 @@ def test_duplicate_live_member_occurrences_keep_order_and_effects(tmp_path):
             world.households[1].members.append(3)
         kill(expected, expected.people[1], "natural")
         kill(session.world, session.world.people[1], "natural")
+        # Check ordinary gameplay's load bound BEFORE an explicit full-world
+        # digest, which correctly materializes all historical Person records.
+        _page_bound(session, 1000)
         assert session.world.digest() == expected.digest()
         bereaved = [e.actors[0].id for e in expected.events
                     if e.kind == "bereavement"]
         assert bereaved.count(2) == 2
         assert bereaved.count(3) == 2
-        _page_bound(session, 1000)
