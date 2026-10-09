@@ -343,6 +343,55 @@ class LazyHouseholdMembers(MutableSequence):
                 return True
         return False
 
+    def matching_member_ids(self, candidates):
+        """Select candidate IDs in native sequence order, retaining duplicates.
+
+        This is an indexed *selection*, not a replacement for an explicit
+        whole-history iteration. Only requested candidate occurrence rows and
+        locally dirty pages are examined. No cached page is trusted over a
+        changed page, and checked query witnesses are verified against their
+        actual bounded page payloads.
+        """
+        self._ensure()
+        wanted = set(candidates)
+        if any(type(member) is not int or member <= 0 for member in wanted):
+            raise TypeError("household candidate IDs must be positive integers")
+        if not wanted:
+            return []
+        if self._detached_values is not None:
+            return [member for member in self._detached_values if member in wanted]
+
+        positions = []
+        for number, page in self._dirty_pages.items():
+            start = number * PAGE_SIZE
+            for offset, member in enumerate(page):
+                position = start + offset
+                if position < self._length and member in wanted:
+                    positions.append((position, member))
+
+        for member in wanted:
+            for page_key, offset in self._store.query_memberships(
+                self._pin, PAGE_NAMESPACE, "member", member,
+            ):
+                if type(page_key) is not tuple or len(page_key) != 2:
+                    raise StoreIntegrityError("malformed household member page key")
+                owner, number = page_key
+                if owner != self._owner or number in self._dirty_pages:
+                    continue
+                if (type(number) is not int or number < 0
+                        or type(offset) is not int
+                        or not 0 <= offset < PAGE_SIZE):
+                    raise StoreIntegrityError("invalid household member occurrence")
+                position = number * PAGE_SIZE + offset
+                if position >= self._length:
+                    raise StoreIntegrityError("member occurrence beyond sequence length")
+                if self._read_page(number)[offset] != member:
+                    raise StoreIntegrityError("member occurrence disagrees with page")
+                positions.append((position, member))
+
+        positions.sort(key=lambda item: item[0])
+        return [member for _position, member in positions]
+
     def __setitem__(self, index, value):
         self._mutation()
         if self._detached_values is not None:
