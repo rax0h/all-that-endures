@@ -41,7 +41,8 @@ def _heap_size(value, seen=None):
 
 class IdentityCoordinator:
     def __init__(self, store, pin, registry, *, load_owner, resolve_path, install_path,
-                 mark_dirty, preflight, occurrence_limit=4096, byte_limit=2 * 1024 * 1024):
+                 mark_dirty, preflight, encode_placement=None,
+                 occurrence_limit=4096, byte_limit=2 * 1024 * 1024):
         if registry.store_identity != store.store_identity:
             raise StoreConflictError('identity coordinator registry belongs to another store')
         if type(occurrence_limit) is not int or occurrence_limit < 1 or type(byte_limit) is not int or byte_limit < 1:
@@ -53,6 +54,10 @@ class IdentityCoordinator:
         registry.allocator.next_value = max(registry.next_incarnation, self._baseline_allocator)
         self.load_owner, self.resolve_path, self.install_path = load_owner, resolve_path, install_path
         self.mark_dirty, self.preflight = mark_dirty, preflight
+        # Concrete World family adapters compare compact headers. Standalone
+        # scalar fixtures retain their checked store codec; no history codec
+        # or owner namespace is inferred by the coordinator.
+        self.encode_placement = encode_placement
         self.occurrence_limit, self.byte_limit = occurrence_limit, byte_limit
         self.discovered_groups = OrderedDict()
         self._cache_occurrences = self._cache_bytes = 0
@@ -152,7 +157,9 @@ class IdentityCoordinator:
                 value = self.load_owner(owner)
                 current = self.resolve_path(value, path)
                 if current is not obj:
-                    if self.store.codec.encode(current) != self.store.codec.encode(obj):
+                    encode = (self.store.codec.encode if self.encode_placement is None
+                              else lambda child: self.encode_placement(owner, path, child))
+                    if encode(current) != encode(obj):
                         raise StoreIntegrityError('checked shared placement payload copies disagree')
                     installations.append((owner, path))
                 if owner not in owner_keys:

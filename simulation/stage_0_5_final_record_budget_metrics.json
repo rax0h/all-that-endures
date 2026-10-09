@@ -13,7 +13,7 @@
     "ate_sim/persistence_lazy.py": "3b6f51a48ebf8f3d58e156a765e0a69d6c6214d16dbaaa5e87377931f9da1d3d",
     "ate_sim/persistence_tracking.py": "24dcc5b724f2df9da071cf68fc43305ca16d2934b44c3400f44d122969797cf0",
     "ate_sim/persistence_lazy_budget.py": "0f5ea4bd091d323c9a231e63cfa83a93915d93aa43f1e70f53920b452e30e490",
-    "ate_sim/persistence_lazy_families.py": "3275abd616b16b0a01264cd02a49b1aaf1db9c9803f62ea26f59670001044b08",
+    "ate_sim/persistence_lazy_families.py": "0420ef2ec85246763f8a81d4b7a51c41746d03928eae52b2bc6f983d9a21816f",
     "ate_sim/persistence_lazy_lineage_children.py": "24214b874a8ae6daca0fbb3aaeef8ea65cef1b2c95f647695c476af8944faf0e",
     "measure_stage_0_5_record_budget.py": "083888827434d4b130425a879064c69cbd8e927c9610688bbc86e8c20542cc4a"
   },
@@ -66,13 +66,13 @@
         "temporary_keys_peak": 0,
         "maintenance_removed_rows": 0
       },
-      "edit_seconds": 0.07211655299943232,
+      "edit_seconds": 0.08890434800014191,
       "dirty_before_save": {
         "owners": 2,
         "resident_python_bytes": 1618
       },
-      "edit_traced_retained_bytes": 114145,
-      "edit_traced_peak_bytes": 226786,
+      "edit_traced_retained_bytes": 114200,
+      "edit_traced_peak_bytes": 226841,
       "clean_after_edit": {
         "entries": 9,
         "bytes": 21373,
@@ -156,7 +156,7 @@
         "temporary_keys_peak": 0,
         "maintenance_removed_rows": 0
       },
-      "edit_seconds": 0.06856705599966517,
+      "edit_seconds": 0.06823854200047208,
       "dirty_before_save": {
         "owners": 2,
         "resident_python_bytes": 1618

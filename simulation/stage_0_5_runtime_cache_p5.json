@@ -2,14 +2,14 @@
   "checkpoint_bytes": 310819,
   "checkpoint_schema": 8,
   "cold_file_bytes": 1916928,
-  "cold_sha256": "3893824241652a4636d3df2313ee05c68e5c41cff4158ec39d35580b11898c79",
+  "cold_sha256": "f7d6b07d551897cc3e05632d31e2ccb05527cfcdea4565d59c688b16f2019298",
   "continuation_years": 4,
   "control_final_digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e",
   "control_total_digest": "b31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387",
   "detached_checkpoint_bytes": 538526,
   "events_total": 439,
   "final_year": 10,
-  "first_continuation_simulation_seconds": 7.135485718999917,
+  "first_continuation_simulation_seconds": 7.798120600999937,
   "first_full_audit_io": {
     "payload_read_bytes": 420434,
     "payload_reads": 1951,
@@ -24,7 +24,7 @@
   },
   "fixture_creation": {
     "cold": {
-      "commit_token": "ec38e05ab79747bf85f7b4ba8ba91d30",
+      "commit_token": "8932f965165447c7bc15621e8aeb2965",
       "deleted_event_rows": 0,
       "disk_events": 0,
       "disk_segments": 0,
@@ -96,18 +96,13 @@
       "wallets": 0
     }
   },
-  "forced_pressure_regression": {
-    "cases": 5,
-    "file": "tests/test_stage_0_5_final_pressure_arithmetic.py",
-    "scope": "Exact native ordered sum, duplicate/extinct occurrences, repeated edits, shared list replacement, reopen, float.hex counterexamples and identical forced RNG calls"
-  },
   "last_event_id": 439,
   "lazy_file_bytes": 20828160,
-  "lazy_sha256": "7cdfe6a6a23a343f15b3e3be74a9146c70bf15c95a6bafd55adffbb18a34bb2c",
+  "lazy_sha256": "80f9bd698e9f3d575a3a3236e5119839ab086fc4408f73eae1777ed32b67e284",
   "limitations": [
-    "Checked catalog/coordinator is not yet activated in ordinary World open/save.",
+    "Checked catalog/coordinator is not yet activated in ordinary World open/save; compact comparison has its own focused tests.",
     "Household headers and Settlement.households are not yet counted-sequence backed.",
-    "Forced-pressure regression protects arithmetic; checked scalar streaming/cache revisions and cold-miss H measurements remain pending.",
+    "Forced-pressure regressions protect arithmetic; checked scalar streaming/cache revisions and cold-miss H measurements remain pending.",
     "P5 temporary verified SQLite files were deleted; final retrievable restore artifacts remain pending.",
     "This is not final integrated architecture review, final full suite, endurance or production acceptance."
   ],
@@ -120,11 +115,11 @@
   "passed": true,
   "pre_years": 3,
   "relocated_file_bytes": 18124800,
-  "relocated_sha256": "b57e47a89c21abd526e523a273cdb20fbdf0c9128e3408b1c9228cfd9bfcc042",
+  "relocated_sha256": "f2a0fffaf66f74ed2f21889f040e7fdbe9e7afd69784f709298047db823c2ce8",
   "reopen_years": 3,
   "rules_id": "stage-0-5-p5-validation",
-  "scope": "Independent eager-control compatibility runtime P5 after eager/lazy child alias fixes; not final capability6 acceptance",
-  "second_continuation_simulation_seconds": 6.557502802000272,
+  "scope": "Independent eager-control compatibility runtime P5 at compact identity-header foundation source; coordinator activation still pending",
+  "second_continuation_simulation_seconds": 6.668931530000009,
   "second_full_audit_io": {
     "payload_read_bytes": 345452,
     "payload_reads": 1441,
@@ -142,17 +137,20 @@
     "ate_sim/engine.py": "1a451f38bc08060c92d1be372374a08fedf0a99f3b7ec46750ccd3e9b7ffd728",
     "ate_sim/persistence_lazy.py": "3b6f51a48ebf8f3d58e156a765e0a69d6c6214d16dbaaa5e87377931f9da1d3d",
     "ate_sim/persistence_lazy_budget.py": "0f5ea4bd091d323c9a231e63cfa83a93915d93aa43f1e70f53920b452e30e490",
-    "ate_sim/persistence_lazy_families.py": "3275abd616b16b0a01264cd02a49b1aaf1db9c9803f62ea26f59670001044b08",
+    "ate_sim/persistence_lazy_families.py": "0420ef2ec85246763f8a81d4b7a51c41746d03928eae52b2bc6f983d9a21816f",
+    "ate_sim/persistence_lazy_identity_coordinator.py": "59f1bfc535420687e6fa43a27033ff779348b1f307025fdeaf746b1d074249d3",
+    "ate_sim/persistence_lazy_identity_headers.py": "78421ecb4c5c61803952ffef028a50cfbf5e788fcc924a73517c31edfa00ee01",
     "ate_sim/persistence_lazy_lineage_children.py": "24214b874a8ae6daca0fbb3aaeef8ea65cef1b2c95f647695c476af8944faf0e",
     "ate_sim/persistence_tracking.py": "24dcc5b724f2df9da071cf68fc43305ca16d2934b44c3400f44d122969797cf0",
     "persistence_p5_validation.py": "80ad1cc6baa0225412afa09595efa274804ab0ad8c6311fd8737b9f736e0a9f8",
+    "tests/test_stage_0_5_final_identity_headers.py": "224e0f2d6d625c16f2ad76372555d92db9fea3fd660fc0fea44bc09bdb4c8f23",
     "tests/test_stage_0_5_final_pressure_arithmetic.py": "51caa94ee75cf2b515e52f4c29fc1899c8b57c7cb06fe99585d67a4ab572dd78"
   },
   "timings": {
-    "checkpoint_lane_seconds": 0.26235636599994905,
-    "control_final_seconds": 0.1710155479995592,
-    "control_total_seconds": 0.14020671700018283,
-    "fixture_creation_seconds": 2.320721869999943
+    "checkpoint_lane_seconds": 0.23636902999987797,
+    "control_final_seconds": 0.1722616189999826,
+    "control_total_seconds": 0.12664539600064018,
+    "fixture_creation_seconds": 2.411453540000366
   },
   "total_year": 7
 }

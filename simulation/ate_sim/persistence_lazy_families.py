@@ -27,6 +27,10 @@ class FamilyAdapter:
             placement = ()
         return self.root_path + placement + relative
 
+    def identity_payload_bytes(self, store, pin, value):
+        from .persistence_lazy_identity_headers import encode_identity_header
+        return encode_identity_header(store, pin, value)
+
 
 # Baseline representation, not a claim that eager fields have been migrated.
 _FAMILY_ROWS = (
