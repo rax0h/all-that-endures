@@ -1,12 +1,13 @@
 from __future__ import annotations
 from .core_types import layer_ref
 from .metaphysics import try_resurrection
+from .household_queries import living_household_members
 
 def kill(world,p,cause,causes=()):
  if not p.alive:return None
  Layer,Ref=layer_ref();p.alive=False;e=world.emit('death',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),causes,age=p.age,rank=p.rank,species=p.species,cause=cause);world.metaphysics.record_death(p.id)
  if try_resurrection(world,p.id,e) is not None:return e
- h=world.households[p.household];survivors=[i for i in h.members if i!=p.id and world.people[i].alive]
+ survivors=[person.id for person in living_household_members(world,p.household) if person.id!=p.id]
  for oid in survivors:
   q=world.people[oid];rel=world.social.get(p.id,oid);q.grief=min(1,q.grief+.12+.55*rel.attachment);world.social.record(p.id,oid,e.id,attachment=.01);world.emit('bereavement',Layer.SOCIETY,(Ref('person',oid),Ref('person',p.id)),Ref('settlement',p.settlement),(e.id,),grief=q.grief)
  if survivors:
