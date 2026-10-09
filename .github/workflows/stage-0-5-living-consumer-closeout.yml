@@ -5,6 +5,9 @@ name: Stage 0.5 living household consumer closeout
       - sim/stage-0-5-living-consumer-closeout
     paths:
       - .github/workflows/stage-0-5-living-consumer-closeout.yml
+      - simulation/tests/test_stage_0_5_living_consumer_closeout.py
+      - simulation/ate_sim/mortality.py
+      - simulation/ate_sim/engine.py
   workflow_dispatch: {}
 permissions:
   contents: write
