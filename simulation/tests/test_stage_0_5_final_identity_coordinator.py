@@ -168,7 +168,12 @@ def test_repeated_replacement_and_cancel_drop_intermediate_group_routes(tmp_path
         for _ in range(1000):
             coord.replace_placement((NS, 1), (), Box(value=1))
             coord.replace_placement((NS, 1), (), original)
-        assert coord.prepare_delta(()).decode(store.codec) == ((), (), ())
+        versions, ordinary, placements = coord.prepare_delta(()).decode(store.codec)
+        assert ordinary == placements == ()
+        from simulation.ate_sim.persistence_lazy_identity_catalog import GROUP_NAMESPACE, CATALOG_NAMESPACE
+        assert all(v.namespace in (GROUP_NAMESPACE, CATALOG_NAMESPACE) for v in versions)
+        assert {v.key for v in versions if v.namespace == GROUP_NAMESPACE} == set(range(1001, registry.next_incarnation))
+        assert all(v.value[2] == 0 for v in versions if v.namespace == GROUP_NAMESPACE)
         stats = coord.diagnostics()
         assert stats["dirty_groups"] == 0
         assert stats["dirty_owners"] == 0

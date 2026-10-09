@@ -119,7 +119,14 @@ def test_noop_catalog_delta_has_no_archive_reads(tmp_path):
         before = store.diagnostics()
         delta = catalog().IdentityCatalog(store).prepare_delta(pin, (), (), next_incarnation_id=1001)
         assert delta.decode(store.codec) == ((), (), ())
-        assert store.diagnostics() == before
+        after = store.diagnostics()
+        assert after.payload_reads == before.payload_reads
+        assert after.payload_read_bytes == before.payload_read_bytes
+        assert after.payload_writes == before.payload_writes
+        assert after.query_rows == before.query_rows
+        # Checked pin/allocator metadata distinguishes a real no-op from
+        # reservations without placements; no owner/group inventory is read.
+        assert after.metadata_rows - before.metadata_rows <= 2
 
 
 def test_large_owner_point_proof_and_edit_do_not_inventory_other_occurrences(tmp_path):

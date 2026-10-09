@@ -7,9 +7,10 @@ one exact placement without enumerating a large owner's other identities.
 """
 from __future__ import annotations
 from dataclasses import dataclass
-from .incremental_store import Membership, StoreIntegrityError, StoreFormatError, _framed_sha, _record_checksum
+from .incremental_store import Membership, StoreIntegrityError, StoreFormatError, StoreConflictError, _framed_sha, _record_checksum
 from .persistence_lazy_store import VersionChange
 from .persistence_lazy_families import FAMILIES, ParticipantDelta
+from .persistence_lazy_identity_retired import RetiredIdentityRanges, EMPTY_HEADER, checked_header, NODE_NAMESPACE as RETIRED_NODE_NAMESPACE
 
 CATALOG_NAMESPACE = 'aux.lazy.identity.catalog'
 GROUP_NAMESPACE = 'aux.lazy.identity.groups'
@@ -17,11 +18,12 @@ OWNER_NAMESPACE = 'aux.lazy.identity.owners'
 OWNER_TREE_NAMESPACE = 'aux.lazy.identity.owner_tree'
 RETIRED_NAMESPACE = 'aux.lazy.identity.retired'
 LINK_NAMESPACE = 'world_identity_links'
-CATALOG_TAG = 'identity-catalog/v1'
+CATALOG_TAG = 'identity-catalog/v2'
 SCHEMA = 1
 CATALOG_NAMESPACES = (CATALOG_NAMESPACE, GROUP_NAMESPACE, OWNER_NAMESPACE,
-                      OWNER_TREE_NAMESPACE, RETIRED_NAMESPACE, LINK_NAMESPACE)
-FEATURES = ('complete-groups/v1', 'owner-radix/v1', 'versioned-p2c/v1')
+                      OWNER_TREE_NAMESPACE, RETIRED_NAMESPACE, LINK_NAMESPACE, RETIRED_NODE_NAMESPACE)
+LEGACY_FEATURES = ('complete-groups/v1', 'owner-radix/v1', 'versioned-p2c/v1')
+FEATURES = LEGACY_FEATURES + ('retired-intervals/v1',)
 
 
 def digest(codec, domain, values):
@@ -162,12 +164,13 @@ def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incar
         value = ('identity-group/v1', 'mutable', len(occurrences),
                  digest(codec, b'identity-group-occurrences-v1', occurrences), len(links),
                  digest(codec, b'identity-group-links-v1', links), paths[0] if paths else None)
-        changes.append(VersionChange(GROUP_NAMESPACE, inc, value))
+        changes.append(VersionChange(GROUP_NAMESPACE, inc, value,
+            memberships=() if occurrences else (Membership('retired', True, generation),)))
     # Checked empty retirement directory is mandatory, not inferred from absence.
-    changes.append(VersionChange(RETIRED_NAMESPACE, 0, ('identity-retired-directory/v1', 0, None)))
+    changes.append(VersionChange(RETIRED_NAMESPACE, 0, EMPTY_HEADER))
     changes.append(VersionChange(CATALOG_NAMESPACE, 0,
                    (CATALOG_TAG, FEATURES, next_incarnation_id, next_incarnation_id - 1,
-                    ('identity-retired-directory/v1', 0, None))))
+                    EMPTY_HEADER)))
     # An explicit delete of an absent key declares a checked empty namespace
     # without inventing a live record or competing relation.
     populated = {change.namespace for change in changes}
@@ -206,19 +209,31 @@ class IdentityCatalog:
             raise StoreIntegrityError(f'missing required identity authority in {namespace}') from exc
 
     def _descriptor(self, pin):
-        for ns in CATALOG_NAMESPACES:
+        value = self._read(pin, CATALOG_NAMESPACE, 0)
+        legacy = type(value) is tuple and len(value) == 5 and value[0] == 'identity-catalog/v1'
+        for ns in CATALOG_NAMESPACES[:-1] if legacy else CATALOG_NAMESPACES:
             if self.store._namespace_state_at(ns, pin.captured_head) is None:
                 raise StoreIntegrityError(f'missing identity catalog namespace: {ns}')
-        value = self._read(pin, CATALOG_NAMESPACE, 0)
-        if (type(value) is not tuple or len(value) != 5 or value[0] != CATALOG_TAG
-            or value[1] != FEATURES or type(value[2]) is not int or value[2] < 1
+        if (type(value) is not tuple or len(value) != 5 or value[0] not in (CATALOG_TAG, 'identity-catalog/v1')
+            or value[1] != (LEGACY_FEATURES if legacy else FEATURES) or type(value[2]) is not int or value[2] < 1
             or type(value[3]) is not int or value[3] < 0):
             raise StoreFormatError('identity catalog descriptor schema/capabilities mismatch')
         if value[2] != self.store._identity_state_at(pin.captured_head)[0]:
             raise StoreIntegrityError('identity catalog allocator disagreement')
         retired = self._read(pin, RETIRED_NAMESPACE, 0)
-        if retired != value[4] or retired != ('identity-retired-directory/v1', 0, None):
+        if retired != value[4]:
             raise StoreIntegrityError('identity retirement directory commitment mismatch')
+        if legacy:
+            if retired != ('identity-retired-directory/v1', 0, None):
+                raise StoreIntegrityError('invalid legacy retirement marker')
+            retired_count = 0
+        else:
+            checked_header(retired)
+            retired_count = retired[2][6] if retired[2] else 0
+            if retired[2] and retired[2][5] >= value[2]:
+                raise StoreIntegrityError('retired identity exceeds allocator')
+        if value[3] + retired_count != value[2] - 1 or self.store.namespace_size(pin, GROUP_NAMESPACE) != value[3]:
+            raise StoreIntegrityError('identity group/retirement inventory count disagreement')
         return value
 
     def _owner(self, pin, owner):
@@ -368,7 +383,22 @@ class IdentityCatalog:
             descriptor = self._descriptor(pin)
             if incarnation_id >= descriptor[2]:
                 raise StoreIntegrityError('identity incarnation exceeds catalog allocator')
-            header = self._read(pin, GROUP_NAMESPACE, incarnation_id)
+            retired = (descriptor[0] == CATALOG_TAG and
+                RetiredIdentityRanges(self.store, pin, header=descriptor[4]).contains(incarnation_id))
+            try:
+                header = self._read(pin, GROUP_NAMESPACE, incarnation_id)
+            except StoreIntegrityError:
+                # A range proof permits absence only; malformed surviving
+                # authority may not be relabeled as retirement.
+                if not retired or self.store._visible_record_row(pin.captured_head, GROUP_NAMESPACE,
+                                                                self.codec.encode(incarnation_id)) is not None:
+                    raise
+                if (self.store.identity_occurrences_for_incarnation(pin, incarnation_id)
+                    or self.store.query_memberships(pin, LINK_NAMESPACE, 'incarnation', incarnation_id, limit=1)):
+                    raise StoreIntegrityError('retired identity still has current placements/links')
+                return CheckedIdentityGroup(incarnation_id, (), (), None)
+            if retired:
+                raise StoreIntegrityError('identity has both live header and retirement range')
             if (type(header) is not tuple or len(header) != 7 or header[0] != 'identity-group/v1'
                 or header[1] != 'mutable' or type(header[2]) is not int or header[2] < 0
                 or type(header[4]) is not int or header[4] != max(0, header[2] - 1)):
@@ -410,6 +440,50 @@ class IdentityCatalog:
                                       next_incarnation_id=next_incarnation_id,
                                       ordinary_changes=ordinary_changes)
 
+    def prepare_retirement_delta(self, pin, *, protected_incarnations=(), row_budget=256):
+        """Bounded indexed metadata preparation; central commit remains publisher.
+
+        The coordinator supplies its live backing leases as protected IDs.
+        This does not drain store cleanup or retire leased history trees.
+        """
+        if type(row_budget) is not int or not 0 <= row_budget <= 256:
+            raise ValueError('retirement row budget must be in 0..256')
+        if row_budget < 4:
+            return ParticipantDelta.freeze(self.codec, 'identity-catalog')
+        protected = tuple(protected_incarnations)
+        if any(type(inc) is not int or inc < 1 for inc in protected):
+            raise ValueError('invalid protected incarnation')
+        with self.store.read_snapshot(pin):
+            descriptor = self._descriptor(pin)
+            if descriptor[0] != CATALOG_TAG:
+                raise StoreFormatError('legacy catalog retirement requires explicit copy upgrade')
+            if pin.captured_head != int(self.store._checked_head_row()[0]):
+                raise StoreConflictError('retirement preparation requires current writer pin')
+            floor = self.store._validated_retention_floor(pin.captured_head)
+            candidates = self.store.query_memberships(pin, GROUP_NAMESPACE, 'retired', True,
+                limit=row_budget, exclude_keys=protected)
+            ranges = RetiredIdentityRanges(self.store, pin, header=descriptor[4])
+            deletions = []
+            for inc, retired_at in candidates:
+                if retired_at > floor: break  # Query is ordered by retirement generation.
+                header = self.store.read_version(pin, GROUP_NAMESPACE, inc, expected_record_schema=SCHEMA)
+                if header.valid_from != retired_at:
+                    raise StoreIntegrityError('retirement eligibility/header revision disagreement')
+                if self.read_identity_group(pin, inc).occurrences:
+                    raise StoreIntegrityError('retirement index points to a placed identity')
+                root, dirty, baseline = ranges.root, ranges._dirty.copy(), ranges._baseline.copy()
+                ranges.add(inc)
+                proposed = ranges.pending_changes()
+                if len(deletions) + 1 + len(proposed) + 1 > row_budget:
+                    ranges.root, ranges._dirty, ranges._baseline = root, dirty, baseline
+                    break
+                deletions.append(VersionChange(GROUP_NAMESPACE, inc, delete=True))
+            if not deletions:
+                return ParticipantDelta.freeze(self.codec, 'identity-catalog')
+            changes = tuple(deletions) + ranges.pending_changes() + (VersionChange(CATALOG_NAMESPACE, 0,
+                (CATALOG_TAG, FEATURES, descriptor[2], descriptor[3] - len(deletions), ranges.header)),)
+            return ParticipantDelta.freeze(self.codec, 'identity-catalog', version_changes=changes)
+
     def validate_publication(self, delta, successor_pin):
         if delta.participant != 'identity-catalog':
             raise ValueError('wrong participant delta')
@@ -436,6 +510,10 @@ class IdentityCatalog:
                     self.read_identity_group(successor_pin, change.key)
                 elif change.namespace == OWNER_NAMESPACE:
                     self._owner(successor_pin, change.key)
+            for change in versions:
+                if (change.namespace == GROUP_NAMESPACE and change.delete
+                    and type(change.key) is int and change.key > 0):
+                    self.read_identity_group(successor_pin, change.key)
 
     def accept_delta(self, delta, successor_pin):
         # The catalog has no committed mutable cache to publish. Coordinators
@@ -534,7 +612,9 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
     placements = tuple(identity_changes)
     ordinary = tuple(ordinary_changes)
     if not versions and not placements and not ordinary:
-        return ParticipantDelta.freeze(self.codec, 'identity-catalog')
+        with self.store.read_snapshot(pin):
+            if next_incarnation_id == self.store._identity_state_at(pin.captured_head)[0]:
+                return ParticipantDelta.freeze(self.codec, 'identity-catalog')
     with self.store.read_snapshot(pin):
         descriptor = self._descriptor(pin)
         old_allocator = descriptor[2]
@@ -566,6 +646,9 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
             if new is not None:
                 edits_by_group.setdefault(new, {})[pkey] = placement
         changes = []
+        retirement = (RetiredIdentityRanges(self.store, pin, header=descriptor[4])
+                      if descriptor[0] == CATALOG_TAG else None)
+        revived = 0
         for marker, owner in owner_keys.items():
             source_kind, source = sources.get(marker, (None, None))
             generation = pin.captured_head + 1
@@ -612,6 +695,11 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
                 else:
                     base[pkey] = value
             occurrences = tuple(base.values())
+            if retirement is not None and inc < old_allocator and retirement.contains(inc):
+                if not occurrences:
+                    continue  # A previously retired unplaced ID remains retired.
+                retirement.remove(inc)
+                revived += 1
             paths = sorted((placement_path(*o) for o in occurrences), key=self.codec.encode)
             links = tuple((target, paths[0]) for target in paths[1:])
             final_links = dict(links)
@@ -624,11 +712,15 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
             value = ('identity-group/v1', 'mutable', len(occurrences),
                      digest(self.codec, b'identity-group-occurrences-v1', occurrences), len(links),
                      digest(self.codec, b'identity-group-links-v1', links), paths[0] if paths else None)
-            changes.append(VersionChange(GROUP_NAMESPACE, inc, value))
-        if next_incarnation_id != old_allocator:
+            changes.append(VersionChange(GROUP_NAMESPACE, inc, value,
+                memberships=() if occurrences else (Membership('retired', True, pin.captured_head + 1),)))
+        if retirement is not None:
+            changes.extend(retirement.pending_changes())
+        if next_incarnation_id != old_allocator or revived:
             changes.append(VersionChange(CATALOG_NAMESPACE, 0,
-                (CATALOG_TAG, FEATURES, next_incarnation_id, descriptor[3] + next_incarnation_id - old_allocator,
-                 descriptor[4])))
+                (descriptor[0], descriptor[1], next_incarnation_id,
+                 descriptor[3] + next_incarnation_id - old_allocator + revived,
+                 retirement.header if retirement is not None else descriptor[4])))
         # Coalesce targets moved between groups to a final action. Group iteration
         # order cannot decide whether an old target deletion overrides its upsert.
         final = {}

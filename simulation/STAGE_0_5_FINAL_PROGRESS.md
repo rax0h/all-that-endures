@@ -207,6 +207,84 @@ catalog/coordinator/sequence participant integration. Final independent P5,
 stable full simulation suite and architectural review remain pending. PR14 has
 not changed, and no new endurance run or production promotion was started.
 
+## Checked retirement checkpoint (October 9, 2026)
+
+Sequence compatibility published as `bdd99adf973615d60e37896873555cea3a345a78`,
+tree `2d13baf4858d9a478ecae0e42babfc98eb67f683`; matches local
+`fb27a9d932be82046e2dcc4da72fc5c035035ab3`.
+
+Added authenticated MVCC coalesced retired-ID ranges with local AVL edits,
+subtree interval/ID counts, ordering/boundary commitments and a bounded clean
+cache (64 entries AND 2MiB). The catalog v2 descriptor commits this mandatory
+directory and the live-header/retired-ID inventory. Missing group headers are
+accepted only with a checked range proof and zero current placements/links.
+Retirement selection uses the existing checked current-query index, a pin-safe
+retirement generation and explicit protected backing leases supplied by callers.
+Plans contain <=256 version changes; source-copy upgrade/runtime lease wiring
+and the shared physical maintenance budget remain pending.
+
+Revival removes that same ID from its range and restores its group header in
+the existing hybrid transaction. No ID is reused for another object by this
+directory. Legacy catalog v1 remains readable/writable in compatibility mode;
+it cannot enter retirement mode implicitly. Capability6 is still not emitted.
+
+RED: missing range module and retirement preparation (7 failures initially).
+Further permanent REDs: warmed payload corruption escaped full scrub; initial
+directory construction could overwrite existing authority; allocator-only
+reservations received no mandatory headers. Full scrub now bypasses clean
+caches, initial construction rejects existing authority, and reservations
+publish empty checked headers eligible for later retirement. Cancelling a
+replacement does not cancel the consumed incarnation IDs. Cancellation tests
+now require those exact reserved IDs, no placements/ordinary writes and no
+rewrites of existing owners/groups. The standalone catalog no-op checks two
+compact pin/allocator metadata rows; no archive payload/query/write work. The
+coordinator true-no-op fast path retains its stricter zero-archive behavior.
+
+Fixture corrections: retirement preparation, rather than a third-generation
+commit, is checked while a generation1 pin is retained; the existing two-pin
+generation-pressure contract is preserved. The scale-edit target initially
+named an already-present ID; it now names an absent ID and asserts actual node
+writes and membership after reopen. The measurement harness initially omitted
+world_identity_links from its head inventory; checked full verification rejected
+it, and the harness now supplies the required inventory.
+
+Final affected gate on unchanged implementation:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_retired_identity.py simulation/tests/test_stage_0_5_final_identity_catalog.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_contracts.py simulation/tests/test_persistence_lazy_identity_reverse.py simulation/tests/test_persistence_lazy_store.py simulation/tests/test_persistence_lazy_store_failures.py`
+— **118 passed in 37.54s**. Includes 18 new retirement tests, legacy/no-hidden
+upgrade, protected IDs, old pins/revival, missing/corrupt authority, 600-ID churn
+and three subprocess SIGKILL points. Counts overlap earlier gates.
+
+Reproduce metrics with the same environment/interpreter and
+`simulation/measure_stage_0_5_retired_identity.py --output simulation/stage_0_5_final_retired_identity_metrics.json`.
+Source SHA256 values are embedded in that JSON. Explicit conversion is excluded.
+
+| One interval edit | H1k | H10k |
+| --- | ---: | ---: |
+| Payload reads / bytes | 20 / 7,488 | 26 / 10,206 |
+| Node changes | 10 | 13 |
+| Total version changes | 11 | 14 |
+
+An additional permanent RED caught shallow dirty-memory accounting that omitted
+the journal's retained node objects. Recursive reporting now includes those
+objects and baseline bytes: 13,942 / 18,921 estimated dirty bytes at H1k/H10k;
+separate tracemalloc peaks are 26,531 / 28,098 bytes. Metrics were rerun on the
+corrected implementation, matching the final gate above.
+
+600 reserved unplaced IDs are reclaimed in three plans: 251/251/98 headers,
+256/256/103 total version changes, leaving one interval/node and zero group
+headers. Indexed selection is evidenced separately; actual SQL rows examined
+remain unknown. These are standalone metadata fixtures, not World bounds.
+The same metrics explicitly expose the old store's drain-loop work: commit
+maintenance_rows 1518/1524/610 counts selection plus deletion. This does NOT
+satisfy <=256 physical eligible-row removals per ordinary operation. Closing
+that shared budget and proving point lookups against a cleanup backlog is the
+next dependency of safe bounded retirement; do not conceal the old counters.
+
+Next: bounded store maintenance and backlog-safe indexed reads, then large-group
+stream/spill and World catalog/coordinator/frozen participant integration.
+Household/settlement and nested-history integration, final P5/full suite/review,
+release pressure decision and production acceptance remain outstanding.
+
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.

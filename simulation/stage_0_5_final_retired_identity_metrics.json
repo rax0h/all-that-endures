@@ -1,0 +1,238 @@
+{
+  "scope": "standalone retired metadata; not World integration or global maintenance",
+  "source_sha256": {
+    "persistence_lazy_identity_retired.py": "1ec014f44b26a52ab8b6424501f30328f8cba7a06c8329a49bb44a948494376f",
+    "persistence_lazy_identity_catalog.py": "ae63c2324d5226020941d8486a62306950c404d2298c488232aa2f3e6b882825",
+    "persistence_lazy_identity_coordinator.py": "4889c032369e64d07b4984f01e7550e6cceb88473c716336d2a888323543a446",
+    "persistence_lazy_store.py": "ac69d1a46a3ee759afba503d0ca8e9a48efa08819706c935250dd3b8c32cc07b"
+  },
+  "point_edits": [
+    {
+      "intervals": 1000,
+      "target": 1502,
+      "open_io": {
+        "payload_reads": 1,
+        "payload_read_bytes": 237,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 237,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 2,
+        "query_rows": 0,
+        "pin_rows": 5,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "edit_io": {
+        "payload_reads": 20,
+        "payload_read_bytes": 7488,
+        "payload_check_reads": 20,
+        "payload_check_bytes": 7488,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 41,
+        "query_rows": 0,
+        "pin_rows": 85,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "commit_io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 11,
+        "payload_check_bytes": 3981,
+        "payload_writes": 11,
+        "payload_write_bytes": 3981,
+        "metadata_rows": 58,
+        "query_rows": 0,
+        "pin_rows": 22,
+        "maintenance_rows": 26,
+        "temporary_keys_peak": 0
+      },
+      "version_changes": 11,
+      "node_changes": 10,
+      "cache": {
+        "clean_entries": 0,
+        "clean_bytes": 0,
+        "dirty_entries": 10,
+        "dirty_bytes": 13942
+      },
+      "tracemalloc_current_bytes": 22105,
+      "tracemalloc_peak_bytes": 26531,
+      "sql_rows_examined": null,
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    },
+    {
+      "intervals": 10000,
+      "target": 15002,
+      "open_io": {
+        "payload_reads": 1,
+        "payload_read_bytes": 243,
+        "payload_check_reads": 1,
+        "payload_check_bytes": 243,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 2,
+        "query_rows": 0,
+        "pin_rows": 5,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "edit_io": {
+        "payload_reads": 26,
+        "payload_read_bytes": 10206,
+        "payload_check_reads": 26,
+        "payload_check_bytes": 10206,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 53,
+        "query_rows": 0,
+        "pin_rows": 109,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "commit_io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 14,
+        "payload_check_bytes": 5346,
+        "payload_writes": 14,
+        "payload_write_bytes": 5346,
+        "metadata_rows": 70,
+        "query_rows": 0,
+        "pin_rows": 22,
+        "maintenance_rows": 32,
+        "temporary_keys_peak": 0
+      },
+      "version_changes": 14,
+      "node_changes": 13,
+      "cache": {
+        "clean_entries": 0,
+        "clean_bytes": 0,
+        "dirty_entries": 13,
+        "dirty_bytes": 18921
+      },
+      "tracemalloc_current_bytes": 23661,
+      "tracemalloc_peak_bytes": 28098,
+      "sql_rows_examined": null,
+      "point_query_plan": [
+        "SEARCH lazy_record_versions USING INDEX lazy_record_lookup (namespace=? AND typed_key=? AND valid_from<?)"
+      ]
+    }
+  ],
+  "churn": {
+    "fixture": "600_reserved_unplaced_ids",
+    "operations": [
+      {
+        "step": 0,
+        "version_changes": 256,
+        "retired_headers": 251,
+        "prepare_io": {
+          "payload_reads": 1010,
+          "payload_read_bytes": 206474,
+          "payload_check_reads": 1266,
+          "payload_check_bytes": 267914,
+          "payload_writes": 0,
+          "payload_write_bytes": 0,
+          "metadata_rows": 8868,
+          "query_rows": 256,
+          "pin_rows": 11704,
+          "maintenance_rows": 0,
+          "temporary_keys_peak": 0
+        },
+        "commit_io": {
+          "payload_reads": 0,
+          "payload_read_bytes": 0,
+          "payload_check_reads": 253,
+          "payload_check_bytes": 60578,
+          "payload_writes": 5,
+          "payload_write_bytes": 1202,
+          "metadata_rows": 1542,
+          "query_rows": 753,
+          "pin_rows": 22,
+          "maintenance_rows": 1518,
+          "temporary_keys_peak": 0
+        },
+        "remaining_headers": 349
+      },
+      {
+        "step": 1,
+        "version_changes": 256,
+        "retired_headers": 251,
+        "prepare_io": {
+          "payload_reads": 1534,
+          "payload_read_bytes": 406572,
+          "payload_check_reads": 1790,
+          "payload_check_bytes": 468012,
+          "payload_writes": 0,
+          "payload_write_bytes": 0,
+          "metadata_rows": 9642,
+          "query_rows": 256,
+          "pin_rows": 12704,
+          "maintenance_rows": 0,
+          "temporary_keys_peak": 0
+        },
+        "commit_io": {
+          "payload_reads": 0,
+          "payload_read_bytes": 0,
+          "payload_check_reads": 256,
+          "payload_check_bytes": 61442,
+          "payload_writes": 5,
+          "payload_write_bytes": 1201,
+          "metadata_rows": 1551,
+          "query_rows": 753,
+          "pin_rows": 22,
+          "maintenance_rows": 1524,
+          "temporary_keys_peak": 0
+        },
+        "remaining_headers": 98
+      },
+      {
+        "step": 2,
+        "version_changes": 103,
+        "retired_headers": 98,
+        "prepare_io": {
+          "payload_reads": 604,
+          "payload_read_bytes": 159277,
+          "payload_check_reads": 702,
+          "payload_check_bytes": 182797,
+          "payload_writes": 0,
+          "payload_write_bytes": 0,
+          "metadata_rows": 3770,
+          "query_rows": 98,
+          "pin_rows": 4980,
+          "maintenance_rows": 0,
+          "temporary_keys_peak": 0
+        },
+        "commit_io": {
+          "payload_reads": 0,
+          "payload_read_bytes": 0,
+          "payload_check_reads": 103,
+          "payload_check_bytes": 24721,
+          "payload_writes": 3,
+          "payload_write_bytes": 726,
+          "metadata_rows": 637,
+          "query_rows": 294,
+          "pin_rows": 22,
+          "maintenance_rows": 610,
+          "temporary_keys_peak": 0
+        },
+        "remaining_headers": 0
+      }
+    ],
+    "final_ranges": [
+      [
+        1,
+        600
+      ]
+    ],
+    "retired_node_count": 1,
+    "sql_rows_examined": null,
+    "selection_query_plan": [
+      "SEARCH lazy_query_versions USING INDEX lazy_query_current (namespace=? AND index_name=? AND index_value=?)"
+    ],
+    "logical_backing_rows": 3
+  }
+}
