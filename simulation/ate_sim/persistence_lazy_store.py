@@ -1169,21 +1169,50 @@ class LazyRecordStore:
             raise
 
     def _read_snapshot_start(self, pin: GenerationPin) -> int:
-        self.db.execute("BEGIN")
+        nested = getattr(self, "_checked_snapshot_depth", 0)
+        if not nested:
+            self.db.execute("BEGIN")
         try:
             generation = self._require_pin(pin)
             head = int(self._checked_head_row()[0])
             floor = self._validated_retention_floor(head)
             if generation < floor or generation > head:
                 raise StoreConflictError("generation pin is outside retained visibility")
+            self._checked_snapshot_depth = nested + 1
             return generation
         except Exception:
-            self.db.rollback()
+            if not nested:
+                self.db.rollback()
             raise
 
     def _read_snapshot_end(self) -> None:
-        if self.db.in_transaction:
+        depth = getattr(self, "_checked_snapshot_depth", 0)
+        if depth:
+            self._checked_snapshot_depth = depth - 1
+        if depth <= 1 and self.db.in_transaction:
             self.db.rollback()
+
+    @contextmanager
+    def read_snapshot(self, pin: GenerationPin):
+        """Compose checked reads in one bounded, generation-matched snapshot."""
+        self._ensure_open()
+        generation = self._read_snapshot_start(pin)
+        try:
+            yield generation
+        finally:
+            self._read_snapshot_end()
+
+    def read_identity_group(self, pin: GenerationPin, incarnation_id: int):
+        from .persistence_lazy_identity_catalog import IdentityCatalog
+        return IdentityCatalog(self).read_identity_group(pin, incarnation_id)
+
+    def read_owner_identity(self, pin: GenerationPin, owner: tuple):
+        from .persistence_lazy_identity_catalog import IdentityCatalog
+        return IdentityCatalog(self).read_owner_identity(pin, owner)
+
+    def read_identity_links(self, pin: GenerationPin, incarnation_id: int):
+        from .persistence_lazy_identity_catalog import IdentityCatalog
+        return IdentityCatalog(self).read_identity_links(pin, incarnation_id)
 
     def _visible_record_row(self, generation: int, namespace: str, typed_key: bytes) -> tuple[Any, ...] | None:
         rows = self.db.execute(
