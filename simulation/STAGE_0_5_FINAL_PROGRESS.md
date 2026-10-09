@@ -711,3 +711,76 @@ one final applicable full suite; final independent architectural review and
 retrievable restore artifacts. Pressure latency/arithmetic, endurance policy
 and production promotion remain separately owner-controlled release decisions.
 No routine Astra approval is needed to implement the next package.
+
+## 2026-10-09 — eager/lazy child publication and exact pressure regressions
+
+Implementation local `750edbed60232c5ef23834da97078ea7e8f71e89`, public
+`757e9a8d7a940eb2706e57671b005868b097b807`, matching tree
+`3c80b056f9aa3eb99c0abcd6f63d9554c8204455`. Live publication verified with a
+leased, non-force ref update. PR14 remains unchanged; no Actions or endurance
+run was launched.
+
+The eager-to-lazy seed bridge now shares the concrete runtime manifest. Its
+third duplicated callback map previously omitted skill and lineage records;
+its skill child type check wrongly expected SkillHistory for a provenance list.
+Both legacy cross-boundary refresh filters now use the same manifest. This
+repairs namespace drift but does not remove the legacy global refresh.
+
+Concrete skill/soul/advancement list/set aliases bind their lazy owner before a
+cold mutation. The eager tracker retains their existing weak object binding;
+guards and changed notifications reach both current payload authorities.
+Direct eager child aliases, deletion followed by retained-reference mutation,
+closed backing, save/reopen and canonical sharing are covered. A retained alias
+does not recreate a removed settlement placement.
+
+RED tests then reproduced native partial writes with failing iterables: list
+extend and set update/difference changed their value but never dirtied the
+owner. Callbacks now run in finally when the actual container changed. Set
+notifications also preserve changes in equal values' representatives. The
+first broader advancement gate caught a duplicate own-owner notification
+turning scalar edits into complete graph reconciliation. IndexedRecord already
+delivers its exact field notification; shared notification now reaches peers
+without repeating the original owner with field=None. The existing scalar
+fast-path regression is preserved, not weakened.
+
+Intermediate evidence (overlapping scopes, not final-source acceptance):
+bridge RED3, bridge focused58/1 then59 passed65.13s; affected134 passed62.35s;
+direct partial-write RED3/8; runtime11 passed1.05s; affected138 passed77.57s;
+cross-family55/1 identified advancement; fixed advancement/runtime23 passed8.23s.
+Logs are `/tmp/final-eager-bridge-*.log`; they are reproducible scratch logs.
+
+Final stable-source command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_persistence_tracking.py simulation/tests/test_persistence_lifecycle.py simulation/tests/test_persistence_lazy_souls.py simulation/tests/test_persistence_cold_save.py simulation/tests/test_persistence_cold_save_failures.py simulation/tests/test_persistence_cold_identity_restore.py simulation/tests/test_stage_0_5_final_runtime_families.py simulation/tests/test_stage_0_5_final_pressure_arithmetic.py simulation/tests/test_stage_0_5_final_record_budget.py simulation/tests/test_persistence_lazy_advancement.py simulation/tests/test_persistence_lazy_skills.py simulation/tests/test_persistence_lazy_lineage.py simulation/tests/test_persistence_lazy_currency.py simulation/tests/test_stage_0_5_r3_cross_family_extra.py simulation/tests/test_stage_0_5_r3_recovery_extra.py simulation/tests/test_stage_0_5_paged_household_world.py`
+— **194 passed177.06s**, `/tmp/final-eager-bridge-stable-gate.log`, exit0.
+`git diff --check` passed. This affected suite is not the final applicable full suite.
+
+The five new forced-pressure regressions preserve one native ordered sum,
+duplicate/extinct occurrences, repeated unsaved preparedness assignments,
+shared list mutation/first removal/replacement and reopen. Exact float.hex
+events and forced RNG call sequences match independent eager worlds. Concrete
+CPython3.12 counterexamples reject fsum, page subtotals and subtract/add. No
+pressure arithmetic or engine implementation was changed. Checked scalar
+streaming, complete cache revisions, H measurements and the owner's latency
+exception decision remain outstanding.
+
+Independent compatibility P5 rerun on this exact production source:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/persistence_p5_validation.py --paged-households --output simulation/stage_0_5_runtime_cache_p5.json`
+— **passed**, seed843000 3+4+3, 439 events, exact final digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
+Log `/tmp/final-eager-bridge-stable-p5.log`. JSON includes changed production
+module hashes, engine/harness and pressure regression provenance; all verified.
+Temporary restore files were verified then removed, not declared retrievable.
+
+H1k/H10k rerun:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/measure_stage_0_5_record_budget.py --output simulation/stage_0_5_final_record_budget_metrics.json`
+— exit0, `/tmp/final-eager-bridge-stable-metrics.log`. Both edits still read
+7/505 payload rows/bytes, check11/3047, write4/1417, metadata201/query4,
+clean9 entries/21373 estimated Python bytes. Source hashes now include the
+eager tracker; every embedded hash verified. Existing legacy-open, SQL scan,
+unpaged histories, dirty-memory and strict hot-step count caveats still apply.
+
+**Next action:** finish compact family header comparison for the checked
+coordinator without materializing page-backed histories, then activate the
+complete checked catalog/coordinator through the integrated new-format runtime.
+Continue all remaining packages listed above. Implementation remains in
+progress; this passing checkpoint is not candidate validation or release acceptance.
