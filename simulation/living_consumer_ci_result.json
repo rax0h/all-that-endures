@@ -1,10 +1,10 @@
 {
-  "focused_exit_code": 1,
-  "focused_summary": "1 failed, 69 passed in 198.19s (0:03:18)",
+  "focused_exit_code": 0,
+  "focused_summary": "70 passed in 144.54s (0:02:24)",
   "note": "Focused/P5 outcomes certify tested_commit, not later heads or the full suite.",
   "p5_exit_code": 0,
   "p5_final_year": 10,
   "p5_passed": true,
-  "tested_commit": "1d214b9eed2f77f4dd04eb30f216869244599bc1",
-  "workflow_run": "37872719447"
+  "tested_commit": "53575cfeb38fc20604e6e575628f682caa3fb70c",
+  "workflow_run": "37873110356"
 }
