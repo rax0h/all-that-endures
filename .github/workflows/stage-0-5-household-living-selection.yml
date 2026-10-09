@@ -7,7 +7,7 @@ name: Stage 0.5 checked household living selection
       - .github/workflows/stage-0-5-household-living-selection.yml
   workflow_dispatch: {}
 permissions:
-  contents: read
+  contents: write
 jobs:
   focused:
     runs-on: ubuntu-latest
@@ -16,29 +16,79 @@ jobs:
       PYTHONPATH: .:simulation
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install pytest
         run: python -m pip install -q pytest
-      - name: Validate living selection, paged operations and existing people adapters
+      - name: Focused regression and independent short continuation
+        shell: bash
         run: |
+          set +e
           python -m pytest -q --tb=short \
             simulation/tests/test_stage_0_5_household_living_selection.py \
             simulation/tests/test_stage_0_5_household_sequence.py \
             simulation/tests/test_stage_0_5_paged_household_world.py \
-            simulation/tests/test_persistence_lazy_people.py
-      - name: Independent short continued-world control
-        run: |
+            simulation/tests/test_persistence_lazy_people.py > household-focus.log 2>&1
+          FOCUSED_RC=$?
+          cat household-focus.log
           python simulation/persistence_p5_validation.py \
             --seed 843000 --pre-years 3 --continuation-years 4 \
             --reopen-years 3 --paged-households \
-            --output household-living-p5.json
-      - name: Retain checked focused/P5 provenance
+            --output household-living-p5.json > household-p5.log 2>&1
+          P5_RC=$?
+          cat household-p5.log
+          echo "FOCUSED_RC=$FOCUSED_RC" >> "$GITHUB_ENV"
+          echo "P5_RC=$P5_RC" >> "$GITHUB_ENV"
+          exit 0
+      - name: Retain exact source regression and P5 logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: household-living-selection-evidence
           retention-days: 30
-          path: household-living-p5.json
+          path: |
+            household-focus.log
+            household-p5.log
+            household-living-p5.json
           if-no-files-found: warn
+      - name: Publish machine-readable outcome on isolated branch
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, pathlib, re
+          focus = pathlib.Path("household-focus.log").read_text()
+          continuation = pathlib.Path("household-living-p5.json")
+          try:
+              p5 = json.loads(continuation.read_text()) if continuation.exists() else None
+          except (ValueError, OSError):
+              p5 = None
+          result = {
+              "tested_commit": os.environ["GITHUB_SHA"],
+              "workflow_run": os.environ["GITHUB_RUN_ID"],
+              "focused_exit_code": int(os.environ["FOCUSED_RC"]),
+              "focused_summary": focus.strip().splitlines()[-1] if focus.strip() else "",
+              "p5_exit_code": int(os.environ["P5_RC"]),
+              "p5_passed": bool(isinstance(p5, dict) and p5.get("passed") is True),
+              "p5_final_year": p5.get("final_year") if isinstance(p5, dict) else None,
+              "note": "Run checks apply only to the tested SHA, never later branch heads.",
+          }
+          pathlib.Path("simulation/household_selection_ci_result.json").write_text(
+              json.dumps(result, indent=2, sort_keys=True) + "\n"
+          )
+          print(result)
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add simulation/household_selection_ci_result.json
+          git commit -m "ci: record household selection focused proof [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          r=json.loads(Path("simulation/household_selection_ci_result.json").read_text())
+          if r["focused_exit_code"] or r["p5_exit_code"] or not r["p5_passed"]:
+              sys.exit("household candidate has failing gate(s)")
+          PY
