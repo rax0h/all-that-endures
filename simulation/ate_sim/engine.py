@@ -2,6 +2,7 @@ from .core import *
 from .biology import state as biology_state,mortality_risk,reproductive_window,pair_reproductive_opportunity,child_species,combat_value,injury_resilience
 from .culture import cultural_step
 from .households import household_step
+from .household_queries import living_household_members
 from .civilization import civilization_step
 from .development import development_step
 from .agency import agency_step
@@ -85,7 +86,7 @@ class Simulation:
   if not p.alive:return
   p.alive=False;e=self.w.emit("death",Layer.REALITY,(Ref("person",p.id),),Ref("settlement",p.settlement),causes,age=p.age,rank=p.rank,species=p.species,cause=cause);self.w.metaphysics.record_death(p.id)
   if try_resurrection(self.w,p.id,e) is not None:return
-  h=self.w.households[p.household];survivors=[i for i in h.members if i!=p.id and self.w.people[i].alive]
+  survivors=[person.id for person in living_household_members(self.w,p.household) if person.id!=p.id]
   for oid in survivors:
    q=self.w.people[oid];rel=self.w.social.get(p.id,oid);q.grief=min(1,q.grief+.12+.55*rel.attachment);self.w.social.record(p.id,oid,e.id,attachment=.01);self.w.emit("bereavement",Layer.SOCIETY,(Ref("person",oid),Ref("person",p.id)),Ref("settlement",p.settlement),(e.id,),grief=q.grief)
   if survivors:
@@ -112,7 +113,7 @@ class Simulation:
    for cid,strength in inherited.items():self.w.transmission.record(self.w.year,"parenting","community_membership",cid,"parents",min(pair),"person",pid,e.id,reliability=strength)
    for parent in pair:self.w.social.record(parent,pid,e.id,trust=.15,attachment=.3,obligation=.25)
   for h in self.w.active_households():
-   if h.alive and not any(self.w.people[i].alive for i in h.members):h.alive=False
+   if h.alive and not living_household_members(self.w,h.id):h.alive=False
  def _pressure(self):
   by_settlement={sid:[] for sid in self.w.settlements}
   for p in self.w.current_people():
