@@ -95,6 +95,75 @@ FAMILIES = MappingProxyType({
 })
 
 
+@dataclass(frozen=True)
+class RuntimeFamily:
+    """Concrete session attribute and callback authority for one family."""
+    attribute: str
+    indexed_record: bool
+
+
+# Deliberately explicit: dictionary-valued fields and record-valued fields
+# have different mutation callbacks even when their roots look alike.
+RUNTIME_FAMILIES = MappingProxyType({
+    'world.people': RuntimeFamily('people', True),
+    'world.magic_resources.aspirations': RuntimeFamily('aspirations', True),
+    'world.magic_resources.resources': RuntimeFamily('resources', True),
+    'world.magic_resources.owner_index': RuntimeFamily('owner_index', False),
+    'world.materials.lots': RuntimeFamily('material_lots', True),
+    'world.materials.items': RuntimeFamily('material_items', True),
+    'world.materials.lot_index': RuntimeFamily('material_lot_index', False),
+    'world.materials.active_lot_index': RuntimeFamily('material_active_index', False),
+    'world.currency.wallets': RuntimeFamily('wallets', False),
+    'world.currency.treasuries': RuntimeFamily('treasuries', False),
+    'world.metaphysics.souls': RuntimeFamily('souls', True),
+    'world.advancement.paths': RuntimeFamily('advancement_paths', True),
+    'world.institutions.magic_records': RuntimeFamily('institution_magic_records', True),
+    'world.institutions.notices': RuntimeFamily('institution_notices', True),
+    'world.institutions.applications': RuntimeFamily('institution_applications', True),
+    'world.transmission.records': RuntimeFamily('transmissions', True),
+    'world.agency.motives': RuntimeFamily('motives', True),
+    'world.lineage.nodes': RuntimeFamily('lineage_nodes', True),
+    'world.lineage.children': RuntimeFamily('lineage_children', False),
+    'world.genealogy.parents': RuntimeFamily('genealogy_parents', False),
+    'world.genealogy.children': RuntimeFamily('genealogy_children', False),
+    'world.communities.memberships': RuntimeFamily('community_memberships', False),
+    'world.social.edges': RuntimeFamily('social_edges', True),
+    'world.social.adjacency': RuntimeFamily('social_adjacency', False),
+    'world.social.partnerships': RuntimeFamily('social_partnerships', False),
+    'world.skills.skills': RuntimeFamily('skills', True),
+})
+
+
+class RuntimeFamilyBindings:
+    """Bind root authorities once, without inspecting owners or payloads.
+
+    The session owns this object. It holds no independent identity registry,
+    cache or write authority; both routing and alias callbacks use its maps.
+    """
+    def __init__(self, session, *, scalar_record_namespaces):
+        tables, indexed = {}, {}
+        for namespace, spec in RUNTIME_FAMILIES.items():
+            table = getattr(session, spec.attribute)
+            tables[namespace] = table
+            if spec.indexed_record:
+                indexed[namespace] = table
+        for namespace, table in session._scalar_tables.items():
+            if namespace in tables:
+                raise ValueError(f'duplicate runtime authority: {namespace}')
+            tables[namespace] = table
+            if namespace in scalar_record_namespaces:
+                indexed[namespace] = table
+        for namespace, table in tables.items():
+            adapter = FAMILIES[namespace]
+            value = session.world
+            for kind, field in adapter.root_path:
+                value = getattr(value, field)
+            if value is not table or table._namespace != namespace:
+                raise ValueError(f'runtime root authority mismatch: {namespace}')
+        self.tables = MappingProxyType(tables)
+        self.indexed_tables = MappingProxyType(indexed)
+
+
 def validate_manifest():
     expected = {f"{root}.{field}" for root, fields in ROOT_FIELDS.items()
                 for field, kind in fields.items() if kind not in ("int", "state")}

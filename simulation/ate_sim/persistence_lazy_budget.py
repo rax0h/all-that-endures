@@ -159,3 +159,109 @@ class CleanCacheOwner:
         self._cache.clear()
         self._cache_weights.clear()
         self._cache_bytes = 0
+
+
+def schema_resident_bytes(value, seen=None):
+    """Count resident schema values without calling lazy collection readers.
+
+    Compact page-backed proxies are charged for their reference object here;
+    their decoded pages and sidecars belong to the shared history budget.
+    """
+    from .persistence_schema import RECORD_FIELDS
+    seen = set() if seen is None else seen
+    marker = id(value)
+    if marker in seen:
+        return 0
+    seen.add(marker)
+    size = sys.getsizeof(value)
+    fields = RECORD_FIELDS.get(type(value))
+    if fields is not None:
+        size += sys.getsizeof(getattr(value, '__dict__', {}))
+        size += sum(schema_resident_bytes(getattr(value, field), seen) for field in fields)
+    elif isinstance(value, dict):
+        size += sum(schema_resident_bytes(k, seen) + schema_resident_bytes(v, seen)
+                    for k, v in dict.items(value))
+    elif isinstance(value, list):
+        size += sum(schema_resident_bytes(v, seen) for v in list.__iter__(value))
+    elif isinstance(value, set):
+        size += sum(schema_resident_bytes(v, seen) for v in set.__iter__(value))
+    elif type(value) in (tuple, frozenset):
+        size += sum(schema_resident_bytes(v, seen) for v in value)
+    return size
+
+
+class RecordCacheLRU(OrderedDict):
+    """Global byte accounting for clean records and pinned query caches.
+
+    The LRU owns only cache metadata. Eviction drops clean table entries and
+    sidecars without detaching registry occurrences or retained live aliases.
+    The session's budget can change before admission (useful for measurements).
+    """
+    def __init__(self, session):
+        super().__init__()
+        self._cache_session = weakref.ref(session)
+        self._record_owner = None
+
+    def bind_record_owner(self, table):
+        if self._record_owner is not None and self._record_owner() is not table:
+            raise ValueError('record cache already has an owner')
+        self._record_owner = weakref.ref(table)
+
+    def _budget(self):
+        session = self._cache_session()
+        return None if session is None else session._record_cache_budget
+
+    def _weight(self, key, value):
+        table = None if self._record_owner is None else self._record_owner()
+        if table is None:
+            return schema_resident_bytes((key, value)) + 128
+        if key in table._dirty or not dict.__contains__(table, key):
+            return None
+        payload = dict.__getitem__(table, key)
+        sidecars = tuple(getattr(table, field, {}).get(key) for field in (
+            '_baseline_payload', '_baseline_presence', '_baseline_incarnation',
+            '_baseline_ordinal', '_baseline_identity_labels',
+        ))
+        return schema_resident_bytes((key, payload, sidecars)) + 128
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        budget = self._budget()
+        if budget is not None:
+            weight = self._weight(key, value)
+            if weight is not None:
+                budget.admit(self, key, weight)
+            else:
+                budget.forget(self, key)
+
+    def pop(self, key, *default):
+        result = super().pop(key, *default)
+        budget = self._budget()
+        if budget is not None:
+            budget.forget(self, key)
+        return result
+
+    def popitem(self, last=True):
+        key, value = super().popitem(last=last)
+        budget = self._budget()
+        if budget is not None:
+            budget.forget(self, key)
+        return key, value
+
+    def clear(self):
+        budget = self._budget()
+        if budget is not None:
+            for key in tuple(self):
+                budget.forget(self, key)
+        super().clear()
+
+    def _budget_evict(self, key):
+        OrderedDict.pop(self, key, None)
+        table = None if self._record_owner is None else self._record_owner()
+        if table is None or key in table._dirty:
+            return
+        if dict.__contains__(table, key):
+            dict.__delitem__(table, key)
+        for field in ('_baseline_payload', '_baseline_presence', '_baseline_incarnation',
+                      '_baseline_ordinal', '_baseline_identity_labels'):
+            getattr(table, field, {}).pop(key, None)

@@ -47,7 +47,8 @@ from .persistence_lazy_nested_history import (
     initial_list_changes, initial_scalar_changes, checked_scalar_entry, HistoryReference, HISTORY_CLASSES, HISTORY_TYPES,
     ENTRY_NAMESPACE as NESTED_ENTRY_NAMESPACE,
 )
-from .persistence_lazy_budget import SharedCacheBudget
+from .persistence_lazy_budget import SharedCacheBudget, RecordCacheLRU, RECORD_BYTES
+from .persistence_lazy_families import RuntimeFamilyBindings
 from .persistence_lazy_household_members import (
     LENGTH_NAMESPACE as HOUSEHOLD_LENGTH_NAMESPACE,
     BACKING_NAMESPACE as HOUSEHOLD_BACKING_NAMESPACE,
@@ -275,17 +276,19 @@ def _scalar_authorities(store, manifest, generation):
     return active
 
 
-class _StepAwareLRU(OrderedDict):
+class _StepAwareLRU(RecordCacheLRU):
     """LRU that records the clean working set touched by one simulation step."""
 
     def __init__(self, session):
-        super().__init__()
+        super().__init__(session)
         self._session_ref = weakref.ref(session)
         self._step_epoch = None
         self._step_touched = set()
 
     def __setitem__(self, key, value):
         super().__setitem__(key, value)
+        if key not in self:
+            return  # An oversized entry was rejected by the shared budget.
         session = self._session_ref()
         if session is None:
             return
@@ -297,6 +300,15 @@ class _StepAwareLRU(OrderedDict):
             self._step_epoch = epoch
             self._step_touched.clear()
         self._step_touched.add(key)
+
+    def _budget_evict(self, key):
+        super()._budget_evict(key)
+        self._step_touched.discard(key)
+
+    def popitem(self, last=True):
+        key, value = super().popitem(last=last)
+        self._step_touched.discard(key)
+        return key, value
 
     def touched(self, epoch):
         if self._step_epoch != epoch:
@@ -3325,6 +3337,15 @@ class LazyRecordTable(RecordTable):
         for table, key in self._session._shared_object_routes(record):
             table.changed(key)
 
+    def _retain_dirty_owner(self, key):
+        # Called after a mutation notification. Dirty residency is an actual
+        # unsaved cost, outside clean budgets. Pin it before checked loading,
+        # otherwise an oversized owner can be evicted during its own callback.
+        self._dirty.add(key)
+        self._lru.pop(key, None)
+        if not dict.__contains__(self, key):
+            self[key]
+
     def _baseline_exists(self, key):
         # Membership lookups without a resident/dirty owner are one-shot
         # checked projections: do not cache either positive history or misses.
@@ -3409,10 +3430,11 @@ class LazyRecordTable(RecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -3968,10 +3990,11 @@ class LazyAspirationTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -4528,10 +4551,11 @@ class LazyOwnerIndexTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -4564,8 +4588,7 @@ class LazyOwnerIndexTable(LazyRecordTable):
             raise StoreIntegrityError(
                 "mutation notification has no current owner-index bucket"
             )
-        if not dict.__contains__(self, key):
-            self[key]
+        self._retain_dirty_owner(key)
         self._dirty.add(key)
         self._lru.pop(key, None)
 
@@ -4951,10 +4974,11 @@ class LazySocialEdgeTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -5010,8 +5034,7 @@ class LazySocialEdgeTable(LazyRecordTable):
             raise StoreIntegrityError(
                 "mutation notification has no current social relationship"
             )
-        if not dict.__contains__(self, key):
-            self[key]
+        self._retain_dirty_owner(key)
         record = dict.__getitem__(self, key)
         if field == "shared_history" and key in self._pending_history_old:
             old = self._pending_history_old.pop(key)
@@ -5313,10 +5336,11 @@ class LazySocialAdjacencyTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -5349,8 +5373,7 @@ class LazySocialAdjacencyTable(LazyRecordTable):
             raise StoreIntegrityError(
                 "mutation notification has no current social adjacency"
             )
-        if not dict.__contains__(self, key):
-            self[key]
+        self._retain_dirty_owner(key)
         self._dirty.add(key)
         self._lru.pop(key, None)
 
@@ -5604,10 +5627,11 @@ class LazySocialPartnershipTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -5872,10 +5896,11 @@ class LazyCommunityMembershipTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -6149,10 +6174,11 @@ class LazyResourceTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -6200,10 +6226,7 @@ class LazyResourceTable(LazyRecordTable):
             raise StoreIntegrityError(
                 "mutation notification has no current lazy resource"
             )
-        if not dict.__contains__(self, key):
-            # A retained child alias can outlive the cached parent. Reloading
-            # reuses the child's persisted incarnation and restores ownership.
-            self[key]
+        self._retain_dirty_owner(key)
         record = dict.__getitem__(self, key)
         if field == "transfers" and key in self._pending_transfer_old:
             old = self._pending_transfer_old.pop(key)
@@ -6693,10 +6716,11 @@ class _LazySimpleMaterialObjectTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -6727,8 +6751,7 @@ class _LazySimpleMaterialObjectTable(LazyRecordTable):
             raise StoreIntegrityError(
                 f"mutation notification has no current lazy {self._label}"
             )
-        if not dict.__contains__(self, key):
-            self[key]
+        self._retain_dirty_owner(key)
         self._dirty.add(key)
         self._lru.pop(key, None)
 
@@ -7385,10 +7408,11 @@ class LazyGenealogyParentTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -7630,10 +7654,11 @@ class _LazyMaterialContainerTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -7662,8 +7687,7 @@ class _LazyMaterialContainerTable(LazyRecordTable):
             raise StoreIntegrityError(
                 f"mutation notification has no current lazy {self._label}"
             )
-        if not dict.__contains__(self, key):
-            self[key]
+        self._retain_dirty_owner(key)
         self._dirty.add(key)
         self._lru.pop(key, None)
 
@@ -8232,10 +8256,11 @@ class LazyMaterialLotTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -8283,8 +8308,7 @@ class LazyMaterialLotTable(LazyRecordTable):
             raise StoreIntegrityError(
                 "mutation notification has no current lazy material lot"
             )
-        if not dict.__contains__(self, key):
-            self[key]
+        self._retain_dirty_owner(key)
         record = dict.__getitem__(self, key)
         if field == "transfers" and key in self._pending_transfer_old:
             old = self._pending_transfer_old.pop(key)
@@ -8591,7 +8615,19 @@ class _LazySoulBindingMixin:
                 raise StoreIntegrityError(
                     "tracked soul child retained a non-current owner"
                 )
-        return bindings
+        # A child may first be read through a wallet alias while its concrete
+        # record authority is still cold. Bind that authority before the edit,
+        # then resample the field callbacks installed by its checked loader.
+        sessions = {id(table._session): table._session for table, _, _ in bindings}
+        routes = {}
+        for session in sessions.values():
+            for table, key in session._shared_object_routes(self):
+                routes[(id(table), key)] = (table, key)
+        bindings = list(self._bindings())
+        bound = {(id(table), key) for table, key, _ in bindings}
+        bindings.extend((table, key, None) for marker, (table, key) in routes.items()
+                        if marker not in bound)
+        return tuple(bindings)
 
     @staticmethod
     def _touch(bindings):
@@ -8851,10 +8887,11 @@ class LazyAdvancementPathTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -8892,8 +8929,7 @@ class LazyAdvancementPathTable(LazyRecordTable):
             raise StoreIntegrityError(
                 "mutation notification has no current advancement path"
             )
-        if not dict.__contains__(self, key):
-            self[key]
+        self._retain_dirty_owner(key)
         # Most advancement writes are scalar progress/rank/training updates.
         # Rewalking and reattaching the entire nested identity graph for those
         # cannot change identity topology and becomes quadratic at mature-world
@@ -9214,10 +9250,11 @@ class LazySkillTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -9263,8 +9300,7 @@ class LazySkillTable(LazyRecordTable):
             raise StoreIntegrityError(
                 "mutation notification has no current skill history"
             )
-        if not dict.__contains__(self, key):
-            self[key]
+        self._retain_dirty_owner(key)
         record = dict.__getitem__(self, key)
         token = (key, field)
         if field in self._nested_paths and token in self._pending_nested_old:
@@ -9552,10 +9588,11 @@ class LazySoulTable(LazyRecordTable):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,
@@ -9599,8 +9636,7 @@ class LazySoulTable(LazyRecordTable):
             raise StoreIntegrityError(
                 "mutation notification has no current lazy soul"
             )
-        if not dict.__contains__(self, key):
-            self[key]
+        self._retain_dirty_owner(key)
         record = dict.__getitem__(self, key)
         token = (key, field)
         if field in self._nested_paths and token in self._pending_nested_old:
@@ -9939,6 +9975,9 @@ class LazyWorldSession:
     ):
         self.store = store
         self._history_cache_budget = SharedCacheBudget()
+        self._record_cache_budget = SharedCacheBudget(
+            entry_limit=65536, byte_limit=RECORD_BYTES,
+        )
         self.pin = pin
         self.world = world
         self.manifest = manifest
@@ -10067,6 +10106,11 @@ class LazyWorldSession:
             owner = _at_path(world, _namespace_path(namespace)[:-1])
             object.__setattr__(owner, namespace.rsplit('.', 1)[1], table)
 
+        self._family_bindings = RuntimeFamilyBindings(
+            self, scalar_record_namespaces=SCALAR_RECORD_SPECS,
+        )
+        for table in self._family_bindings.tables.values():
+            table._lru.bind_record_owner(table)
         self._restore_eager_nested_references()
 
         self._deferred_household_cross_links = tuple(
@@ -10476,32 +10520,7 @@ class LazyWorldSession:
         incarnation = self._registry.incarnation_for_object(obj)
         if incarnation is None:
             return ()
-        tables = {
-            PEOPLE_NAMESPACE: self.people,
-            ASPIRATION_NAMESPACE: self.aspirations,
-            RESOURCE_NAMESPACE: self.resources,
-            OWNER_INDEX_NAMESPACE: self.owner_index,
-            MATERIAL_LOT_NAMESPACE: self.material_lots,
-            MATERIAL_ITEM_NAMESPACE: self.material_items,
-            MATERIAL_LOT_INDEX_NAMESPACE: self.material_lot_index,
-            MATERIAL_ACTIVE_INDEX_NAMESPACE: self.material_active_index,
-            WALLET_NAMESPACE: self.wallets,
-            TREASURY_NAMESPACE: self.treasuries,
-            SOUL_NAMESPACE: self.souls,
-            ADVANCEMENT_NAMESPACE: self.advancement_paths,
-            INSTITUTION_MAGIC_RECORD_NAMESPACE: self.institution_magic_records,
-            INSTITUTION_NOTICE_NAMESPACE: self.institution_notices,
-            INSTITUTION_APPLICATION_NAMESPACE: self.institution_applications,
-            TRANSMISSION_NAMESPACE: self.transmissions,
-            MOTIVE_NAMESPACE: self.motives,
-            **self._scalar_tables,
-            SOCIAL_EDGE_NAMESPACE: self.social_edges,
-            SOCIAL_ADJACENCY_NAMESPACE: self.social_adjacency,
-            SKILL_NAMESPACE: self.skills,
-            LINEAGE_NODE_NAMESPACE: self.lineage_nodes,
-            LINEAGE_CHILD_NAMESPACE: self.lineage_children,
-            GENEALOGY_CHILD_NAMESPACE: self.genealogy_children,
-        }
+        tables = self._family_bindings.tables
         routes = {}
         for occurrence in self._registry.occurrences_for_incarnation(incarnation):
             table = tables.get(occurrence.owner_namespace)
@@ -12460,22 +12479,7 @@ class LazyWorldSession:
         if not isinstance(obj, IndexedRecord):
             return
 
-        table_by_namespace = {
-            PEOPLE_NAMESPACE: self.people,
-            ASPIRATION_NAMESPACE: self.aspirations,
-            RESOURCE_NAMESPACE: self.resources,
-            MATERIAL_LOT_NAMESPACE: self.material_lots,
-            MATERIAL_ITEM_NAMESPACE: self.material_items,
-            SOUL_NAMESPACE: self.souls,
-            ADVANCEMENT_NAMESPACE: self.advancement_paths,
-            INSTITUTION_MAGIC_RECORD_NAMESPACE: self.institution_magic_records,
-            INSTITUTION_NOTICE_NAMESPACE: self.institution_notices,
-            INSTITUTION_APPLICATION_NAMESPACE: self.institution_applications,
-            TRANSMISSION_NAMESPACE: self.transmissions,
-            MOTIVE_NAMESPACE: self.motives,
-            **self._scalar_tables,
-            SOCIAL_EDGE_NAMESPACE: self.social_edges,
-        }
+        table_by_namespace = self._family_bindings.indexed_tables
         owners = []
         for occurrence in self._registry.occurrences_for_incarnation(
             incarnation
@@ -12708,6 +12712,21 @@ class LazyWorldSession:
                 if type(current) is dict:
                     current = LazyTrackedDict(current)
                     _relative_set(wrapper, path, current)
+                elif type(current) is list and isinstance(
+                    _relative_get(wrapper, path[:-1]), (SkillHistory, SoulState)
+                ):
+                    # These concrete records use the unrestricted multi-owner
+                    # child adapter. Bind it before a cold top-level authority
+                    # is loaded, so subsequent loading reuses the same object.
+                    current = LazySoulTrackedList(current)
+                    current._attach(table, key, None)
+                    _relative_set(wrapper, path, current)
+                elif type(current) is set and isinstance(
+                    _relative_get(wrapper, path[:-1]), SoulState
+                ):
+                    current = LazySoulTrackedSet(current)
+                    current._attach(table, key, None)
+                    _relative_set(wrapper, path, current)
                 try:
                     self._registry.bind(
                         current,
@@ -12727,6 +12746,8 @@ class LazyWorldSession:
             )
             if isinstance(current, LazyTrackedDict):
                 current._attach(table, key)
+            elif isinstance(current, _LazySoulBindingMixin):
+                current._attach(table, key, None)
 
         actual = self._currency_incarnation_labels(
             namespace, key, wrapper
@@ -16721,6 +16742,7 @@ class LazyWorldSession:
         self._nested_dirty.clear()
         self._nested_lists.clear()
         self._history_cache_budget.clear()
+        self._record_cache_budget.clear()
         self.social_edges = detached_social_edges
         self.social_adjacency = detached_social_adjacency
         self.social_partnerships = detached_social_partnerships
@@ -17017,6 +17039,7 @@ class LazyWorldSession:
         return {
             "state": self._state,
             "history_cache": self._history_cache_budget.diagnostics(),
+            "record_cache": self._record_cache_budget.diagnostics(),
             "frozen_save": (None if self._pending_save is None else {
                 "participants": len(self._pending_save.publication.participants),
                 "payload_bytes": self._pending_save.publication.frozen_bytes,
@@ -17126,6 +17149,7 @@ class LazyWorldSession:
         finally:
             self._registry.close()
             self._history_cache_budget.clear()
+            self._record_cache_budget.clear()
             self.store.close()
             self._active = False
             self._state = "closed"

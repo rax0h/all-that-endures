@@ -1,0 +1,201 @@
+{
+  "scope": "legacy World shared record-cache bytes and concrete alias routing; not final acceptance",
+  "limitations": [
+    "Legacy ordinary open still reads global P2C authority; new-format catalog is not activated.",
+    "Legacy hot-step entry-count behavior is preserved; a complete capability6 runtime still needs strict per-family counts.",
+    "Unpaged skill/resource/soul nested histories remain outside history-budget closure.",
+    "Clean bytes are recursive Python residency estimates, not RSS. tracemalloc excludes native SQLite and fixture construction.",
+    "Dirty estimate covers two edited payload objects, not all registry/callback/transaction memory.",
+    "One long history has separate existing evidence; this fixture holds payload size fixed.",
+    "SQL examined rows are unknown; returned row counters are not a scan bound."
+  ],
+  "source_sha256": {
+    "ate_sim/persistence_lazy.py": "3bacb8d1188c50a371b0eb8780b9f1ef282650ab521cc5df38e003a7fe97e7b3",
+    "ate_sim/persistence_lazy_budget.py": "0f5ea4bd091d323c9a231e63cfa83a93915d93aa43f1e70f53920b452e30e490",
+    "ate_sim/persistence_lazy_families.py": "3275abd616b16b0a01264cd02a49b1aaf1db9c9803f62ea26f59670001044b08",
+    "ate_sim/persistence_lazy_lineage_children.py": "24214b874a8ae6daca0fbb3aaeef8ea65cef1b2c95f647695c476af8944faf0e",
+    "measure_stage_0_5_record_budget.py": "7405220906151b8c54327f838deb70d9e49ea040614ff8e1254bc5b7f7c22fa4"
+  },
+  "results": [
+    {
+      "history_owners": 1000,
+      "live_candidates": 8,
+      "edits": 1,
+      "sharing_placements": 2,
+      "source_preserved": true,
+      "open_io": {
+        "payload_reads": 35,
+        "payload_read_bytes": 17320,
+        "payload_check_reads": 35,
+        "payload_check_bytes": 17320,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 132,
+        "query_rows": 0,
+        "pin_rows": 1,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      },
+      "save_io": {
+        "payload_reads": 7,
+        "payload_read_bytes": 505,
+        "payload_check_reads": 11,
+        "payload_check_bytes": 3047,
+        "payload_writes": 4,
+        "payload_write_bytes": 1417,
+        "metadata_rows": 201,
+        "query_rows": 4,
+        "pin_rows": 247,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      },
+      "subsequent_noop": {
+        "payload_reads": 3,
+        "payload_read_bytes": 217,
+        "payload_check_reads": 3,
+        "payload_check_bytes": 217,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 35,
+        "query_rows": 0,
+        "pin_rows": 0,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      },
+      "edit_seconds": 0.1268100819997926,
+      "dirty_before_save": {
+        "owners": 2,
+        "resident_python_bytes": 1618
+      },
+      "edit_traced_retained_bytes": 114042,
+      "edit_traced_peak_bytes": 226738,
+      "clean_after_edit": {
+        "entries": 9,
+        "bytes": 21373,
+        "owners": 2,
+        "evictions": 0,
+        "metadata_python_bytes": 4788
+      },
+      "clean_after_explicit_churn": {
+        "entries": 257,
+        "bytes": 610406,
+        "owners": 2,
+        "evictions": 0,
+        "metadata_python_bytes": 122464
+      },
+      "explicit_churn_io": {
+        "payload_reads": 992,
+        "payload_read_bytes": 618917,
+        "payload_check_reads": 992,
+        "payload_check_bytes": 618917,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 6944,
+        "query_rows": 0,
+        "pin_rows": 11904,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      },
+      "churn_traced_retained_bytes": 1222561,
+      "churn_traced_peak_bytes": 1235877,
+      "external_aliases": 8,
+      "old_pin_exact": true,
+      "retained_alias_is_canonical": true,
+      "sql_rows_examined": null
+    },
+    {
+      "history_owners": 10000,
+      "live_candidates": 8,
+      "edits": 1,
+      "sharing_placements": 2,
+      "source_preserved": true,
+      "open_io": {
+        "payload_reads": 35,
+        "payload_read_bytes": 17323,
+        "payload_check_reads": 35,
+        "payload_check_bytes": 17323,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 132,
+        "query_rows": 0,
+        "pin_rows": 1,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      },
+      "save_io": {
+        "payload_reads": 7,
+        "payload_read_bytes": 505,
+        "payload_check_reads": 11,
+        "payload_check_bytes": 3047,
+        "payload_writes": 4,
+        "payload_write_bytes": 1417,
+        "metadata_rows": 201,
+        "query_rows": 4,
+        "pin_rows": 247,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      },
+      "subsequent_noop": {
+        "payload_reads": 3,
+        "payload_read_bytes": 217,
+        "payload_check_reads": 3,
+        "payload_check_bytes": 217,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 35,
+        "query_rows": 0,
+        "pin_rows": 0,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      },
+      "edit_seconds": 0.08962888199948793,
+      "dirty_before_save": {
+        "owners": 2,
+        "resident_python_bytes": 1618
+      },
+      "edit_traced_retained_bytes": 53920,
+      "edit_traced_peak_bytes": 163901,
+      "clean_after_edit": {
+        "entries": 9,
+        "bytes": 21373,
+        "owners": 2,
+        "evictions": 0,
+        "metadata_python_bytes": 4788
+      },
+      "clean_after_explicit_churn": {
+        "entries": 257,
+        "bytes": 610662,
+        "owners": 2,
+        "evictions": 0,
+        "metadata_python_bytes": 122464
+      },
+      "explicit_churn_io": {
+        "payload_reads": 9992,
+        "payload_read_bytes": 6243918,
+        "payload_check_reads": 9992,
+        "payload_check_bytes": 6243918,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 69944,
+        "query_rows": 0,
+        "pin_rows": 119904,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      },
+      "churn_traced_retained_bytes": 1203305,
+      "churn_traced_peak_bytes": 1243394,
+      "external_aliases": 8,
+      "old_pin_exact": true,
+      "retained_alias_is_canonical": true,
+      "sql_rows_examined": null
+    }
+  ]
+}

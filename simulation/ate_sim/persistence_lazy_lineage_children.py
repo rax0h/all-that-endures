@@ -320,7 +320,8 @@ class LazyLineageChildrenTable(dict):
         self._pin = session.pin
         self._namespace = LINEAGE_CHILD_NAMESPACE
         self._clean_limit = clean_limit
-        self._lru = OrderedDict()
+        from .persistence_lazy_budget import RecordCacheLRU
+        self._lru = RecordCacheLRU(session)
         self._loads = 0
         state = self._store._namespace_state_at(
             self._namespace, self._pin.captured_head
@@ -573,10 +574,11 @@ class LazyLineageChildrenTable(dict):
         if not self._visible(key):
             raise KeyError(key)
         if dict.__contains__(self, key):
+            cached_value = dict.__getitem__(self, key)
             self._lru.pop(key, None)
             if key not in self._dirty:
                 self._lru[key] = None
-            return dict.__getitem__(self, key)
+            return cached_value
         checked = self._store.read_version(
             self._pin,
             self._namespace,

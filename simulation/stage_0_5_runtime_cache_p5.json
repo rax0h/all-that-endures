@@ -1,0 +1,148 @@
+{
+  "checkpoint_bytes": 310819,
+  "checkpoint_schema": 8,
+  "cold_file_bytes": 1916928,
+  "cold_sha256": "1f0148a169a821eb221340c8f451f682d086b0f74d4ca54c90b851940337d32d",
+  "continuation_years": 4,
+  "control_final_digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e",
+  "control_total_digest": "b31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387",
+  "detached_checkpoint_bytes": 538526,
+  "events_total": 439,
+  "final_year": 10,
+  "first_continuation_simulation_seconds": 11.163629491000393,
+  "first_full_audit_io": {
+    "payload_read_bytes": 420434,
+    "payload_reads": 1951,
+    "payload_write_bytes": 0,
+    "payload_writes": 0
+  },
+  "first_save_io": {
+    "payload_read_bytes": 59077,
+    "payload_reads": 251,
+    "payload_write_bytes": 674595,
+    "payload_writes": 1778
+  },
+  "fixture_creation": {
+    "cold": {
+      "commit_token": "1bb986ed800f477cb79b9ae2d059a0b1",
+      "deleted_event_rows": 0,
+      "disk_events": 0,
+      "disk_segments": 0,
+      "event_count": 194,
+      "final_file_bytes": 1916928,
+      "final_generation": 2,
+      "finalize_io": {
+        "payload_read_bytes": 7738,
+        "payload_reads": 1,
+        "payload_write_bytes": 8026,
+        "payload_writes": 4
+      },
+      "largest_transfer_batch_chunks": 0,
+      "remaining_suffix_records": 194,
+      "staging_io": {
+        "payload_read_bytes": 0,
+        "payload_reads": 0,
+        "payload_write_bytes": 1064302,
+        "payload_writes": 3405
+      },
+      "transfer_commits": 0,
+      "transfer_io": {
+        "payload_read_bytes": 0,
+        "payload_reads": 0,
+        "payload_write_bytes": 0,
+        "payload_writes": 0
+      },
+      "transferred_events": 0,
+      "validation_io": {
+        "payload_read_bytes": 2251174,
+        "payload_reads": 7012,
+        "payload_write_bytes": 0,
+        "payload_writes": 0
+      }
+    },
+    "lazy": {
+      "advancement_paths": 19,
+      "aspirations": 95,
+      "community_memberships": 144,
+      "destination_format": 5,
+      "genealogy_children": 24,
+      "genealogy_parents": 15,
+      "generation": 2,
+      "identity_occurrences": 5250,
+      "institution_applications": 0,
+      "institution_magic_records": 0,
+      "institution_notices": 0,
+      "lineage_child_edges": 285,
+      "lineage_children": 84,
+      "lineage_nodes": 292,
+      "material_active_index": 5,
+      "material_items": 0,
+      "material_lot_index": 5,
+      "material_lots": 38,
+      "motives": 95,
+      "next_incarnation_id": 5251,
+      "owner_index": 1,
+      "people": 144,
+      "resources": 22,
+      "skills": 300,
+      "social_adjacency": 144,
+      "social_edges": 418,
+      "social_partnerships": 27,
+      "souls": 144,
+      "source_format": "p3b-cold/current-links",
+      "source_preserved": true,
+      "transmissions": 16,
+      "treasuries": 0,
+      "wallets": 0
+    }
+  },
+  "last_event_id": 439,
+  "lazy_file_bytes": 20828160,
+  "lazy_sha256": "e39e178faf098bde3807463a90785ec3aedddfe3c0d077387018e067c6e3adb3",
+  "limitations": [
+    "Checked catalog/coordinator and capability6 are not activated in World.",
+    "Temporary P5 restore files were validated, then removed by the harness; retrievable final-source restore artifacts remain a release requirement.",
+    "Forced-pressure float.hex counterexamples are not part of this checkpoint."
+  ],
+  "open_io": {
+    "payload_read_bytes": 505504,
+    "payload_reads": 1588,
+    "payload_write_bytes": 0,
+    "payload_writes": 0
+  },
+  "passed": true,
+  "pre_years": 3,
+  "relocated_file_bytes": 18124800,
+  "relocated_sha256": "acf024e8dec7bb63861a9a3414fb8b4bcfb54f7e2b743d6b1c86fce7bcfb6304",
+  "reopen_years": 3,
+  "rules_id": "stage-0-5-p5-validation",
+  "second_continuation_simulation_seconds": 8.359953947000577,
+  "second_full_audit_io": {
+    "payload_read_bytes": 345452,
+    "payload_reads": 1441,
+    "payload_write_bytes": 0,
+    "payload_writes": 0
+  },
+  "second_save_io": {
+    "payload_read_bytes": 21944,
+    "payload_reads": 143,
+    "payload_write_bytes": 664801,
+    "payload_writes": 1346
+  },
+  "seed": 843000,
+  "source_sha256": {
+    "ate_sim/persistence_lazy.py": "3bacb8d1188c50a371b0eb8780b9f1ef282650ab521cc5df38e003a7fe97e7b3",
+    "ate_sim/persistence_lazy_budget.py": "0f5ea4bd091d323c9a231e63cfa83a93915d93aa43f1e70f53920b452e30e490",
+    "ate_sim/persistence_lazy_families.py": "3275abd616b16b0a01264cd02a49b1aaf1db9c9803f62ea26f59670001044b08",
+    "ate_sim/persistence_lazy_lineage_children.py": "24214b874a8ae6daca0fbb3aaeef8ea65cef1b2c95f647695c476af8944faf0e",
+    "persistence_p5_validation.py": "80ad1cc6baa0225412afa09595efa274804ab0ad8c6311fd8737b9f736e0a9f8"
+  },
+  "timings": {
+    "checkpoint_lane_seconds": 0.42299640700002783,
+    "control_final_seconds": 0.5595066580008279,
+    "control_total_seconds": 0.4412436180000441,
+    "fixture_creation_seconds": 3.416497351000544
+  },
+  "total_year": 7,
+  "validation_scope": "Compatibility runtime checkpoint: concrete family bindings and shared record-cache bytes. Not final Stage 0.5 acceptance."
+}
