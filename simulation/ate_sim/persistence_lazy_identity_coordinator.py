@@ -211,12 +211,13 @@ class IdentityCoordinator:
         self.dirty_owners.add(owner)
         self.mark_dirty(owner)
 
-    def prepare_delta(self, owner_versions):
+    def prepare_delta(self, owner_versions, *, ordinary_changes=()):
         self.preflight()
         if self._prepared is not None:
             return self._prepared.delta
         payloads = tuple(owner_versions)
-        if not payloads and not self.placement_overlay:
+        ordinary_payloads = tuple(ordinary_changes)
+        if not payloads and not ordinary_payloads and not self.placement_overlay:
             self.dirty_owners.clear()
             self.dirty_incarnations.clear()
             self._value_dirty_groups.clear()
@@ -224,7 +225,8 @@ class IdentityCoordinator:
             return ParticipantDelta.freeze(self.store.codec, 'identity-coordinator')
         placements = tuple(self.placement_overlay.values())
         catalog_delta = self.catalog.prepare_delta(self.pin, payloads, placements,
-                           next_incarnation_id=self.registry.next_incarnation)
+                           next_incarnation_id=self.registry.next_incarnation,
+                           ordinary_changes=ordinary_payloads)
         versions, ordinary, _ = catalog_delta.decode(self.store.codec)
         delta = ParticipantDelta.freeze(self.store.codec, 'identity-coordinator',
             version_changes=versions, ordinary_changes=ordinary, identity_changes=placements)

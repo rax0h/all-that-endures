@@ -7,7 +7,7 @@ one exact placement without enumerating a large owner's other identities.
 """
 from __future__ import annotations
 from dataclasses import dataclass
-from .incremental_store import Membership, StoreIntegrityError, StoreFormatError, _framed_sha
+from .incremental_store import Membership, StoreIntegrityError, StoreFormatError, _framed_sha, _record_checksum
 from .persistence_lazy_store import VersionChange
 from .persistence_lazy_families import FAMILIES, ParticipantDelta
 
@@ -102,11 +102,34 @@ def initial_owner_tree(codec, owner, placements):
     return prefix, count, checksum, tuple(changes)
 
 
-def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incarnation_id, generation):
+def _source_commitment(codec, source, kind, generation):
+    payload = codec.encode(source.value)
+    if kind == 'lazy':
+        return _framed_sha(b'lazy-payload-v1', payload)
+    return _record_checksum(source.namespace, codec.encode(source.key), source.record_schema,
+                            codec.version, generation, payload)
+
+
+def _owner_sources(codec, owner_versions, ordinary_changes):
+    sources = {}
+    for kind, changes in (('lazy', owner_versions), ('ordinary', ordinary_changes)):
+        for source in changes:
+            if source.namespace not in FAMILIES:
+                raise StoreFormatError('identity source is not a declared family')
+            marker = source.namespace, codec.encode(source.key)
+            if marker in sources:
+                raise ValueError('duplicate/competing identity owner source')
+            sources[marker] = kind, source
+    return sources
+
+
+def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incarnation_id, generation,
+                          ordinary_changes=()):
     """Freeze a complete explicit conversion; this does not publish a format floor."""
     if type(next_incarnation_id) is not int or next_incarnation_id < 1:
         raise ValueError('invalid incarnation allocator')
-    owners = {(v.namespace, codec.encode(v.key)): v for v in owner_versions if not v.delete}
+    owners = {marker: entry for marker, entry in _owner_sources(codec, owner_versions, ordinary_changes).items()
+              if not entry[1].delete}
     by_owner = {}
     by_group = {}
     seen = set()
@@ -121,12 +144,12 @@ def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incar
         by_owner.setdefault((marker[0], marker[1]), []).append((change.occurrence_path, change.incarnation_id))
         by_group.setdefault(change.incarnation_id, []).append((change.owner_namespace, change.owner_key, change.occurrence_path))
     changes = []
-    for marker, version in owners.items():
+    for marker, (kind, version) in owners.items():
         owner = version.namespace, version.key
         prefix, count, root_digest, nodes = initial_owner_tree(codec, owner, by_owner.get(marker, ()))
         changes.extend(nodes)
-        payload_commit = _framed_sha(b'lazy-payload-v1', codec.encode(version.value))
-        value = ('identity-owner/v1', True, 'lazy', generation, version.record_schema,
+        payload_commit = _source_commitment(codec, version, kind, generation)
+        value = ('identity-owner/v1', True, kind, generation, version.record_schema,
                  payload_commit, prefix, count, root_digest)
         changes.append(VersionChange(OWNER_NAMESPACE, owner, value))
     for inc in range(1, next_incarnation_id):
@@ -168,6 +191,7 @@ class CheckedOwnerIdentity:
     payload_revision: int
     payload_commitment: str
     exists: bool = True
+    storage_kind: str = 'lazy'
 
 
 class IdentityCatalog:
@@ -200,25 +224,51 @@ class IdentityCatalog:
     def _owner(self, pin, owner):
         header = self._read(pin, OWNER_NAMESPACE, owner)
         if (type(header) is not tuple or len(header) != 9 or header[0] != 'identity-owner/v1'
-            or type(header[1]) is not bool or header[2] != 'lazy' or type(header[3]) is not int
+            or type(header[1]) is not bool or header[2] not in ('lazy', 'ordinary') or type(header[3]) is not int
             or not 0 <= header[3] <= pin.captured_head or type(header[4]) is not int or header[4] < 1
             or type(header[5]) is not str or len(header[5]) != 64 or type(header[7]) is not int or header[7] < 0
             or type(header[8]) is not str or len(header[8]) != 64
             or (header[6] is not None and (type(header[6]) is not bytes or len(header[6]) > 32))):
             raise StoreIntegrityError('invalid identity owner witness')
-        # Metadata-only agreement; actual payload checksum is checked on payload
-        # access. Historical metadata comes from MVCC, never current ordinary rows.
-        rows = self.store.db.execute('SELECT valid_from,record_schema,payload_checksum FROM lazy_record_versions '
-            'WHERE namespace=? AND typed_key=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2',
-            (owner[0], self.codec.encode(owner[1]), pin.captured_head, pin.captured_head)).fetchall()
-        self.store._metadata_rows += len(rows)
-        if (header[1] and (len(rows) != 1 or rows[0] != (header[3], header[4], header[5]))) or (not header[1] and (rows or header[7] != 0)):
-            raise StoreIntegrityError('identity owner/header commitment disagreement')
+        # Metadata-only source agreement. A historical ordinary witness is MVCC
+        # metadata, never permission to decode today's overwritten ordinary body.
+        # Old ordinary payload authority remains unavailable through this API.
+        rows = None
+        if header[2] == 'lazy':
+            rows = self.store.db.execute('SELECT valid_from,record_schema,payload_checksum FROM lazy_record_versions '
+                'WHERE namespace=? AND typed_key=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 2',
+                (owner[0], self.codec.encode(owner[1]), pin.captured_head, pin.captured_head)).fetchall()
+        elif pin.captured_head == int(self.store._checked_head_row()[0]):
+            rows = self.store.db.execute('SELECT last_changed_generation,record_schema,payload_checksum FROM records '
+                'WHERE namespace=? AND typed_key=?', (owner[0], self.codec.encode(owner[1]))).fetchall()
+        if rows is not None:
+            self.store._metadata_rows += len(rows)
+            if (header[1] and (len(rows) != 1 or rows[0] != (header[3], header[4], header[5]))) or (not header[1] and rows):
+                raise StoreIntegrityError('identity owner/header commitment disagreement')
+        if not header[1] and header[7] != 0:
+            raise StoreIntegrityError('retired identity owner still has placements')
         if (header[7] == 0) != (header[6] is None):
             raise StoreIntegrityError('identity owner root/count mismatch')
         if header[6] is None and header[8] != _framed_sha(b'identity-owner-empty-v1'):
             raise StoreIntegrityError('identity owner empty commitment mismatch')
         return header
+
+    def _has_source(self, pin, owner):
+        if self.store._visible_record_row(pin.captured_head, owner[0], self.codec.encode(owner[1])) is not None:
+            return True
+        rows = self.store.db.execute('SELECT last_changed_generation FROM records WHERE namespace=? AND typed_key=?',
+                                     (owner[0], self.codec.encode(owner[1]))).fetchall()
+        self.store._metadata_rows += len(rows)
+        if rows:
+            return True
+        # A lost body/witness cannot turn a still-placed owner into a new one.
+        # This is an indexed existence probe, not an inventory of its paths.
+        placed = self.store.db.execute('SELECT 1 FROM lazy_identity_occurrence_versions '
+            'WHERE owner_namespace=? AND owner_key=? AND valid_from<=? '
+            'AND (valid_to IS NULL OR ?<valid_to) LIMIT 1',
+            (owner[0], self.codec.encode(owner[1]), pin.captured_head, pin.captured_head)).fetchall()
+        self.store._metadata_rows += len(placed)
+        return bool(placed)
 
     def _node(self, pin, owner, prefix, expected_count, expected_digest):
         node = self._read(pin, OWNER_TREE_NAMESPACE, (*owner, prefix))
@@ -272,7 +322,7 @@ class IdentityCatalog:
                 placement_path(*owner, path)
                 if type(inc) is not int or not 0 < inc < self.store._identity_state_at(pin.captured_head)[0]:
                     raise StoreIntegrityError('owner occurrence exceeds allocator')
-            return CheckedOwnerIdentity(owner, tuple(actual), header[3], header[5], header[1])
+            return CheckedOwnerIdentity(owner, tuple(actual), header[3], header[5], header[1], header[2])
 
     def read_identity_membership(self, pin, owner, path):
         """Prove an exact path's membership or absence through its owner root."""
@@ -282,9 +332,9 @@ class IdentityCatalog:
             try:
                 header = self._owner(pin, owner)
             except StoreIntegrityError:
-                raw = self.store._visible_record_row(pin.captured_head, owner[0], self.codec.encode(owner[1]))
+                present = self._has_source(pin, owner)
                 witness = self.store._visible_record_row(pin.captured_head, OWNER_NAMESPACE, self.codec.encode(owner))
-                if raw is None and witness is None:
+                if not present and witness is None:
                     return None  # No persisted owner; caller may prepare a new one.
                 raise
             wanted = path_hash(self.codec, path)
@@ -354,9 +404,11 @@ class IdentityCatalog:
     def read_identity_links(self, pin, incarnation_id):
         return self.read_identity_group(pin, incarnation_id).links
 
-    def prepare_delta(self, pin, owner_versions, identity_changes, *, next_incarnation_id):
+    def prepare_delta(self, pin, owner_versions, identity_changes, *, next_incarnation_id,
+                      ordinary_changes=()):
         return _prepare_catalog_delta(self, pin, owner_versions, identity_changes,
-                                      next_incarnation_id=next_incarnation_id)
+                                      next_incarnation_id=next_incarnation_id,
+                                      ordinary_changes=ordinary_changes)
 
     def validate_publication(self, delta, successor_pin):
         if delta.participant != 'identity-catalog':
@@ -382,6 +434,8 @@ class IdentityCatalog:
                     raise StoreIntegrityError('identity publication disagrees with frozen bytes')
                 if change.namespace == GROUP_NAMESPACE:
                     self.read_identity_group(successor_pin, change.key)
+                elif change.namespace == OWNER_NAMESPACE:
+                    self._owner(successor_pin, change.key)
 
     def accept_delta(self, delta, successor_pin):
         # The catalog has no committed mutable cache to publish. Coordinators
@@ -474,18 +528,20 @@ class OwnerTreeEditor:
         return tuple(out)
 
 
-def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_incarnation_id):
+def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_incarnation_id,
+                           ordinary_changes=()):
     versions = tuple(owner_versions)
     placements = tuple(identity_changes)
-    if not versions and not placements:
+    ordinary = tuple(ordinary_changes)
+    if not versions and not placements and not ordinary:
         return ParticipantDelta.freeze(self.codec, 'identity-catalog')
     with self.store.read_snapshot(pin):
         descriptor = self._descriptor(pin)
         old_allocator = descriptor[2]
         if type(next_incarnation_id) is not int or next_incarnation_id < old_allocator:
             raise ValueError('incarnation allocator cannot move backwards')
-        sources = {(v.namespace, self.codec.encode(v.key)): v for v in versions}
-        owner_keys = {marker: (v.namespace, v.key) for marker, v in sources.items()}
+        sources = _owner_sources(self.codec, versions, ordinary)
+        owner_keys = {marker: (v.namespace, v.key) for marker, (_kind, v) in sources.items()}
         edits_by_owner = {}
         edits_by_group = {}
         for change in placements:
@@ -511,18 +567,18 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
                 edits_by_group.setdefault(new, {})[pkey] = placement
         changes = []
         for marker, owner in owner_keys.items():
-            source = sources.get(marker)
+            source_kind, source = sources.get(marker, (None, None))
             generation = pin.captured_head + 1
             try:
                 header = self._owner(pin, owner)
             except StoreIntegrityError:
                 # A new owner must be absent at the pin, not a corrupt old owner.
-                if self.store._visible_record_row(pin.captured_head, owner[0], marker[1]) is not None:
+                if self._has_source(pin, owner):
                     raise
                 if source is None or source.delete:
                     raise StoreIntegrityError('new identity owner lacks a prepared payload')
-                header = ('identity-owner/v1', True, 'lazy', generation, source.record_schema,
-                          _framed_sha(b'lazy-payload-v1', self.codec.encode(source.value)),
+                header = ('identity-owner/v1', True, source_kind, generation, source.record_schema,
+                          _source_commitment(self.codec, source, source_kind, generation),
                           None, 0, _framed_sha(b'identity-owner-empty-v1'))
             root = None if header[6] is None else header[6:]
             editor = OwnerTreeEditor(self, pin, owner, root)
@@ -533,11 +589,11 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
             if source is not None and source.delete:
                 if tree[1] != 0:
                     raise StoreIntegrityError('owner deletion must retire all current placements')
-                value = ('identity-owner/v1', False, 'lazy', generation, source.record_schema,
+                value = ('identity-owner/v1', False, source_kind, generation, source.record_schema,
                          header[5], *tree)
             elif source is not None:
-                value = ('identity-owner/v1', True, 'lazy', generation, source.record_schema,
-                         _framed_sha(b'lazy-payload-v1', self.codec.encode(source.value)), *tree)
+                value = ('identity-owner/v1', True, source_kind, generation, source.record_schema,
+                         _source_commitment(self.codec, source, source_kind, generation), *tree)
             else:
                 value = (*header[:6], *tree)
             if value != header:

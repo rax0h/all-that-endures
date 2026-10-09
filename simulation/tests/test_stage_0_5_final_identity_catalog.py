@@ -3,7 +3,7 @@ import importlib
 
 import pytest
 
-from simulation.ate_sim.incremental_store import StoreIntegrityError, StoreConflictError
+from simulation.ate_sim.incremental_store import StoreIntegrityError, StoreConflictError, RecordChange
 from simulation.ate_sim.persistence_lazy_store import IdentityOccurrenceChange, VersionChange
 from simulation.tests.test_persistence_lazy_store import make_store, metadata
 
@@ -191,3 +191,129 @@ def test_scalar_owner_edit_does_not_rewrite_unchanged_identity_projection(tmp_pa
             changes=(), new_segments=(), metadata=metadata(2, (NS, "world_identity_links"))).pin
         module.IdentityCatalog(store).validate_publication(delta, pin)
         assert len(store.read_identity_group(pin, 1).occurrences) == 2
+
+
+def test_scalar_acknowledgement_validates_source_owner_commitment(tmp_path):
+    module = catalog()
+    with make_store(tmp_path / 'wrong-source.sqlite') as store:
+        pin = groups(store)
+        expected = (VersionChange(NS, 1, 'expected scalar'),)
+        delta = module.IdentityCatalog(store).prepare_delta(pin, expected, (), next_incarnation_id=3)
+        pin = store.commit(pin, commit_token='wrong-source', changes=(), new_segments=(),
+            version_changes=(VersionChange(NS, 1, 'different scalar'),) + delta.decode(store.codec)[0],
+            metadata=metadata(2, (NS, 'world_identity_links'))).pin
+        with pytest.raises(StoreIntegrityError, match='owner/header'):
+            module.IdentityCatalog(store).validate_publication(delta, pin)
+
+
+EAGER_NS = 'world.settlements'
+
+
+def mixed_catalog(store):
+    pin = store.capture_pin()
+    versions = (VersionChange(NS, 1, {'shared': [1], 'scalar': 0}),)
+    ordinary = (RecordChange(EAGER_NS, 1, {'shared': [1], 'scalar': 0}),)
+    placements = (IdentityOccurrenceChange(NS, 1, (('key', 'shared'),), 1),
+                  IdentityOccurrenceChange(EAGER_NS, 1, (('key', 'shared'),), 1))
+    delta = catalog().initial_catalog_delta(store.codec, versions, placements, ordinary_changes=ordinary,
+                                            next_incarnation_id=2, generation=1)
+    pin = store.commit(pin, commit_token='mixed', version_changes=versions + delta.decode(store.codec)[0],
+        changes=ordinary, new_segments=(), identity_changes=placements, next_incarnation_id=2,
+        metadata=metadata(1, (NS, EAGER_NS, 'world_identity_links'))).pin
+    return pin
+
+
+def test_eager_owner_witness_is_pinned_without_using_current_rows_for_old_payloads(tmp_path):
+    with make_store(tmp_path / 'mixed.sqlite') as store:
+        pin = mixed_catalog(store)
+        old = store.capture_pin()
+        previous = store.read_owner_identity(old, (EAGER_NS, 1))
+        assert previous.storage_kind == 'ordinary' and previous.payload_revision == 1
+        ordinary = (RecordChange(EAGER_NS, 1, {'shared': [1], 'scalar': 99}),)
+        delta = catalog().IdentityCatalog(store).prepare_delta(pin, (), (), ordinary_changes=ordinary,
+                                                              next_incarnation_id=2)
+        assert len(delta.decode(store.codec)[0]) == 1  # no unchanged P2C writes
+        pin = store.commit(pin, commit_token='scalar', version_changes=delta.decode(store.codec)[0],
+            changes=ordinary, new_segments=(), metadata=metadata(2, (NS, EAGER_NS, 'world_identity_links'))).pin
+        catalog().IdentityCatalog(store).validate_publication(delta, pin)
+        assert store.read_owner_identity(old, (EAGER_NS, 1)) == previous
+        current = store.read_owner_identity(pin, (EAGER_NS, 1))
+        assert current.payload_revision == 2 and current.payload_commitment != previous.payload_commitment
+        assert store.read_identity_group(old, 1).occurrences == store.read_identity_group(pin, 1).occurrences
+
+
+def test_missing_eager_owner_or_header_is_corruption_not_new_owner(tmp_path):
+    with make_store(tmp_path / 'eager-missing.sqlite') as store:
+        pin = mixed_catalog(store)
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?',
+                         (catalog().OWNER_NAMESPACE, store.codec.encode((EAGER_NS, 1))))
+        store.db.commit()
+        with pytest.raises(StoreIntegrityError):
+            catalog().IdentityCatalog(store).read_identity_membership(pin, (EAGER_NS, 1), (('key', 'new'),))
+        with pytest.raises(StoreIntegrityError):
+            catalog().IdentityCatalog(store).prepare_delta(pin, (), (),
+                ordinary_changes=(RecordChange(EAGER_NS, 1, {'shared': [1]}),), next_incarnation_id=2)
+
+
+def test_eager_scalar_ack_rejects_a_different_ordinary_payload(tmp_path):
+    with make_store(tmp_path / 'eager-ack.sqlite') as store:
+        pin = mixed_catalog(store)
+        delta = catalog().IdentityCatalog(store).prepare_delta(pin, (), (),
+            ordinary_changes=(RecordChange(EAGER_NS, 1, {'shared': [1], 'scalar': 9}),), next_incarnation_id=2)
+        pin = store.commit(pin, commit_token='wrong', version_changes=delta.decode(store.codec)[0],
+            changes=(RecordChange(EAGER_NS, 1, {'shared': [1], 'scalar': 10}),), new_segments=(),
+            metadata=metadata(2, (NS, EAGER_NS, 'world_identity_links'))).pin
+        with pytest.raises(StoreIntegrityError, match='owner/header'):
+            catalog().IdentityCatalog(store).validate_publication(delta, pin)
+
+
+def test_eager_retirement_keeps_old_pin_witness_and_current_group_exact(tmp_path):
+    with make_store(tmp_path / 'eager-retired.sqlite') as store:
+        pin = mixed_catalog(store)
+        old = store.capture_pin()
+        ordinary = (RecordChange(EAGER_NS, 1, delete=True),)
+        placements = (IdentityOccurrenceChange(EAGER_NS, 1, (('key', 'shared'),), delete=True),)
+        delta = catalog().IdentityCatalog(store).prepare_delta(pin, (), placements,
+            ordinary_changes=ordinary, next_incarnation_id=2)
+        pin = store.commit(pin, commit_token='delete-eager', version_changes=delta.decode(store.codec)[0],
+            changes=ordinary, identity_changes=placements, new_segments=(),
+            metadata=metadata(2, (NS, EAGER_NS, 'world_identity_links'))).pin
+        catalog().IdentityCatalog(store).validate_publication(delta, pin)
+        assert not store.read_owner_identity(pin, (EAGER_NS, 1)).exists
+        assert store.read_owner_identity(old, (EAGER_NS, 1)).exists
+        assert len(store.read_identity_group(pin, 1).occurrences) == 1
+        assert len(store.read_identity_group(old, 1).occurrences) == 2
+
+
+def test_missing_owner_header_and_body_cannot_hide_surviving_placements(tmp_path):
+    with make_store(tmp_path / 'missing-all.sqlite') as store:
+        pin = mixed_catalog(store)
+        store.db.execute('DELETE FROM records WHERE namespace=?', (EAGER_NS,))
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=? AND typed_key=?',
+                         (catalog().OWNER_NAMESPACE, store.codec.encode((EAGER_NS, 1))))
+        store.db.commit()
+        with pytest.raises(StoreIntegrityError):
+            catalog().IdentityCatalog(store).read_identity_membership(pin, (EAGER_NS, 1), (('key', 'new'),))
+
+
+def test_in_place_authority_move_is_rejected_without_changing_source(tmp_path):
+    with make_store(tmp_path / 'transition.sqlite') as store:
+        pin = mixed_catalog(store)
+        old = store.capture_pin()
+        versions = (VersionChange(EAGER_NS, 1, {'shared': [1], 'scalar': 0}),)
+        ordinary = (RecordChange(EAGER_NS, 1, delete=True),)
+        # Final-format conversion writes an empty isolated destination, never
+        # changes the authority of a live source namespace in place.
+        with pytest.raises(ValueError, match='competing'):
+            catalog().IdentityCatalog(store).prepare_delta(pin, versions, (), ordinary_changes=ordinary,
+                                                          next_incarnation_id=2)
+        with pytest.raises(StoreConflictError, match='ordinary record authority'):
+            store.commit(pin, commit_token='transition', version_changes=versions,
+                changes=ordinary, new_segments=(), metadata=metadata(2, (NS, EAGER_NS, 'world_identity_links')))
+        assert store.resolve_commit(pin, 'transition').outcome == 'not_committed'
+        assert store.read_owner_identity(pin, (EAGER_NS, 1)).storage_kind == 'ordinary'
+        assert store.read_owner_identity(old, (EAGER_NS, 1)).storage_kind == 'ordinary'
+        assert store.db.execute('SELECT COUNT(*) FROM records WHERE namespace=?', (EAGER_NS,)).fetchone()[0] == 1
+        assert len(store.read_identity_group(old, 1).occurrences) == 2
+        assert len(store.read_identity_group(pin, 1).occurrences) == 2
+        store.verify_all()

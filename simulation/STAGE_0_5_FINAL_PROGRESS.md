@@ -126,6 +126,46 @@ Capability6 is still not emitted. No production ref changed, final review or
 endurance started. Continue through the integration packages, not a green-test
 stop or routine Astra implementation request.
 
+## Eager-owner commitment checkpoint (October 9, 2026)
+
+Sequence checkpoint published as `479bd4f467312f03353083bf8f278feca51df116`,
+tree `e8640726601e9e043ea52e9dbe9d949c638ad337`; matches local implementation
+commit `41b0490c4ac61d4a309808d479e5919424e725cb`. Production PR14 still has
+`c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Catalog preparation now accepts concrete ordinary family writes alongside MVCC
+owner writes. Current ordinary source checksum/schema/revision must match its
+versioned witness; old-pin ordinary identity metadata comes only from that
+witness. This does not recover overwritten ordinary payloads. World adapters
+must use their captured eager objects, not today's rows, for historical data.
+No shadow ordinary payload authority or second registry was added.
+
+Permanent RED: scalar-only acknowledgement accepted a different source body
+because it checked the frozen witness but did not validate the owner/source
+agreement. Acknowledgement now validates every changed owner witness, including
+scalar-only plans. Another RED showed a missing body plus missing owner witness
+could hide surviving placements for a new path. An indexed owner-existence
+probe now rejects this; it does not enumerate all paths in that owner.
+
+Tests cover pinned eager scalar changes/deletion, wrong acknowledged ordinary
+body, missing mandatory witness, cross-lazy/eager mutable-child routing with the
+sole registry and one hybrid acknowledgement. The proposed in-place authority
+move was a fixture outside the approved source-copy upgrade design: it is now a
+permanent rejection/atomic-source-preservation test. Duplicate/competing owner
+source plans are rejected. Destination bootstrap remains explicit future work.
+
+Affected gate: final catalog/coordinator/contracts, lazy identity reverse,
+store and store failures — **100 passed in 26.44s** with the same interpreter
+and `PYTHONPATH=.:simulation`. Log: `final-eager-identity-affected.log`. Existing
+identity foundation metrics remain historical evidence on their recorded
+earlier source; this acknowledgement closure requires fresh integrated metrics.
+
+Next: typed sequence/reference and settlement equality/import compatibility;
+catalog retirement ranges/large-group handling; runtime family callbacks and
+frozen participant integration; lazy household headers and settlement fields.
+Do not emit capability6 until complete authority/feature markers and explicit
+checked copy upgrade are ready. Final P5/full suite/review remain pending.
+
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.

@@ -5,7 +5,8 @@ from dataclasses import dataclass
 import pytest
 
 from simulation.ate_sim.persistence_lazy_identity import LazyIdentityRegistry, IncarnationId, Occurrence
-from simulation.ate_sim.persistence_lazy_store import VersionChange
+from simulation.ate_sim.persistence_lazy_store import VersionChange, IdentityOccurrenceChange
+from simulation.ate_sim.incremental_store import RecordChange
 from simulation.tests.test_persistence_lazy_store import make_store, metadata
 from simulation.tests.test_stage_0_5_final_identity_catalog import groups, NS
 
@@ -13,6 +14,55 @@ from simulation.tests.test_stage_0_5_final_identity_catalog import groups, NS
 @dataclass
 class Box:
     value: int
+
+
+def test_cross_lazy_eager_child_route_uses_one_registry_and_hybrid_ack(tmp_path):
+    catalog = importlib.import_module('simulation.ate_sim.persistence_lazy_identity_catalog')
+    coord_module = importlib.import_module('simulation.ate_sim.persistence_lazy_identity_coordinator')
+    eager = 'world.settlements'
+    path = (('key', 'shared'),)
+    with make_store(tmp_path / 'mixed-route.sqlite') as store:
+        store.codec.register_record('CoordinatorBox', Box)
+        pin = store.capture_pin()
+        versions = (VersionChange(NS, 1, {'shared': Box(1)}),)
+        ordinary = (RecordChange(eager, 1, {'shared': Box(1)}),)
+        placements = (IdentityOccurrenceChange(NS, 1, path, 1), IdentityOccurrenceChange(eager, 1, path, 1))
+        initial = catalog.initial_catalog_delta(store.codec, versions, placements, ordinary_changes=ordinary,
+                                                next_incarnation_id=2, generation=1)
+        pin = store.commit(pin, commit_token='initial', version_changes=versions + initial.decode(store.codec)[0],
+            changes=ordinary, new_segments=(), identity_changes=placements, next_incarnation_id=2,
+            metadata=metadata(1, (NS, eager, 'world_identity_links'))).pin
+        registry = LazyIdentityRegistry(store.store_identity, next_incarnation=2, prune_dead_occurrences=True)
+        registry.live_bindings = lambda: pytest.fail('global registry inventory')
+        owners, loads, dirty = {}, [], set()
+        def load(owner):
+            if owner not in owners:
+                loads.append(owner)
+                owners[owner] = (store.read_record(*owner, expected_record_schema=1) if owner[0] == eager
+                    else store.read_version(coord.pin, *owner, expected_record_schema=1).value)
+            return owners[owner]
+        def install(owner, path, obj):
+            owners[owner]['shared'] = obj
+        coord = coord_module.IdentityCoordinator(store, pin, registry, load_owner=load,
+            resolve_path=lambda value, path: value['shared'], install_path=install,
+            mark_dirty=dirty.add, preflight=lambda: None)
+        obj = load((NS, 1))['shared']
+        registry.bind(obj, Occurrence(NS, 1, path), incarnation=IncarnationId(store.store_identity, 1))
+        assert set(coord.routes_for_mutation(obj)) == {(NS, 1), (eager, 1)}
+        assert owners[eager, 1]['shared'] is obj
+        obj.value = 8
+        versions = (VersionChange(NS, 1, owners[NS, 1]),)
+        ordinary = (RecordChange(eager, 1, owners[eager, 1]),)
+        delta = coord.prepare_delta(versions, ordinary_changes=ordinary)
+        metadata_versions, records, identities = delta.decode(store.codec)
+        assert records == ()  # family payloads remain in their central plan
+        successor = store.commit(pin, commit_token='hybrid', version_changes=versions + metadata_versions,
+            changes=ordinary, identity_changes=identities, new_segments=(),
+            metadata=metadata(2, (NS, eager, 'world_identity_links'))).pin
+        coord.accept_delta(delta, successor)
+        assert not coord.dirty_owners
+        assert registry.object_for_incarnation(IncarnationId(store.store_identity, 1)) is obj
+        assert store.read_record(eager, 1, expected_record_schema=1)['shared'].value == 8
 
 
 def coordinator(store, pin, loads, dirty):
