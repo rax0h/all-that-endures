@@ -3,11 +3,12 @@ from math import hypot
 from .core import Layer, Ref, TradeRoute
 from .culture import Institution, Law, adoption_items_above
 from .species import habitat_suitability
+from .household_queries import living_household_members
 
 def _distance(world,a:int,b:int)->float:
     sa,sb=world.settlements[a],world.settlements[b]
     return max(1.0,hypot(sa.x-sb.x,sa.y-sb.y))
-def _household_living(world,hid:int): return [world.people[pid] for pid in world.households[hid].members if world.people[pid].alive]
+def _household_living(world,hid:int): return living_household_members(world,hid)
 def _capacity(world,sid:int):
     s=world.settlements[sid];c=world.cells[(s.x,s.y)];return max(24.,90.+150.*c.fertility+55.*s.irrigation+35.*s.roads-45.*c.hazard)
 def _household_habitat_fit(world,living,destination:int):
