@@ -1,0 +1,10 @@
+{
+  "focused_exit_code": 0,
+  "focused_summary": "59 passed in 103.09s (0:01:43)",
+  "note": "Run checks apply only to the tested SHA, never later branch heads.",
+  "p5_exit_code": 0,
+  "p5_final_year": 10,
+  "p5_passed": true,
+  "tested_commit": "00a0c693ed3e7a0d6b34241b230c564c2d6d7f73",
+  "workflow_run": "37870946768"
+}
