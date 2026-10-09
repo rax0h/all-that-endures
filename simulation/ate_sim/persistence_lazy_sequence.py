@@ -14,6 +14,7 @@ import sys
 
 from .incremental_store import StoreConflictError, StoreIntegrityError, _framed_sha
 from .persistence_lazy_store import VersionChange
+from .persistence_lazy_budget import SharedCacheBudget
 
 DESCRIPTOR_NAMESPACE = 'aux.lazy.sequence.descriptors'
 NODE_NAMESPACE = 'aux.lazy.sequence.nodes'
@@ -80,13 +81,15 @@ class LazyOrderedSequence(MutableSequence):
     _kind = 'sequence'
 
     def __init__(self, store, pin, incarnation, *, initial_values=None,
-                 guard=None, changed=None, read_guard=None, value_mode=None):
+                 guard=None, changed=None, read_guard=None, value_mode=None,
+                 cache_budget=None):
         if not _positive(incarnation):
             raise ValueError('invalid sequence incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
         self._guard, self._changed, self._read_guard = guard, changed, read_guard
         self._cache = OrderedDict()
         self._cache_bytes = 0
+        self._cache_budget = cache_budget if cache_budget is not None else SharedCacheBudget()
         self._dirty, self._baseline = {}, {}
         self._prepared = self._accepted = None
         self._new = initial_values is not None
@@ -184,8 +187,7 @@ class LazyOrderedSequence(MutableSequence):
         except BaseException:
             descriptor, self._dirty, self._baseline = state
             self._load_descriptor(descriptor)
-            self._cache.clear()
-            self._cache_bytes = 0
+            self._clear_cache()
             raise
         if self._descriptor() != state[0]:
             self._revision += 1
@@ -211,16 +213,29 @@ class LazyOrderedSequence(MutableSequence):
         if marker in self._cache:
             value, size = self._cache.pop(marker)
             self._cache[marker] = value, size
+            self._cache_budget.touch(self, marker)
             return value
         value = self._raw(namespace, key)
         size = _resident(marker) + _resident(value)
         if size <= CACHE_BYTES:
             self._cache[marker] = value, size
             self._cache_bytes += size
+            self._cache_budget.admit(self, marker, size)
             while len(self._cache) > CACHE_ENTRIES or self._cache_bytes > CACHE_BYTES:
-                _, (_, removed) = self._cache.popitem(last=False)
-                self._cache_bytes -= removed
+                oldest = next(iter(self._cache))
+                self._cache_budget.forget(self, oldest)
+                self._budget_evict(oldest)
         return value
+
+    def _budget_evict(self, marker):
+        cached = self._cache.pop(marker, None)
+        if cached is not None:
+            self._cache_bytes -= cached[1]
+
+    def _clear_cache(self):
+        self._cache_budget.release(self)
+        self._cache.clear()
+        self._cache_bytes = 0
 
     def _put(self, namespace, key, value):
         marker = namespace, key
@@ -234,9 +249,8 @@ class LazyOrderedSequence(MutableSequence):
             self._baseline.pop(marker, None)
         else:
             self._dirty[marker] = value
-        cached = self._cache.pop(marker, None)
-        if cached is not None:
-            self._cache_bytes -= cached[1]
+        self._cache_budget.forget(self, marker)
+        self._budget_evict(marker)
 
     def _digest(self, namespace, key, value):
         return _framed_sha(b'counted-sequence-node/v1', self._store.codec.encode((namespace, key, value)))
@@ -935,8 +949,7 @@ class LazyOrderedSequence(MutableSequence):
         self._base_descriptor = self._store.codec.encode(self._descriptor())
         self._dirty.clear()
         self._baseline.clear()
-        self._cache.clear()
-        self._cache_bytes = 0
+        self._clear_cache()
         self._accepted = delta.fingerprint, successor_pin
         self._prepared = None
 
@@ -968,8 +981,7 @@ class LazyOrderedSequence(MutableSequence):
                 raise StoreConflictError('dirty sequence has no frozen acknowledged plan')
             self._store._require_pin(pin)
             self._pin = pin
-            self._cache.clear()
-            self._cache_bytes = 0
+            self._clear_cache()
 
     def scrub(self):
         """Explicit full-history validation, including orphan/extra projections."""

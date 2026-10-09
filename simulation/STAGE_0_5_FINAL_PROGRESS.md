@@ -366,6 +366,85 @@ leases/GC remain separate unfinished work. Household/settlement integration,
 nested closure, exact pressure path, migration, independent P5/full suite/review
 and production acceptance are still outstanding. No production ref changed.
 
+## Shared history cache checkpoint (October 9, 2026)
+
+Workspace execution recovered. Verified local implementation `66c550b`, tree
+`2e462db3c35ea39ffb6bf2eafa3897dddf6ae651`, with only the six uncommitted
+budget tests retained from the interruption; the attempted budget module had
+not been written. Public implementation remains `d2081e8`; documentation-only
+recovery commit `0744fac13adbd3cd378e629ae64a19919e0163ce`, tree
+`182ce85e40bf66097143d7e0b13b764a5da95cfa`, is preserved in this local tree.
+No implementation was silently overwritten or reset. See the recovery document
+for the precise earlier interruption; it is historical, not the current state.
+
+Implemented a shared clean LRU with simultaneous entry and byte limits,
+weak owners (including unhashable proxies), owner-local eviction/forget/release,
+and bounded teardown. Eviction never changes logical ownership, dirty state,
+registry placements or persisted authority. Collected owners lose payload and
+weak metadata; replacing an entry changes its charge without evicting the new
+value. Oversized pages are returned without clean retention. Payload/sidecar
+weights and recursively estimated manager metadata are separately reported;
+these are not claimed as process RSS.
+
+Counted sequences accept the manager and release it on clean-to-dirty transfer,
+rollback, exact acknowledgement and clean pin advance. Typed lists/maps/sets
+and compatibility household member pages share one session manager, capped at
+64 entries AND 8 MiB. Existing smaller per-list four-page bounds remain.
+Session close and portable materialization release the bounded clean inventory
+without a registry walk. Dirty pages/baselines and detached aliases have separate
+Python residency diagnostics. New tests cover cross-family World histories,
+clean sidecar teardown, oversized page rejection, external proxy collection,
+dirty survival and acknowledgement. Counted-sequence World ownership integration
+is still pending; this change does not emit capability6 or upgrade any store.
+
+RED evidence: six missing-module failures on resume (0.15s); typed list/map/set
+and household constructors rejected cache_budget; World lacked the shared
+manager and household sharing. A permanent additional RED found cancelled
+typed-list edits retaining every touched dirty page/baseline after returning to
+original bytes. Preparation now drops cancelled journals and unpublished empty
+pages, preserving exact numeric representatives and real changed/deleted pages.
+
+Commands use `PYTHONPATH=.:simulation` and
+`/workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q`.
+Final source affected gate:
+`simulation/tests/test_stage_0_5_final_budget.py simulation/tests/test_stage_0_5_final_world_budget.py simulation/tests/test_stage_0_5_household_sequence.py simulation/tests/test_stage_0_5_household_tail_delete.py simulation/tests/test_stage_0_5_paged_household_world.py simulation/tests/test_persistence_lazy_typed_property_histories.py simulation/tests/test_persistence_lazy_typed_institution_divinity.py simulation/tests/test_persistence_lazy_nested_history.py simulation/tests/test_persistence_lazy_nested_maps_sets.py`
+— **99 passed in 84.69s**.
+Sequence/lifecycle/alias/scoped-index gate:
+`simulation/tests/test_stage_0_5_final_sequence.py simulation/tests/test_stage_0_5_final_sequence_compat.py simulation/tests/test_persistence_lifecycle.py simulation/tests/test_stage_0_5_unloaded_alias_routing.py simulation/tests/test_stage_0_5_household_scoped_index.py`
+— **77 passed in 103.99s**. Both ran on unchanged implementation source;
+counts overlap other gates. Earlier 87-test gate preceded the final household
+and cancelled-journal changes and is not substituted for these final gates.
+One initial command named a nonexistent advancement test file and collected no
+tests; it was corrected before the actual gates. No failures are concealed.
+Staged whitespace checking subsequently found trailing blank lines in two new
+files; these were removed, the source-hashed measurements regenerated, and the
+final focused budget/World gate passed **13 tests in 9.19s**. No behavior changed.
+
+Reproduce metrics:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/measure_stage_0_5_history_budget.py --output simulation/stage_0_5_final_history_budget_metrics.json`.
+Explicit construction/traversal is O(H), not ordinary-open acceptance. Long
+fixtures use two histories; many-owner fixtures retain at most eight external
+proxies. Source SHA-256, real checked read/commit counters, old-pin assertion,
+dirty residency and cleanup results are embedded. SQL rows examined remain
+unknown; returned counters are not presented as proof of absence of SQL scans.
+
+| Fixture H1k / H10k | Peak clean entries | Clean weighted bytes | Traced Python peak bytes | Actual edit payload writes / bytes |
+| --- | ---: | ---: | ---: | ---: |
+| Two long histories | 8 / 8 | 37,504 / 34,336 | 83,802 / 91,311 | 1 / 1; 1,802 / 1,929 |
+| Many owners, eight external aliases | 8 / 8 | 3,584 / 3,584 | 36,625 / 36,626 | 1 / 1; 108 / 108 |
+
+World regression additionally traverses 39 independent Property/Infrastructure/
+Household histories and verifies their combined 64-entry limit and release on
+close. Component fixture clean weights stay bounded as H grows; this is not a
+claim about all World caches, overall process RSS, or pressure latency.
+
+Next: large identity-group streaming/spill, World catalog/coordinator/frozen
+participant integration and household/settlement counted-sequence headers.
+Shared 32-MiB record budget, lifetime leases, retired backing-tree reclamation,
+nested closure/exceptional EventIdSet, exact pressure and migration remain.
+Independent P5, stable final full suite and architectural review are not run.
+Stage 0.5 is neither implementation complete, candidate validated nor accepted.
+
 ## Release decision still open
 
 Implement exact bounded-memory ordered native pressure sum and measure O(H) cache misses. Owner has not authorized that latency exception or changed arithmetic. This does not block continued implementation; it blocks production acceptance. Endurance/restore retention and promotion remain separately authorized gates.

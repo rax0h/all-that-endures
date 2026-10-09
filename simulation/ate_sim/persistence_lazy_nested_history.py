@@ -7,6 +7,7 @@ import weakref
 
 from .incremental_store import StoreFormatError, StoreIntegrityError, Membership
 from .persistence_lazy_store import VersionChange, _query_checksum
+from .persistence_lazy_budget import CleanCacheOwner, resident_bytes
 
 DESCRIPTOR_NAMESPACE = 'aux.lazy.nested.descriptors'
 PAGE_NAMESPACE = 'aux.lazy.nested.list_pages'
@@ -93,20 +94,21 @@ def checked_list_extent(store, pin, incarnation, length):
             store._read_snapshot_end()
 
 
-class LazyHistoryList(MutableSequence):
+class LazyHistoryList(CleanCacheOwner, MutableSequence):
     """Typed list with bounded point/tail operations and explicit whole edits."""
 
     __hash__ = None
     _kind = 'list'
 
-    def __init__(self, store, pin, incarnation, *, guard=None, changed=None, initial_values=None):
+    def __init__(self, store, pin, incarnation, *, guard=None, changed=None,
+                 initial_values=None, cache_budget=None):
         if type(incarnation) is not int or incarnation <= 0:
             raise ValueError('invalid nested history incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
         self._guard, self._changed = guard, changed
         self._read_guard = None
         self._sorting_values = None
-        self._cache = OrderedDict()
+        self._initialize_cache(cache_budget)
         self._dirty_pages = {}
         self._baseline_page_bytes = {}
         self._page_loads = 0
@@ -165,15 +167,14 @@ class LazyHistoryList(MutableSequence):
             return self._dirty_pages[number]
         if number in self._cache:
             self._cache.move_to_end(number)
+            self._cache_budget.touch(self, number)
             return self._cache[number]
         value = checked_value(self._store, self._pin, PAGE_NAMESPACE, (self._incarnation, number))
         expected = min(PAGE_SIZE, self._base_length - number * PAGE_SIZE)
         if type(value) is not tuple or len(value) != expected or any(not immutable_value(item) for item in value):
             raise StoreIntegrityError('invalid nested list page')
         self._page_loads += 1
-        self._cache[number] = value
-        while len(self._cache) > CACHE_PAGES:
-            self._cache.popitem(last=False)
+        self._cache_value(number, value, CACHE_PAGES)
         return value
 
     def _page(self, number):
@@ -182,6 +183,7 @@ class LazyHistoryList(MutableSequence):
                 old = self._read_page(number)
                 self._baseline_page_bytes[number] = self._store.codec.encode(tuple(old))
                 self._dirty_pages[number] = list(old)
+                self._drop_clean(number)
             else:
                 self._dirty_pages[number] = []
         return self._dirty_pages[number]
@@ -286,7 +288,7 @@ class LazyHistoryList(MutableSequence):
                 self._baseline_page_bytes[number] = self._store.codec.encode(tuple(self._read_page(number)))
             self._dirty_pages[number] = list(values[number * PAGE_SIZE:(number + 1) * PAGE_SIZE])
         self._length = len(values)
-        self._cache.clear()
+        self._clear_cache()
 
     def __iter__(self):
         index = 0
@@ -381,11 +383,16 @@ class LazyHistoryList(MutableSequence):
             if number * PAGE_SIZE >= self._length:
                 if number * PAGE_SIZE < self._base_length:
                     out.append(VersionChange(PAGE_NAMESPACE, key, delete=True, record_schema=RECORD_SCHEMA))
+                else:
+                    self._dirty_pages.pop(number, None)
+                    self._baseline_page_bytes.pop(number, None)
                 continue
             value = tuple(page)
             if len(value) != min(PAGE_SIZE, self._length - number * PAGE_SIZE):
                 raise StoreIntegrityError('incomplete nested list page')
             if self._store.codec.encode(value) == self._baseline_page_bytes.get(number):
+                self._dirty_pages.pop(number, None)
+                self._baseline_page_bytes.pop(number, None)
                 continue
             out.append(VersionChange(PAGE_NAMESPACE, key, value, record_schema=RECORD_SCHEMA))
         return tuple(out)
@@ -396,11 +403,13 @@ class LazyHistoryList(MutableSequence):
         self._new = False
         self._dirty_pages.clear()
         self._baseline_page_bytes.clear()
-        self._cache.clear()
+        self._clear_cache()
 
     def diagnostics(self):
         return {'length': self._length, 'page_loads': self._page_loads,
                 'cached_pages': len(self._cache), 'dirty_pages': len(self._dirty_pages),
+                'clean_bytes': self._cache_bytes,
+                'dirty_bytes': resident_bytes((self._dirty_pages, self._baseline_page_bytes)),
                 'cached_values': sum(len(page) for page in self._cache.values())}
 
 
@@ -498,16 +507,16 @@ class _HistoryIterator:
             self._state.remove(key)
 
 
-class _ScalarHistory:
+class _ScalarHistory(CleanCacheOwner):
     _kind = None
     __hash__ = None
 
-    def __init__(self, store, pin, incarnation, *, initial_values=None):
+    def __init__(self, store, pin, incarnation, *, initial_values=None, cache_budget=None):
         if type(incarnation) is not int or incarnation <= 0:
             raise ValueError('invalid nested history incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
         self._guard = self._changed = self._read_guard = None
-        self._cache = OrderedDict()
+        self._initialize_cache(cache_budget)
         self._iterators = weakref.WeakSet()
         self._dirty_entries, self._baseline_bytes = {}, {}
         self._entry_loads = self._structure_revision = 0
@@ -555,15 +564,14 @@ class _ScalarHistory:
     def _baseline(self, canonical):
         if canonical in self._cache:
             self._cache.move_to_end(canonical)
+            self._cache_budget.touch(self, canonical)
             return self._cache[canonical]
         value = None if self._new else checked_scalar_entry(self._store, self._pin, self._incarnation, canonical)
         if value is not None:
             if value[0] >= self._base_next or (self._kind == 'set' and value[2] is not None):
                 raise StoreIntegrityError('nested scalar entry exceeds descriptor')
             self._entry_loads += 1
-        self._cache[canonical] = value
-        while len(self._cache) > 256:
-            self._cache.popitem(last=False)
+        self._cache_value(canonical, value, 256)
         return value
 
     def _entry(self, canonical):
@@ -581,6 +589,7 @@ class _ScalarHistory:
             self._baseline_bytes.pop(canonical, None)
         else:
             self._dirty_entries[canonical] = entry
+        self._drop_clean(canonical)
 
     def _set(self, key, value):
         canonical = self._canonical(key)
@@ -662,10 +671,12 @@ class _ScalarHistory:
         self._new = False
         self._dirty_entries.clear()
         self._baseline_bytes.clear()
-        self._cache.clear()
+        self._clear_cache()
 
     def diagnostics(self):
         return {'length': self._count, 'entry_loads': self._entry_loads,
+                'clean_bytes': self._cache_bytes,
+                'dirty_bytes': resident_bytes((self._dirty_entries, self._baseline_bytes)),
                 'cached_entries': len(self._cache), 'dirty_entries': len(self._dirty_entries)}
 
 

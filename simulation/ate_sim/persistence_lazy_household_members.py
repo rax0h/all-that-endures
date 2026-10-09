@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from collections.abc import MutableSequence
+from .persistence_lazy_budget import CleanCacheOwner, resident_bytes
 from .incremental_store import Membership, StoreError, StoreIntegrityError, StoreFormatError
 from .persistence_lazy_store import (
     VersionChange, _namespace_checksum, _order_checksum, _query_checksum, _version_checksum,
@@ -162,7 +163,7 @@ def bootstrap_household_members(store, generation, owners):
         )
 
 
-class LazyHouseholdMembers(MutableSequence):
+class LazyHouseholdMembers(CleanCacheOwner, MutableSequence):
     _ate_household_page_sequence = True
 
     """Mutable list semantics backed by checked, bounded-size versioned pages.
@@ -172,7 +173,8 @@ class LazyHouseholdMembers(MutableSequence):
     and active lifecycle operations before any mutation.
     """
 
-    def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES, initial_values=None, baseline_length=None):
+    def __init__(self, store, pin, owner, *, guard=None, cache_pages=CACHE_PAGES,
+                 initial_values=None, baseline_length=None, cache_budget=None):
         if not (type(owner) is int and owner > 0) and not (
             type(owner) is tuple and len(owner) == 2
             and owner[0] == BACKING_TAG and type(owner[1]) is int and owner[1] > 0
@@ -185,7 +187,7 @@ class LazyHouseholdMembers(MutableSequence):
         self._cache_pages = cache_pages
         if type(cache_pages) is not int or cache_pages <= 0:
             raise ValueError("cache_pages must be positive")
-        self._cache = OrderedDict()
+        self._initialize_cache(cache_budget)
         self._dirty_pages = {}
         # P2C current links, not this set, are the sharing authority.
         # This is the derived set of owners currently sharing one live list.
@@ -254,7 +256,7 @@ class LazyHouseholdMembers(MutableSequence):
         values = list(self)
         self._detached_values = values
         self._dirty_pages.clear()
-        self._cache.clear()
+        self._clear_cache()
         self._guard = None
         self._length = len(values)
 
@@ -284,7 +286,7 @@ class LazyHouseholdMembers(MutableSequence):
             self.detach_to_memory()
         elif self._owner == key:
             self._owner = min(self._related_owners)
-            self._cache.clear()
+            self._clear_cache()
 
     def _mutation(self):
         self._ensure()
@@ -305,6 +307,7 @@ class LazyHouseholdMembers(MutableSequence):
             return self._dirty_pages[number]
         if number in self._cache:
             self._cache.move_to_end(number)
+            self._cache_budget.touch(self, number)
             return self._cache[number]
         checked = self._store.read_version(
             self._pin, PAGE_NAMESPACE, (self._owner, number),
@@ -315,9 +318,7 @@ class LazyHouseholdMembers(MutableSequence):
         if (type(value) is not tuple or len(value) != expected
                 or any(type(x) is not int or x <= 0 for x in value)):
             raise StoreIntegrityError("invalid household member sequence page")
-        self._cache[number] = value
-        while len(self._cache) > self._cache_pages:
-            self._cache.popitem(last=False)
+        self._cache_value(number, value, self._cache_pages)
         return value
 
     def _page(self, number):
@@ -328,6 +329,7 @@ class LazyHouseholdMembers(MutableSequence):
         else:
             page = list(self._read_page(number))
         self._dirty_pages[number] = page
+        self._drop_clean(number)
         return page
 
     def __len__(self):
@@ -559,7 +561,7 @@ class LazyHouseholdMembers(MutableSequence):
             start = number * PAGE_SIZE
             self._dirty_pages[number] = list(values[start:start+PAGE_SIZE])
         self._length = len(values)
-        self._cache.clear()
+        self._clear_cache()
 
     def reverse(self):
         self._mutation()
@@ -700,13 +702,15 @@ class LazyHouseholdMembers(MutableSequence):
         self._base_length = self._length
         self._new_owner = False
         self._dirty_pages.clear()
-        self._cache.clear()
+        self._clear_cache()
 
     def diagnostics(self):
         return {
             "owner": self._owner, "length": self._length,
             "base_length": self._base_length, "resident_cached_pages": len(self._cache),
             "dirty_pages": len(self._dirty_pages),
+            "clean_bytes": self._cache_bytes,
+            "dirty_bytes": resident_bytes((self._dirty_pages, self._detached_values)),
             "cached_member_ids": sum(len(p) for p in self._cache.values()),
             "dirty_member_ids": sum(len(p) for p in self._dirty_pages.values()),
         }

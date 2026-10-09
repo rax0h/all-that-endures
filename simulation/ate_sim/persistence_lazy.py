@@ -47,6 +47,7 @@ from .persistence_lazy_nested_history import (
     initial_list_changes, initial_scalar_changes, checked_scalar_entry, HistoryReference, HISTORY_CLASSES, HISTORY_TYPES,
     ENTRY_NAMESPACE as NESTED_ENTRY_NAMESPACE,
 )
+from .persistence_lazy_budget import SharedCacheBudget
 from .persistence_lazy_household_members import (
     LENGTH_NAMESPACE as HOUSEHOLD_LENGTH_NAMESPACE,
     BACKING_NAMESPACE as HOUSEHOLD_BACKING_NAMESPACE,
@@ -9936,6 +9937,7 @@ class LazyWorldSession:
         paged_household_members=False,
     ):
         self.store = store
+        self._history_cache_budget = SharedCacheBudget()
         self.pin = pin
         self.world = world
         self.manifest = manifest
@@ -10106,6 +10108,7 @@ class LazyWorldSession:
             guard=guard,
             initial_values=initial_values,
             baseline_length=baseline_length,
+            cache_budget=self._history_cache_budget,
         )
         binding["sequence"] = sequence
         sequence._related_owners = set() if key is None else {key}
@@ -11721,7 +11724,8 @@ class LazyWorldSession:
                 raise StoreIntegrityError('nested reference disagrees with owner incarnation')
             proxy = self._registry.object_for_incarnation(incarnation)
             if proxy is None:
-                proxy = history_class(self.store, self.pin, incarnation.value)
+                proxy = history_class(self.store, self.pin, incarnation.value,
+                                      cache_budget=self._history_cache_budget)
                 self._registry.bind(proxy, incarnation=incarnation)
             elif type(proxy) is not history_class:
                 raise StoreIntegrityError('nested list incarnation has wrong live type')
@@ -11736,7 +11740,8 @@ class LazyWorldSession:
             if type(value) is not {'list': list, 'map': dict, 'set': set}[kind]:
                 raise TypeError('nested history field has wrong type')
             incarnation = self._registry.allocator.allocate()
-            proxy = history_class(self.store, self.pin, incarnation.value, initial_values=value)
+            proxy = history_class(self.store, self.pin, incarnation.value, initial_values=value,
+                                  cache_budget=self._history_cache_budget)
             self._registry.bind(proxy, incarnation=incarnation)
             self._nested_dirty[incarnation.value] = proxy
         old = self._registry.incarnation_for_occurrence(occurrence)
@@ -16825,6 +16830,7 @@ class LazyWorldSession:
         self._scalar_tables = detached_scalar_tables
         self._nested_dirty.clear()
         self._nested_lists.clear()
+        self._history_cache_budget.clear()
         self.social_edges = detached_social_edges
         self.social_adjacency = detached_social_adjacency
         self.social_partnerships = detached_social_partnerships
@@ -17120,6 +17126,7 @@ class LazyWorldSession:
         tracker = self._eager_tracker
         return {
             "state": self._state,
+            "history_cache": self._history_cache_budget.diagnostics(),
             "scalar_records": {ns: table.diagnostics() for ns, table in self._scalar_tables.items()},
             "people": self.people.diagnostics(),
             "aspirations": self.aspirations.diagnostics(),
@@ -17224,6 +17231,7 @@ class LazyWorldSession:
             self.store.release_pin(self.pin)
         finally:
             self._registry.close()
+            self._history_cache_budget.clear()
             self.store.close()
             self._active = False
             self._state = "closed"
