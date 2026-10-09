@@ -447,7 +447,65 @@ class LazyHouseholdMembers(MutableSequence):
             self._replace_all(new)
             return
         index = self._normalize(index)
+        if index == self._length - 1:
+            # Native tail deletion changes one page and the length. Historical
+            # prefix pages remain pinned and never need to be repacked.
+            page = self._page(index // PAGE_SIZE)
+            if len(page) != index % PAGE_SIZE + 1:
+                raise StoreIntegrityError("inconsistent household tail page")
+            page.pop()
+            self._length -= 1
+            return
         self._replace_all(list(self[:index]) + list(self[index+1:]))
+
+    def remove(self, value):
+        """Remove the first equal ID; use checked occurrences for integer IDs.
+
+        An arbitrary middle deletion still uses native full-order repacking.
+        Only a tail match is a bounded physical mutation. Weird native probes
+        (e.g., 1.0 or True) retain the generic MutableSequence equality path.
+        """
+        self._mutation()
+        if self._detached_values is not None:
+            self._detached_values.remove(value)
+            self._length = len(self._detached_values)
+            return
+        if type(value) is not int or value <= 0:
+            return super().remove(value)
+
+        first = None
+        for number, page in self._dirty_pages.items():
+            start = number * PAGE_SIZE
+            for offset, member in enumerate(page):
+                position = start + offset
+                if position < self._length and member == value:
+                    if first is None or position < first:
+                        first = position
+
+        name = OWNER_MEMBER_INDEX if self._owner_indexed else "member"
+        lookup = (self._owner, value) if self._owner_indexed else value
+        for page_key, offset in self._store.query_memberships(
+            self._pin, PAGE_NAMESPACE, name, lookup,
+        ):
+            if type(page_key) is not tuple or len(page_key) != 2:
+                raise StoreIntegrityError("malformed household member page key")
+            owner, number = page_key
+            if owner != self._owner or number in self._dirty_pages:
+                continue
+            if (type(number) is not int or number < 0
+                    or type(offset) is not int or not 0 <= offset < PAGE_SIZE):
+                raise StoreIntegrityError("invalid household member occurrence")
+            position = number * PAGE_SIZE + offset
+            if position >= self._length:
+                raise StoreIntegrityError("member occurrence past household end")
+            if self._read_page(number)[offset] != value:
+                raise StoreIntegrityError("member occurrence disagrees with page")
+            if first is None or position < first:
+                first = position
+
+        if first is None:
+            raise ValueError("list.remove(x): x not in list")
+        del self[first]
 
     def insert(self, index, value):
         self._mutation()
