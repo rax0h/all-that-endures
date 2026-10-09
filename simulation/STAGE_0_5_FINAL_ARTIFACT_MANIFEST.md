@@ -4,9 +4,9 @@ Status: implementation in progress. This manifest is a checkpoint index, not
 release acceptance. PR14 remains unmodified and unmerged.
 
 Current code checkpoint:
-- Public commit: `757e9a8d7a940eb2706e57671b005868b097b807`.
-- Local commit: `750edbed60232c5ef23834da97078ea7e8f71e89`.
-- Matching source tree: `3c80b056f9aa3eb99c0abcd6f63d9554c8204455`.
+- Public commit: `ad5f699d673a1449c314f597c9361e82e0beb2c4`.
+- Local commit: `6847275e54ba540ff3e86dffd18e8108f6339a4f`.
+- Matching source tree: `710a8b7395ddb476c97f6dc1c083080f7d7945b1`.
 
 | Artifact | Scope and authority |
 | --- | --- |
@@ -26,11 +26,13 @@ Current code checkpoint:
 | `tests/test_stage_0_5_final_runtime_families.py` | Cold record/child aliases and immutable concrete bindings |
 | `tests/test_stage_0_5_final_record_budget.py` | Byte accounting, sidecars, retained aliases, dirty owner rehydration, step/query budgets, precommit/lost-ack recovery |
 | `tests/test_stage_0_5_final_pressure_arithmetic.py` | Forced exact float.hex/RNG arithmetic regressions; duplicates, extinct occurrences, shared/replaced list and reopen; checked scalar/cache integration still pending |
+| `ate_sim/persistence_lazy_identity_headers.py` and `tests/test_stage_0_5_final_identity_headers.py` | Compact checked lease/header encoding and coordinator peer comparison; zero history traversal at H1k/H10k, mismatch-before-install; ordinary World activation still pending |
 
 Historical metrics are not silently promoted to evidence for the current source.
 Current metrics carry source SHA256 for every changed production module.
-The progress ledger records the current 194-pass affected gate, historical
-92/96 gates with overlapping scopes, intermediate REDs and repairs. Logs in scratch
+The progress ledger records the 55-pass compact-header affected gate, preceding
+194-pass runtime gate and historical92/96 gates with overlapping scopes,
+intermediate REDs and repairs. Logs in scratch
 are reproducible from those commands; this manifest does not claim their paths
 are permanent artifacts.
 

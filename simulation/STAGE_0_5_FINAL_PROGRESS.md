@@ -784,3 +784,53 @@ coordinator without materializing page-backed histories, then activate the
 complete checked catalog/coordinator through the integrated new-format runtime.
 Continue all remaining packages listed above. Implementation remains in
 progress; this passing checkpoint is not candidate validation or release acceptance.
+
+## 2026-10-09 — compact checked identity placement headers
+
+Local implementation `6847275e54ba540ff3e86dffd18e8108f6339a4f`, public
+`ad5f699d673a1449c314f597c9361e82e0beb2c4`, matching tree
+`710a8b7395ddb476c97f6dc1c083080f7d7945b1`. Publication and exact live ref verified.
+
+FamilyAdapter now provides compact identity payload encoding. A private
+WorldCodec subclass retains the closed schema and portable codec behavior,
+but replaces checked typed history proxies with immutable references during
+placement comparison. It validates the backing store, registered pin,
+generation and lifecycle guard without reading history pages. Equal-valued
+distinct sequence incarnations remain distinct. Incoming reference validity
+and owner/group agreement remain the catalog's responsibility; these encoded
+bytes are not a second identity or historical payload authority.
+
+IdentityCoordinator accepts a concrete placement encoder. World family
+adapters supply the compact header encoder; standalone scalar fixtures keep
+their existing checked codec. The coordinator does not guess a namespace or
+history type. All peer comparisons finish before any installation. A later
+peer referencing another incarnation raises corruption with no installation
+or dirty notification.
+
+RED header5 failed because the adapter method was absent; initial focused5
+passed82.18s. Coordinator RED2 failed for the missing encoder contract, then
+coordinator/lease focused14 passed24.98s (two H-size cases deselected).
+Final command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_identity_headers.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_identity_catalog.py simulation/tests/test_stage_0_5_final_sequence_compat.py simulation/tests/test_stage_0_5_final_runtime_families.py`
+— **55 passed120.11s**, `/tmp/final-identity-headers-stable-gate.log`, exit0.
+H1k/H10k comparisons read zero history payloads; checked node reading is
+forbidden in the regression. Explicit sequence construction is excluded from
+that comparison bound. Wrong-store and wrong-generation leases are rejected.
+`git diff --check` passed.
+
+Compatibility P5 and shared record-budget measurements were rerun with the
+same commands above, logs `/tmp/final-identity-headers-p5.log` and
+`/tmp/final-identity-headers-metrics.log`, both exit0. P5 retains the exact
+baseline final digest and439 events. H1k/H10k edit values remain7/505 reads,
+11/3047 checked,4/1417 writes and9/21373 clean entries/bytes. Reports now carry
+this source's hashes; P5 also identifies the compact-header/coordinator source
+and regression. The 194-pass runtime gate belongs to the immediately preceding
+alias checkpoint; the 55-pass gate is the new foundation's affected gate.
+Neither is a final applicable full suite.
+
+This component is ready for the concrete catalog runtime integration. It does
+not activate the coordinator in ordinary World open/save, publish capability6,
+replace eager household/settlement authority, or close nested histories.
+**Next:** complete runtime adapter/coordinator publication and the dependent
+household/sequence integrations. Preserve native exceptional list behavior
+when closing the counted-sequence interfaces. All final release gates remain.
