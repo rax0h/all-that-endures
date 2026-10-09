@@ -37,6 +37,8 @@ from .threat_ecology import MagicalThreat
 from .economy import Property
 from .infrastructure import Infrastructure
 from .culture import Practice
+from .communities import Community
+from .metaphysics import ResurrectionToken
 from .divinity import God, GreatAstralBeing, Church
 from .institutions import Institution, Branch
 from .persistence_lazy_nested_history import (
@@ -63,6 +65,7 @@ from .persistence_lazy_lineage_children import (
     insert_lineage_child_edge,
 )
 
+from .persistence_lazy_minimum import (MinimumQueries, FIELDS as MINIMUM_FIELDS, HEADER_NAMESPACE as MINIMUM_HEADER_NAMESPACE, NODE_NAMESPACE as MINIMUM_NODE_NAMESPACE, membership_tuples as minimum_memberships, initial_changes as initial_minimum_changes, checked_marker as checked_minimum_marker)
 from .persistence_lazy_adoption import (AdoptionQueries, ADOPTION_NAMESPACE, BUCKET_NAMESPACE as ADOPTION_BUCKET_NAMESPACE, SCOPE_NAMESPACE as ADOPTION_SCOPE_NAMESPACE, memberships as adoption_memberships, initial_buckets)
 
 from .event_log import EventLog, FrozenDict, FrozenList
@@ -198,6 +201,8 @@ CLEAN_GROUP_LIMIT = 256
 # description tag distinguishes complete empty authority from a legacy field.
 SCALAR_RECORD_KINDS = {'dict-scalar/v1': 'dict', 'RecordTable-scalar/v1': 'RecordTable'}
 SCALAR_RECORD_SPECS = {
+    'world.communities.communities': (Community, MINIMUM_FIELDS['world.communities.communities']),
+    'world.metaphysics.resurrection_tokens': (ResurrectionToken, MINIMUM_FIELDS['world.metaphysics.resurrection_tokens']),
     'world.culture.practices': (Practice, {}),
     'world.institutions.institutions': (Institution, {}),
     'world.institutions.branches': (Branch, {}),
@@ -533,9 +538,12 @@ def _institution_memberships(namespace, record, ordinal):
         expected, fields = SCALAR_RECORD_SPECS[namespace]
         if not isinstance(record, expected):
             raise TypeError('wrong scalar family record type')
-        return tuple((name, _scalar_predicate_value(getattr(record, names[0])) if len(names) == 1
+        result = tuple((name, _scalar_predicate_value(getattr(record, names[0])) if len(names) == 1
                       else tuple(_scalar_predicate_value(getattr(record, field)) for field in names), ordinal)
                      for names, name in fields.items())
+        if namespace in MINIMUM_FIELDS:
+            result += minimum_memberships(namespace, record, ordinal, WorldCodec(identity_links_recorded=True))
+        return result
     if namespace == SOCIAL_EDGE_NAMESPACE:
         if not isinstance(record, Relationship):
             raise TypeError("expected Relationship")
@@ -1320,6 +1328,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
 
                     scalar_counts = {namespace: [0, 0] for namespace in SCALAR_NAMESPACES}
                     adoption_values = []
+                    minimum_records = []
                     people_count = 0
                     next_ordinal = 0
                     aspiration_count = 0
@@ -1431,6 +1440,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                                 target, namespace=namespace, generation=generation,
                                 typed_key=typed_key, ordinal=ordinal, value=value, record_schema=1,
                             )
+                            if namespace in MINIMUM_FIELDS:
+                                minimum_records.append((namespace, codec.decode(typed_key), ordinal, value))
                             scalar_counts[namespace][0] += 1
                             scalar_counts[namespace][1] = max(scalar_counts[namespace][1], ordinal + 1)
                             continue
@@ -2330,6 +2341,16 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             _insert_lazy_plain_record(target, namespace=namespace, generation=generation,
                                 typed_key=codec.encode(key), ordinal=count, value=value, record_schema=1)
                             count += 1
+                        target.db.execute('INSERT INTO lazy_namespace_state VALUES (?,?,NULL,?,?,?)',
+                            (namespace, generation, count, count,
+                             _namespace_checksum(namespace, count, count, generation, None)))
+                    minimum_counts = {MINIMUM_HEADER_NAMESPACE: 0, MINIMUM_NODE_NAMESPACE: 0}
+                    for change in initial_minimum_changes(minimum_records, codec):
+                        _insert_lazy_plain_record(target, namespace=change.namespace, generation=generation,
+                            typed_key=codec.encode(change.key), ordinal=minimum_counts[change.namespace],
+                            value=change.value, record_schema=1)
+                        minimum_counts[change.namespace] += 1
+                    for namespace, count in minimum_counts.items():
                         target.db.execute('INSERT INTO lazy_namespace_state VALUES (?,?,NULL,?,?,?)',
                             (namespace, generation, count, count,
                              _namespace_checksum(namespace, count, count, generation, None)))
@@ -7175,6 +7196,10 @@ class LazyScalarRecordTable(_LazyInstitutionRecordTable):
         return versions, identities + tuple(extra), touched, structural
 
 
+class LazyMinimumRecordTable(MinimumQueries, LazyScalarRecordTable):
+    pass
+
+
 class LazyInstitutionMagicRecordTable(_LazyInstitutionRecordTable):
     _record_type = MagicUserRecord
     _record_schema = LAZY_INSTITUTION_MAGIC_RECORD_SCHEMA
@@ -10033,7 +10058,7 @@ class LazyWorldSession:
         self._eager_nested_labels = {}
         self._scalar_tables = {}
         for namespace in _scalar_authorities(store, manifest, pin.captured_head):
-            table_type = LazyScalarRecordTable if namespace in SCALAR_RECORD_SPECS else (LazyAdoptionTable if namespace == ADOPTION_NAMESPACE else LazyScalarMapTable)
+            table_type = (LazyMinimumRecordTable if namespace in MINIMUM_FIELDS else LazyScalarRecordTable) if namespace in SCALAR_RECORD_SPECS else (LazyAdoptionTable if namespace == ADOPTION_NAMESPACE else LazyScalarMapTable)
             table = table_type(self, namespace)
             self._scalar_tables[namespace] = table
             owner = _at_path(world, _namespace_path(namespace)[:-1])
@@ -15539,6 +15564,72 @@ class LazyWorldSession:
                 )
 
 
+    def _validate_minimum_successor(self, plan, generation):
+        checked = set()
+        def marker(namespace, scope, rank, key, ordinal):
+            label = (namespace, scope, rank, key, ordinal)
+            if label not in checked:
+                checked_minimum_marker(self.store, generation, namespace, scope, rank, key, ordinal)
+                checked.add(label)
+        def auxiliary(namespace, key):
+            encoded = self.store.codec.encode(key)
+            row = self.store._visible_record_row(generation, namespace, encoded)
+            if row is None:
+                raise StoreIntegrityError('saved minimum linked authority missing')
+            value, schema, *_ = self.store._check_record_row(namespace, encoded, row, decode=True)
+            if schema != 1:
+                raise StoreIntegrityError('saved minimum authority schema mismatch')
+            return value
+        for unit in plan.scalar_record_plans:
+            if unit.namespace not in MINIMUM_FIELDS:
+                continue
+            for change in unit.version_changes:
+                if change.delete:
+                    row = self.store.db.execute('SELECT 1 FROM lazy_query_versions '
+                        'WHERE namespace=? AND record_key=? AND valid_from<=? '
+                        'AND (valid_to IS NULL OR ?<valid_to) LIMIT 1',
+                        (unit.namespace, self.store.codec.encode(change.key), generation, generation)).fetchone()
+                    if row:
+                        raise StoreIntegrityError('deleted minimum record retains query authority')
+                for member in change.memberships:
+                    if member.index_name.startswith('minimum/v1/') or member.index_name == 'insertion':
+                        marker(unit.namespace, member.index_name, member.value, change.key, member.ordinal)
+        for change in plan.scalar_index_version_changes:
+            if change.namespace == MINIMUM_NODE_NAMESPACE:
+                namespace, scope, key = change.key
+                if change.delete:
+                    row = self.store.db.execute('SELECT 1 FROM lazy_query_versions '
+                        'WHERE namespace=? AND index_name=? AND record_key=? AND valid_from<=? '
+                        'AND (valid_to IS NULL OR ?<valid_to) LIMIT 1',
+                        (namespace, scope, self.store.codec.encode(key), generation, generation)).fetchone()
+                    if row:
+                        raise StoreIntegrityError('deleted minimum node retains query authority')
+                    continue
+                node = change.value
+                marker(namespace, scope, node[1], key, node[2])
+                if node[3] is None:
+                    header = auxiliary(MINIMUM_HEADER_NAMESPACE, (namespace, scope))
+                    if header[2] != (key,):
+                        raise StoreIntegrityError('saved minimum head linkage mismatch')
+                else:
+                    previous = auxiliary(MINIMUM_NODE_NAMESPACE, (namespace, scope, node[3][0]))
+                    if previous[4] != (key,) or previous[1:3] >= node[1:3]:
+                        raise StoreIntegrityError('saved minimum predecessor linkage mismatch')
+                if node[4] is not None:
+                    following = auxiliary(MINIMUM_NODE_NAMESPACE, (namespace, scope, node[4][0]))
+                    if following[3] != (key,) or following[1:3] <= node[1:3]:
+                        raise StoreIntegrityError('saved minimum successor linkage mismatch')
+            elif change.namespace == MINIMUM_HEADER_NAMESPACE:
+                namespace, scope = change.key
+                header = change.value
+                if (header[1] == 0) != (header[2] is None):
+                    raise StoreIntegrityError('saved minimum count/head mismatch')
+                if header[2] is not None:
+                    node = auxiliary(MINIMUM_NODE_NAMESPACE, (namespace, scope, header[2][0]))
+                    if node[3] is not None:
+                        raise StoreIntegrityError('saved minimum first node has predecessor')
+                    marker(namespace, scope, node[1], header[2][0], node[2])
+
     def _validate_adoption_successor(self, plan, generation):
         for unit in plan.scalar_record_plans:
             if unit.namespace != ADOPTION_NAMESPACE:
@@ -15635,6 +15726,7 @@ class LazyWorldSession:
         self._arm_cold_publication(plan)
         self._validate_nested_history_successor(plan, result.generation)
         self._validate_adoption_successor(plan, result.generation)
+        self._validate_minimum_successor(plan, result.generation)
         tracker = self._eager_tracker
         self._validate_people_successor(
             plan, result.generation

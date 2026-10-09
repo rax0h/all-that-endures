@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from .record_index import IndexedRecord
 
 @dataclass
-class Community:
+class Community(IndexedRecord):
     id:int
     kind:str
     founded:int
@@ -50,10 +51,18 @@ class CommunityState:
         return inherited
 
     def local_root(self,settlement):
+        query=getattr(self.communities,"minimum",None)
+        if query is not None:
+            root=query(("kind","origin_settlement"),"founder_network",settlement)
+            return None if root is None else root.id
         roots=[c.id for c in self.communities.values() if c.kind=="founder_network" and c.origin_settlement==settlement]
         return min(roots) if roots else None
 
     def diaspora(self,parent_id,destination,year,event_id):
+        query=getattr(self.communities,"minimum",None)
+        if query is not None:
+            existing=query(("kind","parent","origin_settlement"),"diaspora",parent_id,destination)
+            return existing if existing is not None else self.create("diaspora",year,destination,event_id,parent_id)
         existing=[c for c in self.communities.values() if c.kind=="diaspora" and c.parent==parent_id and c.origin_settlement==destination]
         if existing:return min(existing,key=lambda c:c.id)
         return self.create("diaspora",year,destination,event_id,parent_id)

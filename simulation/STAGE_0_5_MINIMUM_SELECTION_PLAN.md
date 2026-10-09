@@ -1,0 +1,7 @@
+# Community and resurrection-token minimum selection
+
+Preserve native minimum record ID, with original dictionary insertion order for ties. Dictionary keys are independent of IDs, and negative IDs remain legal. Community active flags do not remove founder roots or diaspora records. Tokens remain available whenever person matches and consumed_year is None, including tokens for dead people.
+
+Use the concrete scalar-record authority and frozen auxiliary save lane. Explicit conversion builds checked per-predicate ordered linked nodes and a bucket header containing count/first node. Minimum lookup follows at most the current touched width plus one persisted candidate, then merges current overlays. A lexically ordered exact numeric-rank projection on the existing query index supports bounded neighbor discovery for insertion; neighbor links independently validate gaps. No new tables or implicit open upgrades are required. Auxiliary nodes/headers publish with record changes and retain old-pin visibility.
+
+Develop regression tests first: H=1,000/10,000 and one selected payload; unrelated consumed/community history; unequal key/ID, negative IDs, duplicate ties/reinsertion; live edits, replacement, aliases, rollback/lost acknowledgement, missing query/header/node, eager legacy and portable detach. Preserve all current cohorts and thresholds. This checkpoint precedes household and global identity work, the final combined review, and one final full-suite launch.

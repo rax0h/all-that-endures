@@ -19,7 +19,7 @@ class SoulState(IndexedRecord):
  transformations:list[int]=field(default_factory=list)
 
 @dataclass
-class ResurrectionToken:
+class ResurrectionToken(IndexedRecord):
  id:int
  person:int
  patron_kind:str
@@ -49,6 +49,8 @@ class MetaphysicalState:
   t=ResurrectionToken(tid,person,patron_kind,str(patron_id),year,event_id);self.resurrection_tokens[tid]=t;return t
 
  def available_token(self,pid):
+  query=getattr(self.resurrection_tokens,"minimum",None)
+  if query is not None:return query(("person","consumed_year"),pid,None)
   return next((t for t in sorted(self.resurrection_tokens.values(),key=lambda x:x.id) if t.person==pid and t.consumed_year is None),None)
 
  def record_death(self,pid):
