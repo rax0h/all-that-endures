@@ -1,5 +1,77 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: frozen physical owner-header witnesses (October 10 UTC)
+
+Public source `e1327a3350872a4fc2e0f77381a809e22b67252c`, local source
+`da601f756702b49804cb91042aeb2d07fa4f6ab6`, matching tree
+`afa8f1012dd3992ce4ceb1e1561380adf116d4ba`. Exact-tree leased non-force publication
+completed. Parent public docs `ac01bffc7fe185245d72bdb9b751ae44687d2e20`, local docs
+`3ce8ce3c049cea08e092099852aa126d22ea3ff9`, matching tree
+`c6f4ddaba3df423a6a7af6c7b09a81b340285d86`.
+
+Concrete RuntimeFamilyBindings can construct an unchanged lazy owner header from
+its checked physical source and current compact encoding. It verifies the complete
+owner query projection, preserves schema and memberships, and refuses to substitute
+an old baseline when scalar/header values actually changed. Actual skill histories
+at H1k/H10k require one compact header read (<4096 bytes), no member-history reads.
+Household scalar-query projections are preserved and missing query rows fail.
+
+Coordinator preparation now accepts an explicit `value_changed_incarnations`
+projection from the central publisher and an optional `prepare_owner_header`
+callback. It visits only those routed groups/current placements and adds any
+suppressed physical headers to its own immutable delta, alongside catalog metadata.
+Already supplied family headers are not duplicated. Guarded operations with no
+actual backing writes add no header, payload or identity rows. Frozen retry returns
+the identical delta without running the provider again. Reentrant preparation or
+mutation is blocked throughout provider capture. Missing/wrong providers fail
+without clearing dirt or freezing an incomplete plan. This interface is not yet
+activated in World; the complete-format publisher must supply the actual backing
+write set and eager-family header provider together with its other participants.
+
+Ruling: force suppressed headers only for publisher-declared actual backing edits,
+not every guarded alias access — guarded no-ops must remain write-free — cost if
+wrong: an omitted backing edit could fail to refresh an owner witness. The complete
+World bridge must derive the set from its frozen child writes, never an access log.
+
+Acknowledgement checks physical header bytes/schema/generation and exact lazy
+query projections in addition to catalog commitments. Forced eager headers check
+body bytes and their complete indexed query projection with LIMIT(expected+1).
+New stores create `ordinary_query_owner(namespace,record_key)`; legacy missing or
+misdefined indexes require explicit copy upgrade, without migration on open/ack.
+The H1k/H10k surplus-projection tests read only two eager query rows (three total
+including the one lazy peer projection), with EXPLAIN showing indexed SEARCH and
+no temporary sort. This index also scopes the existing ordinary query writer's
+owner updates; it adds no payload/identity authority.
+
+REDs reproduced the missing concrete header API, missing coordinator callback,
+cached native witness omission, and successful acknowledgement after an eager/lazy
+query projection was corrupted. The protocol tests cover shared physical headers,
+provided-source de-duplication, no-op saves, provider reentrancy, precommit rollback,
+postcommit lost acknowledgement, exact idempotent acceptance, omitted physical
+header and retained frozen plan on corruption. The precommit test initially reused
+the store's latest attempt token; it was corrected to use a fresh token after exact
+`not_committed` resolution, preserving the existing store rule and frozen bytes.
+
+Final affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_owner_header_witnesses.py simulation/tests/test_stage_0_5_final_coordinator_header_witnesses.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_owner_replacement.py simulation/tests/test_stage_0_5_final_owner_retirement.py simulation/tests/test_stage_0_5_final_participant_abort.py simulation/tests/test_stage_0_5_final_identity_headers.py simulation/tests/test_persistence_lazy_store.py simulation/tests/test_persistence_lazy_store_failures.py -k 'not comparison_never'`
+— pipefail exit0, **104 passed,2 deselected in26.70s**,
+`stage_0_5_final_forced_header_affected_gate.txt`. The two excluded standalone
+sequence comparison-construction cases retain earlier evidence; new actual-family
+H-size header cases were included. Earlier50-case gate precedes the eager query
+index and final validation additions, and is supporting only. Counts overlap.
+`git diff --check` passed. No new P5/full-suite/endurance run: current live World
+catalog activation remains absent, and exact integrated P5 stays at the preceding
+type-admission source boundary.
+
+Next: connect complete-format World touched placement/header journals, coordinator
+and dependency/retirement participants; eliminate new-format global identity scans;
+finish recursive mutable/exotic-key and live counted-alias closure; complete the
+source-preserving capability6 copy upgrade and all mandatory authorities; integrated
+H/fault/P5 and one final full applicable suite; final independent architectural
+review. Pressure cold-miss release decision remains open. Capability6 is not
+emitted. Stage0.5 is not complete, and PR14 is not promoted.
+
+
 ## Latest checkpoint: bounded paged type admission (October 10 UTC)
 
 Public source `0a0362c66d8561190f76a9da6e2f95d8cb87650e`, local source
