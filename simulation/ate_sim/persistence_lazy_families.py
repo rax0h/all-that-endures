@@ -6,6 +6,7 @@ instead of receiving a guessed serialization or growth policy.
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 from types import MappingProxyType
+import weakref
 from typing import Protocol
 from .persistence_schema import ROOT_FIELDS, RECORD_FIELDS
 from .incremental_store import RecordChange, Membership, _framed_sha
@@ -145,6 +146,7 @@ class RuntimeFamilyBindings:
     cache or write authority; both routing and alias callbacks use its maps.
     """
     def __init__(self, session, *, scalar_record_namespaces):
+        self._session_ref = weakref.ref(session)
         tables, indexed = {}, {}
         for namespace, spec in RUNTIME_FAMILIES.items():
             table = getattr(session, spec.attribute)
@@ -166,6 +168,102 @@ class RuntimeFamilyBindings:
                 raise ValueError(f'runtime root authority mismatch: {namespace}')
         self.tables = MappingProxyType(tables)
         self.indexed_tables = MappingProxyType(indexed)
+
+    def _session(self):
+        from .incremental_store import StoreError
+        session = self._session_ref()
+        if session is None:
+            raise StoreError('identity owner session is closed')
+        session._ensure_people_mutation_allowed()
+        return session
+
+    @staticmethod
+    def _adapter(owner, path=()):
+        from .incremental_store import StoreIntegrityError
+        from .persistence_lazy_identity_catalog import placement_path
+        if type(owner) is not tuple or len(owner) != 2:
+            raise StoreIntegrityError('invalid identity owner')
+        placement_path(*owner, path)
+        if owner[0] == 'world.event_ids' and (type(owner[1]) is not int or owner[1] != 0):
+            raise StoreIntegrityError('event-ID facade has only owner zero')
+        return FAMILIES[owner[0]]
+
+    def _root(self, session, adapter):
+        value = session.world
+        for _kind, field in adapter.root_path:
+            value = getattr(value, field)
+        return value
+
+    def load_owner(self, owner):
+        """Resolve one concrete authority; mutable event tail only."""
+        from .incremental_store import StoreIntegrityError
+        from .persistence_identity import iter_mutable_event_owners
+        session = self._session()
+        adapter = self._adapter(owner)
+        table = self.tables.get(owner[0])
+        if table is not None:
+            return table[owner[1]]
+        root = self._root(session, adapter)
+        if adapter.collection_kind == 'events':
+            for candidate, value, _path in iter_mutable_event_owners(root):
+                if candidate == owner:
+                    return value
+            raise StoreIntegrityError('identity owner is not a mutable event')
+        if owner[0] == 'world.event_ids':
+            return root
+        return root[owner[1]]
+
+    @staticmethod
+    def resolve_path(value, path):
+        from .persistence_lazy import _relative_get
+        return _relative_get(value, path)
+
+    def install_path(self, owner, path, obj):
+        """Stitch a checked copy without firing assignment/change callbacks."""
+        from .persistence_lazy import _relative_set
+        from .record_index import IndexedRecord
+        from .incremental_store import StoreIntegrityError
+        session = self._session()
+        adapter = self._adapter(owner, path)
+        value = self.load_owner(owner)
+        table = self.tables.get(owner[0])
+        if table is None:
+            prepared = session._eager_tracker._bind_nested(
+                obj, {owner}, initial=True, allow_existing=True)
+            if prepared is not obj:
+                raise StoreIntegrityError('canonical identity requires an existing runtime wrapper')
+        replacement = _relative_set(value, path, obj)
+        if replacement is value:
+            return
+        root = table if table is not None else self._root(session, adapter)
+        if table is not None or adapter.collection_kind == 'dict':
+            dict.__setitem__(root, owner[1], replacement)
+        elif adapter.collection_kind == 'list':
+            list.__setitem__(root, owner[1], replacement)
+        elif adapter.collection_kind == 'events':
+            first = root._disk_count + len(root._chunks) * root.chunk_size
+            list.__setitem__(root._tail, owner[1] - first, replacement)
+        elif owner[0] == 'world.event_ids':
+            object.__setattr__(session.world, 'event_ids', replacement)
+        else:
+            raise StoreIntegrityError('unsupported identity owner root')
+        if table is not None and isinstance(replacement, IndexedRecord):
+            object.__setattr__(replacement, '_index_table', weakref.ref(table))
+            object.__setattr__(replacement, '_index_key', owner[1])
+
+    def mark_dirty(self, owner):
+        session = self._session()
+        self._adapter(owner)
+        table = self.tables.get(owner[0])
+        if table is not None:
+            table.changed(owner[1])
+        else:
+            session._eager_tracker._mark(owner)
+
+    def encode_placement(self, owner, path, value):
+        session = self._session()
+        adapter = self._adapter(owner, path)
+        return adapter.identity_payload_bytes(session.store, session.pin, value)
 
 
 def validate_manifest():
@@ -293,7 +391,7 @@ _COLLECTION_POLICIES = {
     ('World', 'threat_ecology'): FieldPolicy('state-root', 'core.py: World writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('Genealogy', 'parents'): FieldPolicy('root-collection', 'genealogy.py: Genealogy writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('Genealogy', 'children'): FieldPolicy('root-collection', 'genealogy.py: Genealogy writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
-    ('Relationship', 'shared_history'): FieldPolicy('list-history', 'social.py: Relationship writers', 'unbounded; must use compact backing for ordinary operations', 'typed history reference (existing or pending integration); event data uses immutable segment values'),
+    ('Relationship', 'shared_history'): FieldPolicy('list-history', 'social.py: Relationship writers', 'unbounded; compact header, bounded point/tail operations; whole-list edits remain explicit O(H)', 'typed list reference with current-owner integer event-ID validation; genuine legacy lists remain readable with resident costs'),
     ('SocialGraph', 'edges'): FieldPolicy('root-collection', 'social.py: SocialGraph writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('SocialGraph', 'partnerships'): FieldPolicy('root-collection', 'social.py: SocialGraph writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('SocialGraph', 'adjacency'): FieldPolicy('root-collection', 'social.py: SocialGraph writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
@@ -336,7 +434,7 @@ _COLLECTION_POLICIES = {
     ('ResponseModel', 'coefficients'): FieldPolicy('bounded-generated-list', 'mastery_training.py: ResponseModel writers', 'generated guards only; unrestricted imports are materialized compatibility state; trial trims samples to 3/5, solve coefficients <=5', 'resident tracked topology; oversized import requires explicit classification before new-format conversion'),
     ('MagicAspiration', 'desired_base_essences'): FieldPolicy('fixed-tuple', 'magic_resources.py: MagicAspiration writers', 'immutable tuple; writer-specific generated length, imported tuple unrestricted', 'exact tuple values; no mutable history flattening'),
     ('MagicAspiration', 'desired_abilities'): FieldPolicy('fixed-tuple', 'magic_resources.py: MagicAspiration writers', 'immutable tuple; writer-specific generated length, imported tuple unrestricted', 'exact tuple values; no mutable history flattening'),
-    ('MagicResource', 'transfers'): FieldPolicy('list-history', 'magic_resources.py: MagicResource writers', 'unbounded; must use compact backing for ordinary operations', 'typed history reference (existing or pending integration); event data uses immutable segment values'),
+    ('MagicResource', 'transfers'): FieldPolicy('list-history', 'magic_resources.py: MagicResource writers', 'unbounded; compact header, bounded point/tail operations; whole-list edits remain explicit O(H)', 'typed list reference with current-owner integer event-ID validation; genuine legacy lists remain readable with resident costs'),
     ('MagicResourceState', 'resources'): FieldPolicy('root-collection', 'magic_resources.py: MagicResourceState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('MagicResourceState', 'owner_index'): FieldPolicy('root-collection', 'magic_resources.py: MagicResourceState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('MagicResourceState', 'aspirations'): FieldPolicy('root-collection', 'magic_resources.py: MagicResourceState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
@@ -354,9 +452,9 @@ _COLLECTION_POLICIES = {
     ('InstitutionState', 'magic_records'): FieldPolicy('root-collection', 'institutions.py: InstitutionState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('InstitutionState', 'notices'): FieldPolicy('root-collection', 'institutions.py: InstitutionState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('InstitutionState', 'applications'): FieldPolicy('root-collection', 'institutions.py: InstitutionState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
-    ('SoulState', 'authorities'): FieldPolicy('set-history', 'metaphysics.py: SoulState writers', 'unbounded; must use compact backing for ordinary operations', 'typed history reference (existing or pending integration); event data uses immutable segment values'),
-    ('SoulState', 'marks'): FieldPolicy('set-history', 'metaphysics.py: SoulState writers', 'unbounded; must use compact backing for ordinary operations', 'typed history reference (existing or pending integration); event data uses immutable segment values'),
-    ('SoulState', 'cosmic_links'): FieldPolicy('map-history', 'metaphysics.py: SoulState writers', 'unbounded; must use compact backing for ordinary operations', 'typed history reference (existing or pending integration); event data uses immutable segment values'),
+    ('SoulState', 'authorities'): FieldPolicy('set-history', 'metaphysics.py: SoulState writers', 'unbounded; compact header and indexed point edits; explicit iteration/materialization retains O(H) costs', 'typed scalar set/map reference and shared cache budget; mutable descendant cold imports reject before staging; genuine legacy collections remain readable'),
+    ('SoulState', 'marks'): FieldPolicy('set-history', 'metaphysics.py: SoulState writers', 'unbounded; compact header and indexed point edits; explicit iteration/materialization retains O(H) costs', 'typed scalar set/map reference and shared cache budget; mutable descendant cold imports reject before staging; genuine legacy collections remain readable'),
+    ('SoulState', 'cosmic_links'): FieldPolicy('map-history', 'metaphysics.py: SoulState writers', 'unbounded; compact header and indexed point edits; explicit iteration/materialization retains O(H) costs', 'typed scalar set/map reference and shared cache budget; mutable descendant cold imports reject before staging; genuine legacy collections remain readable'),
     ('SoulState', 'transformations'): FieldPolicy('list-history', 'metaphysics.py: SoulState writers', 'unbounded native scalar history; header and point/tail operations are paged; legacy representation has explicit O(H) costs', 'typed list reference and shared history-page budget; native scalar conversion integrated; recursive mutable cold imports reject before staging; genuine legacy lists remain readable'),
     ('MetaphysicalState', 'souls'): FieldPolicy('root-collection', 'metaphysics.py: MetaphysicalState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('MetaphysicalState', 'resurrection_tokens'): FieldPolicy('root-collection', 'metaphysics.py: MetaphysicalState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
@@ -373,7 +471,7 @@ _COLLECTION_POLICIES = {
     ('DivineState', 'great_astral_beings'): FieldPolicy('root-collection', 'divinity.py: DivineState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('DivineState', 'churches'): FieldPolicy('root-collection', 'divinity.py: DivineState writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),
     ('MaterialLot', 'magical_properties'): FieldPolicy('fixed-tuple', 'materials.py: MaterialLot writers', 'immutable tuple; writer-specific generated length, imported tuple unrestricted', 'exact tuple values; no mutable history flattening'),
-    ('MaterialLot', 'transfers'): FieldPolicy('list-history', 'materials.py: MaterialLot writers', 'unbounded; must use compact backing for ordinary operations', 'typed history reference (existing or pending integration); event data uses immutable segment values'),
+    ('MaterialLot', 'transfers'): FieldPolicy('list-history', 'materials.py: MaterialLot writers', 'unbounded; compact header, bounded point/tail operations; whole-list edits remain explicit O(H)', 'typed list reference with current-owner integer event-ID validation; genuine legacy lists remain readable with resident costs'),
     ('CraftedItem', 'materials'): FieldPolicy('fixed-tuple', 'materials.py: CraftedItem writers', 'immutable tuple; writer-specific generated length, imported tuple unrestricted', 'exact tuple values; no mutable history flattening'),
     ('CraftedItem', 'magical_properties'): FieldPolicy('fixed-tuple', 'materials.py: CraftedItem writers', 'immutable tuple; writer-specific generated length, imported tuple unrestricted', 'exact tuple values; no mutable history flattening'),
     ('MaterialEconomy', 'lots'): FieldPolicy('root-collection', 'materials.py: MaterialEconomy writers', 'current work or historical outer collection; concrete family boundary governs payload loading', 'registered root/family; legacy eager costs disclosed'),

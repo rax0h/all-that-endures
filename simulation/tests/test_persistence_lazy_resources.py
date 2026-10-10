@@ -1,3 +1,4 @@
+from ate_sim.persistence_lazy_nested_history import LazyHistoryList
 import pytest
 
 from ate_sim import checkpoint
@@ -7,7 +8,6 @@ from ate_sim.magic_resources import MagicResource
 from ate_sim.persistence_lazy import (
     LazyOwnerIndexTable,
     LazyResourceTable,
-    LazyTrackedList,
     LazyTrackedSet,
     convert_cold_to_lazy,
     open_lazy_world_session,
@@ -59,7 +59,7 @@ def test_resources_open_zero_payloads_point_read_one_and_owner_query(tmp_path):
         # Membership lookup does not need the resource body.
         assert table.diagnostics()["resource_payload_loads"] == 0
         item = table[300]
-        assert isinstance(item.transfers, LazyTrackedList)
+        assert isinstance(item.transfers, LazyHistoryList)
         assert table.diagnostics()["resource_payload_loads"] == 1
 
 

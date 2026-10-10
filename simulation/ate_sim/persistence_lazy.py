@@ -42,7 +42,8 @@ from .metaphysics import ResurrectionToken
 from .divinity import God, GreatAstralBeing, Church
 from .institutions import Institution, Branch
 from .persistence_lazy_nested_history import (
-    LazyHistoryList, DESCRIPTOR_NAMESPACE as NESTED_DESCRIPTOR_NAMESPACE,
+    LazyHistoryList, LazyHistoryMap, LazyHistorySet,
+    DESCRIPTOR_NAMESPACE as NESTED_DESCRIPTOR_NAMESPACE,
     PAGE_NAMESPACE as NESTED_PAGE_NAMESPACE, reference as nested_reference,
     initial_list_changes, initial_scalar_changes, checked_scalar_entry, HistoryReference, HISTORY_CLASSES, HISTORY_TYPES,
     ENTRY_NAMESPACE as NESTED_ENTRY_NAMESPACE,
@@ -223,8 +224,11 @@ SCALAR_RECORD_SPECS = {
     }),
 }
 NESTED_RECORD_FIELDS = {
+    'world.magic_resources.resources': ('transfers',),
+    'world.materials.lots': ('transfers',),
+    'world.social.edges': ('shared_history',),
     'world.skills.skills': ('teachers', 'provenance'),
-    'world.metaphysics.souls': ('transformations',),
+    'world.metaphysics.souls': ('authorities', 'marks', 'cosmic_links', 'transformations'),
     'world.culture.practices': ('traits',),
     'world.institutions.institutions': ('branches', 'members'),
     'world.institutions.branches': ('records', 'notices', 'trainees'),
@@ -235,6 +239,9 @@ NESTED_RECORD_FIELDS = {
     'world.infrastructure.assets': ('provenance',),
 }
 NESTED_FIELD_KINDS = {
+    ('world.metaphysics.souls', 'authorities'): 'set',
+    ('world.metaphysics.souls', 'marks'): 'set',
+    ('world.metaphysics.souls', 'cosmic_links'): 'map',
     ('world.culture.practices', 'traits'): 'map',
     ('world.institutions.institutions', 'members'): 'set',
     ('world.institutions.branches', 'records'): 'set',
@@ -965,7 +972,8 @@ def _plain_resource_value(resource):
     """Storage value for a live lazy resource without runtime wrappers."""
     if not isinstance(resource, MagicResource):
         raise TypeError("expected MagicResource")
-    return replace(resource, transfers=list(resource.transfers))
+    return replace(resource, transfers=(resource.transfers.storage_reference()
+        if type(resource.transfers) is LazyHistoryList else list(resource.transfers)))
 
 
 def _resource_memberships(resource, ordinal):
@@ -1069,7 +1077,8 @@ def _plain_material_lot_value(lot):
     """Storage value for a live lazy material lot without runtime wrappers."""
     if not isinstance(lot, MaterialLot):
         raise TypeError("expected MaterialLot")
-    return replace(lot, transfers=list(lot.transfers))
+    return replace(lot, transfers=(lot.transfers.storage_reference()
+        if type(lot.transfers) is LazyHistoryList else list(lot.transfers)))
 
 
 def _material_lot_memberships(lot, ordinal):
@@ -1313,7 +1322,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     if type(values) is not {'list': list, 'map': dict, 'set': set}[kind]:
                         raise StoreFormatError('typed history source has wrong type')
                     if namespace in {SKILL_NAMESPACE, SOUL_NAMESPACE} and any(
-                        not nested_immutable_value(value) for value in values
+                        not nested_immutable_value(value) for value in
+                        (tuple(values) + tuple(values.values()) if kind == 'map' else values)
                     ):
                         # Recursive mutable history is not yet a complete
                         # authority. Reject before staging instead of publishing
@@ -2712,7 +2722,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
     if resource is not None:
         relative = resource[1]
         expected_type = (
-            list
+            (list, LazyHistoryList, HistoryReference)
             if relative == LazyResourceTable._transfer_path
             else MagicResource
         )
@@ -2734,7 +2744,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
     if material_lot is not None:
         relative = material_lot[1]
         expected_type = (
-            list
+            (list, LazyHistoryList, HistoryReference)
             if relative == LazyMaterialLotTable._transfer_path
             else MaterialLot
         )
@@ -2793,9 +2803,9 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             (("field", "authorities"),),
             (("field", "marks"),),
         ):
-            expected_type = set
+            expected_type = (set, LazyHistorySet, HistoryReference)
         elif relative == (("field", "cosmic_links"),):
-            expected_type = dict
+            expected_type = (dict, LazyHistoryMap, HistoryReference)
         elif relative == (("field", "transformations"),):
             expected_type = (list, LazyHistoryList, HistoryReference)
         else:
@@ -2843,7 +2853,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
     if social_edge is not None:
         relative = social_edge[1]
         expected = (
-            list
+            (list, LazyHistoryList, HistoryReference)
             if relative == LazySocialEdgeTable._history_path
             else Relationship
         )
@@ -2890,6 +2900,11 @@ def _relative_set(root, path, value):
     elif kind == "key":
         dict.__setitem__(parent, key, value)
     elif kind == "index":
+        if type(parent) is tuple:
+            values = list(parent)
+            values[key] = value
+            replacement = tuple(values)
+            return _relative_set(root, path[:-1], replacement)
         list.__setitem__(parent, key, value)
     else:
         raise StoreFormatError("unsupported identity path component")
@@ -4813,6 +4828,8 @@ class LazyTrackedList(list):
     def __init__(self, values, table, key):
         list.__init__(self, values)
         self._table_ref = weakref.ref(table)
+        session = getattr(table, '_session', None)
+        self._session_ref = None if session is None else weakref.ref(session)
         self._key = key
 
     @staticmethod
@@ -4827,16 +4844,26 @@ class LazyTrackedList(list):
 
     def _guard(self):
         table = self._table()
-        if table is not None:
+        session = None if self._session_ref is None else self._session_ref()
+        if session is not None:
+            session._shared_object_routes(self)
+        elif table is not None:
             table._ensure_mutation()
         return table
 
     def _touch(self, table):
-        if table is not None:
+        session = None if self._session_ref is None else self._session_ref()
+        if session is not None:
+            for owner_table, key in session._shared_object_routes(self):
+                owner_table.changed(key)
+            session._eager_tracker._mark_many(session._nested_eager_owners(self))
+        elif table is not None:
             table.changed(self._key, "transfers")
 
     def _attach(self, table, key):
         self._table_ref = weakref.ref(table)
+        session = getattr(table, '_session', None)
+        self._session_ref = None if session is None else weakref.ref(session)
         self._key = key
 
     def _detach(self):
@@ -4978,7 +5005,8 @@ class LazySocialEdgeTable(LazyRecordTable):
 
     @staticmethod
     def _plain(record):
-        return replace(record, shared_history=list(record.shared_history))
+        return replace(record, shared_history=(record.shared_history.storage_reference()
+            if type(record.shared_history) is LazyHistoryList else list(record.shared_history)))
 
     def __getitem__(self, key):
         self._ensure()
@@ -8585,9 +8613,12 @@ def _plain_soul_value(soul):
         raise TypeError("expected SoulState")
     return replace(
         soul,
-        authorities=set(soul.authorities),
-        marks=set(soul.marks),
-        cosmic_links=dict(soul.cosmic_links),
+        authorities=(soul.authorities.storage_reference()
+                     if type(soul.authorities) is LazyHistorySet else set(soul.authorities)),
+        marks=(soul.marks.storage_reference()
+               if type(soul.marks) is LazyHistorySet else set(soul.marks)),
+        cosmic_links=(soul.cosmic_links.storage_reference()
+                      if type(soul.cosmic_links) is LazyHistoryMap else dict(soul.cosmic_links)),
         transformations=(soul.transformations.storage_reference()
                          if type(soul.transformations) is LazyHistoryList
                          else list(soul.transformations)),
@@ -10557,10 +10588,10 @@ class LazyWorldSession:
             # callback can rehydrate that entry without a redundant decode.
             owner = (
                 obj if not occurrence.path and isinstance(obj, IndexedRecord)
-                else table[key]
+                else self._family_bindings.load_owner(occurrence.owner)
             )
             try:
-                current = _relative_get(owner, occurrence.path)
+                current = self._family_bindings.resolve_path(owner, occurrence.path)
             except (KeyError, IndexError, AttributeError, TypeError):
                 # A dirty owner can have removed this placement before its
                 # checked occurrence tombstone is prepared for publication.
@@ -11306,6 +11337,10 @@ class LazyWorldSession:
         occurrence = self._social_edge_occurrence(
             key, LazySocialEdgeTable._history_path
         )
+        if nested_reference(values) or type(values) is LazyHistoryList:
+            return self._bind_history_list(values, occurrence, incarnation, kind='list')
+        if incarnation is None and type(values) is list and all(nested_immutable_value(value) for value in values):
+            return self._bind_history_list(values, occurrence, kind='list')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
             if live is not None:
@@ -11542,6 +11577,10 @@ class LazyWorldSession:
         occurrence = self._resource_occurrence(
             key, LazyResourceTable._transfer_path
         )
+        if nested_reference(transfers) or type(transfers) is LazyHistoryList:
+            return self._bind_history_list(transfers, occurrence, incarnation, kind='list')
+        if incarnation is None and type(transfers) is list and all(nested_immutable_value(value) for value in transfers):
+            return self._bind_history_list(transfers, occurrence, kind='list')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
             if live is not None:
@@ -11764,6 +11803,28 @@ class LazyWorldSession:
             if self._state == 'recovery-required':
                 raise StoreError('nested history read requires save acknowledgement')
         proxy.bind(guard, changed, read_guard)
+        if type(proxy) is LazyHistoryList:
+            # Shared aliases obey the current integer-history owners, including
+            # cold peers just bound by guard. Retirement removes the constraint.
+            integer_paths = {
+                (RESOURCE_NAMESPACE, LazyResourceTable._transfer_path),
+                (MATERIAL_LOT_NAMESPACE, LazyMaterialLotTable._transfer_path),
+                (SOCIAL_EDGE_NAMESPACE, LazySocialEdgeTable._history_path),
+            }
+            def constrained():
+                return any((item.owner_namespace, item.path) in integer_paths
+                    for item in self._registry.occurrences_for_incarnation(incarnation))
+            def validate_value(item):
+                if constrained() and type(item) is not int:
+                    raise TypeError('MagicResource.transfers requires integer event IDs')
+            def validate_batch(values):
+                if constrained():
+                    values = list(values)
+                    for item in values:
+                        validate_value(item)
+                return values
+            proxy._value_validator = validate_value
+            proxy._batch_validator = validate_batch
         return proxy
 
     def _eager_nested_owners(self):
@@ -12293,6 +12354,10 @@ class LazyWorldSession:
         occurrence = self._material_lot_occurrence(
             key, LazyMaterialLotTable._transfer_path
         )
+        if nested_reference(transfers) or type(transfers) is LazyHistoryList:
+            return self._bind_history_list(transfers, occurrence, incarnation, kind='list')
+        if incarnation is None and type(transfers) is list and all(nested_immutable_value(value) for value in transfers):
+            return self._bind_history_list(transfers, occurrence, kind='list')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
             if live is not None:
@@ -12759,6 +12824,10 @@ class LazyWorldSession:
         occurrence = self._soul_occurrence(
             key, LazySoulTable._nested_paths[field]
         )
+        if nested_reference(values) or type(values) is LazyHistorySet:
+            return self._bind_history_list(values, occurrence, incarnation, kind='set')
+        if incarnation is None and type(values) is set and all(nested_immutable_value(value) for value in values):
+            return self._bind_history_list(values, occurrence, kind='set')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
             if live is not None:
@@ -12796,6 +12865,12 @@ class LazyWorldSession:
         occurrence = self._soul_occurrence(
             key, LazySoulTable._nested_paths[field]
         )
+        if nested_reference(values) or type(values) is LazyHistoryMap:
+            return self._bind_history_list(values, occurrence, incarnation, kind='map')
+        if incarnation is None and type(values) is dict and all(
+            nested_immutable_value(k) and nested_immutable_value(v) for k, v in values.items()
+        ):
+            return self._bind_history_list(values, occurrence, kind='map')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
             if live is not None:
@@ -12910,9 +12985,11 @@ class LazyWorldSession:
         self._registry.attach_occurrence(
             soul, self._soul_occurrence(key)
         )
+        replacements = {}
         for field in LazySoulTable._nested_paths:
             value = getattr(soul, field)
-            wrapper = self._bind_soul_nested(key, field, value)
+            wrapper = self._bind_soul_nested(key, field, replacements.get(id(value), value))
+            replacements[id(value)] = wrapper
             if wrapper is not value:
                 object.__setattr__(soul, field, wrapper)
         return soul
@@ -16018,7 +16095,7 @@ class LazyWorldSession:
                     "lazy detach encountered non-resource value"
                 )
             transfers = resource.transfers
-            if isinstance(transfers, LazyTrackedList):
+            if isinstance(transfers, (LazyTrackedList, LazyHistoryList)):
                 replacement = transfer_replacements.get(id(transfers))
                 if replacement is None:
                     replacement = list(transfers)
@@ -16069,7 +16146,7 @@ class LazyWorldSession:
                     "lazy detach encountered non-MaterialLot value"
                 )
             transfers = lot.transfers
-            if isinstance(transfers, LazyTrackedList):
+            if isinstance(transfers, (LazyTrackedList, LazyHistoryList)):
                 replacement = replacements.get(id(transfers))
                 if replacement is None:
                     replacement = list(transfers)
@@ -16513,7 +16590,7 @@ class LazyWorldSession:
                     "lazy detach encountered non-Relationship social edge"
                 )
             history = record.shared_history
-            if isinstance(history, LazyTrackedList):
+            if isinstance(history, (LazyTrackedList, LazyHistoryList)):
                 replacement = replacements.get(id(history))
                 if replacement is None:
                     replacement = list(history)

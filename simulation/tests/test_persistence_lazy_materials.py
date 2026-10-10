@@ -1,3 +1,4 @@
+from ate_sim.persistence_lazy_nested_history import LazyHistoryList
 import pytest
 
 from ate_sim import checkpoint
@@ -9,7 +10,6 @@ from ate_sim.persistence_lazy import (
     LazyMaterialLotIndexTable,
     LazyMaterialLotTable,
     LazyTrackedIdList,
-    LazyTrackedList,
     LazyTrackedSet,
     convert_cold_to_lazy,
     open_lazy_world_session,
@@ -150,7 +150,7 @@ def test_retained_material_transfer_list_rehydrates_evicted_lot(tmp_path):
         lots = session.world.materials.lots
         lot = lots[1]
         transfers = lot.transfers
-        assert isinstance(transfers, LazyTrackedList)
+        assert isinstance(transfers, LazyHistoryList)
         for key in range(2, 401):
             lots[key]
         assert not dict.__contains__(lots, 1)

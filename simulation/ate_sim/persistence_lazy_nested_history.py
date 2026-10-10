@@ -107,6 +107,8 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         self._store, self._pin, self._incarnation = store, pin, incarnation
         self._guard, self._changed = guard, changed
         self._read_guard = None
+        self._value_validator = None
+        self._batch_validator = None
         self._sorting_values = None
         self._initialize_cache(cache_budget)
         self._dirty_pages = {}
@@ -149,6 +151,8 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
             self._changed()
 
     def _validate(self, value):
+        if self._value_validator is not None:
+            self._value_validator(value)
         if not immutable_value(value):
             raise TypeError('typed history values must be immutable schema values')
         self._store.codec.encode(value)
@@ -209,8 +213,9 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
             self._sorting_values[index] = [self._validate(item) for item in value] if isinstance(index, slice) else self._validate(value)
             return
         if isinstance(index, slice):
+            value = [self._validate(item) for item in value]
             values = list(self)
-            values[index] = [self._validate(item) for item in value]
+            values[index] = value
             self._replace_all(values)
         else:
             index = self._normalize(index)
@@ -252,6 +257,8 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
 
     def extend(self, values):
         self._mutation()
+        if self._batch_validator is not None:
+            values = self._batch_validator(values)
         if self._sorting_values is not None:
             if values is self:
                 values = tuple(self)

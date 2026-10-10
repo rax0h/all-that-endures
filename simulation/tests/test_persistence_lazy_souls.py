@@ -1,3 +1,4 @@
+from ate_sim.persistence_lazy_nested_history import LazyHistoryMap, LazyHistorySet
 import pytest
 
 from ate_sim import checkpoint
@@ -8,9 +9,6 @@ from ate_sim.metaphysics import attempt_transcendence, grant_resurrection_token
 from ate_sim.persistence_lazy import (
     SOUL_NAMESPACE,
     LazySoulTable,
-    LazySoulTrackedList,
-    LazySoulTrackedSet,
-    LazyTrackedDict,
     convert_cold_to_lazy,
     open_lazy_world_session,
 )
@@ -147,9 +145,9 @@ def test_nested_soul_incarnations_survive_save_and_reopen(tmp_path):
     with open_lazy_world_session(destination, rules_id=RULES) as reopened:
         soul = reopened.world.metaphysics.souls[4]
         assert identity_labels(reopened, 4) == before
-        assert isinstance(soul.authorities, LazySoulTrackedSet)
-        assert isinstance(soul.marks, LazySoulTrackedSet)
-        assert isinstance(soul.cosmic_links, LazyTrackedDict)
+        assert isinstance(soul.authorities, LazyHistorySet)
+        assert isinstance(soul.marks, LazyHistorySet)
+        assert isinstance(soul.cosmic_links, LazyHistoryMap)
         assert isinstance(soul.transformations, LazyHistoryList)
 
 
@@ -412,7 +410,8 @@ def test_soul_history_scaling_is_bounded_by_requested_access(tmp_path, count):
         )
         assert (
             after_reads.payload_reads - before_reads.payload_reads
-        ) <= 2  # Compact soul header plus checked history descriptor.
-        assert soul.transformations.diagnostics()['page_loads'] == 0
+        ) <= 5  # Compact header plus four checked child descriptors.
+        assert all(getattr(soul, field).diagnostics()['page_loads' if field == 'transformations' else 'entry_loads'] == 0
+                   for field in ('authorities', 'marks', 'cosmic_links', 'transformations'))
         assert soul_diag["resident_souls"] <= 256
         assert write_diag.payload_writes <= 3
