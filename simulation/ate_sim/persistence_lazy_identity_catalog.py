@@ -527,6 +527,9 @@ class IdentityCatalog:
             deletions = []
             for inc, retired_at in candidates:
                 if retired_at > floor: break  # Query is ordered by retirement generation.
+                from .persistence_history_retirement import pending_retirement
+                if pending_retirement(self.store, pin, inc):
+                    continue  # Keep the checked group until backing cleanup ends.
                 header = self.store.read_version(pin, GROUP_NAMESPACE, inc, expected_record_schema=SCHEMA)
                 if header.valid_from != retired_at:
                     raise StoreIntegrityError('retirement eligibility/header revision disagreement')

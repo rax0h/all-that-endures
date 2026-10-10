@@ -184,6 +184,8 @@ CREATE INDEX lazy_record_lookup
     ON lazy_record_versions(namespace, typed_key, valid_from, valid_to);
 CREATE INDEX lazy_record_expiry
     ON lazy_record_versions(valid_to, namespace, typed_key, valid_from);
+CREATE INDEX lazy_record_current_key
+    ON lazy_record_versions(namespace, typed_key) WHERE valid_to IS NULL;
 
 CREATE TABLE lazy_order_versions(
     namespace TEXT NOT NULL,
