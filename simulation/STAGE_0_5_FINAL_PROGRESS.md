@@ -1,5 +1,61 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: actual World retained-history lifetime (October 10 UTC)
+
+Public source `df5055e0fc65e2eee9ecd4e70efc2ac722c2b5b5`, local source
+`c0556fbe49413c00ca5291eb28f1ca03a70e942e`, matching tree
+`0b7f62ca2cc6089107e63b71a3bfd59374b846b4`. Exact-tree leased non-force
+publication completed; PR14 remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+The explicit staged checked-catalog World mode now acquires typed history aliases
+in the existing BackingDependencyPool and freezes that participant in the same
+central save. It borrows the World publisher token: no older generation pin or
+extra transaction. Typed event-ID exception histories use the same acquisition
+boundary. Existing aliases acquired before activation are included without an
+owner/archive inventory. Dependency metadata residency is reported separately.
+New backing authority is created alongside its backing; required existing rows
+are checked, not inferred empty. Private orphan edits remain unpublished until
+reattachment; the alias lease advances on unrelated saves without losing edits.
+
+Close and materializing detach release the dependency publisher before graph
+teardown. Failed release preserves the active graph, callbacks, pool and exact
+plan. A newly tested losing-writer case exposed a frozen stale plan preventing
+close. Explicit stale abandonment now first checks an older valid lease, then
+uses native release (which rejects uncertain attempts or an advanced own token).
+Only successful permanent token invalidation clears the frozen pool; it never
+thaws or permits stale replay. Current frozen plans still cannot be abandoned.
+
+Ruling: retain histories using the existing publisher token and weak roster,
+not historical snapshot pins — cost if wrong: retirement must consult both this
+checked authority and currently acquired aliases before any backing cleanup.
+Ruling: allow stale-plan destruction only through checked permanent lease release,
+not an unchecked abort — cost if wrong: unresolved commit acknowledgement remains
+a hard close blocker, with all frozen metadata preserved on release failure.
+
+Focused/affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py simulation/tests/test_stage_0_5_final_world_catalog_bridge.py simulation/tests/test_stage_0_5_final_backing_dependencies.py simulation/tests/test_stage_0_5_final_participant_abort.py simulation/tests/test_stage_0_5_final_world_participants.py simulation/tests/test_stage_0_5_final_catalog_publication.py simulation/tests/test_persistence_lifecycle.py -k 'not comparison_never'`
+— exit0, **86 passed in9.57s** on the final source. The new actual-World cases
+cover H1k/H10k orphan retention,12 unrelated saves with exactly one publisher
+pin, private-edit reattachment/reopen, new history authority, weak collection
+without SQL, read-only/no-op acquisition, missing authority, rollback/lost ack,
+failed close/detach release, and losing-writer release/retry. Initial seven REDs
+identified absent wiring; the separate writer-race RED identified the close gap.
+
+Legacy family affected command (same six files as previous checkpoint): exit0,
+**108 passed in62.89s**. Log: `world-lifetime-family-check.log` in task scratch.
+This command ran before the final stale-abandonment conditional; all these legacy
+paths are unchanged by that conditional. It was collected once after other work,
+not repeatedly polled. `git diff --check` passed. Counts overlap earlier evidence.
+
+Evidence remains an explicitly staged catalog fixture, not ordinary complete-format
+open: mandatory empty dependency rows are now staged in test conversion only.
+Automatic backing retirement, complete activation/copy migration, eager/event
+placement journals, recursive stable-path closure, live counted promotion and
+exotic exact equality remain pending. No capability6 emitted. P5 remains at
+`b57704304dc51238ac14420e55d1b1bc3ed79892`; no new full suite/endurance or final
+review. Stage0.5 is not finished or release accepted. Next: connect last-owner
+retirement scheduling and bounded cleanup to actual World central publication.
+
 ## Latest checkpoint: actual World checked-catalog wiring (October 10 UTC)
 
 Public source `e8135092cef3b9bffaae02fa2093f6747624b1c5`, local source
