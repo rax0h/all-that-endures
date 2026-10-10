@@ -1153,7 +1153,7 @@ class LazyRecordStore:
         finally:
             self._read_snapshot_end()
 
-    def capture_pin(self) -> GenerationPin:
+    def capture_pin(self, *, source_pin: GenerationPin | None = None) -> GenerationPin:
         self._ensure_open()
         token = str(uuid.uuid4())
         self._phase_hook("before_pin_capture")
@@ -1163,10 +1163,13 @@ class LazyRecordStore:
             pins, _, _ = self._checked_operational_rows(head)
             if len(pins) >= MAX_PINS:
                 raise GenerationPressureError(head, head)
-            checksum = _pin_checksum(self.store_identity, token, head)
+            generation = head if source_pin is None else self._require_pin(source_pin)
+            if source_pin is not None and source_pin.token in self._recovery_required:
+                raise StoreConflictError('cannot clone a pin with unresolved acknowledgement')
+            checksum = _pin_checksum(self.store_identity, token, generation)
             self.db.execute(
                 "INSERT INTO generation_pins(token,store_uuid,generation,row_checksum) VALUES (?,?,?,?)",
-                (token, self.store_identity, head, checksum),
+                (token, self.store_identity, generation, checksum),
             )
             self._pin_rows += 1
             self._phase_hook("before_pin_capture_commit")
@@ -1175,34 +1178,54 @@ class LazyRecordStore:
             if self.db.in_transaction:
                 self.db.rollback()
             raise
-        return GenerationPin(token, self.store_identity, head)
+        return GenerationPin(token, self.store_identity, generation)
 
-    def release_pin(self, pin: GenerationPin) -> None:
+    def release_pin(self, pin: GenerationPin, *, cleanup_budget: int = 256) -> None:
+        self.release_pins((pin,), cleanup_budget=cleanup_budget)
+
+    def release_pins(self, pins: Iterable[GenerationPin], *, cleanup_budget: int = 256) -> None:
+        """Release a bounded lease group atomically, with one cleanup budget."""
         self._ensure_open()
-        if pin.token in self._recovery_required:
-            raise StoreConflictError("pin has unresolved commit acknowledgement")
+        requested = tuple(pins)
+        if type(cleanup_budget) is not int or not 0 <= cleanup_budget <= 256:
+            raise ValueError('ordinary pin cleanup budget must be between0 and256')
+        if len(requested) > MAX_PINS or len({pin.token for pin in requested}) != len(requested):
+            raise ValueError('invalid pin release group')
+        if not requested:
+            return
+        for pin in requested:
+            if pin.store_identity != self.store_identity:
+                raise StoreConflictError("generation pin belongs to another store")
+            if pin.token in self._recovery_required:
+                raise StoreConflictError("pin has unresolved commit acknowledgement")
         self._phase_hook("before_pin_release")
         self.db.execute("BEGIN IMMEDIATE")
         try:
-            if pin.store_identity != self.store_identity:
-                raise StoreConflictError("generation pin belongs to another store")
             head = int(self._checked_head_row()[0])
             pins, _, attempts = self._checked_operational_rows(head)
-            row = next((item for item in pins if item[0] == pin.token), None)
-            if row is None:
+            by_token = {item[0]: item for item in pins}
+            attempts_by_token = {item[0]: item for item in attempts}
+            present = []
+            for pin in requested:
+                row = by_token.get(pin.token)
+                if row is None:
+                    continue
+                if int(row[2]) != pin.captured_head:
+                    raise StoreConflictError("generation pin has advanced; use the updated pin")
+                attempt = attempts_by_token.get(pin.token)
+                if attempt is not None and attempt[3] in {"pending", "committed"}:
+                    raise StoreConflictError("pin has unresolved commit acknowledgement")
+                present.append(pin)
+            if not present:
                 self.db.rollback()
                 return
-            if int(row[2]) != pin.captured_head:
-                raise StoreConflictError("generation pin has advanced; use the updated pin")
-            attempt = next((item for item in attempts if item[0] == pin.token), None)
-            if attempt is not None and attempt[3] in {"pending", "committed"}:
-                raise StoreConflictError("pin has unresolved commit acknowledgement")
-            self.db.execute("DELETE FROM pin_receipts WHERE pin_token=?", (pin.token,))
-            self.db.execute("DELETE FROM pin_attempts WHERE pin_token=?", (pin.token,))
-            self.db.execute("DELETE FROM generation_pins WHERE token=?", (pin.token,))
-            self._pin_rows += 3
+            for pin in present:
+                self.db.execute("DELETE FROM pin_receipts WHERE pin_token=?", (pin.token,))
+                self.db.execute("DELETE FROM pin_attempts WHERE pin_token=?", (pin.token,))
+                self.db.execute("DELETE FROM generation_pins WHERE token=?", (pin.token,))
+                self._pin_rows += 3
             floor = self._validated_retention_floor(head)
-            self._cleanup_expired(floor)
+            self._cleanup_expired(floor, row_budget=cleanup_budget)
             self._phase_hook("during_pin_release_cleanup")
             self._phase_hook("before_pin_release_commit")
             self.db.commit()
