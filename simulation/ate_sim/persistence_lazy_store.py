@@ -164,7 +164,10 @@ def _auxiliary_namespace(namespace: str) -> bool:
     return namespace.startswith(AUXILIARY_NAMESPACE_PREFIX)
 
 
+ORDINARY_QUERY_OWNER_INDEX = 'ordinary_query_owner'
+
 P4_DDL = """
+CREATE INDEX ordinary_query_owner ON query_membership(namespace,record_key);
 CREATE TABLE lazy_record_versions(
     namespace TEXT NOT NULL,
     typed_key BLOB NOT NULL,

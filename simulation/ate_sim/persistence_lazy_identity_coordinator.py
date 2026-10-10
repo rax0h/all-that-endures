@@ -11,11 +11,11 @@ from dataclasses import dataclass
 from contextlib import contextmanager
 import weakref
 import sys
-from .incremental_store import StoreIntegrityError, StoreConflictError
+from .incremental_store import StoreIntegrityError, StoreConflictError, StoreFormatError, RecordChange
 from .persistence_lazy_identity import IncarnationId, Occurrence
 from .persistence_lazy_identity_catalog import IdentityCatalog, CheckedIdentityGroup, OWNER_NAMESPACE, placement_path
-from .persistence_lazy_store import IdentityOccurrenceChange
-from .persistence_lazy_families import ParticipantDelta
+from .persistence_lazy_store import IdentityOccurrenceChange, VersionChange, ORDINARY_QUERY_OWNER_INDEX
+from .persistence_lazy_families import ParticipantDelta, FAMILIES
 from .persistence_lazy_spill import CheckedSpool
 
 
@@ -44,6 +44,7 @@ def _heap_size(value, seen=None):
 class IdentityCoordinator:
     def __init__(self, store, pin, registry, *, load_owner, resolve_path, install_path,
                  mark_dirty, preflight, encode_placement=None,
+                 prepare_owner_header=None,
                  occurrence_limit=4096, byte_limit=2 * 1024 * 1024):
         if registry.store_identity != store.store_identity:
             raise StoreConflictError('identity coordinator registry belongs to another store')
@@ -60,6 +61,8 @@ class IdentityCoordinator:
         # scalar fixtures retain their checked store codec; no history codec
         # or owner namespace is inferred by the coordinator.
         self.encode_placement = encode_placement
+        self.prepare_owner_header = prepare_owner_header
+        self._preparing_headers = False
         self.occurrence_limit, self.byte_limit = occurrence_limit, byte_limit
         self.discovered_groups = OrderedDict()
         self._cache_occurrences = self._cache_bytes = 0
@@ -139,6 +142,8 @@ class IdentityCoordinator:
 
     @contextmanager
     def _mutation(self):
+        if self._preparing_headers:
+            raise StoreConflictError('identity mutation is blocked during owner header preparation')
         self._mutation_depth += 1
         try:
             self.preflight()
@@ -369,7 +374,37 @@ class IdentityCoordinator:
         with self._mutation():
             self._replace_scope(owner, (), ())
 
-    def prepare_delta(self, owner_versions, *, ordinary_changes=()):
+    def _force_owner_headers(self, versions, ordinary, value_changed_incarnations):
+        """The publisher names actual backing writes; guarded no-ops add no rows."""
+        forced_versions, forced_ordinary = [], []
+        with self._mutation():
+            self._preparing_headers = True
+            try:
+                selected = set(value_changed_incarnations)
+                if any(type(inc) is not int or inc not in self._value_dirty_groups for inc in selected):
+                    raise StoreIntegrityError('changed backing lacks its routed identity group')
+                owners = set()
+                for inc in selected:
+                    group = self.discover_group(inc)
+                    owners.update((namespace, key) for namespace, key, _path in self._current_placements(group))
+                provided = {(change.namespace, self.store.codec.encode(change.key))
+                            for change in (*versions, *ordinary)}
+                for owner in sorted(owners, key=self.store.codec.encode):
+                    if (owner[0], self.store.codec.encode(owner[1])) in provided:
+                        continue
+                    if self.prepare_owner_header is None:
+                        raise StoreIntegrityError('changed backing requires a physical owner header')
+                    source = self.prepare_owner_header(owner)
+                    if (type(source) not in (VersionChange, RecordChange) or source.delete
+                            or source.namespace != owner[0]
+                            or self.store.codec.encode(source.key) != self.store.codec.encode(owner[1])):
+                        raise StoreIntegrityError('physical owner header provider returned a different source')
+                    (forced_versions if type(source) is VersionChange else forced_ordinary).append(source)
+            finally:
+                self._preparing_headers = False
+        return tuple(forced_versions), tuple(forced_ordinary)
+
+    def prepare_delta(self, owner_versions, *, ordinary_changes=(), value_changed_incarnations=()):
         if self._mutation_depth:
             raise StoreConflictError('identity save preparation is blocked during mutation')
         self.preflight()
@@ -377,6 +412,10 @@ class IdentityCoordinator:
             return self._prepared.delta
         payloads = tuple(owner_versions)
         ordinary_payloads = tuple(ordinary_changes)
+        forced_versions, forced_ordinary = self._force_owner_headers(payloads, ordinary_payloads,
+                                                                    value_changed_incarnations)
+        payloads += forced_versions
+        ordinary_payloads += forced_ordinary
         if not payloads and not ordinary_payloads and not self.placement_overlay:
             self.dirty_owners.clear()
             self.dirty_incarnations.clear()
@@ -394,7 +433,8 @@ class IdentityCoordinator:
                            ordinary_changes=ordinary_payloads)
         versions, ordinary, _ = catalog_delta.decode(self.store.codec)
         delta = ParticipantDelta.freeze(self.store.codec, 'identity-coordinator',
-            version_changes=versions, ordinary_changes=ordinary, identity_changes=placements)
+            version_changes=forced_versions + versions, ordinary_changes=forced_ordinary + ordinary,
+            identity_changes=placements)
         self._prepared = PreparedCoordinatorState(delta, catalog_delta, self.pin.captured_head,
             self.registry.next_incarnation, tuple(sorted(self.placement_overlay)))
         return delta
@@ -409,8 +449,44 @@ class IdentityCoordinator:
             or successor_pin.captured_head != prepared.expected_generation + 1):
             raise StoreConflictError('identity publication has the wrong successor pin')
         self.catalog.validate_publication(prepared.catalog_delta, successor_pin)
-        _, _, placements = delta.decode(self.store.codec)
+        versions, ordinary, placements = delta.decode(self.store.codec)
         with self.store.read_snapshot(successor_pin):
+            for source in versions:
+                if source.namespace not in FAMILIES:
+                    continue  # Catalog metadata has its own frozen validation.
+                key = self.store.codec.encode(source.key)
+                row = self.store._visible_record_row(successor_pin.captured_head, source.namespace, key)
+                if row is None:
+                    raise StoreIntegrityError('missing acknowledged physical owner header')
+                order = self.store._visible_order(source.namespace, key, successor_pin.captured_head)
+                self.store._validate_owner_projection(source.namespace, key, successor_pin.captured_head, row, order)
+                _, schema, generation, _, members = self.store._check_record_row(source.namespace, key, row, decode=False)
+                expected_members = {(m.index_name, self.store.codec.encode(m.value), m.ordinal) for m in source.memberships}
+                actual_members = {(name, self.store.codec.encode(value), ordinal) for name, value, ordinal in members}
+                if (schema != source.record_schema or generation != successor_pin.captured_head
+                        or row[2] != self.store.codec.encode(source.value) or expected_members != actual_members):
+                    raise StoreIntegrityError('physical owner header disagrees with the frozen source')
+            for source in ordinary:
+                value = self.store.read_record(source.namespace, source.key, expected_record_schema=source.record_schema)
+                if self.store.codec.encode(value) != self.store.codec.encode(source.value):
+                    raise StoreIntegrityError('ordinary owner header disagrees with the frozen source')
+                index = self.store.db.execute('SELECT sql FROM sqlite_master WHERE type=? AND name=?',
+                    ('index', ORDINARY_QUERY_OWNER_INDEX)).fetchone()
+                expected_sql = 'CREATE INDEX ordinary_query_owner ON query_membership(namespace,record_key)'
+                if index is None or ''.join(index[0].split()).lower() != ''.join(expected_sql.split()).lower():
+                    raise StoreFormatError('ordinary owner header validation requires an explicit indexed copy upgrade')
+                # LIMIT detects one surplus row without reading an unrelated or
+                # corrupt unbounded projection. This index is created by new
+                # stores/copy upgrades, never by ordinary open or acknowledgement.
+                expected = {(m.index_name, self.store.codec.encode(m.value), m.ordinal,
+                             successor_pin.captured_head) for m in source.memberships}
+                rows = self.store.db.execute(
+                    f'SELECT index_name,index_value,ordinal,generation FROM query_membership INDEXED BY {ORDINARY_QUERY_OWNER_INDEX} '
+                    'WHERE namespace=? AND record_key=? LIMIT ?',
+                    (source.namespace, self.store.codec.encode(source.key), len(expected) + 1)).fetchall()
+                self.store._query_rows += len(rows)
+                if len(rows) != len(expected) or set(rows) != expected:
+                    raise StoreIntegrityError('ordinary owner header query projection disagrees with the frozen source')
             for change in placements:
                 try:
                     actual = self.store.read_identity_occurrence(successor_pin,
