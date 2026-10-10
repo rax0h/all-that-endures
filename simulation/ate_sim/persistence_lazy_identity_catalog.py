@@ -12,7 +12,7 @@ from contextlib import closing
 import hashlib
 from .incremental_store import Membership, StoreIntegrityError, StoreFormatError, StoreConflictError, _framed_sha, _record_checksum
 from .persistence_lazy_store import VersionChange
-from .persistence_lazy_families import FAMILIES, ParticipantDelta
+from .persistence_lazy_families import IDENTITY_OWNER_FAMILIES, AUXILIARY_OWNER_FAMILIES, ParticipantDelta
 from .persistence_lazy_budget import resident_bytes
 from .persistence_lazy_spill import CheckedSpool
 from .persistence_lazy_identity_retired import RetiredIdentityRanges, EMPTY_HEADER, checked_header, NODE_NAMESPACE as RETIRED_NODE_NAMESPACE
@@ -42,14 +42,14 @@ def digest(codec, domain, values):
 
 
 def placement_path(namespace, key, path):
-    if namespace not in FAMILIES:
+    if namespace not in IDENTITY_OWNER_FAMILIES:
         raise StoreFormatError(f'identity owner family is not registered: {namespace}')
     if type(path) is not tuple or any(type(c) is not tuple or len(c) != 2
         or c[0] not in ('field', 'key', 'index')
         or (c[0] == 'field' and (type(c[1]) is not str or not c[1]))
         or (c[0] == 'index' and (type(c[1]) is not int or c[1] < 0)) for c in path):
         raise StoreIntegrityError('invalid identity placement path')
-    return FAMILIES[namespace].absolute_path(key, path)
+    return IDENTITY_OWNER_FAMILIES[namespace].absolute_path(key, path)
 
 
 def path_hash(codec, path):
@@ -127,8 +127,11 @@ def _owner_sources(codec, owner_versions, ordinary_changes):
     sources = {}
     for kind, changes in (('lazy', owner_versions), ('ordinary', ordinary_changes)):
         for source in changes:
-            if source.namespace not in FAMILIES:
+            if source.namespace not in IDENTITY_OWNER_FAMILIES:
                 raise StoreFormatError('identity source is not a declared family')
+            adapter = AUXILIARY_OWNER_FAMILIES.get(source.namespace)
+            if adapter is not None:
+                adapter.validate_source(source, kind, codec)
             marker = source.namespace, codec.encode(source.key)
             if marker in sources:
                 raise ValueError('duplicate/competing identity owner source')
@@ -143,6 +146,9 @@ def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incar
         raise ValueError('invalid incarnation allocator')
     owners = {marker: entry for marker, entry in _owner_sources(codec, owner_versions, ordinary_changes).items()
               if not entry[1].delete}
+    if any(v.key[0] >= next_incarnation_id for _kind, v in owners.values()
+           if v.namespace in AUXILIARY_OWNER_FAMILIES):
+        raise StoreIntegrityError('physical history owner has an unallocated incarnation')
     by_owner = {}
     by_group = {}
     seen = set()
@@ -159,6 +165,9 @@ def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incar
     changes = []
     for marker, (kind, version) in owners.items():
         owner = version.namespace, version.key
+        adapter = AUXILIARY_OWNER_FAMILIES.get(version.namespace)
+        if adapter is not None and dict(by_owner.get(marker, ())) != dict(adapter.reference_placements(version.value)):
+            raise StoreIntegrityError('physical history references disagree with identity placements')
         prefix, count, root_digest, nodes = initial_owner_tree(codec, owner, by_owner.get(marker, ()))
         changes.extend(nodes)
         payload_commit = _source_commitment(codec, version, kind, generation)
@@ -252,6 +261,7 @@ class IdentityCatalog:
         return value
 
     def _owner(self, pin, owner):
+        placement_path(*owner, ())
         header = self._read(pin, OWNER_NAMESPACE, owner)
         if (type(header) is not tuple or len(header) != 9 or header[0] != 'identity-owner/v1'
             or type(header[1]) is not bool or header[2] not in ('lazy', 'ordinary') or type(header[3]) is not int
@@ -260,6 +270,9 @@ class IdentityCatalog:
             or type(header[8]) is not str or len(header[8]) != 64
             or (header[6] is not None and (type(header[6]) is not bytes or len(header[6]) > 32))):
             raise StoreIntegrityError('invalid identity owner witness')
+        adapter = AUXILIARY_OWNER_FAMILIES.get(owner[0])
+        if adapter is not None and (header[2] != 'lazy' or header[4] != adapter.record_schema):
+            raise StoreIntegrityError('physical history owner witness has a different schema')
         # Metadata-only source agreement. A historical ordinary witness is MVCC
         # metadata, never permission to decode today's overwritten ordinary body.
         # Old ordinary payload authority remains unavailable through this API.
@@ -613,6 +626,21 @@ class OwnerTreeEditor:
         count, checksum = node_commit(self.catalog.codec, value)
         return prefix, count, checksum
 
+    def membership(self, path):
+        """Check one path against this editor's pinned plus prepared root."""
+        wanted = path_hash(self.catalog.codec, path)
+        link = self.root
+        while link is not None:
+            prefix = link[0]
+            if not wanted.startswith(prefix):
+                return None
+            node = self._read(link)
+            if node[0] == 'owner-leaf/v1':
+                return node[2] if node[1] == path else None
+            child = next((c for c in node[2] if c[0] == wanted[len(prefix)]), None)
+            link = None if child is None else child[1:]
+        return None
+
     def replace(self, path, incarnation):
         codec = self.catalog.codec
         wanted = path_hash(codec, path)
@@ -692,6 +720,9 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
         if type(next_incarnation_id) is not int or next_incarnation_id < old_allocator:
             raise ValueError('incarnation allocator cannot move backwards')
         sources = _owner_sources(self.codec, versions, ordinary)
+        if any(v.key[0] >= next_incarnation_id for _kind, v in sources.values()
+               if v.namespace in AUXILIARY_OWNER_FAMILIES):
+            raise StoreIntegrityError('physical history owner has an unallocated incarnation')
         owner_keys = {marker: (v.namespace, v.key) for marker, (_kind, v) in sources.items()}
         edits_by_owner = {}
         edits_by_group = {}
@@ -722,6 +753,8 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
         revived = 0
         for marker, owner in owner_keys.items():
             source_kind, source = sources.get(marker, (None, None))
+            if owner[0] in AUXILIARY_OWNER_FAMILIES and source is None:
+                raise StoreIntegrityError('physical history placement edit requires its payload source')
             generation = pin.captured_head + 1
             new_owner = False
             try:
@@ -740,6 +773,12 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
             editor = OwnerTreeEditor(self, pin, owner, root)
             for change in edits_by_owner.get(marker, ()):
                 editor.replace(change.occurrence_path, None if change.delete else change.incarnation_id)
+            adapter = AUXILIARY_OWNER_FAMILIES.get(owner[0])
+            if adapter is not None and source is not None and not source.delete:
+                expected = adapter.reference_placements(source.value)
+                count = 0 if editor.root is None else editor.root[1]
+                if count != len(expected) or any(editor.membership(path) != inc for path, inc in expected):
+                    raise StoreIntegrityError('physical history references disagree with identity placements')
             changes.extend(editor.delta())
             tree = editor.root or (None, 0, _framed_sha(b'identity-owner-empty-v1'))
             if source is not None and source.delete:

@@ -103,6 +103,11 @@ FAMILIES = MappingProxyType({
     for ns, kind, mode in _FAMILY_ROWS
 })
 
+# Keep the World schema inventory separate from concrete physical child owners.
+# Neither registry is inferred from a namespace prefix or a live object scan.
+from .persistence_history_owner_adapters import AUXILIARY_OWNER_FAMILIES
+IDENTITY_OWNER_FAMILIES = MappingProxyType({**FAMILIES, **AUXILIARY_OWNER_FAMILIES})
+
 
 @dataclass(frozen=True)
 class RuntimeFamily:

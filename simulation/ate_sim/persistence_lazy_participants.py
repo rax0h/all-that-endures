@@ -8,7 +8,7 @@ from collections import defaultdict
 from dataclasses import dataclass, fields, replace
 
 from .incremental_store import NewSegment, StoreIntegrityError, StoreConflictError, _framed_sha, _record_checksum
-from .persistence_lazy_families import FAMILIES, ParticipantDelta
+from .persistence_lazy_families import FAMILIES, IDENTITY_OWNER_FAMILIES, AUXILIARY_OWNER_FAMILIES, ParticipantDelta
 
 
 # Explicit order preserves the existing hybrid transaction's source order.
@@ -77,7 +77,7 @@ class FamilySaveParticipant:
     def __init__(self, store, pin, target_generation, delta):
         self.store, self.parent_pin = store, pin
         self.target_generation, self.namespace = target_generation, delta.participant
-        self.adapter = FAMILIES.get(self.namespace)  # Auxiliary namespaces have their own checked schemas.
+        self.adapter = IDENTITY_OWNER_FAMILIES.get(self.namespace)
         self.delta = delta
         self._validated_pin = None
         self._row_proved_pin = None
@@ -475,7 +475,15 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
         if sorted(identity_bytes) != sorted(expected):
             raise StoreIntegrityError('hybrid identity sources differ from coordinator overlay')
         all_versions = tuple(change for d in deltas for change in d.decode(codec)[0])
-        owner_versions = tuple(change for change in all_versions if change.namespace in FAMILIES)
+        # Only explicitly routed physical child owners join the catalog. Existing
+        # scalar archive pages are not silently bootstrapped on a small save.
+        physical_owners = {(owner[0], codec.encode(owner[1])) for owner in coord.dirty_owners
+                           if owner[0] in AUXILIARY_OWNER_FAMILIES}
+        physical_owners.update((change.owner_namespace, codec.encode(change.owner_key))
+                              for change in coord.placement_overlay.values()
+                              if change.owner_namespace in AUXILIARY_OWNER_FAMILIES)
+        owner_versions = tuple(change for change in all_versions if change.namespace in FAMILIES
+                               or (change.namespace, codec.encode(change.key)) in physical_owners)
         owner_records = tuple(change for change in ordinary.decode(codec)[1] if change.namespace in FAMILIES)
         supplied_owners = {(change.namespace, codec.encode(change.key))
                            for change in (*owner_versions, *owner_records)}

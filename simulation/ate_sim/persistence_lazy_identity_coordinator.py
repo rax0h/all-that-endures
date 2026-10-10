@@ -15,7 +15,7 @@ from .incremental_store import StoreIntegrityError, StoreConflictError, StoreFor
 from .persistence_lazy_identity import IncarnationId, Occurrence
 from .persistence_lazy_identity_catalog import IdentityCatalog, CheckedIdentityGroup, OWNER_NAMESPACE, placement_path
 from .persistence_lazy_store import IdentityOccurrenceChange, VersionChange, ORDINARY_QUERY_OWNER_INDEX
-from .persistence_lazy_families import ParticipantDelta, FAMILIES
+from .persistence_lazy_families import ParticipantDelta, IDENTITY_OWNER_FAMILIES
 from .persistence_lazy_spill import CheckedSpool
 
 
@@ -465,10 +465,14 @@ class IdentityCoordinator:
         versions, ordinary, placements = delta.decode(self.store.codec)
         with self.store.read_snapshot(successor_pin):
             for source in versions:
-                if source.namespace not in FAMILIES:
+                if source.namespace not in IDENTITY_OWNER_FAMILIES:
                     continue  # Catalog metadata has its own frozen validation.
                 key = self.store.codec.encode(source.key)
                 row = self.store._visible_record_row(successor_pin.captured_head, source.namespace, key)
+                if source.delete:
+                    if row is not None:
+                        raise StoreIntegrityError('deleted physical owner header remains visible')
+                    continue
                 if row is None:
                     raise StoreIntegrityError('missing acknowledged physical owner header')
                 order = self.store._visible_order(source.namespace, key, successor_pin.captured_head)
