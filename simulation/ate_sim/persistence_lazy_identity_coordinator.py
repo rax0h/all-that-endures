@@ -207,22 +207,32 @@ class IdentityCoordinator:
         if obj is not None:
             self.install_path(owner, path, obj)
             self.registry.attach_occurrence(obj, occurrence)
+        self._record_placement_change(owner, path, original, old, chosen)
+        self._trim()
+        self.dirty_owners.add(owner)
+        self.mark_dirty(owner)
+
+    def _record_placement_change(self, owner, path, original, old, chosen):
+        """Apply a prevalidated placement edit; no loading or user callbacks."""
+        marker = self._marker(owner, path)
         affected = {i for i in (original, old, chosen) if i is not None}
-        # Remove superseded routes immediately. Only the original persisted
-        # group and final local group need placement overlay entries.
         for inc in affected:
             entries = self._by_incarnation.get(inc)
             if entries is not None:
                 entries.discard(marker)
                 if not entries:
                     self._by_incarnation.pop(inc, None)
-        for inc in affected:
             self.dirty_incarnations.add(inc)
         if chosen == original:
             self.placement_overlay.pop(marker, None)
             self._original.pop(marker, None)
-            self._by_owner.get(owner, set()).discard(marker)
+            entries = self._by_owner.get(owner)
+            if entries is not None:
+                entries.discard(marker)
+                if not entries:
+                    self._by_owner.pop(owner, None)
         else:
+            self._original[marker] = original
             self.placement_overlay[marker] = IdentityOccurrenceChange(*owner, path, chosen, delete=chosen is None)
             self._by_owner.setdefault(owner, set()).add(marker)
             for inc in {i for i in (original, chosen) if i is not None}:
@@ -230,9 +240,42 @@ class IdentityCoordinator:
         for inc in affected:
             if inc not in self._by_incarnation and inc not in self._value_dirty_groups:
                 self.dirty_incarnations.discard(inc)
-        self._trim()
-        self.dirty_owners.add(owner)
-        self.mark_dirty(owner)
+
+    def retire_owner(self, owner):
+        """Retire all final placements using checked metadata, not child values.
+
+        Inventory and affected-group validation complete before changing routes.
+        The pending edits are actual deletion output, outside clean cache bounds.
+        The caller owns the header deletion and its central transactional plan.
+        """
+        self.preflight()
+        if self._prepared is not None:
+            raise StoreConflictError('identity coordinator has an unacknowledged frozen plan')
+        checked = self.catalog.read_owner_identity(self.pin, owner)
+        changes = {}
+        try:
+            for path, original in checked.occurrences:
+                marker = self._marker(owner, path)
+                previous = self.placement_overlay.get(marker)
+                old = original if previous is None else None if previous.delete else previous.incarnation_id
+                changes[marker] = path, original, old
+            for marker in self._by_owner.get(owner, ()):
+                if marker not in changes:
+                    previous = self.placement_overlay[marker]
+                    changes[marker] = (previous.occurrence_path, self._original[marker],
+                                       None if previous.delete else previous.incarnation_id)
+            for path, original, old in changes.values():
+                for inc in {i for i in (original, old) if i is not None}:
+                    self.discover_group(inc)
+            for path, original, old in changes.values():
+                self.registry.detach_occurrence(Occurrence(*owner, path))
+                self._record_placement_change(owner, path, original, old, None)
+            self._trim()
+            self.dirty_owners.add(owner)
+            self.mark_dirty(owner)
+        finally:
+            if isinstance(checked.occurrences, CheckedSpool):
+                checked.occurrences.close()
 
     def prepare_delta(self, owner_versions, *, ordinary_changes=()):
         self.preflight()

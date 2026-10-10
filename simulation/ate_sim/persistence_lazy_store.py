@@ -1758,43 +1758,42 @@ class LazyRecordStore:
         finally:
             self._read_snapshot_end()
 
-    def identity_occurrences_for_owner(
-        self,
-        pin: GenerationPin,
-        owner_namespace: str,
-        owner_key: Any,
-    ) -> tuple[tuple[tuple[Any, ...], int], ...]:
+    def identity_occurrences_for_owner(self, pin, owner_namespace, owner_key):
+        """Materializing compatibility API; checked catalogs stream one owner."""
+        return tuple(self.iter_identity_occurrences_for_owner(pin, owner_namespace, owner_key))
+
+    def iter_identity_occurrences_for_owner(self, pin, owner_namespace, owner_key):
+        """Stream checked placements using the owner-leading interval index."""
         self._ensure_open()
         namespace = _validate_namespace(owner_namespace)
         encoded_key = self.codec.encode(owner_key)
         generation = self._read_snapshot_start(pin)
+        rows = None
         try:
+            next_id = self._identity_state_at(generation)[0]
             rows = self._interval_rows('lazy_identity_occurrence_versions',
                 'occurrence_path,incarnation_id,valid_from,valid_to,row_checksum',
                 ('owner_namespace', 'owner_key'), (namespace, encoded_key), generation,
-                'lazy_identity_owner_interval', order='occurrence_path')
-            self._metadata_rows += len(rows)
-            out = []
+                'lazy_identity_owner_interval', order='occurrence_path', stream=True)
+            previous = None
             for path, incarnation_id, valid_from, valid_to, checksum in rows:
-                if checksum != _identity_occurrence_checksum(
-                    namespace,
-                    encoded_key,
-                    path,
-                    incarnation_id,
-                    valid_from,
-                    valid_to,
-                ):
-                    raise StoreIntegrityError(
-                        "lazy identity occurrence checksum mismatch"
-                    )
+                self._metadata_rows += 1
+                if (path == previous or type(incarnation_id) is not int
+                    or not 0 < incarnation_id < next_id
+                    or type(valid_from) is not int or not 0 <= valid_from <= generation
+                    or (valid_to is not None and (type(valid_to) is not int
+                        or valid_to <= generation or valid_to <= valid_from))
+                    or checksum != _identity_occurrence_checksum(namespace, encoded_key,
+                        path, incarnation_id, valid_from, valid_to)):
+                    raise StoreIntegrityError('lazy identity owner occurrence checksum or interval mismatch')
                 decoded_path = self.codec.decode(path)
-                if type(decoded_path) is not tuple:
-                    raise StoreIntegrityError(
-                        "identity occurrence path is not a tuple"
-                    )
-                out.append((decoded_path, int(incarnation_id)))
-            return tuple(out)
+                if type(decoded_path) is not tuple or self.codec.encode(decoded_path) != path:
+                    raise StoreIntegrityError('identity owner occurrence path is not canonical')
+                previous = path
+                yield decoded_path, incarnation_id
         finally:
+            if rows is not None:
+                rows.close()
             self._read_snapshot_end()
 
     def identity_occurrences_for_incarnation(self, pin, incarnation_id):

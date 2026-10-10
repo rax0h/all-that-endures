@@ -338,24 +338,32 @@ class IdentityCatalog:
         with self.store.read_snapshot(pin):
             self._descriptor(pin)
             header = self._owner(pin, owner)
-            actual = self.store.identity_occurrences_for_owner(pin, *owner)
-            leaves = []
-            def walk(prefix, count, checksum):
-                node = self._node(pin, owner, prefix, count, checksum)
-                if node[0] == 'owner-leaf/v1':
-                    leaves.append(node[1:])
-                else:
-                    for _slot, child, child_count, child_checksum in node[2]:
-                        walk(child, child_count, child_checksum)
-            if header[6] is not None:
-                walk(*header[6:])
-            if len(actual) != header[7] or sorted(actual, key=self.codec.encode) != sorted(leaves, key=self.codec.encode):
-                raise StoreIntegrityError('identity owner occurrence completeness mismatch')
-            for path, inc in actual:
-                placement_path(*owner, path)
-                if type(inc) is not int or not 0 < inc < self.store._identity_state_at(pin.captured_head)[0]:
-                    raise StoreIntegrityError('owner occurrence exceeds allocator')
-            return CheckedOwnerIdentity(owner, tuple(actual), header[3], header[5], header[1], header[2])
+            actual = CheckedSpool(self.codec, entry_limit=self.occurrence_limit,
+                                  byte_limit=self.byte_limit, unique=True)
+            leaves = CheckedSpool(self.codec, entry_limit=self.occurrence_limit,
+                                  byte_limit=self.byte_limit, unique=True)
+            try:
+                def walk(prefix, count, checksum):
+                    node = self._node(pin, owner, prefix, count, checksum)
+                    if node[0] == 'owner-leaf/v1':
+                        leaves.add(node[1:])
+                    else:
+                        for _slot, child, child_count, child_checksum in node[2]:
+                            walk(child, child_count, child_checksum)
+                if header[6] is not None:
+                    walk(*header[6:])
+                for path, inc in self.store.iter_identity_occurrences_for_owner(pin, *owner):
+                    placement_path(*owner, path)
+                    actual.add((path, inc))
+                if (len(actual) != header[7] or len(leaves) != header[7]
+                    or any(a != b for a, b in zip(actual.encoded_sorted(), leaves.encoded_sorted()))):
+                    raise StoreIntegrityError('identity owner occurrence completeness mismatch')
+                return CheckedOwnerIdentity(owner, actual.freeze(), header[3], header[5], header[1], header[2])
+            except BaseException:
+                actual.close()
+                raise
+            finally:
+                leaves.close()
 
     def read_identity_membership(self, pin, owner, path):
         """Prove an exact path's membership or absence through its owner root."""
