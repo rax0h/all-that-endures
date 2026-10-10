@@ -1,5 +1,60 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: concrete eager owner-header capture (October 10 UTC)
+
+Public source `04f986993f8aedde39f5510299ce0d4782125b41`, local source
+`ad809119ddf2ff5af85ee4f1126e8c6628d77381`, matching tree
+`4eb13d09613154b4d7d85adc80d412422b83a943`. Exact-tree leased non-force
+publication completed. Parent docs are public
+`65c087ac1fbd8117bcea1e467baea4647ecbb5c5`, local
+`63a4f2d38957707fe133293fa11ced4c2c0fd330`, tree
+`995229113accc992e076ec7471766b569ea9823d`.
+
+RuntimeFamilyBindings now captures suppressed concrete eager dictionary-family
+headers from checked ordinary authority at the captured current head. It preserves
+the existing (ordinal, value) entry envelope and compares the current complete
+compact envelope before returning the original physical source. Scalar edits
+cannot be replaced by a stale baseline. An old pin rejects before any ordinary
+body read. Missing body/index or surplus query rows reject without migration.
+The accepted eager dictionary writer has an empty query-membership projection;
+one indexed LIMIT1 probe checks it. Packed action lists, mutable event envelopes
+and event-ID descriptors still require their distinct central physical provider.
+
+The private identity-header codec now understands only the three concrete
+TrackedDict/TrackedList/TrackedSet runtime wrappers as native schema containers,
+with current/live tracker lease checks and cycle protection. It retains compact
+history references recursively; the portable WorldCodec is unchanged. REDs found
+the missing eager provider and the wrapper codec gap. Inspecting the actual writer
+also established the ordinal-envelope format; capture uses that writer's concrete
+record-value accessor, not a guessed plain-record format.
+
+Ruling: capture eager dictionary headers only through their existing ordinal
+envelope and empty query contract; require central sources for other physical
+formats — do not infer packed/event authority — cost if wrong: any future eager
+query projection requires an explicit adapter contract update.
+
+Actual settlement histories at H1k/H10k capture one compact ordinary body
+(<4096 bytes) and no history nodes, with the sequence iterator disabled. Tests
+also cover scalar-header refusal, missing/extra authority, all three tracked
+wrapper types, foreign/closed trackers, and stale ordinary snapshots.
+
+Affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_owner_header_witnesses.py simulation/tests/test_stage_0_5_final_runtime_families.py simulation/tests/test_stage_0_5_final_identity_headers.py simulation/tests/test_stage_0_5_final_catalog_publication.py -k 'not comparison_never'`
+— exit0, **51 passed,2 deselected in14.48s**. The two standalone large sequence
+construction cases retain earlier evidence; actual eager/lazy H-size fixtures are
+included. Additional affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_event_id_headers.py simulation/tests/test_stage_0_5_final_coordinator_header_witnesses.py simulation/tests/test_persistence_lifecycle.py`
+— exit0, **33 passed in6.65s**. Counts overlap. `git diff --check` passed.
+An initial command named a nonexistent event-header test file and ran no tests;
+the corrected event-id-header selection above is the evidence.
+
+P5 remains at preceding public source `b57704304dc51238ac14420e55d1b1bc3ed79892`,
+not this source. No final full suite/endurance run or partial capability6 marker.
+Complete World catalog activation, recursive mutable/stable-path closure, live
+counted-alias promotion/projection, exact exotic equality, source-copy migration
+and integrated final validation/review remain. These are substantial integration
+tasks, not just final test polish. Stage0.5 remains unfinished; PR14 is unchanged.
+
 ## Latest checkpoint: frozen backing publication bridge (October 10 UTC)
 
 Public source `b57704304dc51238ac14420e55d1b1bc3ed79892`, local source
