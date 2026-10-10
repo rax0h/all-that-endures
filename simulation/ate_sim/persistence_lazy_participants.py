@@ -291,6 +291,7 @@ class FrozenHybridPublication:
     dependency_participant: object = None
     retirement_participant: object = None
     cold_namespace_counts_bytes: bytes | None = None
+    cleanup_budget: int = 256
 
     @property
     def frozen_bytes(self):
@@ -367,6 +368,7 @@ class FrozenHybridPublication:
                 self.retirement_participant.store.codec)[0])
         return dict(commit_token=replay.token, version_changes=tuple(versions), identity_changes=tuple(identities),
             next_incarnation_id=self.next_incarnation, required_format_version=self.required_format_version,
+            cleanup_budget=self.cleanup_budget,
             changes=replay.cold_plan.changes + forced_ordinary, new_segments=replay.cold_plan.new_segments,
             metadata=replay.cold_plan.metadata)
 
@@ -398,7 +400,11 @@ def _catalog_cold_counts(store, pin, delta, counts_bytes):
 
 
 def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_format_version,
-                              identity_coordinator=None, backing_dependencies=None, retirement_delta=None):
+                              identity_coordinator=None, backing_dependencies=None, retirement_delta=None,
+                              retire_world_backings=False):
+    if retire_world_backings and (identity_coordinator is None or backing_dependencies is None
+                                  or retirement_delta is not None):
+        raise StoreIntegrityError('World retirement requires its joint identity/dependency publisher')
     declared = {f.name for f in fields(plan) if f.name.endswith(('_version_changes', '_identity_changes'))
                 or f.name in ('version_changes', 'identity_changes')}
     if declared != set(VERSION_FIELDS + IDENTITY_FIELDS):
@@ -427,6 +433,7 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
     coordinator_participant = None
     dependency_participant = None
     retirement_participant = None
+    cleanup_budget = 256
     deltas = tuple(d for _, d in sources) + tuple(d for _, d in scalars)
     captured = deltas + (ordinary,)
     if retirement_delta is not None:
@@ -439,6 +446,7 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
                 or ParticipantDelta.freeze(codec, 'history-retirement', version_changes=versions) != retirement_delta):
             raise StoreIntegrityError('invalid frozen backing retirement delta')
         retirement_participant = FamilySaveParticipant(store, pin, plan.target_generation, retirement_delta)
+        cleanup_budget -= len(versions)
         captured += (retirement_delta,)
     _check_unique_authorities(codec, captured)
     if backing_dependencies is not None:
@@ -453,6 +461,13 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
         if (coord.store is not store or coord.pin != pin or coord._prepared is not None
                 or coord.registry.next_incarnation != next_incarnation):
             raise StoreIntegrityError('hybrid coordinator parent or allocator differs from frozen plan')
+        if retire_world_backings:
+            from .persistence_history_retirement import prepare_world_retirement_delta
+            retirement_delta = prepare_world_retirement_delta(store, pin, coord, backing_dependencies)
+            retirement_participant = FamilySaveParticipant(store, pin, plan.target_generation, retirement_delta)
+            cleanup_budget = 128
+            captured += (retirement_delta,)
+            _check_unique_authorities(codec, captured)
         identity_bytes = tuple(b for d in deltas for b in d.identity_bytes)
         expected = ParticipantDelta.freeze(codec, 'identity-coordinator',
             identity_changes=tuple(coord.placement_overlay.values())).identity_bytes
@@ -516,4 +531,5 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
     return FrozenHybridPublication(sources, scalars, ordinary, participants,
         metadata_bytes, segment_bytes, layout_bytes, cold_layout_bytes,
         next_incarnation, required_format_version, pin, plan.target_generation,
-        commit_token_bytes, coordinator_participant, dependency_participant, retirement_participant, cold_counts_bytes)
+        commit_token_bytes, coordinator_participant, dependency_participant, retirement_participant, cold_counts_bytes,
+        cleanup_budget)

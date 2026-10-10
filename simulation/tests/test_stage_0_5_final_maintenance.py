@@ -137,6 +137,26 @@ def test_invalid_maintenance_budget_is_rejected(tmp_path):
             with pytest.raises(ValueError): store.maintenance(row_budget=budget)
 
 
+def test_commit_can_reserve_cleanup_budget_for_joint_retirement(tmp_path):
+    with make_store(tmp_path / 'joint-budget.sqlite') as store:
+        pin = bulk_generation(store, store.capture_pin(), 1)
+        pin = bulk_generation(store, pin, 2)
+        assert eligible(store, 2) > 128
+        before = store.diagnostics().maintenance_removed_rows
+        pin = store.commit(pin, commit_token='reserved', version_changes=(), changes=(), new_segments=(),
+            metadata=metadata(3, ('people',)), cleanup_budget=128).pin
+        assert store.diagnostics().maintenance_removed_rows - before == 128
+        before = store.diagnostics().maintenance_removed_rows
+        pin = store.commit(pin, commit_token='zero', version_changes=(), changes=(), new_segments=(),
+            metadata=metadata(4, ('people',)), cleanup_budget=0).pin
+        assert store.diagnostics().maintenance_removed_rows == before
+        for budget in (-1, 257, True, 1.5):
+            with pytest.raises(ValueError):
+                store.commit(pin, commit_token='invalid', version_changes=(), changes=(), new_segments=(),
+                    metadata=metadata(5, ('people',)), cleanup_budget=budget)
+        assert store.generation == 4
+
+
 def test_eager_owner_witness_source_probe_does_not_scan_lazy_payload_versions(tmp_path):
     from simulation.ate_sim.persistence_lazy_identity_catalog import IdentityCatalog, OWNER_NAMESPACE
     with make_store(tmp_path / 'owner-backlog.sqlite') as store:

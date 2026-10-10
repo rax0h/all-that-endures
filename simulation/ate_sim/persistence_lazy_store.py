@@ -2602,8 +2602,11 @@ class LazyRecordStore:
         identity_changes: Iterable[IdentityOccurrenceChange] = (),
         next_incarnation_id: int | None = None,
         required_format_version: int = FORMAT_VERSION,
+        cleanup_budget: int = 256,
     ) -> CommitResult:
         self._ensure_open()
+        if type(cleanup_budget) is not int or not 0 <= cleanup_budget <= 256:
+            raise ValueError('ordinary commit cleanup budget must be between0 and256')
         if required_format_version not in SUPPORTED_FORMAT_VERSIONS:
             raise StoreFormatError("unsupported required persistence format")
         if pin.token in self._recovery_required:
@@ -2816,7 +2819,7 @@ class LazyRecordStore:
             )
             self._pin_rows += 2
             floor = self._validated_retention_floor(new_generation)
-            self._cleanup_expired(floor)
+            self._cleanup_expired(floor, row_budget=cleanup_budget)
             format_row = self.db.execute(
                 "SELECT value FROM store_metadata WHERE key='format_version'"
             ).fetchone()

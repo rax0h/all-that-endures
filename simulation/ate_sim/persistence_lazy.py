@@ -14992,6 +14992,7 @@ class LazyWorldSession:
             next_incarnation=self._registry.next_incarnation,
             identity_coordinator=self._identity_coordinator,
             backing_dependencies=self._backing_dependencies,
+            retire_world_backings=self._identity_coordinator is not None,
             required_format_version=(5 if self._eager_tracker._description('world.event_ids')[0] in ('event-ids-range/v1', 'event-ids-exceptions/v1')
                 else 4 if any(change.namespace == HOUSEHOLD_BACKING_NAMESPACE
                               for change in plan.household_member_version_changes) else 3))

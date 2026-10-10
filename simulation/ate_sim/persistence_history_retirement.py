@@ -173,3 +173,53 @@ def validate_publication(store, delta, pin):
             else:
                 if change.delete or current.value != change.value:
                     raise StoreIntegrityError('history retirement publication disagrees with frozen plan')
+
+
+def prepare_world_retirement_delta(store, pin, coordinator, dependencies):
+    """Queue affected last-owner removals plus at most128 background edits.
+
+    Foreground jobs scale with actual placement changes, never owner inventory.
+    Both projections use the same checked coordinator and publisher lease.
+    The other128 ordinary maintenance rows are reserved for physical expiry GC.
+    """
+    if (coordinator.store is not store or coordinator.pin != pin or coordinator._prepared is not None
+            or dependencies.store is not store or dependencies.pin != pin or dependencies.closed):
+        raise StoreIntegrityError('World retirement has a different publisher parent')
+    jobs = []
+    with store.read_snapshot(pin):
+        for inc in sorted({i for i in coordinator._original.values() if i is not None}):
+            group = coordinator.discover_group(inc)
+            current = coordinator._current_placements(group)
+            try:
+                last_removed = bool(group.occurrences) and not current
+            finally:
+                if hasattr(current, 'close'):
+                    current.close()
+            if not last_removed:
+                continue
+            kinds = []
+            for namespace in (HISTORY_DESCRIPTOR, SEQUENCE_DESCRIPTOR):
+                try:
+                    value = store.read_version(pin, namespace, inc, expected_record_schema=1).value
+                except KeyError:
+                    continue
+                kind = 'sequence' if namespace == SEQUENCE_DESCRIPTOR else value[0] if type(value) is tuple and value else None
+                if (kind not in SCOPES or type(value) is not tuple or not value
+                        or namespace == SEQUENCE_DESCRIPTOR and value[0] not in ('ordered-sequence/v1', 'ordered-sequence/v2')):
+                    raise StoreIntegrityError('retiring World history has an invalid descriptor')
+                kinds.append(kind)
+            authority = checked_dependencies(store, pin, inc, required=bool(kinds))
+            if not kinds and authority is None:
+                continue  # This incarnation is a record/container, not a backing.
+            if len(kinds) != 1 or authority[1] != kinds[0]:
+                raise StoreIntegrityError('retiring World history has conflicting backing authority')
+            # Requeue if a previously revived job was awaiting cancellation.
+            # The checked old group was placed, so background cannot delete its
+            # children. Foreground replacement wins over that queue cancellation.
+            jobs.append(initial_retirement_change(kinds[0], inc, generation=pin.captured_head + 1))
+        background = prepare_retirement_delta(store, pin,
+            row_budget=128,
+            protected_incarnations=(*dependencies.protected_incarnations(), *coordinator.dirty_incarnations))
+    combined = {(c.namespace, store.codec.encode(c.key)): c for c in background.decode(store.codec)[0]}
+    combined.update(((c.namespace, store.codec.encode(c.key)), c) for c in jobs)
+    return ParticipantDelta.freeze(store.codec, 'history-retirement', version_changes=tuple(combined.values()))
