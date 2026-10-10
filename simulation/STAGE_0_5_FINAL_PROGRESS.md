@@ -1,5 +1,63 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: checked EventID facade and fixed backing slots (October 10 UTC)
+
+Public source `076e647666213097cc2e3832481985b6edba2348`, local source
+`e0a54213351aae5b89c0fb0318e1dbc3e8a51141`, matching tree
+`a0af5db5ff5398066adf199df2363519a7c7f21a`. Leased non-force exact-tree
+publication completed. PR14 remains draft/unmerged at
+`c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+The staged checked-catalog bridge now projects the public facade plus its two
+fixed `_exact.removed` / `_exact.added` history references under the actual
+`world.event_ids,0` descriptor owner. The same coordinator, registry, backing
+dependency pool and central transaction publish those slots. No auxiliary
+ownership DAG, independent commit or legacy ordinary-link journal is added.
+Clearing the facade preserves its incarnation, removes the backing placements,
+and schedules last-owner retirement; retained old backing aliases remain usable.
+
+`stitch_for_read` validates/canonicalizes a complete checked sharing group before
+the public edit without granting value dirt. The real changed callback routes
+dirty owners afterward. Existing-add and missing-discard no-ops, including cold
+shared Soul peers, leave the generation unchanged. Pending peer replacements
+win before routing an old facade alias. Captured ordinary descriptor changes
+now count as actual facade value writes even for a consecutive append with no
+history-page write, forcing unchanged shared cold headers through the same
+publication. Soul set binding/plain encoding accepts the checked root authority
+reference rather than materializing the facade. Backing guards also validate
+the facade's current peers before changing an internal exception history.
+
+Initial RED reproduced three saves rejected with `changed backing lacks its
+routed identity group`. The shared cold-header regression then reproduced
+Soul authority materialization/lost sharing; after fixing compact encoding it
+reproduced the omitted unchanged peer revision. Those product failures are
+covered permanently. A corruption-fixture SQL column typo was corrected before
+the final gate and is not product evidence.
+
+Final focused gate: **10 passed in2.19s**. Cases cover fixed backing placement,
+clear/retained aliases, no-op saves, paired H1k/H10k identical checked read/write
+work without member iteration or global registry/owner search, shared cold
+headers/reopen identity, replacement precedence, corruption-before-edit, rollback
+and lost acknowledgement. Final broader gates both exit0:
+
+- Catalog: **164 passed in87.15s**, `event-id-catalog-final.log`.
+  Command is the packed-action affected gate above plus
+  `simulation/tests/test_stage_0_5_final_world_event_id_placements.py`, retaining
+  `-k 'not point_and_reverse_reads and not comparison_never'`.
+- Legacy: **125 passed in94.77s**, `event-id-legacy-final.log`.
+  Command: `PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_persistence_event_id_facade.py simulation/tests/test_persistence_event_ids_compact.py simulation/tests/test_stage_0_5_final_event_id_exceptions.py simulation/tests/test_stage_0_5_final_event_id_headers.py simulation/tests/test_stage_0_5_final_soul_collections.py simulation/tests/test_stage_0_5_final_soul_transformations.py simulation/tests/test_persistence_event_identity.py`.
+
+Counts overlap prior gates. `git diff --check` passed. Long gates were collected
+once after other work; no repeated polling or endurance run.
+
+This remains explicit staged-catalog integration of range/paged-admissible IDs.
+It does not supply the still-pending exotic equality directory, recursive
+mutable-history schema, live append-page/count-tree promotion, complete ordinary
+activation or source-preserving capability6 converter. Existing format3/4/5
+ordinary open remains legacy; no capability6 is emitted. P5 still certifies only
+`b57704304dc51238ac14420e55d1b1bc3ed79892`. Final bounds/P5/full suite/fresh Astra
+review follow the remaining implementations. Stage0.5 is not complete.
+
 ## Latest checkpoint: packed current-action identity integration (October 10 UTC)
 
 Public source `b77d91b4592a80eaf93846e096642edba7226682`, local source
