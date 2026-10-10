@@ -867,3 +867,62 @@ complete new-format candidate. Numeric equal lookup routing and native sort
 exception semantics still need closure. Catalog/household/nested integration and
 all final acceptance/release gates remain outstanding. Next: runtime catalog
 adapter/publication integration, preserving checked compact history comparisons.
+
+## 2026-10-10 — checked owner retirement and numeric lookup closure
+
+Owner retirement local `e92f1728d25b34bb58f4151fc84f517440c3c1f2`, public
+`f7421344c03ec6995c1189a0247aea0c57e3aac1`, tree
+`939d22cb48d0c8304fc18dcbcf4e35f5de65916c`. Numeric sequence local
+`58eca6fe588e40b13cf6ecac65b7ba82c56a34e1`, public
+`2b0c4672c15648c45f2c9cac4d86ad82bb5d7b39`, tree
+`20ee6634422e64177fca119a70e4624440d88986`. Both non-force publications
+matched their exact local trees and preceding public-head leases.
+
+Store owner occurrence reads now have a streaming checked iterator, using the
+owner-leading interval index. The compatibility tuple API delegates to it.
+It validates canonical paths, allocator, checksums, intervals and overlapping
+visible placements, and closes the snapshot/cursor after an early stop.
+Catalog owner completeness compares checked spill buffers instead of allocating
+two archive-sized native inventories. Requested owner rows remain O(D); this
+does not inventory other owners or decode a child payload.
+
+Coordinator.retire_owner validates the complete pinned owner and every affected
+group before detaching anything. It overlays replacements/deletions and cancels
+local-only placements, updates both overlay indexes and dirties only that owner.
+The family participant still owns deletion of its header in the one transaction.
+Retained original/replacement objects route to no removed placement; exact
+acknowledgement clears the journal and an independently held old pin retains
+its original group. Later corrupt group, corrupt owner and frozen-plan tests
+fail without a partial retirement. Long owner membership spills and its private
+file is explicitly reclaimed. This is the coordinator's integration seam, not
+activation in ordinary World open/save. Bulk owner/subtree replacement remains
+a next contract to close.
+
+Affected command (four new owner tests at that run):
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_owner_retirement.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_identity_catalog.py simulation/tests/test_persistence_lazy_store.py`
+— exit0, **59 passed24.09s**, `stage_0_5_final_owner_retirement_gate.txt`.
+Later complete six owner regressions plus spill/non-death failure cases:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_owner_retirement.py simulation/tests/test_stage_0_5_final_identity_spill.py simulation/tests/test_persistence_lazy_store_failures.py -k 'not process_death'`
+— **39 passed,3 deselected,1.91s**, `stage_0_5_final_owner_retirement_fault_gate.txt`.
+The attempted gate including process death ended after30 dots with no pytest
+summary (tool reported exit0). It is not passing evidence. Death cases remain
+unchanged and must be completed in a suitable final validation environment.
+An initial command used nonexistent test_stage_0_5_final_spill.py and exited4;
+it was corrected to the actual identity_spill file. Counts overlap.
+
+Sequence occurrence/removal queries now normalize True and integral positive
+floats through the existing stored membership key. Four REDs proved these
+queries scanned history and ignored a deleted required membership node. Fixed
+queries traverse checked occurrence order trees, preserving native numeric
+representatives, first-equal removal, old pins and duplicate positions.
+Unindexed values retain the explicit compatibility scan. Final command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_sequence_numeric_index.py simulation/tests/test_stage_0_5_final_sequence_compat.py simulation/tests/test_stage_0_5_final_sequence_errors.py`
+— exit0, **16 passed5.66s**, `stage_0_5_final_sequence_numeric_gate.txt`.
+The earlier58-case sequence gate remains evidence at its own exact source.
+`git diff --check` passed.
+
+Compatibility P5/H-size reports remain recorded at the preceding header
+checkpoint. No complete cap6 format, migration, lazy household activation,
+nested closure or final integrated acceptance is claimed. Next: owner/subtree
+replacement and concrete runtime catalog publication/adapters; then household
+sequence and dependent remaining packages. No endurance or PR14 operation.
