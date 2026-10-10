@@ -28,9 +28,10 @@ class FamilyAdapter:
             placement = ()
         return self.root_path + placement + relative
 
-    def identity_payload_bytes(self, store, pin, value):
+    def identity_payload_bytes(self, store, pin, value, relative=()):
         from .persistence_lazy_identity_headers import encode_identity_header
-        return encode_identity_header(store, pin, value)
+        return encode_identity_header(store, pin, value,
+            event_id_root=self.namespace == 'world.event_ids' and not relative)
 
 
 # Baseline representation, not a claim that eager fields have been migrated.
@@ -263,7 +264,7 @@ class RuntimeFamilyBindings:
     def encode_placement(self, owner, path, value):
         session = self._session()
         adapter = self._adapter(owner, path)
-        return adapter.identity_payload_bytes(session.store, session.pin, value)
+        return adapter.identity_payload_bytes(session.store, session.pin, value, path)
 
 
 def validate_manifest():

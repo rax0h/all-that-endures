@@ -1476,6 +1476,7 @@ class IncrementalWorldSession:
             self._manifest_dirty = True
 
         facade.bind(self._ensure_mutation_allowed, changed)
+        facade._persistence_tracker_ref = weakref.ref(self)
         self._root_containers[namespace] = facade
         return facade
 
