@@ -1,5 +1,35 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: backing dependencies and bounded retirement (October 10 UTC)
+
+Public source `792facbe1e39e19a585ba87c286dbcf216e1f7bc`, local source
+`aa73df9555874a98875fa800b0e90fe916a668b1`, matching tree
+`89d9c371018c4a9aaa5b188e50d141d41dd61e7c`. Exact-tree leased non-force
+publication completed. PR14 remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+The recovered batch adds checked dependency rosters using the existing publisher
+pin (no old-generation pin clone), weak live-alias bookkeeping, frozen publication
+validation, and indexed backing-retirement jobs. Last-owner retirement queues
+constant metadata; subsequent plans retire at most256 version rows and leave the
+descriptor/dependency/job until the final atomic step. Required authority errors,
+old pins, private overlays, exact retry and all four backend scopes are covered.
+Catalog compaction waits for backing retirement. These are transaction primitives;
+complete World catalog/dependency activation is still pending.
+
+Recovered final affected gate: **78 passed in6.88s**, pipefail exit0,
+`stage_0_5_final_backing_retirement_gate.txt`. The transport-blocked catalog
+selection now completed: **8 passed,10 deselected in1.72s**, pipefail exit0,
+`stage_0_5_final_backing_retirement_catalog_gate.txt` using
+`test_stage_0_5_final_retired_identity.py -k 'retired_header or retirement_respects or catalog_churn or allocator_only or retirement_subprocess or legacy_catalog'`.
+`git diff --check` passed. Unchanged tests were not rerun just for recovery.
+No P5/full-suite/endurance claim at this source. Capability6 is not emitted.
+
+Next: bounded typed-owner admission and cached read validation, then complete
+World checked identity/touched headers and recursive/live sequence closure,
+explicit capability6 copy upgrade, integrated acceptance and final review.
+Stage0.5 remains in progress.
+
+
 ## Latest checkpoint: compact checked EventIdSet identity headers (October 10 UTC)
 
 Public source `0b3bd9f1123aca32f6f0e4df952fc805ab75eef4`, local source
