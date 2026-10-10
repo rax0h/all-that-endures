@@ -3601,21 +3601,13 @@ class LazyRecordTable(RecordTable):
             index_name == "alive" and value is True
         ):
             cache[cache_key] = rows
+            while len(cache) > self._clean_limit:
+                cache.popitem(last=False)
         return rows
 
     def _prune_query_caches(self, epoch=None, *, retain_hot=False):
         for cache in getattr(self, "_query_caches", ()):
-            if epoch is None:
-                limit = self._clean_limit
-            else:
-                touched = cache.touched(epoch)
-                touched.intersection_update(cache.keys())
-                limit = (
-                    max(self._clean_limit, len(touched))
-                    if retain_hot
-                    else self._clean_limit
-                )
-            while len(cache) > limit:
+            while len(cache) > self._clean_limit:
                 cache.popitem(last=False)
             if epoch is not None:
                 cache.finish_step(epoch)
@@ -3640,13 +3632,8 @@ class LazyRecordTable(RecordTable):
                 cache.pop(key, None)
 
     def _evict_clean(self):
-        tracker = getattr(self._session, "_eager_tracker", None)
-        if tracker is not None and tracker._cold_step_depth:
-            # During a real simulation step, repeated access to live working
-            # state must not churn through SQLite merely because the ordinary
-            # clean-cache cap is smaller than the active workload. The step
-            # boundary prunes this back to the actual hot working set.
-            return
+        # Current work and dirty owners are separate from the clean cache.
+        # A run/step lifetime does not waive the per-family header cap.
         while len(self._lru) > self._clean_limit:
             key, _ = self._lru.popitem(last=False)
             if key in self._dirty:
@@ -3658,20 +3645,8 @@ class LazyRecordTable(RecordTable):
 
     def _finish_simulation_step(self, epoch, *, retain_hot):
         touched = self._lru.touched(epoch)
-        # Dirty owners are already pinned outside the clean LRU. During a
-        # multi-year Simulation.run, retain at most the clean keys actually
-        # used by this step (or the ordinary small-query cache, whichever is
-        # larger). Direct one-step calls keep the original 256-entry bound.
-        # Every clean access moves its key to the LRU tail, so untouched
-        # prior-step state is evicted first and historical growth cannot
-        # accumulate in the hot set.
         touched.intersection_update(self._lru.keys())
-        limit = (
-            max(self._clean_limit, len(touched))
-            if retain_hot
-            else self._clean_limit
-        )
-        while len(self._lru) > limit:
+        while len(self._lru) > self._clean_limit:
             key, _ = self._lru.popitem(last=False)
             if key in self._dirty:
                 continue

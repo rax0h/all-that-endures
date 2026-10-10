@@ -249,7 +249,7 @@ def test_lazy_people_cache_is_bounded_and_reuses_external_alias_by_incarnation(t
 
 
 
-def test_multi_year_run_retains_only_step_hot_working_set_then_restores_cache_bound(tmp_path):
+def test_multi_year_run_keeps_clean_cap_and_reuses_only_resident_working_set(tmp_path):
     source = tmp_path / "hot-run-cold.sqlite"
     destination = tmp_path / "hot-run-lazy.sqlite"
     write_cold_snapshot(
@@ -272,25 +272,28 @@ def test_multi_year_run_retains_only_step_hot_working_set_then_restores_cache_bo
             finally:
                 lifetime.end_step()
 
-            # A multi-year run may retain the active step working set even
-            # when it is larger than the ordinary point-query cache.
-            assert people.diagnostics()["resident_people"] == 400
+            assert people.diagnostics()["resident_people"] == 256
 
             session.store.reset_diagnostics()
             lifetime.begin_step()
             try:
-                for key in range(1, 401):
+                # The surviving 256 headers stay warm. A larger current-work
+                # request rehydrates misses while preserving the clean cap.
+                for key in range(145, 401):
                     people[key]
+                assert session.store.diagnostics().payload_reads == 0
+                for key in range(1, 145):
+                    assert people[key].id == key
+                    assert people.diagnostics()["resident_people"] <= 256
             finally:
                 lifetime.end_step()
             warm = session.store.diagnostics()
-            assert warm.payload_reads == 0
-            assert people.diagnostics()["person_payload_loads"] == 400
+            assert warm.payload_reads >= 144
+            assert people.diagnostics()["person_payload_loads"] == 544
         finally:
             lifetime.end_run()
 
-        # Hot residency is scoped to Simulation.run and cannot turn into a
-        # second unbounded archive.
+        # Run and step lifetimes use the same clean-cache bound.
         diag = people.diagnostics()
         assert diag["clean_cache_entries"] <= 256
         assert diag["resident_people"] <= 256

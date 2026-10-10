@@ -1,0 +1,100 @@
+{
+  "measurements": [
+    {
+      "H": 1000,
+      "construction_and_sweep_cost": "explicit O(H), excluded from point timing",
+      "construction_seconds": 0.8132265599997481,
+      "explicit_sweep_seconds": 0.3870467690003352,
+      "external_aliases": 1,
+      "inside_step": {
+        "clean_entries": 256,
+        "peak_clean_entries": 256,
+        "record_budget": {
+          "bytes": 600065,
+          "entries": 256,
+          "evictions": 0,
+          "metadata_python_bytes": 121676,
+          "owners": 1
+        },
+        "sidecar_entries": {
+          "_baseline_incarnation": 256,
+          "_baseline_ordinal": 0,
+          "_baseline_payload": 256,
+          "_baseline_presence": 256
+        },
+        "sidecar_python_bytes": 238322,
+        "step_touched": 256
+      },
+      "live_people": 8,
+      "point_edits": 1,
+      "retained_alias_scalar_edit": {
+        "io": {
+          "maintenance_removed_rows": 3,
+          "maintenance_rows": 6,
+          "metadata_rows": 220,
+          "payload_check_bytes": 2365,
+          "payload_check_reads": 10,
+          "payload_read_bytes": 1125,
+          "payload_reads": 8,
+          "payload_write_bytes": 766,
+          "payload_writes": 3,
+          "pin_rows": 219,
+          "query_rows": 4,
+          "temporary_keys_peak": 0
+        },
+        "seconds": 0.03656898699955491
+      }
+    },
+    {
+      "H": 10000,
+      "construction_and_sweep_cost": "explicit O(H), excluded from point timing",
+      "construction_seconds": 5.791748598000595,
+      "explicit_sweep_seconds": 3.961799427999722,
+      "external_aliases": 1,
+      "inside_step": {
+        "clean_entries": 256,
+        "peak_clean_entries": 256,
+        "record_budget": {
+          "bytes": 600321,
+          "entries": 256,
+          "evictions": 0,
+          "metadata_python_bytes": 121676,
+          "owners": 1
+        },
+        "sidecar_entries": {
+          "_baseline_incarnation": 256,
+          "_baseline_ordinal": 0,
+          "_baseline_payload": 256,
+          "_baseline_presence": 256
+        },
+        "sidecar_python_bytes": 238578,
+        "step_touched": 256
+      },
+      "live_people": 8,
+      "point_edits": 1,
+      "retained_alias_scalar_edit": {
+        "io": {
+          "maintenance_removed_rows": 3,
+          "maintenance_rows": 6,
+          "metadata_rows": 220,
+          "payload_check_bytes": 2365,
+          "payload_check_reads": 10,
+          "payload_read_bytes": 1125,
+          "payload_reads": 8,
+          "payload_write_bytes": 766,
+          "payload_writes": 3,
+          "pin_rows": 219,
+          "query_rows": 4,
+          "temporary_keys_peak": 0
+        },
+        "seconds": 0.03077391099941451
+      }
+    }
+  ],
+  "scope": "record/sidecar cache cap; not global catalog/external lease/eager topology acceptance",
+  "source_sha256": {
+    "ate_sim/persistence_lazy.py": "bbdfa331b846ef456093653f4ea86ac950eeeaa2c7c154bef04ea8bf023dad90",
+    "ate_sim/persistence_lazy_budget.py": "0f5ea4bd091d323c9a231e63cfa83a93915d93aa43f1e70f53920b452e30e490",
+    "ate_sim/persistence_lazy_families.py": "af4908d6c56d82e2ad9615bc125d5487169d50d7cda4ffd0bcdd1e3d20ffe43d"
+  }
+}
