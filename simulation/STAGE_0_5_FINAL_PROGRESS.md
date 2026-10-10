@@ -1,5 +1,82 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: candidate exceptional event-ID paging (October 10 UTC)
+
+Public source `12034323043bf3b36ea897d4941a372e8f3ba89a`, local source
+`4e7c5b1d573b696bb0e39fbbc5add2078c620d65`, matching tree
+`d04c0d667db88800fab49821d99bd976874a68ae`. Parent public
+`f27c0903cae5e938ed0b25ef6dc541ccd6c3727f`, local
+`3e6dfc2` (full ID in local history), matching tree
+`2a7f61f8454afdc07664a058cd270d5ed8ee0f0d`.
+Production remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+The explicit native-graph candidate lane now enters range-plus-paged-exceptions
+without materializing the positive-integer prefix. Sorted removed integer IDs
+use the existing counted sequence; exact additional representatives use the
+existing typed set. The descriptor, internal backing, EventLog and aliases
+publish in the sole hybrid transaction. Internal children use the sole registry
+allocator and existing frozen-plan acknowledgement/abort path, not another
+current-link relation or publisher. Reopen checks child descriptor presence and
+parent/child counts. Popping past a long removed suffix uses binary value-rank
+search in the counted tree, rather than walking all holes.
+
+Removing integer1 then adding True or1.0 retains that native representative.
+Signed zero, set comparisons, failed-input behavior and explicit whole-set
+operations retain the facade contract. Wallet and scalar-record set aliases,
+including Institution.members, retain the same EventIdSet facade across save,
+reopen and portable detach. Root collection replacement remains the accepted
+P2B guarded operation; tests were corrected to preserve this contract rather
+than introducing unsupported root replacement. Retiring a wallet does not
+resurrect it through a later event-ID edit. Ordinary participant evidence errors
+now identify their namespace, making corrupt successor failures actionable.
+
+**Equality closure still has a disclosed compatibility exception.** NaNs (also
+inside tuples/frozensets) and opaque unsupported Python keys retain native exact
+resident authority, including distinct NaN representatives and partial mutation
+semantics. The existing typed equality-key primitive cannot encode these as a
+unique exact paged set. Point entry into this compatibility path can still cost
+O(H); it is not a capability-6 acceptance claim. Unsupported hash/equality probes
+retain native results via explicit comparison of additional exceptions. Explicit
+whole-set operations/materializing export remain O(H). Legacy opens do not
+silently convert member rows. Complete equality-directory admission and history
+lease/backing reclamation remain part of closeout, not silently waived.
+
+RED evidence: middle deletion visited1000/10000 prefix members; exceptional
+reopen initially used logical size as ordinary row count; pop traversed removed
+suffix; affected compatibility checks found a set-field routing type error and
+an uninformative earlier participant failure. These are corrected. Corruption
+regressions remove a child descriptor and install a checksum-valid contradictory
+child count; both fail open before adopting incomplete state.
+
+Affected graph/household/identity/event gate before the final exotic-key
+compatibility extension: **156 passed in72.63s**, exit0,
+`stage_0_5_final_event_id_exceptions_gate.txt`. Final runtime focused/affected
+facade, compact IDs, new exceptions, World participants and abort gate:
+**111 passed in39.78s**, exit0,
+`stage_0_5_final_event_id_exceptions_compat_gate.txt`. Two added integrity cases
+passed in0.31s on the same runtime;
+`stage_0_5_final_event_id_exceptions_integrity_gate.txt`. Counts overlap.
+A first gate invocation named a nonexistent test file, collected no tests, and
+was corrected; it is not evidence of a passing gate. No full suite/endurance.
+
+Fresh final-runtime P5 `--native-graph-buckets` passed seed843000,3+4+3,
+year10,439 events and expected digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`;
+`stage_0_5_final_event_id_exceptions_p5.json`. Eager control, relocation, reopen
+and one-memo detach are included. Paired H1k/H10k metrics in
+`stage_0_5_final_event_id_exceptions_metrics.json` have verified source hashes:
+fixed two aliases and one edit; explicit O(H) construction excluded.
+Middle deletion20 payload reads/11 total writes/7 nested writes;
+outlier addition15/6/2; representative replacement(two point edits)29/13/9.
+All counts identical at both sizes; zero facade member visits, maximum combined
+nested payload1288 bytes. These bounds apply to the paged admissible lane only.
+
+Continue global clean-cache caps and metadata closure, checked World catalog and
+touched journals, recursive/type/equality closure, external leases/retired backing
+and explicit capability-6 copy upgrade, then stable integrated H gates, one full
+applicable suite and final independent architecture review. Exact O(H) pressure
+cold-miss owner release decision remains open. Stage0.5 is not complete.
+
 ## Latest checkpoint: native graph bucket histories (October 10 UTC)
 
 Public source `d09aa2a71f66436d3e5aaa63869c8633680cf50a`, local source
