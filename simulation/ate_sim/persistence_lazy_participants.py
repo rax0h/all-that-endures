@@ -290,6 +290,7 @@ class FrozenHybridPublication:
     coordinator_participant: object = None
     dependency_participant: object = None
     retirement_participant: object = None
+    cold_namespace_counts_bytes: bytes | None = None
 
     @property
     def frozen_bytes(self):
@@ -303,7 +304,8 @@ class FrozenHybridPublication:
             *self.coordinator_participant.delta.ordinary_bytes,
             *self.coordinator_participant.delta.identity_bytes)) if self.coordinator_participant is not None else 0) + (
             sum(map(len, self.dependency_participant.delta.version_bytes)) if self.dependency_participant is not None else 0) + (
-            sum(map(len, self.retirement_participant.delta.version_bytes)) if self.retirement_participant is not None else 0)
+            sum(map(len, self.retirement_participant.delta.version_bytes)) if self.retirement_participant is not None else 0) + (
+            len(self.cold_namespace_counts_bytes) if self.cold_namespace_counts_bytes is not None else 0)
 
     def abort_uncommitted(self):
         """Release a checked failed catalog freeze, preserving all dirty state."""
@@ -329,11 +331,13 @@ class FrozenHybridPublication:
             scalars.append(replace(original, version_changes=versions, identity_changes=identities))
         replacements['scalar_record_plans'] = tuple(scalars)
         replacements['layout_value'] = codec.decode(self.layout_bytes)
+        cold_counts = ({} if self.cold_namespace_counts_bytes is None else
+            {'expected_namespace_counts': self.cold_namespace_counts_bytes})
         replacements['cold_plan'] = replace(plan.cold_plan,
             token=codec.decode(self.commit_token_bytes),
             changes=self.ordinary_delta.decode(codec)[1],
             new_segments=tuple(NewSegment(*codec.decode(b)) for b in self.segment_bytes),
-            metadata=codec.decode(self.metadata_bytes), layout_value=codec.decode(self.cold_layout_bytes))
+            metadata=codec.decode(self.metadata_bytes), layout_value=codec.decode(self.cold_layout_bytes), **cold_counts)
         replacements['publication'] = self
         return replace(plan, **replacements)
 
@@ -367,6 +371,32 @@ class FrozenHybridPublication:
             metadata=replay.cold_plan.metadata)
 
 
+def _catalog_cold_counts(store, pin, delta, counts_bytes):
+    from .persistence_lazy_identity_catalog import LINK_NAMESPACE
+    codec = store.codec
+    counts = codec.decode(counts_bytes)
+    with store.read_snapshot(pin):
+        state = store._namespace_state_at(LINK_NAMESPACE, pin.captured_head)
+        if state is None:
+            raise StoreIntegrityError('checked catalog has no versioned link-count authority')
+        link_count = state[0]
+        for change in delta.decode(codec)[0]:
+            if change.namespace != LINK_NAMESPACE:
+                continue
+            key = codec.encode(change.key)
+            row = store._visible_record_row(pin.captured_head, LINK_NAMESPACE, key)
+            if row is not None:
+                order = store._visible_order(LINK_NAMESPACE, key, pin.captured_head)
+                store._validate_owner_projection(LINK_NAMESPACE, key, pin.captured_head, row, order)
+                store._check_record_row(LINK_NAMESPACE, key, row, decode=False)
+            link_count += -int(row is not None) if change.delete else int(row is None)
+        if link_count:
+            counts[LINK_NAMESPACE] = (link_count, 0)
+        else:
+            counts.pop(LINK_NAMESPACE, None)
+    return codec.encode({namespace: counts[namespace] for namespace in sorted(counts)})
+
+
 def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_format_version,
                               identity_coordinator=None, backing_dependencies=None, retirement_delta=None):
     declared = {f.name for f in fields(plan) if f.name.endswith(('_version_changes', '_identity_changes'))
@@ -389,6 +419,11 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
                                        s.first_id, s.last_id)) for s in plan.cold_plan.new_segments)
     layout_bytes, cold_layout_bytes = codec.encode(plan.layout_value), codec.encode(plan.cold_plan.layout_value)
     commit_token_bytes = codec.encode(plan.token)
+    cold_counts_bytes = (plan.cold_plan.expected_namespace_counts
+                         if hasattr(plan.cold_plan, 'expected_namespace_counts') else None)
+    if cold_counts_bytes is not None and (type(cold_counts_bytes) is not bytes
+            or type(codec.decode(cold_counts_bytes)) is not dict):
+        raise StoreIntegrityError('invalid cold namespace-count evidence')
     coordinator_participant = None
     dependency_participant = None
     retirement_participant = None
@@ -447,6 +482,14 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
                 dependency_participant.abort_delta(plan.token)
             raise
         coordinator_participant = CoordinatorSaveParticipant(coord, delta, pin, plan.target_generation)
+        if cold_counts_bytes is not None:
+            try:
+                cold_counts_bytes = _catalog_cold_counts(store, pin, delta, cold_counts_bytes)
+            except BaseException:
+                coord.abort_delta(delta, plan.token)
+                if dependency_participant is not None:
+                    dependency_participant.abort_delta(plan.token)
+                raise
     elif backing_dependencies is not None:
         dependency_participant = DependencySaveParticipant(pool, pool.prepare_delta(), pin, plan.target_generation)
         try:
@@ -473,4 +516,4 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
     return FrozenHybridPublication(sources, scalars, ordinary, participants,
         metadata_bytes, segment_bytes, layout_bytes, cold_layout_bytes,
         next_incarnation, required_format_version, pin, plan.target_generation,
-        commit_token_bytes, coordinator_participant, dependency_participant, retirement_participant)
+        commit_token_bytes, coordinator_participant, dependency_participant, retirement_participant, cold_counts_bytes)

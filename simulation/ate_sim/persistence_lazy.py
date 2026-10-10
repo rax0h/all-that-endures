@@ -10293,6 +10293,8 @@ class LazyWorldSession:
         self._state = "active"
         self._lifecycle_operation: str | None = None
         self._pending_save: LazyPeopleSavePlan | None = None
+        self._identity_coordinator = None
+        self._identity_bridge = None
         self._head = head
         self._paged_sequences = weakref.WeakValueDictionary()
         self._registry = LazyIdentityRegistry(
@@ -10824,6 +10826,11 @@ class LazyWorldSession:
         separate repair, not an excuse to scan all live bindings here.
         """
         self._ensure_people_mutation_allowed()
+        if self._identity_coordinator is not None:
+            self._identity_bridge.synchronize_lazy_placements()
+            owners = self._identity_coordinator.routes_for_mutation(obj)
+            return tuple((self._family_bindings.tables[namespace], key)
+                         for namespace, key in owners if namespace in self._family_bindings.tables)
         incarnation = self._registry.incarnation_for_object(obj)
         if incarnation is None:
             return ()
@@ -10850,6 +10857,30 @@ class LazyWorldSession:
             if current is obj:
                 routes[(id(table), key)] = (table, key)
         return tuple(routes.values())
+
+    def _activate_checked_identity_catalog(self):
+        """Wire an already checked catalog, without creating/migrating authority.
+
+        Complete-format open will call this after its explicit format checks.
+        Legacy open deliberately does not select this mode from partial markers.
+        """
+        self._ensure_people_mutation_allowed()
+        if self._identity_coordinator is not None:
+            return
+        if (self._eager_tracker._dirty or self._eager_tracker._deleted
+                or any(table._effective_touched() for table in self._family_bindings.tables.values())):
+            raise StoreConflictError('checked catalog activation requires a clean session')
+        if self.identity_links or self._cross_boundary_links:
+            raise StoreFormatError('checked catalog cannot share legacy identity authority')
+        from .persistence_lazy_world_identity import WorldIdentityBridge
+        bridge = WorldIdentityBridge(self)
+        self._identity_bridge = bridge
+        self._identity_coordinator = bridge.coordinator
+
+    def _owner_identity_labels(self, pin, namespace, key):
+        if self._identity_coordinator is None:
+            return self.store.identity_occurrences_for_owner(pin, namespace, key)
+        return self._identity_coordinator.catalog.read_owner_identity(pin, (namespace, key)).occurrences
 
     def _ensure_people_mutation_allowed(self):
         self._ensure_active()
@@ -10967,6 +10998,8 @@ class LazyWorldSession:
         return self._absolute_lazy_occurrence_path(occurrence)
 
     def _refresh_cross_boundary_identity(self):
+        if self._identity_coordinator is not None:
+            return  # The checked generation-aware relation is the sole authority.
         tracker = self._eager_tracker
 
         # Synthetic occurrences bridge compact placeholders during open only.
@@ -11304,7 +11337,7 @@ class LazyWorldSession:
 
     def _bind_loaded_advancement_path(self, key, path):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, ADVANCEMENT_NAMESPACE, key
             )
         )
@@ -11456,7 +11489,7 @@ class LazyWorldSession:
 
     def _bind_loaded_aspiration(self, key, aspiration):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, ASPIRATION_NAMESPACE, key
             )
         )
@@ -11540,7 +11573,7 @@ class LazyWorldSession:
 
     def _bind_loaded_owner_bucket(self, key, bucket):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, OWNER_INDEX_NAMESPACE, key
             )
         )
@@ -11690,7 +11723,7 @@ class LazyWorldSession:
 
     def _bind_loaded_social_edge(self, key, record):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, SOCIAL_EDGE_NAMESPACE, key
             )
         )
@@ -11776,7 +11809,7 @@ class LazyWorldSession:
 
     def _bind_loaded_social_adjacency(self, key, values):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, SOCIAL_ADJACENCY_NAMESPACE, key
             )
         )
@@ -11936,7 +11969,7 @@ class LazyWorldSession:
 
     def _bind_loaded_resource(self, key, resource):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, RESOURCE_NAMESPACE, key
             )
         )
@@ -12325,7 +12358,7 @@ class LazyWorldSession:
         return {path: self._registry.incarnation_for_object(_relative_get(record, path)).value for path in fields}
 
     def _bind_loaded_nested_record(self, table, key, record):
-        labels = dict(self.store.identity_occurrences_for_owner(self.pin, table._namespace, key))
+        labels = dict(self._owner_identity_labels(self.pin, table._namespace, key))
         fields = NESTED_RECORD_FIELDS[table._namespace]
         expected = {()} | {(("field", field),) for field in fields}
         if set(labels) != expected:
@@ -12410,7 +12443,7 @@ class LazyWorldSession:
         self, table, namespace, key, record, expected_type
     ):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, namespace, key
             )
         )
@@ -12489,7 +12522,7 @@ class LazyWorldSession:
 
     def _bind_loaded_material_item(self, key, item):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, MATERIAL_ITEM_NAMESPACE, key
             )
         )
@@ -12575,7 +12608,7 @@ class LazyWorldSession:
 
     def _bind_loaded_material_lot_index(self, key, values):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, MATERIAL_LOT_INDEX_NAMESPACE, key
             )
         )
@@ -12664,7 +12697,7 @@ class LazyWorldSession:
 
     def _bind_loaded_material_active_index(self, key, values):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, MATERIAL_ACTIVE_INDEX_NAMESPACE, key
             )
         )
@@ -12825,7 +12858,7 @@ class LazyWorldSession:
 
     def _bind_loaded_material_lot(self, key, lot):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, MATERIAL_LOT_NAMESPACE, key
             )
         )
@@ -13045,7 +13078,7 @@ class LazyWorldSession:
         self, table, namespace, key, value
     ):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, namespace, key
             )
         )
@@ -13413,7 +13446,7 @@ class LazyWorldSession:
 
     def _bind_loaded_soul(self, key, soul):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, SOUL_NAMESPACE, key
             )
         )
@@ -13594,7 +13627,7 @@ class LazyWorldSession:
 
     def _bind_loaded_skill(self, key, record):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, SKILL_NAMESPACE, key
             )
         )
@@ -13684,7 +13717,7 @@ class LazyWorldSession:
 
     def _bind_loaded_lineage_children(self, key, values):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, LINEAGE_CHILD_NAMESPACE, key
             )
         )
@@ -13765,7 +13798,7 @@ class LazyWorldSession:
 
     def _bind_loaded_genealogy_children(self, key, values):
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, GENEALOGY_CHILD_NAMESPACE, key
             )
         )
@@ -13846,7 +13879,7 @@ class LazyWorldSession:
     def _bind_loaded_person(self, key, person):
         owner = (PEOPLE_NAMESPACE, key)
         labels = dict(
-            self.store.identity_occurrences_for_owner(
+            self._owner_identity_labels(
                 self.pin, PEOPLE_NAMESPACE, key
             )
         )
@@ -14168,6 +14201,11 @@ class LazyWorldSession:
             raise
 
     def _prepare_hybrid_save_inner(self, token):
+        if self._identity_bridge is not None:
+            self._identity_bridge.synchronize_lazy_placements()
+            for proxy in tuple(self._nested_dirty.values()):
+                if history_has_pending_overlay(proxy):
+                    self._shared_object_routes(proxy)
         nested_history_identity_changes = self._prepare_eager_nested_identities()
         scalar_record_plans = tuple(
             ScalarRecordSavePlan(namespace, *table.prepare_save_changes())
@@ -14942,6 +14980,7 @@ class LazyWorldSession:
         from .persistence_lazy_participants import freeze_hybrid_publication
         publication = freeze_hybrid_publication(self.store, self.pin, plan,
             next_incarnation=self._registry.next_incarnation,
+            identity_coordinator=self._identity_coordinator,
             required_format_version=(5 if self._eager_tracker._description('world.event_ids')[0] in ('event-ids-range/v1', 'event-ids-exceptions/v1')
                 else 4 if any(change.namespace == HOUSEHOLD_BACKING_NAMESPACE
                               for change in plan.household_member_version_changes) else 3))
@@ -16312,6 +16351,8 @@ class LazyWorldSession:
         )
         for participant in plan.publication.participants:
             participant.accept_delta(participant.delta, result.pin)
+        if self._identity_bridge is not None:
+            self._identity_bridge.finish_acknowledgement(plan.publication.coordinator_participant.delta)
         self._pending_save = None
         self._state = "active"
         return result.generation
