@@ -210,8 +210,11 @@ class _ObjectBinding:
                 return ("root_scalar", namespace, getattr(obj, name))
             return self.session._prepare_root_assignment(namespace, getattr(obj, name), value, kind)
         owners = frozenset(self.owners)
+        prepare_child = getattr(self.session, '_prepare_record_child', None)
         prepare_members = getattr(self.session, "_prepare_paged_members", None)
-        if prepare_members is not None and isinstance(obj, Household) and name == "members":
+        if prepare_child is not None and prepare_child(obj, name):
+            wrapped = prepare_child(obj, name, value, owners)
+        elif prepare_members is not None and isinstance(obj, Household) and name == "members":
             wrapped = prepare_members(obj, value, owners)
         else:
             wrapped = self.session._prepare_nested(
@@ -1632,8 +1635,11 @@ class IncrementalWorldSession:
             self._remember_memo(value, value)
             for name in RECORD_FIELDS[type(value)]:
                 child = getattr(value, name)
+                prepare_child = getattr(self, '_prepare_record_child', None)
                 prepare_members = getattr(self, "_prepare_paged_members", None)
-                if prepare_members is not None and isinstance(value, Household) and name == "members":
+                if prepare_child is not None and prepare_child(value, name):
+                    replacement = prepare_child(value, name, child, owners)
+                elif prepare_members is not None and isinstance(value, Household) and name == "members":
                     replacement = prepare_members(value, child, owners)
                 else:
                     replacement = self._bind_nested(

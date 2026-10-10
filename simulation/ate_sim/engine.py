@@ -3,6 +3,7 @@ from .biology import state as biology_state,mortality_risk,reproductive_window,p
 from .culture import cultural_step
 from .households import household_step
 from .household_queries import living_household_members
+from .persistence_pressure import household_preparedness_mean
 from .civilization import civilization_step
 from .development import development_step
 from .agency import agency_step
@@ -121,7 +122,7 @@ class Simulation:
   for sid,s in self.w.settlements.items():
    c=self.w.cells[(s.x,s.y)];r=self.rng.stream("hazard",self.w.year,sid);ambient=self.w.ambient_magic.field(sid).level;surge_chance=.012*c.hazard*(1+max(0.,ambient-.55)*1.8)
    if r.random()<surge_chance:
-    residents=by_settlement[sid];exposure=.5+.5*r.random();hp=sum(self.w.households[h].preparedness for h in s.households)/max(1,len(s.households));defenders=sum(combat_value(p) for p in residents);rank_defense=min(.35,defenders/max(1,len(residents))*.025);preparedness=min(.95,.55*s.defense+.2*s.roads+.25*hp+rank_defense);severity=max(0,exposure*(1-preparedness)*c.hazard*(1+max(0.,ambient-.72)*.8));attack=self.w.emit("monster_surge",Layer.REALITY,location=Ref("settlement",sid),severity=severity,preparedness=preparedness,ambient_magic=round(ambient,3))
+    residents=by_settlement[sid];exposure=.5+.5*r.random();hp=household_preparedness_mean(self.w,s);defenders=sum(combat_value(p) for p in residents);rank_defense=min(.35,defenders/max(1,len(residents))*.025);preparedness=min(.95,.55*s.defense+.2*s.roads+.25*hp+rank_defense);severity=max(0,exposure*(1-preparedness)*c.hazard*(1+max(0.,ambient-.72)*.8));attack=self.w.emit("monster_surge",Layer.REALITY,location=Ref("settlement",sid),severity=severity,preparedness=preparedness,ambient_magic=round(ambient,3))
     for p in residents:
      resilience=injury_resilience(p)
      if self.rng.stream("surge_person",self.w.year,p.id).random()<severity*.12/resilience:self._die(p,"monster_surge",(attack.id,))

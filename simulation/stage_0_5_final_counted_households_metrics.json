@@ -1,0 +1,1299 @@
+{
+  "measurements": [
+    {
+      "H": 1000,
+      "fixture_cost": "explicit O(H) construction and verification excluded from ordinary operations",
+      "fixture_seconds": 0.7101010040000801,
+      "live_people": 8,
+      "rows": [
+        {
+          "history_cache": {
+            "bytes": 1004,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1418,
+            "owners": 1
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 138,
+            "payload_check_bytes": 18468,
+            "payload_check_reads": 38,
+            "payload_read_bytes": 18468,
+            "payload_reads": 38,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 6,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "open",
+          "resident_household_headers": 0
+        },
+        {
+          "history_cache": {
+            "bytes": 1004,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1418,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 2,
+            "live_incarnations": 1,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 3,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 1,
+            "weak_reverse_entries": 1
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 36,
+            "payload_check_bytes": 217,
+            "payload_check_reads": 3,
+            "payload_read_bytes": 217,
+            "payload_reads": 3,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 0,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "no_op_save",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "resident_household_headers": 0,
+          "seconds": 0.0014302149998002278
+        },
+        {
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 2,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 3,
+            "live_incarnations": 3,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 4,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 3,
+            "weak_reverse_entries": 3
+          },
+          "io": {
+            "maintenance_removed_rows": 5,
+            "maintenance_rows": 10,
+            "metadata_rows": 210,
+            "payload_check_bytes": 1771,
+            "payload_check_reads": 11,
+            "payload_read_bytes": 1169,
+            "payload_reads": 9,
+            "payload_write_bytes": 447,
+            "payload_writes": 3,
+            "pin_rows": 212,
+            "query_rows": 12,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_edit",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 1881,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1292,
+            "owners": 1
+          },
+          "resident_household_headers": 1,
+          "seconds": 0.013661097999829508
+        },
+        {
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 79,
+            "metadata_python_bytes": 7080,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 12791,
+          "history_version_writes": 133,
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 136,
+            "maintenance_rows": 272,
+            "metadata_rows": 1501,
+            "payload_check_bytes": 64248,
+            "payload_check_reads": 558,
+            "payload_read_bytes": 38920,
+            "payload_reads": 294,
+            "payload_write_bytes": 12937,
+            "payload_writes": 135,
+            "pin_rows": 1403,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "middle_insert",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 3763,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "seconds": 0.08277471299993522,
+          "sequence_locator_writes": 126,
+          "sequence_node_writes": 2
+        },
+        {
+          "history_cache": {
+            "bytes": 128613,
+            "entries": 18,
+            "evictions": 79,
+            "metadata_python_bytes": 14226,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 45,
+            "payload_check_bytes": 39549,
+            "payload_check_reads": 18,
+            "payload_read_bytes": 39549,
+            "payload_reads": 18,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 1113,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "pressure_cold",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 1,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 1,
+            "occurrence_visits": 1000,
+            "python_bytes": 628
+          },
+          "record_cache": {
+            "bytes": 3763,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "result_hex": "0x1.999999999999ap-3",
+          "seconds": 0.01568570000017644
+        },
+        {
+          "history_cache": {
+            "bytes": 128613,
+            "entries": 18,
+            "evictions": 79,
+            "metadata_python_bytes": 14226,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 0,
+            "payload_check_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_reads": 0,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 2,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "pressure_hit",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 1,
+            "entry_limit": 64,
+            "hits": 1,
+            "misses": 1,
+            "occurrence_visits": 1000,
+            "python_bytes": 628
+          },
+          "record_cache": {
+            "bytes": 3763,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "result_hex": "0x1.999999999999ap-3",
+          "seconds": 5.1007000138270087e-05
+        }
+      ],
+      "sharing_placements": 2,
+      "topology": "long_history"
+    },
+    {
+      "H": 10000,
+      "fixture_cost": "explicit O(H) construction and verification excluded from ordinary operations",
+      "fixture_seconds": 6.7203341220001676,
+      "live_people": 8,
+      "rows": [
+        {
+          "history_cache": {
+            "bytes": 1004,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1418,
+            "owners": 1
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 138,
+            "payload_check_bytes": 18472,
+            "payload_check_reads": 38,
+            "payload_read_bytes": 18472,
+            "payload_reads": 38,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 6,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "open",
+          "resident_household_headers": 0
+        },
+        {
+          "history_cache": {
+            "bytes": 1004,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1418,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 2,
+            "live_incarnations": 1,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 3,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 1,
+            "weak_reverse_entries": 1
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 36,
+            "payload_check_bytes": 217,
+            "payload_check_reads": 3,
+            "payload_read_bytes": 217,
+            "payload_reads": 3,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 0,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "no_op_save",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "resident_household_headers": 0,
+          "seconds": 0.0014101849999406113
+        },
+        {
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 2,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 3,
+            "live_incarnations": 3,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 4,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 3,
+            "weak_reverse_entries": 3
+          },
+          "io": {
+            "maintenance_removed_rows": 5,
+            "maintenance_rows": 10,
+            "metadata_rows": 210,
+            "payload_check_bytes": 1775,
+            "payload_check_reads": 11,
+            "payload_read_bytes": 1173,
+            "payload_reads": 9,
+            "payload_write_bytes": 447,
+            "payload_writes": 3,
+            "pin_rows": 212,
+            "query_rows": 12,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_edit",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 1881,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1292,
+            "owners": 1
+          },
+          "resident_household_headers": 1,
+          "seconds": 0.011185767999904783
+        },
+        {
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 106,
+            "metadata_python_bytes": 7080,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 14171,
+          "history_version_writes": 89,
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 92,
+            "maintenance_rows": 184,
+            "metadata_rows": 1249,
+            "payload_check_bytes": 78725,
+            "payload_check_reads": 454,
+            "payload_read_bytes": 50640,
+            "payload_reads": 278,
+            "payload_write_bytes": 14317,
+            "payload_writes": 91,
+            "pin_rows": 1339,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "middle_insert",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 3763,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "seconds": 0.06791268099982517,
+          "sequence_locator_writes": 81,
+          "sequence_node_writes": 3
+        },
+        {
+          "history_cache": {
+            "bytes": 498724,
+            "entries": 64,
+            "evictions": 208,
+            "metadata_python_bytes": 37482,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 415,
+            "payload_check_bytes": 405415,
+            "payload_check_reads": 166,
+            "payload_read_bytes": 405415,
+            "payload_reads": 166,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 11001,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "pressure_cold",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 1,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 1,
+            "occurrence_visits": 10000,
+            "python_bytes": 628
+          },
+          "record_cache": {
+            "bytes": 3763,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "result_hex": "0x1.999999999999ap-3",
+          "seconds": 0.13850150600001143
+        },
+        {
+          "history_cache": {
+            "bytes": 498724,
+            "entries": 64,
+            "evictions": 208,
+            "metadata_python_bytes": 37482,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 17,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 0,
+            "payload_check_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_reads": 0,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 2,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "pressure_hit",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 1,
+            "entry_limit": 64,
+            "hits": 1,
+            "misses": 1,
+            "occurrence_visits": 10000,
+            "python_bytes": 628
+          },
+          "record_cache": {
+            "bytes": 3763,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "result_hex": "0x1.999999999999ap-3",
+          "seconds": 4.4767999952455284e-05
+        }
+      ],
+      "sharing_placements": 2,
+      "topology": "long_history"
+    },
+    {
+      "H": 1000,
+      "fixture_cost": "explicit O(H) construction and verification excluded from ordinary operations",
+      "fixture_seconds": 6.516399810999928,
+      "live_people": 8,
+      "rows": [
+        {
+          "history_cache": {
+            "bytes": 1004,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1418,
+            "owners": 1
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 138,
+            "payload_check_bytes": 18483,
+            "payload_check_reads": 38,
+            "payload_read_bytes": 18483,
+            "payload_reads": 38,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 6,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "open",
+          "resident_household_headers": 0
+        },
+        {
+          "history_cache": {
+            "bytes": 1004,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1418,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 2,
+            "live_incarnations": 1,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 2013,
+            "occurrences": 3,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 1,
+            "weak_reverse_entries": 1
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 36,
+            "payload_check_bytes": 217,
+            "payload_check_reads": 3,
+            "payload_read_bytes": 217,
+            "payload_reads": 3,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 0,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "no_op_save",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "resident_household_headers": 0,
+          "seconds": 0.0020839809999415593
+        },
+        {
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 2,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 3,
+            "live_incarnations": 3,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 2013,
+            "occurrences": 4,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 3,
+            "weak_reverse_entries": 3
+          },
+          "io": {
+            "maintenance_removed_rows": 5,
+            "maintenance_rows": 10,
+            "metadata_rows": 210,
+            "payload_check_bytes": 1805,
+            "payload_check_reads": 11,
+            "payload_read_bytes": 1203,
+            "payload_reads": 9,
+            "payload_write_bytes": 447,
+            "payload_writes": 3,
+            "pin_rows": 212,
+            "query_rows": 12,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_edit",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 1881,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1292,
+            "owners": 1
+          },
+          "resident_household_headers": 1,
+          "seconds": 0.01760345800016694
+        },
+        {
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 4,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 1173,
+          "history_version_writes": 7,
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 2013,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 8,
+            "maintenance_rows": 16,
+            "metadata_rows": 329,
+            "payload_check_bytes": 4328,
+            "payload_check_reads": 35,
+            "payload_read_bytes": 2649,
+            "payload_reads": 25,
+            "payload_write_bytes": 1319,
+            "payload_writes": 9,
+            "pin_rows": 335,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "middle_insert",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 3734,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "seconds": 0.02992440599996371,
+          "sequence_locator_writes": 2,
+          "sequence_node_writes": 1
+        },
+        {
+          "history_cache": {
+            "bytes": 128613,
+            "entries": 18,
+            "evictions": 4,
+            "metadata_python_bytes": 8378,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 2013,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 5035,
+            "payload_check_bytes": 347170,
+            "payload_check_reads": 1016,
+            "payload_read_bytes": 347170,
+            "payload_reads": 1016,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 9097,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "pressure_cold",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 1,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 1,
+            "occurrence_visits": 1000,
+            "python_bytes": 628
+          },
+          "record_cache": {
+            "bytes": 3734,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "result_hex": "0x1.999999999999ap-3",
+          "seconds": 0.1772728509999979
+        },
+        {
+          "history_cache": {
+            "bytes": 128613,
+            "entries": 18,
+            "evictions": 4,
+            "metadata_python_bytes": 8378,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 2013,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 0,
+            "payload_check_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_reads": 0,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 2,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "pressure_hit",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 1,
+            "entry_limit": 64,
+            "hits": 1,
+            "misses": 1,
+            "occurrence_visits": 1000,
+            "python_bytes": 628
+          },
+          "record_cache": {
+            "bytes": 3734,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "result_hex": "0x1.999999999999ap-3",
+          "seconds": 0.00013031599996793375
+        }
+      ],
+      "sharing_placements": 2,
+      "topology": "many_owners"
+    },
+    {
+      "H": 10000,
+      "fixture_cost": "explicit O(H) construction and verification excluded from ordinary operations",
+      "fixture_seconds": 91.987187468,
+      "live_people": 8,
+      "rows": [
+        {
+          "history_cache": {
+            "bytes": 1004,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1418,
+            "owners": 1
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 138,
+            "payload_check_bytes": 18493,
+            "payload_check_reads": 38,
+            "payload_read_bytes": 18493,
+            "payload_reads": 38,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 6,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "open",
+          "resident_household_headers": 0
+        },
+        {
+          "history_cache": {
+            "bytes": 1004,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1418,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 2,
+            "live_incarnations": 1,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 20013,
+            "occurrences": 3,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 1,
+            "weak_reverse_entries": 1
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 36,
+            "payload_check_bytes": 217,
+            "payload_check_reads": 3,
+            "payload_read_bytes": 217,
+            "payload_reads": 3,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 0,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "no_op_save",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "resident_household_headers": 0,
+          "seconds": 0.0014350620001550851
+        },
+        {
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 2,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 3,
+            "live_incarnations": 3,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 20013,
+            "occurrences": 4,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 3,
+            "weak_reverse_entries": 3
+          },
+          "io": {
+            "maintenance_removed_rows": 5,
+            "maintenance_rows": 10,
+            "metadata_rows": 210,
+            "payload_check_bytes": 1805,
+            "payload_check_reads": 11,
+            "payload_read_bytes": 1203,
+            "payload_reads": 9,
+            "payload_write_bytes": 447,
+            "payload_writes": 3,
+            "pin_rows": 212,
+            "query_rows": 12,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_edit",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 1881,
+            "entries": 1,
+            "evictions": 0,
+            "metadata_python_bytes": 1292,
+            "owners": 1
+          },
+          "resident_household_headers": 1,
+          "seconds": 0.012901401999897644
+        },
+        {
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 4,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 1173,
+          "history_version_writes": 7,
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 20013,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 8,
+            "maintenance_rows": 16,
+            "metadata_rows": 329,
+            "payload_check_bytes": 4328,
+            "payload_check_reads": 35,
+            "payload_read_bytes": 2649,
+            "payload_reads": 25,
+            "payload_write_bytes": 1319,
+            "payload_writes": 9,
+            "pin_rows": 335,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "middle_insert",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 0,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 0,
+            "occurrence_visits": 0,
+            "python_bytes": 128
+          },
+          "record_cache": {
+            "bytes": 3734,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "seconds": 0.020547775000068214,
+          "sequence_locator_writes": 2,
+          "sequence_node_writes": 1
+        },
+        {
+          "history_cache": {
+            "bytes": 498724,
+            "entries": 64,
+            "evictions": 106,
+            "metadata_python_bytes": 37482,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 20013,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 50405,
+            "payload_check_bytes": 3517038,
+            "payload_check_reads": 10164,
+            "payload_read_bytes": 3517038,
+            "payload_reads": 10164,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 90985,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "pressure_cold",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 1,
+            "entry_limit": 64,
+            "hits": 0,
+            "misses": 1,
+            "occurrence_visits": 10000,
+            "python_bytes": 628
+          },
+          "record_cache": {
+            "bytes": 3734,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "result_hex": "0x1.999999999999ap-3",
+          "seconds": 1.8269825859999855
+        },
+        {
+          "history_cache": {
+            "bytes": 498724,
+            "entries": 64,
+            "evictions": 106,
+            "metadata_python_bytes": 37482,
+            "owners": 1
+          },
+          "identity_residency": {
+            "incarnations_with_occurrences": 4,
+            "live_incarnations": 4,
+            "max_owner_group_size": 2,
+            "metadata_container_bytes": 1120,
+            "next_incarnation": 20013,
+            "occurrences": 5,
+            "owner_groups": 2,
+            "owners_with_occurrences": 3,
+            "strong_object_roots": 0,
+            "weak_forward_entries": 4,
+            "weak_reverse_entries": 4
+          },
+          "io": {
+            "maintenance_removed_rows": 0,
+            "maintenance_rows": 0,
+            "metadata_rows": 0,
+            "payload_check_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_reads": 0,
+            "payload_write_bytes": 0,
+            "payload_writes": 0,
+            "pin_rows": 2,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "pressure_hit",
+          "pressure_cache": {
+            "byte_limit": 65536,
+            "cold_miss_time_bound": "O(all household occurrences)",
+            "entries": 1,
+            "entry_limit": 64,
+            "hits": 1,
+            "misses": 1,
+            "occurrence_visits": 10000,
+            "python_bytes": 628
+          },
+          "record_cache": {
+            "bytes": 3734,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1724,
+            "owners": 1
+          },
+          "resident_household_headers": 2,
+          "result_hex": "0x1.999999999999ap-3",
+          "seconds": 6.992599992372561e-05
+        }
+      ],
+      "sharing_placements": 2,
+      "topology": "many_owners"
+    }
+  ],
+  "release_exception": "Exact pressure cache misses visit all household occurrences, O(H); owner latency decision remains open.",
+  "scope": "counted household integration; legacy global current links remain; not capability-6 closeout",
+  "source_sha256": {
+    "ate_sim/engine.py": "8b80094af38a2b0c5155d8422df136cc9c70107d21d6a56de03c7a38a64ca4d8",
+    "ate_sim/household_queries.py": "dc382c6ff85b5f576e9c8f935920491cc61f15c45e22f937b2d897b0403c5194",
+    "ate_sim/persistence_lazy.py": "e35d539e58f24f3dfd8a047dccf114f99731f83071bc44a317f3463d5ece17e1",
+    "ate_sim/persistence_lazy_sequence.py": "f710bdc857e5c76a52f9fe1eb57cbe0cfa48b85de23ea7ce5f12d5da2a00a48d",
+    "ate_sim/persistence_lazy_store.py": "91e15fd1316bdd7e5e20c43b4db73df2ee1e71bff71b84e3a488cb6021b40ad1",
+    "ate_sim/persistence_pressure.py": "e9b4da79b286cd95c63a37d755ec8dcf87c6748277c3b1f42978b0fdfd15d980",
+    "ate_sim/persistence_tracking.py": "3769fac5b59ea96706bf03b84f5fc792059b9498ab2eae8eeb2f36b0475cd6a7"
+  }
+}

@@ -18,7 +18,7 @@ import uuid
 import weakref
 from typing import Any, Iterator
 
-from .core import Person, Household, World
+from .core import Person, Household, Settlement, World
 from .incremental_store import _record_checksum
 from .magic_resources import MagicAspiration, MagicResource
 from .materials import MaterialLot, CraftedItem
@@ -52,6 +52,8 @@ from .persistence_lazy_nested_history import (
 )
 from .persistence_lazy_budget import SharedCacheBudget, RecordCacheLRU, RECORD_BYTES
 from .persistence_lazy_families import RuntimeFamilyBindings
+from .persistence_lazy_sequence import LazyOrderedSequence, NAMESPACES as SEQUENCE_NAMESPACES
+from .persistence_pressure import ExactPressureCache
 from .persistence_lazy_household_members import (
     LENGTH_NAMESPACE as HOUSEHOLD_LENGTH_NAMESPACE,
     BACKING_NAMESPACE as HOUSEHOLD_BACKING_NAMESPACE,
@@ -206,6 +208,7 @@ CLEAN_GROUP_LIMIT = 256
 # description tag distinguishes complete empty authority from a legacy field.
 SCALAR_RECORD_KINDS = {'dict-scalar/v1': 'dict', 'RecordTable-scalar/v1': 'RecordTable'}
 SCALAR_RECORD_SPECS = {
+    'world.households': (Household, {('alive',): 'alive', ('settlement',): 'settlement', ('alive', 'settlement'): 'alive_settlement'}),
     'world.communities.communities': (Community, MINIMUM_FIELDS['world.communities.communities']),
     'world.metaphysics.resurrection_tokens': (ResurrectionToken, MINIMUM_FIELDS['world.metaphysics.resurrection_tokens']),
     'world.culture.practices': (Practice, {}),
@@ -225,6 +228,7 @@ SCALAR_RECORD_SPECS = {
     }),
 }
 NESTED_RECORD_FIELDS = {
+    'world.households': ('members',),
     'world.magic_resources.resources': ('transfers',),
     'world.materials.lots': ('transfers',),
     'world.social.edges': ('shared_history',),
@@ -240,6 +244,7 @@ NESTED_RECORD_FIELDS = {
     'world.infrastructure.assets': ('provenance',),
 }
 NESTED_FIELD_KINDS = {
+    ('world.households', 'members'): 'sequence',
     ('world.metaphysics.souls', 'authorities'): 'set',
     ('world.metaphysics.souls', 'marks'): 'set',
     ('world.metaphysics.souls', 'cosmic_links'): 'map',
@@ -1216,7 +1221,7 @@ def _convert_event_id_range(target, capture, source_head, authority):
     target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
 
 
-def _declare_bounded_collections(target):
+def _declare_bounded_collections(target, scalar_namespaces=SCALAR_NAMESPACES):
     from .persistence_adapters import COLLECTION_LAYOUT
     key = target.codec.encode(COLLECTION_LAYOUT)
     row = target.db.execute('SELECT payload,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?', (META, key)).fetchone()
@@ -1229,7 +1234,7 @@ def _declare_bounded_collections(target):
         value = layout = target.codec.decode(row[0])
     old = layout[INSTITUTION_APPLICATION_NAMESPACE]
     layout[INSTITUTION_APPLICATION_NAMESPACE] = (APPLICATION_QUERY_KIND, old[1], old[2])
-    for namespace in SCALAR_NAMESPACES:
+    for namespace in scalar_namespaces:
         old = layout[namespace]
         base = _base_kind(old[0])
         if base not in ('dict', 'RecordTable'):
@@ -1241,9 +1246,14 @@ def _declare_bounded_collections(target):
     target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
 
 
-def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True):
+def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True, counted_households=False):
     """Explicit checked P3B cold -> P4 conversion. New Worlds use bounded household pages."""
     source, destination = _preflight_conversion_paths(source, destination)
+    if type(counted_households) is not bool:
+        raise TypeError('counted_households must be bool')
+    if counted_households:
+        paged_household_members = False
+    scalar_namespaces = tuple(ns for ns in SCALAR_NAMESPACES if ns != 'world.households' or counted_households)
     codec = WorldCodec(identity_links_recorded=True)
     source_store = TransactionalStore.open(
         source,
@@ -1316,8 +1326,17 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                 codec,
             )
             nested_children = {}
+            if counted_households:
+                for namespace, owner_key, relative, incarnation in identity_rows:
+                    if ((namespace == 'world.households' and relative == (("field", "members"),))
+                            or (namespace == 'world.settlements' and relative == (("field", "households"),))):
+                        values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
+                        if type(values) is not list or any(not nested_immutable_value(value) for value in values):
+                            raise StoreFormatError('counted household source requires immutable list values')
+                        nested_children[incarnation] = ('sequence', values)
             for namespace, owner_key, relative, incarnation in identity_rows:
-                if namespace in NESTED_RECORD_FIELDS and relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS[namespace]):
+                if (namespace != 'world.households' and namespace in NESTED_RECORD_FIELDS
+                        and relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS[namespace])):
                     values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)) + relative)
                     kind = NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')
                     if type(values) is not {'list': list, 'map': dict, 'set': set}[kind]:
@@ -1353,6 +1372,17 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     rules_id=rules_id,
                 )
                 try:
+                    sequence_changes = []
+                    if counted_households:
+                        construction_pin = target.capture_pin()
+                        try:
+                            for incarnation, (kind, values) in sorted(nested_children.items()):
+                                if kind == 'sequence':
+                                    builder = LazyOrderedSequence(target, construction_pin, incarnation,
+                                        initial_values=values, value_mode='native')
+                                    sequence_changes.extend(builder.pending_changes())
+                        finally:
+                            target.release_pin(construction_pin)
                     target.db.execute("BEGIN IMMEDIATE")
                     target.db.execute("DELETE FROM save_head")
                     target.db.execute(
@@ -1360,7 +1390,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         source_head,
                     )
 
-                    scalar_counts = {namespace: [0, 0] for namespace in SCALAR_NAMESPACES}
+                    scalar_counts = {namespace: [0, 0] for namespace in scalar_namespaces}
                     adoption_values = []
                     minimum_records = []
                     people_count = 0
@@ -1465,7 +1495,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             scalar_counts[namespace][0] += 1
                             scalar_counts[namespace][1] = max(scalar_counts[namespace][1], ordinal + 1)
                             continue
-                        if namespace in SCALAR_RECORD_SPECS:
+                        if namespace in SCALAR_RECORD_SPECS and namespace in scalar_namespaces:
                             ordinal, value = codec.decode(payload)
                             expected, _fields = SCALAR_RECORD_SPECS[namespace]
                             if type(ordinal) is not int or ordinal < 0 or not isinstance(value, expected):
@@ -2343,7 +2373,15 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         )
 
                     nested_counts = {NESTED_DESCRIPTOR_NAMESPACE: 0, NESTED_PAGE_NAMESPACE: 0, NESTED_ENTRY_NAMESPACE: 0}
+                    nested_counts.update({ns: 0 for ns in SEQUENCE_NAMESPACES} if counted_households else {})
+                    for change in sequence_changes:
+                        _insert_lazy_plain_record(target, namespace=change.namespace, generation=generation,
+                            typed_key=codec.encode(change.key), ordinal=nested_counts[change.namespace],
+                            value=change.value, record_schema=change.record_schema)
+                        nested_counts[change.namespace] += 1
                     for incarnation, (kind, values) in sorted(nested_children.items()):
+                        if kind == 'sequence':
+                            continue
                         changes = initial_list_changes(incarnation, values, codec) if kind == 'list' else initial_scalar_changes(incarnation, kind, values, codec)
                         for change in changes:
                             _insert_lazy_plain_record(
@@ -2435,7 +2473,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         _convert_event_id_range(target, capture, source_head, event_id_authority)
                     elif event_id_alias_paths:
                         target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
-                    _declare_bounded_collections(target)
+                    _declare_bounded_collections(target, scalar_namespaces)
                     target.db.commit()
                     target.verify_all()
                     target.close()
@@ -2698,16 +2736,17 @@ def _scalar_archive_occurrence_from_path(path):
 
 
 def _lazy_occurrence_from_path(path, scalar_namespaces=None):
-    if type(path) is tuple and len(path) >= 3:
+    if type(path) is tuple and len(path) >= 2:
         for namespace, (record_type, _fields) in SCALAR_RECORD_SPECS.items():
             prefix = _namespace_path(namespace)
-            if path[:2] == prefix and type(path[2]) is tuple and len(path[2]) == 2 and path[2][0] == 'key':
+            offset = len(prefix)
+            if len(path) > offset and path[:offset] == prefix and type(path[offset]) is tuple and len(path[offset]) == 2 and path[offset][0] == 'key':
                 if scalar_namespaces is not None and namespace not in scalar_namespaces:
                     return None
-                relative = tuple(path[3:])
+                relative = tuple(path[offset + 1:])
                 if relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS.get(namespace, ())):
-                    record_type = HISTORY_CLASSES[NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')]
-                return namespace, path[2][1], relative, record_type
+                    record_type = (list, HistoryReference, *tuple(HISTORY_CLASSES.values()))
+                return namespace, path[offset][1], relative, record_type
     people = _people_occurrence_from_path(path)
     if people is not None:
         return PEOPLE_NAMESPACE, people[0], people[1], Person
@@ -3150,6 +3189,8 @@ def _initialize_eager_tracker(
     tracker._excluded_namespaces.update(session._scalar_tables)
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     tracker._foreign_child_types = (LazySoulTrackedList, LazySoulTrackedSet)
+    if 'world.households' in session._scalar_tables:
+        tracker._prepare_record_child = session._prepare_counted_record_child
     try:
         tracker.generation = session.pin.captured_head
         tracker._manifest = session.manifest
@@ -7265,6 +7306,57 @@ class LazyMinimumRecordTable(MinimumQueries, LazyScalarRecordTable):
     pass
 
 
+class LazyHouseholdTable(LazyScalarRecordTable):
+    """Compact household headers and a conservative complete writer revision."""
+    def __init__(self, session, namespace='world.households', **kwargs):
+        self.preparedness_revision = 0
+        super().__init__(session, namespace, **kwargs)
+
+    def changed(self, key, field=None):
+        super().changed(key, field)
+        self.preparedness_revision += 1
+
+    def __setitem__(self, key, record):
+        super().__setitem__(key, record)
+        self.preparedness_revision += 1
+
+    def __delitem__(self, key):
+        super().__delitem__(key)
+        self.preparedness_revision += 1
+
+    def _evict_clean(self):
+        # Pressure visits historical households inside a simulation step.
+        # Those reads must not enlarge the clean "hot working set" to H.
+        while len(self._lru) > self._clean_limit:
+            key, _ = self._lru.popitem(last=False)
+            if key not in self._dirty:
+                if dict.__contains__(self, key):
+                    dict.__delitem__(self, key)
+                self._discard_clean_baseline(key)
+        self._prune_query_caches()
+
+    def _finish_simulation_step(self, epoch, *, retain_hot):
+        super()._finish_simulation_step(epoch, retain_hot=False)
+
+    def checked_preparedness(self, key):
+        """Read one scalar header without instantiating its member history."""
+        self._ensure()
+        if not self._visible(key):
+            raise KeyError(key)
+        record = dict.get(self, key)
+        if record is None:
+            incarnation = self._session._registry.incarnation_for_occurrence(
+                Occurrence(self._namespace, key, ()))
+            if incarnation is not None:
+                record = self._session._registry.object_for_incarnation(incarnation)
+        if record is None:
+            record = self._store.read_version(self._pin, self._namespace, key,
+                expected_record_schema=self._record_schema).value
+        if not isinstance(record, Household):
+            raise StoreIntegrityError('pressure household header has wrong type')
+        return record.preparedness
+
+
 class LazyInstitutionMagicRecordTable(_LazyInstitutionRecordTable):
     _record_type = MagicUserRecord
     _record_schema = LAZY_INSTITUTION_MAGIC_RECORD_SCHEMA
@@ -10157,11 +10249,12 @@ class LazyWorldSession:
         self._eager_nested_labels = {}
         self._scalar_tables = {}
         for namespace in _scalar_authorities(store, manifest, pin.captured_head):
-            table_type = (LazyMinimumRecordTable if namespace in MINIMUM_FIELDS else LazyScalarRecordTable) if namespace in SCALAR_RECORD_SPECS else (LazyAdoptionTable if namespace == ADOPTION_NAMESPACE else LazyScalarMapTable)
+            table_type = (LazyHouseholdTable if namespace == 'world.households' else LazyMinimumRecordTable if namespace in MINIMUM_FIELDS else LazyScalarRecordTable) if namespace in SCALAR_RECORD_SPECS else (LazyAdoptionTable if namespace == ADOPTION_NAMESPACE else LazyScalarMapTable)
             table = table_type(self, namespace)
             self._scalar_tables[namespace] = table
             owner = _at_path(world, _namespace_path(namespace)[:-1])
             object.__setattr__(owner, namespace.rsplit('.', 1)[1], table)
+        self._pressure_cache = ExactPressureCache(self)
 
         self._family_bindings = RuntimeFamilyBindings(
             self, scalar_record_namespaces=SCALAR_RECORD_SPECS,
@@ -11752,10 +11845,20 @@ class LazyWorldSession:
         return table
 
     def _bind_history_list(self, value, occurrence, incarnation=None, kind=None):
+        actual_kind = value.kind if nested_reference(value) else value._kind if type(value) in HISTORY_TYPES else None
+        if actual_kind == 'sequence' and kind in (None, 'list', 'sequence'):
+            kind = 'sequence'
         if kind is None:
             kind = value.kind if nested_reference(value) else value._kind if type(value) in HISTORY_TYPES else {list: 'list', dict: 'map', set: 'set'}.get(type(value))
         if kind not in HISTORY_CLASSES:
             raise TypeError('invalid typed history kind')
+        tracker = getattr(self, '_eager_tracker', None)
+        original_value = value
+        if incarnation is None and tracker is not None and type(value) is list:
+            memo = tracker._memo.get(id(value))
+            if memo is not None and memo[0] is value and type(memo[1]) in HISTORY_TYPES:
+                value = memo[1]
+                kind = value._kind
         history_class = HISTORY_CLASSES[kind]
         if incarnation is not None:
             if not (nested_reference(value) and value.kind == kind and value.incarnation == incarnation.value) and not (
@@ -11777,17 +11880,20 @@ class LazyWorldSession:
             if incarnation is None:
                 raise StoreIntegrityError('nested history lacks current incarnation')
         else:
-            if type(value) is not {'list': list, 'map': dict, 'set': set}[kind]:
+            if type(value) is not {'list': list, 'sequence': list, 'map': dict, 'set': set}[kind]:
                 raise TypeError('nested history field has wrong type')
             incarnation = self._registry.allocator.allocate()
             proxy = history_class(self.store, self.pin, incarnation.value, initial_values=value,
-                                  cache_budget=self._history_cache_budget)
+                                  cache_budget=self._history_cache_budget,
+                                  **({'value_mode': 'native'} if kind == 'sequence' else {}))
             self._registry.bind(proxy, incarnation=incarnation)
             self._nested_dirty[incarnation.value] = proxy
         old = self._registry.incarnation_for_occurrence(occurrence)
         if old is not None and old != incarnation:
             self._registry.detach_occurrence(occurrence, expected=old)
         self._registry.attach_existing(incarnation, occurrence)
+        if tracker is not None and original_value is not proxy and type(original_value) is list:
+            tracker._remember_memo(original_value, proxy)
         self._register_nested_overlay(proxy)
         def guard():
             self._shared_object_routes(proxy)
@@ -11804,7 +11910,7 @@ class LazyWorldSession:
             if self._state == 'recovery-required':
                 raise StoreError('nested history read requires save acknowledgement')
         proxy.bind(guard, changed, read_guard)
-        if type(proxy) is LazyHistoryList:
+        if type(proxy) in (LazyHistoryList, LazyOrderedSequence):
             # Shared aliases obey the current integer-history owners, including
             # cold peers just bound by guard. Retirement removes the constraint.
             integer_paths = {
@@ -11827,6 +11933,21 @@ class LazyWorldSession:
             proxy._value_validator = validate_value
             proxy._batch_validator = validate_batch
         return proxy
+
+    def _prepare_counted_record_child(self, record, field, value=None, owners=None):
+        """Normalize counted eager Settlement fields at assignment, before exposure."""
+        selected = isinstance(record, Settlement) and field == 'households'
+        if owners is None:
+            return selected
+        if not selected:
+            raise StoreIntegrityError('unsupported counted record child')
+        result = value
+        for namespace, key in owners:
+            if namespace != 'world.settlements':
+                continue
+            result = self._bind_history_list(result,
+                Occurrence(namespace, key, (("field", field),)), kind='sequence')
+        return result
 
     def _register_nested_overlay(self, proxy):
         """Admit a canonical same-session child and journal its private edits."""
@@ -13806,6 +13927,19 @@ class LazyWorldSession:
 
 
     def _prepare_hybrid_save(self):
+        token = uuid.uuid4().hex
+        try:
+            return self._prepare_hybrid_save_inner(token)
+        except BaseException:
+            # A child can freeze before the central byte plan is complete.
+            # Prove that this token never published before releasing that
+            # freeze; keep its complete dirty overlay for retry.
+            for proxy in tuple(self._nested_dirty.values()):
+                if type(proxy) is LazyOrderedSequence and proxy._prepared is not None:
+                    proxy.abort_delta(proxy._prepared[0], token)
+            raise
+
+    def _prepare_hybrid_save_inner(self, token):
         nested_history_identity_changes = self._prepare_eager_nested_identities()
         scalar_record_plans = tuple(
             ScalarRecordSavePlan(namespace, *table.prepare_save_changes())
@@ -14086,7 +14220,6 @@ class LazyWorldSession:
 
         self._refresh_cross_boundary_identity()
 
-        token = uuid.uuid4().hex
         try:
             cold_plan = prepare_cold_save(
                 self._eager_tracker,
@@ -15956,6 +16089,9 @@ class LazyWorldSession:
         if self._pending_save is not None:
             try:
                 self._pending_save.publication.abort_uncommitted()
+                for proxy in tuple(self._nested_dirty.values()):
+                    if type(proxy) is LazyOrderedSequence and proxy._prepared is not None:
+                        proxy.abort_delta(proxy._prepared[0], self._pending_save.token)
             except Exception:
                 self._state = tracker._cold_state = 'recovery-required'
                 raise
@@ -16843,6 +16979,7 @@ class LazyWorldSession:
         self._nested_dirty.clear()
         self._nested_lists.clear()
         self._history_cache_budget.clear()
+        self._pressure_cache.clear()
         self._record_cache_budget.clear()
         self.social_edges = detached_social_edges
         self.social_adjacency = detached_social_adjacency
@@ -17140,6 +17277,7 @@ class LazyWorldSession:
         return {
             "state": self._state,
             "history_cache": self._history_cache_budget.diagnostics(),
+            "pressure_cache": self._pressure_cache.diagnostics(),
             "record_cache": self._record_cache_budget.diagnostics(),
             "frozen_save": (None if self._pending_save is None else {
                 "participants": len(self._pending_save.publication.participants),
@@ -17250,6 +17388,7 @@ class LazyWorldSession:
         finally:
             self._registry.close()
             self._history_cache_budget.clear()
+            self._pressure_cache.clear()
             self._record_cache_budget.clear()
             self.store.close()
             self._active = False

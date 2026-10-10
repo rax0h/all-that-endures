@@ -156,7 +156,7 @@ This is the exhaustive baseline classification. Planned compact representations 
 | Household.food | scalar | Household field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Household.id | scalar | Household field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Household.lineage | scalar | Household field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Household.members | ordered-history | core.py: Household writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| Household.members | ordered-history | core.py: Household writers | unbounded; local counted tree edits in counted conversion lane | lazy household header and counted HistoryReference; accepted paged/eager legacy modes remain explicit |
 | Household.preparedness | scalar | Household field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Household.settlement | scalar | Household field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Household.wealth | scalar | Household field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -362,7 +362,7 @@ This is the exhaustive baseline classification. Planned compact representations 
 | ResurrectionToken.person | scalar | ResurrectionToken field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Settlement.defense | scalar | Settlement field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Settlement.food_stock | scalar | Settlement field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Settlement.households | ordered-history | core.py: Settlement writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| Settlement.households | ordered-history | core.py: Settlement writers | unbounded; exact order, duplicates and extinct occurrences | counted HistoryReference in counted conversion lane; legacy eager mode remains explicit |
 | Settlement.id | scalar | Settlement field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Settlement.irrigation | scalar | Settlement field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Settlement.memory | current-map | core.py: Settlement writers | generated keys monster_surge/war; imported arbitrary map unrestricted | resident current map with explicit imported-value classification |

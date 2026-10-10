@@ -1,0 +1,135 @@
+{
+  "checkpoint_bytes": 310819,
+  "checkpoint_schema": 8,
+  "cold_file_bytes": 1916928,
+  "cold_sha256": "855d2ca89ece5e6b4e9389b7c06fc9e471cb486f0e6f22523d50632bdc108e93",
+  "continuation_years": 4,
+  "control_final_digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e",
+  "control_total_digest": "b31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387",
+  "detached_checkpoint_bytes": 538526,
+  "events_total": 439,
+  "final_year": 10,
+  "first_continuation_simulation_seconds": 8.32306741299999,
+  "first_full_audit_io": {
+    "payload_read_bytes": 522602,
+    "payload_reads": 3479,
+    "payload_write_bytes": 0,
+    "payload_writes": 0
+  },
+  "first_save_io": {
+    "payload_read_bytes": 135906,
+    "payload_reads": 548,
+    "payload_write_bytes": 778743,
+    "payload_writes": 2492
+  },
+  "fixture_creation": {
+    "cold": {
+      "commit_token": "00dc6b1e91b64c59a33a47926bde69fd",
+      "deleted_event_rows": 0,
+      "disk_events": 0,
+      "disk_segments": 0,
+      "event_count": 194,
+      "final_file_bytes": 1916928,
+      "final_generation": 2,
+      "finalize_io": {
+        "payload_read_bytes": 7738,
+        "payload_reads": 1,
+        "payload_write_bytes": 8026,
+        "payload_writes": 4
+      },
+      "largest_transfer_batch_chunks": 0,
+      "remaining_suffix_records": 194,
+      "staging_io": {
+        "payload_read_bytes": 0,
+        "payload_reads": 0,
+        "payload_write_bytes": 1064302,
+        "payload_writes": 3405
+      },
+      "transfer_commits": 0,
+      "transfer_io": {
+        "payload_read_bytes": 0,
+        "payload_reads": 0,
+        "payload_write_bytes": 0,
+        "payload_writes": 0
+      },
+      "transferred_events": 0,
+      "validation_io": {
+        "payload_read_bytes": 2251174,
+        "payload_reads": 7012,
+        "payload_write_bytes": 0,
+        "payload_writes": 0
+      }
+    },
+    "lazy": {
+      "advancement_paths": 19,
+      "aspirations": 95,
+      "community_memberships": 144,
+      "destination_format": 5,
+      "genealogy_children": 24,
+      "genealogy_parents": 15,
+      "generation": 2,
+      "identity_occurrences": 5250,
+      "institution_applications": 0,
+      "institution_magic_records": 0,
+      "institution_notices": 0,
+      "lineage_child_edges": 285,
+      "lineage_children": 84,
+      "lineage_nodes": 292,
+      "material_active_index": 5,
+      "material_items": 0,
+      "material_lot_index": 5,
+      "material_lots": 38,
+      "motives": 95,
+      "next_incarnation_id": 5251,
+      "owner_index": 1,
+      "people": 144,
+      "resources": 22,
+      "skills": 300,
+      "social_adjacency": 144,
+      "social_edges": 418,
+      "social_partnerships": 27,
+      "souls": 144,
+      "source_format": "p3b-cold/current-links",
+      "source_preserved": true,
+      "transmissions": 16,
+      "treasuries": 0,
+      "wallets": 0
+    }
+  },
+  "last_event_id": 439,
+  "lazy_file_bytes": 24576000,
+  "lazy_sha256": "3e3ad7559713adef4d550f57b7d16328e9bdca0be6f81efaf1df9e1fb02a2db6",
+  "open_io": {
+    "payload_read_bytes": 475734,
+    "payload_reads": 1449,
+    "payload_write_bytes": 0,
+    "payload_writes": 0
+  },
+  "passed": true,
+  "pre_years": 3,
+  "relocated_file_bytes": 21549056,
+  "relocated_sha256": "b9e496a516554ade35d17bc26fef990eb64b6c6e35d24c413ef4663951639027",
+  "reopen_years": 3,
+  "rules_id": "stage-0-5-p5-validation",
+  "second_continuation_simulation_seconds": 9.346128130000125,
+  "second_full_audit_io": {
+    "payload_read_bytes": 406679,
+    "payload_reads": 2400,
+    "payload_write_bytes": 0,
+    "payload_writes": 0
+  },
+  "second_save_io": {
+    "payload_read_bytes": 59308,
+    "payload_reads": 223,
+    "payload_write_bytes": 718070,
+    "payload_writes": 1733
+  },
+  "seed": 843000,
+  "timings": {
+    "checkpoint_lane_seconds": 0.285750809000092,
+    "control_final_seconds": 0.22443687500003762,
+    "control_total_seconds": 0.13897661400005745,
+    "fixture_creation_seconds": 2.3827808210000967
+  },
+  "total_year": 7
+}

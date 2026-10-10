@@ -55,12 +55,13 @@ def event_values(world):
     ([1., 2.**-53], [1, 2, 2]),
     ([1., 2.**-53], None),
 ])
-def test_forced_pressure_matches_eager_native_hex_and_rng_after_edit_and_reopen(tmp_path, values, occurrences):
+@pytest.mark.parametrize('counted', [False, True])
+def test_forced_pressure_matches_eager_native_hex_and_rng_after_edit_and_reopen(tmp_path, values, occurrences, counted):
     control = world_for(values, occurrences=occurrences)
     initial = world_for(values, occurrences=occurrences)
     source, target = tmp_path / 'source.sqlite', tmp_path / 'target.sqlite'
     write_cold_snapshot(initial, source, rules_id=RULES)
-    convert_cold_to_lazy(source, target, rules_id=RULES)
+    convert_cold_to_lazy(source, target, rules_id=RULES, counted_households=counted)
     expected_mean = sum(initial.households[hid].preparedness for hid in initial.settlements[1].households) / len(initial.settlements[1].households)
     with open_lazy_world_session(target, rules_id=RULES) as session:
         assert pressure(session.world) == pressure(control)
@@ -79,13 +80,14 @@ def test_forced_pressure_matches_eager_native_hex_and_rng_after_edit_and_reopen(
         assert event_values(session.world) == event_values(control)
 
 
-def test_shared_occurrence_list_duplicates_and_replacement_keep_native_order(tmp_path):
+@pytest.mark.parametrize('counted', [False, True])
+def test_shared_occurrence_list_duplicates_and_replacement_keep_native_order(tmp_path, counted):
     values = [1., 2.**-53]
     control = world_for(values, occurrences=[1, 2, 2], shared=True)
     initial = world_for(values, occurrences=[1, 2, 2], shared=True)
     source, target = tmp_path / 'source.sqlite', tmp_path / 'target.sqlite'
     write_cold_snapshot(initial, source, rules_id=RULES)
-    convert_cold_to_lazy(source, target, rules_id=RULES)
+    convert_cold_to_lazy(source, target, rules_id=RULES, counted_households=counted)
     with open_lazy_world_session(target, rules_id=RULES) as session:
         assert session.world.settlements[1].households is session.world.settlements[2].households
         for world in (control, session.world):

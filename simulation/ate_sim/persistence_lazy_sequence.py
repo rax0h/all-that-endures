@@ -87,6 +87,8 @@ class LazyOrderedSequence(MutableSequence):
             raise ValueError('invalid sequence incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
         self._guard, self._changed, self._read_guard = guard, changed, read_guard
+        self._value_validator = None
+        self._batch_validator = None
         self._cache = OrderedDict()
         self._cache_bytes = 0
         self._cache_budget = cache_budget if cache_budget is not None else SharedCacheBudget()
@@ -126,6 +128,8 @@ class LazyOrderedSequence(MutableSequence):
         self._store._require_pin(self._pin)
 
     def _validate(self, value):
+        if self._value_validator is not None:
+            self._value_validator(value)
         if not self._valid_value(value):
             if self._value_mode == 'native':
                 raise TypeError('sequence values must be immutable schema values')
@@ -481,9 +485,9 @@ class LazyOrderedSequence(MutableSequence):
             self._dreplace(key, self._minsert(self._dget(key), occurrence, key))
 
     def insert(self, index, value):
-        value = self._validate(value)
         index = operator.index(index)
         with self._mutation():
+            value = self._validate(value)
             rank = min(self._length, max(0, index + self._length if index < 0 else index))
             self._insert(rank, value)
 
@@ -495,6 +499,8 @@ class LazyOrderedSequence(MutableSequence):
         with self._mutation():
             if values is self:
                 values = tuple(self)
+            if self._batch_validator is not None:
+                values = self._batch_validator(values)
             iterator = iter(values)
             while True:
                 try:
@@ -599,8 +605,8 @@ class LazyOrderedSequence(MutableSequence):
             self._dreplace(new_key, self._minsert(self._dget(new_key), occurrence, new_key))
 
     def __setitem__(self, index, value):
-        values = tuple(self._validate(v) for v in value) if isinstance(index, slice) else (self._validate(value),)
         with self._mutation():
+            values = tuple(self._validate(v) for v in value) if isinstance(index, slice) else (self._validate(value),)
             if not isinstance(index, slice):
                 self._assign(self._index(index), values[0])
                 return

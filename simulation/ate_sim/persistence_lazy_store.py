@@ -1213,8 +1213,11 @@ class LazyRecordStore:
 
     def _read_snapshot_start(self, pin: GenerationPin) -> int:
         nested = getattr(self, "_checked_snapshot_depth", 0)
+        owns_transaction = not getattr(self, '_active_read_transaction', False)
         if not nested:
-            self.db.execute("BEGIN")
+            if owns_transaction:
+                self.db.execute("BEGIN")
+            self._checked_snapshot_owns_transaction = owns_transaction
         try:
             generation = self._require_pin(pin)
             head = int(self._checked_head_row()[0])
@@ -1224,7 +1227,7 @@ class LazyRecordStore:
             self._checked_snapshot_depth = nested + 1
             return generation
         except Exception:
-            if not nested:
+            if not nested and owns_transaction:
                 self.db.rollback()
             raise
 
@@ -1232,7 +1235,7 @@ class LazyRecordStore:
         depth = getattr(self, "_checked_snapshot_depth", 0)
         if depth:
             self._checked_snapshot_depth = depth - 1
-        if depth <= 1 and self.db.in_transaction:
+        if depth <= 1 and getattr(self, '_checked_snapshot_owns_transaction', True) and self.db.in_transaction:
             self.db.rollback()
 
     @contextmanager

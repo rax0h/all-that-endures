@@ -131,7 +131,7 @@ def _run_unbound(seed, years):
     return world
 
 
-def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id, paged_households=False):
+def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id, paged_households=False, counted_households=False):
     total_years = pre_years + continuation_years
     final_years = total_years + reopen_years
     workdir = Path(workdir)
@@ -171,7 +171,7 @@ def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id, pa
     cold_result = write_cold_snapshot(cold_source, cold, rules_id=rules_id)
     if cold_source.digest() != pre_digest:
         raise AssertionError("cold bootstrap mutated its source World")
-    conversion_result = convert_cold_to_lazy(cold, lazy, rules_id=rules_id, paged_household_members=paged_households)
+    conversion_result = convert_cold_to_lazy(cold, lazy, rules_id=rules_id, paged_household_members=paged_households, counted_households=counted_households)
     timings["fixture_creation_seconds"] = time.perf_counter() - started
 
     with open_lazy_world_session(lazy, rules_id=rules_id, paged_household_members=paged_households) as session:
@@ -282,6 +282,7 @@ def main():
     parser.add_argument("--workdir")
     parser.add_argument("--output")
     parser.add_argument("--paged-households", action="store_true")
+    parser.add_argument("--counted-households", action="store_true")
     args = parser.parse_args()
 
     if min(args.pre_years, args.continuation_years, args.reopen_years) < 0:
@@ -296,6 +297,7 @@ def main():
             args.workdir,
             args.rules_id,
             paged_households=args.paged_households,
+            counted_households=args.counted_households,
         )
     else:
         with tempfile.TemporaryDirectory(prefix="ate-p5-") as directory:
@@ -307,6 +309,7 @@ def main():
                 directory,
                 args.rules_id,
                 paged_households=args.paged_households,
+                counted_households=args.counted_households,
             )
 
     rendered = json.dumps(summary, indent=2, sort_keys=True)
