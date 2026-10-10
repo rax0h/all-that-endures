@@ -54,6 +54,7 @@ from .persistence_lazy_budget import SharedCacheBudget, RecordCacheLRU, RECORD_B
 from .persistence_lazy_families import RuntimeFamilyBindings
 from .persistence_lazy_sequence import LazyOrderedSequence, NAMESPACES as SEQUENCE_NAMESPACES
 from .persistence_pressure import ExactPressureCache
+from .persistence_lazy_graph_buckets import BUCKET_KIND, BUCKET_SPECS, valid_member as valid_bucket_member, valid_key as valid_bucket_key
 from .persistence_lazy_household_members import (
     LENGTH_NAMESPACE as HOUSEHOLD_LENGTH_NAMESPACE,
     BACKING_NAMESPACE as HOUSEHOLD_BACKING_NAMESPACE,
@@ -364,6 +365,7 @@ def _cross_boundary_field_value_is_immutable(value) -> bool:
 def _base_kind(kind: str) -> str:
     return {
         **SCALAR_RECORD_KINDS,
+        BUCKET_KIND: 'dict',
         APPLICATION_QUERY_KIND: 'RecordTable',
         "dict-stable/v1": "dict",
         "RecordTable-stable/v1": "RecordTable",
@@ -979,7 +981,7 @@ def _plain_resource_value(resource):
     if not isinstance(resource, MagicResource):
         raise TypeError("expected MagicResource")
     return replace(resource, transfers=(resource.transfers.storage_reference()
-        if type(resource.transfers) is LazyHistoryList else list(resource.transfers)))
+        if type(resource.transfers) in (LazyHistoryList, LazyOrderedSequence) else list(resource.transfers)))
 
 
 def _resource_memberships(resource, ordinal):
@@ -1084,7 +1086,7 @@ def _plain_material_lot_value(lot):
     if not isinstance(lot, MaterialLot):
         raise TypeError("expected MaterialLot")
     return replace(lot, transfers=(lot.transfers.storage_reference()
-        if type(lot.transfers) is LazyHistoryList else list(lot.transfers)))
+        if type(lot.transfers) in (LazyHistoryList, LazyOrderedSequence) else list(lot.transfers)))
 
 
 def _material_lot_memberships(lot, ordinal):
@@ -1221,7 +1223,7 @@ def _convert_event_id_range(target, capture, source_head, authority):
     target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
 
 
-def _declare_bounded_collections(target, scalar_namespaces=SCALAR_NAMESPACES):
+def _declare_bounded_collections(target, scalar_namespaces=SCALAR_NAMESPACES, native_graph_buckets=False):
     from .persistence_adapters import COLLECTION_LAYOUT
     key = target.codec.encode(COLLECTION_LAYOUT)
     row = target.db.execute('SELECT payload,codec_version,record_schema,last_changed_generation FROM records WHERE namespace=? AND typed_key=?', (META, key)).fetchone()
@@ -1240,17 +1242,24 @@ def _declare_bounded_collections(target, scalar_namespaces=SCALAR_NAMESPACES):
         if base not in ('dict', 'RecordTable'):
             raise StoreFormatError('invalid scalar family collection description')
         layout[namespace] = (base + '-scalar/v1', old[1], old[2])
+    if native_graph_buckets:
+        for namespace in BUCKET_SPECS:
+            old = layout[namespace]
+            layout[namespace] = (BUCKET_KIND, old[1], old[2])
     payload = target.codec.encode(value)
     _old_payload, codec_version, schema, generation = row
     target.db.execute('UPDATE records SET payload=?,payload_checksum=? WHERE namespace=? AND typed_key=?', (payload, _record_checksum(META, key, schema, codec_version, generation, payload), META, key))
     target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
 
 
-def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True, counted_households=False):
+def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_members=True, counted_households=False, native_graph_buckets=False):
     """Explicit checked P3B cold -> P4 conversion. New Worlds use bounded household pages."""
     source, destination = _preflight_conversion_paths(source, destination)
     if type(counted_households) is not bool:
         raise TypeError('counted_households must be bool')
+    if type(native_graph_buckets) is not bool:
+        raise TypeError('native_graph_buckets must be bool')
+    counted_households = counted_households or native_graph_buckets
     if counted_households:
         paged_household_members = False
     scalar_namespaces = tuple(ns for ns in SCALAR_NAMESPACES if ns != 'world.households' or counted_households)
@@ -1326,6 +1335,16 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                 codec,
             )
             nested_children = {}
+            if native_graph_buckets:
+                for namespace, owner_key, relative, incarnation in identity_rows:
+                    if namespace in BUCKET_SPECS and not relative:
+                        values = _at_path(capture.world, _owner_path(capture.manifest, (namespace, owner_key)))
+                        kind = BUCKET_SPECS[namespace][0]
+                        if (not valid_bucket_key(namespace, owner_key)
+                                or type(values) is not {'list': list, 'set': set}[kind]
+                                or any(not valid_bucket_member(namespace, value) for value in values)):
+                            raise StoreFormatError('invalid native graph bucket source')
+                        nested_children.setdefault(incarnation, (kind, values))
             if counted_households:
                 for namespace, owner_key, relative, incarnation in identity_rows:
                     if ((namespace == 'world.households' and relative == (("field", "members"),))
@@ -1391,6 +1410,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     )
 
                     scalar_counts = {namespace: [0, 0] for namespace in scalar_namespaces}
+                    bucket_counts = {namespace: [0, 0] for namespace in BUCKET_SPECS} if native_graph_buckets else {}
                     adoption_values = []
                     minimum_records = []
                     people_count = 0
@@ -1479,6 +1499,15 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             payload = codec.encode((ordinal, value))
                             checksum = _record_checksum(namespace, typed_key, record_schema, codec_version, changed_generation, payload)
                             row = (namespace, typed_key, payload, checksum, codec_version, record_schema, changed_generation)
+                        if namespace in bucket_counts:
+                            ordinal, value = codec.decode(payload)
+                            if type(ordinal) is not int or ordinal < 0 or not nested_reference(value):
+                                raise StoreFormatError('invalid native graph header envelope')
+                            _insert_lazy_plain_record(target, namespace=namespace, generation=generation,
+                                typed_key=typed_key, ordinal=ordinal, value=value, record_schema=1)
+                            bucket_counts[namespace][0] += 1
+                            bucket_counts[namespace][1] = max(bucket_counts[namespace][1], ordinal + 1)
+                            continue
                         if namespace in SCALAR_MAP_SPECS:
                             ordinal, value = codec.decode(payload)
                             key = codec.decode(typed_key)
@@ -2372,6 +2401,11 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             ),
                         )
 
+                    for namespace, (count, next_ord) in bucket_counts.items():
+                        updated = target.db.execute('UPDATE lazy_namespace_state SET member_count=?,next_ordinal=?,row_checksum=? WHERE namespace=? AND valid_from=?',
+                            (count, next_ord, _namespace_checksum(namespace, count, next_ord, generation, None), namespace, generation))
+                        if updated.rowcount != 1:
+                            raise StoreIntegrityError('native graph namespace state missing')
                     nested_counts = {NESTED_DESCRIPTOR_NAMESPACE: 0, NESTED_PAGE_NAMESPACE: 0, NESTED_ENTRY_NAMESPACE: 0}
                     nested_counts.update({ns: 0 for ns in SEQUENCE_NAMESPACES} if counted_households else {})
                     for change in sequence_changes:
@@ -2473,7 +2507,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                         _convert_event_id_range(target, capture, source_head, event_id_authority)
                     elif event_id_alias_paths:
                         target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
-                    _declare_bounded_collections(target, scalar_namespaces)
+                    _declare_bounded_collections(target, scalar_namespaces, native_graph_buckets)
                     target.db.commit()
                     target.verify_all()
                     target.close()
@@ -2497,11 +2531,11 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                 "people": people_count,
                 "aspirations": aspiration_count,
                 "resources": resource_count,
-                "owner_index": owner_index_count,
+                "owner_index": bucket_counts.get(OWNER_INDEX_NAMESPACE, (owner_index_count,))[0],
                 "material_lots": material_lot_count,
                 "material_items": material_item_count,
-                "material_lot_index": material_lot_index_count,
-                "material_active_index": material_active_index_count,
+                "material_lot_index": bucket_counts.get(MATERIAL_LOT_INDEX_NAMESPACE, (material_lot_index_count,))[0],
+                "material_active_index": bucket_counts.get(MATERIAL_ACTIVE_INDEX_NAMESPACE, (material_active_index_count,))[0],
                 "wallets": wallet_count,
                 "treasuries": treasury_count,
                 "souls": soul_count,
@@ -2512,14 +2546,14 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                 "transmissions": transmission_count,
                 "motives": motive_count,
                 "social_edges": social_edge_count,
-                "social_adjacency": social_adjacency_count,
+                "social_adjacency": bucket_counts.get(SOCIAL_ADJACENCY_NAMESPACE, (social_adjacency_count,))[0],
                 "social_partnerships": social_partnership_count,
                 "skills": skill_count,
                 "lineage_nodes": lineage_node_count,
-                "lineage_children": lineage_child_count,
+                "lineage_children": bucket_counts.get(LINEAGE_CHILD_NAMESPACE, (lineage_child_count,))[0],
                 "lineage_child_edges": lineage_child_edge_count,
                 "genealogy_parents": genealogy_parent_count,
-                "genealogy_children": genealogy_child_count,
+                "genealogy_children": bucket_counts.get(GENEALOGY_CHILD_NAMESPACE, (genealogy_child_count,))[0],
                 "community_memberships": community_membership_count,
                 "identity_occurrences": summary["identity_occurrences"],
                 "next_incarnation_id": summary["next_incarnation_id"],
@@ -2762,7 +2796,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
     if resource is not None:
         relative = resource[1]
         expected_type = (
-            (list, LazyHistoryList, HistoryReference)
+            (list, LazyHistoryList, LazyOrderedSequence, HistoryReference)
             if relative == LazyResourceTable._transfer_path
             else MagicResource
         )
@@ -2778,13 +2812,13 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             OWNER_INDEX_NAMESPACE,
             owner_bucket[0],
             owner_bucket[1],
-            set,
+            (set, LazyHistorySet, HistoryReference),
         )
     material_lot = _material_occurrence_from_path(path, "lots")
     if material_lot is not None:
         relative = material_lot[1]
         expected_type = (
-            (list, LazyHistoryList, HistoryReference)
+            (list, LazyHistoryList, LazyOrderedSequence, HistoryReference)
             if relative == LazyMaterialLotTable._transfer_path
             else MaterialLot
         )
@@ -2808,7 +2842,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             MATERIAL_LOT_INDEX_NAMESPACE,
             material_lot_index[0],
             material_lot_index[1],
-            list,
+            (list, LazyHistoryList, LazyOrderedSequence, HistoryReference),
         )
     material_active_index = _material_occurrence_from_path(
         path, "active_lot_index"
@@ -2818,7 +2852,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             MATERIAL_ACTIVE_INDEX_NAMESPACE,
             material_active_index[0],
             material_active_index[1],
-            set,
+            (set, LazyHistorySet, HistoryReference),
         )
     genealogy_child = _genealogy_occurrence_from_path(path, "children")
     if genealogy_child is not None:
@@ -2826,16 +2860,16 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             GENEALOGY_CHILD_NAMESPACE,
             genealogy_child[0],
             genealogy_child[1],
-            list,
+            (list, LazyHistoryList, LazyOrderedSequence, HistoryReference),
         )
     wallet = _currency_occurrence_from_path(path, "wallets")
     if wallet is not None:
         from .persistence_event_ids import EventIdSet
-        return WALLET_NAMESPACE, wallet[0], wallet[1], (dict, list, set, EventIdSet, LazyHouseholdMembers) if wallet[1] else dict
+        return WALLET_NAMESPACE, wallet[0], wallet[1], (dict, list, set, EventIdSet, LazyHouseholdMembers, *HISTORY_TYPES) if wallet[1] else dict
     treasury = _currency_occurrence_from_path(path, "treasuries")
     if treasury is not None:
         from .persistence_event_ids import EventIdSet
-        return TREASURY_NAMESPACE, treasury[0], treasury[1], (dict, list, set, EventIdSet, LazyHouseholdMembers) if treasury[1] else dict
+        return TREASURY_NAMESPACE, treasury[0], treasury[1], (dict, list, set, EventIdSet, LazyHouseholdMembers, *HISTORY_TYPES) if treasury[1] else dict
     soul = _soul_occurrence_from_path(path)
     if soul is not None:
         relative = soul[1]
@@ -2847,7 +2881,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
         elif relative == (("field", "cosmic_links"),):
             expected_type = (dict, LazyHistoryMap, HistoryReference)
         elif relative == (("field", "transformations"),):
-            expected_type = (list, LazyHistoryList, HistoryReference)
+            expected_type = (list, LazyHistoryList, LazyOrderedSequence, HistoryReference)
         else:
             expected_type = SoulState
         return SOUL_NAMESPACE, soul[0], relative, expected_type
@@ -2875,7 +2909,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             LINEAGE_CHILD_NAMESPACE,
             lineage_children[0],
             lineage_children[1],
-            set,
+            (set, LazyHistorySet, HistoryReference),
         )
     scalar_archive = _scalar_archive_occurrence_from_path(path)
     if scalar_archive is not None:
@@ -2887,13 +2921,13 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             LINEAGE_NODE_NAMESPACE: LineageNode,
         }[namespace]
         if namespace == SKILL_NAMESPACE and relative in LazySkillTable._nested_paths.values():
-            expected = (list, LazyHistoryList, HistoryReference)
+            expected = (list, LazyHistoryList, LazyOrderedSequence, HistoryReference)
         return namespace, key, relative, expected
     social_edge = _social_occurrence_from_path(path, "edges")
     if social_edge is not None:
         relative = social_edge[1]
         expected = (
-            (list, LazyHistoryList, HistoryReference)
+            (list, LazyHistoryList, LazyOrderedSequence, HistoryReference)
             if relative == LazySocialEdgeTable._history_path
             else Relationship
         )
@@ -2904,7 +2938,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             SOCIAL_ADJACENCY_NAMESPACE,
             social_adjacency[0],
             social_adjacency[1],
-            set,
+            (set, LazyHistorySet, HistoryReference),
         )
     return None
 
@@ -5048,7 +5082,7 @@ class LazySocialEdgeTable(LazyRecordTable):
     @staticmethod
     def _plain(record):
         return replace(record, shared_history=(record.shared_history.storage_reference()
-            if type(record.shared_history) is LazyHistoryList else list(record.shared_history)))
+            if type(record.shared_history) in (LazyHistoryList, LazyOrderedSequence) else list(record.shared_history)))
 
     def __getitem__(self, key):
         self._ensure()
@@ -8017,6 +8051,67 @@ class _LazyMaterialContainerTable(LazyRecordTable):
         }
 
 
+class LazyTypedBucketTable(_LazyMaterialContainerTable):
+    """Compact root child references with typed pages in the hybrid journal."""
+    _record_schema = 1
+
+    def __init__(self, session, namespace, **kwargs):
+        self._bucket_kind, _attribute, self._touched_attr = BUCKET_SPECS[namespace]
+        self._label = namespace
+        super().__init__(session, namespace, **kwargs)
+        state = self._store._namespace_state_at(namespace, self._pin.captured_head)
+        if state is None or state[0] != session.manifest['collections'][namespace][1]:
+            raise StoreIntegrityError('native graph namespace authority missing or wrong count')
+
+    def _plain(self, value):
+        return value.storage_reference() if type(value) in HISTORY_TYPES else value
+
+    def _valid_plain(self, value):
+        if nested_reference(value):
+            return value.kind == self._bucket_kind or (self._bucket_kind == 'list' and value.kind == 'sequence')
+        return type(value) is {'list': list, 'set': set}[self._bucket_kind] and all(valid_bucket_member(self._namespace, item) for item in value)
+
+    def __setitem__(self, key, value):
+        if not valid_bucket_key(self._namespace, key):
+            raise TypeError('native graph bucket key has wrong type')
+        super().__setitem__(key, value)
+
+    def setdefault(self, key, default=None):
+        self._ensure_mutation()
+        if not self._visible(key):
+            self[key] = {'list': list, 'set': set}[self._bucket_kind]() if default is None else default
+        return self[key]
+
+    def _bind_loaded_bucket(self, key, value):
+        labels = dict(self._store.identity_occurrences_for_owner(self._pin, self._namespace, key))
+        if set(labels) != {()}:
+            raise StoreIntegrityError('native graph owner identity incomplete or extra')
+        return self._session._bind_history_list(value, Occurrence(self._namespace, key, ()),
+            IncarnationId(self._store.store_identity, labels[()]), kind=self._bucket_kind)
+
+    def _bind_assigned_bucket(self, key, value):
+        return self._session._bind_history_list(value, Occurrence(self._namespace, key, ()), kind=self._bucket_kind)
+
+    def _detach_assigned_bucket(self, key, value):
+        self._session._registry.detach_occurrence(Occurrence(self._namespace, key, ()))
+
+    def _detach_unloaded_bucket(self, key):
+        labels = dict(self._store.identity_occurrences_for_owner(self._pin, self._namespace, key))
+        if set(labels) != {()}:
+            raise StoreIntegrityError('native graph owner identity incomplete or extra')
+        incarnation = IncarnationId(self._store.store_identity, labels[()])
+        occurrence = Occurrence(self._namespace, key, ())
+        self._session._registry.attach_existing(incarnation, occurrence)
+        self._session._registry.detach_occurrence(occurrence, expected=incarnation)
+
+    def prepare_save_changes(self):
+        result = super().prepare_save_changes()
+        return (*result, ()) if self._namespace == LINEAGE_CHILD_NAMESPACE else result
+
+    def add_child(self, parent, child):
+        self.setdefault(parent).add(child)
+
+
 class LazyMaterialLotIndexTable(_LazyMaterialContainerTable):
     _record_schema = LAZY_MATERIAL_LOT_INDEX_SCHEMA
     _touched_attr = "material_lot_index_touched_keys"
@@ -8713,7 +8808,7 @@ def _plain_soul_value(soul):
         cosmic_links=(soul.cosmic_links.storage_reference()
                       if type(soul.cosmic_links) is LazyHistoryMap else dict(soul.cosmic_links)),
         transformations=(soul.transformations.storage_reference()
-                         if type(soul.transformations) is LazyHistoryList
+                         if type(soul.transformations) in (LazyHistoryList, LazyOrderedSequence)
                          else list(soul.transformations)),
     )
 
@@ -9367,7 +9462,7 @@ class LazySkillTable(LazyRecordTable):
         return replace(
             record,
             **{field: (getattr(record, field).storage_reference()
-                       if type(getattr(record, field)) is LazyHistoryList
+                       if type(getattr(record, field)) in (LazyHistoryList, LazyOrderedSequence)
                        else list(getattr(record, field)))
                for field in LazySkillTable._nested_paths},
         )
@@ -10104,6 +10199,14 @@ class _LazyLifetime:
 
 
 class LazyWorldSession:
+    def _bucket_table(self, namespace, legacy_type):
+        description = self.manifest['collections'][namespace]
+        if description[0] != BUCKET_KIND:
+            return legacy_type(self)
+        if int(self.store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0]) < 5:
+            raise StoreFormatError('native graph buckets require reader capability 5')
+        return LazyTypedBucketTable(self, namespace)
+
     def __init__(
         self,
         store,
@@ -10153,7 +10256,7 @@ class LazyWorldSession:
         object.__setattr__(
             world.magic_resources, "resources", self.resources
         )
-        self.owner_index = LazyOwnerIndexTable(self)
+        self.owner_index = self._bucket_table(OWNER_INDEX_NAMESPACE, LazyOwnerIndexTable)
         object.__setattr__(
             world.magic_resources, "owner_index", self.owner_index
         )
@@ -10161,11 +10264,11 @@ class LazyWorldSession:
         object.__setattr__(world.materials, "lots", self.material_lots)
         self.material_items = LazyMaterialItemTable(self)
         object.__setattr__(world.materials, "items", self.material_items)
-        self.material_lot_index = LazyMaterialLotIndexTable(self)
+        self.material_lot_index = self._bucket_table(MATERIAL_LOT_INDEX_NAMESPACE, LazyMaterialLotIndexTable)
         object.__setattr__(
             world.materials, "lot_index", self.material_lot_index
         )
-        self.material_active_index = LazyMaterialActiveIndexTable(self)
+        self.material_active_index = self._bucket_table(MATERIAL_ACTIVE_INDEX_NAMESPACE, LazyMaterialActiveIndexTable)
         object.__setattr__(
             world.materials, "active_lot_index", self.material_active_index
         )
@@ -10215,7 +10318,7 @@ class LazyWorldSession:
         object.__setattr__(world.agency, "motives", self.motives)
         self.lineage_nodes = LazyLineageNodeTable(self)
         object.__setattr__(world.lineage, "nodes", self.lineage_nodes)
-        self.lineage_children = LazyLineageChildrenTable(self)
+        self.lineage_children = self._bucket_table(LINEAGE_CHILD_NAMESPACE, LazyLineageChildrenTable)
         object.__setattr__(
             world.lineage, "children", self.lineage_children
         )
@@ -10223,7 +10326,7 @@ class LazyWorldSession:
         object.__setattr__(
             world.genealogy, "parents", self.genealogy_parents
         )
-        self.genealogy_children = LazyGenealogyChildrenTable(self)
+        self.genealogy_children = self._bucket_table(GENEALOGY_CHILD_NAMESPACE, LazyGenealogyChildrenTable)
         object.__setattr__(
             world.genealogy, "children", self.genealogy_children
         )
@@ -10233,7 +10336,7 @@ class LazyWorldSession:
         )
         self.social_edges = LazySocialEdgeTable(self)
         object.__setattr__(world.social, "edges", self.social_edges)
-        self.social_adjacency = LazySocialAdjacencyTable(self)
+        self.social_adjacency = self._bucket_table(SOCIAL_ADJACENCY_NAMESPACE, LazySocialAdjacencyTable)
         object.__setattr__(
             world.social, "adjacency", self.social_adjacency
         )
@@ -11431,7 +11534,7 @@ class LazyWorldSession:
         occurrence = self._social_edge_occurrence(
             key, LazySocialEdgeTable._history_path
         )
-        if nested_reference(values) or type(values) is LazyHistoryList:
+        if nested_reference(values) or type(values) in (LazyHistoryList, LazyOrderedSequence):
             return self._bind_history_list(values, occurrence, incarnation, kind='list')
         if incarnation is None and type(values) is list and all(nested_immutable_value(value) for value in values):
             return self._bind_history_list(values, occurrence, kind='list')
@@ -11671,7 +11774,7 @@ class LazyWorldSession:
         occurrence = self._resource_occurrence(
             key, LazyResourceTable._transfer_path
         )
-        if nested_reference(transfers) or type(transfers) is LazyHistoryList:
+        if nested_reference(transfers) or type(transfers) in (LazyHistoryList, LazyOrderedSequence):
             return self._bind_history_list(transfers, occurrence, incarnation, kind='list')
         if incarnation is None and type(transfers) is list and all(nested_immutable_value(value) for value in transfers):
             return self._bind_history_list(transfers, occurrence, kind='list')
@@ -11854,7 +11957,7 @@ class LazyWorldSession:
             raise TypeError('invalid typed history kind')
         tracker = getattr(self, '_eager_tracker', None)
         original_value = value
-        if incarnation is None and tracker is not None and type(value) is list:
+        if incarnation is None and tracker is not None and type(value) in (list, dict, set):
             memo = tracker._memo.get(id(value))
             if memo is not None and memo[0] is value and type(memo[1]) in HISTORY_TYPES:
                 value = memo[1]
@@ -11892,7 +11995,7 @@ class LazyWorldSession:
         if old is not None and old != incarnation:
             self._registry.detach_occurrence(occurrence, expected=old)
         self._registry.attach_existing(incarnation, occurrence)
-        if tracker is not None and original_value is not proxy and type(original_value) is list:
+        if tracker is not None and original_value is not proxy and type(original_value) in (list, dict, set):
             tracker._remember_memo(original_value, proxy)
         self._register_nested_overlay(proxy)
         def guard():
@@ -11920,6 +12023,8 @@ class LazyWorldSession:
             }
             def constrained():
                 return any((item.owner_namespace, item.path) in integer_paths
+                    or (not item.path and item.owner_namespace in BUCKET_SPECS
+                        and BUCKET_SPECS[item.owner_namespace][0] == 'list')
                     for item in self._registry.occurrences_for_incarnation(incarnation))
             def validate_value(item):
                 if constrained() and type(item) is not int:
@@ -11932,6 +12037,21 @@ class LazyWorldSession:
                 return values
             proxy._value_validator = validate_value
             proxy._batch_validator = validate_batch
+        if type(proxy) is LazyHistorySet:
+            def required_namespaces():
+                return tuple(item.owner_namespace for item in self._registry.occurrences_for_incarnation(incarnation)
+                    if not item.path and item.owner_namespace in BUCKET_SPECS)
+            def validate_key(item):
+                if any(not valid_bucket_member(namespace, item) for namespace in required_namespaces()):
+                    raise TypeError('native graph bucket member has wrong type')
+            def validate_set_batch(values):
+                if required_namespaces():
+                    values = list(values)
+                    for item in values:
+                        validate_key(item)
+                return values
+            proxy._key_validator = validate_key
+            proxy._batch_validator = validate_set_batch
         return proxy
 
     def _prepare_counted_record_child(self, record, field, value=None, owners=None):
@@ -12489,7 +12609,7 @@ class LazyWorldSession:
         occurrence = self._material_lot_occurrence(
             key, LazyMaterialLotTable._transfer_path
         )
-        if nested_reference(transfers) or type(transfers) is LazyHistoryList:
+        if nested_reference(transfers) or type(transfers) in (LazyHistoryList, LazyOrderedSequence):
             return self._bind_history_list(transfers, occurrence, incarnation, kind='list')
         if incarnation is None and type(transfers) is list and all(nested_immutable_value(value) for value in transfers):
             return self._bind_history_list(transfers, occurrence, kind='list')
@@ -13045,7 +13165,7 @@ class LazyWorldSession:
         occurrence = self._soul_occurrence(
             key, LazySoulTable._nested_paths[field]
         )
-        if nested_reference(values) or type(values) is LazyHistoryList:
+        if nested_reference(values) or type(values) in (LazyHistoryList, LazyOrderedSequence):
             return self._bind_history_list(values, occurrence, incarnation, kind='list')
         if incarnation is None and type(values) is list and all(nested_immutable_value(value) for value in values):
             return self._bind_history_list(values, occurrence, kind='list')
@@ -13248,7 +13368,7 @@ class LazyWorldSession:
         occurrence = self._skill_occurrence(
             key, LazySkillTable._nested_paths[field]
         )
-        if nested_reference(values) or type(values) is LazyHistoryList:
+        if nested_reference(values) or type(values) in (LazyHistoryList, LazyOrderedSequence):
             return self._bind_history_list(values, occurrence, incarnation, kind='list')
         if incarnation is None and type(values) is list and all(nested_immutable_value(value) for value in values):
             return self._bind_history_list(values, occurrence, kind='list')
@@ -16259,7 +16379,7 @@ class LazyWorldSession:
                     "lazy detach encountered non-resource value"
                 )
             transfers = resource.transfers
-            if isinstance(transfers, (LazyTrackedList, LazyHistoryList)):
+            if isinstance(transfers, (LazyTrackedList, LazyHistoryList, LazyOrderedSequence)):
                 replacement = transfer_replacements.get(id(transfers))
                 if replacement is None:
                     replacement = list(transfers)
@@ -16281,7 +16401,7 @@ class LazyWorldSession:
             replacements = {}
         for key in self.owner_index:
             bucket = self.owner_index[key]
-            if not isinstance(bucket, (set, LazyTrackedSet)):
+            if not isinstance(bucket, (set, LazyTrackedSet, LazyHistorySet)):
                 raise StoreIntegrityError(
                     "lazy detach encountered non-set owner-index bucket"
                 )
@@ -16310,7 +16430,7 @@ class LazyWorldSession:
                     "lazy detach encountered non-MaterialLot value"
                 )
             transfers = lot.transfers
-            if isinstance(transfers, (LazyTrackedList, LazyHistoryList)):
+            if isinstance(transfers, (LazyTrackedList, LazyHistoryList, LazyOrderedSequence)):
                 replacement = replacements.get(id(transfers))
                 if replacement is None:
                     replacement = list(transfers)
@@ -16348,7 +16468,7 @@ class LazyWorldSession:
             replacements = {}
         for key in self.material_lot_index:
             bucket = self.material_lot_index[key]
-            if not isinstance(bucket, (list, LazyTrackedIdList)):
+            if not isinstance(bucket, (list, LazyTrackedIdList, LazyHistoryList, LazyOrderedSequence)):
                 raise StoreIntegrityError(
                     "lazy detach encountered non-list material lot index"
                 )
@@ -16370,7 +16490,7 @@ class LazyWorldSession:
             replacements = {}
         for key in self.material_active_index:
             bucket = self.material_active_index[key]
-            if not isinstance(bucket, (set, LazyTrackedSet)):
+            if not isinstance(bucket, (set, LazyTrackedSet, LazyHistorySet)):
                 raise StoreIntegrityError(
                     "lazy detach encountered non-set material active index"
                 )
@@ -16601,7 +16721,7 @@ class LazyWorldSession:
             replacements = {}
         for key in self.lineage_children:
             bucket = self.lineage_children[key]
-            if not isinstance(bucket, (set, LazyLineageTrackedSet)):
+            if not isinstance(bucket, (set, LazyLineageTrackedSet, LazyHistorySet)):
                 raise StoreIntegrityError(
                     "lazy detach encountered invalid lineage child set"
                 )
@@ -16643,7 +16763,7 @@ class LazyWorldSession:
             replacements = {}
         for key in self.genealogy_children:
             bucket = self.genealogy_children[key]
-            if not isinstance(bucket, (list, LazySoulTrackedList, LazyHouseholdMembers)):
+            if not isinstance(bucket, (list, LazySoulTrackedList, LazyHouseholdMembers, LazyHistoryList, LazyOrderedSequence)):
                 raise StoreIntegrityError(
                     "lazy detach encountered invalid genealogy child list"
                 )
@@ -16754,7 +16874,7 @@ class LazyWorldSession:
                     "lazy detach encountered non-Relationship social edge"
                 )
             history = record.shared_history
-            if isinstance(history, (LazyTrackedList, LazyHistoryList)):
+            if isinstance(history, (LazyTrackedList, LazyHistoryList, LazyOrderedSequence)):
                 replacement = replacements.get(id(history))
                 if replacement is None:
                     replacement = list(history)
@@ -16774,7 +16894,7 @@ class LazyWorldSession:
             replacements = {}
         for key in self.social_adjacency:
             bucket = self.social_adjacency[key]
-            if not isinstance(bucket, (set, LazyTrackedSet)):
+            if not isinstance(bucket, (set, LazyTrackedSet, LazyHistorySet)):
                 raise StoreIntegrityError(
                     "lazy detach encountered non-set social adjacency"
                 )

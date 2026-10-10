@@ -1221,6 +1221,7 @@ class IncrementalWorldSession:
         return {
             'RecordTable-branch-passed/v1': 'RecordTable',
             'dict-scalar/v1': 'dict',
+            'dict-history/v1': 'dict',
             'RecordTable-scalar/v1': 'RecordTable',
             "dict-stable/v1": "dict",
             "RecordTable-stable/v1": "RecordTable",

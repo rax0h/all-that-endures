@@ -1,0 +1,1159 @@
+{
+  "measurements": [
+    {
+      "H": 1000,
+      "family": "world.genealogy.children",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 0.0813795230001233,
+      "rows": [
+        {
+          "header_bytes": 29,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 933,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 782,
+            "payload_reads": 11,
+            "payload_write_bytes": 237,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_pages": 0,
+            "cached_values": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_pages": 0,
+            "length": 1000,
+            "page_loads": 0
+          },
+          "record_cache": {
+            "bytes": 1717,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1924,
+            "owners": 2
+          },
+          "seconds": 0.027167799999915587
+        },
+        {
+          "header_bytes": 29,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 1482,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 4,
+            "maintenance_rows": 8,
+            "metadata_rows": 239,
+            "payload_check_bytes": 5250,
+            "payload_check_reads": 15,
+            "payload_read_bytes": 2189,
+            "payload_reads": 11,
+            "payload_write_bytes": 1684,
+            "payload_writes": 4,
+            "pin_rows": 214,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_pages": 0,
+            "cached_values": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_pages": 0,
+            "length": 1001,
+            "page_loads": 1
+          },
+          "record_cache": {
+            "bytes": 1717,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2244,
+            "owners": 2
+          },
+          "seconds": 0.02433512899960988
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 10000,
+      "family": "world.genealogy.children",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 0.28017164699986097,
+      "rows": [
+        {
+          "header_bytes": 29,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 933,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 782,
+            "payload_reads": 11,
+            "payload_write_bytes": 237,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_pages": 0,
+            "cached_values": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_pages": 0,
+            "length": 10000,
+            "page_loads": 0
+          },
+          "record_cache": {
+            "bytes": 1717,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1924,
+            "owners": 2
+          },
+          "seconds": 0.015839460999814037
+        },
+        {
+          "header_bytes": 29,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 267,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 4,
+            "maintenance_rows": 8,
+            "metadata_rows": 239,
+            "payload_check_bytes": 1607,
+            "payload_check_reads": 15,
+            "payload_read_bytes": 973,
+            "payload_reads": 11,
+            "payload_write_bytes": 471,
+            "payload_writes": 4,
+            "pin_rows": 214,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_pages": 0,
+            "cached_values": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_pages": 0,
+            "length": 10001,
+            "page_loads": 1
+          },
+          "record_cache": {
+            "bytes": 1717,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2244,
+            "owners": 2
+          },
+          "seconds": 0.014535304999753862
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 1000,
+      "family": "world.lineage.children",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 0.3692165259999456,
+      "rows": [
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 930,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 781,
+            "payload_reads": 11,
+            "payload_write_bytes": 236,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 1000
+          },
+          "record_cache": {
+            "bytes": 1818,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2027,
+            "owners": 2
+          },
+          "seconds": 0.016503046000252652
+        },
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 79,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 239,
+            "payload_check_bytes": 990,
+            "payload_check_reads": 14,
+            "payload_read_bytes": 801,
+            "payload_reads": 11,
+            "payload_write_bytes": 280,
+            "payload_writes": 4,
+            "pin_rows": 218,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 1001
+          },
+          "record_cache": {
+            "bytes": 1818,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2347,
+            "owners": 2
+          },
+          "seconds": 0.019495251999614993
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 10000,
+      "family": "world.lineage.children",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 4.483438467000269,
+      "rows": [
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 930,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 781,
+            "payload_reads": 11,
+            "payload_write_bytes": 236,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 10000
+          },
+          "record_cache": {
+            "bytes": 1818,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2027,
+            "owners": 2
+          },
+          "seconds": 0.022174638000251434
+        },
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 81,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 239,
+            "payload_check_bytes": 998,
+            "payload_check_reads": 14,
+            "payload_read_bytes": 803,
+            "payload_reads": 11,
+            "payload_write_bytes": 284,
+            "payload_writes": 4,
+            "pin_rows": 218,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 10001
+          },
+          "record_cache": {
+            "bytes": 1818,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2347,
+            "owners": 2
+          },
+          "seconds": 0.023208206000163045
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 1000,
+      "family": "world.social.adjacency",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 0.2694621189998543,
+      "rows": [
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 930,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 781,
+            "payload_reads": 11,
+            "payload_write_bytes": 236,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 1000
+          },
+          "record_cache": {
+            "bytes": 1715,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1924,
+            "owners": 2
+          },
+          "seconds": 0.014719803999923897
+        },
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 50,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 239,
+            "payload_check_bytes": 932,
+            "payload_check_reads": 14,
+            "payload_read_bytes": 772,
+            "payload_reads": 11,
+            "payload_write_bytes": 251,
+            "payload_writes": 4,
+            "pin_rows": 218,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 1001
+          },
+          "record_cache": {
+            "bytes": 1715,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2244,
+            "owners": 2
+          },
+          "seconds": 0.02222974099959174
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 10000,
+      "family": "world.social.adjacency",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 2.792506868000146,
+      "rows": [
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 930,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 781,
+            "payload_reads": 11,
+            "payload_write_bytes": 236,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 10000
+          },
+          "record_cache": {
+            "bytes": 1715,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1924,
+            "owners": 2
+          },
+          "seconds": 0.017636241000218433
+        },
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 52,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 239,
+            "payload_check_bytes": 940,
+            "payload_check_reads": 14,
+            "payload_read_bytes": 774,
+            "payload_reads": 11,
+            "payload_write_bytes": 255,
+            "payload_writes": 4,
+            "pin_rows": 218,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 10001
+          },
+          "record_cache": {
+            "bytes": 1715,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2244,
+            "owners": 2
+          },
+          "seconds": 0.01700610099987898
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 1000,
+      "family": "world.magic_resources.owner_index",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 0.24368633200037948,
+      "rows": [
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 930,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 781,
+            "payload_reads": 11,
+            "payload_write_bytes": 236,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 1000
+          },
+          "record_cache": {
+            "bytes": 1818,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2027,
+            "owners": 2
+          },
+          "seconds": 0.016240176999872347
+        },
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 50,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 239,
+            "payload_check_bytes": 932,
+            "payload_check_reads": 14,
+            "payload_read_bytes": 772,
+            "payload_reads": 11,
+            "payload_write_bytes": 251,
+            "payload_writes": 4,
+            "pin_rows": 218,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 1001
+          },
+          "record_cache": {
+            "bytes": 1818,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2347,
+            "owners": 2
+          },
+          "seconds": 0.01583788000016284
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 10000,
+      "family": "world.magic_resources.owner_index",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 2.2017352419998133,
+      "rows": [
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 930,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 781,
+            "payload_reads": 11,
+            "payload_write_bytes": 236,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 10000
+          },
+          "record_cache": {
+            "bytes": 1818,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2027,
+            "owners": 2
+          },
+          "seconds": 0.016440598999906797
+        },
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 52,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 239,
+            "payload_check_bytes": 940,
+            "payload_check_reads": 14,
+            "payload_read_bytes": 774,
+            "payload_reads": 11,
+            "payload_write_bytes": 255,
+            "payload_writes": 4,
+            "pin_rows": 218,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 10001
+          },
+          "record_cache": {
+            "bytes": 1818,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2347,
+            "owners": 2
+          },
+          "seconds": 0.017618052999750944
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 1000,
+      "family": "world.materials.lot_index",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 0.043725762000121904,
+      "rows": [
+        {
+          "header_bytes": 29,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 933,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 782,
+            "payload_reads": 11,
+            "payload_write_bytes": 237,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_pages": 0,
+            "cached_values": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_pages": 0,
+            "length": 1000,
+            "page_loads": 0
+          },
+          "record_cache": {
+            "bytes": 1717,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1924,
+            "owners": 2
+          },
+          "seconds": 0.014783291000185272
+        },
+        {
+          "header_bytes": 29,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 1482,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 4,
+            "maintenance_rows": 8,
+            "metadata_rows": 239,
+            "payload_check_bytes": 5250,
+            "payload_check_reads": 15,
+            "payload_read_bytes": 2189,
+            "payload_reads": 11,
+            "payload_write_bytes": 1684,
+            "payload_writes": 4,
+            "pin_rows": 214,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_pages": 0,
+            "cached_values": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_pages": 0,
+            "length": 1001,
+            "page_loads": 1
+          },
+          "record_cache": {
+            "bytes": 1717,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2244,
+            "owners": 2
+          },
+          "seconds": 0.01649752499997703
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 10000,
+      "family": "world.materials.lot_index",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 0.22772990799967374,
+      "rows": [
+        {
+          "header_bytes": 29,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 933,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 782,
+            "payload_reads": 11,
+            "payload_write_bytes": 237,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_pages": 0,
+            "cached_values": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_pages": 0,
+            "length": 10000,
+            "page_loads": 0
+          },
+          "record_cache": {
+            "bytes": 1717,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1924,
+            "owners": 2
+          },
+          "seconds": 0.014397710000139341
+        },
+        {
+          "header_bytes": 29,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 267,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 4,
+            "maintenance_rows": 8,
+            "metadata_rows": 239,
+            "payload_check_bytes": 1607,
+            "payload_check_reads": 15,
+            "payload_read_bytes": 973,
+            "payload_reads": 11,
+            "payload_write_bytes": 471,
+            "payload_writes": 4,
+            "pin_rows": 214,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_pages": 0,
+            "cached_values": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_pages": 0,
+            "length": 10001,
+            "page_loads": 1
+          },
+          "record_cache": {
+            "bytes": 1717,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2244,
+            "owners": 2
+          },
+          "seconds": 0.01429457399990497
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 1000,
+      "family": "world.materials.active_lot_index",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 0.24852421899959154,
+      "rows": [
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 930,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 781,
+            "payload_reads": 11,
+            "payload_write_bytes": 236,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 1000
+          },
+          "record_cache": {
+            "bytes": 1715,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1924,
+            "owners": 2
+          },
+          "seconds": 0.013373796999985643
+        },
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 50,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 239,
+            "payload_check_bytes": 932,
+            "payload_check_reads": 14,
+            "payload_read_bytes": 772,
+            "payload_reads": 11,
+            "payload_write_bytes": 251,
+            "payload_writes": 4,
+            "pin_rows": 218,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 1001
+          },
+          "record_cache": {
+            "bytes": 1715,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2244,
+            "owners": 2
+          },
+          "seconds": 0.014048022999759269
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 10000,
+      "family": "world.materials.active_lot_index",
+      "fixture_cost": "explicit O(H) conversion and verification",
+      "fixture_seconds": 2.102048785000079,
+      "rows": [
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 0,
+          "history_payload_writes": 0,
+          "io": {
+            "maintenance_removed_rows": 2,
+            "maintenance_rows": 4,
+            "metadata_rows": 235,
+            "payload_check_bytes": 930,
+            "payload_check_reads": 13,
+            "payload_read_bytes": 781,
+            "payload_reads": 11,
+            "payload_write_bytes": 236,
+            "payload_writes": 3,
+            "pin_rows": 203,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "operation": "scalar_wallet",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 10000
+          },
+          "record_cache": {
+            "bytes": 1715,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 1924,
+            "owners": 2
+          },
+          "seconds": 0.021267171000090457
+        },
+        {
+          "header_bytes": 28,
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "history_encoded_write_bytes": 52,
+          "history_payload_writes": 1,
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 239,
+            "payload_check_bytes": 940,
+            "payload_check_reads": 14,
+            "payload_read_bytes": 774,
+            "payload_reads": 11,
+            "payload_write_bytes": 255,
+            "payload_writes": 4,
+            "pin_rows": 218,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "operation": "one_addition",
+          "proxy": {
+            "cached_entries": 0,
+            "clean_bytes": 0,
+            "dirty_bytes": 184,
+            "dirty_entries": 0,
+            "entry_loads": 0,
+            "length": 10001
+          },
+          "record_cache": {
+            "bytes": 1715,
+            "entries": 2,
+            "evictions": 0,
+            "metadata_python_bytes": 2244,
+            "owners": 2
+          },
+          "seconds": 0.014010815000347066
+        }
+      ],
+      "sharing_placements": 2
+    }
+  ],
+  "scope": "native graph candidate lane; not complete capability-6/catalog/lifetime acceptance",
+  "source_sha256": {
+    "ate_sim/persistence_lazy.py": "a13ad2c5fbf0d257592d6722f477db8755fb04c36a1b816ca28e53ffc37de4a1",
+    "ate_sim/persistence_lazy_graph_buckets.py": "edd61463433bde9049f2311aa407962bf6f1c7e933a834cfe4f61a4025af44dd",
+    "ate_sim/persistence_lazy_nested_history.py": "4e72d09d36cbf1a14cf779adbc579043a9fd628c73eaf14857e6e23e655f419a",
+    "ate_sim/persistence_tracking.py": "f8891a773292d84802e24b00d03ca27c373af73ba5dfe3c7732bd3ff8487b607"
+  }
+}

@@ -523,6 +523,7 @@ class _ScalarHistory(CleanCacheOwner):
             raise ValueError('invalid nested history incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
         self._guard = self._changed = self._read_guard = None
+        self._key_validator = self._batch_validator = None
         self._initialize_cache(cache_budget)
         self._iterators = weakref.WeakSet()
         self._dirty_entries, self._baseline_bytes = {}, {}
@@ -575,6 +576,11 @@ class _ScalarHistory(CleanCacheOwner):
             return self._cache[canonical]
         value = None if self._new else checked_scalar_entry(self._store, self._pin, self._incarnation, canonical)
         if value is not None:
+            if self._key_validator is not None:
+                try:
+                    self._key_validator(value[1])
+                except TypeError as exc:
+                    raise StoreIntegrityError('stored history member violates its current owner type') from exc
             if value[0] >= self._base_next or (self._kind == 'set' and value[2] is not None):
                 raise StoreIntegrityError('nested scalar entry exceeds descriptor')
             self._entry_loads += 1
@@ -599,6 +605,8 @@ class _ScalarHistory(CleanCacheOwner):
         self._drop_clean(canonical)
 
     def _set(self, key, value):
+        if self._key_validator is not None:
+            self._key_validator(key)
         canonical = self._canonical(key)
         if not immutable_value(value):
             raise TypeError('typed history values must be immutable schema values')
@@ -875,6 +883,8 @@ class LazyHistorySet(_ScalarHistory, MutableSet):
 
     def update(self, *others):
         self._mutation()
+        if self._batch_validator is not None:
+            others = tuple(self._batch_validator(values) for values in others)
         for values in others:
             for value in values:
                 self.add(value)
