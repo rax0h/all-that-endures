@@ -1155,7 +1155,7 @@ class IncrementalWorldSession:
                 continue
             from .persistence_event_ids import EventIdSet
             if type(container) is EventIdSet:
-                keys[namespace] = ({0} if container.range_end is not None
+                keys[namespace] = ({0} if container.descriptor() is not None
                                    else set(container._exact._by_ordinal))
                 continue
             kind = self._base_kind(self._description(namespace)[0])
@@ -1419,8 +1419,11 @@ class IncrementalWorldSession:
             # them is an explicit conversion, never work hidden in open.
             facade = EventIdSet()
             facade._end, facade._exact = None, set(value)
+        prepare = getattr(self, '_prepare_event_ids', None)
+        if prepare is not None:
+            prepare(facade)
         delegate = None
-        if facade.range_end is None:
+        if facade.descriptor() is None:
             delegate = _RootSet(facade._exact)
             delegate._setup(self, namespace, stored_kind, ordinals)
             facade._exact = delegate
@@ -1431,11 +1434,11 @@ class IncrementalWorldSession:
             if binding is not None:
                 self._mark_many(binding.owners)
             previous = state[0]
-            if facade.range_end is not None and previous is None:
+            if facade.descriptor() is not None and previous is None:
                 self._mark((namespace, 0))
                 self._manifest_dirty = True
                 return
-            if facade.range_end is None and facade._exact is previous:
+            if facade.descriptor() is None and facade._exact is previous:
                 # Point edits already used the stable ordinal delegate.
                 return
             # A whole-set operation or range/fallback transition is explicit
@@ -1447,7 +1450,7 @@ class IncrementalWorldSession:
             old_keys.update(key for ns, key in self._dirty if ns == namespace)
             for key in old_keys:
                 self._delete((namespace, key))
-            if facade.range_end is not None:
+            if facade.descriptor() is not None:
                 state[0] = None
                 self._mark((namespace, 0))
             else:
@@ -1858,7 +1861,7 @@ class IncrementalWorldSession:
             return None
         from .persistence_event_ids import EventIdSet
         if type(container) is EventIdSet:
-            if container.range_end is not None:
+            if container.descriptor() is not None:
                 return container.descriptor()
             return container._exact._by_ordinal.get(key)
         kind = self._base_kind(self._description(namespace)[0])
@@ -2171,7 +2174,8 @@ class IncrementalWorldSession:
             return current
         from .persistence_event_ids import EventIdSet, RANGE_TAG
         if type(value) is EventIdSet:
-            return (RANGE_TAG if value.range_end is not None else 'set-stable/v1', len(value), 0)
+            descriptor = value.descriptor()
+            return (descriptor[0] if descriptor is not None else 'set-stable/v1', len(value), 0)
         if type(value) is EventLog:
             if self._cold_mode:
                 sealed = value._disk_count + len(value._chunks) * value.chunk_size
@@ -2242,7 +2246,7 @@ class IncrementalWorldSession:
         container = self._root_containers[namespace]
         from .persistence_event_ids import EventIdSet
         if type(container) is EventIdSet:
-            if container.range_end is not None:
+            if container.descriptor() is not None:
                 return (0, container.descriptor())
             return (key, container._exact.value_for_ordinal(key))
         kind = self._base_kind(self._description(namespace)[0])

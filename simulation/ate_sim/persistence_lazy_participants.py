@@ -106,7 +106,7 @@ class FamilySaveParticipant:
                 if (codec_version != codec.version or schema != change.record_schema
                         or payload != codec.encode(change.value)
                         or checksum != _record_checksum(change.namespace, key, schema, codec_version, generation, payload)):
-                    raise StoreIntegrityError('ordinary family publication differs from frozen plan')
+                    raise StoreIntegrityError(f'ordinary family publication differs from frozen plan: {change.namespace}')
                 for member in change.memberships:
                     row = self.store.db.execute('SELECT generation FROM query_membership '
                         'WHERE namespace=? AND index_name=? AND index_value=? AND record_key=? AND ordinal=?',

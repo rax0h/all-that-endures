@@ -1180,8 +1180,8 @@ def _insert_lazy_material_lot(
         )
 
 
-def _convert_event_id_range(target, capture, source_head, authority):
-    """Publish independently proved range authority in the private conversion."""
+def _convert_event_id_authority(target, capture, source_head, authority):
+    """Publish independently proved compact authority in the private conversion."""
     from .incremental_store import _counts_blob, _namespace_counts, _head_checksum
     from .persistence_adapters import COLLECTION_LAYOUT, RECORD_SCHEMA
     from .persistence_event_ids import RANGE_TAG
@@ -1196,7 +1196,7 @@ def _convert_event_id_range(target, capture, source_head, authority):
         target.codec.version, RECORD_SCHEMA, generation,
     ))
     layout = dict(capture.manifest['collections'])
-    layout[namespace] = (RANGE_TAG, authority.range_end, 0)
+    layout[namespace] = (authority.descriptor()[0], len(authority), 0)
     layout_key = target.codec.encode(COLLECTION_LAYOUT)
     exists = target.db.execute('SELECT 1 FROM records WHERE namespace=? AND typed_key=?', (META, layout_key)).fetchone()
     if exists:
@@ -1335,6 +1335,16 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                 codec,
             )
             nested_children = {}
+            from .persistence_event_ids import paged_key_supported
+            if (native_graph_buckets and event_id_authority.range_end is None
+                    and all(paged_key_supported(value) for value in capture.world.event_ids)):
+                from .persistence_event_ids import EXCEPTION_TAG
+                nested_children[next_incarnation] = ('sequence', ())
+                nested_children[next_incarnation + 1] = ('set', capture.world.event_ids)
+                event_id_authority = EventIdSet.from_exception_descriptor((EXCEPTION_TAG, 0,
+                    HistoryReference('sequence', next_incarnation), HistoryReference('set', next_incarnation + 1),
+                    len(capture.world.event_ids)))
+                next_incarnation += 2
             if native_graph_buckets:
                 for namespace, owner_key, relative, incarnation in identity_rows:
                     if namespace in BUCKET_SPECS and not relative:
@@ -1481,7 +1491,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             record_schema,
                             changed_generation,
                         ) = row
-                        if namespace == 'world.event_ids' and event_id_authority.range_end is not None:
+                        if namespace == 'world.event_ids' and event_id_authority.descriptor() is not None:
                             continue
                         child_paths = nested_alias_paths.get((namespace, typed_key), ())
                         if child_paths:
@@ -2503,8 +2513,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             ),
                         ),
                     )
-                    if event_id_authority.range_end is not None:
-                        _convert_event_id_range(target, capture, source_head, event_id_authority)
+                    if event_id_authority.descriptor() is not None:
+                        _convert_event_id_authority(target, capture, source_head, event_id_authority)
                     elif event_id_alias_paths:
                         target.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
                     _declare_bounded_collections(target, scalar_namespaces, native_graph_buckets)
@@ -2779,7 +2789,12 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
                     return None
                 relative = tuple(path[offset + 1:])
                 if relative in tuple((("field", field),) for field in NESTED_RECORD_FIELDS.get(namespace, ())):
-                    record_type = (list, HistoryReference, *tuple(HISTORY_CLASSES.values()))
+                    kind = NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')
+                    record_type = ({'list': list, 'sequence': list, 'map': dict, 'set': set}[kind],
+                                   HistoryReference, *tuple(HISTORY_CLASSES.values()))
+                    if kind == 'set':
+                        from .persistence_event_ids import EventIdSet
+                        record_type += (EventIdSet,)
                 return namespace, path[offset][1], relative, record_type
     people = _people_occurrence_from_path(path)
     if people is not None:
@@ -3223,6 +3238,7 @@ def _initialize_eager_tracker(
     tracker._excluded_namespaces.update(session._scalar_tables)
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     tracker._foreign_child_types = (LazySoulTrackedList, LazySoulTrackedSet)
+    tracker._prepare_event_ids = session._prepare_event_id_facade
     if 'world.households' in session._scalar_tables:
         tracker._prepare_record_child = session._prepare_counted_record_child
     try:
@@ -10199,6 +10215,49 @@ class _LazyLifetime:
 
 
 class LazyWorldSession:
+    def _prepare_event_id_facade(self, facade):
+        from .persistence_event_id_exceptions import PagedEventIdExceptions
+        from .persistence_event_ids import EXCEPTION_TAG
+        enabled = any(description[0] == BUCKET_KIND for description in self.manifest['collections'].values())
+        if not enabled and not (facade.descriptor() is not None and facade.descriptor()[0] == EXCEPTION_TAG):
+            return
+
+        def read_guard():
+            self._ensure_active()
+            if self._state == 'recovery-required':
+                raise StoreError('event-ID history read requires save acknowledgement')
+
+        def history(ref=None, values=(), kind='set'):
+            incarnation = (self._registry.allocator.allocate() if ref is None
+                           else IncarnationId(self.store.store_identity, ref.incarnation))
+            proxy = self._registry.object_for_incarnation(incarnation)
+            if proxy is None:
+                history_class = LazyOrderedSequence if kind == 'sequence' else LazyHistorySet
+                proxy = history_class(self.store, self.pin, incarnation.value,
+                    initial_values=values if ref is None else None,
+                    cache_budget=self._history_cache_budget,
+                    **({'value_mode': 'native'} if kind == 'sequence' else {}))
+                self._registry.bind(proxy, incarnation=incarnation)
+            if type(proxy) is not (LazyOrderedSequence if kind == 'sequence' else LazyHistorySet):
+                raise StoreIntegrityError('event-ID exception incarnation has wrong type')
+            def changed():
+                self._nested_dirty[incarnation.value] = proxy
+            proxy.bind(self._ensure_hybrid_mutation_allowed, changed, read_guard)
+            self._nested_lists[incarnation.value] = proxy
+            if history_has_pending_overlay(proxy):
+                self._nested_dirty[incarnation.value] = proxy
+            return proxy
+
+        def factory(end, values):
+            return PagedEventIdExceptions(end, history(kind='sequence'), history(values=values))
+
+        if facade._pending_descriptor is not None:
+            descriptor = facade._pending_descriptor
+            facade._exact = PagedEventIdExceptions(descriptor[1], history(descriptor[2], kind='sequence'),
+                history(descriptor[3]), expected_length=descriptor[4])
+            facade._pending_descriptor = None
+        facade.enable_paged_exceptions(factory)
+
     def _bucket_table(self, namespace, legacy_type):
         description = self.manifest['collections'][namespace]
         if description[0] != BUCKET_KIND:
@@ -11948,6 +12007,21 @@ class LazyWorldSession:
         return table
 
     def _bind_history_list(self, value, occurrence, incarnation=None, kind=None):
+        from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
+        if value is self.world.event_ids or (type(value) is tuple and value == AUTHORITY_REFERENCE):
+            if kind != 'set':
+                raise StoreIntegrityError('event-ID facade used by a non-set owner')
+            proxy = self.world.event_ids
+            actual = self._registry.incarnation_for_object(proxy)
+            if actual is None:
+                actual = self._registry.bind(proxy, incarnation=incarnation)
+            if incarnation is not None and actual != incarnation:
+                raise StoreIntegrityError('event-ID reference disagrees with owner incarnation')
+            old = self._registry.incarnation_for_occurrence(occurrence)
+            if old is not None and old != actual:
+                self._registry.detach_occurrence(occurrence, expected=old)
+            self._registry.attach_existing(actual, occurrence)
+            return proxy
         actual_kind = value.kind if nested_reference(value) else value._kind if type(value) in HISTORY_TYPES else None
         if actual_kind == 'sequence' and kind in (None, 'list', 'sequence'):
             kind = 'sequence'
@@ -14232,9 +14306,13 @@ class LazyWorldSession:
 
         # Family reconciliation can attach a previously unowned history through
         # a nested wallet/treasury edit. Capture its bytes after all placements.
+        from .persistence_event_id_exceptions import PagedEventIdExceptions
+        event_histories = (self.world.event_ids._exact.histories
+                          if isinstance(self.world.event_ids._exact, PagedEventIdExceptions) else ())
+        event_incarnations = {proxy._incarnation for proxy in event_histories}
         nested_changes = []
         for incarnation, proxy in sorted(self._nested_dirty.items()):
-            if not (self._registry.occurrences_for_incarnation(IncarnationId(self.store.store_identity, incarnation)) or self._nested_eager_owners(proxy)):
+            if not (incarnation in event_incarnations or self._registry.occurrences_for_incarnation(IncarnationId(self.store.store_identity, incarnation)) or self._nested_eager_owners(proxy)):
                 self._nested_dirty.pop(incarnation, None)
                 continue
             changes = proxy.pending_changes()
@@ -14830,7 +14908,7 @@ class LazyWorldSession:
         from .persistence_lazy_participants import freeze_hybrid_publication
         publication = freeze_hybrid_publication(self.store, self.pin, plan,
             next_incarnation=self._registry.next_incarnation,
-            required_format_version=(5 if self._eager_tracker._description('world.event_ids')[0] == 'event-ids-range/v1'
+            required_format_version=(5 if self._eager_tracker._description('world.event_ids')[0] in ('event-ids-range/v1', 'event-ids-exceptions/v1')
                 else 4 if any(change.namespace == HOUSEHOLD_BACKING_NAMESPACE
                               for change in plan.household_member_version_changes) else 3))
         return publication.replay_plan(plan)

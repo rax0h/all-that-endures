@@ -1,0 +1,343 @@
+{
+  "measurements": [
+    {
+      "H": 1000,
+      "construction_scope": "explicit O(H) conversion and verification; excluded from point metrics",
+      "construction_seconds": 0.11361363100058952,
+      "rows": [
+        {
+          "descriptor_bytes": 137,
+          "facade": {
+            "exceptions": {
+              "added": {
+                "cached_entries": 0,
+                "clean_bytes": 0,
+                "dirty_bytes": 184,
+                "dirty_entries": 0,
+                "entry_loads": 0,
+                "length": 0
+              },
+              "prefix_end": 1000,
+              "removed": {
+                "clean_bytes": 0,
+                "clean_entries": 0,
+                "dirty_bytes": 0,
+                "dirty_entries": 0,
+                "length": 1,
+                "tree_height": 0
+              }
+            },
+            "member_visits": 0,
+            "range_end": null,
+            "resident_members": 0
+          },
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "io": {
+            "maintenance_removed_rows": 8,
+            "maintenance_rows": 16,
+            "metadata_rows": 288,
+            "payload_check_bytes": 26387,
+            "payload_check_reads": 29,
+            "payload_read_bytes": 17603,
+            "payload_reads": 20,
+            "payload_write_bytes": 8930,
+            "payload_writes": 11,
+            "pin_rows": 291,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "nested_encoded_write_bytes": 828,
+          "nested_writes": 7,
+          "operation": "middle_remove",
+          "seconds": 0.03182414799994149
+        },
+        {
+          "descriptor_bytes": 138,
+          "facade": {
+            "exceptions": {
+              "added": {
+                "cached_entries": 0,
+                "clean_bytes": 0,
+                "dirty_bytes": 184,
+                "dirty_entries": 0,
+                "entry_loads": 0,
+                "length": 1
+              },
+              "prefix_end": 1000,
+              "removed": {
+                "clean_bytes": 0,
+                "clean_entries": 0,
+                "dirty_bytes": 0,
+                "dirty_entries": 0,
+                "length": 1,
+                "tree_height": 0
+              }
+            },
+            "member_visits": 0,
+            "range_end": null,
+            "resident_members": 0
+          },
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 243,
+            "payload_check_bytes": 24977,
+            "payload_check_reads": 20,
+            "payload_read_bytes": 16874,
+            "payload_reads": 15,
+            "payload_write_bytes": 8200,
+            "payload_writes": 6,
+            "pin_rows": 240,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "nested_encoded_write_bytes": 96,
+          "nested_writes": 2,
+          "operation": "outlier_add",
+          "seconds": 0.02393066200056637
+        },
+        {
+          "descriptor_bytes": 138,
+          "facade": {
+            "exceptions": {
+              "added": {
+                "cached_entries": 0,
+                "clean_bytes": 0,
+                "dirty_bytes": 184,
+                "dirty_entries": 0,
+                "entry_loads": 0,
+                "length": 2
+              },
+              "prefix_end": 1000,
+              "removed": {
+                "clean_bytes": 0,
+                "clean_entries": 0,
+                "dirty_bytes": 0,
+                "dirty_entries": 0,
+                "length": 2,
+                "tree_height": 0
+              }
+            },
+            "member_visits": 0,
+            "range_end": null,
+            "resident_members": 0
+          },
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 2,
+            "metadata_python_bytes": 824,
+            "owners": 0
+          },
+          "io": {
+            "maintenance_removed_rows": 11,
+            "maintenance_rows": 22,
+            "metadata_rows": 339,
+            "payload_check_bytes": 28324,
+            "payload_check_reads": 44,
+            "payload_read_bytes": 18523,
+            "payload_reads": 29,
+            "payload_write_bytes": 9390,
+            "payload_writes": 13,
+            "pin_rows": 425,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "nested_encoded_write_bytes": 1286,
+          "nested_writes": 9,
+          "operation": "replace_representative",
+          "seconds": 0.031021858999338292
+        }
+      ],
+      "sharing_placements": 2
+    },
+    {
+      "H": 10000,
+      "construction_scope": "explicit O(H) conversion and verification; excluded from point metrics",
+      "construction_seconds": 0.7101465729992924,
+      "rows": [
+        {
+          "descriptor_bytes": 139,
+          "facade": {
+            "exceptions": {
+              "added": {
+                "cached_entries": 0,
+                "clean_bytes": 0,
+                "dirty_bytes": 184,
+                "dirty_entries": 0,
+                "entry_loads": 0,
+                "length": 0
+              },
+              "prefix_end": 10000,
+              "removed": {
+                "clean_bytes": 0,
+                "clean_entries": 0,
+                "dirty_bytes": 0,
+                "dirty_entries": 0,
+                "length": 1,
+                "tree_height": 0
+              }
+            },
+            "member_visits": 0,
+            "range_end": null,
+            "resident_members": 0
+          },
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 248,
+            "owners": 0
+          },
+          "io": {
+            "maintenance_removed_rows": 8,
+            "maintenance_rows": 16,
+            "metadata_rows": 288,
+            "payload_check_bytes": 26402,
+            "payload_check_reads": 29,
+            "payload_read_bytes": 17612,
+            "payload_reads": 20,
+            "payload_write_bytes": 8936,
+            "payload_writes": 11,
+            "pin_rows": 291,
+            "query_rows": 0,
+            "temporary_keys_peak": 0
+          },
+          "nested_encoded_write_bytes": 831,
+          "nested_writes": 7,
+          "operation": "middle_remove",
+          "seconds": 0.02664541299964185
+        },
+        {
+          "descriptor_bytes": 140,
+          "facade": {
+            "exceptions": {
+              "added": {
+                "cached_entries": 0,
+                "clean_bytes": 0,
+                "dirty_bytes": 184,
+                "dirty_entries": 0,
+                "entry_loads": 0,
+                "length": 1
+              },
+              "prefix_end": 10000,
+              "removed": {
+                "clean_bytes": 0,
+                "clean_entries": 0,
+                "dirty_bytes": 0,
+                "dirty_entries": 0,
+                "length": 1,
+                "tree_height": 0
+              }
+            },
+            "member_visits": 0,
+            "range_end": null,
+            "resident_members": 0
+          },
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 0,
+            "metadata_python_bytes": 632,
+            "owners": 0
+          },
+          "io": {
+            "maintenance_removed_rows": 3,
+            "maintenance_rows": 6,
+            "metadata_rows": 243,
+            "payload_check_bytes": 24988,
+            "payload_check_reads": 20,
+            "payload_read_bytes": 16881,
+            "payload_reads": 15,
+            "payload_write_bytes": 8204,
+            "payload_writes": 6,
+            "pin_rows": 240,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "nested_encoded_write_bytes": 97,
+          "nested_writes": 2,
+          "operation": "outlier_add",
+          "seconds": 0.022977505999733694
+        },
+        {
+          "descriptor_bytes": 140,
+          "facade": {
+            "exceptions": {
+              "added": {
+                "cached_entries": 0,
+                "clean_bytes": 0,
+                "dirty_bytes": 184,
+                "dirty_entries": 0,
+                "entry_loads": 0,
+                "length": 2
+              },
+              "prefix_end": 10000,
+              "removed": {
+                "clean_bytes": 0,
+                "clean_entries": 0,
+                "dirty_bytes": 0,
+                "dirty_entries": 0,
+                "length": 2,
+                "tree_height": 0
+              }
+            },
+            "member_visits": 0,
+            "range_end": null,
+            "resident_members": 0
+          },
+          "history_cache": {
+            "bytes": 0,
+            "entries": 0,
+            "evictions": 2,
+            "metadata_python_bytes": 824,
+            "owners": 0
+          },
+          "io": {
+            "maintenance_removed_rows": 11,
+            "maintenance_rows": 22,
+            "metadata_rows": 339,
+            "payload_check_bytes": 28341,
+            "payload_check_reads": 44,
+            "payload_read_bytes": 18534,
+            "payload_reads": 29,
+            "payload_write_bytes": 9395,
+            "payload_writes": 13,
+            "pin_rows": 425,
+            "query_rows": 1,
+            "temporary_keys_peak": 0
+          },
+          "nested_encoded_write_bytes": 1288,
+          "nested_writes": 9,
+          "operation": "replace_representative",
+          "seconds": 0.029535670000768732
+        }
+      ],
+      "sharing_placements": 2
+    }
+  ],
+  "scope": "candidate exceptional point authority; full catalog/lifetime/recursive acceptance remains open",
+  "source_sha256": {
+    "ate_sim/persistence_adapters.py": "5b57c2bd8c070584d0ab7c0c4b7067b6e12c8aa02429163a80c3cd86c7cbdf21",
+    "ate_sim/persistence_cold_save.py": "139c7c76c1ce26bc04529fc6d91ce5407d012f0a584301feed753cd134942839",
+    "ate_sim/persistence_event_id_exceptions.py": "5e4c5258411ed29c058d53abde7dcc26a75adfd24ed352eb23de61318b8790bb",
+    "ate_sim/persistence_event_ids.py": "611c68c05de34f933fbbd84c7dc14a393dbae2d47399e8c62edc535d1dbc9662",
+    "ate_sim/persistence_lazy.py": "715c5d07f841cc685a43beddcf1951d78ef7b099d4511c3872ad0a0f19ce40a5",
+    "ate_sim/persistence_lazy_participants.py": "23295cd04c3d003bf2cf9c8bcbdeb2bbbdd9923aa4195ac7f99b39e9b2fa3233",
+    "ate_sim/persistence_session.py": "70984926c887fda1c2548dd8284c68286a9ca8f860899be7277edabaa2430c58",
+    "ate_sim/persistence_tracking.py": "3657132e0d37489c51ed6e0b42f0e8a047d13440bb537bd4494e1a594b95d7c4"
+  }
+}

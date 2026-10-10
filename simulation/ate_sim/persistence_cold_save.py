@@ -765,11 +765,11 @@ def _capture_successor(session, plan, *, full_evidence):
                 # descriptor. Validate changed event-ID bytes before adoption.
                 _verify_successor_records(session, plan, namespace='world.event_ids')
             from .persistence_adapters import _read_cold_manifest, _restore_collection
-            from .persistence_event_ids import RANGE_TAG
+            from .persistence_event_ids import RANGE_TAG, EXCEPTION_TAG
             planned_layout = (plan.layout_value if plan.layout_value is not None
                               else session._manifest['collections'])
             expected_ids = planned_layout['world.event_ids']
-            if expected_ids[0] == RANGE_TAG and any(evidence.namespace == 'world.event_ids' for evidence in plan.record_evidence):
+            if expected_ids[0] in (RANGE_TAG, EXCEPTION_TAG) and any(evidence.namespace == 'world.event_ids' for evidence in plan.record_evidence):
                 actual_ids = _read_cold_manifest(session.store)['collections']['world.event_ids']
                 if actual_ids != expected_ids:
                     raise StoreIntegrityError('event-ID successor layout mismatch')

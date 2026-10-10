@@ -13,7 +13,7 @@ import zlib
 
 from .core import World, Event, Layer
 from .event_log import EventLog, FrozenDict, FrozenList
-from .persistence_event_ids import EventIdSet, RANGE_TAG
+from .persistence_event_ids import EventIdSet, RANGE_TAG, EXCEPTION_TAG
 from .persistence_lazy_nested_history import LazyHistoryList, LazyHistoryMap, LazyHistorySet, HISTORY_TYPES, HistoryReference, REFERENCE_TAG, reference as history_reference
 from .persistence_lazy_sequence import LazyOrderedSequence
 from .persistence_identity import iter_mutable_event_items
@@ -391,7 +391,7 @@ def _restore_collection(store, namespace, expected, description):
     if type(description) is not tuple or len(description) != 3:
         raise StoreFormatError(f'invalid collection description: {namespace}')
     kind, size, chunks = description
-    if kind == RANGE_TAG:
+    if kind in (RANGE_TAG, EXCEPTION_TAG):
         if (namespace != 'world.event_ids' or expected != 'set'
                 or type(size) is not int or size < 0
                 or type(chunks) is not int or chunks != 0):
@@ -406,8 +406,15 @@ def _restore_collection(store, namespace, expected, description):
         if (type(key) is not int or key != 0 or type(envelope) is not tuple
                 or len(envelope) != 2 or type(envelope[0]) is not int
                 or envelope[0] != 0 or type(envelope[1]) is not tuple
-                or len(envelope[1]) != 2 or envelope[1][0] != RANGE_TAG
-                or type(envelope[1][1]) is not int or envelope[1][1] != size):
+                or not envelope[1]
+                or envelope[1][0] != kind):
+            raise StoreIntegrityError('event-ID authority disagrees with layout')
+        if kind == EXCEPTION_TAG:
+            result = EventIdSet.from_exception_descriptor(envelope[1])
+            if len(result) != size:
+                raise StoreIntegrityError('event-ID exceptions disagree with layout')
+            return result
+        if len(envelope[1]) != 2 or type(envelope[1][1]) is not int or envelope[1][1] != size:
             raise StoreIntegrityError('event-ID authority disagrees with layout')
         return EventIdSet.from_range_descriptor(size)
     allowed = {'dict': ('dict', 'RecordTable', 'dict-stable/v1', 'RecordTable-stable/v1'),

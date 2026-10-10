@@ -8,11 +8,26 @@ materialize only for explicit portable export/detach operations.
 
 from collections.abc import MutableSet, Set
 import operator
+import math
 import sys
 
 
 RANGE_TAG = "event-ids-range/v1"
+EXCEPTION_TAG = "event-ids-exceptions/v1"
 AUTHORITY_REFERENCE = ('event-id-authority-ref/v1',)
+
+
+def paged_key_supported(value):
+    """Admission for the current equality-key primitive, never coercion.
+
+    NaNs and opaque Python keys retain the accepted exact resident authority
+    until the paged equality directory supports their native identity rules.
+    """
+    if value is None or type(value) in (bool, int, str, bytes):
+        return True
+    if type(value) is float:
+        return not math.isnan(value)
+    return type(value) in (tuple, frozenset) and all(paged_key_supported(item) for item in value)
 
 
 class EventIdSet(MutableSet):
@@ -22,6 +37,8 @@ class EventIdSet(MutableSet):
         self._guard_callback = None
         self._changed_callback = None
         self._member_visits = 0
+        self._exception_factory = None
+        self._pending_descriptor = None
         self._install_values(set(values))
 
     def _install_values(self, values):
@@ -35,6 +52,9 @@ class EventIdSet(MutableSet):
                 self._end, self._exact = None, values
         else:
             self._end, self._exact = None, values
+        if self._end is None and self._exception_factory is not None:
+            if all(paged_key_supported(value) for value in self._exact):
+                self._exact = self._exception_factory(0, self._exact)
 
     @classmethod
     def from_checked_values(cls, values):
@@ -53,7 +73,31 @@ class EventIdSet(MutableSet):
         return self._end
 
     def descriptor(self):
-        return None if self._end is None else (RANGE_TAG, self._end)
+        if self._end is not None:
+            return (RANGE_TAG, self._end)
+        if self._pending_descriptor is not None:
+            return self._pending_descriptor
+        return self._exact.descriptor() if hasattr(self._exact, 'descriptor') else None
+
+    def storage_reference(self):
+        return AUTHORITY_REFERENCE
+
+    @classmethod
+    def from_exception_descriptor(cls, value):
+        from .persistence_event_id_exceptions import checked_descriptor
+        result = cls()
+        result._end, result._exact = None, None
+        result._pending_descriptor = checked_descriptor(value)
+        return result
+
+    def enable_paged_exceptions(self, factory):
+        self._exception_factory = factory
+
+    def _leave_range(self):
+        end = self._end
+        self._exact = (set(self) if self._exception_factory is None
+                       else self._exception_factory(end, ()))
+        self._end = None
 
     def bind(self, guard, changed):
         self._guard_callback = guard
@@ -68,6 +112,8 @@ class EventIdSet(MutableSet):
             self._changed_callback()
 
     def __len__(self):
+        if self._pending_descriptor is not None:
+            return self._pending_descriptor[4]
         return len(self._exact) if self._end is None else self._end
 
     def __iter__(self):
@@ -110,11 +156,16 @@ class EventIdSet(MutableSet):
         hash(value)  # add, unlike membership, rejects unhashable set probes.
         if value in self:
             return
+        if self._exception_factory is not None and not paged_key_supported(value):
+            # Preserve native set semantics, including multiple distinct NaNs.
+            # This explicit compatibility fallback retains its old O(H) cost;
+            # it is not claimed as complete capability-6 equality closure.
+            self._exact, self._end = set(self), None
         if self._end is not None and type(value) is int and value == self._end + 1:
             self._end += 1
         else:
             if self._end is not None:
-                self._exact, self._end = set(self), None
+                self._leave_range()
             self._exact.add(value)
         self._changed()
 
@@ -126,7 +177,7 @@ class EventIdSet(MutableSet):
             self._end -= 1
         else:
             if self._end is not None:
-                self._exact, self._end = set(self), None
+                self._leave_range()
             self._exact.discard(value)
         self._changed()
 
@@ -138,7 +189,7 @@ class EventIdSet(MutableSet):
             self._end -= 1
         else:
             if self._end is not None:
-                self._exact, self._end = set(self), None
+                self._leave_range()
             self._exact.remove(value)
         self._changed()
 
@@ -267,7 +318,8 @@ class EventIdSet(MutableSet):
 
     def diagnostics(self):
         return {
-            "resident_members": 0 if self._end is not None else len(self._exact),
+            "resident_members": (0 if self._end is not None or self.descriptor() is not None else len(self._exact)),
             "member_visits": self._member_visits,
             "range_end": self._end,
+            "exceptions": self._exact.diagnostics() if hasattr(self._exact, 'diagnostics') else None,
         }
