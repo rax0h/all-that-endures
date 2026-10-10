@@ -895,7 +895,8 @@ class LazyOrderedSequence(MutableSequence):
         """Exact current ranks; candidate selection pays only for requested IDs."""
         self._ensure()
         with self._store.read_snapshot(self._pin):
-            if not _positive(value):
+            member = self._member_key(value)
+            if member is None:
                 return tuple(rank for rank, item in enumerate(self) if item is value or item == value)
             ranks = []
             seen = set()
@@ -905,14 +906,14 @@ class LazyOrderedSequence(MutableSequence):
                 if link[0] in seen:
                     raise StoreIntegrityError('duplicate/cyclic sequence membership node')
                 seen.add(link[0])
-                node = self._mread(link, value)
+                node = self._mread(link, member)
                 rank, actual = self._occurrence(link[0])
-                if actual != value or not lower < rank < upper:
+                if actual != member or not lower < rank < upper:
                     raise StoreIntegrityError('sequence membership order/value disagreement')
                 visit(node[2], lower, rank)
                 ranks.append(rank)
                 visit(node[3], rank, upper)
-            visit(self._dget(value), -1, self._length)
+            visit(self._dget(member), -1, self._length)
             return tuple(ranks)
 
     def candidate_positions(self, values):
@@ -921,7 +922,8 @@ class LazyOrderedSequence(MutableSequence):
 
     def remove(self, value):
         with self._mutation():
-            rank = self._first(value) if _positive(value) else next(
+            member = self._member_key(value)
+            rank = self._first(member) if member is not None else next(
                 (rank for rank, item in enumerate(self) if item is value or item == value), None)
             if rank is None:
                 raise ValueError('list.remove(x): x not in list')
