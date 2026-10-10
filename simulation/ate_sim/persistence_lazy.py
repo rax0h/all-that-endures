@@ -46,6 +46,7 @@ from .persistence_lazy_nested_history import (
     PAGE_NAMESPACE as NESTED_PAGE_NAMESPACE, reference as nested_reference,
     initial_list_changes, initial_scalar_changes, checked_scalar_entry, HistoryReference, HISTORY_CLASSES, HISTORY_TYPES,
     ENTRY_NAMESPACE as NESTED_ENTRY_NAMESPACE,
+    immutable_value as nested_immutable_value,
 )
 from .persistence_lazy_budget import SharedCacheBudget, RecordCacheLRU, RECORD_BYTES
 from .persistence_lazy_families import RuntimeFamilyBindings
@@ -222,6 +223,8 @@ SCALAR_RECORD_SPECS = {
     }),
 }
 NESTED_RECORD_FIELDS = {
+    'world.skills.skills': ('teachers', 'provenance'),
+    'world.metaphysics.souls': ('transformations',),
     'world.culture.practices': ('traits',),
     'world.institutions.institutions': ('branches', 'members'),
     'world.institutions.branches': ('records', 'notices', 'trainees'),
@@ -1309,6 +1312,13 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     kind = NESTED_FIELD_KINDS.get((namespace, relative[0][1]), 'list')
                     if type(values) is not {'list': list, 'map': dict, 'set': set}[kind]:
                         raise StoreFormatError('typed history source has wrong type')
+                    if namespace in {SKILL_NAMESPACE, SOUL_NAMESPACE} and any(
+                        not nested_immutable_value(value) for value in values
+                    ):
+                        # Recursive mutable history is not yet a complete
+                        # authority. Reject before staging instead of publishing
+                        # a legacy header with unbindable descendant labels.
+                        raise StoreFormatError('skill/soul history contains unsupported mutable descendants')
                     nested_children.setdefault(incarnation, (kind, values))
             nested_alias_paths = {}
             for namespace, owner_key, relative, incarnation in identity_rows:
@@ -2787,7 +2797,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
         elif relative == (("field", "cosmic_links"),):
             expected_type = dict
         elif relative == (("field", "transformations"),):
-            expected_type = list
+            expected_type = (list, LazyHistoryList, HistoryReference)
         else:
             expected_type = SoulState
         return SOUL_NAMESPACE, soul[0], relative, expected_type
@@ -2827,7 +2837,7 @@ def _lazy_occurrence_from_path(path, scalar_namespaces=None):
             LINEAGE_NODE_NAMESPACE: LineageNode,
         }[namespace]
         if namespace == SKILL_NAMESPACE and relative in LazySkillTable._nested_paths.values():
-            expected = list
+            expected = (list, LazyHistoryList, HistoryReference)
         return namespace, key, relative, expected
     social_edge = _social_occurrence_from_path(path, "edges")
     if social_edge is not None:
@@ -8578,7 +8588,9 @@ def _plain_soul_value(soul):
         authorities=set(soul.authorities),
         marks=set(soul.marks),
         cosmic_links=dict(soul.cosmic_links),
-        transformations=list(soul.transformations),
+        transformations=(soul.transformations.storage_reference()
+                         if type(soul.transformations) is LazyHistoryList
+                         else list(soul.transformations)),
     )
 
 
@@ -9230,8 +9242,10 @@ class LazySkillTable(LazyRecordTable):
     def _plain(record):
         return replace(
             record,
-            teachers=list(record.teachers),
-            provenance=list(record.provenance),
+            **{field: (getattr(record, field).storage_reference()
+                       if type(getattr(record, field)) is LazyHistoryList
+                       else list(getattr(record, field)))
+               for field in LazySkillTable._nested_paths},
         )
 
     def _baseline_bytes(self, key):
@@ -12819,6 +12833,10 @@ class LazyWorldSession:
         occurrence = self._soul_occurrence(
             key, LazySoulTable._nested_paths[field]
         )
+        if nested_reference(values) or type(values) is LazyHistoryList:
+            return self._bind_history_list(values, occurrence, incarnation, kind='list')
+        if incarnation is None and type(values) is list and all(nested_immutable_value(value) for value in values):
+            return self._bind_history_list(values, occurrence, kind='list')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
             if live is not None:
@@ -13016,6 +13034,10 @@ class LazyWorldSession:
         occurrence = self._skill_occurrence(
             key, LazySkillTable._nested_paths[field]
         )
+        if nested_reference(values) or type(values) is LazyHistoryList:
+            return self._bind_history_list(values, occurrence, incarnation, kind='list')
+        if incarnation is None and type(values) is list and all(nested_immutable_value(value) for value in values):
+            return self._bind_history_list(values, occurrence, kind='list')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
             if live is not None:
@@ -13074,9 +13096,11 @@ class LazyWorldSession:
         self._registry.attach_occurrence(
             record, self._skill_occurrence(key)
         )
+        replacements = {}
         for field in LazySkillTable._nested_paths:
             value = getattr(record, field)
-            wrapper = self._bind_skill_list(key, field, value)
+            wrapper = self._bind_skill_list(key, field, replacements.get(id(value), value))
+            replacements[id(value)] = wrapper
             if wrapper is not value:
                 object.__setattr__(record, field, wrapper)
         return record

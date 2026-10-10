@@ -15,6 +15,7 @@ from ate_sim.persistence_lazy import (
     open_lazy_world_session,
 )
 from ate_sim.persistence_session import write_cold_snapshot
+from ate_sim.persistence_lazy_nested_history import LazyHistoryList
 
 
 RULES = "stage-0.5-p4-lazy-soul-tests"
@@ -149,7 +150,7 @@ def test_nested_soul_incarnations_survive_save_and_reopen(tmp_path):
         assert isinstance(soul.authorities, LazySoulTrackedSet)
         assert isinstance(soul.marks, LazySoulTrackedSet)
         assert isinstance(soul.cosmic_links, LazyTrackedDict)
-        assert isinstance(soul.transformations, LazySoulTrackedList)
+        assert isinstance(soul.transformations, LazyHistoryList)
 
 
 def test_shared_nested_soul_identity_is_one_live_object(tmp_path):
@@ -411,6 +412,7 @@ def test_soul_history_scaling_is_bounded_by_requested_access(tmp_path, count):
         )
         assert (
             after_reads.payload_reads - before_reads.payload_reads
-        ) <= 1
+        ) <= 2  # Compact soul header plus checked history descriptor.
+        assert soul.transformations.diagnostics()['page_loads'] == 0
         assert soul_diag["resident_souls"] <= 256
         assert write_diag.payload_writes <= 3

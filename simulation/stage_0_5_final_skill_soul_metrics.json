@@ -1,0 +1,192 @@
+{
+  "scope": "Skill/soul scalar headers and one shared typed list; explicit construction is O(H). Not whole-World catalog/household/pressure certification.",
+  "source_sha256": "f566a31519ff0916418168345073930534ad109d72ca1235036ae0e31f8a2aec",
+  "rows": [
+    {
+      "H": 1000,
+      "operation": "skill_scalar",
+      "history_page_loads": 0,
+      "history_page_writes": 0,
+      "history_page_write_bytes": 0,
+      "skill_header_bytes": 260,
+      "soul_header_bytes": 377,
+      "store_operation_counters": {
+        "payload_reads": 10,
+        "payload_read_bytes": 722,
+        "payload_check_reads": 12,
+        "payload_check_bytes": 1242,
+        "payload_writes": 3,
+        "payload_write_bytes": 406,
+        "metadata_rows": 224,
+        "query_rows": 0,
+        "pin_rows": 193,
+        "maintenance_rows": 4,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 2
+      },
+      "history_cache": {
+        "entries": 0,
+        "bytes": 0,
+        "owners": 0,
+        "evictions": 0,
+        "metadata_python_bytes": 248
+      },
+      "elapsed_seconds": 0.015953123000144842
+    },
+    {
+      "H": 1000,
+      "operation": "soul_scalar",
+      "history_page_loads": 0,
+      "history_page_writes": 0,
+      "history_page_write_bytes": 0,
+      "skill_header_bytes": 260,
+      "soul_header_bytes": 377,
+      "store_operation_counters": {
+        "payload_reads": 10,
+        "payload_read_bytes": 722,
+        "payload_check_reads": 12,
+        "payload_check_bytes": 1476,
+        "payload_writes": 3,
+        "payload_write_bytes": 523,
+        "metadata_rows": 225,
+        "query_rows": 0,
+        "pin_rows": 193,
+        "maintenance_rows": 4,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 2
+      },
+      "history_cache": {
+        "entries": 0,
+        "bytes": 0,
+        "owners": 0,
+        "evictions": 0,
+        "metadata_python_bytes": 248
+      },
+      "elapsed_seconds": 0.01449153299927275
+    },
+    {
+      "H": 1000,
+      "operation": "shared_append",
+      "history_page_loads": 1,
+      "history_page_writes": 1,
+      "history_page_write_bytes": 1482,
+      "skill_header_bytes": 260,
+      "soul_header_bytes": 377,
+      "store_operation_counters": {
+        "payload_reads": 11,
+        "payload_read_bytes": 2189,
+        "payload_check_reads": 15,
+        "payload_check_bytes": 5250,
+        "payload_writes": 4,
+        "payload_write_bytes": 1684,
+        "metadata_rows": 236,
+        "query_rows": 0,
+        "pin_rows": 199,
+        "maintenance_rows": 8,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 4
+      },
+      "history_cache": {
+        "entries": 0,
+        "bytes": 0,
+        "owners": 0,
+        "evictions": 0,
+        "metadata_python_bytes": 632
+      },
+      "elapsed_seconds": 0.015961084000082337
+    },
+    {
+      "H": 10000,
+      "operation": "skill_scalar",
+      "history_page_loads": 0,
+      "history_page_writes": 0,
+      "history_page_write_bytes": 0,
+      "skill_header_bytes": 260,
+      "soul_header_bytes": 377,
+      "store_operation_counters": {
+        "payload_reads": 10,
+        "payload_read_bytes": 722,
+        "payload_check_reads": 12,
+        "payload_check_bytes": 1242,
+        "payload_writes": 3,
+        "payload_write_bytes": 406,
+        "metadata_rows": 224,
+        "query_rows": 0,
+        "pin_rows": 193,
+        "maintenance_rows": 4,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 2
+      },
+      "history_cache": {
+        "entries": 0,
+        "bytes": 0,
+        "owners": 0,
+        "evictions": 0,
+        "metadata_python_bytes": 248
+      },
+      "elapsed_seconds": 0.013531393999983266
+    },
+    {
+      "H": 10000,
+      "operation": "soul_scalar",
+      "history_page_loads": 0,
+      "history_page_writes": 0,
+      "history_page_write_bytes": 0,
+      "skill_header_bytes": 260,
+      "soul_header_bytes": 377,
+      "store_operation_counters": {
+        "payload_reads": 10,
+        "payload_read_bytes": 722,
+        "payload_check_reads": 12,
+        "payload_check_bytes": 1476,
+        "payload_writes": 3,
+        "payload_write_bytes": 523,
+        "metadata_rows": 225,
+        "query_rows": 0,
+        "pin_rows": 193,
+        "maintenance_rows": 4,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 2
+      },
+      "history_cache": {
+        "entries": 0,
+        "bytes": 0,
+        "owners": 0,
+        "evictions": 0,
+        "metadata_python_bytes": 248
+      },
+      "elapsed_seconds": 0.01348395300010452
+    },
+    {
+      "H": 10000,
+      "operation": "shared_append",
+      "history_page_loads": 1,
+      "history_page_writes": 1,
+      "history_page_write_bytes": 267,
+      "skill_header_bytes": 260,
+      "soul_header_bytes": 377,
+      "store_operation_counters": {
+        "payload_reads": 11,
+        "payload_read_bytes": 973,
+        "payload_check_reads": 15,
+        "payload_check_bytes": 1607,
+        "payload_writes": 4,
+        "payload_write_bytes": 471,
+        "metadata_rows": 236,
+        "query_rows": 0,
+        "pin_rows": 199,
+        "maintenance_rows": 8,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 4
+      },
+      "history_cache": {
+        "entries": 0,
+        "bytes": 0,
+        "owners": 0,
+        "evictions": 0,
+        "metadata_python_bytes": 632
+      },
+      "elapsed_seconds": 0.01443099300013273
+    }
+  ]
+}
