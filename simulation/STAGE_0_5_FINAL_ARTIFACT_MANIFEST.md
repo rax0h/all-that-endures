@@ -4,9 +4,9 @@ Status: implementation in progress. This manifest is a checkpoint index, not
 release acceptance. PR14 remains unmodified and unmerged.
 
 Current code checkpoint:
-- Public commit: `b12a562120f33bc5cdd5bed000ad795e42dc6fb0`.
-- Local commit: `f5f3f6dc545ccbd13a9b95beccb6f1c99c4cd753`.
-- Matching source tree: `29e44cf75738a491b83abb3f6ec98f6ec0a8d65c`.
+- Public commit: `db3cb7fbc62a6451b38bba34cc8794f28ddf0f51`.
+- Local commit: `20ce624750755193495ffea5b869b6770859f7ff`.
+- Matching source tree: `95939ec6018fd5c63f7c2c10d7e19b4e9df69921`.
 
 | Artifact | Scope and authority |
 | --- | --- |
@@ -26,6 +26,7 @@ Current code checkpoint:
 | `tests/test_stage_0_5_final_runtime_families.py` | Cold record/child aliases and immutable concrete bindings |
 | `tests/test_stage_0_5_final_record_budget.py` | Byte accounting, sidecars, retained aliases, dirty owner rehydration, step/query budgets, precommit/lost-ack recovery |
 | `tests/test_stage_0_5_final_pressure_arithmetic.py` | Forced exact float.hex/RNG arithmetic regressions; duplicates, extinct occurrences, shared/replaced list and reopen; checked scalar/cache integration still pending |
+| `tests/test_stage_0_5_final_catalog_publication.py`, `tests/test_stage_0_5_final_world_participants.py`, `stage_0_5_final_catalog_publication*gate.txt` | Central catalog composition, exact token/generation replay, checked failed-plan release;70-pass affected and74-pass compatibility/lifecycle/cold-fault gates, overlapping; ordinary checked World activation remains pending |
 | `ate_sim/persistence_lazy_publication_guard.py`, `tests/test_stage_0_5_final_participant_abort.py` and `stage_0_5_final_participant_abort_gate.txt` | Checked thaw after failure, preserve frozen committed/stale plan, exact writer lease;49-pass affected gate including actual legacy World publication |
 | `tests/test_stage_0_5_final_owner_replacement.py` and `stage_0_5_final_owner_replacement_*gate.txt` | Complete compact owner/subtree journal contract;54-pass affected gate and concrete runtime/header subsets; frozen failed-plan integration pending |
 | `stage_0_5_final_owner_retirement_gate.txt`, `stage_0_5_final_owner_retirement_fault_gate.txt` and `tests/test_stage_0_5_final_owner_retirement.py` | Checked metadata-only retirement; 59-pass affected gate and39-pass non-death fault gate, overlapping; subprocess-death completion outstanding |

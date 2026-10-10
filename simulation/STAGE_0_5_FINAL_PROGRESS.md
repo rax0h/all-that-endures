@@ -2,6 +2,63 @@
 
 Spec: STAGE_0_5_FINAL_ARCHITECTURE.md. Execution: STAGE_0_5_SOL_61_EXECUTION.md.
 
+## Latest checkpoint: central checked-catalog composition (October 10 UTC / October 9 Chicago)
+
+Local source `20ce624750755193495ffea5b869b6770859f7ff`; public
+`db3cb7fbc62a6451b38bba34cc8794f28ddf0f51`; matching tree
+`95939ec6018fd5c63f7c2c10d7e19b4e9df69921`.
+Isolated branch; no production promotion or Actions run.
+
+The existing frozen hybrid publisher optionally composes an explicit checked
+IdentityCoordinator. It captures owner payloads from detached family bytes,
+requires exactly the coordinator placement overlay (no missing/extra/duplicate
+rows), requires every touched owner header, and appends catalog version writes
+to the same central commit. It never duplicates family placement writes or
+publishes legacy ordinary P2C links alongside checked catalog authority.
+The coordinator participant validates the relational catalog and joins the
+central successor proof before exact, idempotent live acknowledgement.
+Unrelated auxiliary writes freeze even an empty coordinator delta, perform no
+owner/group discovery and advance its lease only after acknowledgement.
+
+Frozen replay now captures the commit token and target generation as well as
+payload/control bytes; replacing a private replay frame cannot change them.
+World failed-plan reset checks the existing pin/attempt/receipt protocol before
+discarding its pending plan. Corrupt failure evidence keeps recovery-required
+state and dirty owners. No new journal or publication authority was added.
+
+RED:8 missing-composition cases; actual World token/generation replay mismatch;
+then empty-delta mutation was not blocked and missing touched-owner payload was
+accepted. Retained as regressions. A corruption fixture initially left the
+attempt pending (correctly already retained) and used the wrong checksum helper
+signature; corrected to a resolved-not-committed attempt then checksum damage.
+An auxiliary fixture initially omitted its new namespace from head inventory;
+corrected the fixture without relaxing production validation.
+
+Affected gate (PYTHONPATH=.:simulation, ownership-gate-venv/bin/python):
+`pytest -q --tb=short` on final_catalog_publication, final_world_participants,
+final_identity_coordinator, final_participant_abort, final_owner_replacement,
+and persistence_lazy_store_failures, `-k 'not process_death'`:
+**70 passed,3 deselected in12.22s**, exit0.
+Compatibility gate on persistence_lazy_people, persistence_lifecycle,
+persistence_cold_save_failures: **74 passed in31.98s**, exit0, including its
+three subprocess writer-death cases. A second concurrently started gate with
+`-k 'not subprocess_writer_death'` passed71,deselected3 in27.71s; counts overlap
+and it adds no separate acceptance claim. These durable gate logs are committed.
+Earlier direct-store process-death run without a final summary remains
+uncertified; the complete cold-session crash gate does not silently certify it.
+`git diff --check` passed. No final full suite or fresh integrated P5 launched.
+
+This closes central composition, not ordinary checked World activation.
+Capability6 is still not emitted; default World sessions retain genuine legacy
+compatibility. Remaining work: concrete checked owner binders and touched
+journals/open integration; lazy Household headers and counted settlement/member
+sequences; residual nested-history and exceptional EventIdSet closure; exact
+pressure streaming/cache/measurement, strict shared lifetime budgets and retired
+tree cleanup; complete source-copy upgrade/feature markers; final-source fault,
+H1k/H10k,P5/full-suite/review and retrievable restore artifacts. Pressure cold
+latency exception still needs owner resolution for release. Implementation is
+in progress; candidate validation and production acceptance remain outstanding.
+
 ## Verified starting boundary
 
 Live repair ref a6f1b55a30b259c03e9e895a1df18ca0caf8b9b9, tree 5db9482a5685d6342691e1bcde123057a2212c04.
