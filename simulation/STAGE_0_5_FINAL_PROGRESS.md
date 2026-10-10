@@ -1,5 +1,62 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: checked snapshot-lease primitives; World lease constraint found (October 10 UTC)
+
+Public source `cebc98ca8693fce72dd5d00aed7c73450704b719`, local source
+`95e0a261ed5ba65cd2ab4baf5f40ea070074761b`, matching tree
+`8cafa4427f2347bf226dff1ef725032da04928b1`. Parent public
+`f46b60d61a537a229e9ff21adf83cfdb8e325120`, local
+`2978fca9c054592cd5fd749cff992dae79d272d7`, matching tree
+`7f7c938bed05750c8557f848dcb2305a675eb257`.
+Production remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Store capture can now clone an existing checked generation pin, including an old
+pinned generation, without substituting today's head. A bounded release group
+validates every pin/receipt before atomically releasing all tokens and uses one
+<=256-row maintenance budget for the entire group. Existing single-pin callers
+use the same implementation. Explicit zero-cleanup release lets deferred alias
+GC avoid multiplying the next ordinary operation's maintenance work.
+
+HistoryLeasePool is a tested snapshot-lease primitive: weak alias bookkeeping,
+one independent token per referenced generation, no SQL in weak callbacks,
+deferred checked release, shared-token revival, and atomic close together with
+the publisher pin. A hundred aliases share one token. Failed group release
+rolls back all tokens so old and current checked reads both remain valid.
+
+**It is deliberately not activated in World.** An integration experiment found
+that leaving an unowned child at one old ordinary snapshot correctly triggers
+the existing generation-pressure guard on the next publisher advance: an
+external pin older than the current head blocks another ordinary commit. A
+broad reattachment matrix caught this immediately. The entire experimental
+World integration was removed; persistence_lazy.py is identical to the preceding
+published checkpoint. Generation-pressure behavior was not weakened to hide the
+failure. An explicit regression preserves it and proves release allows progress.
+
+The operational World alias lease must retain only that backing/incarnation,
+with durable checked dependencies understood by retirement and row cleanup,
+rather than pin every unrelated record at an old whole-store generation. This
+is still within the approved backing-lifetime scope, but is a concrete integration
+constraint. Blindly advancing an old pin or bypassing the guard does not prove
+old private views or safe retirement. Do not claim external alias lease or
+retired backing cleanup complete. Current compatibility backing is not reclaimed
+on owner retirement; retained overlays still work through the accepted path.
+
+Final store/World affected gate: **83 passed in47.08s**, exit0, with pipefail,
+`stage_0_5_final_history_lease_affected_gate.txt`: snapshot/atomic release cases,
+store, store failures, counted households and exceptional event IDs. Supporting
+retention/reattachment/native graph selection: **56 passed,69 deselected in10.78s**,
+`stage_0_5_final_history_lease_store_gate.txt`. Five final primitive cases passed
+in0.21s, `stage_0_5_final_history_lease_primitive_gate.txt`. Counts overlap.
+Fixture API mistakes were corrected before the valid RED (missing source-pin
+clone argument). No full applicable suite or new P5/endurance run; the preceding
+strict-cache integrated P5 remains evidence at its own source boundary.
+
+Continue backing-specific operational leases/retirement, compact identity header
+coverage, complete checked World catalog/touched journals, recursive/type/equality
+closure, explicit capability-6 copy upgrade and final integrated acceptance.
+Exotic event-key and exact pressure costs remain disclosed/open as above.
+Stage0.5 is not complete; do not emit capability6 or promote PR14.
+
 ## Latest checkpoint: clean caps throughout run/step lifetimes (October 10 UTC)
 
 Public source `e92d107b8d5227ee9b9e2eeefc1196cd179a9229`, local source
