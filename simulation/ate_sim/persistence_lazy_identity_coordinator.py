@@ -8,10 +8,12 @@ logical deletion from clean-cache eviction.
 from __future__ import annotations
 from collections import OrderedDict
 from dataclasses import dataclass
+from contextlib import contextmanager
+import weakref
 import sys
 from .incremental_store import StoreIntegrityError, StoreConflictError
 from .persistence_lazy_identity import IncarnationId, Occurrence
-from .persistence_lazy_identity_catalog import IdentityCatalog, CheckedIdentityGroup
+from .persistence_lazy_identity_catalog import IdentityCatalog, CheckedIdentityGroup, OWNER_NAMESPACE, placement_path
 from .persistence_lazy_store import IdentityOccurrenceChange
 from .persistence_lazy_families import ParticipantDelta
 from .persistence_lazy_spill import CheckedSpool
@@ -72,6 +74,7 @@ class IdentityCoordinator:
         self._accepted = None
         self._discoveries = 0
         self._routing = set()
+        self._mutation_depth = 0
 
     def _marker(self, owner, path):
         return self.store.codec.encode((*owner, path))
@@ -134,7 +137,22 @@ class IdentityCoordinator:
             out.close()
             raise
 
+    @contextmanager
+    def _mutation(self):
+        self._mutation_depth += 1
+        try:
+            self.preflight()
+            if self._prepared is not None:
+                raise StoreConflictError('identity coordinator has an unacknowledged frozen plan')
+            yield
+        finally:
+            self._mutation_depth -= 1
+
     def routes_for_mutation(self, obj):
+        with self._mutation():
+            return self._routes_for_mutation(obj)
+
+    def _routes_for_mutation(self, obj):
         self.preflight()
         if self._prepared is not None:
             raise StoreConflictError('identity coordinator has an unacknowledged frozen plan')
@@ -188,6 +206,10 @@ class IdentityCoordinator:
             self._routing.remove(incarnation.value)
 
     def replace_placement(self, owner, path, obj):
+        with self._mutation():
+            return self._replace_placement(owner, path, obj)
+
+    def _replace_placement(self, owner, path, obj):
         self.preflight()
         if self._prepared is not None:
             raise StoreConflictError('identity coordinator has an unacknowledged frozen plan')
@@ -241,43 +263,115 @@ class IdentityCoordinator:
             if inc not in self._by_incarnation and inc not in self._value_dirty_groups:
                 self.dirty_incarnations.discard(inc)
 
-    def retire_owner(self, owner):
-        """Retire all final placements using checked metadata, not child values.
-
-        Inventory and affected-group validation complete before changing routes.
-        The pending edits are actual deletion output, outside clean cache bounds.
-        The caller owns the header deletion and its central transactional plan.
-        """
-        self.preflight()
-        if self._prepared is not None:
-            raise StoreConflictError('identity coordinator has an unacknowledged frozen plan')
-        checked = self.catalog.read_owner_identity(self.pin, owner)
+    def _owner_changes(self, owner, prefix):
+        """Capture only metadata; no owner or child payload loading."""
+        try:
+            checked = self.catalog.read_owner_identity(self.pin, owner)
+        except StoreIntegrityError:
+            # Match the catalog's checked exact-membership new-owner rule.
+            # A present source/witness can never become an empty/new owner.
+            with self.store.read_snapshot(self.pin):
+                witness = self.store._visible_record_row(self.pin.captured_head,
+                    OWNER_NAMESPACE, self.store.codec.encode(owner))
+                if witness is not None or self.catalog._has_source(self.pin, owner):
+                    raise
+                if self.catalog.read_identity_membership(self.pin, owner, ()) is not None:
+                    raise StoreIntegrityError('new owner has a persisted placement')
+            checked = None
         changes = {}
         try:
-            for path, original in checked.occurrences:
-                marker = self._marker(owner, path)
-                previous = self.placement_overlay.get(marker)
-                old = original if previous is None else None if previous.delete else previous.incarnation_id
-                changes[marker] = path, original, old
+            if checked is not None:
+                for path, original in checked.occurrences:
+                    if path[:len(prefix)] != prefix:
+                        continue
+                    marker = self._marker(owner, path)
+                    previous = self.placement_overlay.get(marker)
+                    old = original if previous is None else None if previous.delete else previous.incarnation_id
+                    changes[marker] = path, original, old
             for marker in self._by_owner.get(owner, ()):
-                if marker not in changes:
-                    previous = self.placement_overlay[marker]
+                previous = self.placement_overlay[marker]
+                if marker not in changes and previous.occurrence_path[:len(prefix)] == prefix:
                     changes[marker] = (previous.occurrence_path, self._original[marker],
                                        None if previous.delete else previous.incarnation_id)
-            for path, original, old in changes.values():
-                for inc in {i for i in (original, old) if i is not None}:
-                    self.discover_group(inc)
-            for path, original, old in changes.values():
-                self.registry.detach_occurrence(Occurrence(*owner, path))
-                self._record_placement_change(owner, path, original, old, None)
-            self._trim()
-            self.dirty_owners.add(owner)
-            self.mark_dirty(owner)
+            return changes
         finally:
-            if isinstance(checked.occurrences, CheckedSpool):
+            if checked is not None and isinstance(checked.occurrences, CheckedSpool):
                 checked.occurrences.close()
 
+    def replace_owner(self, owner, placements):
+        """Replace a family's complete compact identity projection.
+
+        Placements are explicit (owner-relative path, mutable object) pairs.
+        Adapters supply the projection; this coordinator never walks a header
+        or expands a history to infer it. Header publication stays central.
+        """
+        with self._mutation():
+            self._replace_scope(owner, (), placements)
+
+    def replace_subtree(self, owner, prefix, placements):
+        """Replace explicit paths under one prefix, retaining other placements."""
+        with self._mutation():
+            self._replace_scope(owner, prefix, placements)
+
+    def _replace_scope(self, owner, prefix, placements):
+        placement_path(*owner, prefix)
+        incoming = {}
+        for path, obj in placements:
+            placement_path(*owner, path)
+            marker = self._marker(owner, path)
+            if marker in incoming or path[:len(prefix)] != prefix or obj is None:
+                raise ValueError('duplicate, absent or out-of-scope identity placement')
+            # Validate every incoming mutable/codec/lease before allocating or
+            # changing any route. A failed caller iterator leaves no journal.
+            weakref.ref(obj)
+            if self.encode_placement is None:
+                self.store.codec.encode(obj)
+            else:
+                self.encode_placement(owner, path, obj)
+            incoming[marker] = path, obj
+        changes = self._owner_changes(owner, prefix)
+        for path, original, old in changes.values():
+            for inc in {i for i in (original, old) if i is not None}:
+                self.discover_group(inc)
+        # Existing incoming identities also require their complete group before
+        # any new identity is allocated or any path is installed.
+        for path, obj in incoming.values():
+            inc = self.registry.incarnation_for_object(obj)
+            if inc is not None:
+                self.discover_group(inc)
+        chosen = {}
+        for marker, (path, obj) in incoming.items():
+            chosen[marker] = self.registry.bind(obj).value
+            if marker not in changes:
+                original = self.catalog.read_identity_membership(self.pin, owner, path)
+                changes[marker] = path, original, original
+        # Parents precede children, independent of caller projection ordering.
+        for marker, (path, obj) in sorted(incoming.items(),
+                key=lambda item: (len(item[1][0]), self.store.codec.encode(item[1][0]))):
+            self.install_path(owner, path, obj)
+        for marker, (path, original, old) in changes.items():
+            self.registry.detach_occurrence(Occurrence(*owner, path))
+            inc = chosen.get(marker)
+            if inc is not None:
+                self.registry.attach_occurrence(incoming[marker][1], Occurrence(*owner, path))
+            self._record_placement_change(owner, path, original, old, inc)
+        self._trim()
+        self.dirty_owners.add(owner)
+        self.mark_dirty(owner)
+
+    def retire_owner(self, owner):
+        """Retire all final placements without loading an owner or history.
+
+        Complete inventory/group validation precedes route changes. Pending
+        deletions are actual output state, outside clean cache bounds. The
+        caller deletes its header in the same central transactional plan.
+        """
+        with self._mutation():
+            self._replace_scope(owner, (), ())
+
     def prepare_delta(self, owner_versions, *, ordinary_changes=()):
+        if self._mutation_depth:
+            raise StoreConflictError('identity save preparation is blocked during mutation')
         self.preflight()
         if self._prepared is not None:
             return self._prepared.delta
