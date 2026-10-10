@@ -260,7 +260,14 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
             self._sorting_values[index] = [self._validate(item) for item in value] if isinstance(index, slice) else self._validate(value)
             return
         if isinstance(index, slice):
-            value = [self._validate(item) for item in value]
+            raw_values = tuple(value)
+            if self._recursive_runtime is not None:
+                for item in raw_values:
+                    self._recursive_runtime.validate_native(item)
+            start, stop, step = index.indices(self._length)
+            if step != 1 and len(raw_values) != len(range(start, stop, step)):
+                raise ValueError(f'attempt to assign sequence of size {len(raw_values)} to extended slice of size {len(range(start, stop, step))}')
+            value = [self._validate(item) for item in raw_values]
             values = list(self)
             values[index] = value
             self._replace_all(values)

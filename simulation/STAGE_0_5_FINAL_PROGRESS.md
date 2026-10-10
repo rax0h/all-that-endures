@@ -1,5 +1,94 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: recursive input lifetime and failed-edit bounds (October 10 UTC)
+
+Continued from public `afdf39e84ed7fbb86edb6f01db2dde8b1eefd3e9`, local
+`9ab711e16ec38ed709f9e415337aa6f277e2c54c`, matching tree
+`46552d0e088fb52a627be88c3a540ef972706854`. Publication provenance is recorded
+below after exact-tree leased publication. This is another implementation
+checkpoint, not completion or acceptance of Stage0.5.
+
+The existing eager input memo could keep original native sources and every
+recursive child proxy strongly alive after publication. New input D now receives
+an alias marker using the source ID and proxy incarnation. After acknowledged
+save, release unheld original parents before descendants; held inputs keep their
+exact existing canonical proxy. Later ordinary preparation checks at most256
+queued source candidates, so released aliases drain gradually without scanning
+clean archive objects or the global registry. Unheld sources and their first
+child proxy are collected with fixed64 new children at both unrelated H1k/H10k.
+A separate301-source held-input case drops all memo leases within three no-op
+saves, each checking <=256 candidates and adding no payload writes.
+
+**Ruling: CPython source-alias bookkeeping.** Use `sys.getrefcount` on the actual
+source still strongly held in the existing memo, with the proxy incarnation
+marker, to distinguish an unheld source from an external/container alias.
+Retain the source until this check, preventing address reuse from identifying a
+new object. Metadata is actual admitted D/held U/release backlog, not a second
+identity registry. This is validated on the project's CPython runtime only;
+portability to another interpreter is not certified. It does not solve immutable
+NaN/key identity or change the existing exact-equality design boundary.
+
+Recursive save preparation previously synchronized all D once per dirty child
+and searched all a proxy's physical D to resolve one owner. A permanent probe
+reproduced1299 projection visits for25 dirty histories. Preparation now routes
+one already-checked projection, suppresses nested projection reentry during that
+routing scope, and uses exact physical dirty-key lookup. The final gate measures
+50 projection visits for the same25 histories. Checked group validation and the
+one frozen hybrid publisher remain authoritative.
+
+Failed finite counted extension, out-of-range indexed assignment, extended-slice
+size mismatch and a later invalid slice member now reject before admitting
+native children. The slice checks cover both append and counted backings.
+Cancelled unpublished pages retire their pending physical placement, with no
+witness for an absent source. Returning a dirty published page to its baseline
+still reconciles its current placement before the payload no-op is pruned.
+Allocated incarnations are never rolled back or reused.
+
+Caller iteration during counted extension can read the already-consumed native
+prefix using the preflighted in-progress leaf. This read does not expose pending
+placement metadata from a rollback scope. Caller iterator exceptions retain the
+supported prefix; invalid stored values still roll back the counted value journal.
+A failed streamed input containing an unowned nested graph previously left
+physical placement additions whose headers were omitted by World publication.
+Unattached new payload is now excluded from that projection. An unpublished
+private dirty parent retains its canonical descendants through explicit parent
+aliases; these are dirty-payload keepalive references, never sharing authority.
+Reattachment registers/publishes that D using the existing registry and physical
+owners. Owning publication clears those references; a regression checks both
+parent and descendant can then be collected. This is not exhaustive private-graph
+residency or reclamation certification.
+
+Permanent recursive cases now total31, plus5 source-lifetime/routing cases.
+Final current-source affected gate: **252 passed in155.37s**, exit0, no failures
+or errors. It includes all recursive World cases, source lifetimes, unpublished
+promotion, checked catalog/backing lifetime/retirement, EventID/packed action
+placements, identity compaction, physical owner adapters, catalog publication,
+participant abort, sequence errors/compatibility/numeric indices, legacy typed
+list/map/set behaviors and owner type admission/witness checks.
+Separate legacy/lifecycle gate: **116 passed in205.46s**. That gate preceded only
+the final append-backed slice preflight; affected nested/type modules were rerun
+in the final252-case current-source gate. Counts overlap and must not be added.
+Earlier190-case catalog and49-case focused gates preceded that final slice change
+and are superseded for current-source claims.
+
+Paired H1k/H10k recursive edit plus no-op save: **104 payload reads,10 payload
+writes,738 metadata rows**, identical at both extents. New-source residency cases
+hold actual new D fixed at64 children while varying an unrelated archive. Two
+earlier large-new-D attempts were cancelled; they are not pass evidence or a
+10000-child batch bound. Full source/test SHA-256 inventories, exact commands,
+retained testcase results/properties, source boundaries and reproduced failures
+are in `simulation/stage_0_5_recursive_input_lifetime_validation.json`.
+`git diff --check` passed. All test processes completed.
+
+Remaining fixed scope: recursive registered-record/schema closure and exhaustive
+bounds; persisted append/count-tree promotion; exotic exact equality; complete
+capability6 ordinary open and source-preserving copy upgrade; then integrated
+bounds/P5, one stable full suite and fresh independent architectural review.
+No capability6, new P5, full-suite, release or endurance claim. P5 remains at
+`b57704304dc51238ac14420e55d1b1bc3ed79892`. PR14 remains draft/unmerged at
+`c29e3d06a0c9d219235e2b3f0390271bd1245aea`, verified via live ref and PR metadata.
+No production branch, gameplay/rules, Stage1, merge or force push change.
+
 ## Latest checkpoint: recursive container runtime (October 10 UTC)
 
 Public source `95ac3d0b624ffa331fbdc4e7f76c69692283ab19`, local source

@@ -4,6 +4,9 @@ Only explicitly activated checked sessions select this runtime. Backing pages
 contain compact references, never live child payload copies or a second DAG.
 """
 from dataclasses import dataclass
+from collections import deque
+from contextlib import contextmanager
+import sys
 import weakref
 
 from .incremental_store import StoreIntegrityError, StoreError, Membership
@@ -30,6 +33,60 @@ class RecursiveHistoryRuntime:
         self._session_ref = weakref.ref(session)
         self._admitting = set()
         self._synchronizing = False
+        self._source_leases = {}
+        self._new_sources = []
+        self._source_queue = deque()
+        self._source_release_checks = 0
+
+    def remember_source(self, source, proxy):
+        """Track only input D/U; the existing memo owns each actual source."""
+        marker = id(source), proxy._incarnation
+        if self._source_leases.get(marker[0]) != marker[1]:
+            self._source_leases[marker[0]] = marker[1]
+            self._new_sources.append(marker)
+
+    def _release_source(self, marker):
+        source_id, incarnation = marker
+        if self._source_leases.get(source_id) != incarnation:
+            return True
+        tracker = self.session()._eager_tracker
+        pair = tracker._memo.get(source_id)
+        self._source_release_checks += 1
+        if (pair is None or type(pair[1]) not in HISTORY_TYPES
+                or pair[1]._incarnation != incarnation):
+            self._source_leases.pop(source_id, None)
+            return True
+        # CPython: the memo tuple and this temporary getrefcount argument are
+        # the only two references when no caller/container holds the source.
+        # Keeping the actual source until this check prevents address reuse
+        # from ever identifying another object as the original alias.
+        if sys.getrefcount(pair[0]) != 2:
+            return False
+        if tracker._memo_reverse.get(id(pair[1])) == source_id:
+            tracker._memo_reverse.pop(id(pair[1]), None)
+        tracker._memo.pop(source_id)
+        self._source_leases.pop(source_id)
+        return True
+
+    def accept_source_memos(self):
+        # Parents were admitted last. Release them before their descendants;
+        # this pass costs actual new input D, never a clean archive inventory.
+        for marker in reversed(self._new_sources):
+            if not self._release_source(marker):
+                self._source_queue.append(marker)
+        self._new_sources.clear()
+
+    def collect_source_memos(self, budget=256):
+        for _ in range(min(budget, len(self._source_queue))):
+            marker = self._source_queue.popleft()
+            if not self._release_source(marker):
+                self._source_queue.append(marker)
+
+    def source_diagnostics(self):
+        return {'source_memo_leases': len(self._source_leases),
+                'new_source_memos': len(self._new_sources),
+                'source_release_queue': len(self._source_queue),
+                'source_release_checks': self._source_release_checks}
 
     def session(self):
         session = self._session_ref()
@@ -112,6 +169,7 @@ class RecursiveHistoryRuntime:
                 initial_values=values, cache_budget=session._history_cache_budget, recursive=True)
             session._registry.bind(proxy, incarnation=incarnation)
             tracker._remember_memo(value, proxy)
+            self.remember_source(value, proxy)
             session._register_nested_overlay(proxy)
             self.bind(proxy)
             return proxy.storage_reference()
@@ -122,9 +180,11 @@ class RecursiveHistoryRuntime:
         session = self.session()
         proxy._recursive = True
         proxy._recursive_runtime = self
+        self.retain_pending_children(proxy)
         def guard():
             session._shared_object_routes(proxy)
         def changed():
+            self.retain_pending_children(proxy)
             session._shared_object_routes(proxy)
             incarnation = session._registry.incarnation_for_object(proxy)
             coord = session._identity_coordinator
@@ -141,9 +201,58 @@ class RecursiveHistoryRuntime:
                 raise StoreError('nested history read requires save acknowledgement')
         proxy.bind(guard, changed, read_guard)
 
+    def retain_pending_children(self, proxy):
+        """Private unpublished D keeps canonical descendants alive through U.
+
+        These references are not placements or a second identity authority.
+        Publication clears them; only unpublished dirty payload is traversed.
+        """
+        if not proxy._new:
+            return
+        session = self.session()
+        children = {}
+        for source in self._changes(proxy):
+            if source.delete:
+                continue
+            for _path, inc in AUXILIARY_OWNER_FAMILIES[source.namespace].reference_placements(source.value):
+                child = session._registry.object_for_incarnation(IncarnationId(session.store.store_identity, inc))
+                if child is None:
+                    raise StoreIntegrityError('unpublished child lost its canonical object')
+                children[inc] = child
+        proxy._recursive_pending_children = children
+
     def decode(self, value, owner, path):
         if reference(value):
             session = self.session()
+            parent = session._registry.object_for_incarnation(
+                IncarnationId(session.store.store_identity, owner[1][0]))
+            if parent is not None and parent._new:
+                source = self._source_change(parent, owner)
+                child = getattr(parent, '_recursive_pending_children', {}).get(value.incarnation)
+                if source is not None and not source.delete and child is not None:
+                    current = AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(source.value, path)
+                    if current != value or child._kind != value.kind:
+                        raise StoreIntegrityError('private recursive reference disagrees with its pending value')
+                    return child
+            if owner[0] == NODE_NAMESPACE:
+                if (type(parent) is LazyOrderedSequence and parent._mutation_depth
+                        and owner[1][1] in parent._recursive_preflight_leaves
+                        and owner in parent._dirty):
+                    # Caller iteration can read its native partial prefix.
+                    # These leaves passed source/incoming preflight, but their
+                    # physical routes cannot escape a rollback scope yet.
+                    current = AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(parent._dirty[owner], path)
+                    child = session._registry.object_for_incarnation(
+                        IncarnationId(session.store.store_identity, value.incarnation))
+                    if child is None:
+                        child = HISTORY_CLASSES[value.kind](session.store, session.pin, value.incarnation,
+                            cache_budget=session._history_cache_budget, recursive=True)
+                        session._registry.bind(child, incarnation=IncarnationId(session.store.store_identity, value.incarnation))
+                        session._register_nested_overlay(child)
+                        self.bind(child)
+                    if current != value or child._kind != value.kind:
+                        raise StoreIntegrityError('pending recursive reference lacks its canonical child')
+                    return child
             if session._lifecycle_operation is None:
                 self.synchronize()
             coord = session._identity_coordinator
@@ -178,21 +287,50 @@ class RecursiveHistoryRuntime:
 
     def _changes(self, proxy):
         if type(proxy) is LazyHistoryList:
-            for number, page in tuple(proxy._dirty_pages.items()):
-                key = proxy._incarnation, number
-                deleted = number * PAGE_SIZE >= proxy._length
-                if not deleted or number * PAGE_SIZE < proxy._base_length:
-                    if not deleted and proxy._store.codec.encode(tuple(page)) == proxy._baseline_page_bytes.get(number):
-                        continue
-                    yield VersionChange(PAGE_NAMESPACE, key, None if deleted else tuple(page), delete=deleted)
+            owners = ((PAGE_NAMESPACE, (proxy._incarnation, number)) for number in tuple(proxy._dirty_pages))
         elif type(proxy) is LazyHistoryMap:
-            for key, entry in tuple(proxy._dirty_entries.items()):
-                yield VersionChange(ENTRY_NAMESPACE, (proxy._incarnation, key), entry, delete=entry is None,
-                    memberships=() if entry is None else (Membership('incarnation', proxy._incarnation, entry[0]),))
+            owners = ((ENTRY_NAMESPACE, (proxy._incarnation, key)) for key in tuple(proxy._dirty_entries))
         elif type(proxy) is LazyOrderedSequence:
-            for (namespace, key), value in tuple(proxy._dirty.items()):
-                if namespace == NODE_NAMESPACE and (value is None or value[0] == 'leaf'):
-                    yield VersionChange(namespace, key, value, delete=value is None)
+            owners = (owner for owner in tuple(proxy._dirty) if owner[0] == NODE_NAMESPACE)
+        else:
+            return
+        for owner in owners:
+            source = self._source_change(proxy, owner)
+            if source is not None:
+                yield source
+
+    def _source_change(self, proxy, owner):
+        """Resolve a requested pending physical key without visiting other D."""
+        namespace, key = owner
+        if key[0] != proxy._incarnation:
+            raise StoreIntegrityError('physical history owner belongs to another backing')
+        if type(proxy) is LazyHistoryList and namespace == PAGE_NAMESPACE:
+            number = key[1]
+            if number not in proxy._dirty_pages:
+                return None
+            deleted = number * PAGE_SIZE >= proxy._length
+            value = None if deleted else tuple(proxy._dirty_pages[number])
+            return VersionChange(namespace, key, value, delete=deleted)
+        if type(proxy) is LazyHistoryMap and namespace == ENTRY_NAMESPACE and key[1] in proxy._dirty_entries:
+            entry = proxy._dirty_entries[key[1]]
+            return VersionChange(namespace, key, entry, delete=entry is None,
+                memberships=() if entry is None else (Membership('incarnation', proxy._incarnation, entry[0]),))
+        if type(proxy) is LazyOrderedSequence and namespace == NODE_NAMESPACE and owner in proxy._dirty:
+            value = proxy._dirty[owner]
+            if value is None or value[0] == 'leaf':
+                return VersionChange(namespace, key, value, delete=value is None)
+        return None
+
+    @contextmanager
+    def prepared_routes(self):
+        """The caller synchronized D; routing cannot change backing values."""
+        if self._synchronizing:
+            raise StoreError('recursive save routing is reentrant')
+        self._synchronizing = True
+        try:
+            yield
+        finally:
+            self._synchronizing = False
 
     def retire_unpublished_pages(self, proxy):
         session = self.session()
@@ -231,7 +369,20 @@ class RecursiveHistoryRuntime:
         coord = session._identity_coordinator
         self._synchronizing = True
         try:
-            for proxy in tuple(session._nested_dirty.values()):
+            pending = deque(session._nested_dirty.values())
+            processed = set()
+            while pending:
+                proxy = pending.popleft()
+                if proxy._incarnation in processed:
+                    continue
+                if proxy._new:
+                    placements = session._registry.occurrences_for_incarnation(
+                        IncarnationId(session.store.store_identity, proxy._incarnation))
+                    if not any(o.owner_namespace not in AUXILIARY_OWNER_FAMILIES
+                               or o.owner_key[0] in processed
+                               or o.owner_key[0] not in session._nested_dirty for o in placements):
+                        continue  # Unattached input D belongs only to private aliases.
+                processed.add(proxy._incarnation)
                 for source in self._changes(proxy):
                     owner = source.namespace, source.key
                     adapter = AUXILIARY_OWNER_FAMILIES[source.namespace]
@@ -242,10 +393,26 @@ class RecursiveHistoryRuntime:
                         OWNER_NAMESPACE, session.store.codec.encode(owner))
                     source_present = session.store._visible_record_row(session.pin.captured_head,
                         source.namespace, session.store.codec.encode(source.key))
+                    if source.delete and source_present is None:
+                        # A read may have checked an addition which was then
+                        # cancelled. Retire only this dirty physical owner;
+                        # never publish a witness for its absent source.
+                        before = coord._owner_changes(owner, ())
+                        removed = {inc for _path, _original, inc in before.values() if inc is not None}
+                        if removed:
+                            coord.retire_owner(owner)
+                            self.release_unowned_memos(removed)
+                        coord.dirty_owners.discard(owner)
+                        continue
                     if not refs and present is None and source_present is not None and owner not in coord.dirty_owners:
                         continue
                     before = coord._owner_changes(owner, ())
                     current = {path: inc for path, _, inc in before.values() if inc is not None}
+                    for _path, inc in refs:
+                        child = session._registry.object_for_incarnation(IncarnationId(session.store.store_identity, inc))
+                        if child is not None and child._new and inc not in processed:
+                            session._register_nested_overlay(child)
+                            pending.append(child)
                     if current == dict(refs):
                         # New scalar-only pages also need an empty completeness
                         # witness, before a later edit introduces references.
@@ -271,7 +438,7 @@ class RecursiveHistoryRuntime:
     def load_owner(self, owner):
         session = self.session()
         proxy = session._nested_dirty.get(owner[1][0])
-        source = next((v for v in self._changes(proxy) if (v.namespace, v.key) == owner), None) if proxy is not None else None
+        source = self._source_change(proxy, owner) if proxy is not None else None
         if source is not None:
             if source.delete:
                 raise StoreIntegrityError('recursive owner has a pending deletion')

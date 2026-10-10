@@ -322,3 +322,160 @@ def test_counted_recursive_bulk_failure_restores_placement_and_value_journals(tm
         root.extend([child, child])
         session.save()
         assert len(root) == len(before_values) + 2 and root[-1] is child
+
+
+def test_invalid_counted_bulk_input_does_not_allocate_or_publish_earlier_native_children(tmp_path):
+    from simulation.tests.test_stage_0_5_final_world_unpublished_promotion import counted_catalog
+    target = counted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        session.skills[1, 'craft'].provenance = [1]
+        root = session.skills[1, 'craft'].provenance
+        session.world.households[1].members = root
+        session.save()
+        before = session._registry.next_incarnation
+        with pytest.raises(TypeError):
+            root.extend([[2], [3], object()])
+        assert list(root) == [1]
+        assert not session._nested_dirty
+        assert session._registry.next_incarnation == before
+        assert session.save() == session.pin.captured_head
+
+
+@pytest.mark.parametrize('operation', ['index', 'extended_slice', 'invalid_slice_member'])
+@pytest.mark.parametrize('kind', ['list', 'sequence'])
+def test_rejected_assignment_does_not_admit_native_children(tmp_path, operation, kind):
+    from simulation.tests.test_stage_0_5_final_world_unpublished_promotion import counted_catalog
+    target = counted_catalog(tmp_path) if kind == 'sequence' else converted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        session.skills[1, 'craft'].provenance = [1, 2, 3]
+        root = session.skills[1, 'craft'].provenance
+        if kind == 'sequence':
+            session.world.households[1].members = root
+        session.save()
+        before = session._registry.next_incarnation
+        if operation == 'index':
+            with pytest.raises(IndexError):
+                root[99] = [4]
+        elif operation == 'extended_slice':
+            with pytest.raises(ValueError):
+                root[::2] = [[4]]
+        else:
+            with pytest.raises(TypeError):
+                root[:] = [[4], object()]
+        assert list(root) == [1, 2, 3]
+        assert not session._nested_dirty
+        assert session._registry.next_incarnation == before
+        assert session.save() == session.pin.captured_head
+
+
+def test_cancelled_unpublished_recursive_page_retires_its_checked_placements(tmp_path):
+    from ate_sim.persistence_lazy_nested_history import PAGE_SIZE
+    target = converted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        coord = activate(session)
+        session.skills[1, 'craft'].provenance = list(range(PAGE_SIZE))
+        root = session.skills[1, 'craft'].provenance
+        session.save()
+        generation = session.pin.captured_head
+        root.append([7])
+        child = root[-1]  # materialize and synchronize the pending page owner
+        assert root.pop() is child
+        assert list(root) == list(range(PAGE_SIZE))
+        saved = session.save()
+        assert saved >= generation  # Allocated identities are never reused.
+        assert session.save() == saved
+        assert not coord.placement_overlay
+        child.append(8)
+        assert list(child) == [7, 8]
+        assert session.save() == saved
+
+
+def test_counted_recursive_iterator_sees_native_prefix_and_preserves_it_on_input_failure(tmp_path):
+    from simulation.tests.test_stage_0_5_final_world_unpublished_promotion import counted_catalog
+    target = counted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        session.skills[1, 'craft'].provenance = [1]
+        root = session.skills[1, 'craft'].provenance
+        session.world.households[1].members = root
+        session.save()
+        aliases = []
+        def incoming():
+            yield [2]
+            aliases.append(root[-1])
+            assert list(aliases[-1]) == [2]
+            yield [3]
+            raise ValueError('caller input failed')
+        with pytest.raises(ValueError, match='caller input failed'):
+            root.extend(incoming())
+        assert root[1] is aliases[0]
+        assert list(root[2]) == [3]
+        session.save()
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        root = session.skills[1, 'craft'].provenance
+        assert root[0] == 1 and list(root[1]) == [2] and list(root[2]) == [3]
+
+
+def test_invalid_streamed_recursive_input_preserves_private_alias_without_publishing_orphan_graph(tmp_path):
+    import gc
+    import weakref
+    from simulation.tests.test_stage_0_5_final_world_unpublished_promotion import counted_catalog
+    target = counted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        coord = activate(session)
+        session.skills[1, 'craft'].provenance = [1]
+        root = session.skills[1, 'craft'].provenance
+        session.world.households[1].members = root
+        session.save()
+        aliases = []
+        def incoming():
+            yield [[2]]
+            aliases.append(root[-1])
+            yield object()
+        with pytest.raises(TypeError):
+            root.extend(incoming())
+        assert list(root) == [1]
+        session.save()
+        assert not coord.placement_overlay
+        assert list(aliases[0][0]) == [2]
+        aliases[0][0].append(3)
+        stable = session.pin.captured_head
+        assert session.save() == stable
+        private_parent = weakref.ref(aliases[0])
+        private_child = weakref.ref(aliases[0][0])
+        root.append(aliases[0])
+        session.save()
+        aliases.clear()
+        gc.collect()
+        assert private_parent() is None and private_child() is None
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        root = session.skills[1, 'craft'].provenance
+        assert list(root[-1][0]) == [2, 3]
+
+
+def test_cancelled_recursive_replacement_restores_persisted_page_projection(tmp_path):
+    target = converted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        coord = activate(session)
+        session.skills[1, 'craft'].provenance = [[1]]
+        root = session.skills[1, 'craft'].provenance
+        old = root[0]
+        session.save()
+        generation = session.pin.captured_head
+        root[0] = [2]
+        replaced = root[0]
+        root[0] = old
+        saved = session.save()
+        assert saved >= generation
+        assert root[0] is old and not coord.placement_overlay
+        replaced.append(3)
+        assert session.save() == saved
+        old.append(4)
+        session.save()
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        assert list(session.skills[1, 'craft'].provenance[0]) == [1, 4]

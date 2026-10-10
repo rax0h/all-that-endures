@@ -536,6 +536,11 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
                 values = tuple(self)
             if self._batch_validator is not None:
                 values = self._batch_validator(values)
+            if self._recursive_runtime is not None and type(values) in (list, tuple):
+                # Finite inputs have no iteration callbacks. Reject an invalid
+                # later member before allocating any earlier native child.
+                for value in values:
+                    self._recursive_runtime.validate_native(value)
             iterator = iter(values)
             while True:
                 try:
@@ -644,15 +649,20 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
 
     def __setitem__(self, index, value):
         with self._mutation():
-            values = tuple(self._validate(v) for v in value) if isinstance(index, slice) else (self._validate(value),)
             if not isinstance(index, slice):
-                self._assign(self._index(index), values[0])
+                rank = self._index(index)
+                self._assign(rank, self._validate(value))
                 return
+            raw_values = tuple(value)
+            if self._recursive_runtime is not None:
+                for item in raw_values:
+                    self._recursive_runtime.validate_native(item)
             start, stop, step = index.indices(self._length)
             positions = range(start, stop, step)
+            if step != 1 and len(raw_values) != len(positions):
+                raise ValueError(f'attempt to assign sequence of size {len(raw_values)} to extended slice of size {len(positions)}')
+            values = tuple(self._validate(v) for v in raw_values)
             if step != 1:
-                if len(values) != len(positions):
-                    raise ValueError(f'attempt to assign sequence of size {len(values)} to extended slice of size {len(positions)}')
                 for rank, item in zip(positions, values):
                     self._assign(rank, item)
             else:

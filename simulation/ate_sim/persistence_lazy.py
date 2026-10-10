@@ -10850,7 +10850,7 @@ class LazyWorldSession:
         if not self._active:
             raise StoreError("lazy World session is closed")
 
-    def _shared_object_routes(self, obj):
+    def _shared_object_routes(self, obj, *, placements_synchronized=False):
         """Check and load only current owners of one live incarnation.
 
         Loading a peer binds its mutable paths to the existing object, before
@@ -10861,7 +10861,8 @@ class LazyWorldSession:
         """
         self._ensure_people_mutation_allowed()
         if self._identity_coordinator is not None:
-            self._identity_bridge.synchronize_lazy_placements()
+            if not placements_synchronized:
+                self._identity_bridge.synchronize_lazy_placements()
             owners = self._identity_coordinator.routes_for_mutation(obj)
             return tuple((self._family_bindings.tables[namespace], key)
                          for namespace, key in owners if namespace in self._family_bindings.tables)
@@ -12208,6 +12209,8 @@ class LazyWorldSession:
         self._registry.attach_existing(incarnation, occurrence)
         if tracker is not None and original_value is not proxy and type(original_value) in (list, dict, set):
             tracker._remember_memo(original_value, proxy)
+            if self._identity_coordinator is not None:
+                self._recursive_histories.remember_source(original_value, proxy)
         self._register_nested_overlay(proxy)
         def guard():
             self._shared_object_routes(proxy)
@@ -14312,10 +14315,12 @@ class LazyWorldSession:
 
     def _prepare_hybrid_save_inner(self, token):
         if self._identity_bridge is not None:
+            self._recursive_histories.collect_source_memos()
             self._identity_bridge.synchronize_lazy_placements()
-            for proxy in tuple(self._nested_dirty.values()):
-                if history_has_pending_overlay(proxy):
-                    self._shared_object_routes(proxy)
+            with self._recursive_histories.prepared_routes():
+                for proxy in tuple(self._nested_dirty.values()):
+                    if history_has_pending_overlay(proxy):
+                        self._shared_object_routes(proxy, placements_synchronized=True)
         nested_history_identity_changes = self._prepare_eager_nested_identities()
         scalar_record_plans = tuple(
             ScalarRecordSavePlan(namespace, *table.prepare_save_changes())
@@ -16434,6 +16439,8 @@ class LazyWorldSession:
         for proxy in tuple(self._nested_lists.values()):
             if proxy._incarnation in published_histories or not history_has_pending_overlay(proxy):
                 proxy.accept_save(result.pin)
+                if hasattr(proxy, '_recursive_pending_children'):
+                    proxy._recursive_pending_children.clear()
             else:
                 # The lease advanced above, but no bytes of this unowned
                 # private overlay were published. Keep its baseline and dirt.
@@ -16468,6 +16475,8 @@ class LazyWorldSession:
             self._identity_bridge.finish_acknowledgement(plan.publication.coordinator_participant.delta)
         self._pending_save = None
         self._state = "active"
+        if self._identity_bridge is not None:
+            self._recursive_histories.accept_source_memos()
         return result.generation
 
     def _reset_uncommitted_plan(self):
