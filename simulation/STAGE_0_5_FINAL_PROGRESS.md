@@ -1,5 +1,52 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: packed current-action identity integration (October 10 UTC)
+
+Public source `b77d91b4592a80eaf93846e096642edba7226682`, local source
+`d3ec9518b929e334943013cfcd32dd4cfa3657d4`, matching tree
+`52d5f231a37fda89dc83f9319d8a295b515c41b5`. Leased non-force exact-tree
+publication completed; PR14 remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Staged checked-catalog actions now use their actual `__packed__` physical owner
+with owner-relative logical index paths. Canonical absolute paths remain the real
+World action paths; no invalid string list-index component. Touched packed-body
+projection uses current action objects and directly addressed original action
+witnesses, not all registry/tracker owners. Prefix trimming preserves survivor IDs
+by original object identity instead of reallocating shifted ranks. Direct action
+mutations reconcile placements and validate/stitch the checked group before edits.
+Packed current-root activation stitches resident eager peers (including mutable
+events), keeps cold lazy payloads unloaded, and grants no dirt or no-op commit.
+Old private aliases cannot resurrect trimmed positions. Source must already be
+explicitly packed; no missing physical authority is inferred from legacy indices.
+
+The existing packed body still costs O(C) to project/serialize. Generated actions
+have the existing50k rolling cap; unrestricted imported current C is not claimed
+to have that bound. This is functional packed-owner integration, not completion
+of the ordinary-open/global bootstrap retirement or arbitrary recursive schema
+closure. Test conversion explicitly stages the packed source/layout and remaps
+old logical occurrence rows atomically with catalog initialization. It does not
+implement or advertise the complete capability6 copy converter.
+
+An additional catalog bug reproduced by the first new-action RED was repaired:
+new owners with zero placements must publish their mandatory empty owner witness,
+even when its initialized source commitment already equals the final value.
+The new scalar-owner regression verifies that boundary independently.
+
+Final affected command: `PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_world_packed_actions.py simulation/tests/test_stage_0_5_final_world_event_placements.py simulation/tests/test_stage_0_5_final_world_eager_placements.py simulation/tests/test_stage_0_5_final_world_identity_compaction.py simulation/tests/test_stage_0_5_final_world_catalog_bridge.py simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py simulation/tests/test_stage_0_5_final_world_backing_retirement.py simulation/tests/test_stage_0_5_final_identity_catalog.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_retired_identity.py simulation/tests/test_stage_0_5_final_catalog_publication.py simulation/tests/test_stage_0_5_final_runtime_families.py simulation/tests/test_stage_0_5_final_owner_header_witnesses.py -k 'not point_and_reverse_reads and not comparison_never'`
+— exit0, **154 passed in53.06s**. Log: packed-actions-final.log. Counts overlap
+other gates. Nine new packed cases cover new/scalar/shared records, cross-family
+event aliases, no-op after activation, pending append plus direct edit, prefix
+trim/private aliases, corruption-before-edit, rollback and lost acknowledgement.
+Earlier fixture layout lookup and accidental test-tail insertion errors were
+corrected before the final gate; neither is claimed as product evidence.
+`git diff --check` passed. No repeated long-test polling or endurance run.
+
+Remaining: EventID descriptor/backing identity integration; recursive stable
+physical paths; live counted promotion; exotic exact equality; complete ordinary
+activation/source-copy upgrade; final bounds/P5/full-suite/fresh review. No
+capability6 emitted or Stage0.5 completion/release-acceptance claim. Next is the
+fixed EventID facade/backing integration, not an added requirement.
+
 ## Latest checkpoint: joint World retired-identity compaction (October 10 UTC)
 
 Public source `3fbe6d4738ab465010e5146ba9b946c3197ff432`, local source
