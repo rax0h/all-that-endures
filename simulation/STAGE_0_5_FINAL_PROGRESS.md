@@ -1,5 +1,135 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: native event histories, soul collections and concrete owner callbacks (October 10 UTC)
+
+Public implementation `e28a5c5273116a9215e2321e30ec6ab6f9a013dd`;
+local implementation `1500b112555cd83a1826cdb4d6c453a98e2f789b`;
+matching tree `b01e7f8d0098ab5f3171d08838dece002eadb3ac`.
+Recovered clean public `4979b34b663be7487163fbc218d286fc96f0402b` /
+local `13febff99da82e2a577b5b88e870fe9053dedd31`, matching tree
+`328321b182917711df23f37caa46de8a2c30a495`. Live production PR14 branch
+was still `c29e3d06a0c9d219235e2b3f0390271bd1245aea`; no production change,
+Actions launch, whole-suite claim, capability6 emission or endurance run.
+
+Six additional fields now preserve compact typed backing in ordinary adapters:
+Relationship.shared_history, MagicResource.transfers, MaterialLot.transfers,
+SoulState.authorities, SoulState.marks and SoulState.cosmic_links. Reused the
+existing typed primitives, sole registry, shared cache and frozen hybrid
+publisher. Scalar serialization/acknowledgement retains references, avoiding
+list/set/map materialization. Portable detach uses the existing shared memo;
+resource, lot and relationship detach now explicitly replaces typed lists.
+New Soul assignment preserves a supplied shared authorities/marks set using
+one local replacement memo. Genuine resident legacy representations do not
+migrate on open or no-op save. Soul mutable map values reject during the
+existing cold-conversion preflight before destination staging; the previously
+conservative skill/soul recursive-import boundary remains in force.
+
+Integer event-ID mutation validation now follows the current typed-list owners,
+including unloaded resource/lot/social peers reached through wallet/skill
+aliases. Bool, float and other non-int additions reject. Extend/iadd validates
+the entire incoming batch before changing these histories, retaining the
+legacy adapter's atomic invalid-input behavior. A retired integer owner removes
+its constraint from a surviving native skill alias. Generic unqualified typed
+lists retain native partial-extend behavior. Invalid slice input validates
+before reading the existing history. No values are dropped or coerced.
+
+A genuine legacy shared event-list fixture exposed a pre-existing notification
+bug: only its last attached owner became dirty. Legacy LazyTrackedList guards
+and notifications now route through the sole registry, marking every current
+resource/lot/social owner and any supported eager placements. This uses a weak
+session reference so replacing one placement cannot disable remaining routes;
+retained old placements are not resurrected. The fixture intentionally tests
+the legacy resource/lot/social adapter intersection, not the separately
+unfinished arbitrary legacy skill/currency compound-alias closure.
+
+RuntimeFamilyBindings now supplies concrete load_owner, resolve_path,
+install_path, mark_dirty and compact encode_placement callbacks. Existing
+ordinary live routing uses its loading/path callbacks; the retained indexed
+record shortcut remains. Installation bypasses user notifications, preserves
+lazy IndexedRecord callbacks, restricts events to the mutable tail, and restores
+eager bindings without expanding typed history children. Tuple paths rebuild
+their immutable parent while preserving siblings and native index errors.
+The catalog/coordinator can consume these callbacks, but ordinary checked
+catalog activation and complete owner journals remain **unfinished**. No claim
+that global identity-link discovery has been removed follows from this work.
+
+RED evidence:13 event-history tests failed at compact-reference/adapter and
+cross-family validation boundaries;4 soul collection tests failed at resident
+types/shared assignment;4 initial concrete callback tests failed because the
+callbacks were absent. Later legacy append/reopen failed and remains a
+regression. A soul metrics fixture was corrected to read entry_loads for the
+set/map primitives, not list page_loads. Existing adapter type assertions now
+name the compact proxies. Soul point-read bound is max5 payloads (one header
+plus four checked child descriptors), additionally asserting zero history
+payload loads in all four fields; its scalar write budget remains max3.
+
+Final runtime focused/affected command (PYTHONPATH=.:simulation,
+ownership-gate-venv/bin/python): `pytest -q --tb=short` on final_contracts,
+final_owner_binders, final_runtime_families, final_event_histories,
+final_soul_collections, final_skill_histories, final_soul_transformations,
+persistence_lazy_resources, persistence_lazy_materials, persistence_lazy_social,
+persistence_lazy_souls, persistence_lazy_nested_history and
+persistence_lazy_nested_maps_sets, `-k 'not scale_metrics'`:
+**131 passed in66.90s**, exit0, `stage_0_5_final_native_history_gate.txt`.
+The filter did not deselect tests in this set. Unused legacy-type imports were
+subsequently removed from one test module; runtime source was stable.
+Additional routing/alias gate: owner_binders, runtime_families,
+stage_0_5_unloaded_alias_routing, final_skill_histories,
+final_soul_collections and final_event_histories: **74 passed in15.14s**, exit0,
+`stage_0_5_final_owner_binder_gate.txt` (before the final tuple index-error
+cleanup, which the131 gate covers). Focused new histories: **23 passed in9.13s**,
+`stage_0_5_final_native_history_focused_gate.txt`. Counts overlap; do not sum.
+`git diff --check` passed. This is not the final full simulation suite.
+
+Reproducible paired measurements: `python
+simulation/measure_stage_0_5_native_histories.py --output <report>`;
+exact report `stage_0_5_final_native_history_metrics.json` contains source
+SHA-256s verified against this runtime source, actual store counters/cache
+weights/residency, bytes and timings. H1k/H10k hold one edit and exactly two
+sharing placements in two concrete owners fixed. Explicit fixture construction
+is reported separately as O(H).
+
+| Field | Scalar history reads/writes, H1k and H10k | One addition reads/writes, both H | Header bytes, both H |
+|---|---|---|---|
+| Resource transfers | 0/0 | 1 page /1 page | 394 |
+| Material lot transfers | 0/0 | 1 page /1 page | 489 |
+| Relationship shared history | 0/0 | 1 page /1 page | 394 |
+| Soul marks | 0/0 | 0 payload /1 indexed entry | 430 |
+| Soul cosmic links | 0/0 | 0 payload /1 indexed entry | 430 |
+
+Tail bytes differ with tail-page occupancy, not full history length. Maintenance
+removed2–4 rows in these operations. These measurements do not certify ordinary
+checked-catalog open, many historical owners, exceptional EventIdSet, household
+sequences, pressure, recursive imports or all external-alias/lifetime bounds.
+
+Fresh final-runtime independent P5: `python
+simulation/persistence_p5_validation.py --output <report>` passed seed843000,
+3+4+3 years, final year10,439 exact events, expected digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
+Retained `stage_0_5_final_native_history_p5.json`, including checked save/reopen,
+relocation and portable detach against independent eager authority. Its normal
+open still reads resident World/identity state; it is not an ordinary-open
+archive-bound certificate. No long restore fixture or final endurance evidence
+is implied. Bounded task self-review covered validation/retirement, compact
+references, sharing, descriptor reads, legacy notifications, detach memo and
+failure/recovery; final independent architecture review remains outstanding.
+
+Ruling: reuse existing typed backing for these six native fields and the existing
+registry for legacy notification repair; supply concrete owner callbacks without
+claiming checked World activation — preserves values, identity and event-ID
+validation while isolating the remaining catalog transition — cost if wrong:
+callback/install cases outside the tested native closure must reject or be
+extended before capability6 migration/release.
+
+Implementation remains in progress. Next: wire these concrete callbacks to
+ordinary checked-catalog routing and complete replacement/deletion journals;
+integrate lazy Household headers and counted members/Settlement.households;
+close residual buckets and recursive histories; page exceptional EventIdSet;
+implement exact pressure/revisions and lifetime/retired-tree reclamation;
+complete capability6 source-copy upgrade; final integrated H/fault/P5/full-suite,
+independent review and release artifacts. Pressure release decision, final
+endurance/restore policy and production promotion keep their explicit gates.
+
 ## Latest checkpoint: scalar skill and soul transformation pages (October 10 UTC / October 9 Chicago)
 
 Public implementation `7d964c0fcd6440840e205ec4c75bda404d5a2385`;
