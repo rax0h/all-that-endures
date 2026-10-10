@@ -10887,6 +10887,15 @@ class LazyWorldSession:
         self._identity_coordinator = bridge.coordinator
         self._eager_tracker._checked_identity_coordinator = bridge.coordinator
         self._backing_dependencies = dependencies
+        from .persistence_adapters import PACKED_LIST_KIND
+        if self._eager_tracker._manifest['collections'][AGENCY_ACTIONS_NAMESPACE][0] == PACKED_LIST_KIND:
+            try:
+                bridge.synchronize_packed_actions()
+                bridge.stitch_eager_action_peers()
+            except BaseException:
+                self._identity_bridge = self._identity_coordinator = self._backing_dependencies = None
+                self._eager_tracker._checked_identity_coordinator = None
+                raise
 
     def _owner_identity_labels(self, pin, namespace, key):
         if self._identity_coordinator is None:
@@ -10943,6 +10952,12 @@ class LazyWorldSession:
         self, *, subject=None, field=None, value=None
     ):
         self._ensure_people_mutation_allowed()
+        if self._identity_bridge is not None:
+            from .agency import ActionRecord
+            if isinstance(subject, ActionRecord):
+                self._identity_bridge.synchronize_packed_actions(subject)
+                self._identity_bridge.synchronize_lazy_placements()
+                self._identity_coordinator.routes_for_mutation(subject)
         if (
             isinstance(
                 subject,

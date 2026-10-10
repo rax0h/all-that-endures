@@ -28,6 +28,21 @@ def groups(store, count=2):
     return result.pin
 
 
+def test_new_scalar_owner_publishes_mandatory_empty_identity_witness(tmp_path):
+    with make_store(tmp_path / 'empty-owner.sqlite') as store:
+        pin = groups(store)
+        namespace = 'world.currency.minted'
+        ordinary = (RecordChange(namespace, 'copper', (0, 7)),)
+        cat = catalog().IdentityCatalog(store)
+        delta = cat.prepare_delta(pin, (), (), ordinary_changes=ordinary, next_incarnation_id=3)
+        pin = store.commit(pin, commit_token='scalar-owner', changes=ordinary,
+            version_changes=delta.decode(store.codec)[0], identity_changes=(), next_incarnation_id=3,
+            new_segments=(), metadata=metadata(2, (NS, namespace, 'world_identity_links'))).pin
+        cat.validate_publication(delta, pin)
+        owner = cat.read_owner_identity(pin, (namespace, 'copper'))
+        assert tuple(owner.occurrences) == () and owner.storage_kind == 'ordinary'
+
+
 def publish_delta(store, pin, versions, placements, allocator, token="changed"):
     delta = catalog().IdentityCatalog(store).prepare_delta(pin, versions, placements,
                                                           next_incarnation_id=allocator)

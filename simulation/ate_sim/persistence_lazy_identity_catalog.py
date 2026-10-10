@@ -723,6 +723,7 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
         for marker, owner in owner_keys.items():
             source_kind, source = sources.get(marker, (None, None))
             generation = pin.captured_head + 1
+            new_owner = False
             try:
                 header = self._owner(pin, owner)
             except StoreIntegrityError:
@@ -731,6 +732,7 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
                     raise
                 if source is None or source.delete:
                     raise StoreIntegrityError('new identity owner lacks a prepared payload')
+                new_owner = True
                 header = ('identity-owner/v1', True, source_kind, generation, source.record_schema,
                           _source_commitment(self.codec, source, source_kind, generation),
                           None, 0, _framed_sha(b'identity-owner-empty-v1'))
@@ -750,7 +752,7 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
                          _source_commitment(self.codec, source, source_kind, generation), *tree)
             else:
                 value = (*header[:6], *tree)
-            if value != header:
+            if new_owner or value != header:
                 changes.append(VersionChange(OWNER_NAMESPACE, owner, value))
         affected = set(edits_by_group) | set(range(old_allocator, next_incarnation_id))
         for inc in sorted(affected):

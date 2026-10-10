@@ -23,6 +23,9 @@ class FamilyAdapter:
     identity_enabled: bool = True
 
     def absolute_path(self, key, relative=()):
+        from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY
+        if self.namespace == AGENCY_ACTIONS_NAMESPACE and key == PACKED_LIST_KEY:
+            return self.root_path + relative
         placement = (("index", key),) if self.collection_kind in ("list", "events") else (("key", key),)
         if self.namespace == "world.event_ids":
             placement = ()
@@ -204,6 +207,9 @@ class RuntimeFamilyBindings:
         if table is not None:
             return table[owner[1]]
         root = self._root(session, adapter)
+        from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY
+        if owner == (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY):
+            return root
         if adapter.collection_kind == 'events':
             value = session._eager_tracker._owner_value(owner)
             if value is not None:

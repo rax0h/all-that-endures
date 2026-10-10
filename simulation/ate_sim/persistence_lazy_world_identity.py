@@ -4,8 +4,9 @@ import weakref
 from .incremental_store import StoreIntegrityError
 from .persistence_lazy_identity_coordinator import IdentityCoordinator
 from .persistence_lazy_families import FAMILIES
-from .persistence_lazy_identity import IncarnationId
+from .persistence_lazy_identity import IncarnationId, Occurrence
 from .persistence_lazy_nested_history import HISTORY_TYPES
+from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY, PACKED_LIST_KIND
 
 
 class WorldIdentityBridge:
@@ -44,12 +45,105 @@ class WorldIdentityBridge:
             for key in tuple(table._effective_touched()):
                 self._synchronize_owner((namespace, key), table._visible(key))
         tracker = session._eager_tracker
+        if any(owner[0] == AGENCY_ACTIONS_NAMESPACE for owner in tracker._dirty | tracker._deleted):
+            self.synchronize_packed_actions()
         for owner in tuple(tracker._dirty | tracker._deleted):
             adapter = FAMILIES.get(owner[0])
             if (adapter is not None and adapter.collection_kind in ('dict', 'events')
                     and owner[0] not in session._family_bindings.tables):
                 value = None if owner in tracker._deleted else tracker._owner_value(owner)
                 self._synchronize_owner(owner, value is not None)
+
+    def synchronize_packed_actions(self, subject=None):
+        """Project the accepted packed current action body, not old histories.
+
+        Logical action positions belong to one real packed physical source.
+        Original object witnesses, not current ranks, preserve identity on trims.
+        A direct mutation chooses its subject as the canonical shared copy before
+        any field changes, then the checked coordinator stitches its peers.
+        """
+        session = self._session_ref()
+        tracker, registry, coord = session._eager_tracker, session._registry, self.coordinator
+        owner = (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY)
+        if tracker._manifest['collections'][owner[0]][0] != PACKED_LIST_KIND:
+            raise StoreIntegrityError('checked action placements require an explicit packed copy upgrade')
+        changes = coord._owner_changes(owner, ())
+        before = {path: old for path, _, old in changes.values() if old is not None}
+        originals = {}
+        for key in {path[0][1] for path in before if path and path[0][0] == 'index'}:
+            occurrences = tracker._identity_index.owner_occurrences.get((owner[0], key), ())
+            prefix = tracker._owner_path((owner[0], key))
+            for ident, obj, path in occurrences:
+                relative = (('index', key),) + path[len(prefix):]
+                if relative in before:
+                    originals[ident] = (obj, before[relative])
+        value = session.world.agency.actions
+        rows = []
+        tracker._identity_index._scan(value, (), rows)
+        rows = [(ident, obj, path) for ident, obj, path in rows if path]
+        if subject is not None and any(obj is subject for _ident, obj, _path in rows):
+            original = originals.get(id(subject))
+            if registry.incarnation_for_object(subject) is None and original is not None and original[0] is subject:
+                coord.discover_group(original[1])
+                registry.bind(subject, incarnation=IncarnationId(session.store.store_identity, original[1]))
+        placements = []
+        for _ident, _obj, path in rows:
+            child = session._family_bindings.resolve_path(value, path)
+            inc = registry.incarnation_for_object(child)
+            original = originals.get(id(child))
+            if inc is None and original is not None and original[0] is child:
+                inc = IncarnationId(session.store.store_identity, original[1])
+                coord.discover_group(inc)
+                canonical = registry.object_for_incarnation(inc)
+                if canonical is None:
+                    registry.bind(child, incarnation=inc)
+                else:
+                    adapter = FAMILIES[owner[0]]
+                    if adapter.identity_payload_bytes(session.store, session.pin, child) != adapter.identity_payload_bytes(
+                            session.store, session.pin, canonical):
+                        raise StoreIntegrityError('checked action payload copies disagree')
+                    session._family_bindings.install_path(owner, path, canonical)
+                    child = canonical
+            if registry.incarnation_for_object(child) is None:
+                registry.bind(child)
+            placements.append((path, child))
+        current = {path: registry.incarnation_for_object(child).value for path, child in placements}
+        if before != current:
+            coord.replace_owner(owner, placements)
+
+    def stitch_eager_action_peers(self):
+        """Canonicalize resident current copies before exposing an eager body.
+
+        Groups come from the same checked coordinator. Cold lazy owner payloads
+        stay unloaded; their normal checked binders select this canonical object
+        later. This current-root initialization does not grant mutation dirt.
+        """
+        session = self._session_ref()
+        registry, coord = session._registry, self.coordinator
+        seen = set()
+        for action in session.world.agency.actions:
+            inc = registry.incarnation_for_object(action)
+            if inc is None or inc.value in seen:
+                continue
+            seen.add(inc.value)
+            placements = coord._current_placements(coord.discover_group(inc))
+            try:
+                for namespace, key, path in placements:
+                    if namespace in session._family_bindings.tables:
+                        continue
+                    owner = (namespace, key)
+                    value = session._family_bindings.load_owner(owner)
+                    current = session._family_bindings.resolve_path(value, path)
+                    if current is not action:
+                        adapter = FAMILIES[namespace]
+                        if adapter.identity_payload_bytes(session.store, session.pin, current, path) != adapter.identity_payload_bytes(
+                                session.store, session.pin, action, path):
+                            raise StoreIntegrityError('checked action payload copies disagree')
+                        session._family_bindings.install_path(owner, path, action)
+                    registry.attach_occurrence(action, Occurrence(namespace, key, path))
+            finally:
+                if hasattr(placements, 'close'):
+                    placements.close()
 
     def _synchronize_owner(self, owner, exists):
         session = self._session_ref()

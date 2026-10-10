@@ -23,7 +23,8 @@ NS = 'world.skills.skills'
 PATH = (('field', 'provenance'),)
 
 
-def converted_catalog(tmp_path, size=32, owners=2, *, configure_world=None, counted_households=False):
+def converted_catalog(tmp_path, size=32, owners=2, *, configure_world=None, counted_households=False,
+                      packed_actions=False):
     world = World(843000)
     history = list(range(size))
     for key in range(1, owners + 1):
@@ -39,6 +40,20 @@ def converted_catalog(tmp_path, size=32, owners=2, *, configure_world=None, coun
         pin = store.capture_pin()
         removals = tuple(RecordChange('world_identity_links', key, delete=True)
                         for key, _, _ in store.read_records('world_identity_links'))
+        if packed_actions:
+            from ate_sim.persistence_adapters import (PACKED_LIST_KEY, PACKED_LIST_KIND,
+                PACKED_LIST_PAYLOAD, META)
+            namespace = 'world.agency.actions'
+            rows = tuple(store.read_records(namespace))
+            assert all(type(key) is int for key, _, _ in rows)
+            values = tuple(value for _ordinal, value in sorted(envelope for _key, envelope, _schema in rows))
+            manifest = dict(store.read_record(META, 'manifest'))
+            layout = dict(manifest['collections'])
+            layout[namespace] = (PACKED_LIST_KIND, len(values), 0)
+            manifest['collections'] = layout
+            removals += tuple(RecordChange(namespace, key, delete=True) for key, _, _ in rows)
+            removals += (RecordChange(namespace, PACKED_LIST_KEY, (0, (PACKED_LIST_PAYLOAD, values))),
+                         RecordChange(META, 'manifest', manifest))
         # Only test setup uses two commits. The eventual copy converter must
         # stage this authority replacement atomically before publishing a file.
         pin = store.commit(pin, commit_token='a' * 32, changes=removals +
@@ -58,6 +73,14 @@ def converted_catalog(tmp_path, size=32, owners=2, *, configure_world=None, coun
         placements = tuple(IdentityOccurrenceChange(namespace, store.codec.decode(key), store.codec.decode(path), inc)
             for namespace, key, path, inc in store.db.execute('SELECT owner_namespace,owner_key,occurrence_path,incarnation_id '
                 'FROM lazy_identity_occurrence_versions WHERE valid_to IS NULL'))
+        remapped = ()
+        if packed_actions:
+            old = tuple(p for p in placements if p.owner_namespace == 'world.agency.actions')
+            new = tuple(IdentityOccurrenceChange(p.owner_namespace, PACKED_LIST_KEY,
+                (('index', p.owner_key),) + p.occurrence_path, p.incarnation_id) for p in old)
+            placements = tuple(p for p in placements if p.owner_namespace != 'world.agency.actions') + new
+            remapped = tuple(IdentityOccurrenceChange(p.owner_namespace, p.owner_key, p.occurrence_path,
+                delete=True) for p in old) + new
         allocator = store.read_identity_state(pin)
         delta = initial_catalog_delta(store.codec, versions, placements, ordinary_changes=ordinary,
             next_incarnation_id=allocator, generation=pin.captured_head + 1)
@@ -69,7 +92,7 @@ def converted_catalog(tmp_path, size=32, owners=2, *, configure_world=None, coun
             for namespace in (NESTED, SEQUENCES) for key in store.iter_keys(pin, namespace))
         result = store.commit(pin, commit_token='b' * 32, changes=tuple(ordinary) +
             (RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY, (1, pin.captured_head + 1, 'b' * 32)),),
-            version_changes=tuple(versions) + delta.decode(store.codec)[0] + dependencies, identity_changes=(),
+            version_changes=tuple(versions) + delta.decode(store.codec)[0] + dependencies, identity_changes=remapped,
             next_incarnation_id=allocator, new_segments=(), metadata=store.head_metadata())
         store.release_pin(result.pin)
     return target
