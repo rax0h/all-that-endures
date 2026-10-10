@@ -186,6 +186,7 @@ def prepare_world_retirement_delta(store, pin, coordinator, dependencies, *, row
             or dependencies.store is not store or dependencies.pin != pin or dependencies.closed):
         raise StoreIntegrityError('World retirement has a different publisher parent')
     jobs = []
+    previous_overlay = dict(coordinator.placement_overlay)
     with store.read_snapshot(pin):
         for inc in sorted({i for i in coordinator._original.values() if i is not None}):
             group = coordinator.discover_group(inc)
@@ -220,6 +221,18 @@ def prepare_world_retirement_delta(store, pin, coordinator, dependencies, *, row
         background = prepare_retirement_delta(store, pin,
             row_budget=row_budget,
             protected_incarnations=(*dependencies.protected_incarnations(), *coordinator.dirty_incarnations))
+        # A reclaimed page/leaf is a physical catalog owner. Remove its exact
+        # placements in this same bounded central plan, without decoding it.
+        from .persistence_history_owner_adapters import AUXILIARY_OWNER_FAMILIES
+        from .persistence_lazy_identity_catalog import OWNER_NAMESPACE
+        for source in background.decode(store.codec)[0]:
+            if source.delete and source.namespace in AUXILIARY_OWNER_FAMILIES:
+                owner = source.namespace, source.key
+                if store._visible_record_row(pin.captured_head, OWNER_NAMESPACE, store.codec.encode(owner)) is not None:
+                    coordinator.retire_owner(owner)
     combined = {(c.namespace, store.codec.encode(c.key)): c for c in background.decode(store.codec)[0]}
     combined.update(((c.namespace, store.codec.encode(c.key)), c) for c in jobs)
-    return ParticipantDelta.freeze(store.codec, 'history-retirement', version_changes=tuple(combined.values()))
+    placements = tuple(change for marker, change in coordinator.placement_overlay.items()
+                       if previous_overlay.get(marker) != change)
+    return ParticipantDelta.freeze(store.codec, 'history-retirement', version_changes=tuple(combined.values()),
+                                   identity_changes=placements)

@@ -40,6 +40,33 @@ def immutable_value(value):
     return type(value) in (tuple, frozenset) and all(immutable_value(item) for item in value)
 
 
+def stored_value(value):
+    """Closed recursive backing values; mutable objects live behind references."""
+    return reference(value) or immutable_value(value) or (type(value) is tuple and all(stored_value(v) for v in value))
+
+
+def materialize_history_value(value, memo):
+    """Explicit full materialization shares one memo across all descendants."""
+    if type(value) is tuple:
+        if id(value) not in memo:
+            memo[id(value)] = tuple(materialize_history_value(v, memo) for v in value)
+        return memo[id(value)]
+    if type(value) not in HISTORY_TYPES:
+        return value
+    if id(value) in memo:
+        return memo[id(value)]
+    kind = value._kind
+    result = {} if kind == 'map' else set() if kind == 'set' else []
+    memo[id(value)] = result
+    if kind == 'map':
+        result.update((key, materialize_history_value(child, memo)) for key, child in value.items())
+    elif kind == 'set':
+        result.update(value)
+    else:
+        result.extend(materialize_history_value(child, memo) for child in value)
+    return result
+
+
 def checked_value(store, pin, namespace, key):
     if getattr(store, '_active_read_transaction', False):
         if store._require_pin(pin) != pin.captured_head:
@@ -102,13 +129,15 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
     _kind = 'list'
 
     def __init__(self, store, pin, incarnation, *, guard=None, changed=None,
-                 initial_values=None, cache_budget=None, checked_types=None):
+                 initial_values=None, cache_budget=None, checked_types=None, recursive=False):
         if type(incarnation) is not int or incarnation <= 0:
             raise ValueError('invalid nested history incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
         self._guard, self._changed = guard, changed
         self._read_guard = None
         self._value_validator = None
+        self._recursive = recursive
+        self._recursive_runtime = None
         self._batch_validator = None
         self._sorting_values = None
         self._initialize_cache(cache_budget)
@@ -156,7 +185,9 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
     def _validate(self, value):
         if self._value_validator is not None:
             self._value_validator(value)
-        if not immutable_value(value):
+        if self._recursive_runtime is not None:
+            value = self._recursive_runtime.admit(value)
+        if not (stored_value(value) if self._recursive else immutable_value(value)):
             raise TypeError('typed history values must be immutable schema values')
         self._store.codec.encode(value)
         return value
@@ -178,13 +209,17 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
             return self._cache[number]
         value = checked_value(self._store, self._pin, PAGE_NAMESPACE, (self._incarnation, number))
         expected = min(PAGE_SIZE, self._base_length - number * PAGE_SIZE)
-        if type(value) is not tuple or len(value) != expected or any(not immutable_value(item) for item in value):
+        valid = stored_value if self._recursive else immutable_value
+        if type(value) is not tuple or len(value) != expected or any(not valid(item) for item in value):
             raise StoreIntegrityError('invalid nested list page')
         self._page_loads += 1
         self._cache_value(number, value, CACHE_PAGES)
         return value
 
     def _page(self, number):
+        if self._recursive_runtime is not None and number * PAGE_SIZE < self._length:
+            self._recursive_runtime.validate_physical_children(
+                (PAGE_NAMESPACE, (self._incarnation, number)), tuple(self._read_page(number)))
         if number not in self._dirty_pages:
             if number * PAGE_SIZE < self._base_length:
                 old = self._read_page(number)
@@ -209,6 +244,9 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
             return [self[i] for i in range(*index.indices(self._length))]
         index = self._normalize(index)
         value = self._read_page(index // PAGE_SIZE)[index % PAGE_SIZE]
+        if self._recursive_runtime is not None:
+            value = self._recursive_runtime.decode(value,
+                (PAGE_NAMESPACE, (self._incarnation, index // PAGE_SIZE)), (('index', index % PAGE_SIZE),))
         if self._value_validator is not None:
             try:
                 self._value_validator(value)
@@ -302,6 +340,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         self._notify()
 
     def _replace_all(self, values):
+        values = [self._validate(value) for value in values]
         old_pages = (max(self._length, self._base_length) + PAGE_SIZE - 1) // PAGE_SIZE
         for number in range(max(old_pages, (len(values) + PAGE_SIZE - 1) // PAGE_SIZE)):
             if number * PAGE_SIZE < self._base_length and number not in self._baseline_page_bytes:
@@ -390,9 +429,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
 
     def materialize(self, memo=None):
         memo = {} if memo is None else memo
-        if id(self) not in memo:
-            memo[id(self)] = list(self)
-        return memo[id(self)]
+        return materialize_history_value(self, memo)
 
     def pending_changes(self):
         self._ensure()
@@ -467,7 +504,7 @@ def initial_scalar_changes(incarnation, kind, values, codec, *, checked_types=Fa
     return tuple(changes)
 
 
-def checked_scalar_entry(store, pin, incarnation, canonical):
+def checked_scalar_entry(store, pin, incarnation, canonical, *, recursive=False):
     owns_snapshot = not getattr(store, '_active_read_transaction', False)
     generation = store._read_snapshot_start(pin) if owns_snapshot else pin.captured_head
     key = store.codec.encode((incarnation, canonical))
@@ -485,7 +522,7 @@ def checked_scalar_entry(store, pin, incarnation, canonical):
         value, schema, *_rest, memberships = store._check_record_row(ENTRY_NAMESPACE, key, row, decode=True)
         if (schema != RECORD_SCHEMA or order is None or type(value) is not tuple or len(value) != 3
                 or type(value[0]) is not int or value[0] < 0 or not immutable_value(value[1])
-                or not immutable_value(value[2]) or store.codec.encode(equality_key(value[1])) != store.codec.encode(canonical)
+                or not (stored_value(value[2]) if recursive else immutable_value(value[2])) or store.codec.encode(equality_key(value[1])) != store.codec.encode(canonical)
                 or memberships != (('incarnation', incarnation, value[0]),)):
             raise StoreIntegrityError('invalid nested scalar entry')
         encoded_incarnation = store.codec.encode(incarnation)
@@ -534,12 +571,14 @@ class _ScalarHistory(CleanCacheOwner):
     _kind = None
     __hash__ = None
 
-    def __init__(self, store, pin, incarnation, *, initial_values=None, cache_budget=None, checked_types=None):
+    def __init__(self, store, pin, incarnation, *, initial_values=None, cache_budget=None, checked_types=None, recursive=False):
         if type(incarnation) is not int or incarnation <= 0:
             raise ValueError('invalid nested history incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
         self._guard = self._changed = self._read_guard = None
         self._key_validator = self._batch_validator = None
+        self._recursive = recursive
+        self._recursive_runtime = None
         self._initialize_cache(cache_budget)
         self._iterators = weakref.WeakSet()
         self._dirty_entries, self._baseline_bytes = {}, {}
@@ -592,7 +631,7 @@ class _ScalarHistory(CleanCacheOwner):
             self._cache.move_to_end(canonical)
             self._cache_budget.touch(self, canonical)
             return self._cache[canonical]
-        value = None if self._new else checked_scalar_entry(self._store, self._pin, self._incarnation, canonical)
+        value = None if self._new else checked_scalar_entry(self._store, self._pin, self._incarnation, canonical, recursive=self._recursive)
         if value is not None:
             if value[0] >= self._base_next or (self._kind == 'set' and value[2] is not None):
                 raise StoreIntegrityError('nested scalar entry exceeds descriptor')
@@ -627,10 +666,15 @@ class _ScalarHistory(CleanCacheOwner):
         if self._key_validator is not None:
             self._key_validator(key)
         canonical = self._canonical(key)
-        if not immutable_value(value):
+        old = self._entry(canonical)
+        if old is not None and self._recursive_runtime is not None:
+            self._recursive_runtime.validate_physical_children(
+                (ENTRY_NAMESPACE, (self._incarnation, canonical)), old)
+        if self._recursive_runtime is not None and self._kind == 'map':
+            value = self._recursive_runtime.admit(value)
+        if not (stored_value(value) if self._recursive else immutable_value(value)):
             raise TypeError('typed history values must be immutable schema values')
         self._store.codec.encode(value)
-        old = self._entry(canonical)
         self._remember_baseline(canonical)
         if old is None:
             entry = (self._next_ordinal, key, value)
@@ -649,6 +693,9 @@ class _ScalarHistory(CleanCacheOwner):
         old = self._entry(canonical)
         if old is None:
             raise KeyError(key)
+        if self._recursive_runtime is not None:
+            self._recursive_runtime.validate_physical_children(
+                (ENTRY_NAMESPACE, (self._incarnation, canonical)), old)
         self._remember_baseline(canonical)
         self._journal(canonical, None)
         self._count -= 1
@@ -726,6 +773,9 @@ class LazyHistoryMap(_ScalarHistory, MutableMapping):
         entry = self._entry(self._canonical(key))
         if entry is None:
             raise KeyError(key)
+        if self._recursive_runtime is not None:
+            return self._recursive_runtime.decode(entry[2],
+                (ENTRY_NAMESPACE, (self._incarnation, self._canonical(key))), (('index', 2),))
         return entry[2]
 
     def __setitem__(self, key, value):
@@ -805,9 +855,7 @@ class LazyHistoryMap(_ScalarHistory, MutableMapping):
 
     def materialize(self, memo=None):
         memo = {} if memo is None else memo
-        if id(self) not in memo:
-            memo[id(self)] = self.copy()
-        return memo[id(self)]
+        return materialize_history_value(self, memo)
 
 
 class LazyHistorySet(_ScalarHistory, MutableSet):

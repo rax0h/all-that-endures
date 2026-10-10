@@ -23,10 +23,12 @@ def prepare_unpublished_list(history):
             pass
         else:
             raise StoreIntegrityError('unpublished promotion has an existing append backing')
+    runtime = history._recursive_runtime
+    values = (runtime.admit(value) for value in history) if runtime is not None else history
     return LazyOrderedSequence(history._store, history._pin, history._incarnation,
-        initial_values=history, value_mode='native', cache_budget=history._cache_budget,
+        initial_values=values, value_mode='native', cache_budget=history._cache_budget,
         guard=history._guard, changed=history._changed, read_guard=history._read_guard,
-        checked_types=history._member_types.enabled)
+        checked_types=history._member_types.enabled, recursive=history._recursive)
 
 
 def install_unpublished_list(history, prepared):
@@ -39,6 +41,7 @@ def install_unpublished_list(history, prepared):
     state = dict(prepared.__dict__)
     state['_value_validator'] = history._value_validator
     state['_batch_validator'] = history._batch_validator
+    state['_recursive_runtime'] = history._recursive_runtime
     history._clear_cache()
     # Both concrete pure-Python MutableSequence implementations have the same
     # dict/weakref layout. No second canonical object is registered or exposed.

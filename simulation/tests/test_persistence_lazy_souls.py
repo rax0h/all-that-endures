@@ -363,6 +363,9 @@ def test_soul_materializing_detach_preserves_nested_identity_and_checkpoint(
 
 @pytest.mark.parametrize("count", [1000, 10000])
 def test_soul_history_scaling_is_bounded_by_requested_access(tmp_path, count):
+    from collections import Counter
+    from ate_sim.persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE
+    from ate_sim.persistence_history_types import NAMESPACE as TYPE_WITNESSES
     destination = converted(
         tmp_path, count, name=f"scale-{count}"
     )
@@ -373,7 +376,16 @@ def test_soul_history_scaling_is_bounded_by_requested_access(tmp_path, count):
         assert souls.diagnostics()["resident_souls"] == 0
 
         before_reads = session.store.diagnostics()
-        soul = souls[7]
+        checked_namespaces = Counter()
+        check_record = session.store._check_record_row
+        def check(namespace, *args, **kwargs):
+            checked_namespaces[namespace] += 1
+            return check_record(namespace, *args, **kwargs)
+        session.store._check_record_row = check
+        try:
+            soul = souls[7]
+        finally:
+            session.store._check_record_row = check_record
         after_reads = session.store.diagnostics()
         assert soul.person == 7
         assert souls.diagnostics()["soul_payload_loads"] == 1
@@ -410,7 +422,8 @@ def test_soul_history_scaling_is_bounded_by_requested_access(tmp_path, count):
         )
         assert (
             after_reads.payload_reads - before_reads.payload_reads
-        ) <= 5  # Compact header plus four checked child descriptors.
+        ) <= 9  # Header, four child descriptors, four mandatory type witnesses.
+        assert checked_namespaces == {SOUL_NAMESPACE: 1, DESCRIPTOR_NAMESPACE: 4, TYPE_WITNESSES: 4}
         assert all(getattr(soul, field).diagnostics()['page_loads' if field == 'transformations' else 'entry_loads'] == 0
                    for field in ('authorities', 'marks', 'cosmic_links', 'transformations'))
         assert soul_diag["resident_souls"] <= 256

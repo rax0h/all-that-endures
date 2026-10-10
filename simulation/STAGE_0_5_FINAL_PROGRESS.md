@@ -1,5 +1,76 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: recursive container runtime (October 10 UTC)
+
+Recovered the actual implementation head at local `51c2a07d9bfc022dc756136d4fdae7da851ed75a`
+and public `fd7b4b42ec5d0e69e2f3761f5e22e91d51783f91`, identical tree
+`da85ee8d9f58a3b58ad0ab395982a520664f6fae`. That newer checkpoint registered
+checked physical page, scalar-entry and counted-leaf owner adapters; registration
+alone did not integrate recursive World mutation/save.
+
+This checkpoint adds staged checked-catalog runtime integration for native
+list/map/set descendants and tuples containing them. Existing HistoryReferences,
+canonical weak registry, adapter catalog, backing dependency pool and one frozen
+hybrid publication remain the authorities. Physical slots contain compact
+references, not child payload copies or a second live graph. Child edits discover
+only their checked sharing group and route the affected physical owners. Pending
+replacement wins over a retained child alias. Explicit portable detach uses one
+memo across every descendant. Physical backing retirement removes its exact
+placements in the same central plan, without decoding the retired payload.
+
+Unpublished append-to-counted promotion preserves these children and their
+canonical identities through leaf splits. Counted mutations validate affected
+source leaves once per operation; rewritten/new leaves are pending D, not new
+persisted placements. This avoids publishing intermediate physical projections
+inside a sequence rollback scope. Both clean and already-dirty bulk failure cases
+retain the original value/placement journals; supported bulk extension then saves.
+New scalar-only physical pages/entries/leaves get empty completeness witnesses
+at first publication, so later additions of mutable descendants remain supported.
+Older scalar-only staged pages lacking witnesses remain explicitly unconverted;
+ordinary use does not silently bootstrap their missing identity authority.
+
+Permanent recursive coverage: list/map/tuple sharing and reopen identity;
+before/after-commit recovery; retained aliases after replacement; missing child
+placements before edits; counted leaf split and positional corruption; old-pin
+protection and physical retirement; portable shared native graph; cyclic Skill
+and Soul assignment before owner edits; stale pinned reads with edit rejection;
+scalar physical-owner admission after save; clean/pending counted bulk rollback.
+The recursive schema currently rejects nested registered-record values. This is
+container-path integration, not a claim that recursive schema closure is complete.
+
+Final recursive gate: **20 passed in9.39s**. Final affected current-source gate:
+**173 passed in42.36s**, including recursive World, unpublished promotion,
+catalog/backing lifetime/retirement, EventID, packed actions, identity compaction,
+physical owner adapters, catalog publication, participant abort and sequence
+compatibility/errors. Earlier combined World/legacy gate: **284 passed in246.88s**
+before the empty-witness and final counted bulk-preflight changes; those changes
+are covered by the current 173-case gate. Counts overlap and are not unique totals.
+The separate corrected legacy gate was **84 passed in106.02s**. Structured retained
+testcases, durations, properties and final source/test SHA-256 inventory are in
+`simulation/stage_0_5_recursive_history_validation.json`.
+
+The paired H1k/H10k recursive-child edit plus no-op save has exactly the same
+measured work: **113 payload reads, 10 payload writes, 804 metadata rows**. The
+case forbids global registry enumeration and reads of an unrelated retained
+history, and verifies no-op save adds no payload writes. These are operation
+measurements, not exhaustive residency/maintenance-bound certification.
+
+Legacy Soul scaling had two pre-existing failures reproduced on unchanged
+`51c2a07`: its <=5 payload-read allowance omitted the mandatory type witnesses.
+Actual point reads were one Soul header, four child descriptors and four type
+witnesses, zero history pages/entries. The assertion now permits exactly that
+nine-read inventory and still requires zero nested page loads and bounded save
+writes. No production work was hidden or counters discounted. `git diff --check`
+passed. No capability6, new P5, full-suite, release or endurance claim.
+
+Remaining fixed scope: recursive registered-record/schema closure and complete
+bounds; persisted append/count-tree promotion; exotic exact equality; complete
+ordinary open and source-preserving copy upgrade; then integrated bounds/P5,
+one stable full suite and fresh independent review. PR14 remains draft/unmerged
+at `c29e3d06a0c9d219235e2b3f0390271bd1245aea`; no production branch change.
+P5 remains at `b57704304dc51238ac14420e55d1b1bc3ed79892`.
+Stage0.5 is not complete or ready for final acceptance.
+
 ## Latest checkpoint: unpublished live list promotion (October 10 UTC)
 
 Public source `0eabec6e1c409ed30175d67dcecf92365ba682bc`, local source

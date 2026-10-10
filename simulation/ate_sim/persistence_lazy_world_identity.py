@@ -41,6 +41,7 @@ class WorldIdentityBridge:
         before shared routing, so pending replacement wins over pinned placement.
         """
         session = self._session_ref()
+        session._recursive_histories.synchronize()
         for namespace, table in session._family_bindings.tables.items():
             for key in tuple(table._effective_touched()):
                 self._synchronize_owner((namespace, key), table._visible(key))
@@ -220,6 +221,8 @@ class WorldIdentityBridge:
         current = {path: registry.incarnation_for_object(child).value for path, child in placements}
         if before != current:
             coord.replace_owner(owner, placements)
+
+            session._recursive_histories.release_unowned_memos(set(before.values()) - set(current.values()))
 
     def finish_acknowledgement(self, delta):
         """Clear dirt for suppressed headers forced by this exact frozen delta."""

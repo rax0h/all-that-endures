@@ -83,12 +83,15 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
 
     def __init__(self, store, pin, incarnation, *, initial_values=None,
                  guard=None, changed=None, read_guard=None, value_mode=None,
-                 cache_budget=None, checked_types=None):
+                 cache_budget=None, checked_types=None, recursive=False):
         if not _positive(incarnation):
             raise ValueError('invalid sequence incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
         self._guard, self._changed, self._read_guard = guard, changed, read_guard
         self._value_validator = None
+        self._recursive = recursive
+        self._recursive_runtime = None
+        self._recursive_preflight_leaves = set()
         self._batch_validator = None
         self._cache = OrderedDict()
         self._cache_bytes = 0
@@ -134,6 +137,8 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
     def _validate(self, value):
         if self._value_validator is not None:
             self._value_validator(value)
+        if self._recursive_runtime is not None:
+            value = self._recursive_runtime.admit(value)
         if not self._valid_value(value):
             if self._value_mode == 'native':
                 raise TypeError('sequence values must be immutable schema values')
@@ -143,8 +148,8 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
     def _valid_value(self, value):
         if self._value_mode == 'integer_ids':
             return _positive(value)
-        from .persistence_lazy_nested_history import immutable_value
-        return immutable_value(value)
+        from .persistence_lazy_nested_history import immutable_value, stored_value
+        return stored_value(value) if self._recursive else immutable_value(value)
 
     @staticmethod
     def _member_key(value):
@@ -187,6 +192,8 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
         self._ensure()
         if self._prepared is not None:
             raise StoreConflictError('sequence has a frozen unacknowledged save plan')
+        if not self._mutation_depth:
+            self._recursive_preflight_leaves.clear()
         self._mutation_depth += 1
         try:
             if self._guard is not None:
@@ -206,6 +213,8 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
                     self._changed()
         finally:
             self._mutation_depth -= 1
+            if not self._mutation_depth:
+                self._recursive_preflight_leaves.clear()
 
     def _raw(self, namespace, key, *, absent=False):
         try:
@@ -305,6 +314,11 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
         value = self._read(NODE_NAMESPACE, (self._incarnation, link[0]))
         if self._node_commit(link[0], value) != link:
             raise StoreIntegrityError('sequence node count/digest disagreement')
+        if (value[0] == 'leaf' and self._recursive_runtime is not None and self._mutation_depth
+                and link[0] not in self._recursive_preflight_leaves):
+            self._recursive_runtime.validate_physical_children(
+                (NODE_NAMESPACE, (self._incarnation, link[0])), value)
+            self._recursive_preflight_leaves.add(link[0])
         if parent is not _MISSING:
             actual = self._read(PARENT_NAMESPACE, (self._incarnation, link[0]))
             if (type(actual) is not tuple or len(actual) != 2
@@ -318,6 +332,11 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
         link = self._node_commit(node_id, value)
         self._put(NODE_NAMESPACE, (self._incarnation, node_id), value)
         if kind == 'leaf':
+            if self._recursive_runtime is not None and self._mutation_depth:
+                # This operation validated the source leaves and incoming D.
+                # Temporary rewritten/split leaves have no catalog placement
+                # until the complete value journal succeeds.
+                self._recursive_preflight_leaves.add(node_id)
             for slot, (occurrence, _) in enumerate(entries):
                 self._put(LOCATOR_NAMESPACE, (self._incarnation, occurrence), (node_id, slot))
         else:
@@ -415,7 +434,10 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
         if isinstance(index, slice):
             return [self[k] for k in range(*index.indices(self._length))]
         with self._store.read_snapshot(self._pin):
-            return self._checked_owner_value(self._locate(self._index(index))[2][1])
+            leaf, _slot, (occurrence, value) = self._locate(self._index(index))
+            if self._recursive_runtime is not None:
+                value = self._recursive_runtime.decode(value, (NODE_NAMESPACE, (self._incarnation, leaf[0])), (('key', occurrence),))
+            return self._checked_owner_value(value)
 
     def _checked_owner_value(self, value):
         if self._value_validator is not None:
@@ -678,7 +700,12 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
                 rank += 1
 
     def __iter__(self):
-        for _, value in self.iter_occurrences():
+        for occurrence, value in self.iter_occurrences():
+            if self._recursive_runtime is not None:
+                from .persistence_lazy_nested_history import immutable_value
+                if not immutable_value(value):
+                    leaf, _slot = self._read(LOCATOR_NAMESPACE, (self._incarnation, occurrence))
+                    value = self._recursive_runtime.decode(value, (NODE_NAMESPACE, (self._incarnation, leaf)), (('key', occurrence),))
             yield self._checked_owner_value(value)
 
     def __eq__(self, other):
@@ -1061,10 +1088,9 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
         return HistoryReference('sequence', self._incarnation)
 
     def materialize(self, memo=None):
+        from .persistence_lazy_nested_history import materialize_history_value
         memo = {} if memo is None else memo
-        if id(self) not in memo:
-            memo[id(self)] = list(self)
-        return memo[id(self)]
+        return materialize_history_value(self, memo)
 
     def pending_changes(self):
         return self.prepare_delta().decode(self._store.codec)[0]

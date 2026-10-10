@@ -207,6 +207,8 @@ class RuntimeFamilyBindings:
         """Resolve one concrete authority; mutable event tail only."""
         from .incremental_store import StoreIntegrityError
         session = self._session()
+        if owner[0] in AUXILIARY_OWNER_FAMILIES:
+            return session._recursive_histories.load_owner(owner)
         adapter = self._adapter(owner)
         table = self.tables.get(owner[0])
         if table is not None:
@@ -226,6 +228,9 @@ class RuntimeFamilyBindings:
 
     @staticmethod
     def resolve_path(value, path):
+        from .persistence_history_runtime import PhysicalHistoryOwner
+        if type(value) is PhysicalHistoryOwner:
+            return value.runtime.resolve_path(value, path)
         from .persistence_lazy import _relative_get
         return _relative_get(value, path)
 
@@ -235,6 +240,8 @@ class RuntimeFamilyBindings:
         from .record_index import IndexedRecord
         from .incremental_store import StoreIntegrityError
         session = self._session()
+        if owner[0] in AUXILIARY_OWNER_FAMILIES:
+            return session._recursive_histories.install_path(owner, path, obj)
         adapter = self._adapter(owner, path)
         value = self.load_owner(owner)
         table = self.tables.get(owner[0])
@@ -264,6 +271,10 @@ class RuntimeFamilyBindings:
 
     def mark_dirty(self, owner):
         session = self._session()
+        if owner[0] in AUXILIARY_OWNER_FAMILIES:
+            # Child dirt grants a forced reference-header revision. It does not
+            # change the parent's own values or grant an eager World owner.
+            return
         self._adapter(owner)
         table = self.tables.get(owner[0])
         if table is not None:
@@ -273,6 +284,10 @@ class RuntimeFamilyBindings:
 
     def encode_placement(self, owner, path, value):
         session = self._session()
+        if owner[0] in AUXILIARY_OWNER_FAMILIES:
+            AUXILIARY_OWNER_FAMILIES[owner[0]].absolute_path(owner[1], path)
+            from .persistence_lazy_identity_headers import encode_identity_header
+            return encode_identity_header(session.store, session.pin, value)
         adapter = self._adapter(owner, path)
         return adapter.identity_payload_bytes(session.store, session.pin, value, path)
 
@@ -286,6 +301,8 @@ class RuntimeFamilyBindings:
         """
         from .incremental_store import StoreIntegrityError, StoreFormatError
         session = self._session()
+        if owner[0] in AUXILIARY_OWNER_FAMILIES:
+            return session._recursive_histories.unchanged_header(owner)
         adapter = self._adapter(owner)
         if owner[0] not in self.tables:
             return self._unchanged_eager_header(session, adapter, owner)

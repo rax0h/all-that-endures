@@ -9445,6 +9445,11 @@ class LazySkillTable(LazyRecordTable):
         "provenance": (("field", "provenance"),),
     }
 
+    def preflight_value(self, key, field, value):
+        super().preflight_value(key, field, value)
+        if field in self._nested_paths and self._session._identity_coordinator is not None:
+            self._session._recursive_histories.validate_native(value)
+
     def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
         dict.__init__(self)
         self._session = session
@@ -9792,6 +9797,11 @@ class LazySoulTable(LazyRecordTable):
         "cosmic_links": (("field", "cosmic_links"),),
         "transformations": (("field", "transformations"),),
     }
+
+    def preflight_value(self, key, field, value):
+        super().preflight_value(key, field, value)
+        if field in self._nested_paths and self._session._identity_coordinator is not None:
+            self._session._recursive_histories.validate_native(value)
 
     def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
         dict.__init__(self)
@@ -10900,6 +10910,8 @@ class LazyWorldSession:
             raise StoreFormatError('checked catalog cannot share legacy identity authority')
         from .persistence_lazy_world_identity import WorldIdentityBridge
         from .persistence_history_dependencies import BackingDependencyPool
+        from .persistence_history_runtime import RecursiveHistoryRuntime
+        self._recursive_histories = RecursiveHistoryRuntime(self)
         bridge = WorldIdentityBridge(self)
         dependencies = BackingDependencyPool(self.store, self.pin)
         for proxy in tuple(self._nested_lists.values()):
@@ -12154,7 +12166,8 @@ class LazyWorldSession:
             proxy = self._registry.object_for_incarnation(incarnation)
             if proxy is None:
                 proxy = history_class(self.store, self.pin, incarnation.value,
-                                      cache_budget=self._history_cache_budget)
+                                      cache_budget=self._history_cache_budget,
+                                      **({'recursive': True} if self._identity_coordinator is not None else {}))
                 self._registry.bind(proxy, incarnation=incarnation)
             elif type(proxy) is not history_class:
                 raise StoreIntegrityError('nested list incarnation has wrong live type')
@@ -12169,9 +12182,12 @@ class LazyWorldSession:
             if type(value) is not {'list': list, 'sequence': list, 'map': dict, 'set': set}[kind]:
                 raise TypeError('nested history field has wrong type')
             incarnation = self._registry.allocator.allocate()
-            proxy = history_class(self.store, self.pin, incarnation.value, initial_values=value,
+            values = (self._recursive_histories.initial_values(kind, value)
+                      if self._identity_coordinator is not None else value)
+            proxy = history_class(self.store, self.pin, incarnation.value, initial_values=values,
                                   cache_budget=self._history_cache_budget,
-                                  **({'value_mode': 'native'} if kind == 'sequence' else {}))
+                                  **({'value_mode': 'native'} if kind == 'sequence' else {}),
+                                  **({'recursive': True} if self._identity_coordinator is not None else {}))
             self._registry.bind(proxy, incarnation=incarnation)
             self._nested_dirty[incarnation.value] = proxy
         # Newly decoded references must satisfy the incoming concrete owner too.
@@ -12247,6 +12263,8 @@ class LazyWorldSession:
                 return values
             proxy._key_validator = validate_key
             proxy._batch_validator = validate_set_batch
+        if self._identity_coordinator is not None:
+            self._recursive_histories.bind(proxy)
         return proxy
 
     def _promote_unpublished_history(self, proxy):
@@ -12258,6 +12276,8 @@ class LazyWorldSession:
             pool.check_unpublished_promotion(proxy)
         prepared = prepare_unpublished_list(proxy)
         self._shared_object_routes(proxy)
+        if self._identity_coordinator is not None:
+            self._recursive_histories.retire_unpublished_pages(proxy)
         install_unpublished_list(proxy, prepared)
         if pool is not None:
             pool.accept_unpublished_promotion(proxy)
@@ -12356,8 +12376,9 @@ class LazyWorldSession:
                 return ()
             placements = coord._current_placements(coord.discover_group(incarnation))
             try:
+                from .persistence_lazy_families import FAMILIES
                 return tuple({(namespace, key) for namespace, key, _path in placements
-                    if namespace not in self._family_bindings.tables})
+                    if namespace in FAMILIES and namespace not in self._family_bindings.tables})
             finally:
                 if hasattr(placements, 'close'):
                     placements.close()
@@ -13354,9 +13375,9 @@ class LazyWorldSession:
         )
         if nested_reference(values) or type(values) is LazyHistoryMap:
             return self._bind_history_list(values, occurrence, incarnation, kind='map')
-        if incarnation is None and type(values) is dict and all(
+        if incarnation is None and type(values) is dict and (self._identity_coordinator is not None or all(
             nested_immutable_value(k) and nested_immutable_value(v) for k, v in values.items()
-        ):
+        )):
             return self._bind_history_list(values, occurrence, kind='map')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
@@ -13397,7 +13418,7 @@ class LazyWorldSession:
         )
         if nested_reference(values) or type(values) in (LazyHistoryList, LazyOrderedSequence):
             return self._bind_history_list(values, occurrence, incarnation, kind='list')
-        if incarnation is None and type(values) is list and all(nested_immutable_value(value) for value in values):
+        if incarnation is None and type(values) is list and (self._identity_coordinator is not None or all(nested_immutable_value(value) for value in values)):
             return self._bind_history_list(values, occurrence, kind='list')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
@@ -13600,7 +13621,7 @@ class LazyWorldSession:
         )
         if nested_reference(values) or type(values) in (LazyHistoryList, LazyOrderedSequence):
             return self._bind_history_list(values, occurrence, incarnation, kind='list')
-        if incarnation is None and type(values) is list and all(nested_immutable_value(value) for value in values):
+        if incarnation is None and type(values) is list and (self._identity_coordinator is not None or all(nested_immutable_value(value) for value in values)):
             return self._bind_history_list(values, occurrence, kind='list')
         if incarnation is not None:
             live = self._registry.object_for_incarnation(incarnation)
@@ -16275,7 +16296,8 @@ class LazyWorldSession:
         # Scalar child projections still require their domain-specific checks.
         for change in plan.nested_history_version_changes:
             if change.namespace == NESTED_ENTRY_NAMESPACE:
-                checked_scalar_entry(self.store, self.pin, change.key[0], change.key[1])
+                checked_scalar_entry(self.store, self.pin, change.key[0], change.key[1],
+                                     recursive=self._identity_coordinator is not None)
 
     def _arm_cold_publication(self, plan):
         tracker = self._eager_tracker
@@ -16894,7 +16916,9 @@ class LazyWorldSession:
                 value = getattr(soul, field)
                 replacement = replacements.get(id(value))
                 if replacement is None:
-                    if field in ("authorities", "marks"):
+                    if type(value) in HISTORY_TYPES:
+                        replacement = value.materialize(replacements)
+                    elif field in ("authorities", "marks"):
                         replacement = set(value)
                     elif field == "cosmic_links":
                         replacement = dict(value)
@@ -16928,7 +16952,7 @@ class LazyWorldSession:
                 value = getattr(record, field)
                 replacement = replacements.get(id(value))
                 if replacement is None:
-                    replacement = list(value)
+                    replacement = value.materialize(replacements) if type(value) in HISTORY_TYPES else list(value)
                     replacements[id(value)] = replacement
                 nested_assignments.append(
                     (record, field, replacement)

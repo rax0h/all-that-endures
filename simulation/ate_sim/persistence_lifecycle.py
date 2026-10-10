@@ -202,7 +202,7 @@ def _stage_plain_graph(
             ident = id(value)
             if ident in memo:
                 return memo[ident]
-            result = list(value)
+            result = value.materialize(memo) if type(value) in HISTORY_TYPES else list(value)
             memo[ident] = result
             return result
         cls = type(value)

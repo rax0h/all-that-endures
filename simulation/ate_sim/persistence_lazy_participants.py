@@ -364,8 +364,10 @@ class FrozenHybridPublication:
             versions.extend(self.dependency_participant.delta.decode(
                 self.dependency_participant.store.codec)[0])
         if self.retirement_participant is not None:
-            versions.extend(self.retirement_participant.delta.decode(
-                self.retirement_participant.store.codec)[0])
+            retired_versions, _, retired_identities = self.retirement_participant.delta.decode(
+                self.retirement_participant.store.codec)
+            versions.extend(retired_versions)
+            identities.extend(retired_identities)
         return dict(commit_token=replay.token, version_changes=tuple(versions), identity_changes=tuple(identities),
             next_incarnation_id=self.next_incarnation, required_format_version=self.required_format_version,
             cleanup_budget=self.cleanup_budget,
@@ -469,7 +471,8 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
             cleanup_budget = 128
             captured += (retirement_delta,)
             _check_unique_authorities(codec, captured)
-        identity_bytes = tuple(b for d in deltas for b in d.identity_bytes)
+        identity_bytes = tuple(b for d in deltas for b in d.identity_bytes) + (
+            retirement_delta.identity_bytes if retirement_delta is not None else ())
         expected = ParticipantDelta.freeze(codec, 'identity-coordinator',
             identity_changes=tuple(coord.placement_overlay.values())).identity_bytes
         if sorted(identity_bytes) != sorted(expected):
@@ -484,6 +487,10 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
                               if change.owner_namespace in AUXILIARY_OWNER_FAMILIES)
         owner_versions = tuple(change for change in all_versions if change.namespace in FAMILIES
                                or (change.namespace, codec.encode(change.key)) in physical_owners)
+        if retire_world_backings:
+            owner_versions += tuple(change for change in retirement_delta.decode(codec)[0]
+                if change.namespace in AUXILIARY_OWNER_FAMILIES
+                and (change.namespace, codec.encode(change.key)) in physical_owners)
         owner_records = tuple(change for change in ordinary.decode(codec)[1] if change.namespace in FAMILIES)
         supplied_owners = {(change.namespace, codec.encode(change.key))
                            for change in (*owner_versions, *owner_records)}
