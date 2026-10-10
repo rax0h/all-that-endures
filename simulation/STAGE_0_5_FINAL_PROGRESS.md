@@ -1,5 +1,115 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: scalar skill and soul transformation pages (October 10 UTC / October 9 Chicago)
+
+Public implementation `7d964c0fcd6440840e205ec4c75bda404d5a2385`;
+local implementation `67d1f0d3dc784b9a3e56c3da7c19084086bd8dc8`;
+matching tree `dfc1195a3a7d70b338d073c6c3cc71ce80aae550`.
+Recovered the clean isolated worktree from local `dc879862` / public
+`17108e09`, matching baseline tree `93fd95b39f8f17964efdc8f7182a453ee0154598`.
+No production PR14 change, Actions run, full suite or endurance launch.
+
+The ordinary skill adapter now preserves compact teachers/provenance references
+instead of materializing their pages during scalar save or acknowledgement.
+The soul adapter does the same for transformations. Explicit cold conversion
+constructs existing typed list authority and propagates each reference to all
+persisted sharing placements. Load/mutation uses the existing sole registry,
+typed-list callbacks, shared history cache and central hybrid publisher.
+New skill assignment uses one local replacement memo, preserving shared
+teachers/provenance instead of splitting a single supplied list. Whole-list
+replacement retires the old placement; surviving skill/soul/eager/wallet aliases
+remain the same object. Materializing detach uses the existing sharing memo.
+No new backend, identity relation, receipt or event authority was introduced.
+
+RED evidence: eight initial paging/alias/detach tests failed; four soul/skill
+cross-family cases rejected a compact history as the wrong live list type;
+new assignment split a shared list into distinct wrappers. All retained as
+regressions. Failed-publication fixtures were corrected to call resolve_save
+before reading/retrying an uncertain attempted commit, preserving the existing
+receipt protocol; the corruption fixture now commits its direct SQL tamper
+before requesting a checked read. Production integrity checks were not weakened.
+
+An unrestricted compound cold import exposed a pre-existing incomplete binding
+boundary: a legacy skill with a mutable descendant has extra identity labels
+that its closed adapter cannot bind. The attempted legacy conversion fallback
+was rejected. Conversion now raises StoreFormatError before destination staging
+for mutable descendants in these newly paged fields; the source SHA-256 stays
+identical and no destination is published. New compound assignments retain the
+existing resident compatibility path and preserve their values across reopen.
+This is not recursive mutable-history closure or a guarantee about arbitrary
+nested mutable aliases. Existing genuine legacy scalar lists remain readable,
+open performs no migration and a no-op save does not upgrade their representation.
+
+Ruling: compact the supported immutable schema-value histories using the existing
+primitive; reject unsupported compound cold conversion before publication,
+retain genuine legacy reading/assignment behavior and leave recursive closure
+explicitly unfinished — prevents publishing an unbindable destination without
+broadening the closed serializer — cost if wrong: a future recursive adapter
+must extend this conservative conversion boundary before release.
+
+Fresh final focused command (PYTHONPATH=.:simulation, ownership-gate-venv/bin/python):
+`pytest -q --tb=short` on final_contracts, final_skill_histories,
+final_soul_transformations, persistence_lazy_skills and final_runtime_families:
+**40 passed in 3.08s**, exit0, `stage_0_5_final_skill_soul_gate.txt`.
+Existing soul command on persistence_lazy_souls: **14 passed in 14.86s**, exit0.
+Its point-read budget now names both the compact header and checked descriptor
+(max2 payloads), additionally requiring zero transformation page loads; scalar
+save write budget remains max3. The previous one-whole-record assertion is
+incompatible with splitting the child authority, not an H-dependent regression.
+
+Final-source affected command on persistence_lazy_nested_history,
+persistence_lazy_nested_maps_sets, persistence_lazy_currency,
+persistence_lifecycle, stage_0_5_unloaded_alias_routing,
+final_identity_headers and final_world_budget, with
+`-k 'not identity_header_comparison_never_reads_sequence_history'`:
+**78 passed,2 deselected in23.61s**, exit0,
+`stage_0_5_final_skill_soul_affected_short_gate.txt`.
+An earlier broader run before the final unsupported-import rejection passed
+**80 in83.65s**; its log is retained separately and is not final-source
+certification of those two larger header-history cases. Counts overlap; do not
+sum them. `git diff --check` passed. No full-suite acceptance claim.
+
+Paired H1k/H10k measurements in `stage_0_5_final_skill_soul_metrics.json` hold
+one edit and the same three placements in two concrete owners fixed:
+
+| Operation | H1k page loads / writes | H10k page loads / writes | Header bytes, both scales |
+|---|---|---|---|
+| Skill scalar | 0 / 0 | 0 / 0 | skill260, soul377 |
+| Soul scalar | 0 / 0 | 0 / 0 | skill260, soul377 |
+| Shared append | 1 / 1 | 1 / 1 | skill260, soul377 |
+
+Append page bytes are1482/267 because the last page occupies different offsets,
+not proportional to full history. Report includes actual store counters and
+shared-cache weights, separately from these field-level page bounds. These
+fixtures do not certify ordinary checked-catalog World open, households,
+recursive imports, pressure or global alias-discovery bounds.
+
+Fresh independent P5 on this runtime source passed: seed843000,3+4+3 years,
+year10,439 exact events, expected final digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
+Command: `python simulation/persistence_p5_validation.py --output <scratch-report>`;
+retained exact report `stage_0_5_final_skill_soul_p5.json`. It also checks
+save/reopen, relocation and portable detach against independent eager authority.
+No long restore fixture retention or final endurance acceptance is implied.
+A previous P5 before the final invalid-input guard also passed; only the final
+report is used for this checkpoint. Metadata-only field-policy inventory edits
+were subsequently covered by the focused contract gate.
+
+Bounded task self-review checked reference/label agreement, typed versus legacy
+binding, preflight/acknowledgement guards, sharing, cache ownership, source-copy
+failure and portable detach. This is not independent final architectural review.
+Implementation remains in progress; capability6 is still not emitted. Remaining:
+ordinary checked owner binders/coordinator activation and touched journals;
+lazy Household headers/counting sequences; resource/lot/relationship histories,
+soul maps/sets and recursive mutable closure; exceptional EventIdSet paging;
+exact pressure/cache/lifetime/retired-tree closure; complete capability6 source-copy
+upgrade; final-source integrated H/fault/P5/full-suite/review and release artifacts.
+Next fast boundaries are concrete checked owner binders and residual typed-history
+adapters, preserving validation of integer event-ID lists where currently enforced.
+Pressure exception, independent acceptance, endurance and production promotion
+retain their existing explicit release gates.
+
+
 Spec: STAGE_0_5_FINAL_ARCHITECTURE.md. Execution: STAGE_0_5_SOL_61_EXECUTION.md.
 
 ## Latest checkpoint: central checked-catalog composition (October 10 UTC / October 9 Chicago)
