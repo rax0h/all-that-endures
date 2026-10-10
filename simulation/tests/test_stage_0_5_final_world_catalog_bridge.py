@@ -58,9 +58,15 @@ def converted_catalog(tmp_path, size=32, owners=2):
         allocator = store.read_identity_state(pin)
         delta = initial_catalog_delta(store.codec, versions, placements, ordinary_changes=ordinary,
             next_incarnation_id=allocator, generation=pin.captured_head + 1)
+        from ate_sim.persistence_history_dependencies import NAMESPACE as DEPENDENCIES, dependency_value
+        from ate_sim.persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE as NESTED
+        from ate_sim.persistence_lazy_sequence import DESCRIPTOR_NAMESPACE as SEQUENCES
+        dependencies = tuple(VersionChange(DEPENDENCIES, key, dependency_value(
+            'sequence' if namespace == SEQUENCES else store.read_version(pin, namespace, key, expected_record_schema=1).value[0]))
+            for namespace in (NESTED, SEQUENCES) for key in store.iter_keys(pin, namespace))
         result = store.commit(pin, commit_token='b' * 32, changes=tuple(ordinary) +
             (RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY, (1, pin.captured_head + 1, 'b' * 32)),),
-            version_changes=tuple(versions) + delta.decode(store.codec)[0], identity_changes=(),
+            version_changes=tuple(versions) + delta.decode(store.codec)[0] + dependencies, identity_changes=(),
             next_incarnation_id=allocator, new_segments=(), metadata=store.head_metadata())
         store.release_pin(result.pin)
     return target

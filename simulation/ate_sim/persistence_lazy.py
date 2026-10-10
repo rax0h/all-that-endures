@@ -10239,6 +10239,8 @@ class LazyWorldSession:
                 self._nested_dirty[incarnation.value] = proxy
             proxy.bind(self._ensure_hybrid_mutation_allowed, changed, read_guard)
             self._nested_lists[incarnation.value] = proxy
+            if self._backing_dependencies is not None:
+                self._backing_dependencies.acquire(proxy)
             if history_has_pending_overlay(proxy):
                 self._nested_dirty[incarnation.value] = proxy
             return proxy
@@ -10295,6 +10297,7 @@ class LazyWorldSession:
         self._pending_save: LazyPeopleSavePlan | None = None
         self._identity_coordinator = None
         self._identity_bridge = None
+        self._backing_dependencies = None
         self._head = head
         self._paged_sequences = weakref.WeakValueDictionary()
         self._registry = LazyIdentityRegistry(
@@ -10873,9 +10876,14 @@ class LazyWorldSession:
         if self.identity_links or self._cross_boundary_links:
             raise StoreFormatError('checked catalog cannot share legacy identity authority')
         from .persistence_lazy_world_identity import WorldIdentityBridge
+        from .persistence_history_dependencies import BackingDependencyPool
         bridge = WorldIdentityBridge(self)
+        dependencies = BackingDependencyPool(self.store, self.pin)
+        for proxy in tuple(self._nested_lists.values()):
+            dependencies.acquire(proxy)
         self._identity_bridge = bridge
         self._identity_coordinator = bridge.coordinator
+        self._backing_dependencies = dependencies
 
     def _owner_identity_labels(self, pin, namespace, key):
         if self._identity_coordinator is None:
@@ -12218,6 +12226,8 @@ class LazyWorldSession:
         if incarnation is None or incarnation.value != proxy._incarnation:
             raise StoreIntegrityError('nested history lacks its current incarnation')
         self._nested_lists[incarnation.value] = proxy
+        if self._backing_dependencies is not None:
+            self._backing_dependencies.acquire(proxy)
         if history_has_pending_overlay(proxy):
             # Reattachment must publish private edits with the owner's header.
             self._nested_dirty[incarnation.value] = proxy
@@ -14981,6 +14991,7 @@ class LazyWorldSession:
         publication = freeze_hybrid_publication(self.store, self.pin, plan,
             next_incarnation=self._registry.next_incarnation,
             identity_coordinator=self._identity_coordinator,
+            backing_dependencies=self._backing_dependencies,
             required_format_version=(5 if self._eager_tracker._description('world.event_ids')[0] in ('event-ids-range/v1', 'event-ids-exceptions/v1')
                 else 4 if any(change.namespace == HOUSEHOLD_BACKING_NAMESPACE
                               for change in plan.household_member_version_changes) else 3))
@@ -17161,7 +17172,7 @@ class LazyWorldSession:
         # This is the final fallible storage operation.  If release/cleanup
         # fails, no staged graph replacement has been published and the session
         # remains usable.
-        self.store.release_pin(self.pin)
+        self._release_publisher_pin()
 
         tracker._suspended += 1
         try:
@@ -17590,6 +17601,8 @@ class LazyWorldSession:
                 self.community_memberships.diagnostics()
             ),
             "identity": self._registry.diagnostics(),
+            "backing_dependencies": (None if self._backing_dependencies is None
+                else self._backing_dependencies.diagnostics()),
             "store": self.store.diagnostics(),
             "eager_dirty_owners": len(tracker._dirty),
             "eager_deleted_owners": len(tracker._deleted),
@@ -17625,6 +17638,12 @@ class LazyWorldSession:
         if error is not None:
             raise error
 
+    def _release_publisher_pin(self):
+        if self._backing_dependencies is not None:
+            self._backing_dependencies.close(abandon_stale=self._state == 'stale')
+        else:
+            self.store.release_pin(self.pin)
+
     def close(self):
         if not self._active:
             return
@@ -17643,6 +17662,14 @@ class LazyWorldSession:
             raise StoreError(
                 "resolve uncertain lazy save before closing the session"
             )
+        if self._backing_dependencies is not None:
+            # Release is the final fallible backing boundary. A failed release
+            # must leave the graph, callbacks and dependency roster usable.
+            self._begin_lifecycle_operation("close", allow_stale=True)
+            try:
+                self._release_publisher_pin()
+            finally:
+                self._end_lifecycle_operation("close")
         self._lifetime.close()
         teardown_error = None
         try:
@@ -17657,7 +17684,7 @@ class LazyWorldSession:
         if current_prefix is not None:
             current_prefix.close()
         try:
-            self.store.release_pin(self.pin)
+            self._release_publisher_pin()
         finally:
             self._registry.close()
             self._history_cache_budget.clear()

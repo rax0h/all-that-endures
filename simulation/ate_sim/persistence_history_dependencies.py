@@ -3,7 +3,9 @@
 A dependency borrows the World publisher's token; it creates no older snapshot
 pin. An unowned backing must remain immutable in World authority while its
 canonical proxy keeps a private overlay. Retirement must consult this authority
-before deleting that backing. This participant is not yet activated in World.
+before deleting that backing. World borrows this participant only in its explicit
+checked-catalog mode; ordinary legacy open and complete-format migration remain
+separate activation boundaries.
 
 One mandatory row per backing contains at most MAX_PINS publisher tokens.
 Released tokens are pruned on subsequent edits, avoiding one immortal row per
@@ -173,11 +175,15 @@ class BackingDependencyPool:
         self._prepared = self._prepared_target = None
         self._new.intersection_update(self._aliases)
 
-    def close(self):
+    def close(self, *, abandon_stale=False):
         if self.closed:
             return
         if self._prepared is not None:
-            raise StoreConflictError('backing dependencies have a frozen save plan')
+            if not abandon_stale:
+                raise StoreConflictError('backing dependencies have a frozen save plan')
+            with self.store.read_snapshot(self.pin):
+                if int(self.store._checked_head_row()[0]) <= self.pin.captured_head:
+                    raise StoreConflictError('cannot abandon a current frozen dependency plan')
         # The existing publisher release is the final fallible boundary. On a
         # failed release, all dependency/proxy metadata remains usable.
         self.store.release_pin(self.pin)
@@ -185,6 +191,9 @@ class BackingDependencyPool:
         self._aliases.clear()
         self._persisted.clear()
         self._new.clear()
+        # This is permanent lease invalidation, never a thaw for retry. Native
+        # release rejects pending/committed attempts and an advanced own token.
+        self._prepared = self._prepared_target = None
 
     def diagnostics(self):
         return {'dependencies': len(self._aliases), 'published_dependencies': len(self._persisted),

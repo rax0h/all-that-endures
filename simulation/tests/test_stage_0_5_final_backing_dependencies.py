@@ -88,6 +88,9 @@ def test_failed_commit_preserves_frozen_dependencies_and_exact_retry(tmp_path):
             store.commit(pool.pin, commit_token='failed', version_changes=versions,
                 changes=(), new_segments=(), metadata=metadata(1, ()))
         assert pool.prepare_delta() is delta
+        with pytest.raises(StoreConflictError, match='current frozen'):
+            pool.close(abandon_stale=True)
+        assert not pool.closed and pool.prepare_delta() is delta
         with pytest.raises(StoreConflictError, match='frozen'):
             pool.acquire(LazyHistoryList(store, pool.pin, 2, initial_values=[]))
         store._phase_hook = lambda _: None
