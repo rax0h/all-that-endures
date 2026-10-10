@@ -3520,5 +3520,13 @@
   "p5_boundary": "b57704304dc51238ac14420e55d1b1bc3ed79892",
   "production_pr14_head": "c29e3d06a0c9d219235e2b3f0390271bd1245aea",
   "production_pr14_modified": false,
-  "new_endurance_run": false
+  "new_endurance_run": false,
+  "published_source": {
+    "public_commit": "95ac3d0b624ffa331fbdc4e7f76c69692283ab19",
+    "local_commit": "06cb4ca09d8a8b627e8296311fa358c9f2c80628",
+    "tree": "19a04bbc163d055c52493448e7644836eb0abe81",
+    "expected_parent": "fd7b4b42ec5d0e69e2f3761f5e22e91d51783f91",
+    "non_force_lease": true,
+    "live_ref_verified": true
+  }
 }

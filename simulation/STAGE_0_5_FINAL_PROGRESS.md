@@ -2,6 +2,16 @@
 
 ## Latest checkpoint: recursive container runtime (October 10 UTC)
 
+Public source `95ac3d0b624ffa331fbdc4e7f76c69692283ab19`, local source
+`06cb4ca09d8a8b627e8296311fa358c9f2c80628`, exact matching tree
+`19a04bbc163d055c52493448e7644836eb0abe81`. Leased non-force publication
+completed on `sol/stage-0-5-complete-closeout`; live public ref verified.
+A first shell push was blocked by approval review pending authorization/destination
+evidence. Prior standing GitHub authorization and the exact origin were recovered;
+the retry passed review but lacked shell credentials. Connected GitHub publication
+then succeeded with the verified parent lease and exact local tree. No force,
+production branch change, merge or test workflow was used.
+
 Recovered the actual implementation head at local `51c2a07d9bfc022dc756136d4fdae7da851ed75a`
 and public `fd7b4b42ec5d0e69e2f3761f5e22e91d51783f91`, identical tree
 `da85ee8d9f58a3b58ad0ab395982a520664f6fae`. That newer checkpoint registered
