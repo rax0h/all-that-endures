@@ -1,5 +1,47 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: eager dictionary and mutable LOG placement journals (October 10 UTC)
+
+Public source `544d66e5fb00348123ac4d3d5ef49a2ed00c886d`, local source
+`85faef1047543c1aaa90c1ed604b791ad99c860a`, matching tree
+`b0b8144f165af0ffe121eb9099b05cab2f543bf2`. Leased non-force exact-tree
+publication completed; PR14 remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Explicit staged checked-catalog World routing now reconciles touched eager dict
+and mutable event owners through the same coordinator. It projects only the
+touched compact owner, treating typed history proxies as leaves. Original tracker
+object witnesses preserve unchanged record/container incarnations; new objects
+receive distinct IDs. Deletion/replacement wins before shared mutation, and new
+eager/Event placements attach existing canonical children. The eager tracker keeps
+callbacks and object witnesses but cannot publish a competing legacy link journal
+in this explicit mode. Activation rejects preexisting legacy journals.
+
+Mutable event lookup resolves one absolute tail slot rather than scanning the
+mutable tail. Existing shared-history event restoration no longer attempts native
+list assignment on an EventLog when the owner object was unchanged. Suppressed
+mutable event envelopes use the same checked physical (ordinal, value) provider
+as eager dictionaries, preserving checksum/schema/query absence/current bytes.
+Sealing removes mutable identity placements while preserving immutable event value
+history and still-shared backings. No historical member page is read on save.
+
+Final focused command: `PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_world_eager_placements.py simulation/tests/test_stage_0_5_final_world_event_placements.py simulation/tests/test_stage_0_5_final_world_catalog_bridge.py simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py simulation/tests/test_stage_0_5_final_world_backing_retirement.py`
+— exit0, **43 passed in12.86s**. Paired H1k/H10k event saves perform identical
+payload-read/metadata-row/payload-write counts with historical member reads,
+live-registry inventory and owner-graph searches forbidden after mutation.
+New event placement/backing rollback and lost ack resolve the same captured plan.
+Initial event REDs reproduced EventLog restoration, missing new-event placement
+and absent routing. A further new-eager-owner RED exposed legacy-link publication;
+the checked-mode tracker authority boundary repairs that without relaxing rejection.
+
+Broader affected legacy and catalog gates were launched separately and were still
+running when this checkpoint was written. Their final result is not assumed here.
+No new full suite, P5, endurance, promotion or final review. Stage0.5 is not finished.
+Packed action/EventID descriptor placement integration, recursive stable paths,
+live counted promotion, exotic exact equality, complete activation/copy upgrade,
+World retired-group compaction and final verification/review remain. Current next
+test-first work reproduces absent automatic World group compaction after backing
+retirement. These are fixed approved requirements, not new scope.
+
 ## Latest checkpoint: actual World backing retirement (October 10 UTC)
 
 Public source `88d4ee00fe0d9f50360a94e32df06f387bf0106b`, local source
