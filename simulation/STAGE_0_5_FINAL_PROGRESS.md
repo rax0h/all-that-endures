@@ -1,5 +1,101 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: counted World household histories and exact pressure (October 10 UTC)
+
+Public implementation `57e2625a79d26c770142d94ebe93261c1f97043a`;
+local implementation `6e025cdd257cc9c0bf73cd4553993adaae5fd197`;
+matching tree `8155c2dd94c85f8d192228ef8adce7a817de26e5`.
+Parent public `70738836b7cf53ab7367867c3f65477b621a840d` / local
+`e0b63eb8ea910246e3472d1dfb1da5e018fb2a5d`, matching tree
+`fc33d19121c5b8484946add3b48103d7e937209e`.
+Production remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+The explicit counted conversion lane (`counted_households=True`) now creates
+lazy Household headers with checked alive/settlement projections and counted
+members references. Settlement.households uses the same counted tree while
+Settlement headers remain in the accepted eager tracker. Existing paged/eager
+legacy modes remain readable and the converter default is unchanged. This is
+an integrated candidate lane, not a complete capability-6 copy upgrade; no
+capability-6 feature marker is emitted while the mandatory catalog, exceptional
+IDs, recursive history and lease authorities remain unfinished.
+
+Scalar household edits load no member nodes. Ordered edits use local tree paths,
+stable occurrences and checked membership projections. Living selection queries
+only current candidates and returns their original occurrence order, including
+duplicates. Settlement lists retain extinct households, duplicate occurrences,
+native first-equal removal and replacement order. New household/settlement fields
+normalize before exposure; shared new lists, wallet aliases, retained unowned
+sequences and portable detach reuse the sole registry and sharing memo.
+Deletion of an unloaded household reads identity placements, not member pages.
+Retired backing reclamation and external leases are still outstanding.
+
+World open now composes counted sequence reads with its already checked snapshot;
+it neither starts a second SQLite transaction nor rolls back the caller's outer
+read. Sequence rollback follows the existing explicit resolve protocol and only
+thaws a frozen child after checked proof that the central token did not publish.
+A central preparation failure before commit gets the same unpublished-token
+proof, retaining all dirty tree edits. Lost acknowledgement blocks further reads
+and edits until resolve_save publishes the exact frozen plan once.
+
+Pressure keeps one native ordered sum over all household occurrences. On a cold
+miss it reads checked preparedness headers directly, consulting dirty/canonical
+objects first, without loading those households' members descriptors or nodes.
+Cache witnesses include the membership incarnation/revision, a conservative
+household writer revision, length and generation. Scalar assignment, household
+replacement/deletion, membership edits/replacement and save/recovery invalidate
+the result. The scalar cache has both entry and byte caps. Household clean caches
+keep their 256-header cap inside simulation steps; historical pressure reads do
+not become an H-sized retained hot set. Other-family hot-cache closure remains
+part of the remaining global budget work.
+
+REDs retained: missing counted converter argument; nested snapshot failure on
+open; central preparation left sequences permanently frozen. The first scalar
+test was corrected to distinguish the necessary descriptor read from forbidden
+member-node reads. Rollback tests use the established required resolve_save
+before editing, rather than bypassing recovery.
+
+Final focused/affected gate on this runtime: `pytest -q --tb=short` on
+final_household_sequences, final_pressure, final_pressure_arithmetic,
+final_event_histories, final_history_reattachment, final_owner_binders,
+final_runtime_families, final_sequence_compat, final_sequence_errors and
+final_sequence_numeric_index: **112 passed in33.40s**, exit0.
+Retained `stage_0_5_final_counted_households_gate.txt`. A prior affected legacy
+household/store/lifecycle/scalar gate passed136 in108.82s before the final
+checked-pressure reader/preparation-release extension; this is supporting
+compatibility evidence, not another final-source certificate. Counts overlap.
+No full suite, Actions/endurance run, production promotion or Stage1 work.
+
+Fresh final-runtime independent P5 using
+`python simulation/persistence_p5_validation.py --counted-households --output <report>`
+passed seed843000,3+4+3, year10,439 events and digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
+Retained `stage_0_5_final_counted_households_p5.json`; includes eager control,
+save/reopen, relocation and one-memo materializing detach. Forced hazard tests
+compare exact float.hex preparedness/severity and unchanged RNG calls in both
+the accepted legacy and counted lanes, through edits/replacement/reopen.
+
+Reproducible paired metrics:
+`python simulation/measure_stage_0_5_counted_households.py --output <report>`;
+retained `stage_0_5_final_counted_households_metrics.json`, verified source hashes.
+H1k/H10k separate long-history and many-owner fixtures hold eight live people,
+two sharing placements and one edit. Explicit O(H) construction is excluded.
+Open:38 payload reads in all four fixtures, zero resident household headers.
+No-op:3 descriptor/control reads, zero writes (not zero global-link work).
+Scalar:9 reads and3 writes in every fixture; zero member-node reads.
+Long-history insert:135/91 total writes, at most256 moved locators; many-owner
+insert:9 writes at both sizes. All ordinary maintenance removed <=256 rows.
+Pressure cold visits every occurrence: many-owner reads1016/10164 and measured
+0.1773/1.8270 seconds; pressure hits read0 payloads. Only the two already loaded
+headers remain resident after the stream. Timings are observations, not SLAs.
+This does not certify ordinary checked-catalog open or all Python metadata costs.
+
+**Continue the whole assignment:** integrate the remaining nested graph buckets
+and exceptional event-ID authorities; activate complete checked-catalog World
+routing and touched journals; finish recursive closure, leases/retired backing,
+global budgets and explicit capability-6 upgrade; then stable integrated H gates,
+one final applicable suite and final independent architectural review. The exact
+O(H) pressure cold-miss owner release decision remains open while coding proceeds.
+
 ## Latest checkpoint: retain unpublished history overlays and publish on reattachment (October 10 UTC)
 
 Public implementation `3ee303f90ad5cf2bc72b0fd749f2f2555a47a1a2`;
