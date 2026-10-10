@@ -26,6 +26,64 @@ def test_world_preparation_uses_family_participants_and_detached_replay(tmp_path
         assert publication.replay_plan(plan).version_changes[0].value.wealth != 888
 
 
+def test_frozen_publication_replays_original_token_and_generation(tmp_path):
+    from dataclasses import replace
+    destination = converted_people_store(tmp_path, 12, active=3)
+    with open_lazy_world_session(destination, rules_id=RULES) as session:
+        session.world.people[1].wealth += 3
+        plan = session._prepare_hybrid_save()
+        altered = replace(plan, token='different-token', target_generation=999,
+                          cold_plan=replace(plan.cold_plan, token='different-token'))
+        replay = plan.publication.replay_plan(altered)
+        assert replay.token == replay.cold_plan.token == plan.token
+        assert replay.target_generation == plan.target_generation
+        assert plan.publication.commit_arguments(altered)['commit_token'] == plan.token
+
+
+def test_corrupt_failed_attempt_cannot_discard_world_pending_plan(tmp_path):
+    destination = converted_people_store(tmp_path, 12, active=3)
+    session = open_lazy_world_session(destination, rules_id=RULES)
+    commit = session.store.commit
+    try:
+        session.world.people[1].wealth += 3
+        def fail(phase):
+            if phase == 'before_head':
+                raise OSError('failed transaction')
+        def corrupt_failure(pin, **kwargs):
+            try:
+                return commit(pin, **kwargs)
+            except OSError:
+                assert session.store.resolve_commit(pin, kwargs['commit_token']).outcome == 'not_committed'
+                session.store.db.execute('UPDATE pin_attempts SET row_checksum=? WHERE pin_token=?',
+                                         ('bad', pin.token))
+                session.store.db.commit()
+                raise
+        session.store._phase_hook = fail
+        session.store.commit = corrupt_failure
+        with pytest.raises(StoreIntegrityError):
+            session.save()
+        assert session._state == 'recovery-required'
+        assert session._pending_save is not None
+        assert all(not unit.accepted for unit in session._pending_save.publication.participants)
+        assert session.people._dirty
+    finally:
+        # Restore the exact checked row so cleanup can resolve the deliberately
+        # retained failure. This does not authorize a corrupt row in production.
+        session.store.commit = commit
+        session.store._phase_hook = lambda phase: None
+        row = session.store.db.execute('SELECT commit_token,parent_generation,state,generation '
+                                      'FROM pin_attempts WHERE pin_token=?', (session.pin.token,)).fetchone()
+        if row is not None:
+            from ate_sim.persistence_lazy_store import _attempt_checksum
+            checksum = _attempt_checksum(session.pin.token, *row)
+            session.store.db.execute('UPDATE pin_attempts SET row_checksum=? WHERE pin_token=?',
+                                     (checksum, session.pin.token))
+            session.store.db.commit()
+        if session._state == 'recovery-required':
+            session.resolve_save()
+        session.close()
+
+
 def test_lost_ack_replays_exact_participant_plan_and_accepts_once(tmp_path):
     destination = converted_people_store(tmp_path, 12, active=3)
     with open_lazy_world_session(destination, rules_id=RULES) as session:

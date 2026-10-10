@@ -15824,6 +15824,12 @@ class LazyWorldSession:
 
     def _reset_uncommitted_plan(self):
         tracker = self._eager_tracker
+        if self._pending_save is not None:
+            try:
+                self._pending_save.publication.abort_uncommitted()
+            except Exception:
+                self._state = tracker._cold_state = 'recovery-required'
+                raise
         tracker._cold_plan = None
         tracker._cold_publication_phase = None
         tracker._cold_old_prefix_pending = None

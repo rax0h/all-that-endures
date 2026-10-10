@@ -383,7 +383,11 @@ class IdentityCoordinator:
             self._value_dirty_groups.clear()
             self._trim()
             if self.registry.next_incarnation == self._baseline_allocator:
-                return ParticipantDelta.freeze(self.store.codec, 'identity-coordinator')
+                delta = ParticipantDelta.freeze(self.store.codec, 'identity-coordinator')
+                catalog_delta = ParticipantDelta.freeze(self.store.codec, 'identity-catalog')
+                self._prepared = PreparedCoordinatorState(delta, catalog_delta, self.pin.captured_head,
+                    self.registry.next_incarnation, ())
+                return delta
         placements = tuple(self.placement_overlay.values())
         catalog_delta = self.catalog.prepare_delta(self.pin, payloads, placements,
                            next_incarnation_id=self.registry.next_incarnation,
