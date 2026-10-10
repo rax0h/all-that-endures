@@ -1,5 +1,61 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: native graph bucket histories (October 10 UTC)
+
+Public source `d09aa2a71f66436d3e5aaa63869c8633680cf50a`, local source
+`009a3af1ae765b6eebcb0612f198889bd9a2c643`, matching tree
+`bde43af3471d5ed80500c6c007dc0580cf6bb380`. Parent public
+`a51ecf8622423f3f721b68b25877bb6ea253c795`, local
+`6ed11256cb2bca675bd7b8b2a37837b7e2b6dbf7`, tree
+`5cf92346292fbd47c1a09c64923bc3f8b2a64df6`.
+Production remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Explicit `native_graph_buckets=True` conversion integrates genealogy children,
+lineage children, social adjacency, resource owner buckets, material lot buckets
+and active-lot buckets with typed history references. It implies counted
+households. It is still a capability-5 candidate, not the full capability-6
+upgrade. Defaults and genuine legacy authorities remain separate/readable.
+Community membership already has scalar `(person, community)` rows and a person
+index, rather than a resident historical set bucket.
+
+One scalar wallet edit reads/writes no history pages. One bucket append or set
+addition writes exactly one bounded page or entry. Alias mutation uses current
+owner type guards, including complete prevalidation of constrained batches.
+Retiring the typed owner releases its constraint on a remaining wallet alias.
+Unowned overlays survive unrelated saves and later reattachment without restoring
+deleted owners. Rollback uses explicit resolve before retry. Counted histories
+selected during conversion can also be shared with resource/skill fields,
+genealogy and eager Settlement memory; detach retains one shared native object.
+The social-adjacency route type accepts typed sets, and P5 mode selection now
+normalizes the mutually exclusive household readers.
+
+Affected gate: **174 passed in67.94s**, exit0,
+`stage_0_5_final_graph_buckets_gate.txt`. After the final route-type fix and six
+additional eager-memory alias cases: **35 passed in27.02s**, exit0,
+`stage_0_5_final_graph_buckets_alias_gate.txt`. Counts overlap.
+P5 `--native-graph-buckets` passed seed843000,3+4+3, year10,439 events and
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
+`stage_0_5_final_graph_buckets_p5.json` predates only the final route-type
+allowance/CLI household-mode normalization, which the focused alias gate covers;
+it is supporting evidence, not a full final-source certification.
+
+Paired H1k/H10k metrics in `stage_0_5_final_graph_buckets_metrics.json` have
+verified current runtime hashes. Each fixture holds one historical bucket, two
+sharing placements and one edit; explicit construction/verification is excluded.
+All six families: scalar11 payload reads/3 writes, addition11 reads/4 writes,
+exactly one history payload write. Header sizes28/29 bytes. Largest page write
+1482 bytes, largest set-entry write81 bytes. Ordinary maintenance removals<=4.
+These local bounds do not establish checked catalog open/global coordination or
+all Python metadata bounds. No full suite, Actions/endurance run or promotion.
+
+Remaining alias closure includes bounded type-admission proofs for already paged
+histories and live attachment between append-page/count-tree list backings; the
+cold conversion sharing test is not proof of all live transitions. Continue with
+exceptional IDs, complete checked World routing/touched journals, recursive
+mutable closure, external leases/retired backing, global caps and explicit
+capability-6 copy upgrade, then integrated gates and final independent review.
+The exact O(H) pressure cold-miss release decision remains open.
+
 ## Latest checkpoint: counted World household histories and exact pressure (October 10 UTC)
 
 Public implementation `57e2625a79d26c770142d94ebe93261c1f97043a`;
