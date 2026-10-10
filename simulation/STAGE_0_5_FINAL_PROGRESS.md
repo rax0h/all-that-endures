@@ -1,5 +1,43 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: compact checked EventIdSet identity headers (October 10 UTC)
+
+Public source `0b3bd9f1123aca32f6f0e4df952fc805ab75eef4`, local source
+`b8c7621a11576d07c40b64fa2f4fa35ee64b6441`, matching tree
+`50565c4101f4caf460c7094763f2ba257c02c909`. Parent public docs
+`cd2e9f767a9567192872a4cdf852848bae6c0b89`, local docs
+`72a8772b8923de1d267348ff023ef39f03a6491b`, matching tree
+`86ba9aedadc890cb15b5ecb19e0702d9d5903a8f`.
+Production verified unchanged at `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Concrete identity comparisons now encode the EventIdSet root's captured range
+or paged exception descriptor, and nested wallet/institution aliases as the
+existing authority reference. The private header codec checks a weak owning
+tracker, active World, identical store, current checked generation and exact
+root object before encoding. Foreign, older-generation and closed-session
+facades cannot become unchecked references. Family callbacks pass relative
+placement paths so root and nested roles remain distinct. Portable WorldCodec
+exports still materialize exact values; exact resident legacy root comparisons
+retain the accepted materializing compatibility path. No new capability claim.
+
+RED reproduced a whole-history set encoding. H1k/H10k range and exceptional
+cases now have zero member visits and zero payload reads during header encoding,
+with each encoded header under4096 bytes. Final affected gate **135 passed
+in127.18s**, exit0 with pipefail, `stage_0_5_final_event_id_headers_gate.txt`:
+header/coordinator/participant/recovery, compact facade and exceptional-state
+cases. Supporting concrete binder/lifecycle gate **11 passed in2.77s**,
+`stage_0_5_final_event_id_headers_lifecycle_gate.txt`; counts overlap. An earlier
+134-pass/one-failure run had a missing fixture open argument, corrected before
+the final gate. No new P5, full applicable suite or endurance run: this change
+is confined to comparison callbacks, and previous integrated P5 evidence stays
+at its own source boundary.
+
+Backing-specific retirement protection, complete checked World catalog
+activation/touched header witnesses, recursive/type/equality closure, explicit
+capability6 copy upgrade and final integrated acceptance remain pending.
+Stage0.5 is not complete; capability6 is not emitted and PR14 is not promoted.
+
+
 ## Latest checkpoint: checked snapshot-lease primitives; World lease constraint found (October 10 UTC)
 
 Public source `cebc98ca8693fce72dd5d00aed7c73450704b719`, local source
