@@ -1,5 +1,66 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: actual World backing retirement (October 10 UTC)
+
+Public source `88d4ee00fe0d9f50360a94e32df06f387bf0106b`, local source
+`46a96761d6475ea62322f8dbaf83537239fc6c57`, matching tree
+`96f9d142a8b95e35665e3832e96e7b49ae14aba5`. Leased non-force exact-tree
+publication completed. PR14 remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Explicit staged checked-catalog World publication now queues typed history backing
+retirement when its checked pinned group loses its final current placement. It
+examines only changed original incarnations through the existing coordinator,
+compact descriptor and mandatory dependency authority; no owner inventory or
+historical member-page decode. Record/container incarnations without backing
+authority are not guessed into history jobs. The foreground queue and bounded
+background slices freeze with the central family/coordinator/dependency save.
+
+Real saves process up to128 background changes and reserve up to128 physical
+expired-row removals in the same commit. The validated cleanup budget is captured
+in FrozenHybridPublication; legacy ordinary commits retain their default256.
+Explicit primitive retirement deltas subtract their captured row count from the
+physical GC budget. Foreground queue additions scale with actual user placement
+edits, not the background cap: a260-owner deletion is accepted and queues more
+than256 jobs. Live aliases, same-transaction identity edits and checked older pins
+protect backings. Weak collection releases dependency authority on a real save;
+subsequent slices finish cleanup. No-op save still neither advances nor drains
+maintenance. Pending identity groups stay available until backing retirement ends;
+automatic retired-group/range compaction is not yet wired into World.
+
+Ruling: use coordinator current placement proof for last-owner scheduling, not
+loaded-object reachability — cost if wrong: incomplete owner/catalog authority
+must reject before either participant freezes. Ruling: share the total ordinary
+maintenance budget between logical backing retirement and physical expiry GC,
+not256 each — cost if wrong: deferred backlog must still show eventual progress.
+Ruling: foreground requeue wins over background cancellation after revival and
+another final removal; never reset a partly reclaimed placed backing.
+
+Final affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_world_backing_retirement.py simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py simulation/tests/test_stage_0_5_final_world_catalog_bridge.py simulation/tests/test_stage_0_5_final_backing_dependencies.py simulation/tests/test_stage_0_5_final_history_retirement.py simulation/tests/test_stage_0_5_final_maintenance.py simulation/tests/test_stage_0_5_final_participant_abort.py simulation/tests/test_stage_0_5_final_world_participants.py simulation/tests/test_stage_0_5_final_catalog_publication.py simulation/tests/test_persistence_lifecycle.py -k 'not comparison_never and not point_and_reverse_reads'`
+— exit0, **122 passed,2 deselected in19.38s**. The two previously established
+backlog read-scaling cases were not rerun; their indexed read code is unchanged.
+Additional `simulation/tests/test_persistence_lazy_store.py`: exit0,
+**23 passed in5.00s**. Counts overlap previous evidence. `git diff --check` passed.
+
+Actual-World cases cover H1k/H10k last-owner removal with member-page reads
+disabled, retained private aliases, genuine older-reader protection and pressure,
+bounded cleanup completion after release, shared maintenance accounting,
+rollback/lost ack, revival/redeletion,260-owner foreground work and missing
+descriptor/dependency rejection before freeze. Initial REDs found absent wiring;
+the first old-reader fixture attempted forbidden multiple advances and was corrected
+to assert the existing GenerationPressureError instead of relaxing the protocol.
+A tuple-versus-spilled projection teardown error was repaired. One mistakenly named
+additional test file ran no tests; the corrected lazy-store command above is the
+evidence. No long test was repeatedly polled or endurance launched.
+
+This is still staged-catalog evidence, not complete-format ordinary open/migration.
+Remaining: eager/event placement journals, recursive stable-path closure, live
+counted promotion, exotic exact equality, complete activation/source-copy upgrade,
+World retired-group compaction and final bounds/P5/full-suite/review package. P5
+remains at `b57704304dc51238ac14420e55d1b1bc3ed79892`; no capability6 emitted.
+Stage0.5 is not finished or release accepted. Next: replace eager/global nested
+placement preparation with touched owner journals in the checked-catalog path.
+
 ## Latest checkpoint: actual World retained-history lifetime (October 10 UTC)
 
 Public source `df5055e0fc65e2eee9ecd4e70efc2ac722c2b5b5`, local source
