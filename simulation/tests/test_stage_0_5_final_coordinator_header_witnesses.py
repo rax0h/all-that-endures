@@ -20,9 +20,10 @@ NS = 'world.skills.skills'
 PATH = (('field', 'provenance'),)
 
 
-def fixture(store, *, callback=True, mixed=False):
+def fixture(store, *, callback=True, mixed=False, history_size=None):
     pin = store.capture_pin()
-    child = LazyHistoryList(store, pin, 1, initial_values=[7], checked_types=True)
+    child = LazyHistoryList(store, pin, 1,
+        initial_values=[7] if history_size is None else range(history_size), checked_types=True)
     versions = tuple(VersionChange(NS, (key, 'craft'), SkillHistory(key, 'craft', provenance=HistoryReference('list', 1)),
         memberships=(Membership('person', key, key),)) for key in (1, 2))
     placements = tuple(IdentityOccurrenceChange(NS, (key, 'craft'), PATH, 1) for key in (1, 2))

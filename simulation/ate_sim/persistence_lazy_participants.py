@@ -32,6 +32,46 @@ def _delta(codec, namespace, versions, records, identities):
     return ParticipantDelta(namespace, versions, records, identities, fingerprint)
 
 
+def _changed_backings(versions):
+    """Derive affected groups from captured value writes, never access journals.
+
+    Only the registered typed backing schemas participate. Maintenance deltas
+    are added separately and must not be mistaken for runtime value edits.
+    This visits actual prepared writes, not proxies, owners or history members.
+    """
+    from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE, PAGE_NAMESPACE, ENTRY_NAMESPACE
+    from .persistence_lazy_sequence import NAMESPACES, DESCRIPTOR_NAMESPACE as SEQUENCE_DESCRIPTOR
+    from .persistence_history_types import NAMESPACE as MEMBER_TYPES
+    direct = {DESCRIPTOR_NAMESPACE, SEQUENCE_DESCRIPTOR, MEMBER_TYPES}
+    composite = {PAGE_NAMESPACE, ENTRY_NAMESPACE, *NAMESPACES} - direct
+    changed = set()
+    for change in versions:
+        if change.namespace in direct:
+            inc = change.key
+        elif change.namespace in composite:
+            if type(change.key) is not tuple or len(change.key) != 2:
+                raise StoreIntegrityError('invalid frozen history backing key')
+            inc = change.key[0]
+        else:
+            continue
+        if type(inc) is not int or inc < 1:
+            raise StoreIntegrityError('invalid frozen history backing incarnation')
+        changed.add(inc)
+    return tuple(sorted(changed))
+
+
+def _check_unique_authorities(codec, deltas):
+    seen = set()
+    for delta in deltas:
+        versions, ordinary, _ = delta.decode(codec)
+        for category, changes in enumerate((versions, ordinary)):
+            for change in changes:
+                marker = category, change.namespace, codec.encode(change.key)
+                if marker in seen:
+                    raise StoreIntegrityError('duplicate hybrid backing or owner authority')
+                seen.add(marker)
+
+
 class FamilySaveParticipant:
     """One concrete namespace's immutable writes and exact acknowledgement."""
     def __init__(self, store, pin, target_generation, delta):
@@ -205,6 +245,33 @@ class CoordinatorSaveParticipant:
         self.coordinator.abort_delta(self.delta, commit_token)
 
 
+class DependencySaveParticipant(FamilySaveParticipant):
+    """Borrow the publisher lease and accept only after central cold proof."""
+    def __init__(self, pool, delta, pin, target_generation):
+        super().__init__(pool.store, pin, target_generation, delta)
+        self.pool = pool
+
+    def validate_publication(self, delta, successor_pin):
+        super().validate_publication(delta, successor_pin)
+        if not self.accepted:
+            self.pool.validate_publication(delta, successor_pin)
+
+    def accept_delta(self, delta, successor_pin):
+        self._check(delta, successor_pin)
+        if self._validated_pin != successor_pin:
+            raise StoreIntegrityError('backing dependencies lack central publication proof')
+        if not self.accepted:
+            self.pool.accept_delta(delta, successor_pin)
+            self.accepted = True
+
+    def abort_delta(self, commit_token):
+        if self.accepted or self.pool._prepared is not self.delta:
+            raise StoreConflictError('backing dependency abort differs from frozen plan')
+        from .persistence_lazy_publication_guard import checked_uncommitted_publication
+        with checked_uncommitted_publication(self.store, self.parent_pin, commit_token):
+            self.pool.abort_delta()
+
+
 @dataclass(frozen=True)
 class FrozenHybridPublication:
     sources: tuple
@@ -221,6 +288,8 @@ class FrozenHybridPublication:
     target_generation: int
     commit_token_bytes: bytes
     coordinator_participant: object = None
+    dependency_participant: object = None
+    retirement_participant: object = None
 
     @property
     def frozen_bytes(self):
@@ -231,18 +300,21 @@ class FrozenHybridPublication:
             (*delta.version_bytes, *delta.identity_bytes)) + sum(map(len, self.ordinary_delta.ordinary_bytes)) + sum(
             map(len, self.segment_bytes)) + len(self.metadata_bytes) + len(self.layout_bytes) + len(self.cold_layout_bytes) + len(
             self.commit_token_bytes) + (sum(len(b) for b in (*self.coordinator_participant.delta.version_bytes,
-            *self.coordinator_participant.delta.identity_bytes)) if self.coordinator_participant is not None else 0)
+            *self.coordinator_participant.delta.ordinary_bytes,
+            *self.coordinator_participant.delta.identity_bytes)) if self.coordinator_participant is not None else 0) + (
+            sum(map(len, self.dependency_participant.delta.version_bytes)) if self.dependency_participant is not None else 0) + (
+            sum(map(len, self.retirement_participant.delta.version_bytes)) if self.retirement_participant is not None else 0)
 
     def abort_uncommitted(self):
         """Release a checked failed catalog freeze, preserving all dirty state."""
-        if self.coordinator_participant is not None:
-            codec = self.coordinator_participant.store.codec
-            self.coordinator_participant.abort_delta(codec.decode(self.commit_token_bytes))
-        else:
-            from .persistence_lazy_publication_guard import checked_uncommitted_publication
-            store = self.participants[0].store
-            with checked_uncommitted_publication(store, self.parent_pin, store.codec.decode(self.commit_token_bytes)):
-                pass
+        from .persistence_lazy_publication_guard import checked_uncommitted_publication
+        store = self.participants[0].store
+        token = store.codec.decode(self.commit_token_bytes)
+        with checked_uncommitted_publication(store, self.parent_pin, token):
+            if self.coordinator_participant is not None:
+                self.coordinator_participant.abort_delta(token)
+            if self.dependency_participant is not None:
+                self.dependency_participant.abort_delta(token)
 
     def replay_plan(self, plan):
         codec = self.participants[0].store.codec
@@ -278,15 +350,25 @@ class FrozenHybridPublication:
             if field == 'motive_identity_changes':
                 identities.extend(change for unit in replay.scalar_record_plans for change in unit.identity_changes)
         if self.coordinator_participant is not None:
-            versions.extend(self.coordinator_participant.delta.decode(self.coordinator_participant.store.codec)[0])
+            forced_versions, forced_ordinary, _ = self.coordinator_participant.delta.decode(
+                self.coordinator_participant.store.codec)
+            versions.extend(forced_versions)
+        else:
+            forced_ordinary = ()
+        if self.dependency_participant is not None:
+            versions.extend(self.dependency_participant.delta.decode(
+                self.dependency_participant.store.codec)[0])
+        if self.retirement_participant is not None:
+            versions.extend(self.retirement_participant.delta.decode(
+                self.retirement_participant.store.codec)[0])
         return dict(commit_token=replay.token, version_changes=tuple(versions), identity_changes=tuple(identities),
             next_incarnation_id=self.next_incarnation, required_format_version=self.required_format_version,
-            changes=replay.cold_plan.changes, new_segments=replay.cold_plan.new_segments,
+            changes=replay.cold_plan.changes + forced_ordinary, new_segments=replay.cold_plan.new_segments,
             metadata=replay.cold_plan.metadata)
 
 
 def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_format_version,
-                              identity_coordinator=None):
+                              identity_coordinator=None, backing_dependencies=None, retirement_delta=None):
     declared = {f.name for f in fields(plan) if f.name.endswith(('_version_changes', '_identity_changes'))
                 or f.name in ('version_changes', 'identity_changes')}
     if declared != set(VERSION_FIELDS + IDENTITY_FIELDS):
@@ -308,31 +390,70 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
     layout_bytes, cold_layout_bytes = codec.encode(plan.layout_value), codec.encode(plan.cold_plan.layout_value)
     commit_token_bytes = codec.encode(plan.token)
     coordinator_participant = None
+    dependency_participant = None
+    retirement_participant = None
+    deltas = tuple(d for _, d in sources) + tuple(d for _, d in scalars)
+    captured = deltas + (ordinary,)
+    if retirement_delta is not None:
+        from .persistence_history_retirement import SCOPES, NAMESPACE as RETIREMENT
+        from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES
+        versions, records, identities = retirement_delta.decode(codec)
+        allowed = {RETIREMENT, DEPENDENCIES, *(ns for scopes in SCOPES.values() for ns in scopes)}
+        if (retirement_delta.participant != 'history-retirement' or records or identities or len(versions) > 256
+                or any(c.namespace not in allowed for c in versions)
+                or ParticipantDelta.freeze(codec, 'history-retirement', version_changes=versions) != retirement_delta):
+            raise StoreIntegrityError('invalid frozen backing retirement delta')
+        retirement_participant = FamilySaveParticipant(store, pin, plan.target_generation, retirement_delta)
+        captured += (retirement_delta,)
+    _check_unique_authorities(codec, captured)
+    if backing_dependencies is not None:
+        pool = backing_dependencies
+        if (pool.store is not store or pool.pin != pin or pool.closed or pool._prepared is not None):
+            raise StoreIntegrityError('hybrid backing dependency parent differs from frozen plan')
+        if retirement_delta is not None and set(_changed_backings(
+                c for c in retirement_delta.decode(codec)[0] if c.delete)) & set(pool.protected_incarnations()):
+            raise StoreIntegrityError('retirement delta deletes a retained backing alias')
     if identity_coordinator is not None:
         coord = identity_coordinator
         if (coord.store is not store or coord.pin != pin or coord._prepared is not None
                 or coord.registry.next_incarnation != next_incarnation):
             raise StoreIntegrityError('hybrid coordinator parent or allocator differs from frozen plan')
-        deltas = tuple(d for _, d in sources) + tuple(d for _, d in scalars)
         identity_bytes = tuple(b for d in deltas for b in d.identity_bytes)
         expected = ParticipantDelta.freeze(codec, 'identity-coordinator',
             identity_changes=tuple(coord.placement_overlay.values())).identity_bytes
         if sorted(identity_bytes) != sorted(expected):
             raise StoreIntegrityError('hybrid identity sources differ from coordinator overlay')
-        owner_versions = tuple(change for d in deltas for change in d.decode(codec)[0]
-                               if change.namespace in FAMILIES)
+        all_versions = tuple(change for d in deltas for change in d.decode(codec)[0])
+        owner_versions = tuple(change for change in all_versions if change.namespace in FAMILIES)
         owner_records = tuple(change for change in ordinary.decode(codec)[1] if change.namespace in FAMILIES)
         supplied_owners = {(change.namespace, codec.encode(change.key))
                            for change in (*owner_versions, *owner_records)}
-        dirty_owners = {(namespace, codec.encode(key)) for namespace, key in coord.dirty_owners}
-        if not dirty_owners <= supplied_owners:
+        placement_owners = {(change.owner_namespace, codec.encode(change.owner_key))
+                            for change in coord.placement_overlay.values()}
+        if not placement_owners <= supplied_owners:
             raise StoreIntegrityError('hybrid save omits a touched identity owner payload')
         if any(change.namespace == 'world_identity_links' for change in ordinary.decode(codec)[1]):
             raise StoreIntegrityError('checked catalog cannot publish legacy identity links')
         # Catalog metadata augments the central version list. Placement writes
         # already belong to the family sources and are never appended twice.
-        delta = coord.prepare_delta(owner_versions, ordinary_changes=owner_records)
+        try:
+            if backing_dependencies is not None:
+                dependency_participant = DependencySaveParticipant(pool, pool.prepare_delta(), pin, plan.target_generation)
+                _check_unique_authorities(codec, captured + (dependency_participant.delta,))
+            delta = coord.prepare_delta(owner_versions, ordinary_changes=owner_records,
+                                        value_changed_incarnations=_changed_backings(all_versions))
+        except BaseException:
+            if dependency_participant is not None:
+                dependency_participant.abort_delta(plan.token)
+            raise
         coordinator_participant = CoordinatorSaveParticipant(coord, delta, pin, plan.target_generation)
+    elif backing_dependencies is not None:
+        dependency_participant = DependencySaveParticipant(pool, pool.prepare_delta(), pin, plan.target_generation)
+        try:
+            _check_unique_authorities(codec, captured + (dependency_participant.delta,))
+        except BaseException:
+            dependency_participant.abort_delta(plan.token)
+            raise
     grouped = defaultdict(lambda: [[], [], []])
     for delta in tuple(d for _, d in sources) + tuple(d for _, d in scalars) + (ordinary,):
         for category, payloads in enumerate((delta.version_bytes, delta.ordinary_bytes, delta.identity_bytes)):
@@ -343,9 +464,13 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
         _delta(codec, namespace, *(tuple(values) for values in groups))) for namespace, groups in sorted(grouped.items()))
     if coordinator_participant is not None:
         participants += (coordinator_participant,)
+    if dependency_participant is not None:
+        participants += (dependency_participant,)
+    if retirement_participant is not None:
+        participants += (retirement_participant,)
     if not participants:
         raise StoreIntegrityError('nonempty hybrid plan has no family participants')
     return FrozenHybridPublication(sources, scalars, ordinary, participants,
         metadata_bytes, segment_bytes, layout_bytes, cold_layout_bytes,
         next_incarnation, required_format_version, pin, plan.target_generation,
-        commit_token_bytes, coordinator_participant)
+        commit_token_bytes, coordinator_participant, dependency_participant, retirement_participant)

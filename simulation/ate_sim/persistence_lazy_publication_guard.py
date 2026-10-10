@@ -29,6 +29,14 @@ def checked_uncommitted_publication(store, pin, commit_token):
                 yield
                 return
             raise StoreConflictError('failed publication token differs from the latest attempt')
+        if attempt[2:5] == (pin.captured_head, 'not_committed', None):
+            # The central publisher can hold this same checked snapshot while
+            # thawing several participants. Reuse the durable exact failure
+            # proof; resolve_commit starts a write transaction and must not be
+            # nested inside that snapshot. Operational rows above are checked,
+            # including receipt/attempt consistency, before yielding.
+            yield
+            return
     result = store.resolve_commit(pin, commit_token)
     if (result.outcome != 'not_committed' or result.stale or result.pin != pin
         or result.generation != pin.captured_head):

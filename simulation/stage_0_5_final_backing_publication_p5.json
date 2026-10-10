@@ -1,0 +1,135 @@
+{
+  "checkpoint_bytes": 310819,
+  "checkpoint_schema": 8,
+  "cold_file_bytes": 1916928,
+  "cold_sha256": "f956bb85e4cd85514818144fd33ac4d0514476d6327c3f418ec9705549a83af2",
+  "continuation_years": 4,
+  "control_final_digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e",
+  "control_total_digest": "b31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387",
+  "detached_checkpoint_bytes": 538826,
+  "events_total": 439,
+  "final_year": 10,
+  "first_continuation_simulation_seconds": 10.089449537999826,
+  "first_full_audit_io": {
+    "payload_read_bytes": 729042,
+    "payload_reads": 6034,
+    "payload_write_bytes": 0,
+    "payload_writes": 0
+  },
+  "first_save_io": {
+    "payload_read_bytes": 164177,
+    "payload_reads": 1036,
+    "payload_write_bytes": 878441,
+    "payload_writes": 3706
+  },
+  "fixture_creation": {
+    "cold": {
+      "commit_token": "71aaf17d3dba4461a90f30898d5b06e2",
+      "deleted_event_rows": 0,
+      "disk_events": 0,
+      "disk_segments": 0,
+      "event_count": 194,
+      "final_file_bytes": 1916928,
+      "final_generation": 2,
+      "finalize_io": {
+        "payload_read_bytes": 7738,
+        "payload_reads": 1,
+        "payload_write_bytes": 8026,
+        "payload_writes": 4
+      },
+      "largest_transfer_batch_chunks": 0,
+      "remaining_suffix_records": 194,
+      "staging_io": {
+        "payload_read_bytes": 0,
+        "payload_reads": 0,
+        "payload_write_bytes": 1064302,
+        "payload_writes": 3405
+      },
+      "transfer_commits": 0,
+      "transfer_io": {
+        "payload_read_bytes": 0,
+        "payload_reads": 0,
+        "payload_write_bytes": 0,
+        "payload_writes": 0
+      },
+      "transferred_events": 0,
+      "validation_io": {
+        "payload_read_bytes": 2251174,
+        "payload_reads": 7012,
+        "payload_write_bytes": 0,
+        "payload_writes": 0
+      }
+    },
+    "lazy": {
+      "advancement_paths": 19,
+      "aspirations": 95,
+      "community_memberships": 144,
+      "destination_format": 5,
+      "genealogy_children": 24,
+      "genealogy_parents": 15,
+      "generation": 2,
+      "identity_occurrences": 5250,
+      "institution_applications": 0,
+      "institution_magic_records": 0,
+      "institution_notices": 0,
+      "lineage_child_edges": 0,
+      "lineage_children": 84,
+      "lineage_nodes": 292,
+      "material_active_index": 5,
+      "material_items": 0,
+      "material_lot_index": 5,
+      "material_lots": 38,
+      "motives": 95,
+      "next_incarnation_id": 5251,
+      "owner_index": 1,
+      "people": 144,
+      "resources": 22,
+      "skills": 300,
+      "social_adjacency": 144,
+      "social_edges": 418,
+      "social_partnerships": 27,
+      "souls": 144,
+      "source_format": "p3b-cold/current-links",
+      "source_preserved": true,
+      "transmissions": 16,
+      "treasuries": 0,
+      "wallets": 0
+    }
+  },
+  "last_event_id": 439,
+  "lazy_file_bytes": 32034816,
+  "lazy_sha256": "63a77a8f6980fab8a73443da7e1663ba01938e3d450b08b7e31940db895116a3",
+  "open_io": {
+    "payload_read_bytes": 476428,
+    "payload_reads": 1454,
+    "payload_write_bytes": 0,
+    "payload_writes": 0
+  },
+  "passed": true,
+  "pre_years": 3,
+  "relocated_file_bytes": 28094464,
+  "relocated_sha256": "71991ac71d55872157fd9dc2bf32013dc12901520c447b65e06cd76844aa542a",
+  "reopen_years": 3,
+  "rules_id": "stage-0-5-p5-validation",
+  "second_continuation_simulation_seconds": 7.943133718000354,
+  "second_full_audit_io": {
+    "payload_read_bytes": 534208,
+    "payload_reads": 4478,
+    "payload_write_bytes": 0,
+    "payload_writes": 0
+  },
+  "second_save_io": {
+    "payload_read_bytes": 73832,
+    "payload_reads": 472,
+    "payload_write_bytes": 778350,
+    "payload_writes": 2478
+  },
+  "seed": 843000,
+  "timings": {
+    "checkpoint_lane_seconds": 0.2142839449998064,
+    "control_final_seconds": 0.14692993100015883,
+    "control_total_seconds": 0.11944670499997301,
+    "fixture_creation_seconds": 3.5318429209992246
+  },
+  "total_year": 7
+}
