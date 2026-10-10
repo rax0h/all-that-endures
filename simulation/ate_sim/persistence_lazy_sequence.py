@@ -92,6 +92,7 @@ class LazyOrderedSequence(MutableSequence):
         self._cache_budget = cache_budget if cache_budget is not None else SharedCacheBudget()
         self._dirty, self._baseline = {}, {}
         self._prepared = self._accepted = None
+        self._mutation_depth = 0
         self._new = initial_values is not None
         if value_mode not in (None, 'integer_ids', 'native'):
             raise ValueError('invalid sequence value mode')
@@ -178,21 +179,25 @@ class LazyOrderedSequence(MutableSequence):
         self._ensure()
         if self._prepared is not None:
             raise StoreConflictError('sequence has a frozen unacknowledged save plan')
-        if self._guard is not None:
-            self._guard()
-        state = self._descriptor(), self._dirty.copy(), self._baseline.copy()
+        self._mutation_depth += 1
         try:
-            with self._store.read_snapshot(self._pin):
-                yield
-        except BaseException:
-            descriptor, self._dirty, self._baseline = state
-            self._load_descriptor(descriptor)
-            self._clear_cache()
-            raise
-        if self._descriptor() != state[0]:
-            self._revision += 1
-            if self._changed is not None:
-                self._changed()
+            if self._guard is not None:
+                self._guard()
+            state = self._descriptor(), self._dirty.copy(), self._baseline.copy()
+            try:
+                with self._store.read_snapshot(self._pin):
+                    yield
+            except BaseException:
+                descriptor, self._dirty, self._baseline = state
+                self._load_descriptor(descriptor)
+                self._clear_cache()
+                raise
+            if self._descriptor() != state[0]:
+                self._revision += 1
+                if self._changed is not None:
+                    self._changed()
+        finally:
+            self._mutation_depth -= 1
 
     def _raw(self, namespace, key, *, absent=False):
         try:
@@ -486,10 +491,27 @@ class LazyOrderedSequence(MutableSequence):
         self.insert(self._length, value)
 
     def extend(self, values):
-        values = tuple(self._validate(v) for v in values)
+        input_error = None
         with self._mutation():
-            for value in values:
-                self._insert(self._length, value)
+            if values is self:
+                values = tuple(self)
+            iterator = iter(values)
+            while True:
+                try:
+                    value = next(iterator)
+                except StopIteration:
+                    break
+                except BaseException as exc:
+                    # Native list.extend retains the consumed prefix when
+                    # caller input fails. Leave the checked mutation scope
+                    # successfully so that prefix is journaled and notified.
+                    input_error = exc
+                    break
+                # Invalid stored values or tree/index failures still leave
+                # this scope exceptionally and roll back its entire journal.
+                self._insert(self._length, self._validate(value))
+        if input_error is not None:
+            raise input_error
 
     def _rebalance(self, children, slot, parent_id):
         if len(children) < 2:
@@ -908,6 +930,8 @@ class LazyOrderedSequence(MutableSequence):
     def prepare_delta(self, context=None):
         from .persistence_lazy_families import ParticipantDelta
         self._ensure()
+        if self._mutation_depth:
+            raise StoreConflictError('sequence save preparation is blocked during mutation')
         if self._prepared is not None:
             return self._prepared[0]
         descriptor = self._descriptor()
