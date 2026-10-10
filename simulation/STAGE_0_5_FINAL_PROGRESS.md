@@ -1,5 +1,75 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: actual World checked-catalog wiring (October 10 UTC)
+
+Public source `e8135092cef3b9bffaae02fa2093f6747624b1c5`, local source
+`3273a336e92fa63fe2738b87b9f1f0f8ec9d3a6f`, matching tree
+`ad6d2a7227cf59cc1b7e0b755595afb6c6dea7dc`. Leased non-force publication
+completed; production PR14 remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+The actual LazyWorldSession now has an explicit checked-catalog wiring boundary.
+It connects concrete family callbacks to the existing coordinator and passes that
+coordinator into frozen central publication. Cold peers are discovered before a
+shared child edit; missing group/owner inventory rejects before binding or edit.
+Lazy family replacement/deletion journals synchronize their owner-scoped current
+projections before routing, so a retained old child cannot resurrect a removed
+owner. The session's concrete loaded-record binders use checked owner inventory
+in this mode. Actual changed/new backing overlays are routed before family byte
+preparation, including a new replacement child not mutated after assignment.
+Suppressed headers are forced centrally and their family dirt is cleared only
+after exact acknowledgement. No-op save after acknowledgement reads only the three
+cold event-control bodies, no catalog owner/group or history payload, and writes
+nothing. The old global cross-boundary refresh is bypassed in this mode.
+
+Frozen publication now captures the cold namespace-count evidence as immutable
+bytes. Versioned P2C link additions/deletions update that evidence from the checked
+parent namespace count and exact frozen link output, rather than the legacy
+ordinary-link journal. A post-coordinator count-capture failure thaws the newly
+captured plan only after the checked uncommitted guard, preserving child edits.
+
+Ruling: wire the actual runtime/save path now but keep ordinary format activation
+and conversion separate — do not advertise partial capability6 or silently select
+catalog mode from capability5 — cost if wrong: the complete converter/open adapter
+must still prove every mandatory feature and eager/event placement contract.
+Ruling: derive the successor link count from the checked versioned parent plus
+frozen link writes, and freeze it alongside publication bytes — P2C is one relation,
+not an independently editable ordinary projection — cost if wrong: corruption in
+this accounting must reject acknowledgement rather than partially clear journals.
+
+**Evidence boundary:** test fixtures explicitly stage the catalog and bypass only
+the legacy bootstrap link reader/link-count expectation when constructing a real
+World session. The entire routing, owner callbacks, save transaction, cold successor
+proof, rollback and lost-acknowledgement recovery run as production code. This is
+NOT evidence for ordinary capability6 open or complete source-copy migration;
+neither was activated. No complete format marker is emitted. Eager/event placement
+replacement and automatic backing dependency/retirement activation remain pending.
+
+The World bridge regression covers cold peer discovery, forward/reverse missing
+occurrences, cold owner deletion, child replacement, clean activation, preparation
+capture failure, no-op save, rollback and lost acknowledgement. Its paired scale
+case holds two sharing placements/one edit/24 owners fixed at H1k/H10k. Save plus
+receipt/catalog proof has **91 payload-counter reads and642 metadata rows at both
+sizes**, **19,885/18,669 bytes** respectively. Compact checked metadata is included
+in that payload counter. Historical member-page reads are disabled after the edit,
+unrelated Skill owner reads reject, and live-registry inventory is disabled. The
+initial arbitrary <25 whole-save threshold was not a specified requirement; the
+test now directly compares equal checked work across sizes and prevents forbidden
+archive reads, with a32KiB byte ceiling. No integrity assertion was relaxed.
+
+Affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short -o junit_family=legacy simulation/tests/test_stage_0_5_final_world_catalog_bridge.py simulation/tests/test_stage_0_5_final_world_participants.py simulation/tests/test_stage_0_5_final_catalog_publication.py simulation/tests/test_stage_0_5_final_owner_header_witnesses.py simulation/tests/test_stage_0_5_final_runtime_families.py simulation/tests/test_stage_0_5_final_identity_headers.py simulation/tests/test_persistence_lifecycle.py -k 'not comparison_never' --junitxml=/workspace/scratch/b5f50c091761/world-catalog-affected.xml`
+— exit0, **85 passed,2 deselected in22.52s**. Additional affected family command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_household_sequences.py simulation/tests/test_stage_0_5_final_graph_buckets.py simulation/tests/test_stage_0_5_final_skill_histories.py simulation/tests/test_stage_0_5_final_soul_transformations.py simulation/tests/test_stage_0_5_final_soul_collections.py simulation/tests/test_stage_0_5_final_history_reattachment.py`
+— exit0, **108 passed in62.60s**. Counts overlap. A failed initial fixture import,
+descriptor-token/setup and legacy inventory setup were corrected before the actual
+missing-wiring RED; these are not product gates. `git diff --check` passed.
+
+P5 remains at public source `b57704304dc51238ac14420e55d1b1bc3ed79892`.
+No final full suite/endurance or fresh final review. Complete activation/migration,
+eager/event placement journals, backing dependency/retirement wiring, recursive
+stable-path closure, live counted promotion and exotic exact equality still need
+implementation/integration. Stage0.5 is not finished or release accepted.
+
 ## Latest checkpoint: concrete eager owner-header capture (October 10 UTC)
 
 Public source `04f986993f8aedde39f5510299ce0d4782125b41`, local source
