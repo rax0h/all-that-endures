@@ -4,9 +4,11 @@
 
 Continued from public `afdf39e84ed7fbb86edb6f01db2dde8b1eefd3e9`, local
 `9ab711e16ec38ed709f9e415337aa6f277e2c54c`, matching tree
-`46552d0e088fb52a627be88c3a540ef972706854`. Publication provenance is recorded
-below after exact-tree leased publication. This is another implementation
-checkpoint, not completion or acceptance of Stage0.5.
+`46552d0e088fb52a627be88c3a540ef972706854`. Public source `c9a1b50c5aacba9ae4383cf91e3a0e91abbe8318`, local source
+`9b79a97ac3fe21213418632a245fff166e373ad5`, exact matching tree
+`15daccd395f9739b0c989a050bfb3629b97d629e`. Leased non-force publication
+succeeded on the implementation branch; live public ref verified. This is
+another implementation checkpoint, not completion or acceptance of Stage0.5.
 
 The existing eager input memo could keep original native sources and every
 recursive child proxy strongly alive after publication. New input D now receives

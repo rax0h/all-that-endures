@@ -2332,5 +2332,12 @@
   "production_pr14_head": "c29e3d06a0c9d219235e2b3f0390271bd1245aea",
   "production_pr14_modified": false,
   "new_endurance_run": false,
-  "published_source": null
+  "published_source": {
+    "public_commit": "c9a1b50c5aacba9ae4383cf91e3a0e91abbe8318",
+    "local_commit": "9b79a97ac3fe21213418632a245fff166e373ad5",
+    "tree": "15daccd395f9739b0c989a050bfb3629b97d629e",
+    "expected_parent": "afdf39e84ed7fbb86edb6f01db2dde8b1eefd3e9",
+    "non_force_lease": true,
+    "live_ref_verified": true
+  }
 }
