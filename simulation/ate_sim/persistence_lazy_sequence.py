@@ -14,7 +14,7 @@ import sys
 
 from .incremental_store import StoreConflictError, StoreIntegrityError, _framed_sha
 from .persistence_lazy_store import VersionChange
-from .persistence_lazy_budget import SharedCacheBudget
+from .persistence_lazy_budget import SharedCacheBudget, CleanCacheOwner
 from .persistence_history_types import HistoryMemberTypes
 
 DESCRIPTOR_NAMESPACE = 'aux.lazy.sequence.descriptors'
@@ -70,7 +70,7 @@ def _chunks(values, capacity):
         start = end
 
 
-class LazyOrderedSequence(MutableSequence):
+class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
     """Positive integer IDs with exact list order, duplicate and equality rules.
 
     Explicit conversion/bulk operations may visit all values. Ordinary positional
@@ -682,12 +682,47 @@ class LazyOrderedSequence(MutableSequence):
             yield self._checked_owner_value(value)
 
     def __eq__(self, other):
-        if not isinstance(other, (list, LazyOrderedSequence)):
+        if not self._list_operand(other):
             return False
         return len(self) == len(other) and all(a is b or a == b for a, b in zip(self, other))
 
     def copy(self):
         return list(self)
+
+    @staticmethod
+    def _list_operand(value):
+        from .persistence_lazy_nested_history import LazyHistoryList
+        return isinstance(value, (list, LazyHistoryList, LazyOrderedSequence))
+
+    def _compare(self, other, operation):
+        return operation(list(self), list(other)) if self._list_operand(other) else NotImplemented
+
+    def __lt__(self, other):
+        return self._compare(other, operator.lt)
+
+    def __le__(self, other):
+        return self._compare(other, operator.le)
+
+    def __gt__(self, other):
+        return self._compare(other, operator.gt)
+
+    def __ge__(self, other):
+        return self._compare(other, operator.ge)
+
+    def __add__(self, other):
+        return list(self) + list(other) if self._list_operand(other) else NotImplemented
+
+    def __radd__(self, other):
+        return other + list(self) if isinstance(other, list) else NotImplemented
+
+    def __mul__(self, count):
+        return list(self) * operator.index(count)
+
+    __rmul__ = __mul__
+
+    def __imul__(self, count):
+        self[:] = list(self) * operator.index(count)
+        return self
 
     def reverse(self):
         self[:] = self[::-1]

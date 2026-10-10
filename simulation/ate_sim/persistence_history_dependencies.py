@@ -119,6 +119,23 @@ class BackingDependencyPool:
     def protected_incarnations(self):
         return tuple(self._aliases)
 
+    def check_unpublished_promotion(self, alias):
+        """A kind change is allowed only before this backing's first publication."""
+        if self.closed or self._prepared is not None:
+            raise StoreConflictError('backing promotion requires an active unfrozen dependency pool')
+        row = self._aliases.get(alias._incarnation)
+        if (row is None or row[0]() is not alias or row[1] != 'list'
+                or alias._incarnation not in self._new or alias._incarnation in self._persisted
+                or not alias._new or alias._store is not self.store or alias._pin != self.pin):
+            raise StoreIntegrityError('backing promotion requires an unpublished canonical list')
+
+    def accept_unpublished_promotion(self, alias):
+        self.check_unpublished_promotion(alias)
+        if alias._kind != 'sequence':
+            raise StoreIntegrityError('unpublished backing promotion did not install a counted sequence')
+        row = self._aliases[alias._incarnation]
+        self._aliases[alias._incarnation] = row[0], 'sequence'
+
     def prepare_delta(self):
         if self.closed:
             raise StoreError('backing dependency pool is closed')

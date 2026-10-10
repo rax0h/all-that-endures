@@ -7359,6 +7359,11 @@ class LazyHouseholdTable(LazyScalarRecordTable):
         super().changed(key, field)
         self.preparedness_revision += 1
 
+    def preflight_value(self, key, field, value):
+        if field == 'members' and type(value) is LazyHistoryList:
+            self._ensure_mutation()
+            self._session._promote_unpublished_history(value)
+
     def __setitem__(self, key, record):
         super().__setitem__(key, record)
         self.preparedness_revision += 1
@@ -12127,6 +12132,8 @@ class LazyWorldSession:
         actual_kind = value.kind if nested_reference(value) else value._kind if type(value) in HISTORY_TYPES else None
         if actual_kind == 'sequence' and kind in (None, 'list', 'sequence'):
             kind = 'sequence'
+        if kind == 'sequence' and type(value) is LazyHistoryList:
+            self._promote_unpublished_history(value)
         if kind is None:
             kind = value.kind if nested_reference(value) else value._kind if type(value) in HISTORY_TYPES else {list: 'list', dict: 'map', set: 'set'}.get(type(value))
         if kind not in HISTORY_CLASSES:
@@ -12241,6 +12248,20 @@ class LazyWorldSession:
             proxy._key_validator = validate_key
             proxy._batch_validator = validate_set_batch
         return proxy
+
+    def _promote_unpublished_history(self, proxy):
+        """Promote actual unsaved output, preserving every current/external alias."""
+        self._ensure_people_mutation_allowed()
+        from .persistence_history_promotion import prepare_unpublished_list, install_unpublished_list
+        pool = self._backing_dependencies
+        if pool is not None:
+            pool.check_unpublished_promotion(proxy)
+        prepared = prepare_unpublished_list(proxy)
+        self._shared_object_routes(proxy)
+        install_unpublished_list(proxy, prepared)
+        if pool is not None:
+            pool.accept_unpublished_promotion(proxy)
+        self._nested_dirty[proxy._incarnation] = proxy
 
     def _prepare_counted_record_child(self, record, field, value=None, owners=None):
         """Normalize counted eager Settlement fields at assignment, before exposure."""

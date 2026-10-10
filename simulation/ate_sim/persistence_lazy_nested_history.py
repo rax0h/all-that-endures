@@ -963,6 +963,26 @@ class LazyHistorySet(_ScalarHistory, MutableSet):
 
 from .persistence_lazy_sequence import LazyOrderedSequence
 
+def _preserve_promoted_method(name, original):
+    """A previously retained bound method follows the same promoted live alias."""
+    from functools import wraps
+    @wraps(original)
+    def call(self, *args, **kwargs):
+        if type(self) is LazyOrderedSequence:
+            return getattr(LazyOrderedSequence, name)(self, *args, **kwargs)
+        return original(self, *args, **kwargs)
+    return call
+
+
+for _promoted_method in ('bind', 'storage_reference', '__len__', '__getitem__',
+        '__setitem__', '__delitem__', 'append', 'extend', 'insert', 'remove',
+        '__iter__', 'copy', 'reverse', 'sort', '__eq__', '__lt__', '__le__',
+        '__gt__', '__ge__', '__add__', '__radd__', '__mul__', '__rmul__', '__imul__',
+        'materialize', 'pending_changes', 'accept_save', 'diagnostics'):
+    setattr(LazyHistoryList, _promoted_method, _preserve_promoted_method(
+        _promoted_method, getattr(LazyHistoryList, _promoted_method)))
+
+
 HISTORY_CLASSES = {'list': LazyHistoryList, 'map': LazyHistoryMap, 'set': LazyHistorySet,
                    'sequence': LazyOrderedSequence}
 HISTORY_TYPES = tuple(HISTORY_CLASSES.values())
