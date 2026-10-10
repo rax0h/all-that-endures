@@ -23,14 +23,17 @@ NS = 'world.skills.skills'
 PATH = (('field', 'provenance'),)
 
 
-def converted_catalog(tmp_path, size=32, owners=2):
+def converted_catalog(tmp_path, size=32, owners=2, *, configure_world=None, counted_households=False):
     world = World(843000)
     history = list(range(size))
     for key in range(1, owners + 1):
         world.skills.skills[key, 'craft'] = SkillHistory(key, 'craft', provenance=history if key < 3 else [])
+    if configure_world is not None:
+        configure_world(world, history)
     source, target = tmp_path / 'source.sqlite', tmp_path / 'target.sqlite'
     write_cold_snapshot(world, source, rules_id=RULES)
-    convert_cold_to_lazy(source, target, rules_id=RULES, native_graph_buckets=True)
+    convert_cold_to_lazy(source, target, rules_id=RULES, native_graph_buckets=True,
+                         counted_households=counted_households)
     with LazyRecordStore.open(target, codec=WorldCodec(identity_links_recorded=True), expected_simulation_schema=SCHEMA,
                               expected_rules_id=RULES) as store:
         pin = store.capture_pin()

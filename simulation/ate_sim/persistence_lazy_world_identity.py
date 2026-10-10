@@ -3,6 +3,9 @@ import weakref
 
 from .incremental_store import StoreIntegrityError
 from .persistence_lazy_identity_coordinator import IdentityCoordinator
+from .persistence_lazy_families import FAMILIES
+from .persistence_lazy_identity import IncarnationId
+from .persistence_lazy_nested_history import HISTORY_TYPES
 
 
 class WorldIdentityBridge:
@@ -25,6 +28,8 @@ class WorldIdentityBridge:
             if owner[1] not in table._removed:
                 raise StoreIntegrityError('retired owner has no family deletion journal')
             return
+        if table is None and owner in session._eager_tracker._deleted:
+            return
         session._family_bindings.mark_dirty(owner)
 
     def synchronize_lazy_placements(self):
@@ -35,26 +40,57 @@ class WorldIdentityBridge:
         before shared routing, so pending replacement wins over pinned placement.
         """
         session = self._session_ref()
-        coord, registry = self.coordinator, session._registry
         for namespace, table in session._family_bindings.tables.items():
             for key in tuple(table._effective_touched()):
-                owner = namespace, key
-                changes = coord._owner_changes(owner, ())
-                before = {path: old for path, _, old in changes.values() if old is not None}
-                placements = []
-                if table._visible(key):
-                    value = session._family_bindings.load_owner(owner)
-                    for occurrence in registry.occurrences_for_owner(*owner):
-                        try:
-                            child = session._family_bindings.resolve_path(value, occurrence.path)
-                        except (KeyError, IndexError, TypeError, AttributeError):
-                            continue
-                        inc = registry.incarnation_for_object(child)
-                        if inc is not None:
-                            placements.append((occurrence.path, child))
-                current = {path: registry.incarnation_for_object(child).value for path, child in placements}
-                if before != current:
-                    coord.replace_owner(owner, placements)
+                self._synchronize_owner((namespace, key), table._visible(key))
+        tracker = session._eager_tracker
+        for owner in tuple(tracker._dirty | tracker._deleted):
+            adapter = FAMILIES.get(owner[0])
+            if (adapter is not None and adapter.collection_kind in ('dict', 'events')
+                    and owner[0] not in session._family_bindings.tables):
+                value = None if owner in tracker._deleted else tracker._owner_value(owner)
+                self._synchronize_owner(owner, value is not None)
+
+    def _synchronize_owner(self, owner, exists):
+        session = self._session_ref()
+        coord, registry = self.coordinator, session._registry
+        changes = coord._owner_changes(owner, ())
+        before = {path: old for path, _, old in changes.values() if old is not None}
+        placements = []
+        if exists:
+            value = session._family_bindings.load_owner(owner)
+            if owner[0] not in session._family_bindings.tables:
+                # The accepted eager tracker retains original object witnesses.
+                # Inspect only this touched compact owner; checked histories are
+                # identity leaves, never archive walks or a second catalog.
+                tracker = session._eager_tracker
+                absolute = tracker._owner_path(owner)
+                originals = {path[len(absolute):]: obj for _ident, obj, path
+                    in tracker._identity_index.owner_occurrences.get(owner, ())}
+                rows = []
+                tracker._identity_index._scan(value, (), rows)
+                for _ident, child, path in rows:
+                    inc = registry.incarnation_for_object(child)
+                    if inc is None and path in before and originals.get(path) is child:
+                        inc = registry.bind(child, incarnation=IncarnationId(
+                            session.store.store_identity, before[path]))
+                    if inc is None:
+                        inc = registry.bind(child)
+                    if type(child) in HISTORY_TYPES:
+                        session._register_nested_overlay(child)
+                    placements.append((path, child))
+            else:
+                for occurrence in registry.occurrences_for_owner(*owner):
+                    try:
+                        child = session._family_bindings.resolve_path(value, occurrence.path)
+                    except (KeyError, IndexError, TypeError, AttributeError):
+                        continue
+                    inc = registry.incarnation_for_object(child)
+                    if inc is not None:
+                        placements.append((occurrence.path, child))
+        current = {path: registry.incarnation_for_object(child).value for path, child in placements}
+        if before != current:
+            coord.replace_owner(owner, placements)
 
     def finish_acknowledgement(self, delta):
         """Clear dirt for suppressed headers forced by this exact frozen delta."""

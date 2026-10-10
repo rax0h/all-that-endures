@@ -1795,6 +1795,11 @@ class IncrementalWorldSession:
         self._identity_dirty = bool(self._pending_identity_current)
 
     def _merge_identity_patch(self, removes, adds):
+        if getattr(self, '_checked_identity_coordinator', None) is not None:
+            # The accepted tracker still supplies owner callbacks and current
+            # object witnesses. It cannot publish a competing legacy relation
+            # once the World checked coordinator is the identity authority.
+            return
         if self._identity_mode == "current":
             self._merge_current_identity_patch(removes, adds)
             return

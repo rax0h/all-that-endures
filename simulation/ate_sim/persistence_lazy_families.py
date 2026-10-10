@@ -198,7 +198,6 @@ class RuntimeFamilyBindings:
     def load_owner(self, owner):
         """Resolve one concrete authority; mutable event tail only."""
         from .incremental_store import StoreIntegrityError
-        from .persistence_identity import iter_mutable_event_owners
         session = self._session()
         adapter = self._adapter(owner)
         table = self.tables.get(owner[0])
@@ -206,9 +205,9 @@ class RuntimeFamilyBindings:
             return table[owner[1]]
         root = self._root(session, adapter)
         if adapter.collection_kind == 'events':
-            for candidate, value, _path in iter_mutable_event_owners(root):
-                if candidate == owner:
-                    return value
+            value = session._eager_tracker._owner_value(owner)
+            if value is not None:
+                return value
             raise StoreIntegrityError('identity owner is not a mutable event')
         if owner[0] == 'world.event_ids':
             return root
@@ -270,8 +269,8 @@ class RuntimeFamilyBindings:
         """Force one suppressed compact header from its checked physical source.
 
         The central family plan supplies all changed headers. This fallback
-        handles unchanged lazy headers and concrete eager dictionary records whose child
-        backing is being written. It neither walks a child nor infers new values
+        handles unchanged lazy headers and concrete eager dictionary / mutable
+        event records whose child backing is being written. It neither walks a child nor infers new values
         from an old source. No-op saves never call it.
         """
         from .incremental_store import StoreIntegrityError, StoreFormatError
@@ -297,11 +296,11 @@ class RuntimeFamilyBindings:
     def _unchanged_eager_header(self, session, adapter, owner):
         from .incremental_store import StoreIntegrityError, StoreFormatError, StoreConflictError
         from .persistence_lazy_store import ORDINARY_QUERY_OWNER_INDEX
-        # Mutable event envelopes, packed action lists and event-ID descriptors
-        # have distinct physical formats; their central participants supply the
-        # correct body. Concrete eager dict families store ordinary schema values
-        # and have no query-membership projection in the accepted writer.
-        if adapter.storage_mode != 'eager' or adapter.collection_kind != 'dict':
+        # Eager dictionaries and mutable events use checked (ordinal, value)
+        # envelopes, with no query-membership projection. Packed action lists
+        # and event-ID descriptors still require their distinct central bodies.
+        if not (adapter.storage_mode == 'eager' and adapter.collection_kind == 'dict'
+                or adapter.storage_mode == 'event' and adapter.collection_kind == 'events'):
             raise StoreFormatError('owner physical format requires its central family plan')
         store, pin = session.store, session.pin
         with store.read_snapshot(pin):

@@ -10873,7 +10873,9 @@ class LazyWorldSession:
         if (self._eager_tracker._dirty or self._eager_tracker._deleted
                 or any(table._effective_touched() for table in self._family_bindings.tables.values())):
             raise StoreConflictError('checked catalog activation requires a clean session')
-        if self.identity_links or self._cross_boundary_links:
+        if (self.identity_links or self._cross_boundary_links
+                or self._eager_tracker._pending_identity_current
+                or self._eager_tracker._pending_identity_patch is not None):
             raise StoreFormatError('checked catalog cannot share legacy identity authority')
         from .persistence_lazy_world_identity import WorldIdentityBridge
         from .persistence_history_dependencies import BackingDependencyPool
@@ -10883,6 +10885,7 @@ class LazyWorldSession:
             dependencies.acquire(proxy)
         self._identity_bridge = bridge
         self._identity_coordinator = bridge.coordinator
+        self._eager_tracker._checked_identity_coordinator = bridge.coordinator
         self._backing_dependencies = dependencies
 
     def _owner_identity_labels(self, pin, namespace, key):
@@ -12271,6 +12274,7 @@ class LazyWorldSession:
 
     def _restore_eager_nested_references(self):
         for owner, value, absolute in self._eager_nested_owners():
+            original = value
             labels = {}
             for relative, child in tuple(self._nested_leaves(value)):
                 row = self.store._visible_identity_occurrence(self.pin.captured_head,
@@ -12282,12 +12286,24 @@ class LazyWorldSession:
                 proxy = self._bind_history_list(child, Occurrence(*owner, relative),
                     IncarnationId(self.store.store_identity, row[0]))
                 value = _relative_set(value, relative, proxy)
-            if labels:
+            if labels and value is not original:
                 _relative_set(self.world, absolute, value)
             if labels:
                 self._eager_nested_labels[owner] = labels
 
     def _nested_eager_owners(self, proxy):
+        if self._identity_coordinator is not None:
+            coord = self._identity_coordinator
+            incarnation = self._registry.incarnation_for_object(proxy)
+            if incarnation is None:
+                return ()
+            placements = coord._current_placements(coord.discover_group(incarnation))
+            try:
+                return tuple({(namespace, key) for namespace, key, _path in placements
+                    if namespace not in self._family_bindings.tables})
+            finally:
+                if hasattr(placements, 'close'):
+                    placements.close()
         from .persistence_tracking import _binding
         tracker = getattr(self, '_eager_tracker', None)
         if tracker is None:
@@ -12323,6 +12339,10 @@ class LazyWorldSession:
         return _relative_get(self.world, _owner_path(self.manifest, owner))
 
     def _prepare_eager_nested_identities(self):
+        if self._identity_bridge is not None:
+            self._identity_bridge.synchronize_lazy_placements()
+            return tuple(change for change in self._identity_coordinator.placement_overlay.values()
+                if change.owner_namespace not in self._family_bindings.tables)
         tracker = self._eager_tracker
         changes = []
         for owner in sorted(tracker._dirty | tracker._deleted, key=self.store.codec.encode):
