@@ -1,5 +1,76 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: unpublished live list promotion (October 10 UTC)
+
+Public source `0eabec6e1c409ed30175d67dcecf92365ba682bc`, local source
+`918422602af7d8d63df6694ec05fb88841a06a6e`, matching tree
+`c55ac3a50b77c1313d8905c3983eb7d04ba0a50b`. Leased non-force exact-tree
+publication completed. PR14 remains draft/unmerged at
+`c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Actual unpublished append-page list output can now enter a counted Household or
+Settlement field without replacing its canonical object or incarnation. Build a
+candidate counted tree from its existing unsaved D, check current shared routing,
+then install that backing in the same pure-Python object. Both concrete sequence
+implementations now use the same cache-owner base/layout. No second object is
+registered; existing registry weak references, current peers and external aliases
+remain identical. The dependency pool allows the list-to-sequence kind transition
+only before the backing's first publication. The one hybrid plan publishes only
+the counted backing/member-type authority and the affected owner headers.
+
+Retained bound public methods must also follow the promoted object; a regression
+reproduced an old captured append executing obsolete page code. Forwarding those
+methods now preserves the public API, including indexed first-equal removal.
+Counted sequences also preserve list concatenation, multiplication and comparison
+operations across the transition. Household preflight validates this admission
+before assignment. Already published append histories remain unpromoted and
+their owner unchanged on rejection; this path must not silently read H pages.
+
+This closes ONLY unpublished live promotion, not persisted-backing promotion.
+Cost is proportional to already unsaved list output D plus its sharing group,
+not an unrelated historical archive. A permanent paired H1k/H10k case forbids
+reads of replaced archive pages and gets identical checked payload reads,
+metadata rows and writes with fixed explicit aliases U. An initial fixture
+comparison differed by one backing lease because an unheld replaced counted
+proxy was collected at different times; holding the same two explicit aliases
+in both fixtures isolates the declared fixed-U operation. No production counter
+was hidden or maintenance disabled to get that result.
+
+Initial RED: four supported unpublished admissions raised `nested history field
+has wrong type`. An intermediate object-layout failure was corrected by using
+the shared pure-Python cache-owner base. Final focused gate **7 passed in1.51s**:
+Household/Settlement sharing and reopen identity, rollback/lost acknowledgement,
+retained weak/bound-method aliases, rejection before persisted-history reads or
+owner replacement, and paired historical sizes. Final affected gate exit0:
+**167 passed in169.60s**, `unpublished-promotion-final.log`.
+Command: `PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_world_unpublished_promotion.py simulation/tests/test_stage_0_5_final_world_event_id_placements.py simulation/tests/test_stage_0_5_final_world_packed_actions.py simulation/tests/test_stage_0_5_final_world_event_placements.py simulation/tests/test_stage_0_5_final_world_eager_placements.py simulation/tests/test_stage_0_5_final_world_identity_compaction.py simulation/tests/test_stage_0_5_final_world_catalog_bridge.py simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py simulation/tests/test_stage_0_5_final_world_backing_retirement.py simulation/tests/test_stage_0_5_final_backing_dependencies.py simulation/tests/test_stage_0_5_final_household_sequences.py simulation/tests/test_stage_0_5_final_sequence.py simulation/tests/test_stage_0_5_final_sequence_compat.py simulation/tests/test_stage_0_5_final_sequence_numeric_index.py simulation/tests/test_stage_0_5_final_sequence_errors.py simulation/tests/test_stage_0_5_final_soul_collections.py simulation/tests/test_stage_0_5_final_skill_histories.py -k 'not comparison_never'`.
+That broader collection preceded the final additional paired-size test; the
+focused seven-case run covers it afterward on unchanged production code.
+Counts overlap prior gates. `git diff --check` passed. No full suite, P5,
+endurance run or final-review claim.
+
+The exact-equality investigation has a reproducible small probe,
+`simulation/probe_stage_0_5_exact_equality_constraints.py`, run successfully on
+CPython3.12.14. Native sets keep distinct NaNs as distinct entries; same-object
+membership succeeds while a different NaN fails. Current canonical codec bytes
+collide for those unequal representatives. Base floats cannot be weak-referenced;
+released NaN addresses AND hashes reused on the first observed allocation.
+Tuples with the same NaN child compare equal through native identity semantics,
+while identical encoded tuples with distinct NaN children do not. Therefore
+payload-only canonicalization and a bare `(id,hash)` directory are not correct
+solutions. This probe is diagnostic evidence, NOT a passed equality feature gate
+or proof that every bounded design is impossible. No NaN serializer semantics or
+admission contract has been changed. An alias-safe paged key/lifetime design is
+still needed before complete capability6.
+
+Remaining fixed scope: recursive mutable-history physical ownership; persisted
+append/count-tree live promotion; exotic exact equality; complete ordinary open
+without global legacy bootstrap and source-preserving copy upgrade; then final
+integrated bounds/P5/full-suite/fresh Astra review. No capability6 emitted.
+P5 remains at `b57704304dc51238ac14420e55d1b1bc3ed79892`, not this source.
+Stage0.5 is not complete or ready for final Astra acceptance. All test processes
+from these two checkpoints have completed; no long test is being polled.
+
 ## Latest checkpoint: checked EventID facade and fixed backing slots (October 10 UTC)
 
 Public source `076e647666213097cc2e3832481985b6edba2348`, local source
