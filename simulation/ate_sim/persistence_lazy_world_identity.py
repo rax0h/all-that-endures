@@ -45,6 +45,8 @@ class WorldIdentityBridge:
             for key in tuple(table._effective_touched()):
                 self._synchronize_owner((namespace, key), table._visible(key))
         tracker = session._eager_tracker
+        if ('world.event_ids', 0) in tracker._dirty:
+            self.synchronize_event_id_placements()
         if any(owner[0] == AGENCY_ACTIONS_NAMESPACE for owner in tracker._dirty | tracker._deleted):
             self.synchronize_packed_actions()
         for owner in tuple(tracker._dirty | tracker._deleted):
@@ -53,6 +55,39 @@ class WorldIdentityBridge:
                     and owner[0] not in session._family_bindings.tables):
                 value = None if owner in tracker._deleted else tracker._owner_value(owner)
                 self._synchronize_owner(owner, value is not None)
+
+    def synchronize_event_id_placements(self):
+        """Project the facade and its two fixed descriptor backing slots.
+
+        The physical authority is still owner zero. Internal history references
+        use this owner's checked projection, not a second ownership relation.
+        """
+        from .persistence_event_id_exceptions import PagedEventIdExceptions
+        session = self._session_ref()
+        coord, registry = self.coordinator, session._registry
+        owner = ('world.event_ids', 0)
+        facade = session.world.event_ids
+        if facade.descriptor() is None:
+            raise StoreIntegrityError('checked event-ID owner requires a compact descriptor')
+        changes = coord._owner_changes(owner, ())
+        before = {path: old for path, _, old in changes.values() if old is not None}
+        if () not in before:
+            raise StoreIntegrityError('checked event-ID owner lacks its facade incarnation')
+        incarnation = IncarnationId(session.store.store_identity, before[()])
+        coord.discover_group(incarnation)
+        actual = registry.incarnation_for_object(facade)
+        if actual is None:
+            registry.bind(facade, incarnation=incarnation)
+        elif actual != incarnation:
+            raise StoreIntegrityError('event-ID facade disagrees with checked root identity')
+        placements = [((), facade)]
+        if isinstance(facade._exact, PagedEventIdExceptions):
+            for name, proxy in zip(('removed', 'added'), facade._exact.histories):
+                session._register_nested_overlay(proxy)
+                placements.append(((('field', '_exact'), ('field', name)), proxy))
+        current = {path: registry.incarnation_for_object(child).value for path, child in placements}
+        if before != current:
+            coord.replace_owner(owner, placements)
 
     def synchronize_packed_actions(self, subject=None):
         """Project the accepted packed current action body, not old histories.

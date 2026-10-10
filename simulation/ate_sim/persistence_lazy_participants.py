@@ -491,8 +491,20 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
             if backing_dependencies is not None:
                 dependency_participant = DependencySaveParticipant(pool, pool.prepare_delta(), pin, plan.target_generation)
                 _check_unique_authorities(codec, captured + (dependency_participant.delta,))
+            changed_values = set(_changed_backings(all_versions))
+            # A descriptor edit changes the shared facade's value even when no
+            # typed history page changes (for example a consecutive append).
+            # Use only the captured ordinary body and its checked root slot.
+            # Access guards alone, including no-effect edits, are not evidence.
+            for change in owner_records:
+                if change.namespace == 'world.event_ids' and change.key == 0 and not change.delete:
+                    changes = coord._owner_changes(('world.event_ids', 0), ())
+                    roots = [current for path, _original, current in changes.values() if path == ()]
+                    if len(roots) != 1 or roots[0] is None:
+                        raise StoreIntegrityError('changed event-ID descriptor lacks its checked facade identity')
+                    changed_values.add(roots[0])
             delta = coord.prepare_delta(owner_versions, ordinary_changes=owner_records,
-                                        value_changed_incarnations=_changed_backings(all_versions),
+                                        value_changed_incarnations=tuple(sorted(changed_values)),
                                         retirement_row_budget=32 if retire_world_backings else 0,
                                         protected_incarnations=(pool.protected_incarnations()
                                             if retire_world_backings else ()))

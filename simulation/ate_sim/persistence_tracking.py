@@ -1430,6 +1430,9 @@ class IncrementalWorldSession:
         state = [delegate]
 
         def changed():
+            event_changed = getattr(self, '_external_event_id_changed', None)
+            if event_changed is not None:
+                event_changed(facade)
             binding = _binding(facade)
             if binding is not None:
                 self._mark_many(binding.owners)
@@ -1475,7 +1478,7 @@ class IncrementalWorldSession:
                     self._mark((namespace, ordinal))
             self._manifest_dirty = True
 
-        facade.bind(self._ensure_mutation_allowed, changed)
+        facade.bind(lambda: self._ensure_mutation_allowed(subject=facade), changed)
         facade._persistence_tracker_ref = weakref.ref(self)
         self._root_containers[namespace] = facade
         return facade

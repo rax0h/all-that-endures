@@ -157,7 +157,12 @@ class IdentityCoordinator:
         with self._mutation():
             return self._routes_for_mutation(obj)
 
-    def _routes_for_mutation(self, obj):
+    def stitch_for_read(self, obj):
+        """Check and canonicalize current peers without granting mutation dirt."""
+        with self._mutation():
+            return self._routes_for_mutation(obj, mark_dirty=False)
+
+    def _routes_for_mutation(self, obj, *, mark_dirty=True):
         self.preflight()
         if self._prepared is not None:
             raise StoreConflictError('identity coordinator has an unacknowledged frozen plan')
@@ -193,6 +198,9 @@ class IdentityCoordinator:
                 self.install_path(owner, path, obj)
             for namespace, key, path in placements:
                 self.registry.attach_occurrence(obj, Occurrence(namespace, key, path))
+            if not mark_dirty:
+                self._trim()
+                return tuple(owners)
             for owner in owners:
                 self.dirty_owners.add(owner)
                 self.mark_dirty(owner)
@@ -209,6 +217,8 @@ class IdentityCoordinator:
             return tuple(owners)
         finally:
             self._routing.remove(incarnation.value)
+            if hasattr(placements, 'close'):
+                placements.close()
 
     def replace_placement(self, owner, path, obj):
         with self._mutation():

@@ -3247,6 +3247,7 @@ def _initialize_eager_tracker(
     tracker._external_mutation_guard = session._ensure_hybrid_mutation_allowed
     tracker._foreign_child_types = (LazySoulTrackedList, LazySoulTrackedSet)
     tracker._prepare_event_ids = session._prepare_event_id_facade
+    tracker._external_event_id_changed = session._event_id_facade_changed
     if 'world.households' in session._scalar_tables:
         tracker._prepare_record_child = session._prepare_counted_record_child
     try:
@@ -8808,14 +8809,15 @@ class LazyMaterialLotTable(LazyRecordTable):
 
 def _plain_soul_value(soul):
     """Storage value for a live lazy soul without runtime wrappers."""
+    from .persistence_event_ids import EventIdSet
     if not isinstance(soul, SoulState):
         raise TypeError("expected SoulState")
     return replace(
         soul,
         authorities=(soul.authorities.storage_reference()
-                     if type(soul.authorities) is LazyHistorySet else set(soul.authorities)),
+                     if type(soul.authorities) in (LazyHistorySet, EventIdSet) else set(soul.authorities)),
         marks=(soul.marks.storage_reference()
-               if type(soul.marks) is LazyHistorySet else set(soul.marks)),
+               if type(soul.marks) in (LazyHistorySet, EventIdSet) else set(soul.marks)),
         cosmic_links=(soul.cosmic_links.storage_reference()
                       if type(soul.cosmic_links) is LazyHistoryMap else dict(soul.cosmic_links)),
         transformations=(soul.transformations.storage_reference()
@@ -10237,7 +10239,16 @@ class LazyWorldSession:
                 raise StoreIntegrityError('event-ID exception incarnation has wrong type')
             def changed():
                 self._nested_dirty[incarnation.value] = proxy
-            proxy.bind(self._ensure_hybrid_mutation_allowed, changed, read_guard)
+                if (isinstance(facade._exact, PagedEventIdExceptions)
+                        and any(child is proxy for child in facade._exact.histories)):
+                    facade._changed()
+            def guard():
+                self._ensure_hybrid_mutation_allowed()
+                if self._identity_bridge is not None:
+                    self._identity_bridge.synchronize_event_id_placements()
+                    self._identity_coordinator.stitch_for_read(facade)
+                    self._shared_object_routes(proxy)
+            proxy.bind(guard, changed, read_guard)
             self._nested_lists[incarnation.value] = proxy
             if self._backing_dependencies is not None:
                 self._backing_dependencies.acquire(proxy)
@@ -10254,6 +10265,11 @@ class LazyWorldSession:
                 history(descriptor[3]), expected_length=descriptor[4])
             facade._pending_descriptor = None
         facade.enable_paged_exceptions(factory)
+
+    def _event_id_facade_changed(self, facade):
+        if self._identity_bridge is not None:
+            self._identity_bridge.synchronize_event_id_placements()
+            self._identity_coordinator.routes_for_mutation(facade)
 
     def _bucket_table(self, namespace, legacy_type):
         description = self.manifest['collections'][namespace]
@@ -10954,6 +10970,11 @@ class LazyWorldSession:
         self._ensure_people_mutation_allowed()
         if self._identity_bridge is not None:
             from .agency import ActionRecord
+            from .persistence_event_ids import EventIdSet
+            if isinstance(subject, EventIdSet):
+                self._identity_bridge.synchronize_lazy_placements()
+                self._identity_bridge.synchronize_event_id_placements()
+                self._identity_coordinator.stitch_for_read(subject)
             if isinstance(subject, ActionRecord):
                 self._identity_bridge.synchronize_packed_actions(subject)
                 self._identity_bridge.synchronize_lazy_placements()
@@ -13264,10 +13285,12 @@ class LazyWorldSession:
         return value if isinstance(value, SoulState) else None
 
     def _bind_soul_set(self, key, field, values, *, incarnation=None):
+        from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
         occurrence = self._soul_occurrence(
             key, LazySoulTable._nested_paths[field]
         )
-        if nested_reference(values) or type(values) is LazyHistorySet:
+        if (nested_reference(values) or type(values) in (LazyHistorySet, EventIdSet)
+                or type(values) is tuple and values == AUTHORITY_REFERENCE):
             return self._bind_history_list(values, occurrence, incarnation, kind='set')
         if incarnation is None and type(values) is set and all(nested_immutable_value(value) for value in values):
             return self._bind_history_list(values, occurrence, kind='set')
