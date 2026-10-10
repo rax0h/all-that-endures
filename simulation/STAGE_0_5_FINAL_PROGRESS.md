@@ -1,5 +1,75 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: bounded paged type admission (October 10 UTC)
+
+Public source `0a0362c66d8561190f76a9da6e2f95d8cb87650e`, local source
+`d0600fd49d9565f7ab5431bb193f60c302eb839c`, matching tree
+`e455dbedef9131a9f0df996430a35b2d8de10ffa`. Leased non-force exact-tree publication
+completed. PR14 remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Actual World typed-owner assignment now rejects incompatible already paged list,
+set and counted-sequence aliases before replacing/detaching the existing owner.
+Optional IndexedRecord value preflight protects field assignment before changing
+the attribute. Whole resource/material/social records preflight their histories
+before detaching old records. Checked member-type counters use three exact-type
+classes (int, lineage pair, other), preserve native retained key representatives,
+and update only from actual local edits. They publish in the same frozen hybrid
+plan as the history, survive failed/lost acknowledgement, and are accepted only
+with the plan. Cached scalar/list/counted reads validate the current owner too.
+
+Explicit conversion constructs a witness for every history and scrubs values
+before publishing its destination. Once the witness namespace is declared, a
+missing required backing witness is corruption. Earlier stores without it retain
+an explicit compatibility admission scan; open never builds or writes witnesses.
+This is candidate integration at the existing floor, not complete capability6.
+
+Ruling: use a separate checked versioned member-type witness rather than changing
+existing history header schemas — existing headers/readers remain readable and
+one compact row is updated when type counts change — cost if wrong: an additional
+point read and constant metadata write. Final complete-format migration must
+establish this mandatory authority for every backing together with the catalog.
+
+Retirement v2 includes the type witness scope before the final descriptor phase;
+v1 jobs retain their original phase interpretation. RED4 caught leaked witness
+rows across all four backends when the old scopes were used. Initial admission
+RED4 showed three silent incompatible assignments plus cache-hit bypass; a further
+record-field RED reproduced attribute/route changes before failure, and a counted
+cache RED reproduced another bypass. Counter tests cover exact bool/int/float key
+representatives, cancellation, rollback after a tree write fails, old pins,
+required authority absence/count disagreement, and explicit scrub of a semantically
+false but checksummed witness. Retirement verification and recovery remain bounded.
+
+Final affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short -o junit_family=xunit1 --junitxml=/workspace/scratch/c3a830e86cea/stage_0_5_final_history_types.xml simulation/tests/test_stage_0_5_final_history_type_admission.py simulation/tests/test_stage_0_5_final_history_type_witnesses.py simulation/tests/test_stage_0_5_final_history_retirement.py simulation/tests/test_stage_0_5_final_graph_buckets.py simulation/tests/test_persistence_lazy_nested_maps_sets.py simulation/tests/test_persistence_lazy_nested_history.py simulation/tests/test_stage_0_5_final_participant_abort.py simulation/tests/test_stage_0_5_final_sequence_compat.py simulation/tests/test_stage_0_5_final_sequence_errors.py simulation/tests/test_stage_0_5_final_sequence_numeric_index.py simulation/tests/test_persistence_lifecycle.py simulation/tests/test_stage_0_5_final_runtime_families.py`
+— exit0, **161 passed in117.64s**, `stage_0_5_final_history_types_gate.txt`.
+Supporting primitive/retirement selection30 passed0.93s; counts overlap.
+`git diff --check` passed. The early76-test affected run predates final scrub/scope
+and cached-counted changes; the161 gate is the final source evidence.
+
+| Incoming paged kind | H | Payload reads | Payload bytes | Metadata rows |
+|---|---:|---:|---:|---:|
+| list | 1,000 / 10,000 | 0 / 0 | 0 / 0 | 2 / 2 |
+| set | 1,000 / 10,000 | 0 / 0 | 0 / 0 | 2 / 2 |
+| sequence | 1,000 / 10,000 | 0 / 0 | 0 / 0 | 2 / 2 |
+
+Metrics start with the donor's compact header/witness already loaded; no member
+page/entry/node is decoded to admit it. Writes occur later in the same hybrid save.
+This proves admission only, not full World bounded identity activation.
+
+Exact P5 command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/persistence_p5_validation.py --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --native-graph-buckets --workdir /workspace/scratch/c3a830e86cea/stage-0-5-types-p5 --output simulation/stage_0_5_final_history_types_p5.json`
+— exit0, passed; independent eager/checkpoint controls, relocation/reopen/detach,
+year10,439 events, digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
+This remains integrated candidate evidence, not final full-suite or endurance.
+
+Next: physical touched-owner header witnesses and complete checked World catalog,
+backing dependency/retirement activation; recursive mutable and runtime counted
+alias closure; explicit complete capability6 copy upgrade; integrated final gates,
+one full applicable suite and independent final review. Exact pressure cold-miss
+release decision remains open. Stage0.5 is not complete; no PR14 promotion.
+
+
 ## Latest checkpoint: backing dependencies and bounded retirement (October 10 UTC)
 
 Public source `792facbe1e39e19a585ba87c286dbcf216e1f7bc`, local source

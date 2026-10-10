@@ -1,0 +1,54 @@
+{
+  "admission_metrics": [
+    {
+      "H": 1000,
+      "kind": "list",
+      "metadata_rows": 2,
+      "payload_bytes": 0,
+      "payload_reads": 0
+    },
+    {
+      "H": 1000,
+      "kind": "set",
+      "metadata_rows": 2,
+      "payload_bytes": 0,
+      "payload_reads": 0
+    },
+    {
+      "H": 1000,
+      "kind": "sequence",
+      "metadata_rows": 2,
+      "payload_bytes": 0,
+      "payload_reads": 0
+    },
+    {
+      "H": 10000,
+      "kind": "list",
+      "metadata_rows": 2,
+      "payload_bytes": 0,
+      "payload_reads": 0
+    },
+    {
+      "H": 10000,
+      "kind": "set",
+      "metadata_rows": 2,
+      "payload_bytes": 0,
+      "payload_reads": 0
+    },
+    {
+      "H": 10000,
+      "kind": "sequence",
+      "metadata_rows": 2,
+      "payload_bytes": 0,
+      "payload_reads": 0
+    }
+  ],
+  "affected_seconds": 117.64,
+  "affected_tests": 161,
+  "complete_stage_0_5": false,
+  "metric_boundary": "Donor compact header and checked witness already loaded; no history payload reads during admission.",
+  "p5_file": "stage_0_5_final_history_types_p5.json",
+  "source_local": "d0600fd49d9565f7ab5431bb193f60c302eb839c",
+  "source_public": "0a0362c66d8561190f76a9da6e2f95d8cb87650e",
+  "source_tree": "e455dbedef9131a9f0df996430a35b2d8de10ffa"
+}
