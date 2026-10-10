@@ -1,5 +1,67 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: frozen backing publication bridge (October 10 UTC)
+
+Public source `b57704304dc51238ac14420e55d1b1bc3ed79892`, local source
+`80070944ee087c51707d15d1d07f9cfc8f33edc3`, matching tree
+`41b628f7542a84440c94b45c8c6efcb8b5ce3133`. Exact-tree leased non-force
+publication completed; PR14 remains untouched.
+
+The central publisher now derives changed typed-backing incarnations from frozen
+value writes and sends that exact set to the coordinator. Suppressed physical
+headers are forced only for actual edits; eager forced headers now join ordinary
+commit arguments instead of being omitted. Guarded no-ops with unrelated commits
+perform no owner discovery. Placement replacements still require supplied owner
+headers. Frozen physical bytes cannot be changed through a caller-held replay.
+
+BackingDependencyPool joins the same transaction and cold acknowledgement proof,
+with exact idempotent acceptance and checked failed-plan release. Preparation
+failure thaws only the newly captured dependency freeze, retaining private edits
+and canonical aliases. No extra generation pin or separate commit is introduced.
+An explicit immutable retirement delta joins the publisher separately from runtime
+backing edits, with its <=256-write limit. Duplicate physical authorities and
+retirement of retained aliases reject before publication.
+
+Ruling: require central payloads for placement-dirty owners, while actual backing
+edits force suppressed headers and mere guarded access forces none — access is not
+proof of changed bytes — cost if wrong: missing scalar edits must still be caught
+by each concrete family's dirty/write preparation contract.
+Ruling: keep bounded retirement deltas separate from runtime backing writes —
+maintenance deletes must not route or resurrect retired owners — cost if wrong:
+the complete World bridge must supply the correct separately prepared batch.
+
+REDs reproduced missing changed-backing routing, suppressed eager commit omission,
+guarded-noop rejection, absent dependency/retirement integration and duplicate
+authority acceptance. Joint abort initially nested resolve_commit inside a read
+snapshot; the checked guard now reuses an exact durable not_committed proof in the
+held snapshot, preserving operational consistency checks and blocking committed,
+stale or mismatched attempts. Existing abort regressions remain green.
+
+Final affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_catalog_publication.py simulation/tests/test_stage_0_5_final_participant_abort.py simulation/tests/test_stage_0_5_final_coordinator_header_witnesses.py simulation/tests/test_stage_0_5_final_world_participants.py simulation/tests/test_stage_0_5_final_backing_dependencies.py simulation/tests/test_stage_0_5_final_history_retirement.py simulation/tests/test_stage_0_5_final_household_sequences.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_owner_replacement.py simulation/tests/test_stage_0_5_final_runtime_families.py -k 'not comparison_never'`
+— exit0, **119 passed in23.57s**. The earlier117-case gate predates the two
+additional scale cases and fixture-size option; counts overlap. A redirected
+119-case attempt produced an incomplete log despite reported exit0 and is not
+accepted as completion evidence; the explicit final command above completed.
+Scale XML at `stage_0_5_final_backing_publication_scale.xml` records the21-case
+publication selection: **21 passed0.56s**. H1k/H10k frozen preparation after one
+point edit reads4 compact payloads/956 bytes,21 metadata rows and captures4016
+bytes at both sizes; one child page and two physical headers publish. This does
+not measure ordinary World open or complete-format activation.
+
+P5 at this source:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python simulation/persistence_p5_validation.py --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --native-graph-buckets --workdir /workspace/scratch/c3a830e86cea/stage-0-5-backing-publication-p5 --output simulation/stage_0_5_final_backing_publication_p5.json`
+— exit0, passed; independent eager/checkpoint control, relocation/reopen and
+portable detach reach year10,439 events, exact digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
+`git diff --check` passed. No final full suite or endurance was run.
+
+Next: finish concrete eager forced-header capture, then activate complete-format
+World catalog/touched journals and remove global discovery. Recursive mutable
+history, live counted-alias projection, exotic exact equality, capability6 copy
+migration and final integrated validation/review remain. No incomplete capability6
+marker is emitted. Stage0.5 is still implementation in progress.
+
 ## Latest checkpoint: frozen physical owner-header witnesses (October 10 UTC)
 
 Public source `e1327a3350872a4fc2e0f77381a809e22b67252c`, local source

@@ -1,0 +1,22 @@
+{
+  "local_source": "80070944ee087c51707d15d1d07f9cfc8f33edc3",
+  "public_source": "b57704304dc51238ac14420e55d1b1bc3ed79892",
+  "tree": "41b628f7542a84440c94b45c8c6efcb8b5ce3133",
+  "affected_tests": {"passed": 119, "seconds": 23.57, "exit_code": 0},
+  "scales": [
+    {"history": 1000, "payload_reads": 4, "payload_bytes": 956, "metadata_rows": 21, "frozen_bytes": 4016},
+    {"history": 10000, "payload_reads": 4, "payload_bytes": 956, "metadata_rows": 21, "frozen_bytes": 4016}
+  ],
+  "scale_boundary": "Preparation after one point edit and peer routing; two physical owner placements; one history-page write. Not ordinary World open or complete-format activation.",
+  "p5": {
+    "report": "simulation/stage_0_5_final_backing_publication_p5.json",
+    "passed": true,
+    "year": 10,
+    "events": 439,
+    "digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e"
+  },
+  "complete_world_catalog_activated": false,
+  "capability_6_emitted": false,
+  "final_full_suite_run": false,
+  "stage_0_5_complete": false
+}
