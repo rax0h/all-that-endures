@@ -1,5 +1,107 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: retain unpublished history overlays and publish on reattachment (October 10 UTC)
+
+Public implementation `3ee303f90ad5cf2bc72b0fd749f2f2555a47a1a2`;
+local implementation `85a29d44bb46566460e826136b6ddf5ee092e4c4`;
+matching tree `676d838c2117d53ee0afce8db124824bf0c41ea6`.
+Continues the native-history implementation below, from public
+`007052d404ad7c2a4a06c5f5af1f2968f80ca74b` / local `6f50d8144b022e14dc9d5e1c4f8dc1820eccf0eb`,
+matching tree `3748a67f9c2ea3bf64c15bea5795b3ba95abd8a6`.
+Live production branch remained `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+The native-field lifetime check found a real data-loss bug. After deleting every
+owner, a retained typed list/set/map could hold private edits. A later unrelated
+save acknowledged every live proxy, clearing those unpublished edits or making
+its cached baseline claim nonexistent pages. Reattaching without the unrelated
+save also omitted its private overlay from the central publication. New histories
+assigned and removed before their first publication could lose their entire
+initial value. These were not successful acknowledgements of history data.
+
+A constant-state has_pending_overlay helper now inspects dirty state/counters
+without reading pages or freezing a sequence. Native binding, currency placement
+reconciliation and eager identity reconciliation journal a canonical same-session
+history's retained overlay. Unknown/cross-session histories reject instead of
+receiving a new identity for an old backing incarnation. History byte capture now
+runs after all family placement reconciliation: an edit inside an existing wallet
+can attach a private history during that family's preparation, and its pages must
+join that same frozen hybrid plan. No additional publisher or identity registry.
+
+Acknowledgement derives the published history incarnations from the exact frozen
+version changes. Published histories and clean proxies accept the new pin normally.
+Unpublished dirty proxies advance their existing lease and clear clean cache entries,
+retaining their original backing baseline, new-state flag and private dirty values.
+Reattachment publishes those values and the owner placement together. Removed
+placements stay removed; the retained history keeps its original incarnation.
+This closes the tested active-session private-overlay cases, not the remaining
+independent external-lease/retired-tree reclamation requirement.
+
+RED:9 initial list/set/map cases failed (missing reattachment writes, discarded
+private values and absent pages for new unpublished histories). Extending destinations
+to eager and wallet owners exposed12 more failures; placing the alias inside an
+existing wallet exposed6 additional capture-order failures. All remain regressions.
+The lost-ack fixture's function boundary was corrected before final validation;
+no production validation was changed for a fixture error.
+
+Final focused new regression command: `pytest -q --tb=short
+simulation/tests/test_stage_0_5_final_history_reattachment.py`:
+**36 passed in8.03s**, exit0,
+`stage_0_5_final_history_reattachment_focused_gate.txt`. Matrix covers list/set/map;
+private edits with/without an unrelated save; native, new/replaced eager and wallet
+owners, edits inside existing eager/wallet owners; new never-published histories;
+lost acknowledgement, mutation/read guards and repeated resolve_save.
+
+Final runtime affected command (PYTHONPATH=.:simulation,
+ownership-gate-venv/bin/python): `pytest -q --tb=short` on
+final_history_reattachment, final_event_histories, final_soul_collections,
+final_skill_histories, final_soul_transformations, persistence_lazy_nested_history,
+persistence_lazy_nested_maps_sets, persistence_lazy_currency, persistence_lifecycle,
+final_owner_binders, final_runtime_families and stage_0_5_unloaded_alias_routing:
+**167 passed in35.47s**, exit0,
+`stage_0_5_final_history_reattachment_gate.txt`. A preliminary affected run including
+the counted-sequence primitive passed128 in111.05s before the final destination
+queue/capture-order extension; it is not final-source counted World integration
+evidence and is not retained as a final gate. Counts overlap; do not sum. No full
+suite or endurance launch. `git diff --check` passed.
+
+Fresh final-runtime independent P5 passed seed843000,3+4+3 years, final year10,
+439 exact events and expected digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`.
+Command: `python simulation/persistence_p5_validation.py --output <report>`;
+retained `stage_0_5_final_history_reattachment_p5.json` includes independent eager
+control, save/reopen, relocation and portable detach. It does not certify ordinary
+checked-catalog open or final release/endurance acceptance.
+
+Repeated paired measurements on this exact runtime source using
+`python simulation/measure_stage_0_5_native_histories.py --output <report>`;
+retained `stage_0_5_final_history_reattachment_metrics.json`. Source SHA-256s were
+verified against the files. All20 rows retain the preceding field-level bounds:
+H1k/H10k, two placements/two owners, one edit; scalar history loads/writes0/0;
+list addition1 page read/write, soul set/map addition0 payload reads/1 entry write;
+headers394/489/394/430/430 bytes respectively. Construction, timings, real store
+counters and cache/residency weights are explicit. This does not measure all
+external-alias/private-overlay residency, global catalog discovery or pressure.
+
+Bounded self-review checked ownership admission, descriptor-only dirty counters,
+byte capture after placement reconciliation, acknowledgement of actually published
+incarnations, lease advancement, retained baseline/new flags, no resurrection,
+same-incarnation reattachment and receipt replay. Independent final architectural
+review remains outstanding.
+
+Ruling: preserve unpublished overlays through unrelated acknowledgement and collect
+them after concrete owner reconciliation — prevents a valid commit from erasing
+data that it never wrote — cost if wrong: untested lifecycle/retirement cases must
+remain rejected or receive a valid separate backing lease before reclamation ships.
+
+The fast native-history batch and this discovered data-loss repair are saved.
+Stage0.5 remains in progress; capability6 is not emitted. The remaining work list
+in the preceding checkpoint still controls: checked ordinary World catalog/routing
+and journals; lazy Household/counting sequences and Settlement.households;
+remaining bucket/recursive closure; exceptional EventIdSet; exact pressure,
+external leases and retired backing cleanup; complete source-copy upgrade;
+final integrated tests/metrics/full suite, independent review and release artifacts.
+No production promotion, checkpoint-default change or new endurance run.
+
 ## Latest checkpoint: native event histories, soul collections and concrete owner callbacks (October 10 UTC)
 
 Public implementation `e28a5c5273116a9215e2321e30ec6ab6f9a013dd`;
