@@ -1,5 +1,66 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: clean caps throughout run/step lifetimes (October 10 UTC)
+
+Public source `e92d107b8d5227ee9b9e2eeefc1196cd179a9229`, local source
+`4b1b68d8ec1839578016505c24c7c166481d15e8`, matching tree
+`0f786f6aff6cd163261479c256b87337516bf7e9`. Parent public
+`92c20279987f3d3e05b685f880a85234140692af`, local
+`f95b11eb0e5c76542f9d148542f94b2505162f2f`, matching tree
+`6acc05e0f3516735b5b35f4f0bfac685c6f7d245`.
+Production remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+The common record-table clean eviction path now enforces256 headers per family
+inside simulation steps and between years in a run, alongside the shared32MiB
+byte cap. It no longer treats the complete step working set as exempt clean
+residency. Dirty owners and externally held aliases remain actual working state,
+separate from clean cache accounting. Eviction drops payload/presence/incarnation/
+ordinal/label sidecars while preserving live registry identity. A retained alias
+rehydrates the same object, routes the edit and saves successfully. Query-cache
+admission also caps entries before returning, with bounded step-touched metadata;
+query bytes remain charged to the shared record budget.
+
+RED: all four people, skill, lineage-node and native graph cases exceeded the
+clean cap at257 inside a step. An older regression intentionally expected400
+clean headers retained across years and zero misses on a400-owner sweep. That
+expectation conflicts with the approved final architecture; it now verifies256
+resident headers remain warm and other requested current owners rehydrate under
+the same cap. A new query stress test initially selected an unsupported people
+index and was corrected to the accepted alive-query API. No gameplay or schema
+semantics changed; a current working set larger than256 may incur more reads.
+
+Final affected gate: **79 passed in50.25s**, exit0, with shell pipefail,
+`stage_0_5_final_step_cache_caps_gate.txt`. Includes new cap cases, shared byte
+budgets, tiny-cache retained aliases/recovery, people, scalar families, concrete
+bindings and pressure. The added1000-query admission case passed in0.21s,
+`stage_0_5_final_step_cache_caps_query_gate.txt`; the revised run regression also
+passed independently in0.71s, `stage_0_5_final_step_cache_caps_run_gate.txt`.
+Counts overlap. Earlier gate78passed/1failed was the superseded400-header test,
+not a passing final certificate. No full applicable suite or endurance run.
+
+Fresh final-runtime P5 `--native-graph-buckets` passed seed843000,3+4+3,
+year10,439 events and expected digest
+`3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e`;
+`stage_0_5_final_step_cache_caps_p5.json` includes independent eager control,
+relocation, reopen and portable sharing-preserving detach.
+Paired H1k/H10k metrics in `stage_0_5_final_step_cache_caps_metrics.json` have
+verified runtime hashes. Eight live people, one retained alias, one scalar edit
+are fixed; explicit construction and deliberate archive sweep are excluded from
+point timing. During both sweeps: maximum256 clean headers and step-touched keys,
+256 payload/presence/incarnation sidecars and zero ordinal sidecars.
+Sidecar Python bytes238322/238578, shared charged bytes600065/600321; accounting
+metadata121676 bytes at both sizes. Retained-alias point edit:8 payload reads,
+3 writes,220 metadata rows and3 maintenance removals at both sizes. This is
+record-cache closure evidence, not certification of all global identity/eager
+metadata or independent external history leases.
+
+Continue checked World catalog/touched journals, complete recursive/type/equality
+history closure, external alias leases and retired backing cleanup, explicit
+capability-6 copy upgrade, then stable integrated bounds, one full applicable
+suite and final independent architectural review. Exotic event keys still retain
+the disclosed legacy O(H) compatibility path. Exact O(H) pressure cold-miss owner
+release decision remains open. Stage0.5 is not complete.
+
 ## Latest checkpoint: candidate exceptional event-ID paging (October 10 UTC)
 
 Public source `12034323043bf3b36ea897d4941a372e8f3ba89a`, local source
