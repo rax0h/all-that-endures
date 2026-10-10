@@ -926,3 +926,48 @@ checkpoint. No complete cap6 format, migration, lazy household activation,
 nested closure or final integrated acceptance is claimed. Next: owner/subtree
 replacement and concrete runtime catalog publication/adapters; then household
 sequence and dependent remaining packages. No endurance or PR14 operation.
+
+## 2026-10-10 — complete coordinator replacement interface
+
+Local implementation `be6df5e6c74406bff3c05ae4316de78ed3800e22`, public
+`737b46de63103d161e3ca3467744e6fc7c3df1db`, matching tree
+`e8a5cc4ff599542fc4400e7e298076fafcb77fee`. Exact-tree non-force publication
+completed. Coordinator now provides replace_owner and replace_subtree over
+explicit adapter-supplied compact identity projections. It does not infer a
+projection by traversing a record/history. All incoming paths, duplicate/scope
+constraints, codec/lease eligibility and complete affected old groups are
+validated before allocation/installation. Parents install before children.
+Unrelated subtree paths remain unchanged. Retirement uses the same checked
+metadata reducer; local-only canceled objects keep their reserved incarnation
+and never revive removed placements. Missing present owner source/witness is
+corruption; only the catalog's existing checked new-owner absence rule is used
+for a genuinely unpublished owner. No historical ordinary payload is decoded.
+
+Mutation scope covers input/preflight/peer loading and blocks reentrant save
+preparation. Eight new regressions cover replacement publication and old pins,
+peer aliases, subtree preservation, duplicate/out-of-scope/corrupt-group
+failures before installation/allocation, failing input freeze, new-owner
+retirement and no ID reuse, and peer-load freeze rejection. Initial RED6 failed
+for the missing replacement APIs.
+
+Final affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_owner_replacement.py simulation/tests/test_stage_0_5_final_owner_retirement.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_identity_catalog.py simulation/tests/test_stage_0_5_final_identity_spill.py`
+— exit0, **54 passed21.50s**, `stage_0_5_final_owner_replacement_gate.txt`.
+Concrete compatibility runtime/header lease subset:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_identity_headers.py simulation/tests/test_stage_0_5_final_runtime_families.py -k 'not history'`
+— exit0, **13 passed,5 deselected,0.73s**,
+`stage_0_5_final_owner_replacement_runtime_gate.txt`. This broad expression
+also deselected the two coordinator header cases, so they were explicitly run:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_identity_headers.py -k coordinator`
+— exit0, **2 passed,5 deselected,8.29s**,
+`stage_0_5_final_owner_replacement_header_gate.txt`. The two H-size standalone
+header construction cases were not rerun; their prior zero-history proof stays
+at its own checkpoint. Counts overlap. `git diff --check` passed.
+
+Next integration concern: the legacy session resets known uncommitted plans;
+new frozen sequence/coordinator participants need checked unfreeze on an exact
+not-committed resolution, while committed/lost-ack/stale attempts must retain
+their plan. Close that protocol before activating them in the hybrid publisher.
+Then connect concrete catalog adapters, household sequences and all remaining
+packages. This is still implementation in progress, not candidate/release
+acceptance. Compatibility P5/H metrics retain their previous source boundary.

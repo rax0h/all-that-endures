@@ -4,9 +4,9 @@ Status: implementation in progress. This manifest is a checkpoint index, not
 release acceptance. PR14 remains unmodified and unmerged.
 
 Current code checkpoint:
-- Public commit: `2b0c4672c15648c45f2c9cac4d86ad82bb5d7b39`.
-- Local commit: `58eca6fe588e40b13cf6ecac65b7ba82c56a34e1`.
-- Matching source tree: `20ee6634422e64177fca119a70e4624440d88986`.
+- Public commit: `737b46de63103d161e3ca3467744e6fc7c3df1db`.
+- Local commit: `be6df5e6c74406bff3c05ae4316de78ed3800e22`.
+- Matching source tree: `e8a5cc4ff599542fc4400e7e298076fafcb77fee`.
 
 | Artifact | Scope and authority |
 | --- | --- |
@@ -26,6 +26,7 @@ Current code checkpoint:
 | `tests/test_stage_0_5_final_runtime_families.py` | Cold record/child aliases and immutable concrete bindings |
 | `tests/test_stage_0_5_final_record_budget.py` | Byte accounting, sidecars, retained aliases, dirty owner rehydration, step/query budgets, precommit/lost-ack recovery |
 | `tests/test_stage_0_5_final_pressure_arithmetic.py` | Forced exact float.hex/RNG arithmetic regressions; duplicates, extinct occurrences, shared/replaced list and reopen; checked scalar/cache integration still pending |
+| `tests/test_stage_0_5_final_owner_replacement.py` and `stage_0_5_final_owner_replacement_*gate.txt` | Complete compact owner/subtree journal contract;54-pass affected gate and concrete runtime/header subsets; frozen failed-plan integration pending |
 | `stage_0_5_final_owner_retirement_gate.txt`, `stage_0_5_final_owner_retirement_fault_gate.txt` and `tests/test_stage_0_5_final_owner_retirement.py` | Checked metadata-only retirement; 59-pass affected gate and39-pass non-death fault gate, overlapping; subprocess-death completion outstanding |
 | `stage_0_5_final_sequence_numeric_gate.txt` and `tests/test_stage_0_5_final_sequence_numeric_index.py` | 16-pass numeric-alias checked occurrence gate; no history scan, corruption, duplicates and old pins |
 | `stage_0_5_final_sequence_error_gate.txt` and `tests/test_stage_0_5_final_sequence_errors.py` | Durable 58-pass primitive gate; iterator failures, self-extension, corruption rollback and reentrant freeze regressions |
