@@ -396,10 +396,13 @@ class IdentityCoordinator:
         return delta
 
     def validate_publication(self, delta, successor_pin):
+        self.store._ensure_open()
         prepared = self._prepared
         if prepared is None or delta != prepared.delta:
             raise StoreConflictError('identity publication does not match the prepared plan')
-        if successor_pin.store_identity != self.store.store_identity or successor_pin.captured_head != prepared.expected_generation + 1:
+        if (successor_pin.store_identity != self.store.store_identity
+            or successor_pin.token != self.pin.token
+            or successor_pin.captured_head != prepared.expected_generation + 1):
             raise StoreConflictError('identity publication has the wrong successor pin')
         self.catalog.validate_publication(prepared.catalog_delta, successor_pin)
         _, _, placements = delta.decode(self.store.codec)
@@ -416,7 +419,9 @@ class IdentityCoordinator:
                     raise StoreIntegrityError('acknowledged identity placement mismatch')
 
     def accept_delta(self, delta, successor_pin):
+        self.store._ensure_open()
         if self._accepted == (delta.fingerprint, successor_pin):
+            self.store._require_pin(successor_pin)
             return
         self.validate_publication(delta, successor_pin)
         prepared = self._prepared
@@ -436,6 +441,16 @@ class IdentityCoordinator:
         self._cache_occurrences = self._cache_bytes = 0
         self._prepared = None
         self._accepted = delta.fingerprint, successor_pin
+
+    def abort_delta(self, delta, commit_token):
+        """Release only the freeze after checked failure; retain dirty routes."""
+        self.store._ensure_open()
+        if (self._mutation_depth or self._prepared is None or delta != self._prepared.delta
+            or self.pin.captured_head != self._prepared.expected_generation):
+            raise StoreConflictError('identity abort does not match its frozen plan')
+        from .persistence_lazy_publication_guard import checked_uncommitted_publication
+        with checked_uncommitted_publication(self.store, self.pin, commit_token):
+            self._prepared = None
 
     def diagnostics(self):
         dirty_n = dirty_bytes = 0

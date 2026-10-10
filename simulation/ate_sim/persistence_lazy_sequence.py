@@ -947,10 +947,12 @@ class LazyOrderedSequence(MutableSequence):
         return delta
 
     def validate_publication(self, delta, successor_pin):
+        self._store._ensure_open()
         if self._accepted == (delta.fingerprint, successor_pin):
             self._store._require_pin(successor_pin)
             return
         if (self._prepared is None or delta != self._prepared[0]
+            or successor_pin.token != self._pin.token
             or successor_pin.captured_head != self._prepared[1] + 1):
             raise StoreConflictError('sequence acknowledgement does not match frozen plan/generation')
         with self._store.read_snapshot(successor_pin):
@@ -978,6 +980,16 @@ class LazyOrderedSequence(MutableSequence):
         self._clear_cache()
         self._accepted = delta.fingerprint, successor_pin
         self._prepared = None
+
+    def abort_delta(self, delta, commit_token):
+        """Thaw a checked unpublished plan, retaining every unsaved edit."""
+        self._store._ensure_open()
+        if (self._mutation_depth or self._prepared is None or delta != self._prepared[0]
+            or self._pin.captured_head != self._prepared[1]):
+            raise StoreConflictError('sequence abort does not match its frozen plan')
+        from .persistence_lazy_publication_guard import checked_uncommitted_publication
+        with checked_uncommitted_publication(self._store, self._pin, commit_token):
+            self._prepared = None
 
     def diagnostics(self):
         return {'clean_entries': len(self._cache), 'clean_bytes': self._cache_bytes,
