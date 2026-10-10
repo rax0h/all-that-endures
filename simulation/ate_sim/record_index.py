@@ -13,6 +13,9 @@ class IndexedRecord:
             ref = self.__dict__.get('_index_table')
             table = None if ref is None else ref()
             if table is not None:
+                value_preflight = getattr(table, "preflight_value", None)
+                if value_preflight is not None:
+                    value_preflight(self._index_key, name, value)
                 preflight = getattr(table, "preflight_change", None)
                 if preflight is not None:
                     preflight(self._index_key, name)

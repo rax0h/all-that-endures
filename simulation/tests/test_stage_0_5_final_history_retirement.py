@@ -19,11 +19,12 @@ def module():
     return importlib.import_module('simulation.ate_sim.persistence_history_retirement')
 
 
-def fixture(store, size, kind='list'):
+def fixture(store, size, kind='list', *, checked_types=False):
     mod = module()
     pool = BackingDependencyPool(store, store.capture_pin())
     values = {key: key for key in range(size)} if kind == 'map' else range(size)
     alias = HISTORY_CLASSES[kind](store, pool.pin, 1, initial_values=values,
+                                  checked_types=checked_types,
                                   **({'value_mode': 'native'} if kind == 'sequence' else {}))
     pool.acquire(alias)
     owner = VersionChange(NS, 1, {'history': HistoryReference(kind, 1)})
@@ -183,3 +184,42 @@ def test_retirement_rejects_stale_writer_and_missing_dependency_authority(tmp_pa
         store.db.commit()
         with pytest.raises(StoreIntegrityError):
             mod.prepare_retirement_delta(store, pin)
+
+
+@pytest.mark.parametrize('kind', ['list', 'map', 'set', 'sequence'])
+def test_retirement_reclaims_checked_type_authority_before_final_descriptor(tmp_path, kind):
+    from simulation.ate_sim.persistence_history_types import NAMESPACE as TYPES
+    mod = module()
+    with store_at(tmp_path / 'types.sqlite') as store:
+        pin, pool, alias, old = fixture(store, 8, kind, checked_types=True)
+        store.release_pin(old)
+        pool.close()
+        pin = store.capture_pin()
+        for n in range(45):
+            pin, delta = step(store, pin, f'types-{n}', budget=4)
+            if not store.contains_lazy_key(pin, mod.NAMESPACE, 1):
+                break
+        else:
+            pytest.fail('retirement failed to finish')
+        assert not store.contains_lazy_key(pin, TYPES, 1)
+        store.verify_all()
+
+
+def test_legacy_retirement_job_preserves_its_original_phase_interpretation(tmp_path):
+    mod = module()
+    with store_at(tmp_path / 'legacy-job.sqlite') as store:
+        pin, pool, alias, old = fixture(store, 8)
+        store.release_pin(old)
+        pool.close()
+        pin = store.capture_pin()
+        from simulation.ate_sim.incremental_store import Membership
+        legacy = VersionChange(mod.NAMESPACE, 1, ('history-retirement/v1', 'list', 0, 2, False),
+            memberships=(Membership('pending', True, 2),))
+        pin = store.commit(pin, commit_token='legacy-job', changes=(), new_segments=(),
+            version_changes=(legacy,), metadata=metadata()).pin
+        for n in range(8):
+            pin, delta = step(store, pin, f'legacy-{n}', budget=4)
+            if not store.contains_lazy_key(pin, mod.NAMESPACE, 1):
+                break
+        assert not store.contains_lazy_key(pin, mod.NAMESPACE, 1)
+        assert store.namespace_size(pin, PAGE_NAMESPACE) == 0

@@ -15,6 +15,7 @@ import sys
 from .incremental_store import StoreConflictError, StoreIntegrityError, _framed_sha
 from .persistence_lazy_store import VersionChange
 from .persistence_lazy_budget import SharedCacheBudget
+from .persistence_history_types import HistoryMemberTypes
 
 DESCRIPTOR_NAMESPACE = 'aux.lazy.sequence.descriptors'
 NODE_NAMESPACE = 'aux.lazy.sequence.nodes'
@@ -82,7 +83,7 @@ class LazyOrderedSequence(MutableSequence):
 
     def __init__(self, store, pin, incarnation, *, initial_values=None,
                  guard=None, changed=None, read_guard=None, value_mode=None,
-                 cache_budget=None):
+                 cache_budget=None, checked_types=None):
         if not _positive(incarnation):
             raise ValueError('invalid sequence incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
@@ -96,6 +97,7 @@ class LazyOrderedSequence(MutableSequence):
         self._prepared = self._accepted = None
         self._mutation_depth = 0
         self._new = initial_values is not None
+        self._member_types = HistoryMemberTypes(store, pin, incarnation, 'sequence', new=self._new, required=checked_types)
         if value_mode not in (None, 'integer_ids', 'native'):
             raise ValueError('invalid sequence value mode')
         self._value_mode = value_mode or 'integer_ids'
@@ -110,12 +112,14 @@ class LazyOrderedSequence(MutableSequence):
                     raise StoreConflictError('sequence incarnation already has persisted backing')
             values = tuple(self._validate(v) for v in initial_values)
             self._build(values)
+            self._member_types.replace_all(values)
             self._base_descriptor = None
         else:
             with store.read_snapshot(pin):
                 descriptor = self._read(DESCRIPTOR_NAMESPACE, incarnation)
             self._load_descriptor(descriptor)
             self._base_descriptor = store.codec.encode(descriptor)
+        self._member_types.check_length(self._length)
 
     def bind(self, guard, changed, read_guard=None):
         self._guard, self._changed, self._read_guard = guard, changed, read_guard
@@ -187,12 +191,12 @@ class LazyOrderedSequence(MutableSequence):
         try:
             if self._guard is not None:
                 self._guard()
-            state = self._descriptor(), self._dirty.copy(), self._baseline.copy()
+            state = self._descriptor(), self._dirty.copy(), self._baseline.copy(), self._member_types.counts
             try:
                 with self._store.read_snapshot(self._pin):
                     yield
             except BaseException:
-                descriptor, self._dirty, self._baseline = state
+                descriptor, self._dirty, self._baseline, self._member_types.counts = state
                 self._load_descriptor(descriptor)
                 self._clear_cache()
                 raise
@@ -411,7 +415,15 @@ class LazyOrderedSequence(MutableSequence):
         if isinstance(index, slice):
             return [self[k] for k in range(*index.indices(self._length))]
         with self._store.read_snapshot(self._pin):
-            return self._locate(self._index(index))[2][1]
+            return self._checked_owner_value(self._locate(self._index(index))[2][1])
+
+    def _checked_owner_value(self, value):
+        if self._value_validator is not None:
+            try:
+                self._value_validator(value)
+            except TypeError as exc:
+                raise StoreIntegrityError('stored history member violates its current owner type') from exc
+        return value
 
     def occurrence_id(self, index):
         self._ensure()
@@ -459,6 +471,7 @@ class LazyOrderedSequence(MutableSequence):
             return self._occurrence(occurrence)[0]
 
     def _insert(self, rank, value):
+        self._member_types.add(value)
         occurrence = self._allocate_occurrence()
         def edit(link, offset, parent):
             kind, items = self._nread(link, parent)
@@ -551,6 +564,7 @@ class LazyOrderedSequence(MutableSequence):
 
     def _delete(self, rank):
         occurrence, value = self._locate(rank)[2]
+        self._member_types.add(value, -1)
         key = self._member_key(value)
         if key is not None:
             self._dreplace(key, self._mdelete(self._dget(key), occurrence, key))
@@ -586,6 +600,8 @@ class LazyOrderedSequence(MutableSequence):
         link, slot, (occurrence, old) = self._locate(rank)
         if type(old) is type(value) and (old is value or old == value):
             return
+        self._member_types.add(old, -1)
+        self._member_types.add(value)
         old_key, new_key = self._member_key(old), self._member_key(value)
         if old_key is not None:
             self._dreplace(old_key, self._mdelete(self._dget(old_key), occurrence, old_key))
@@ -663,7 +679,7 @@ class LazyOrderedSequence(MutableSequence):
 
     def __iter__(self):
         for _, value in self.iter_occurrences():
-            yield value
+            yield self._checked_owner_value(value)
 
     def __eq__(self, other):
         if not isinstance(other, (list, LazyOrderedSequence)):
@@ -943,7 +959,7 @@ class LazyOrderedSequence(MutableSequence):
         if self._prepared is not None:
             return self._prepared[0]
         descriptor = self._descriptor()
-        changes = [VersionChange(ns, key, value, delete=value is None)
+        changes = list(self._member_types.pending_changes(self._length)) + [VersionChange(ns, key, value, delete=value is None)
                    for (ns, key), value in self._dirty.items()]
         if self._store.codec.encode(descriptor) != self._base_descriptor:
             changes.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, descriptor))
@@ -981,6 +997,7 @@ class LazyOrderedSequence(MutableSequence):
         self._pin = successor_pin
         self._new = False
         self._base_descriptor = self._store.codec.encode(self._descriptor())
+        self._member_types.accept_save()
         self._dirty.clear()
         self._baseline.clear()
         self._clear_cache()

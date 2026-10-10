@@ -8,6 +8,7 @@ import weakref
 from .incremental_store import StoreFormatError, StoreIntegrityError, Membership
 from .persistence_lazy_store import VersionChange, _query_checksum
 from .persistence_lazy_budget import CleanCacheOwner, resident_bytes
+from .persistence_history_types import HistoryMemberTypes, initial_type_change
 
 DESCRIPTOR_NAMESPACE = 'aux.lazy.nested.descriptors'
 PAGE_NAMESPACE = 'aux.lazy.nested.list_pages'
@@ -57,14 +58,14 @@ def checked_value(store, pin, namespace, key):
         raise StoreIntegrityError('nested history authority is absent') from exc
 
 
-def initial_list_changes(incarnation, values, codec):
+def initial_list_changes(incarnation, values, codec, *, checked_types=False):
     """Explicit conversion/new-value construction; never an ordinary open."""
     values = tuple(values)
     for value in values:
         if not immutable_value(value):
             raise TypeError('typed history values must be immutable schema values')
         codec.encode(value)
-    return (VersionChange(DESCRIPTOR_NAMESPACE, incarnation, ('list', len(values), len(values)), record_schema=RECORD_SCHEMA),) + tuple(
+    return ((initial_type_change(incarnation, 'list', values),) if checked_types else ()) + (VersionChange(DESCRIPTOR_NAMESPACE, incarnation, ('list', len(values), len(values)), record_schema=RECORD_SCHEMA),) + tuple(
         VersionChange(PAGE_NAMESPACE, (incarnation, number // PAGE_SIZE), values[number:number + PAGE_SIZE], record_schema=RECORD_SCHEMA)
         for number in range(0, len(values), PAGE_SIZE)
     )
@@ -101,7 +102,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
     _kind = 'list'
 
     def __init__(self, store, pin, incarnation, *, guard=None, changed=None,
-                 initial_values=None, cache_budget=None):
+                 initial_values=None, cache_budget=None, checked_types=None):
         if type(incarnation) is not int or incarnation <= 0:
             raise ValueError('invalid nested history incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
@@ -115,6 +116,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         self._baseline_page_bytes = {}
         self._page_loads = 0
         self._new = initial_values is not None
+        self._member_types = HistoryMemberTypes(store, pin, incarnation, 'list', new=self._new, required=checked_types)
         if self._new:
             self._length = self._base_length = 0
             for value in initial_values:
@@ -127,6 +129,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
                 raise StoreIntegrityError('invalid nested list descriptor')
             self._length = self._base_length = value[1]
             checked_list_extent(store, pin, incarnation, self._length)
+        self._member_types.check_length(self._length)
 
     def bind(self, guard, changed, read_guard=None):
         self._guard, self._changed = guard, changed
@@ -205,7 +208,13 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         if isinstance(index, slice):
             return [self[i] for i in range(*index.indices(self._length))]
         index = self._normalize(index)
-        return self._read_page(index // PAGE_SIZE)[index % PAGE_SIZE]
+        value = self._read_page(index // PAGE_SIZE)[index % PAGE_SIZE]
+        if self._value_validator is not None:
+            try:
+                self._value_validator(value)
+            except TypeError as exc:
+                raise StoreIntegrityError('stored history member violates its current owner type') from exc
+        return value
 
     def __setitem__(self, index, value):
         self._mutation()
@@ -220,7 +229,10 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         else:
             index = self._normalize(index)
             value = self._validate(value)
-            self._page(index // PAGE_SIZE)[index % PAGE_SIZE] = value
+            page = self._page(index // PAGE_SIZE)
+            self._member_types.add(page[index % PAGE_SIZE], -1)
+            self._member_types.add(value)
+            page[index % PAGE_SIZE] = value
         self._notify()
 
     def __delitem__(self, index):
@@ -231,7 +243,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         if not isinstance(index, slice):
             index = self._normalize(index)
             if index == self._length - 1:
-                self._page(index // PAGE_SIZE).pop()
+                self._member_types.add(self._page(index // PAGE_SIZE).pop(), -1)
                 self._length -= 1
                 self._notify()
                 return
@@ -245,6 +257,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         if len(page) != self._length % PAGE_SIZE:
             raise StoreIntegrityError('nested list append page is inconsistent')
         page.append(value)
+        self._member_types.add(value)
         self._length += 1
 
     def append(self, value):
@@ -295,6 +308,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
                 self._baseline_page_bytes[number] = self._store.codec.encode(tuple(self._read_page(number)))
             self._dirty_pages[number] = list(values[number * PAGE_SIZE:(number + 1) * PAGE_SIZE])
         self._length = len(values)
+        self._member_types.replace_all(values)
         self._clear_cache()
 
     def __iter__(self):
@@ -382,7 +396,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
 
     def pending_changes(self):
         self._ensure()
-        out = []
+        out = list(self._member_types.pending_changes(self._length))
         if self._new or self._length != self._base_length:
             out.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, ('list', self._length, self._length), record_schema=RECORD_SCHEMA))
         for number, page in sorted(self._dirty_pages.items()):
@@ -407,6 +421,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
     def accept_save(self, pin):
         self._pin = pin
         self._base_length = self._length
+        self._member_types.accept_save()
         self._new = False
         self._dirty_pages.clear()
         self._baseline_page_bytes.clear()
@@ -436,11 +451,12 @@ def equality_key(value):
     return value
 
 
-def initial_scalar_changes(incarnation, kind, values, codec):
+def initial_scalar_changes(incarnation, kind, values, codec, *, checked_types=False):
     if kind not in ('map', 'set'):
         raise ValueError('invalid scalar history kind')
     values = dict(values) if kind == 'map' else {key: None for key in values}
-    changes = [VersionChange(DESCRIPTOR_NAMESPACE, incarnation, (kind, len(values), len(values)), record_schema=RECORD_SCHEMA)]
+    changes = list((initial_type_change(incarnation, kind, values),) if checked_types else ())
+    changes.append(VersionChange(DESCRIPTOR_NAMESPACE, incarnation, (kind, len(values), len(values)), record_schema=RECORD_SCHEMA))
     for ordinal, (key, value) in enumerate(values.items()):
         canonical = equality_key(key)
         if not immutable_value(value):
@@ -518,7 +534,7 @@ class _ScalarHistory(CleanCacheOwner):
     _kind = None
     __hash__ = None
 
-    def __init__(self, store, pin, incarnation, *, initial_values=None, cache_budget=None):
+    def __init__(self, store, pin, incarnation, *, initial_values=None, cache_budget=None, checked_types=None):
         if type(incarnation) is not int or incarnation <= 0:
             raise ValueError('invalid nested history incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
@@ -529,6 +545,7 @@ class _ScalarHistory(CleanCacheOwner):
         self._dirty_entries, self._baseline_bytes = {}, {}
         self._entry_loads = self._structure_revision = 0
         self._new = initial_values is not None
+        self._member_types = HistoryMemberTypes(store, pin, incarnation, self._kind, new=self._new, required=checked_types)
         if self._new:
             self._count = self._base_count = self._next_ordinal = self._base_next = 0
             values = dict(initial_values) if self._kind == 'map' else {key: None for key in initial_values}
@@ -542,6 +559,7 @@ class _ScalarHistory(CleanCacheOwner):
                 raise StoreIntegrityError('invalid nested scalar descriptor')
             _, self._count, self._next_ordinal = value
             self._base_count, self._base_next = self._count, self._next_ordinal
+        self._member_types.check_length(self._count)
 
     def bind(self, guard, changed, read_guard=None):
         self._guard, self._changed, self._read_guard = guard, changed, read_guard
@@ -576,11 +594,6 @@ class _ScalarHistory(CleanCacheOwner):
             return self._cache[canonical]
         value = None if self._new else checked_scalar_entry(self._store, self._pin, self._incarnation, canonical)
         if value is not None:
-            if self._key_validator is not None:
-                try:
-                    self._key_validator(value[1])
-                except TypeError as exc:
-                    raise StoreIntegrityError('stored history member violates its current owner type') from exc
             if value[0] >= self._base_next or (self._kind == 'set' and value[2] is not None):
                 raise StoreIntegrityError('nested scalar entry exceeds descriptor')
             self._entry_loads += 1
@@ -588,7 +601,13 @@ class _ScalarHistory(CleanCacheOwner):
         return value
 
     def _entry(self, canonical):
-        return self._dirty_entries[canonical] if canonical in self._dirty_entries else self._baseline(canonical)
+        value = self._dirty_entries[canonical] if canonical in self._dirty_entries else self._baseline(canonical)
+        if value is not None and self._key_validator is not None:
+            try:
+                self._key_validator(value[1])
+            except TypeError as exc:
+                raise StoreIntegrityError('stored history member violates its current owner type') from exc
+        return value
 
     def _remember_baseline(self, canonical):
         if canonical not in self._baseline_bytes:
@@ -617,6 +636,7 @@ class _ScalarHistory(CleanCacheOwner):
             entry = (self._next_ordinal, key, value)
             self._next_ordinal += 1
             self._count += 1
+            self._member_types.add(key)
             self._structure_revision += 1
             for iterator in self._iterators:
                 iterator.added(key)
@@ -632,6 +652,7 @@ class _ScalarHistory(CleanCacheOwner):
         self._remember_baseline(canonical)
         self._journal(canonical, None)
         self._count -= 1
+        self._member_types.add(old[1], -1)
         self._structure_revision += 1
         for iterator in self._iterators:
             iterator.removed(old[1])
@@ -672,7 +693,7 @@ class _ScalarHistory(CleanCacheOwner):
 
     def pending_changes(self):
         self._ensure()
-        changes = []
+        changes = list(self._member_types.pending_changes(self._count))
         if self._new or (self._count, self._next_ordinal) != (self._base_count, self._base_next):
             changes.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, (self._kind, self._count, self._next_ordinal), record_schema=RECORD_SCHEMA))
         for canonical, entry in sorted(self._dirty_entries.items(), key=lambda item: self._store.codec.encode(item[0])):
@@ -684,6 +705,7 @@ class _ScalarHistory(CleanCacheOwner):
         self._pin = pin
         self._base_count, self._base_next = self._count, self._next_ordinal
         self._new = False
+        self._member_types.accept_save()
         self._dirty_entries.clear()
         self._baseline_bytes.clear()
         self._clear_cache()

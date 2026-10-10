@@ -12,14 +12,20 @@ from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE as HISTORY_DES
 from .persistence_lazy_sequence import DESCRIPTOR_NAMESPACE as SEQUENCE_DESCRIPTOR, NAMESPACES as SEQUENCE_NAMESPACES
 from .persistence_history_dependencies import (NAMESPACE as DEPENDENCIES,
     active_backing_dependencies, _checked_value as checked_dependencies)
+from .persistence_history_types import NAMESPACE as MEMBER_TYPES
 
 NAMESPACE = 'aux.lazy.history.retirement'
-TAG = 'history-retirement/v1'
+TAG = 'history-retirement/v2'
 SCOPE_INDEX = 'lazy_record_current_key'
-SCOPES = {'list': (PAGE_NAMESPACE, HISTORY_DESCRIPTOR),
+LEGACY_SCOPES = {'list': (PAGE_NAMESPACE, HISTORY_DESCRIPTOR),
           'map': (ENTRY_NAMESPACE, HISTORY_DESCRIPTOR),
           'set': (ENTRY_NAMESPACE, HISTORY_DESCRIPTOR),
           'sequence': tuple(ns for ns in SEQUENCE_NAMESPACES if ns != SEQUENCE_DESCRIPTOR) + (SEQUENCE_DESCRIPTOR,)}
+SCOPES = {kind: scopes[:-1] + (MEMBER_TYPES, scopes[-1]) for kind, scopes in LEGACY_SCOPES.items()}
+
+
+def _scopes(job):
+    return LEGACY_SCOPES[job[1]] if job[0] == 'history-retirement/v1' else SCOPES[job[1]]
 
 
 def initial_retirement_change(kind, incarnation, *, generation):
@@ -32,9 +38,9 @@ def initial_retirement_change(kind, incarnation, *, generation):
 
 def _job(store, pin, incarnation):
     value = store.read_version(pin, NAMESPACE, incarnation, expected_record_schema=1).value
-    if (type(value) is not tuple or len(value) != 5 or value[0] != TAG
+    if (type(value) is not tuple or len(value) != 5 or value[0] not in (TAG, 'history-retirement/v1')
             or value[1] not in SCOPES or type(value[2]) is not int
-            or not 0 <= value[2] < len(SCOPES[value[1]])
+            or not 0 <= value[2] < len(_scopes(value))
             or type(value[3]) is not int or not 1 <= value[3] <= pin.captured_head
             or type(value[4]) is not bool):
         raise StoreIntegrityError('invalid history retirement job')
@@ -50,6 +56,14 @@ def pending_retirement(store, pin, incarnation):
 
 
 def _scope_keys(store, pin, namespace, incarnation, *, limit):
+    if namespace == MEMBER_TYPES:
+        # Legacy backings have no type authority. Checked absence remains valid;
+        # a dangling row/order still fails the ordinary version read.
+        try:
+            store.read_version(pin, namespace, incarnation, expected_record_schema=1)
+        except KeyError:
+            return ()
+        return (incarnation,)
     if namespace in (HISTORY_DESCRIPTOR, SEQUENCE_DESCRIPTOR):
         try:
             store.read_version(pin, namespace, incarnation, expected_record_schema=1)
@@ -113,7 +127,7 @@ def prepare_retirement_delta(store, pin, *, row_budget=256, protected_incarnatio
             if dependencies[1] != job[1]:
                 raise StoreIntegrityError('history retirement kind disagrees with dependency authority')
             try:
-                descriptor = store.read_version(pin, SCOPES[job[1]][-1], incarnation,
+                descriptor = store.read_version(pin, _scopes(job)[-1], incarnation,
                                                 expected_record_schema=1).value
             except KeyError as exc:
                 raise StoreIntegrityError('history retirement backing descriptor is absent') from exc
@@ -127,7 +141,7 @@ def prepare_retirement_delta(store, pin, *, row_budget=256, protected_incarnatio
                 changes.append(VersionChange(NAMESPACE, incarnation, job,
                     memberships=(Membership('pending', True, pin.captured_head + 1),)))
                 continue
-            scopes, position = SCOPES[job[1]], job[2]
+            scopes, position = _scopes(job), job[2]
             if position == len(scopes) - 1:
                 keys = _scope_keys(store, pin, scopes[position], incarnation, limit=1)
                 changes.extend(VersionChange(scopes[position], key, delete=True) for key in keys)
@@ -137,7 +151,7 @@ def prepare_retirement_delta(store, pin, *, row_budget=256, protected_incarnatio
                 keys = _scope_keys(store, pin, scopes[position], incarnation, limit=remaining - 1)
                 changes.extend(VersionChange(scopes[position], key, delete=True) for key in keys)
                 position += len(keys) < remaining - 1
-                changes.append(VersionChange(NAMESPACE, incarnation, (TAG, job[1], position, job[3], job[4] or bool(keys)),
+                changes.append(VersionChange(NAMESPACE, incarnation, (job[0], job[1], position, job[3], job[4] or bool(keys)),
                     memberships=(Membership('pending', True, pin.captured_head + 1),)))
     return ParticipantDelta.freeze(store.codec, 'history-retirement', version_changes=changes)
 

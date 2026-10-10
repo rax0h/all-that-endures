@@ -1408,7 +1408,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             for incarnation, (kind, values) in sorted(nested_children.items()):
                                 if kind == 'sequence':
                                     builder = LazyOrderedSequence(target, construction_pin, incarnation,
-                                        initial_values=values, value_mode='native')
+                                        initial_values=values, value_mode='native', checked_types=True)
                                     sequence_changes.extend(builder.pending_changes())
                         finally:
                             target.release_pin(construction_pin)
@@ -2418,6 +2418,8 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                             raise StoreIntegrityError('native graph namespace state missing')
                     nested_counts = {NESTED_DESCRIPTOR_NAMESPACE: 0, NESTED_PAGE_NAMESPACE: 0, NESTED_ENTRY_NAMESPACE: 0}
                     nested_counts.update({ns: 0 for ns in SEQUENCE_NAMESPACES} if counted_households else {})
+                    from .persistence_history_types import NAMESPACE as HISTORY_TYPE_NAMESPACE
+                    nested_counts[HISTORY_TYPE_NAMESPACE] = 0
                     for change in sequence_changes:
                         _insert_lazy_plain_record(target, namespace=change.namespace, generation=generation,
                             typed_key=codec.encode(change.key), ordinal=nested_counts[change.namespace],
@@ -2426,7 +2428,7 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     for incarnation, (kind, values) in sorted(nested_children.items()):
                         if kind == 'sequence':
                             continue
-                        changes = initial_list_changes(incarnation, values, codec) if kind == 'list' else initial_scalar_changes(incarnation, kind, values, codec)
+                        changes = initial_list_changes(incarnation, values, codec, checked_types=True) if kind == 'list' else initial_scalar_changes(incarnation, kind, values, codec, checked_types=True)
                         for change in changes:
                             _insert_lazy_plain_record(
                                 target, namespace=change.namespace, generation=generation,
@@ -2520,6 +2522,12 @@ def convert_cold_to_lazy(source, destination, *, rules_id, paged_household_membe
                     _declare_bounded_collections(target, scalar_namespaces, native_graph_buckets)
                     target.db.commit()
                     target.verify_all()
+                    from .persistence_history_types import verify_type_witnesses
+                    verification_pin = target.capture_pin()
+                    try:
+                        verify_type_witnesses(target, verification_pin)
+                    finally:
+                        target.release_pin(verification_pin)
                     target.close()
                     target = None
                     _publish_private_cold_file(private_path, destination)
@@ -3403,6 +3411,11 @@ class ScalarRecordSavePlan:
 
 class LazyRecordTable(RecordTable):
     """RecordTable-compatible lazy people authority with a bounded clean cache."""
+
+    def preflight_value(self, key, field, value):
+        self._ensure_mutation()
+        self._session._preflight_history_owner(value,
+            Occurrence(self._namespace, key, (("field", field),)))
 
     def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
         dict.__init__(self)
@@ -5156,6 +5169,8 @@ class LazySocialEdgeTable(LazyRecordTable):
         self._ensure_mutation()
         if not isinstance(record, Relationship):
             raise TypeError("world.social.edges values must be Relationship")
+        self._session._preflight_history_owner(record.shared_history,
+            Occurrence(self._namespace, key, self._history_path))
         baseline_exists = self._baseline_exists(key)
         currently_visible = self._visible(key)
         old = (
@@ -6349,6 +6364,8 @@ class LazyResourceTable(LazyRecordTable):
             raise TypeError(
                 "world.magic_resources.resources values must be MagicResource"
             )
+        self._session._preflight_history_owner(record.transfers,
+            Occurrence(self._namespace, key, self._transfer_path))
         baseline_exists = self._baseline_exists(key)
         currently_visible = self._visible(key)
         old = (
@@ -8065,6 +8082,7 @@ class LazyTypedBucketTable(_LazyMaterialContainerTable):
     def __setitem__(self, key, value):
         if not valid_bucket_key(self._namespace, key):
             raise TypeError('native graph bucket key has wrong type')
+        self._session._preflight_history_owner(value, Occurrence(self._namespace, key, ()))
         super().__setitem__(key, value)
 
     def setdefault(self, key, default=None):
@@ -8541,6 +8559,8 @@ class LazyMaterialLotTable(LazyRecordTable):
         self._ensure_mutation()
         if not isinstance(record, MaterialLot):
             raise TypeError("world.materials.lots values must be MaterialLot")
+        self._session._preflight_history_owner(record.transfers,
+            Occurrence(self._namespace, key, self._transfer_path))
         baseline_exists = self._baseline_exists(key)
         currently_visible = self._visible(key)
         old = (
@@ -11981,8 +12001,35 @@ class LazyWorldSession:
             )
         return table
 
+    @staticmethod
+    def _history_owner_policy(occurrence):
+        if not occurrence.path and occurrence.owner_namespace in BUCKET_SPECS:
+            return 'lineage_pair' if occurrence.owner_namespace == LINEAGE_CHILD_NAMESPACE else 'int'
+        integer_fields = {
+            RESOURCE_NAMESPACE: 'transfers', MATERIAL_LOT_NAMESPACE: 'transfers',
+            SOCIAL_EDGE_NAMESPACE: 'shared_history',
+        }
+        field = integer_fields.get(occurrence.owner_namespace)
+        return 'int' if field is not None and occurrence.path == (("field", field),) else None
+
+    def _preflight_history_owner(self, value, occurrence):
+        policy = self._history_owner_policy(occurrence)
+        if policy is None:
+            return
+        if type(value) in HISTORY_TYPES:
+            if value._store is not self.store or value._pin.token != self.pin.token:
+                raise StoreError('cross-session nested history')
+            value._ensure()
+            value._member_types.require_policy(value, policy)
+        elif type(value) in (list, set):
+            from .persistence_history_types import member_class
+            allowed = 0 if policy == 'int' else 1
+            if any(member_class(item) != allowed for item in value):
+                raise TypeError('history member violates the incoming owner type')
+
     def _bind_history_list(self, value, occurrence, incarnation=None, kind=None):
         from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
+        self._preflight_history_owner(value, occurrence)
         if value is self.world.event_ids or (type(value) is tuple and value == AUTHORITY_REFERENCE):
             if kind != 'set':
                 raise StoreIntegrityError('event-ID facade used by a non-set owner')
@@ -12040,6 +12087,18 @@ class LazyWorldSession:
                                   **({'value_mode': 'native'} if kind == 'sequence' else {}))
             self._registry.bind(proxy, incarnation=incarnation)
             self._nested_dirty[incarnation.value] = proxy
+        # Newly decoded references must satisfy the incoming concrete owner too.
+        # Earlier stores retain their documented compatibility admission scan.
+        if incarnation is None:
+            raise StoreIntegrityError('nested history lacks a chosen incarnation')
+        policy = self._history_owner_policy(occurrence)
+        if policy is not None and proxy._member_types.enabled:
+            try:
+                proxy._member_types.require_policy(proxy, policy)
+            except TypeError as exc:
+                if nested_reference(original_value):
+                    raise StoreIntegrityError('stored history member violates its current owner type') from exc
+                raise
         old = self._registry.incarnation_for_occurrence(occurrence)
         if old is not None and old != incarnation:
             self._registry.detach_occurrence(occurrence, expected=old)
