@@ -48,6 +48,7 @@ from .persistence_lazy_nested_history import (
     initial_list_changes, initial_scalar_changes, checked_scalar_entry, HistoryReference, HISTORY_CLASSES, HISTORY_TYPES,
     ENTRY_NAMESPACE as NESTED_ENTRY_NAMESPACE,
     immutable_value as nested_immutable_value,
+    has_pending_overlay as history_has_pending_overlay,
 )
 from .persistence_lazy_budget import SharedCacheBudget, RecordCacheLRU, RECORD_BYTES
 from .persistence_lazy_families import RuntimeFamilyBindings
@@ -11787,7 +11788,7 @@ class LazyWorldSession:
         if old is not None and old != incarnation:
             self._registry.detach_occurrence(occurrence, expected=old)
         self._registry.attach_existing(incarnation, occurrence)
-        self._nested_lists[incarnation.value] = proxy
+        self._register_nested_overlay(proxy)
         def guard():
             self._shared_object_routes(proxy)
         def changed():
@@ -11826,6 +11827,19 @@ class LazyWorldSession:
             proxy._value_validator = validate_value
             proxy._batch_validator = validate_batch
         return proxy
+
+    def _register_nested_overlay(self, proxy):
+        """Admit a canonical same-session child and journal its private edits."""
+        if proxy._store is not self.store:
+            raise StoreError('cross-session nested history')
+        incarnation = self._registry.incarnation_for_object(proxy)
+        if incarnation is None or incarnation.value != proxy._incarnation:
+            raise StoreIntegrityError('nested history lacks its current incarnation')
+        self._nested_lists[incarnation.value] = proxy
+        if history_has_pending_overlay(proxy):
+            # Reattachment must publish private edits with the owner's header.
+            self._nested_dirty[incarnation.value] = proxy
+        return incarnation
 
     def _eager_nested_owners(self):
         # Eager headers already undergo bootstrap traversal. Compact history
@@ -11935,7 +11949,7 @@ class LazyWorldSession:
                 value = tracker._owner_value(owner)
                 for path, proxy in self._nested_leaves(value):
                     if type(proxy) in HISTORY_TYPES:
-                        current[path] = self._registry.incarnation_for_object(proxy).value
+                        current[path] = self._register_nested_overlay(proxy).value
             for path in before.keys() | current.keys():
                 if before.get(path) == current.get(path):
                     continue
@@ -12572,6 +12586,8 @@ class LazyWorldSession:
                 namespace, key, relative
             )
             incarnation = self._registry.incarnation_for_object(obj)
+            if type(obj) in HISTORY_TYPES:
+                incarnation = self._register_nested_overlay(obj)
             if incarnation is None:
                 try:
                     incarnation = self._registry.bind(obj)
@@ -13800,17 +13816,6 @@ class LazyWorldSession:
             if hasattr(self._scalar_tables[unit.namespace], 'prepare_index_changes')
             for change in self._scalar_tables[unit.namespace].prepare_index_changes(unit.version_changes)
         )
-        nested_changes = []
-        for incarnation, proxy in sorted(self._nested_dirty.items()):
-            if not (self._registry.occurrences_for_incarnation(IncarnationId(self.store.store_identity, incarnation)) or self._nested_eager_owners(proxy)):
-                self._nested_dirty.pop(incarnation, None)
-                continue
-            changes = proxy.pending_changes()
-            if not changes:
-                proxy.accept_save(self.pin)
-                self._nested_dirty.pop(incarnation, None)
-            nested_changes.extend(changes)
-        nested_history_version_changes = tuple(nested_changes)
         household_member_version_changes = self._household_page_changes()
         (
             version_changes,
@@ -13970,6 +13975,20 @@ class LazyWorldSession:
             community_membership_touched_keys,
             community_membership_structural_keys,
         ) = self.community_memberships.prepare_save_changes()
+
+        # Family reconciliation can attach a previously unowned history through
+        # a nested wallet/treasury edit. Capture its bytes after all placements.
+        nested_changes = []
+        for incarnation, proxy in sorted(self._nested_dirty.items()):
+            if not (self._registry.occurrences_for_incarnation(IncarnationId(self.store.store_identity, incarnation)) or self._nested_eager_owners(proxy)):
+                self._nested_dirty.pop(incarnation, None)
+                continue
+            changes = proxy.pending_changes()
+            if not changes:
+                proxy.accept_save(self.pin)
+                self._nested_dirty.pop(incarnation, None)
+            nested_changes.extend(changes)
+        nested_history_version_changes = tuple(nested_changes)
 
         lazy_effective = bool(
             any(unit.version_changes or unit.identity_changes for unit in scalar_record_plans)
@@ -15891,8 +15910,17 @@ class LazyWorldSession:
                 sequence._descriptor_pending = False
             else:
                 sequence._retirement_published = True
+        published_histories = {
+            change.key if type(change.key) is int else change.key[0]
+            for change in plan.nested_history_version_changes
+        }
         for proxy in tuple(self._nested_lists.values()):
-            proxy.accept_save(result.pin)
+            if proxy._incarnation in published_histories or not history_has_pending_overlay(proxy):
+                proxy.accept_save(result.pin)
+            else:
+                # The lease advanced above, but no bytes of this unowned
+                # private overlay were published. Keep its baseline and dirt.
+                proxy._clear_cache()
         self._nested_dirty.clear()
         for change in plan.nested_history_identity_changes:
             owner = (change.owner_namespace, change.owner_key)

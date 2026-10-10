@@ -934,3 +934,18 @@ from .persistence_lazy_sequence import LazyOrderedSequence
 HISTORY_CLASSES = {'list': LazyHistoryList, 'map': LazyHistoryMap, 'set': LazyHistorySet,
                    'sequence': LazyOrderedSequence}
 HISTORY_TYPES = tuple(HISTORY_CLASSES.values())
+
+
+def has_pending_overlay(history):
+    """Inspect unsaved state without loading pages or freezing a sequence."""
+    if type(history) not in HISTORY_TYPES:
+        raise TypeError('expected typed history')
+    if history._new:
+        return True
+    if type(history) is LazyHistoryList:
+        return bool(history._dirty_pages) or history._length != history._base_length
+    if type(history) in (LazyHistoryMap, LazyHistorySet):
+        return bool(history._dirty_entries) or (
+            history._count, history._next_ordinal) != (history._base_count, history._base_next)
+    return bool(history._dirty) or history._store.codec.encode(
+        history._descriptor()) != history._base_descriptor
