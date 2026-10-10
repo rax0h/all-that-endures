@@ -267,10 +267,10 @@ class RuntimeFamilyBindings:
         return adapter.identity_payload_bytes(session.store, session.pin, value, path)
 
     def unchanged_owner_header(self, owner):
-        """Force one suppressed lazy header, preserving checked query projections.
+        """Force one suppressed compact header from its checked physical source.
 
-        The central family plan supplies all changed headers and eager records.
-        This fallback is only for a compact unchanged lazy header whose child
+        The central family plan supplies all changed headers. This fallback
+        handles unchanged lazy headers and concrete eager dictionary records whose child
         backing is being written. It neither walks a child nor infers new values
         from an old source. No-op saves never call it.
         """
@@ -278,7 +278,7 @@ class RuntimeFamilyBindings:
         session = self._session()
         adapter = self._adapter(owner)
         if owner[0] not in self.tables:
-            raise StoreFormatError('eager owner header must come from its central family plan')
+            return self._unchanged_eager_header(session, adapter, owner)
         store, pin = session.store, session.pin
         key = store.codec.encode(owner[1])
         with store.read_snapshot(pin):
@@ -293,6 +293,42 @@ class RuntimeFamilyBindings:
                 raise StoreIntegrityError('changed owner header is missing from the central family plan')
             return VersionChange(owner[0], owner[1], value, record_schema=schema,
                 memberships=tuple(Membership(name, item, ordinal) for name, item, ordinal in members))
+
+    def _unchanged_eager_header(self, session, adapter, owner):
+        from .incremental_store import StoreIntegrityError, StoreFormatError, StoreConflictError
+        from .persistence_lazy_store import ORDINARY_QUERY_OWNER_INDEX
+        # Mutable event envelopes, packed action lists and event-ID descriptors
+        # have distinct physical formats; their central participants supply the
+        # correct body. Concrete eager dict families store ordinary schema values
+        # and have no query-membership projection in the accepted writer.
+        if adapter.storage_mode != 'eager' or adapter.collection_kind != 'dict':
+            raise StoreFormatError('owner physical format requires its central family plan')
+        store, pin = session.store, session.pin
+        with store.read_snapshot(pin):
+            if store.checked_head().generation != pin.captured_head:
+                raise StoreConflictError('ordinary owner header requires the captured current head')
+            try:
+                value = store.read_record(*owner, expected_record_schema=adapter.record_schema)
+            except KeyError as exc:
+                raise StoreIntegrityError('suppressed owner header has no checked ordinary source') from exc
+            if (type(value) is not tuple or len(value) != 2
+                    or type(value[0]) is not int or value[0] < 0):
+                raise StoreIntegrityError('suppressed ordinary owner has an invalid entry envelope')
+            current = adapter.identity_payload_bytes(store, pin, session._eager_tracker._record_value(*owner))
+            if current != store.codec.encode(value):
+                raise StoreIntegrityError('changed owner header is missing from the central family plan')
+            index = store.db.execute('SELECT sql FROM sqlite_master WHERE type=? AND name=?',
+                ('index', ORDINARY_QUERY_OWNER_INDEX)).fetchone()
+            expected = 'CREATE INDEX ordinary_query_owner ON query_membership(namespace,record_key)'
+            if index is None or ''.join(index[0].split()).lower() != ''.join(expected.split()).lower():
+                raise StoreFormatError('ordinary owner header requires an explicit indexed copy upgrade')
+            rows = store.db.execute(
+                f'SELECT 1 FROM query_membership INDEXED BY {ORDINARY_QUERY_OWNER_INDEX} '
+                'WHERE namespace=? AND record_key=? LIMIT 1', (owner[0], store.codec.encode(owner[1]))).fetchall()
+            store._query_rows += len(rows)
+            if rows:
+                raise StoreIntegrityError('ordinary owner header has an unexpected query projection')
+            return RecordChange(*owner, value, record_schema=adapter.record_schema)
 
 
 def validate_manifest():

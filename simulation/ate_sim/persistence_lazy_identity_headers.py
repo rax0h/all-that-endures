@@ -41,6 +41,30 @@ class _IdentityHeaderCodec(WorldCodec):
         return super().encode(value)
 
     def _encode_value(self, value, active, seen_mutable):
+        from .persistence_tracking import TrackedDict, TrackedList, TrackedSet
+        if type(value) in (TrackedDict, TrackedList, TrackedSet):
+            tracker = value._session
+            if (not tracker._active or tracker.store is not self._store
+                    or tracker._cold_head is None
+                    or tracker._cold_head.generation != self._pin.captured_head):
+                raise StoreConflictError('tracked value has a different or closed authority lease')
+            # Concrete runtime wrappers encode as their existing native schema
+            # type. Descendant histories still recurse through this compact
+            # codec; copying through the portable codec would materialize them.
+            if self.identity_links_recorded:
+                seen_mutable = set()
+            self._enter(value, active, seen_mutable, mutable=True)
+            try:
+                if type(value) is TrackedDict:
+                    return ['dict', [[self._encode_value(k, active, seen_mutable),
+                        self._encode_value(v, active, seen_mutable)] for k, v in value.items()]]
+                if type(value) is TrackedList:
+                    return ['list', [self._encode_value(v, active, seen_mutable) for v in value]]
+                encoded = [self._encode_value(v, active, seen_mutable) for v in value]
+                encoded.sort(key=self._node_sort_key)
+                return ['set', encoded]
+            finally:
+                active.remove(id(value))
         if type(value) is EventIdSet:
             self._check_event_authority(value)
             value = value.storage_reference()
