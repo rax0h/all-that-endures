@@ -971,3 +971,42 @@ their plan. Close that protocol before activating them in the hybrid publisher.
 Then connect concrete catalog adapters, household sequences and all remaining
 packages. This is still implementation in progress, not candidate/release
 acceptance. Compatibility P5/H metrics retain their previous source boundary.
+
+## 2026-10-10 — checked failed-publication release
+
+Local implementation `f5f3f6dc545ccbd13a9b95beccb6f1c99c4cd753`, public
+`b12a562120f33bc5cdd5bed000ad795e42dc6fb0`, matching tree
+`29e44cf75738a491b83abb3f6ec98f6ec0a8d65c`. Non-force exact-tree publication
+completed. Sequence and coordinator abort_delta release only their freeze,
+retaining all dirty pages/routes and canonical objects, after checked existing
+pin/attempt/receipt resolution proves the exact token not committed at the
+unchanged parent. A preparation that never registered an attempt is provably
+unpublished only with no attempt or the preceding acknowledged parent. Wrong
+failed token, wrong delta, corrupt operational metadata, committed/lost-ack
+and stale/superseded parent cannot thaw the plan. No replacement authority or
+new receipt protocol was added. Checks inspect bounded operational pins/receipts,
+not archive owners.
+
+A further RED reproduced a committed sequence misclassified as unattempted
+when the hybrid bridge advanced its lease before acceptance. Abort now checks
+the captured prepared parent, so an advanced lease cannot unfreeze that delta.
+Acknowledgement also requires the original writer pin token, not a separately
+registered pin at the same generation. Closed backing is checked explicitly;
+coordinator idempotent acceptance validates its surviving lease.
+
+Nine new regressions cover failed retry with old-pin preservation, wrong
+delta/token, lost acknowledgement and idempotent acceptance, stale competitor,
+corrupt attempt, coordinator overlay preservation/replacement retry, unattempted
+preparation, advanced lease and both unrelated-successor cases. Initial RED6
+failed for missing abort methods; the advanced-lease RED failed DID NOT RAISE.
+Final affected command:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_participant_abort.py simulation/tests/test_stage_0_5_final_owner_replacement.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_sequence_errors.py simulation/tests/test_stage_0_5_final_sequence_numeric_index.py simulation/tests/test_stage_0_5_final_sequence_compat.py simulation/tests/test_stage_0_5_final_world_participants.py`
+— exit0, **49 passed16.01s**, `stage_0_5_final_participant_abort_gate.txt`.
+`git diff --check` passed. This includes the existing actual World hybrid
+participant tests, but sequence/catalog World activation remains pending.
+
+Next: include catalog/coordinator deltas and exact failed-plan release in the
+frozen central publication interface, then activate concrete adapters with the
+complete new-format contracts. Do not emit an incomplete capability6 marker.
+All household/nested/pressure/migration/final release gates remain outstanding;
+P5/H-size reports retain their previous source boundary.

@@ -4,9 +4,9 @@ Status: implementation in progress. This manifest is a checkpoint index, not
 release acceptance. PR14 remains unmodified and unmerged.
 
 Current code checkpoint:
-- Public commit: `737b46de63103d161e3ca3467744e6fc7c3df1db`.
-- Local commit: `be6df5e6c74406bff3c05ae4316de78ed3800e22`.
-- Matching source tree: `e8a5cc4ff599542fc4400e7e298076fafcb77fee`.
+- Public commit: `b12a562120f33bc5cdd5bed000ad795e42dc6fb0`.
+- Local commit: `f5f3f6dc545ccbd13a9b95beccb6f1c99c4cd753`.
+- Matching source tree: `29e44cf75738a491b83abb3f6ec98f6ec0a8d65c`.
 
 | Artifact | Scope and authority |
 | --- | --- |
@@ -26,6 +26,7 @@ Current code checkpoint:
 | `tests/test_stage_0_5_final_runtime_families.py` | Cold record/child aliases and immutable concrete bindings |
 | `tests/test_stage_0_5_final_record_budget.py` | Byte accounting, sidecars, retained aliases, dirty owner rehydration, step/query budgets, precommit/lost-ack recovery |
 | `tests/test_stage_0_5_final_pressure_arithmetic.py` | Forced exact float.hex/RNG arithmetic regressions; duplicates, extinct occurrences, shared/replaced list and reopen; checked scalar/cache integration still pending |
+| `ate_sim/persistence_lazy_publication_guard.py`, `tests/test_stage_0_5_final_participant_abort.py` and `stage_0_5_final_participant_abort_gate.txt` | Checked thaw after failure, preserve frozen committed/stale plan, exact writer lease;49-pass affected gate including actual legacy World publication |
 | `tests/test_stage_0_5_final_owner_replacement.py` and `stage_0_5_final_owner_replacement_*gate.txt` | Complete compact owner/subtree journal contract;54-pass affected gate and concrete runtime/header subsets; frozen failed-plan integration pending |
 | `stage_0_5_final_owner_retirement_gate.txt`, `stage_0_5_final_owner_retirement_fault_gate.txt` and `tests/test_stage_0_5_final_owner_retirement.py` | Checked metadata-only retirement; 59-pass affected gate and39-pass non-death fault gate, overlapping; subprocess-death completion outstanding |
 | `stage_0_5_final_sequence_numeric_gate.txt` and `tests/test_stage_0_5_final_sequence_numeric_index.py` | 16-pass numeric-alias checked occurrence gate; no history scan, corruption, duplicates and old pins |
