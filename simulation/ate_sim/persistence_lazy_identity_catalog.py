@@ -496,10 +496,12 @@ class IdentityCatalog:
         return self.read_identity_group(pin, incarnation_id).links
 
     def prepare_delta(self, pin, owner_versions, identity_changes, *, next_incarnation_id,
-                      ordinary_changes=()):
+                      ordinary_changes=(), retirement_row_budget=0, protected_incarnations=()):
         return _prepare_catalog_delta(self, pin, owner_versions, identity_changes,
                                       next_incarnation_id=next_incarnation_id,
-                                      ordinary_changes=ordinary_changes)
+                                      ordinary_changes=ordinary_changes,
+                                      retirement_row_budget=retirement_row_budget,
+                                      protected_incarnations=protected_incarnations)
 
     def prepare_retirement_delta(self, pin, *, protected_incarnations=(), row_budget=256):
         """Bounded indexed metadata preparation; central commit remains publisher.
@@ -671,11 +673,16 @@ class OwnerTreeEditor:
 
 
 def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_incarnation_id,
-                           ordinary_changes=()):
+                           ordinary_changes=(), retirement_row_budget=0, protected_incarnations=()):
+    if type(retirement_row_budget) is not int or not 0 <= retirement_row_budget <= 256:
+        raise ValueError('retirement row budget must be in 0..256')
+    protected = set(protected_incarnations)
+    if any(type(inc) is not int or inc < 1 for inc in protected):
+        raise ValueError('invalid protected incarnation')
     versions = tuple(owner_versions)
     placements = tuple(identity_changes)
     ordinary = tuple(ordinary_changes)
-    if not versions and not placements and not ordinary:
+    if not versions and not placements and not ordinary and not retirement_row_budget:
         with self.store.read_snapshot(pin):
             if next_incarnation_id == self.store._identity_state_at(pin.captured_head)[0]:
                 return ParticipantDelta.freeze(self.codec, 'identity-catalog')
@@ -778,12 +785,19 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
                      digest(self.codec, b'identity-group-links-v1', links), paths[0] if paths else None)
             changes.append(VersionChange(GROUP_NAMESPACE, inc, value,
                 memberships=() if occurrences else (Membership('retired', True, pin.captured_head + 1),)))
+        compacted = 0
+        if retirement_row_budget >= 4:
+            if retirement is None:
+                raise StoreFormatError('legacy catalog retirement requires explicit copy upgrade')
+            compacted, maintenance = _compact_retired_groups(self, pin, retirement,
+                protected | affected, retirement_row_budget)
+            changes.extend(maintenance)
         if retirement is not None:
             changes.extend(retirement.pending_changes())
-        if next_incarnation_id != old_allocator or revived:
+        if next_incarnation_id != old_allocator or revived or compacted:
             changes.append(VersionChange(CATALOG_NAMESPACE, 0,
                 (descriptor[0], descriptor[1], next_incarnation_id,
-                 descriptor[3] + next_incarnation_id - old_allocator + revived,
+                 descriptor[3] + next_incarnation_id - old_allocator + revived - compacted,
                  retirement.header if retirement is not None else descriptor[4])))
         # Coalesce targets moved between groups to a final action. Group iteration
         # order cannot decide whether an old target deletion overrides its upsert.
@@ -795,5 +809,51 @@ def _prepare_catalog_delta(self, pin, owner_versions, identity_changes, *, next_
                 continue
             final[marker] = change
         return ParticipantDelta.freeze(self.codec, 'identity-catalog', version_changes=tuple(final.values()))
+
+
+def _compact_retired_groups(catalog, pin, ranges, protected, row_budget):
+    """Add a bounded maintenance slice to the foreground range editor.
+
+    One editor and one descriptor publish both revival and compaction. Count
+    additional changed range rows, including shared foreground paths, rather
+    than imposing a background cap on the user's legitimate placement edits.
+    """
+    store, codec = catalog.store, catalog.codec
+    if pin.captured_head != store.generation:
+        raise StoreConflictError('retirement preparation requires current writer pin')
+    floor = store._validated_retention_floor(pin.captured_head)
+    candidates = store.query_memberships(pin, GROUP_NAMESPACE, 'retired', True,
+        limit=row_budget, exclude_keys=protected)
+    foreground = {(c.namespace, codec.encode(c.key)): c for c in ranges.pending_changes()}
+    changes, compacted = [], 0
+    extra = 0
+    from .persistence_history_retirement import pending_retirement
+    for inc, retired_at in candidates:
+        if retired_at > floor:
+            break
+        header = store.read_version(pin, GROUP_NAMESPACE, inc, expected_record_schema=SCHEMA)
+        if header.valid_from != retired_at:
+            raise StoreIntegrityError('retirement eligibility/header revision disagreement')
+        if catalog.read_identity_group(pin, inc).occurrences:
+            raise StoreIntegrityError('retirement index points to a placed identity')
+        if pending_retirement(store, pin, inc):
+            # Pending/held backings must retain their checked group. Rotate the
+            # candidate so they cannot starve eligible record groups behind it.
+            if len(changes) + extra + 2 > row_budget:
+                break
+            changes.append(VersionChange(GROUP_NAMESPACE, inc, header.value,
+                memberships=(Membership('retired', True, pin.captured_head + 1),)))
+            continue
+        root, dirty, baseline = ranges.root, ranges._dirty.copy(), ranges._baseline.copy()
+        ranges.add(inc)
+        proposed_extra = sum(foreground.get((c.namespace, codec.encode(c.key))) != c
+            for c in ranges.pending_changes())
+        if len(changes) + 1 + proposed_extra + 1 > row_budget:
+            ranges.root, ranges._dirty, ranges._baseline = root, dirty, baseline
+            break
+        changes.append(VersionChange(GROUP_NAMESPACE, inc, delete=True))
+        compacted += 1
+        extra = proposed_extra
+    return compacted, tuple(changes)
 
 

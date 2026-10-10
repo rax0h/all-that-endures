@@ -463,7 +463,8 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
             raise StoreIntegrityError('hybrid coordinator parent or allocator differs from frozen plan')
         if retire_world_backings:
             from .persistence_history_retirement import prepare_world_retirement_delta
-            retirement_delta = prepare_world_retirement_delta(store, pin, coord, backing_dependencies)
+            retirement_delta = prepare_world_retirement_delta(store, pin, coord, backing_dependencies,
+                row_budget=96)
             retirement_participant = FamilySaveParticipant(store, pin, plan.target_generation, retirement_delta)
             cleanup_budget = 128
             captured += (retirement_delta,)
@@ -491,7 +492,10 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
                 dependency_participant = DependencySaveParticipant(pool, pool.prepare_delta(), pin, plan.target_generation)
                 _check_unique_authorities(codec, captured + (dependency_participant.delta,))
             delta = coord.prepare_delta(owner_versions, ordinary_changes=owner_records,
-                                        value_changed_incarnations=_changed_backings(all_versions))
+                                        value_changed_incarnations=_changed_backings(all_versions),
+                                        retirement_row_budget=32 if retire_world_backings else 0,
+                                        protected_incarnations=(pool.protected_incarnations()
+                                            if retire_world_backings else ()))
         except BaseException:
             if dependency_participant is not None:
                 dependency_participant.abort_delta(plan.token)

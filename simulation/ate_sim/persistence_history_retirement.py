@@ -175,7 +175,7 @@ def validate_publication(store, delta, pin):
                     raise StoreIntegrityError('history retirement publication disagrees with frozen plan')
 
 
-def prepare_world_retirement_delta(store, pin, coordinator, dependencies):
+def prepare_world_retirement_delta(store, pin, coordinator, dependencies, *, row_budget=128):
     """Queue affected last-owner removals plus at most128 background edits.
 
     Foreground jobs scale with actual placement changes, never owner inventory.
@@ -218,7 +218,7 @@ def prepare_world_retirement_delta(store, pin, coordinator, dependencies):
             # children. Foreground replacement wins over that queue cancellation.
             jobs.append(initial_retirement_change(kinds[0], inc, generation=pin.captured_head + 1))
         background = prepare_retirement_delta(store, pin,
-            row_budget=128,
+            row_budget=row_budget,
             protected_incarnations=(*dependencies.protected_incarnations(), *coordinator.dirty_incarnations))
     combined = {(c.namespace, store.codec.encode(c.key)): c for c in background.decode(store.codec)[0]}
     combined.update(((c.namespace, store.codec.encode(c.key)), c) for c in jobs)

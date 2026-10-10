@@ -404,7 +404,8 @@ class IdentityCoordinator:
                 self._preparing_headers = False
         return tuple(forced_versions), tuple(forced_ordinary)
 
-    def prepare_delta(self, owner_versions, *, ordinary_changes=(), value_changed_incarnations=()):
+    def prepare_delta(self, owner_versions, *, ordinary_changes=(), value_changed_incarnations=(),
+                      retirement_row_budget=0, protected_incarnations=()):
         if self._mutation_depth:
             raise StoreConflictError('identity save preparation is blocked during mutation')
         self.preflight()
@@ -421,7 +422,7 @@ class IdentityCoordinator:
             self.dirty_incarnations.clear()
             self._value_dirty_groups.clear()
             self._trim()
-            if self.registry.next_incarnation == self._baseline_allocator:
+            if self.registry.next_incarnation == self._baseline_allocator and not retirement_row_budget:
                 delta = ParticipantDelta.freeze(self.store.codec, 'identity-coordinator')
                 catalog_delta = ParticipantDelta.freeze(self.store.codec, 'identity-catalog')
                 self._prepared = PreparedCoordinatorState(delta, catalog_delta, self.pin.captured_head,
@@ -430,7 +431,9 @@ class IdentityCoordinator:
         placements = tuple(self.placement_overlay.values())
         catalog_delta = self.catalog.prepare_delta(self.pin, payloads, placements,
                            next_incarnation_id=self.registry.next_incarnation,
-                           ordinary_changes=ordinary_payloads)
+                           ordinary_changes=ordinary_payloads,
+                           retirement_row_budget=retirement_row_budget,
+                           protected_incarnations=(*protected_incarnations, *self.dirty_incarnations))
         versions, ordinary, _ = catalog_delta.decode(self.store.codec)
         delta = ParticipantDelta.freeze(self.store.codec, 'identity-coordinator',
             version_changes=forced_versions + versions, ordinary_changes=forced_ordinary + ordinary,
