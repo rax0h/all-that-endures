@@ -834,3 +834,36 @@ replace eager household/settlement authority, or close nested histories.
 **Next:** complete runtime adapter/coordinator publication and the dependent
 household/sequence integrations. Preserve native exceptional list behavior
 when closing the counted-sequence interfaces. All final release gates remain.
+
+## 2026-10-10 — counted sequence iterator/freeze repair
+
+Local implementation `27a3e48026d070dd1d263f76360c8f4ddf026091`, public
+`2c4f70d56023079773d00f8669028a596ec95dec`, matching tree
+`e126c3620e99a1968d463b7dfebe2a831f5402a4`. Non-force publication used the
+previous exact public head lease.
+
+Sequence extend now consumes caller input inside the guarded mutation, retaining
+and notifying the successfully consumed prefix if the iterator raises, as native
+list.extend does. Self-extension captures original occurrences once. Stored-value
+validation and checked tree/index failures still roll back the complete operation.
+Save preparation is blocked throughout the mutation, including its preflight
+callback, so a reentrant iterator/guard cannot freeze an intermediate plan.
+
+Permanent regressions cover failed input, iterator observations, frozen preflight,
+self-extension, later corrupt member index rollback, reentrant input preparation
+and reentrant guard preparation. Historical REDs reproduced lost prefix, stale
+iterator observations, premature generator consumption, and both freeze holes.
+Final affected gate:
+`PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_sequence_errors.py simulation/tests/test_stage_0_5_final_sequence.py simulation/tests/test_stage_0_5_final_sequence_compat.py simulation/tests/test_stage_0_5_final_budget.py`
+— **58 passed178.43s**. Durable output: `stage_0_5_final_sequence_error_gate.txt`.
+The process handle was lost across runtime restart; the completed output survived.
+A fresh focused regression run independently returned exit0, **7 passed0.22s**.
+`git diff --check` passed. Previous same-source gate58 passed127.99s belongs to
+its own transient log; counts overlap.
+
+The recorded compatibility P5/record metrics remain at the preceding compact
+header source; they do not certify this unused World sequence primitive or a
+complete new-format candidate. Numeric equal lookup routing and native sort
+exception semantics still need closure. Catalog/household/nested integration and
+all final acceptance/release gates remain outstanding. Next: runtime catalog
+adapter/publication integration, preserving checked compact history comparisons.
