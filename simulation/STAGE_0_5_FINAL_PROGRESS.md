@@ -1,5 +1,48 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: joint World retired-identity compaction (October 10 UTC)
+
+Public source `3fbe6d4738ab465010e5146ba9b946c3197ff432`, local source
+`fd374697950701676bc2a60da7e2c1f3722150e1`, matching tree
+`e29a392bbb1193bc9f16e7320ea1a0c5b97f72e7`. Exact-tree leased non-force
+publication completed; PR14 remains `c29e3d06a0c9d219235e2b3f0390271bd1245aea`.
+
+Real staged-catalog World saves now compact eligible empty groups into checked
+retired-ID ranges through the same catalog editor/coordinator participant. One
+range editor and one catalog descriptor cover foreground revival/allocation and
+background compaction: no independently editable relation or second transaction.
+Dirty groups and live history dependencies are protected; pending backing cleanup
+retains its group. Checked pending candidates rotate so they do not indefinitely
+starve eligible groups behind them. Retention-floor and exact source/witness checks
+precede compaction. A retained record can revive its same incarnation from a range;
+its retained history keeps the backing usable. No-op save does not run maintenance.
+
+The ordinary maintenance budget is now shared as96 backing changes,32 identity
+changes and128 physical expired-row removals. Additional range rows changed from
+the foreground editor count against the background budget; real foreground edits
+are not falsely capped by it. Frozen publication captures the physical128 budget.
+Actual World tests sum all three categories and require<=256 total.
+
+Final affected command: `PYTHONPATH=.:simulation /workspace/scratch/c3a830e86cea/ownership-gate-venv/bin/python -m pytest -q --tb=short simulation/tests/test_stage_0_5_final_world_identity_compaction.py simulation/tests/test_stage_0_5_final_world_eager_placements.py simulation/tests/test_stage_0_5_final_world_event_placements.py simulation/tests/test_stage_0_5_final_world_catalog_bridge.py simulation/tests/test_stage_0_5_final_world_backing_lifetimes.py simulation/tests/test_stage_0_5_final_world_backing_retirement.py simulation/tests/test_stage_0_5_final_identity_catalog.py simulation/tests/test_stage_0_5_final_identity_coordinator.py simulation/tests/test_stage_0_5_final_retired_identity.py simulation/tests/test_stage_0_5_final_catalog_publication.py simulation/tests/test_stage_0_5_final_history_retirement.py simulation/tests/test_stage_0_5_final_participant_abort.py simulation/tests/test_stage_0_5_final_world_participants.py -k 'not point_and_reverse_reads and not comparison_never'`
+— exit0, **153 passed in49.04s**. Log: world-compaction-final.log. The previously
+established slow indexed-read comparisons are excluded; their code is unchanged.
+An initial actual-World RED confirmed missing compaction. A fixture erroneously
+compared save's integer generation with a GenerationPin and was corrected, not a
+production assertion relaxed. All five new World cases then passed, including
+retirement completion, live alias protection, same-ID revival, rollback/lost ack,
+full store verification and zero-advance no-op. `git diff --check` passed.
+
+The previous eager/event affected catalog gate completed **114 passed in99.18s**
+on its captured pre-compaction imports. Its legacy family gate completed
+**154 passed in162.86s**; it began before the final checked-mode-only link guard,
+which does not affect these legacy paths. Counts overlap and are not additive.
+
+Remaining fixed requirements: packed action/EventID descriptor identity integration,
+recursive stable physical paths, live counted promotion, exotic exact equality,
+complete capability6 ordinary activation and source-preserving copy upgrade, then
+final bounded scaling/P5/full-suite/fresh review. No capability6 emitted; no new
+P5, full suite, endurance, promotion or final-review claim. Stage0.5 is not finished.
+
 ## Latest checkpoint: eager dictionary and mutable LOG placement journals (October 10 UTC)
 
 Public source `544d66e5fb00348123ac4d3d5ef49a2ed00c886d`, local source
