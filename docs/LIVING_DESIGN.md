@@ -1688,6 +1688,8 @@ Preserve extensible IDs, world truth, causal semantics, bounded history access a
 
 ## 54. Human and civilizational causality: research into why people and groups act
 
+**Active evidence record:** [Human & Civilizational Causality — Research Record](research/HUMAN_CIVILIZATIONAL_CAUSALITY.md). This separate document maintains published sources, competing explanations, explicitly provisional hypotheses and proposed counterfactual tests; research does not automatically change gameplay canon.
+
 **Research direction, not a claim of completed scientific validation.** To make unscripted love, leadership, innovation, cooperation, greatness, conflict, peace and war possible, ATE must investigate the underlying causes of those outcomes. Do **not** start from lists of compelling stories and then reverse-engineer NPC behavior to guarantee them.
 
 Study human history and relevant empirical/theoretical work across individual psychology, social psychology, anthropology, political science, economic history, ecology, institutional economics, collective action, military history and disaster studies. Separate established evidence, contested theories, useful modeling approximations and fantasy-specific rules. Historical cases should inform *mechanisms*, not become plot templates or universal claims about human nature.
