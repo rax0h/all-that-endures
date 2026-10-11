@@ -1,7 +1,7 @@
 # ALL THAT ENDURES — Living Design Document
 
 **Status:** Living design authority for new simulation direction.  
-**Last cohesive update:** 2026-09-30  
+**Last cohesive update:** 2026-10-11  
 **Purpose:** Preserve design decisions as they become coherent. Before replacing an existing system, inspect the repository and extend shared causal primitives where possible.
 
 > **North star:** Not simulated stories. Simulated people whose lives become stories.
@@ -1402,3 +1402,254 @@ The path may change.
 
 The project does not.
 
+## 45. Character creation, origins, and voluntary magical identity
+
+**Design status:** Core freedoms and constraints below are adopted. Exact creation-screen flow, race catalogue, trials, starting allocation and numerical balance remain design work.
+
+ATE begins with a person entering an already living world, not a premade class or a guaranteed hero's journey. Character creation should provide considerable physical customization and a comprehensible starting situation while leaving most of the character's future to life and circumstance.
+
+### Two ways to enter the world
+
+Offer two broad origin directions:
+
+- **Isekai / outsider:** A person arrives from another world. Their arrival requires a valid in-world cosmological cause, not an unexplained menu exception. They may lack local knowledge and relationships; they are not automatically chosen, cosmically favored or destined for importance.
+- **Natural-born / native:** A person belongs to the simulated world. Their family, birthplace, upbringing, cultural understanding, socioeconomic circumstances and existing ties must be compatible with actual world history. Do not invent an isolated biography that contradicts the save.
+
+Both origins can pursue any legitimate life, magical or mundane. Neither grants automatic superiority. The precise rules by which newly created people are introduced into an established historical timeline, and by which outsiders cross worlds, still need design.
+
+### Customization and presentation boundaries
+
+Support meaningful freedom across the world's playable races, sex and physical appearance, with detailed control over face, body, height and proportions, hair, coloration, markings, scars and physiology-specific traits. Race must correspond to an actual world physiology; its physical properties can matter without reducing people to classes or fixed destinies. Provide usable presets as well as advanced customization. The final catalogue of playable physiologies is not yet fixed.
+
+The game may address adult subjects without displaying explicit nudity. Character creation and ordinary presentation should use appropriate clothing/undergarments; anatomical customization does not require nude display. No finished HUD or character-editor layout is canonized by this section.
+
+### Starting Essence: optional, limited, consequential
+
+**Standard play does not permit building an entire Essence set, confluence and twenty awakened abilities at character creation.** The ordinary starting choice is intentionally limited:
+
+- **Common Essence beginning:** A player may choose a first **Common** Essence and start with that commitment, provided the origin has a legitimate acquisition explanation.
+- **Unbound beginning:** A player may begin with **no Essence**, encounter opportunities in play and acquire magic later—or never.
+- **Possible starting trial:** Investigate a voluntary in-world assessment, apprenticeship, sponsor selection or other earned opportunity that *may* lead to an Uncommon or Rare first Essence. The exact test, eligibility, access, probabilities, costs and consequences are **provisional**, not settled rules. It cannot conjure scarce resources by questionnaire or become an unlimited rarity-reroll loop.
+
+Starting with one Essence is not starting with a complete magic build or automatically qualifying as Iron rank. The established confluence and twenty-ability completion rules still apply. Remaining Essences, awakening stones, abilities, teachers and access must come from actual opportunity and the magic economy. Rare and Legendary ambitions are possible but not promised. Accepting an available Common or Uncommon Essence occupies a real commitment that may close off a desired three-Legendary combination later; waiting preserves opportunity while imposing real uncertainty and cost. Communicate irreversible consequences clearly.
+
+**Mundane life is a complete life-path, not a beginner state, missing class, challenge penalty or failed magical build.** A person can remain without Essence magic until death and still be a master craftsperson, respected parent, politician, soldier, investigator, scholar, entrepreneur, farmer or historical figure. Do not award magic merely to validate a life well lived, or require it for meaningful play. Physical and magical power disparities remain real: an excellent mundane fighter is not secretly made equal to a Diamond.
+
+### Classes are emergent descriptions
+
+No conventional immutable class selector should govern ATE. The four-Essence/twenty-ability framework creates capabilities; profession, equipment, training, technique, reputation, relationships and conduct create a person's practice and social description. Terms like duelist, battlemage, healer, blacksmith or adventurer may help players understand or describe someone, but must not become invisible restrictions on what they can attempt. Two people with the same Essence combination can develop substantially different lives and effective builds.
+
+## 46. The world is the save; playable lives are inhabitants
+
+**Governing rule:** **The world is the persistent game. A character is a life inside it, not the container holding the save.**
+
+The player may spend an entire game with one person, create several people, inhabit existing simulated people where permitted, follow a family across generations, or move between unrelated lives. No protagonist is required to survive for the world to continue.
+
+### Personal creation roster versus people one can inhabit
+
+Adopt **at least six personally created lives per world as the initial roster design target**. Six is not a permanent ceiling on the number of people one may know, revisit or inhabit; capacity, slot reuse, and final UI remain to be specified. A created person is an actual member of the world, not a separate save branch or a disposable character preset.
+
+Maintain two distinct notions:
+
+1. **Created lives / roster:** People the player personally introduces through legitimate origins, initially targeting six or more.
+2. **Inhabited lives / history:** Any existing person whom the game's eventual inhabitation rules permit the player to control, whether or not originally created. Formerly inhabited people may be followed or bookmarked without consuming a created-character slot.
+
+**Do not interpret the six slots as an adventuring party.** Each person may live on another continent, maintain an unrelated career and have their own family, crew, guild or companions. Their paths may cross through causality, but the system must never force crossover because both are on the player's roster. A player can intentionally keep their lives separate by where and how they live; they cannot suspend the world's ordinary causal possibilities.
+
+An adventurer can assemble companions naturally. Those companions are autonomous people, not automatically the user's other created lives; permitted inhabitation of one of them changes viewpoint without magically making the group into six authored protagonists.
+
+### Shared time, mortality and release
+
+All characters inhabit **one world clock and one actual history**. Playing one does not freeze the others. Switching viewpoints must neither duplicate time nor silently fast-forward far beyond the player's informed choice. World-time flow, waiting and explicit long-history advances require clear controls and safeguards; no assumption is made that real-life offline time advances the world.
+
+When the player releases a person, that person returns to the same agency and simulation rules as everyone else. They may train, prosper, fail, change jobs, fall in love, have children, move, join a movement, abandon an ambition, age or die. On return, the player inherits the person's *actual intervening life*, not their earlier snapshot. Player-directed history influences them but does not permanently lock their desires or future decisions.
+
+Death is a real world event and is generally permanent under the existing one-life rule, subject only to genuine rare in-world resurrection mechanisms. It changes inheritance, property, grief, relationships, careers, organizations and history. It does **not** delete the world save or require a restart. The player may continue another existing life or introduce a new life through legitimate origins. The dead remain in memory and history, not erased to make a slot look unused.
+
+### Information and perspective separation
+
+The human player may remember information learned while inhabiting someone else; the current person does not thereby gain it. Knowledge, maps, rumors, private plans, hidden property, identities and relationships remain situated within actual observers and transmission. No shared-roster telepathy, automatic companionship or inventory pooling. Interactions between lives require real-world contact, messages, contracts, trade, inheritance, discovery or other legitimate causes.
+
+### Deliberately shaped people, unpredictable futures
+
+The player may develop someone ruthless, ambitious, cruel or unusually powerful and release them far from familiar settlements. That person might become a feared antagonist, establish an institution, live quietly, reform or die. **There is no Create Villain function and no guaranteed villain trajectory.** A former player-inhabited person is not plot-armored, preserved as a future encounter or obligated to become an adversary. This is one of the central tests of autonomous personhood.
+
+## 47. Autonomous release goals, plans and life commitments
+
+**Core decision:** When leaving an inhabited person, the player may express intentions for that person's future activity, continue existing commitments, or add no new direction. These intentions enter the **same bounded Agency system** that governs every other person; they are not remote-control orders, job-queue cheats, guaranteed outcome scripts or a separate former-player AI.
+
+### Release choices
+
+A proposed release interface should make three intentions intelligible without forcing elaborate micromanagement:
+
+1. **Continue existing life:** Keep present goals, routines, obligations and commitments.
+2. **Prioritize selected goals:** Record specific desired outcomes and priorities for the autonomous person to pursue, to the extent feasible and compatible with who they are.
+3. **No new direction / live freely:** Add no player-authored goals; the person still has memory, needs, habits, existing promises and the freedom to form new plans. This choice does not wipe their prior identity or debts.
+
+The wording and layout of the release screen are not finalized. The player can later inhabit the person again and change their own plans, but intervening consequences and commitments remain real.
+
+### Goal representation and decision model
+
+Represent a goal with enough causal structure to guide action without pretending it determines success. A useful bounded goal record may hold:
+
+- the **desired condition** and subject (e.g., host a banquet, learn a technique, recruit a student);
+- **motivation and personal importance**, distinguished from an external command;
+- a **deadline or horizon** where real, and expected effort;
+- known **prerequisites, dependencies and feasible next steps**;
+- perceived **resource requirements** (money, materials, labor, tools, transport, property, skills, knowledge, time);
+- relevant **relationships, promises, contracts, permissions and consequences**;
+- **confidence, uncertainty and information provenance** from the person's knowledge, not global truth;
+- priority, current status, previous attempts and reasons to continue, delay, renegotiate or abandon.
+
+Goals may overlap, conflict or support one another. Deadline-driven obligations can outrank distant ambitions, while illness, family emergencies, weather, violence, opportunities or changed values may rationally cause reprioritization. Failure may generate debt, reputation change, disappointment, loss of a contract, learning or a new plan. A stated goal must never skip the actual work required by downstream systems.
+
+Agency chooses among plausible efforts using the existing person/world model. Profession systems resolve the practical work; economy resolves resources and prices; social systems resolve cooperation; the world resolves whether outcomes are possible. **Instruction is intention; choice is agency; achievement is consequence.**
+
+### Chef: five simultaneous intentions as an integration test
+
+A restaurant-owning chef is released with five goals, not five completion timers:
+
+| Goal | Real work and dependencies | Possible consequences |
+|---|---|---|
+| **Study advanced cooking techniques** | Find sources or teachers, arrange time, buy or borrow tools/ingredients, practice, fail and improve | Greater competence, expenses, relationships, discoveries, limited or lost time for paid work |
+| **Prepare for the harvest banquet** | Accept/confirm an actual obligation; plan menu and portions; acquire food, staff, equipment, venue and transport before a real date | Income and prestige if successful; shortages, illness, weather or mistakes may cause renegotiation or failure |
+| **Develop a signature regional dish** | Experiment with regional produce, taste, preservation, technique, available equipment and consumer preferences | Original knowledge, regional identity, imitation, prestige, sales or an expensive unsuccessful experiment |
+| **Expand the restaurant** | Determine actual demand, secure finance, property, materials, labor, permits or local consent where applicable | More capacity, jobs and influence—or debt, vacancies, supply stress and closure |
+| **Recruit and train an apprentice** | Find a willing person, agree on terms, allocate teaching time, teach real techniques, earn trust and assess progress | Transmitted knowledge, mutual loyalty or resentment, succession, competition, departure or an institution surviving its founder |
+
+A harvest deadline may draw effort away from studying. An apprentice might make the banquet viable and later develop the signature dish further. Expansion can fail because trade collapses or succeed because new roads reopen. The chef may fall in love, become ill, have children or change careers. None of the five goals immunizes them from life.
+
+The player returning after months or years should find inspectable evidence of what happened: contracts, purchases, actual changes to the restaurant, learned techniques, recipes or their bounded knowledge representations, coworkers, apprentices, debts, reputation by observer, and events. No invented summary claiming the chef "completed banquet 100%" without real underlying state.
+
+### Scope and scalability
+
+A person should hold a **small bounded set** of active concerns and goals, with dormant longer-range ambitions where justified. Reassess them on meaningful events, deadlines and coarse cadence, not by repeatedly scanning global historical archives or deliberating in maximum detail every simulation tick. Released characters must have no more special per-tick machinery than comparable never-inhabited people.
+
+Test routine continuity, conflicting priorities, failure, an unmet prerequisite, a broken contract, discovery of new information, a changed relationship, unexpected success, and a person explicitly abandoning the player's former objective.
+
+## 48. Mirage Arena: diegetic sandbox and imperfect rehearsal of reality
+
+**Core decision:** The **Mirage Arena is the sandbox**. Do not create a second disconnected, omnipotent "sandbox universe" as the conceptual default.
+
+Mirage chambers are real magical locations/institutions governed by in-world access, capability and history, as established in Section 37. An appropriate chamber or player-facing Mirage experimentation context may permit simulated Essence selection, rank and mastery settings, twenty-ability configurations, equipment, monsters, opponents, environments and combat trials. It may permit mundane experimentation as well. The confluence still follows the legitimate Essence combination rather than becoming an independently arbitrary fourth choice.
+
+**Simulated success grants no real Essence, Awakening Stone, rank, rare possession or permanent magical capability.** The living world retains actual scarcity, access restrictions, training, risk, relationships and consequences. Projected deaths do not automatically kill the actual participant, unlike genuinely lethal astral or physical expeditions. Keep those modes distinct.
+
+### Model accuracy is conditional, not a guaranteed percentage
+
+A Mirage reflects its model of physical and magical reality, its technical or magical sophistication, and the quality of information available to it. A sophisticated arena may predict many known interactions extremely well; an older or poorly informed one may fail on rare abilities, unusual environments, unknown power expressions, individual physiology or poorly studied magical combinations.
+
+The player's illustrative idea of "90% accurate" describes meaningful **remaining uncertainty**, not a mandate to implement a fixed 10% error chance or to manufacture a surprise on every tenth event. Test whether the modeled causes are sound; **do not roll a separate narrative inaccuracy die.**
+
+A Mirage-tested ideal three-Legendary build might never be obtainable in the actual world. Even if the real Essences are eventually found, awakening stones, available ability outcomes, training, body, timing, mentors and circumstances may yield a different toolkit. It is also possible to reproduce a projected outcome when the real causes align. Neither success nor divergence is guaranteed for dramatic convenience.
+
+People can practice, learn and plan inside a Mirage where justified by in-world rules, but practice must not bypass real acquisition, material resources or irreversible consequences. The Mirage can show **what might be possible**. The living simulation determines **what actually happens**.
+
+## 49. Consequential civilization and the conditions for emergent stories
+
+**North star, restated:** **Do not write the stories in advance. Construct a world deep enough that meaningful stories and gameplay emerge from people, circumstances and history.**
+
+Every profession, magical capability, relationship, institution, possession and environmental intervention must connect to real causal state. A superb farmer should produce materially different possibilities than an unskilled farmer in otherwise comparable conditions. An ill-equipped merchant should face genuine transport, supply, financial and social risk; good preparation should help but not guarantee victory. These consequences should propagate through specific people, places, inventories, wages, food, debt, trust, jobs, health, ecology, travel, property and knowledge—not through a generic "story importance" or "town prosperity" increment.
+
+### Example: the farmer, the merchant and a drought
+
+A farmer who invested years in irrigation, breeding, reserves and local relationships may weather a drought better than neighbors. Grain scarcity changes prices and leverage. A poorly prepared merchant carrying supplies might break down or fail delivery, worsening local shortages. Those combined effects may change jobs, migration, theft, bargains, influence, family futures or political disputes. The prepared farmer can still fail through disease, bad judgment or wider catastrophe; the merchant can recover through skill, help or improvisation.
+
+The point is not to force drought drama. The point is that the systems recognize what was actually prepared, exposed, attempted, bought, saved, broken, promised or lost.
+
+### Development levers: tune causes, not endings
+
+Designers need explicit calibrated parameters and observability for the processes that make varied histories possible. Important families are:
+
+1. **Scarcity and abundance:** resources, labor, food, land, logistics and unequal access.
+2. **Opportunity and access:** learning, magic acquisition, discovery, careers, encounters, travel and institutions.
+3. **Individual agency:** temperament, values, beliefs, emotion, ability, risk appetite and goals.
+4. **Social friction and conflict response:** grievance, status, exclusion, debt, justice, retaliation and negotiation.
+5. **Interdependence:** trade, family, mentorship, employment, supply chains, services and obligations.
+6. **Environment and ecology:** climate, monsters, health, catastrophe, local habitat and changing resources.
+7. **Institutional resilience and legitimacy:** governance, succession, law, capacity, memory, corruption, reform and collapse.
+8. **Memory and information transmission:** witness knowledge, rumor, records, reputation, inheritance, education and cultural change.
+
+These are broad **causal calibration families**, not eight global "drama sliders" or a replacement for existing subsystem rules. Preserve local differences, random-seed reproducibility and the distinction between what is true and what each individual knows.
+
+### Escalation, climax and resolution without an arc director
+
+A conflict can travel from a small disagreement to a feud, a court case, sabotage, war, compromise, reconciliation or disappearance. A romance may grow, fail, endure, end in death or become a family institution. A discovery may transform a craft or remain forgotten. **Climax is a later observer's description of a decisive change, not a simulation event type that must be produced.**
+
+Do not implement commands like Force War, Start Redemption Arc, Make Epic Romance, Generate Legendary Hero or Save The Protagonist. People pursue motives; circumstances permit actions; consequences change future opportunity. Extraordinary action remains possible for people never inhabited by the player. Ordinary peace, prosperity, artistry and family life may be just as valuable as catastrophe.
+
+### Seed quality without narrative quotas
+
+Every valid seed should support substantial **opportunity for** adventure, surprise, meaningful choice, love, conflict, danger, learning, recovery, social change and historical development. Do **not** guarantee one war, one legendary romance or one cinematic climax in each century or world. An unusually peaceful and creatively productive century can be a successful history. A sterile thousand years of nearly consequence-free behavior is cause for investigation.
+
+Use reproducible multi-seed testing to assess, at minimum:
+
+- Whether goals lead to actual attempts, resource use and changed circumstances.
+- Whether effort, preparation, competence and mistakes make outcomes causally different.
+- Whether relationships, promises and observer-specific reputation influence later decisions.
+- Whether some disputes escalate, others resolve, and both paths leave comprehensible evidence.
+- Whether technologies, professions, institutions, families and cultures develop, transmit knowledge, fail or survive.
+- Whether unusual events arise from mechanisms that can be reconstructed rather than narrative quotas.
+- Whether players can **discover and act upon** consequential events through plausible information channels.
+
+Measure distributions, stagnation, extreme outcomes and causal traceability across seeds. Diagnose weak causes and thin connections rather than injecting plot to satisfy a checklist. Preserve the established millennium performance target and long-history state integrity; observing richness cannot require universal expensive deliberation.
+
+### Playability: history must be encounterable
+
+An extraordinary event on another continent may be hidden from the current character, but the world needs genuine routes by which its effects become encounterable: travelers, prices, trade networks, witnesses, letters, institutional records, apprentices, rumors, archaeology, family stories, displacement and later meetings. A farmer, merchant, scholar, chef and adventurer legitimately experience different portions of the same history.
+
+The player must have ways to investigate, participate, prepare, cooperate, refuse and bear consequences, while retaining the possibility that some events pass unnoticed. Depth without discoverability becomes an invisible database; discoverability without causality becomes a scripted amusement park.
+
+## 50. Character-facing information and interface direction
+
+**Directional, not a finished HUD specification.** The world remains primary. The interface should be clean, legible, flexible and context-sensitive rather than a perpetual dashboard of omniscient statistics.
+
+- Surface combat resources, risks and available actions when relevant without requiring a full-screen spreadsheet.
+- Organize magical progress, Essence paths and abilities through diegetic perception or legitimate soulspace/system interfaces where cosmology permits, never unrestricted hidden-world truth.
+- Show maps, knowledge, contracts, profession information and relationships according to what the currently inhabited person can know.
+- Let mundane characters have rich profession, skill, relationship, equipment, resource and life interfaces; do not permanently display twenty empty magic slots as if their lives were unfinished.
+- Provide comprehensible character selection, world-time change, return, release-goal and history interfaces without making former player characters freeze in menu space.
+- Preserve accessibility, player-configurable clarity and usable controls even where information is represented diegetically.
+
+No precise HUD layout, display style, control mapping or universal soulspace grant is decided here. These must be prototyped alongside an actual playable slice rather than locked down solely by prose.
+
+## 51. Independent completion, audience development and release strategy
+
+**Preferred strategic direction, not a signed distribution or licensing decision:** ATE should be built to a genuinely completed, polished, commercially releasable game and **self-published** where practical. Retain control of the game's intellectual property, canon, creative direction, technology choices, releases and player experience. Do not treat a publisher, investor or exclusive revenue-share agreement as mandatory merely because the team is small.
+
+- **Steam first** is the preferred primary PC storefront to evaluate when a market-ready project exists. Consider GOG and other stores on their actual terms; consoles are a later technical, compliance and business decision.
+- Avoid giving away IP, unnecessary exclusivity or major revenue participation in exchange for vague marketing promises. Distribution platforms necessarily have agreements, fees and obligations; independently review real contracts rather than pretending that publishing can occur with no terms at all.
+- Do not wait until finished development to introduce the game publicly. Once a **truthful, convincing playable vertical slice** exists, begin an audience/wishlist/community effort grounded in actual footage and credible claims.
+- Prefer a representative polished demo and complete release over selling promises. Early access is a possible deliberate future choice, **not** the default method of funding an unfinished vision.
+- Evaluate practical economics before launch: pricing, storefront fees, taxes, conversion, wishlists, marketing costs, support burden, QA, certification, localization, accessibility, infrastructure and post-release obligations.
+- Design commercial sustainability so the project does not *require* blockbuster sales to be viable. Future business models remain open until supported by evidence.
+- AI-assisted and agent-driven development can multiply implementation capacity but do not eliminate the need for independent quality judgment, security, testing, playtesting and responsible release management.
+
+The production order should not confuse long-term aspiration with validated completion. Finish Stage 0.5's persistence independently; build the living-simulation/Agency integrations and a small **playable** slice in a coordinated way after the foundation stabilizes; then expand, evaluate and test the complete RPG. Do not spend indefinitely building invisible infrastructure without validating that entering, living in and changing the world is a compelling experience.
+
+## 52. Decision register and implementation boundaries for Sections 45–51
+
+**Agreed core direction:**
+
+- World-owned persistence, real mortality and continuing history; several created lives in one world, no forced shared party.
+- Player inhabitation of existing people where the rules permit; releases return people to full autonomous life.
+- Optional goals on release, processed through ordinary Agency rather than puppet orders.
+- Isekai or natural-born beginnings; substantial customization; no explicit nudity required.
+- Optional first Common Essence or no Essence; full standard build must be lived and acquired; mundane play remains fully valid.
+- No traditional binding class selection; skills, magic, careers and status emerge from actual capabilities and behavior.
+- Mirage Arena as the in-world sandbox and rehearsal, not a guarantee of actual magic outcomes.
+- Consequential professions, relationships, history, failure and preparation; causal tuning rather than generated plot quotas.
+- Long-term independent release and retained creative/IP control as the preferred business strategy.
+
+**Provisional implementation details (do not quietly promote to canon):**
+
+- Final count above the **at-least-six created-life target**, slot replacement/history interface and restrictions/costs for inhabiting any person.
+- Starting trial access to Uncommon/Rare Essences, its fairness, economics, rarity schedule and world-causal selection mechanism.
+- Exact race catalogue, age/background generation, character-editor controls and HUD.
+- Mirage availability, permissions, custom-build tooling, degree of modeled uncertainty, training carryover and individual chamber capabilities.
+- Release-goal priority UI, active-goal limits, time-advance options and how free-form intentions are captured in player controls.
+- Final storefront, pricing, commercial structure and launch/release schedule.
+
+**Verification requirements before implementation acceptance:** Shared-time continuity; no roster-forced meetings; death retains historical consequences; correct character-relative knowledge; held identity and lawful release/return; autonomous goal abandonment and completion grounded in actual work; real magic rarity and irreversible commitment; genuine mundane alternatives; Mirage/live-world separation; multi-seed causal richness without scripted quotas; bounded per-person Agency and persistence; and a playable interface exposing legitimate opportunities without omniscience.
+
+**Relationship to current architecture:** Extend existing Agency, goal/memory, information, profession, event, identity, magic, economy, institutional, provenance and persistence mechanisms. Do not introduce parallel story, player-NPC, historical artifact, AI companion, loot or world-truth registries where existing primitives can be extended. This design update makes **no claim** that these proposed systems are already implemented, nor does it approve changes to the in-progress Stage 0.5 closeout branch.
