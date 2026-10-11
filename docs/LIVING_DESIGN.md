@@ -18,9 +18,17 @@ ATE should not merely simulate a fantasy setting. It should simulate the process
 
 ## 2. Canonical magic progression
 
-A ranked person cannot exist without a complete magical path. All essences/confluence requirements and **all twenty abilities must be unlocked** before rank progression is valid. This applies even at Iron. An incomplete twenty-ability path is unranked, not a partial Iron character.
+**Owner-confirmed canonical Essence-rank progression (2026-10-11; supersedes the older twenty-before-Iron rule):**
 
-Recent validated PR #5 baseline: 91.55-second millennium run; 15 completed twenty-ability paths and therefore 15 ranked living paths (1 Iron, 2 Bronze, 3 Silver, 6 Gold, 3 Diamond), while 47 incomplete paths remain rank 0. Chronology/progression and wallet/treasury validation passed. The remaining concern is calibration rather than correctness: completion/access/liquidity is too low for the intended mature-world population, especially Gold.
+- **No Confluence = unranked.** A person holding zero, one, or two base Essences has not attained Iron rank, even if one or two innate abilities are awakened. They may have magic without having a complete Essence path.
+- **Confluence = Iron.** Acquiring a third base Essence automatically produces the fourth, the **Confluence Essence**. This is the transition to **Iron rank**, **without** requiring all twenty abilities first.
+- Each absorbed base Essence awakens its one innate ability; the Confluence produces one innate ability of its own. An ordinary newly confluenced Iron has **4 of 20 abilities awakened**: one under each of the four Essences. The remaining sixteen are gained through awakening stones and actual in-world access, not given automatically on reaching Iron.
+- **Bronze gate:** An overall Essence user may become **Bronze only once all twenty abilities exist and all twenty have individually advanced to the Bronze threshold**. An ability may reach Bronze individually while its owner remains Iron; newly awakened Iron abilities still block whole-person promotion until they catch up. The same all-twenty qualification applies to subsequent overall rank transitions as defined by the ranked-progression contracts.
+- Separate **person rank** from **ability rank**, **Essence completion** from **ability completion**, and **natural magical access** from **ranked magical body/ontology**. Do not infer whole-person Iron status merely because one ability is Iron.
+
+**Known discrepancy to repair later, not during Stage 0.5:** The current advancement runtime and some tests still implement the older/incorrect behavior; see [issue #17](https://github.com/rax0h/all-that-endures/issues/17) and Section 57. This document now records the **intended design**, not a claim that current code, checkpoints or test oracles already implement it.
+
+**Historical, not re-certified under the corrected rule:** The accepted PR #5 benchmark (91.55 seconds, 15 completed twenty-ability paths recorded as ranked under that source's definition: 1 Iron, 2 Bronze, 3 Silver, 6 Gold, 3 Diamond; 47 incomplete paths rank 0) must retain its original meaning and reproducibility. Do **not** silently reinterpret its counts or change deterministic baselines. Future recalibration should measure the population distribution under corrected rank semantics, including Iron users with only four or more abilities.
 
 ### Four mastery stages inside every rank
 
@@ -31,7 +39,7 @@ Do not rebalance the established time-to-rank curve merely to add visible progre
 - `Iron 3 — 0.0%` means that skill is halfway from Iron to Bronze.
 - Crossing Stage 4 at completion advances that skill to Stage 1 at 0.0% of the next rank.
 - Example: `Hand of the Reaper — Silver 3 — 45.0%`.
-- Character rank advancement remains gated by all twenty skills meeting the required threshold.
+- **Iron entry is the exception:** Confluence creates Iron with four innate abilities; **Bronze and later overall rank advancement** are gated by all twenty abilities existing and meeting the required next-rank threshold.
 
 This is a resolution/state/display refinement, not a pacing rewrite.
 
@@ -1423,15 +1431,21 @@ Support meaningful freedom across the world's playable races, sex and physical a
 
 The game may address adult subjects without displaying explicit nudity. Character creation and ordinary presentation should use appropriate clothing/undergarments; anatomical customization does not require nude display. No finished HUD or character-editor layout is canonized by this section.
 
-### Starting Essence: optional, limited, consequential
+### Starting Essence: three legitimate magical beginnings (updated 2026-10-11)
 
-**Standard play does not permit building an entire Essence set, confluence and twenty awakened abilities at character creation.** The ordinary starting choice is intentionally limited:
+**Adopted player choice:** Standard character creation should permit an **unawakened** beginning, a **first-Essence** beginning, or an **Iron-rank** beginning. This replaces the older restriction that a normal player could select only one Common Essence. None is an inferior mode or an automatic guarantee of exceptional future success.
 
-- **Common Essence beginning:** A player may choose a first **Common** Essence and start with that commitment, provided the origin has a legitimate acquisition explanation.
-- **Unbound beginning:** A player may begin with **no Essence**, encounter opportunities in play and acquire magic later—or never.
-- **Possible starting trial:** Investigate a voluntary in-world assessment, apprenticeship, sponsor selection or other earned opportunity that *may* lead to an Uncommon or Rare first Essence. The exact test, eligibility, access, probabilities, costs and consequences are **provisional**, not settled rules. It cannot conjure scarce resources by questionnaire or become an unlimited rarity-reroll loop.
+1. **Unawakened / no Essence:** Start with no Essences or awakened abilities, with the freedom to remain mundane for an entire life or seek magic in-world. This leaves open the possibility of eventually discovering **Legendary** Essences or a **potential Transcendent** tier/opportunity if that upper category is formally defined and implemented; neither discovery nor successful acquisition is guaranteed. **"Transcendent Essence" is currently a design possibility, not a confirmed catalogued item or fixed rarity/progression rule.**
+2. **First-Essence beginning:** Start with one **Common** Essence and its innate ability, while remaining **unranked** until two more base Essences are acquired and the Confluence forms. Further Essences and abilities are earned in play. A possible optional in-world *trial* to qualify for rarer initial access remains open design, not a guaranteed Uncommon/Rare grant, unbounded reroll or settled fourth starting path.
+3. **Iron-rank beginning:** Select **three base Essences** from a deliberately **Common-and-Uncommon-focused starting pool**, with a **limited Rare selection** if supported by the actual catalogue and in-world acquisition/provenance. The **Confluence automatically forms** from these three; the player **does not independently pick the Confluence**. Each Essence, including Confluence, begins with **one awakened innate ability**. Therefore the character starts at **Iron rank with exactly four awakened abilities (4/20)**—not with all twenty. The other **sixteen** must be unlocked and developed during the living game.
 
-Starting with one Essence is not starting with a complete magic build or automatically qualifying as Iron rank. The established confluence and twenty-ability completion rules still apply. Remaining Essences, awakening stones, abilities, teachers and access must come from actual opportunity and the magic economy. Rare and Legendary ambitions are possible but not promised. Accepting an available Common or Uncommon Essence occupies a real commitment that may close off a desired three-Legendary combination later; waiting preserves opportunity while imposing real uncertainty and cost. Communicate irreversible consequences clearly.
+**Bronze is not a character-creation shortcut.** An Iron-start character must eventually awaken the other sixteen and progress **every one** of all twenty to Bronze. The choice of three starting Essences fixes meaningful, potentially irreversible parts of the path but leaves most ability acquisition, rank development, tactics and life history open. An Iron-start person's prior acquisition, training, relationships, origin and real magical resources require a world-causal introduction; creating six roster characters must not become infinite resource generation. Exact creation-pool members, Rare access restrictions, ability customization at creation and world-provenance mechanism remain open design.
+
+**Rarity is not a direct combat-strength rating or a quality-of-person score.** Rarer Essences may have unusual properties, availability constraints and greater or different *potential*; they do not inherently make their users better adventurers. Actual effectiveness is shaped by ability expression, rank, mastery, training, experience, creativity, equipment, physiology, strategy, matchup, environment and relationships. A deeply skilled adventurer possessing **only Common Essences** can be among the greatest in the world. Do not impose a universal rarity-damage multiplier or script a Legendary-Essence user to outperform a Common-Essence master.
+
+The Mirage Arena remains the **separate in-world experimentation sandbox**, not a route to grant all twenty real abilities at creation. A full build selected there need not be obtained, or manifest identically, in the living world.
+
+All starts remain available independently of isekai/natural-born origin where their actual world explanations are legitimate; detailed limitations are to be designed. Explain Essence commitment consequences clearly.
 
 **Mundane life is a complete life-path, not a beginner state, missing class, challenge penalty or failed magical build.** A person can remain without Essence magic until death and still be a master craftsperson, respected parent, politician, soldier, investigator, scholar, entrepreneur, farmer or historical figure. Do not award magic merely to validate a life well lived, or require it for meaningful play. Physical and magical power disparities remain real: an excellent mundane fighter is not secretly made equal to a Diamond.
 
@@ -1635,7 +1649,7 @@ The production order should not confuse long-term aspiration with validated comp
 - Player inhabitation of existing people where the rules permit; releases return people to full autonomous life.
 - Optional goals on release, processed through ordinary Agency rather than puppet orders.
 - Isekai or natural-born beginnings; substantial customization; no explicit nudity required.
-- Optional first Common Essence or no Essence; full standard build must be lived and acquired; mundane play remains fully valid.
+- **Three standard magic starts:** no Essence, one Common Essence (unranked), or an **Iron start with three chosen Common/Uncommon-focused Essences, limited Rare possibilities, automatic Confluence, and 4/20 awakened abilities**. Unlock and train the other sixteen in-world; mundane play remains fully valid. Iron = Confluence; Bronze requires all 20 abilities individually at Bronze. See Section 2 and issue #17.
 - No traditional binding class selection; skills, magic, careers and status emerge from actual capabilities and behavior.
 - Mirage Arena as the in-world sandbox and rehearsal, not a guarantee of actual magic outcomes.
 - Consequential professions, relationships, history, failure and preparation; causal tuning rather than generated plot quotas.
@@ -1644,7 +1658,7 @@ The production order should not confuse long-term aspiration with validated comp
 **Provisional implementation details (do not quietly promote to canon):**
 
 - Final count above the **at-least-six created-life target**, slot replacement/history interface and restrictions/costs for inhabiting any person.
-- Starting trial access to Uncommon/Rare Essences, its fairness, economics, rarity schedule and world-causal selection mechanism.
+- Starting trial access to Uncommon/Rare Essences; exact Iron-creation pool and rarity constraints, economic/provenance guardrails, permitted initial ability choices, and the potential **Transcendent** tier's actual definition and source.
 - Exact race catalogue, age/background generation, character-editor controls and HUD.
 - Mirage availability, permissions, custom-build tooling, degree of modeled uncertainty, training carryover and individual chamber capabilities.
 - Release-goal priority UI, active-goal limits, time-advance options and how free-form intentions are captured in player controls.
@@ -1770,3 +1784,30 @@ Measure separate budgets for storage, retained history, memory, CPU per simulate
 **Open until tested/designed:** exact kingdom geography and settlement count; economically viable profession/rank/ecology distribution; demographic and simulated population limits; age and scope of generated prehistory; precise combat formations and recruitment; actual hardware budgets; what the public demo exposes; future sequel/expansion structure; and the evidence-supported causal rules derived from research.
 
 **Do not infer implemented status** from a design section. No change here approves new Stage 0.5 scope, PR merge, million-person optimization work, population balancing or simulation-rule changes without explicit development authorization.
+
+## 57. Essence-rank correction and future gameplay migration — Sol 6.1 / Astra handoff
+
+**Status (2026-10-11): Owner-confirmed rules updated in Sections 2, 45 and 52; current implementation is NOT aligned. [GitHub issue #17](https://github.com/rax0h/all-that-endures/issues/17) is the tracking authority for the discrepancy and its later repair.**
+
+### Exact conflict to avoid propagating
+
+The older Section 2 mistakenly said all twenty abilities must be awakened before **Iron**, and historical completion metrics used this assumption. The owner clarified that **three base Essences cause the Confluence, and that moment makes the character Iron, ordinarily with 4/20 innate abilities**. **Bronze requires all twenty unlocked and each at Bronze**.
+
+The existing \`simulation/ate_sim/advancement.py\` \`AdvancementState.rank(pid)\` instead returns the minimum rank of the **currently awakened** abilities, or zero if there are none. This reports **Iron for a one-Essence person** and can award **Bronze or higher before a Confluence or before twenty ability thresholds are satisfied**. \`simulation/tests/test_advancement.py\` explicitly asserts Iron after one Essence in \`test_absorbing_essence_intrinsically_awakens_catalog_innate\`. By contrast \`test_three_base_essences_form_person_shaped_confluence_and_innate\` already supports **automatic Confluence and four initial abilities**. \`simulation/ate_sim/institutions.py\` \`full_essence_user\` checks for Confluence/four Essences; audit its rank-adjacent consumers without conflating Society eligibility with bodily rank.
+
+**Do not silently "fix" this in Stage 0.5 persistence.** Sol 6.1 is still implementing storage/identity/history, and Astra's Stage 0.5 review must remain evidence-based against its authorized contracts. This is a **deferred gameplay/rules migration**, not a Stage 0.5 release blocker unless a concrete persistence invariant depends on the old behavior. Historical tests and seed digests are previous-version evidence, not updated proof. No instructions here authorize rewriting old stored outcomes, changing population calibration or merging the active persistence PR.
+
+### What must be addressed later
+
+- Separate canonical **overall person rank**, **Essence completion milestone**, **per-ability rank**, and **unawakened ability slots**. Prove that a one- or two-Essence person with strong individual skills remains unranked, completing the Confluence enters Iron, and progression to Bronze waits for 20/20 at Bronze.
+- Evaluate rank-body ontology, physiology/aging, rank ecology, institution eligibility, monster difficulty, economy, NPC advancement, rewards, save/restore, event causality and benchmark diagnostics for assumptions about \`AdvancementState.rank\` and any replicated rank fields.
+- Introduce an explicit **rules version** and carefully designed save/benchmark migration or compatibility path if corrected ranks change observable old outcomes. Preserve deterministic source-specific historical artifacts; no retroactive in-place reinterpretation.
+- Add focused regressions for zero to three Essences, Confluence, four innate skills, stone-unlocked remaining sixteen, partially elevated/missing skills, and all-twenty Bronze gate. Run an affected integration suite and Astra's independent review before adoption.
+- Design character creation to preserve world scarcity and provenance: no freely spawned rare material, no self-selected Confluence, no unearned twenty-skill unlock and no automatic rarity-derived superiority.
+- Treat **Transcendent** Essence access as **aspirational/unresolved rarity ontology** until the actual catalog, world rules and interactions distinguish it from transcendent/divine *powers beyond the normal twenty-ability framework*.
+
+### Source boundaries
+
+The locally supplied rank-ecology design note supports qualitative rank expressions, twenty abilities as a capability ecology, and separation between normal Essence abilities and exceptional external powers. The supplied Jason Asano sheet illustrates 4/4 Essences, 5/5 abilities per Essence and other exceptional powers, **but does not itself establish the Iron-onset or Bronze-gate rule**. The **owner's explicit 2026-10-11 design decision** is authoritative for those thresholds; do not misattribute them to the sheet. See issue #17 for exact source paths/test names.
+
+**Priority:** Document now; **implement only after explicit gameplay authorization outside Stage 0.5**. Sol and Astra may acknowledge the item in their future architecture reviews without interrupting the currently authorized persistence effort.
