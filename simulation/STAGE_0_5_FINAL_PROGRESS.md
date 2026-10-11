@@ -1,5 +1,51 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: private checked-catalog source-copy bootstrap (October11 UTC)
+
+Source local `6bcc2f1ecd03ec5032205aa47e28a8717ac5a097`, public
+`a6270fc01c8e7ea2b7e7d7ab057b99974f639c17`, exact matching tree
+`8920f3b21f7f4623fb92124ce01cd5252cb27996`; leased non-force update succeeded.
+
+The catalog bootstrap previously lived only in test setup. The private copy
+integration now captures one checked committed format5 source generation through
+the existing copier, then builds a separate mutable-empty destination. Its
+immutable event segments are unchanged. One existing commit installs current
+records, placements, checked catalog and empty dependency rosters. Private copy
+construction preserves collection order/high-water counters and ordinary query
+memberships; their record generation advances coherently. Full group/owner/type
+and compact-reference target-kind checks precede no-overwrite publication.
+
+Initial RED7 failed for the missing helper. The live authority-move guard correctly
+rejected the first clone-and-move approach; it remains unchanged. A checksum-valid
+damaged source with a missing referenced backing exposed a semantic gap, now
+rejected before publication. A query-membership regression likewise reproduced
+and fixed lost index entries. No ordinary-open migration or separate publisher.
+
+Final focused **20 passed in3.23s**; final selected affected **49 passed,
+46 deselected,in13.28s**. Broader **118 passed in92.98s** precedes only the last
+ordinary-query-membership preservation change, covered by final20/49. Counts
+overlap. The additional first-seal-through-World-log case passes1/13deselected in
+0.42s on unchanged sealed snapshot production. Exact hashes/cases/boundaries:
+`stage_0_5_catalog_copy_validation.json`. `git diff --check` passed.
+
+Scope: this is private full-copy scaffolding, with explicit O(H) copy work and
+`complete_format=False`, not a complete capability6 upgrade. It preserves already
+held source aliases and pending overlays while copying only committed authority.
+Real before/after commit faults discard only private files; source advancement
+after capture cannot mix heads; competing destinations are never overwritten.
+No incomplete capability6 marker is emitted.
+
+Owner's new rank discrepancy was read from GitHub issue17 and main documentation
+commit `1c46720`. It explicitly defers Iron/Confluence/Bronze reconciliation until
+after Stage0.5. Rank/gameplay code and old golden fixtures are unchanged. This
+does not block persistence. No main documentation changes were merged into this
+implementation branch. P5 stays at its prior certified source; PR14 is untouched.
+
+Remaining complete-closeout gates: legacy/root graph normalization, actual schema
+and byte closure, persisted promotion, exotic equality, ordinary complete format6
+open/copy upgrade, integrated bounds/P5, one final applicable full suite and fresh
+independent review. No Stage1, endurance, merge or production acceptance claim.
+
 ## Latest checkpoint: checked deep snapshots and sealed World-tail custody (October11 UTC)
 
 Source local `d7b290273e2f257785c5b6a2b5213313d3479583`, public

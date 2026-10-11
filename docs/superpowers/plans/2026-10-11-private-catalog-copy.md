@@ -42,7 +42,7 @@
 - [x] Scrub all groups/owners and backing type witnesses; create empty rosters and verify every compact reference's allocated target/kind, including references inside eager headers.
 - [x] Add faults at private-copy, actual commit and publication boundaries; competing path, corrupt/missing-reference source, duplicate catalog, preserved ordering/high water and post-capture source-head advance cases.
 - [x] Run focused (20 cases) and final selected affected (49 cases) catalog/copy checks; broader 118-case gate precedes the final ordinary-query-membership preservation change.
-- [ ] Preserve exact source evidence and checkpoint publication.
+- [x] Preserve exact source evidence and leased exact-tree checkpoint publication.
 
 The in-place authority-move guard correctly rejected the initial clone/commit
 approach. Keep that guard. The destination is instead mutable-empty at the
