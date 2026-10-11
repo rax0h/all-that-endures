@@ -1,5 +1,50 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: checked deep snapshots and sealed World-tail custody (October11 UTC)
+
+Source local `d7b290273e2f257785c5b6a2b5213313d3479583`, public
+`73b4dd6a7a29686c7438c9a4b2e1939863b083d3`, exact matching tree
+`582906ce91843b1b422520dbeff3560a035fe8c6`; leased non-force update succeeded.
+
+Initial RED3 reproduced missing deep certification (two cases) and sealed World
+suffix rejection. Frozen descriptors now require a fourth exact boolean computed
+from actual incoming D and checked frozen child flags. Mutable record/history
+children make it false. World suffix validation uses explicit captured checked
+metadata authority; pure segment validation still requires standalone native
+frozen values. No archived snapshot iteration during ordinary suffix validation.
+
+Sealing retires mutable Event root identity but keeps only the data backing's
+physical `world.events` field placement. Reopen binds that readonly root through
+the same registry; activation binds already resident compact roots recursively.
+Removing the history's Event owner leaves World snapshot custody. Both commit
+fault phases recover exact data and sharing. Explicit detach materializes native
+FrozenDict/FrozenList. Actual 2048-event sealing transfers standalone snapshots
+to the strict segment authority and reopens correctly. Full explicit scrub checks
+mandatory frozen descriptor shapes and recomputes live certification.
+
+Final **13 new regressions passed in22.50s**; **96 recursive/dependency/retirement
+checks passed in13.28s** on final production source. Affected compatibility gate
+**260 passed in398.22s** precedes only the final stronger capture-transaction guard
+and partial-retirement frozen descriptor validation; final13/96 verify those.
+Counts overlap. The initial segment fixture attempt was interrupted without a
+full result: per-filler ID edits repeatedly synchronized pending owners. Native
+bulk ID update makes setup22.5s while retaining actual sealing/publication/adoption
+and reopen. No broad long-gate rerun. `git diff --check` passed.
+
+At H1k/H10k, sealed suffix save/no-op uses exactly **186 payload reads,32 writes,
+1335 metadata rows** each, with sealed data iteration, unrelated archive pages and
+global registry inventory forbidden. Input sealing precedes measurement; this is
+not a bound on unrestricted imported snapshot size. Cases/hashes/provenance and
+source boundaries: `stage_0_5_sealed_tail_snapshot_validation.json`.
+
+Stage0.5 is still implementation in progress. Remaining: legacy tracked Event
+input conversion, special/root collection imports, exhaustive actual schema and
+byte closure, persisted append/count-tree promotion, exotic exact equality,
+ordinary complete capability6 open/source-preserving copy upgrade, integrated
+bounds/P5, one final full applicable suite and independent review. No incomplete
+capability marker is emitted. P5 stays at its prior certified source; PR14 is
+untouched. No Stage1, gameplay, new endurance or merge claim.
+
 ## Latest checkpoint: native mutable World-log Event peers (October11 UTC)
 
 Source local `872b905ab4e678a265205354ca03b917245e1406`, public
