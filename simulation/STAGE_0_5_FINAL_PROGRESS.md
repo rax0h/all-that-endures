@@ -4,7 +4,11 @@
 
 Continued from public `21d98070a298e4997acc78784b6f271aaddccab7`, local
 `fe4db7fa1020914eee0f81745f6d257c8dbe396b`, matching tree
-`d962735dea15f94a4c9c5e4fc4b8f0e8ac7c112a`.
+`d962735dea15f94a4c9c5e4fc4b8f0e8ac7c112a`. Published source
+`46e171733ffc43028a990c860e03aa6709ff350d`, local source
+`c686e4daf852ff99c6bc633c14dd47ff5cb0950f`, exact matching tree
+`8a7525b06141bf90f6c93a9158467f924e98657c`. Leased non-force publication
+succeeded on the implementation branch.
 
 Append-list slice replacement, counted slice replacement and finite builtin
 list/tuple counted extension now preflight each unique native input subtree

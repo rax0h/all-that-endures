@@ -2405,5 +2405,11 @@
     "Mutable-record backing, persisted promotion, exotic equality and complete capability-6 open/source-copy remain pending",
     "P5 remains at b57704304dc51238ac14420e55d1b1bc3ed79892; no new P5/endurance/final full suite",
     "PR14 remains draft/open/unmerged at c29e3d06a0c9d219235e2b3f0390271bd1245aea"
-  ]
+  ],
+  "publication": {
+    "local_source_commit": "c686e4daf852ff99c6bc633c14dd47ff5cb0950f",
+    "public_source_commit": "46e171733ffc43028a990c860e03aa6709ff350d",
+    "matching_source_tree": "8a7525b06141bf90f6c93a9158467f924e98657c",
+    "mode": "leased non-force update on implementation branch"
+  }
 }
