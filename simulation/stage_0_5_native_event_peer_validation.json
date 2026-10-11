@@ -1,0 +1,1500 @@
+{
+  "date_utc": "2026-10-11",
+  "checkpoint": "Native recursively backed Event canonical identity across mutable World-log peers",
+  "publication": {
+    "local_source_commit": "872b905ab4e678a265205354ca03b917245e1406",
+    "public_source_commit": "6c362a34c23b86af2a98747f4b39c7e35a59f878",
+    "matching_source_tree": "177d71c518f7e01e4dc477dc28c7bee64d5beff8",
+    "mode": "leased non-force implementation branch update"
+  },
+  "source_sha256": {
+    "simulation/ate_sim/__init__.py": "5df339589dc36704a1989c3b23440d9f5a0d26f53def1d161225b5340b2d0a50",
+    "simulation/ate_sim/advancement.py": "5a515f36e79276b9a2ae2717ce0cb45f4c26a514a2415f9d74a1afa115a8c281",
+    "simulation/ate_sim/agency.py": "38d0538421cc714fa51f602995cb7eeaa230b2d192c9a2d7fd68faeb0eacf01d",
+    "simulation/ate_sim/ambient_magic.py": "222fa056814e4fde2f8053a85a89cbf6971b3b6c5e839fe482a29cde0277c3bf",
+    "simulation/ate_sim/biology.py": "0630c0da55e1365e8781afb22e87cc899881b667193388b3dd2f838a2b5a54ef",
+    "simulation/ate_sim/canonical_stream.py": "9e1d880d139a6dd916645610cbf9840fa0056825c6cb2d7affc606f7576b9fdd",
+    "simulation/ate_sim/checkpoint.py": "7d352786deee49042eb964fa5f7de4221114a3086ea9cfbe587bb5794ec438f2",
+    "simulation/ate_sim/civilization.py": "d57cf1bd9941d2cca12cebb1fab0d3766506a07123f25ca143c71e8c43395504",
+    "simulation/ate_sim/communities.py": "f7730f609951e4ed9665921ae0a743a60d6f533f85cc78af2cc2927f6b17260d",
+    "simulation/ate_sim/core.py": "b344eb1e75f9a2e2d934de2445eeec8dd9a0d746ffe50845822fc95c2b328cdc",
+    "simulation/ate_sim/core_types.py": "a29cfac62ed6c7acf19f134f24573f16a9637da1d37cee4783b88d55770c2098",
+    "simulation/ate_sim/craft_careers.py": "7f3259268d6dc874108c78a31e4d7f6d98a5e9ba441f1f24c17d5c76cb05597a",
+    "simulation/ate_sim/culture.py": "9bd8a14708df44d6d7971dac12761fd06f4129c55ada7af4e037021d3d928b27",
+    "simulation/ate_sim/currency.py": "3ab604771bbc305943e92e56d5d256ec8b7cea72fb6b1cada8baa681438de21b",
+    "simulation/ate_sim/development.py": "2cd38306d0bf1c0ae48b07d7ff849e9cb1b2a2131db0792402109e497527b0d7",
+    "simulation/ate_sim/diagnostics.py": "80a711e5432bfc05356a56988b89e84e160ddccba8d56420e80f1683af07dacb",
+    "simulation/ate_sim/divinity.py": "b0fe2c96f506b1d10c3ae3319ad45e130e99d062fd2ed0e27fdd35fd2fe3a6dc",
+    "simulation/ate_sim/economy.py": "7f953b791030be6521ae75d220f12d0b7c88d62f343439819ee3bc7e850bc492",
+    "simulation/ate_sim/engine.py": "8b80094af38a2b0c5155d8422df136cc9c70107d21d6a56de03c7a38a64ca4d8",
+    "simulation/ate_sim/event_log.py": "baa09dfaad18846236d9e681623f1f85b483afcceacb8a88ae1720e3fcbcbd0f",
+    "simulation/ate_sim/genealogy.py": "c089d815ed43e521f3c949bc1991fdbce7899f2eabf174e7b62255b6125b412c",
+    "simulation/ate_sim/history_archive.py": "a0589272e6124f9f07b4beb9f831a3c0924ecbf6f09c3f19ecaedb3febf82597",
+    "simulation/ate_sim/household_queries.py": "dc382c6ff85b5f576e9c8f935920491cc61f15c45e22f937b2d897b0403c5194",
+    "simulation/ate_sim/households.py": "d62054b9ae99d316c7c1c0bdc0a4952db1e205c065c000d0d2b5e91505a8dccc",
+    "simulation/ate_sim/incremental_store.py": "3d38fd9ec7df434d1668adabf602c2f2a38266b5f8e08304e8733366514b3019",
+    "simulation/ate_sim/infrastructure.py": "539bfd6902c5bde44c7eae23b651cfd832c1ba10c908a73d27de75a59b73ddc1",
+    "simulation/ate_sim/institutions.py": "0e1504808d3013d2d8f42eb07d0965a32203bf989afe94c45abcdccbf3c0b9e0",
+    "simulation/ate_sim/knowledge.py": "f706c75562ffaea5cb2e49fa7184250ad266fd55d6419e3b9fc3207cac79bd84",
+    "simulation/ate_sim/lineage.py": "48212f0ef7c8af23162e502d8fbe400d54fafebe4fba7e1b7a621d8e0259992d",
+    "simulation/ate_sim/magic_catalog.py": "313f22190afed3b25637ea5c0d3b717a644efda888ca9992dd26346657480edf",
+    "simulation/ate_sim/magic_economy.py": "988824adaf5d3baff84de0591acadb989ac581e01868b5042104f31c2c49dcbe",
+    "simulation/ate_sim/magic_progression.py": "5f379223dc01df6837700a7596708b69015021a3aaa7495709b5a34e660fc4e3",
+    "simulation/ate_sim/magic_resources.py": "32790d5febcce77258b7ae297704806ed0dee848e7b899c67de0152ce658d1c0",
+    "simulation/ate_sim/magical_civilization.py": "f05ba2c5ba7a820f021e09be65a5d371cf3cba2b42571e6533268ee2182310f9",
+    "simulation/ate_sim/mastery_training.py": "a8b73f56b280f5e7c136dcd1453206ee9575d2191ea97c8f39472629f06c5cb3",
+    "simulation/ate_sim/materials.py": "f94e69db5972b055f8a187349c6b796b9031cebea6c67159b54c51b5e95e2622",
+    "simulation/ate_sim/metaphysics.py": "a31809d4d8d4002b3e1eb02e4e5fbdb64afeae512026b34f9d1718087be0c120",
+    "simulation/ate_sim/mortality.py": "e47a7dee1f55eb38c3edd44f81742904f1d2fd4e0987848fa5c46853e1eb069b",
+    "simulation/ate_sim/narrative_sampler.py": "8c628eafe91ad3a16d0574aa41d810f2623e9e0999c59616016f694f51a575b9",
+    "simulation/ate_sim/persistence_adapters.py": "dfc5761f324f25ccc6ddd319f858c9f32dd2277b9fa7464100ba21986fea735f",
+    "simulation/ate_sim/persistence_cold_save.py": "139c7c76c1ce26bc04529fc6d91ce5407d012f0a584301feed753cd134942839",
+    "simulation/ate_sim/persistence_event_id_exceptions.py": "5e4c5258411ed29c058d53abde7dcc26a75adfd24ed352eb23de61318b8790bb",
+    "simulation/ate_sim/persistence_event_ids.py": "611c68c05de34f933fbbd84c7dc14a393dbae2d47399e8c62edc535d1dbc9662",
+    "simulation/ate_sim/persistence_events.py": "ad22e1e187d3e052de1857382e23b47abd356352c7589f7e1c29e4b4443d8149",
+    "simulation/ate_sim/persistence_history_dependencies.py": "36a8d522937da67eb96b1ef3ac0150833949c4864197cbe066934d7923a26c64",
+    "simulation/ate_sim/persistence_history_leases.py": "f7804b75302c5a5927ea523375f916639744a5b44daa33c5023115566717596e",
+    "simulation/ate_sim/persistence_history_owner_adapters.py": "a32f56398394bc2447d05650bd1de10bd7efe65cddb72feb99d52ae745adcbc1",
+    "simulation/ate_sim/persistence_history_promotion.py": "5ade872c1ef9209b72d2ee511f1c5f0533bb8772e57c511bd4880d1e767c538a",
+    "simulation/ate_sim/persistence_history_retirement.py": "dd64bc273c49aa30715bb5a38f2de07c42d1016c45dcc5f4b59aa18bfa883146",
+    "simulation/ate_sim/persistence_history_runtime.py": "f8ce840459fee3215c5070ba0ebd5435b03bc7691d000ad05378d8f318c78536",
+    "simulation/ate_sim/persistence_history_types.py": "95e0efa9aee0bcf166beadbb4f9b18e597a66bba7c906f1ea1da65c93d06e49d",
+    "simulation/ate_sim/persistence_identity.py": "7f37afcc1bc0c55b069d17c5d0f86a311460037d29cfe130ff8ea43ccc17158e",
+    "simulation/ate_sim/persistence_lazy.py": "23686e61ec531dc7554c3079159bab803c57b6972f39caca06221b33dd2318d9",
+    "simulation/ate_sim/persistence_lazy_adoption.py": "731c977d07d90fda2af136b331506e8e85c75965e7d2417e1824bcbd9d6e031d",
+    "simulation/ate_sim/persistence_lazy_budget.py": "0f5ea4bd091d323c9a231e63cfa83a93915d93aa43f1e70f53920b452e30e490",
+    "simulation/ate_sim/persistence_lazy_families.py": "2676a6eacbfd9241d6c43e3b6980bea562c774220ab22ab38192b3450bc944c9",
+    "simulation/ate_sim/persistence_lazy_graph_buckets.py": "edd61463433bde9049f2311aa407962bf6f1c7e933a834cfe4f61a4025af44dd",
+    "simulation/ate_sim/persistence_lazy_household_members.py": "229727ad99ff05c234ec0baf38f9335994829d878d656254f9f772c82723e569",
+    "simulation/ate_sim/persistence_lazy_identity.py": "c26c62f90c1f05d7d24ae34609b993765a8b4fa5ce45f540a29e6090f90de988",
+    "simulation/ate_sim/persistence_lazy_identity_catalog.py": "1a175a9d55f30421ebe4849780ed474ba9a30154985d8c83d7aadd7a7fe1ef9d",
+    "simulation/ate_sim/persistence_lazy_identity_coordinator.py": "36c3aa673b5d96d02401ed6120dc95936e5c6123f348b5f39d96931b35a584ae",
+    "simulation/ate_sim/persistence_lazy_identity_headers.py": "6e148202d363cd956109fd039d3be727f3c819485c5377077ec8ac94f349a143",
+    "simulation/ate_sim/persistence_lazy_identity_retired.py": "1ec014f44b26a52ab8b6424501f30328f8cba7a06c8329a49bb44a948494376f",
+    "simulation/ate_sim/persistence_lazy_lineage_children.py": "24214b874a8ae6daca0fbb3aaeef8ea65cef1b2c95f647695c476af8944faf0e",
+    "simulation/ate_sim/persistence_lazy_minimum.py": "031ad6d4e9d6ccf65653a4dd7a8a83c55496ec75d9ac7ddc7ee4cbcc9381b173",
+    "simulation/ate_sim/persistence_lazy_nested_history.py": "41c82f3716cb5089ae6eac099ca0e422749b37db476c4f87d508ffdb13dcbd2f",
+    "simulation/ate_sim/persistence_lazy_participants.py": "0a2279fb5a32401cfefd5339735d169ed8e0f1ae3a32eccf77fcc560a2a1a02f",
+    "simulation/ate_sim/persistence_lazy_publication_guard.py": "cf55ca044c65e544e8ee23d38e27ee186105e6c2d9b605eb0de8a3a93b97b12c",
+    "simulation/ate_sim/persistence_lazy_sequence.py": "98e4ad0ece4e11507f3ae4302f83c28b327be3208a14553999ea37f7679ab7b5",
+    "simulation/ate_sim/persistence_lazy_spill.py": "967139e2ab700e34655c221e205f70dcfbfc53d3b360cd9d0240ca81b9860f3b",
+    "simulation/ate_sim/persistence_lazy_store.py": "38f187a99a96935a094c684cb6c7cad1e76cac467b13b9eddc5e966389665cd2",
+    "simulation/ate_sim/persistence_lazy_world_identity.py": "01a008e6f257fd2eead9dbd67c40c12803a3eb017434cff134cd5100b682611d",
+    "simulation/ate_sim/persistence_lifecycle.py": "8865df8392735879e0408da40c67a38268673395a2868991a68dbab5ec7b248a",
+    "simulation/ate_sim/persistence_pressure.py": "e9b4da79b286cd95c63a37d755ec8dcf87c6748277c3b1f42978b0fdfd15d980",
+    "simulation/ate_sim/persistence_record_headers.py": "0b23cf9ce0d1d35b02b0d35df482de666b84c1a6f025af6fdcdf3da067e2513b",
+    "simulation/ate_sim/persistence_record_runtime.py": "58cd1e877a7d28b0539e097e3f7473ef65e2b0b02cd54be4de5ea7e288977cab",
+    "simulation/ate_sim/persistence_schema.py": "2a59036c05436fc75ce42ac42d194a49351855345c4f2c7891d0b565bf7beb17",
+    "simulation/ate_sim/persistence_session.py": "70984926c887fda1c2548dd8284c68286a9ca8f860899be7277edabaa2430c58",
+    "simulation/ate_sim/persistence_tracking.py": "9d973b75500fba0737ad58f7b37c3885558b853fb0ea8dc6719ed52c180dc77a",
+    "simulation/ate_sim/personhood.py": "4f5e59e989e1e0b72204f12b0ece54300e972aecfe7bb83adf3d787cdcd1b791",
+    "simulation/ate_sim/query.py": "1fa1f3cf96513ed03399a47363cf23780a4c9683872f6052a7ec8b43455e531f",
+    "simulation/ate_sim/rank.py": "a7c9e09848fd74d71e5115afb803459fdbc08e7c3690ab412edd2d8a656848f2",
+    "simulation/ate_sim/rank_ecology.py": "32e11fecab133652a8fcbbbe2968945bccdfca88c9c31bc583cd6c2e940531f3",
+    "simulation/ate_sim/record_index.py": "002202d5c2f089c67575b389cecce367bbccc3cb6b744f459f2c9f97ce070837",
+    "simulation/ate_sim/resource_offers.py": "4a993be903065269eca28774770513dabca43e0f94c7acec7acc5f5ba194cb0b",
+    "simulation/ate_sim/selection_pool.py": "6403fbebd605d4eca3da4fd484a22f02505ac282c56c89947fe120239ca63cad",
+    "simulation/ate_sim/semantic_dictionary.py": "e3c9a23eb615a7929fce12837448e44578c63f096e909c62844f44584efc5000",
+    "simulation/ate_sim/skills.py": "fee6d7989a5b30586ea0f953dcefef68995324fd8ab59a766599c0bf266517a7",
+    "simulation/ate_sim/social.py": "93ba7265c92ec8765f427d99d901fbe3745e88a709692b5a6699daf68342e08e",
+    "simulation/ate_sim/society_accountability.py": "1f1c28e76d74604056a30531a20a2a08e49a9ea1f4741169b4cab3821ad33623",
+    "simulation/ate_sim/society_careers.py": "65f349628b10ebbc446c333040a7e4e852cbc04c3204cb3732e4fbf8d34aab27",
+    "simulation/ate_sim/species.py": "7efbb902f694fc275c40f120e04c24de613ed5a75c0b9d7f1e07b989dadd95ac",
+    "simulation/ate_sim/threat_ecology.py": "c2905b5435243f81b8c200f01298346a79ff602a31507c56c2368e7c6e2a1ff9",
+    "simulation/ate_sim/transmission.py": "8558dba05caed70cb872ce470f51ca9ec92c058fd20c75a49045e7ba82d67619",
+    "simulation/ate_sim/warfare.py": "b0fc2c2da2480badee25757780d96d7dde7f6a409b852376eb3fbc94fd79679d",
+    "simulation/ate_sim/worldgen.py": "a97dcded3d0917c176ddb469c1a61f2d3b920e3f030b81f49302538e0c0b9f4d",
+    "simulation/tests/test_stage_0_5_final_world_native_event_peers.py": "88a3c0c8a5e274555df950b66f9f46ea37eaffa6a4feb4d1bcf24e6cdef81e57"
+  },
+  "gates": {
+    "affected": {
+      "tests": 157,
+      "failures": 0,
+      "errors": 0,
+      "seconds": "41.680",
+      "cases": [
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_native_event_peer_reopens_and_first_edit_publishes_one_body[history]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_native_event_peer_reopens_and_first_edit_publishes_one_body[world-log]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_uncached_native_event_peer_detach_keeps_one_shared_body",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_resident_event_payload_disagreement_rejects_before_alias_install",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_first_world_event_edit_has_exact_backing_recovery[before_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_first_world_event_edit_has_exact_backing_recovery[after_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_native_event_peer_detach_staging_failure_preserves_publisher_body",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_unsealed_event_record_data_aliases_mutate_and_reopen",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_seal_copies_mutable_container_aliases_and_persists_immutable_snapshot[False]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_seal_copies_mutable_container_aliases_and_persists_immutable_snapshot[True]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_freeze_preserves_native_mutable_record_child_behavior",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_snapshot_save_fault_preserves_retry_and_alias[before_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_snapshot_save_fault_preserves_retry_and_alias[after_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_detach_reads_uncached_record_and_snapshot_descendants",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_header_edit_save_has_fixed_unrelated_history_work",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "115"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "4"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "778"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "115"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "4"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "778"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_legacy_tracked_world_event_input_rejects_before_recursive_admission",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_shared_by_recursive_owners_mutates_and_reopens",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_children_share_histories_and_replacement_preserves_old_alias",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_graph_preflight_rejects_cycle_before_allocating_earlier_children",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_assignment_preflights_invalid_graph_and_closed_alias_rejects",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_save_fault_preserves_exact_frozen_world_plan[before_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_save_fault_preserves_exact_frozen_world_plan[after_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_held_orphan_record_keeps_private_edit_and_revives_same_incarnation",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_clean_record_body_and_binding_are_weak_after_parent_cache_releases",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_corrupt_physical_placement_rejects_before_native_field_edit",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_detach_materializes_one_plain_shared_native_graph",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_shared_with_existing_eager_packed_action_is_one_native_object",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_last_physical_owner_retirement_preserves_old_pin_and_reclaims_children",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_stale_session_reads_pinned_body_but_rejects_mutation_and_cross_session",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_point_edit_save_and_noop_are_independent_of_unrelated_history",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "120"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "4"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "793"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "120"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "4"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "793"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_can_contain_shared_native_record_child_and_replace_it",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[extra]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[missing]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[foreign]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[event]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_self_assignment_rejects_before_owner_and_allocator_changes",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[record_field]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[list_append]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[map_set]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[finite_slice]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_unsaved_record_close_does_not_keep_native_body_alive",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_finite_record_batches_keep_shared_native_identity_after_reopen[list_slice]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_finite_record_batches_keep_shared_native_identity_after_reopen[counted_slice]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_finite_record_batches_keep_shared_native_identity_after_reopen[counted_extend]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_top_level_lazy_record_peer_keeps_backing_and_family_header_consistent",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_materialized_detach_releases_native_record_that_now_has_only_eager_owner",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_backing_is_rechecked_before_field_edit",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_cold_lazy_family_first_assignment_updates_its_shared_record_backing",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_identical_record_assignment_and_return_to_baseline_are_noop_saves",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_unpublished_replaced_record_child_routes_cancel_and_private_graph_revives",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_event_placements",
+          "name": "test_replaced_event_child_routes_old_alias_only_to_remaining_owner",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_event_placements",
+          "name": "test_new_event_attaches_existing_lazy_child_to_checked_catalog",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_event_placements",
+          "name": "test_shared_child_forces_unchanged_event_envelope",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_event_placements",
+          "name": "test_sealed_event_retires_mutable_placements_without_retiring_shared_backing",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_event_placements",
+          "name": "test_scalar_event_edit_preserves_original_event_and_data_incarnations",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_event_placements",
+          "name": "test_event_shared_edit_has_identical_checked_work_at_paired_archive_sizes",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_event_placements",
+          "name": "test_new_event_placement_and_backing_share_exact_save_recovery[before_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_event_placements",
+          "name": "test_new_event_placement_and_backing_share_exact_save_recovery[after_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_packed_actions",
+          "name": "test_packed_action_and_mutable_event_expose_one_canonical_record",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_packed_actions",
+          "name": "test_new_action_placements_use_actual_packed_owner",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_packed_actions",
+          "name": "test_existing_action_scalar_edit_preserves_incarnation",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_packed_actions",
+          "name": "test_shared_action_is_stitched_before_direct_mutation",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_packed_actions",
+          "name": "test_pending_append_does_not_choose_a_different_copy_before_direct_edit",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_packed_actions",
+          "name": "test_corrupt_shared_action_group_rejects_before_field_change",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_packed_actions",
+          "name": "test_prefix_trim_moves_survivor_path_without_reallocating_identity",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_packed_actions",
+          "name": "test_new_packed_action_joins_exact_save_recovery[before_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_packed_actions",
+          "name": "test_new_packed_action_joins_exact_save_recovery[after_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_eager_placements",
+          "name": "test_deleted_eager_owner_cannot_be_resurrected_by_shared_lazy_child",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_eager_placements",
+          "name": "test_replaced_eager_child_routes_old_alias_only_to_its_remaining_owner",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_eager_placements",
+          "name": "test_eager_scalar_save_keeps_complete_catalog_owner_projection",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_eager_placements",
+          "name": "test_new_eager_owner_attaches_existing_canonical_history",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_registered_value_records_and_enums_round_trip_in_recursive_history",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key0-equal0]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key1-equal1]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key2-equal2]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[society-society]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key4-equal4]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key5-equal5]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_recursive_set_value_keys_keep_native_enum_and_ref_representatives",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_mutable_child_hidden_in_frozen_ref_rejects_before_owner_or_allocator_edit",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_undeclared_or_invalid_value_records_fail_closed_before_admission[cycle]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_undeclared_or_invalid_value_records_fail_closed_before_admission[extra]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_undeclared_or_invalid_value_records_fail_closed_before_admission[foreign_record]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_undeclared_or_invalid_value_records_fail_closed_before_admission[foreign_enum]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_all_declared_frozen_records_are_explicitly_accounted_for",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_shared_native_subtree_is_validated_by_unique_input_graph_not_every_placement",
+          "properties": [
+            {
+              "name": "sharing_placements",
+              "value": "48"
+            },
+            {
+              "name": "incoming_scalar_codec_visits",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_completed_native_validation_is_not_reused_after_caller_changes_source",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_finite_recursive_batches_validate_shared_record_child_once[list_slice]",
+          "properties": [
+            {
+              "name": "batch_operation",
+              "value": "list_slice"
+            },
+            {
+              "name": "sharing_placements",
+              "value": "48"
+            },
+            {
+              "name": "incoming_scalar_codec_visits",
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_finite_recursive_batches_validate_shared_record_child_once[counted_slice]",
+          "properties": [
+            {
+              "name": "batch_operation",
+              "value": "counted_slice"
+            },
+            {
+              "name": "sharing_placements",
+              "value": "48"
+            },
+            {
+              "name": "incoming_scalar_codec_visits",
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_finite_recursive_batches_validate_shared_record_child_once[counted_extend]",
+          "properties": [
+            {
+              "name": "batch_operation",
+              "value": "counted_extend"
+            },
+            {
+              "name": "sharing_placements",
+              "value": "48"
+            },
+            {
+              "name": "incoming_scalar_codec_visits",
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_finite_batch_rechecks_caller_sources_after_prior_admission[list_slice]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_finite_batch_rechecks_caller_sources_after_prior_admission[counted_slice]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_finite_batch_rechecks_caller_sources_after_prior_admission[counted_extend]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_slice_index_callback_finishes_before_native_batch_preflight[list]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_slice_index_callback_finishes_before_native_batch_preflight[sequence]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_recursive_list_slice_invokes_index_callback_once_like_native_list",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection0-6]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection1-3]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection2-2]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection3-2]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection4-2]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_detach_requires_explicit_materialization_without_side_effect",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_materializing_detach_preserves_world_tail_aliases_edits_and_portability",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_detach_staging_failure_leaves_cold_session_usable",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_stale_detach_materializes_local_branch_without_touching_winner",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_digest_guard_blocks_mutation_and_releases_after_failure",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_checkpoint_and_direct_pickle_reject_cold_before_traversal",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_legacy_p2_entrypoints_reject_cold_before_scrub_or_audit",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_detach_partition_shapes_preserve_exact_boundary_and_tail_flags[0-0-0-individually_sealed0]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_detach_partition_shapes_preserve_exact_boundary_and_tail_flags[0-0-3-individually_sealed1]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_detach_partition_shapes_preserve_exact_boundary_and_tail_flags[1-0-0-individually_sealed2]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_detach_partition_shapes_preserve_exact_boundary_and_tail_flags[1-1-3-individually_sealed3]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_detach_partition_shapes_preserve_exact_boundary_and_tail_flags[1-0-2-individually_sealed4]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_lifecycle_state_guards_fail_before_work_and_release",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_detach_mid_prefix_failure_is_reversible",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_lifecycle",
+          "name": "test_short_lifecycle_integration_matches_independent_control",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_cold_save_true_noop_does_not_advance_generation",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_cold_save_q0_current_edit_commits_and_reopens",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_cold_save_one_persisted_chunk_moves_rows_to_segment",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_cold_save_selected_chunk_straddles_committed_n",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_cold_save_drains_five_pending_chunks_as_four_then_one",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_individually_sealed_tail_row_is_saved_without_log_identity",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_cold_save_combines_world_identity_event_and_descriptor_work_once",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_same_year_transfer_boundary_preserves_queries_and_absolute_order",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_independent_prefix_reader_keeps_its_captured_generation_until_close",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_q0_scalar_metadata_and_deleted_alias_reanchor_persist_together",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_invalid_dirty_event_rejects_before_commit_and_keeps_retry_state",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_shared_replaced_payload_sealed_before_first_save_reanchors_current_state",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_planner_encoding_failure_keeps_active_dirty_retry_state",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save",
+          "name": "test_dirty_event_year_index_divergence_rejects_before_commit",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_failure_before_commit_proves_old_and_preserves_retry[during_writes]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_failure_before_commit_proves_old_and_preserves_retry[before_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_after_commit_lost_ack_is_resolved_without_second_generation",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_unreadable_ack_blocks_mutation_emit_step_and_log_until_resolve",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_unreadable_initial_ack_can_resolve_proven_durable_old",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_publication_failure_before_adoption_resolves_once",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_pending_identity_deletion_before_apply_resolves_and_reopens",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_mixed_identity_cleanup_partial_action_resolves_and_saves",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_failure_after_journal_cleanup_resolves_idempotently",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_publication_failure_after_adoption_resolves_idempotently",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_stale_writer_with_equal_values_and_later_head_cannot_publish",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_direct_store_close_rejects_mutation_emit_and_simulation_before_change",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_preparing_state_blocks_reentrant_operations_and_mutation",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_save_inside_current_people_scope_fails_before_preparation",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_corrupt_new_segment_during_lost_ack_never_trims_runtime",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_before_commit_failure_proves_old_and_retry_is_single_generation",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_unreadable_ack_of_proven_rollback_blocks_then_resolves_old",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_publication_failure_before_adoption_resolves_without_early_trim",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_equal_value_competitor_token_is_not_mistaken_for_our_ack",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_recovery_checks_changed_record_evidence_not_just_token",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_warmed_new_segment_cache_cannot_hide_corruption_on_resolution",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_close_from_recovery_does_not_resolve_or_advance_again",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_subprocess_writer_death_reopens_complete_old_or_new_partition[during_writes-False]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_subprocess_writer_death_reopens_complete_old_or_new_partition[before_commit-False]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_subprocess_writer_death_reopens_complete_old_or_new_partition[after_commit-True]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_closed_cold_world_values_remain_inspectable_but_simulation_stays_blocked",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_persistence_cold_save_failures",
+          "name": "test_save_called_from_inside_simulation_step_is_rejected_before_prepare",
+          "properties": []
+        }
+      ]
+    },
+    "final_focused": {
+      "tests": 68,
+      "failures": 0,
+      "errors": 0,
+      "seconds": "11.751",
+      "cases": [
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_native_event_peer_reopens_and_first_edit_publishes_one_body[history]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_native_event_peer_reopens_and_first_edit_publishes_one_body[world-log]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_uncached_native_event_peer_detach_keeps_one_shared_body",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_resident_event_payload_disagreement_rejects_before_alias_install",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_first_world_event_edit_has_exact_backing_recovery[before_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_first_world_event_edit_has_exact_backing_recovery[after_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_native_event_peer_detach_staging_failure_preserves_publisher_body",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_native_event_peers",
+          "name": "test_first_resident_event_edit_has_fixed_related_group_work",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "123"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "12"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "827"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "123"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "12"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "827"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_unsealed_event_record_data_aliases_mutate_and_reopen",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_seal_copies_mutable_container_aliases_and_persists_immutable_snapshot[False]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_seal_copies_mutable_container_aliases_and_persists_immutable_snapshot[True]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_freeze_preserves_native_mutable_record_child_behavior",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_snapshot_save_fault_preserves_retry_and_alias[before_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_snapshot_save_fault_preserves_retry_and_alias[after_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_detach_reads_uncached_record_and_snapshot_descendants",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_event_header_edit_save_has_fixed_unrelated_history_work",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "115"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "4"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "778"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "115"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "4"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "778"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_events",
+          "name": "test_legacy_tracked_world_event_input_rejects_before_recursive_admission",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_shared_by_recursive_owners_mutates_and_reopens",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_children_share_histories_and_replacement_preserves_old_alias",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_graph_preflight_rejects_cycle_before_allocating_earlier_children",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_assignment_preflights_invalid_graph_and_closed_alias_rejects",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_save_fault_preserves_exact_frozen_world_plan[before_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_save_fault_preserves_exact_frozen_world_plan[after_commit]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_held_orphan_record_keeps_private_edit_and_revives_same_incarnation",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_clean_record_body_and_binding_are_weak_after_parent_cache_releases",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_corrupt_physical_placement_rejects_before_native_field_edit",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_detach_materializes_one_plain_shared_native_graph",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_shared_with_existing_eager_packed_action_is_one_native_object",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_last_physical_owner_retirement_preserves_old_pin_and_reclaims_children",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_stale_session_reads_pinned_body_but_rejects_mutation_and_cross_session",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_point_edit_save_and_noop_are_independent_of_unrelated_history",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "120"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "4"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "793"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "120"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "4"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "793"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_can_contain_shared_native_record_child_and_replace_it",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[extra]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[missing]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[foreign]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[event]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_self_assignment_rejects_before_owner_and_allocator_changes",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[record_field]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[list_append]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[map_set]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[finite_slice]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_unsaved_record_close_does_not_keep_native_body_alive",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_finite_record_batches_keep_shared_native_identity_after_reopen[list_slice]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_finite_record_batches_keep_shared_native_identity_after_reopen[counted_slice]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_finite_record_batches_keep_shared_native_identity_after_reopen[counted_extend]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_top_level_lazy_record_peer_keeps_backing_and_family_header_consistent",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_materialized_detach_releases_native_record_that_now_has_only_eager_owner",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_backing_is_rechecked_before_field_edit",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_cold_lazy_family_first_assignment_updates_its_shared_record_backing",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_identical_record_assignment_and_return_to_baseline_are_noop_saves",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_unpublished_replaced_record_child_routes_cancel_and_private_graph_revives",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_history_has_checked_reference_descriptor_and_portable_native_type[frozen-list-LazyFrozenHistoryList-values0-FrozenList]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_history_has_checked_reference_descriptor_and_portable_native_type[frozen-map-LazyFrozenHistoryMap-values1-FrozenDict]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_role_cannot_be_restored_from_mutable_descriptor[frozen-list]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_role_cannot_be_restored_from_mutable_descriptor[frozen-map]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_mutation_rejects_before_consuming_input[extend]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_mutation_rejects_before_consuming_input[slice]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_mutation_rejects_before_consuming_input[update]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_mutation_rejects_before_consuming_input[set]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_reference_wire_enum_and_incarnation_are_closed[node0]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_reference_wire_enum_and_incarnation_are_closed[node1]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_reference_wire_enum_and_incarnation_are_closed[node2]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_recursive_frozen_graph_preserves_roles_aliases_and_world_publisher",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_point_read_at_old_pin_has_fixed_payload_work[frozen-list-LazyFrozenHistoryList]",
+          "properties": [
+            {
+              "name": "frozen-list_H1000_payload_reads",
+              "value": "2"
+            },
+            {
+              "name": "frozen-list_H1000_metadata_rows",
+              "value": "7"
+            },
+            {
+              "name": "frozen-list_H10000_payload_reads",
+              "value": "2"
+            },
+            {
+              "name": "frozen-list_H10000_metadata_rows",
+              "value": "7"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_frozen_point_read_at_old_pin_has_fixed_payload_work[frozen-map-LazyFrozenHistoryMap]",
+          "properties": [
+            {
+              "name": "frozen-map_H1000_payload_reads",
+              "value": "2"
+            },
+            {
+              "name": "frozen-map_H1000_metadata_rows",
+              "value": "6"
+            },
+            {
+              "name": "frozen-map_H10000_payload_reads",
+              "value": "2"
+            },
+            {
+              "name": "frozen-map_H10000_metadata_rows",
+              "value": "6"
+            }
+          ]
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_legacy_retirement_cannot_claim_new_backing_roles[record]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_legacy_retirement_cannot_claim_new_backing_roles[frozen-list]",
+          "properties": []
+        },
+        {
+          "class": "simulation.tests.test_stage_0_5_final_frozen_histories",
+          "name": "test_legacy_retirement_cannot_claim_new_backing_roles[frozen-map]",
+          "properties": []
+        }
+      ]
+    }
+  },
+  "source_boundary": "All production files match both gates. Affected gate precedes only one additional paired-bound test and its fixture-size parameters; final focused gate covers all eight native peer cases and current Event/record/frozen tests. Counts overlap; no final full-suite claim.",
+  "regressions": [
+    "RED: native history read reopened an equal but distinct Event from its World-log body.",
+    "RED: first edit through the World-log Event left its native recursive record backing stale.",
+    "RED: uncached full detach produced two Event objects in the portable graph.",
+    "RED: resident untracked Event mismatch was accepted instead of rejecting before binding."
+  ],
+  "repairs": [
+    "Select related resident mutable-log root Event from the checked current incarnation group; compare compact header and canonical incarnation before binding.",
+    "First World-log field edit activates the checked native record backing before the original setter, using the exact related root placement. Incoming graph/cycle preflight remains before edit/allocation.",
+    "Explicit full materialization shares its memo with the staged standalone EventLog tail. Only a checked already-backed Event clone from that memo can replace the staged tail object. Publisher tail remains unchanged until final publication."
+  ],
+  "verified": [
+    "Both first-access orders preserve native Event identity and persist subsequent field edits.",
+    "Resident header disagreement rejects before alias install.",
+    "Before-commit and lost-ack recovery preserve one body and exact frozen publication.",
+    "A before_publish detach failure leaves the publisher log/body/data unchanged; retry restores one shared portable Event."
+  ],
+  "bounds": {
+    "first_world_log_edit_save_noop_H1000_H10000": {
+      "payload_reads": 123,
+      "payload_writes": 12,
+      "metadata_rows": 827,
+      "archive_data_walk_and_global_registry_inventory": "forbidden by probes",
+      "related_live_aliases": "fixed root/data/unrelated history at both scales"
+    }
+  },
+  "remaining": [
+    "Legacy tracked Event/root collection imports",
+    "Sealed World EventLog tail/segment activation and exhaustive actual schema/byte closure",
+    "Persisted append-to-counted promotion and exotic key equality",
+    "Complete ordinary capability6 open and source-preserving upgrade",
+    "Integrated bounds/P5, one final full applicable suite and fresh independent review"
+  ],
+  "unchanged": {
+    "production_PR14_head": "c29e3d06a0c9d219235e2b3f0390271bd1245aea",
+    "PR14_draft_open_unmerged": true,
+    "P5_certified_source": "b57704304dc51238ac14420e55d1b1bc3ed79892",
+    "stage1": false,
+    "new_endurance": false
+  }
+}

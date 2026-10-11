@@ -1,5 +1,42 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: native mutable World-log Event peers (October11 UTC)
+
+Source local `872b905ab4e678a265205354ca03b917245e1406`, public
+`6c362a34c23b86af2a98747f4b39c7e35a59f878`, exact matching tree
+`177d71c518f7e01e4dc477dc28c7bee64d5beff8`; leased non-force update succeeded.
+
+Follow-through found a new recursively backed Event saved correctly but reopened
+as two equal bodies when also appended to the mutable World log. The four initial
+regressions all failed: history-first reopen, log-first field edit, uncached detach
+sharing, and resident payload-disagreement rejection. Record load now selects the
+related resident mutable-log root Event from checked placements, compares its
+compact header/incarnation before binding, and retains it as the sole native
+canonical object. The first edit through the log acquires the record backing
+before the original setter. No history data or global registry is searched.
+
+Explicit full detach rewires only the staged standalone log tail when its one
+sharing memo already materialized the same backed Event. A before-publication
+fault leaves the publisher's log, native Event and data unchanged. Both save
+fault phases resolve through the existing exact frozen plan. Legacy tracked
+Event dictionaries and sealed log snapshots remain distinct pending boundaries.
+
+Affected gate **157 passed in41.69s**, final focused **68 passed in11.75s**, zero
+failures/errors. Production files match both; the second adds one paired-bound
+probe/fixture sizing and covers all8 permanent peer cases. Counts overlap.
+First log edit/save/no-op at H1k/H10k uses exactly **123 reads,12 writes,
+827 metadata rows** each, with Event data iteration and global registry inventory
+forbidden. Full hashes/cases/source boundaries are retained in
+`stage_0_5_native_event_peer_validation.json`.
+
+PR14 was rechecked: draft/open/unmerged at
+`c29e3d06a0c9d219235e2b3f0390271bd1245aea`. P5 remains certified only at its prior
+source. Complete Stage0.5 remains open: legacy/root collection imports, sealed
+EventLog tail/segment activation, exhaustive actual schema/byte closure,
+persisted promotion, exotic equality, ordinary capability6/source copy, integrated
+bounds/P5, one final full applicable suite and fresh independent review. No
+Stage1, gameplay, new endurance, merge or complete-format acceptance claim.
+
 ## Latest checkpoint: readonly histories and native recursive Event snapshots (October11 UTC)
 
 Source local `56fbe32670a1f18e2e2a4e128cde4aeef74bd91f`, public
