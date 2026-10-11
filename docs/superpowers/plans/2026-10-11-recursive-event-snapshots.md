@@ -26,9 +26,9 @@ metadata and immutable mutation behavior.
 
 ## Tasks
 
-- [ ] TDD closed frozen reference/descriptor roles, readonly views, exact portable
+- [x] TDD closed frozen reference/descriptor roles, readonly views, exact portable
   types, malformed role rejection, old-pin point reads and caller-input guards.
-- [ ] Add concrete FrozenList/FrozenDict admission to the existing recursive runtime
+- [x] Add concrete FrozenList/FrozenDict admission to the existing recursive runtime
   and source memo; extend existing dependency/retirement/type-witness verification.
 - [ ] TDD native Event admission, field assignment and seal hooks, aliases, mutable
   record children, eager event peers, cold reopen, faults, detach and corruption.
@@ -42,3 +42,17 @@ classification, exhaustive schema and byte bounds remain separate closure work.
 Persisted append/count-tree promotion, exotic key equality, complete capability6
 ordinary open/source-copy, integrated P5, the one final applicable suite and fresh
 independent review remain open. No Stage1, gameplay, PR14, merge or new endurance.
+
+## Native mutable-log peer follow-through
+
+A new native recursively backed Event appended to the mutable World log exposed
+two equal bodies on reopen. Checked record load now selects its related resident
+mutable-log root Event, compares the compact header before binding, and preserves
+that native object as the sole registry canonical body. The first edit through
+the World log acquires its record backing before the original setter. This follows
+related checked placements only, without archived data or global registry scans.
+
+Explicit full detach uses its one sharing memo to rewire only the staged standalone
+EventLog tail when recursive materialization already cloned the same backed Event.
+A before-publication fault leaves the publisher log/body unchanged. Legacy eager
+TrackedDict Event imports and sealed tail/segment activation remain separate.

@@ -310,9 +310,17 @@ def _stage_plain_graph(
     # The canonical EventLog root is remapped without traversing history, but
     # its resident tail Events remain the same objects and must shed any tracked
     # payload wrappers before the session closes.
-    for event in new_log._tail:
-        if stage(event) is not event:
-            raise StoreIntegrityError("detach cannot replace resident tail Events")
+    for index, event in enumerate(new_log._tail):
+        replacement = stage(event)
+        if replacement is not event:
+            from .persistence_record_runtime import record_backing
+            if (record_backing(event) is None or type(replacement) is not Event
+                    or not replacements or replacements.get(id(event)) is not replacement):
+                raise StoreIntegrityError("detach cannot replace resident tail Events")
+            # Explicit recursive materialization already cloned this same
+            # native record through its one sharing memo. Rewire only the
+            # staged standalone tail, leaving the publisher body untouched.
+            new_log._tail[index] = replacement
 
     staged_world = stage(session.world)
     if staged_world is not session.world:

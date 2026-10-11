@@ -10999,6 +10999,22 @@ class LazyWorldSession:
         if self._identity_bridge is not None:
             from .agency import ActionRecord
             from .persistence_event_ids import EventIdSet
+            from .core import Event
+            if type(subject) is Event:
+                from .persistence_tracking import _binding
+                from .persistence_record_headers import RecordReference, NAMESPACE as RECORD_HEADER
+                bound = _binding(subject)
+                for owner in tuple(bound.owners if bound is not None else ()):
+                    if owner[0] != 'world.events' or self._eager_tracker._owner_value(owner) is not subject:
+                        continue
+                    rows = self._identity_coordinator._owner_changes(owner, ())
+                    root = rows.get(self._identity_coordinator._marker(owner, ()))
+                    if root is not None and root[2] is not None and self.store.contains_lazy_key(
+                            self.pin, RECORD_HEADER, (root[2], 0)):
+                        self._recursive_histories.validate_native(value)
+                        self._recursive_histories.check_assignment_cycle(subject, value)
+                        self._recursive_histories.load_record(RecordReference(root[2]))
+                        break
             if isinstance(subject, EventIdSet):
                 self._identity_bridge.synchronize_lazy_placements()
                 self._identity_bridge.synchronize_event_id_placements()

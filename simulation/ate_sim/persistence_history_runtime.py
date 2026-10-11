@@ -365,6 +365,26 @@ class RecursiveHistoryRuntime:
                 return current
         from .persistence_schema import RECORD_FIELDS
         header = read_record_header(session.store, session.pin, value.incarnation)
+        if current is None:
+            from .core import Event
+            if type(restore_record_header(header)) is Event:
+                # Only checked related mutable-log root occurrences are read.
+                # The resident Event predates recursive access and must become
+                # the sole canonical body, not another equal decoded copy.
+                coord = session._identity_coordinator
+                placements = coord._current_placements(coord.discover_group(value.incarnation, read_only=True))
+                try:
+                    for namespace, key, path in placements:
+                        if namespace == 'world.events' and not path:
+                            candidate = session._eager_tracker._owner_value((namespace, key))
+                            if type(candidate) is not Event:
+                                raise StoreIntegrityError('record Event placement lacks its mutable log body')
+                            if current is not None and current is not candidate:
+                                raise StoreIntegrityError('record Event has distinct resident log bodies')
+                            current = candidate
+                finally:
+                    if hasattr(placements, 'close'):
+                        placements.close()
         result = restore_record_header(header) if current is None else current
         if current is not None:
             if not mutable_record(current) or type(current) is not type(restore_record_header(header)):
@@ -385,7 +405,10 @@ class RecursiveHistoryRuntime:
                                       for field in RECORD_FIELDS[type(current)]))
             if session.store.codec.encode(projected) != session.store.codec.encode(header):
                 raise StoreIntegrityError('eager and backed record payloads disagree')
-        else:
+        actual = session._registry.incarnation_for_object(result)
+        if actual is not None and actual != incarnation:
+            raise StoreIntegrityError('resident record has a different canonical incarnation')
+        if actual is None:
             session._registry.bind(result, incarnation=incarnation)
         bind_record(self, result, incarnation, header, new=False)
         session._register_nested_overlay(result)
