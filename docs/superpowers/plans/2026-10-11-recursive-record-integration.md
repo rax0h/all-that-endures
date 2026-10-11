@@ -37,7 +37,7 @@
 - [x] Run to confirm the missing primitive fails (missing module, collection error).
 - [x] Implement exact closed references/header validation and restore, using existing schema and codec; no live object binding or publication inside helpers.
 - [x] Register a concrete record physical adapter with field/index paths, exact child reference projection, no memberships and schema1.
-- [ ] Run focused and affected catalog/codec/history tests; record actual source hashes and measured read bounds; commit with [skip ci].
+- [x] Run focused and affected catalog/codec/history tests; record actual source hashes and measured read bounds; commit with [skip ci].
 
 ### Task2: Native canonical record admission and assignment
 

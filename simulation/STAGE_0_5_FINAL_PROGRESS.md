@@ -1,5 +1,38 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: closed registered-record header primitives (October 11 UTC)
+
+The interrupted affected run completed: **427 passed in132.30s**, exit0,
+zero failures/errors. Focused primitive/catalog contracts: **133 passed in2.28s**,
+including101 new header cases; counts overlap. Source is local
+`76bf8b6b252e4e567ea78b291fb8e2014004ad4e`, public
+`7d40e9ad69d63e940d92d71b16fa46313afff5aa`, matching tree
+`3a5dceca2bb8fe8eef452e721a188b59031e2586`; leased non-force publication succeeded.
+
+Added a closed `RecordReference` codec tag and ordered record header in
+`aux.lazy.records.headers` at `(incarnation,0)`, with explicit declared class
+names and Event seal metadata. A concrete physical owner adapter validates exact
+field/tuple placements, schema1 and absence of memberships. Frozen/foreign
+classes, malformed stored fields and missing headers fail closed. No dynamic
+imports or generic serializer were added.
+
+At1,000 and10,000 unrelated headers, an actual header point read used exactly
+**1 payload read,2 metadata rows,191 bytes**; old-generation values remain intact.
+All declared mutable classes have ordered-field/parser coverage. These synthetic
+None-field bodies are not proof of live field graphs or imported bounds. The
+source-catalog fixture certifies projections/witnesses without constructing its
+child target backings. Restored Event bodies still contain stored references;
+live seal/frozen-data behavior is pending. Evidence with source hashes, commands
+and case properties: `stage_0_5_recursive_record_header_validation.json`.
+
+This is Task1 of `docs/superpowers/plans/2026-10-11-recursive-record-integration.md`.
+Task2–3 continues native canonical admission/assignment, compact identity headers,
+existing dependency leases, publisher acknowledgement/recovery and retirement.
+The backing wrapper will not become another canonical object or identity registry.
+Ordinary mutable recursive admission is still excluded. Capability6, persisted
+promotion, exotic equality, exhaustive bounds/P5/final suite and fresh independent
+review remain pending; no completion/endurance/acceptance claim or PR14 change.
+
 ## Latest checkpoint: finite recursive batch preflight and slice callbacks (October 11 UTC)
 
 Continued from public `21d98070a298e4997acc78784b6f271aaddccab7`, local

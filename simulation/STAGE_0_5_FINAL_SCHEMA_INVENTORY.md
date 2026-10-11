@@ -12,6 +12,16 @@ overlapping counts). Finite admission/callback follow-up now covers30 permanent
 value/admission cases within302 affected cases; see
 `stage_0_5_recursive_finite_batch_validation.json`.
 
+Implemented record-header primitive (October11 UTC): every declared mutable
+class has closed ordered-field/parser coverage, with one record backing namespace
+and checked physical field/tuple placements. At unrelated H1k/H10k, a point read
+uses1 payload read,2 metadata rows and191 bytes. This does not yet admit mutable
+records into live histories, certify their actual child graphs/import bounds, or
+preserve native Event sealing through runtime bindings. Evidence:
+`stage_0_5_recursive_record_header_validation.json` (101 new,133 focused,427
+affected; overlapping). Live integration remains Task2–3 of the approved native
+record plan.
+
 | Record.field | Classification | Growth writer / guard | Actual bound | Representation |
 |---|---|---|---|---|
 | AbilityProgress.aura | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
