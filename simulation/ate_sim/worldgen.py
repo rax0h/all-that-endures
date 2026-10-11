@@ -3,6 +3,7 @@ from .culture import seed_practices
 from .species import habitat_suitability
 from .semantic_dictionary import ESSENCE_IDS,ESSENCES,STONE_IDS,AWAKENING_STONES
 from .divinity import seed_gods
+from .settlement_space import seed_settlement_space
 import math
 PEOPLES=('human','elf','celestine','leonid','smoulder','draconian','merfolk','runic');ESSENCES_AVAILABLE=ESSENCE_IDS
 
@@ -46,5 +47,6 @@ def generate_world(seed:int,width=24,height=18,settlements=5):
    hm=w.households[h].members
    for a,b in zip(hm,hm[1:]):w.social.record(a,b,founded.id,trust=.15,attachment=.15)
  seed_practices(w,w.culture)
+ seed_settlement_space(w,r)
  for pid,practice in w.culture.practices.items():w.lineage.register('practice',pid,origin_year=practice.origin_year)
  return w

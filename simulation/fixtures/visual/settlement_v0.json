@@ -1,0 +1,1221 @@
+{
+  "settlement_id": "settlement:riverwatch",
+  "world_seed": 843000,
+  "visual_seed": 12001,
+  "time_slice_year": 240,
+  "terrain_regions": [
+    {
+      "region_id": "terrain:mainland",
+      "boundary": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 145,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 145,
+          "y": 100,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 100,
+          "z": 0
+        }
+      ],
+      "elevation_band": [
+        0.18,
+        0.42
+      ],
+      "soil_family": "alluvial_loam",
+      "moisture": 0.61,
+      "disturbance": 0.22,
+      "provenance": {
+        "source_kind": "terrain_region",
+        "source_id": "mainland",
+        "event_ids": [
+          "event:mainland"
+        ],
+        "source_year": 0
+      },
+      "surface_kind": "land"
+    },
+    {
+      "region_id": "terrain:river",
+      "boundary": [
+        {
+          "x": 0,
+          "y": 40,
+          "z": 0
+        },
+        {
+          "x": 22,
+          "y": 34,
+          "z": 0
+        },
+        {
+          "x": 45,
+          "y": 38,
+          "z": 0
+        },
+        {
+          "x": 70,
+          "y": 31,
+          "z": 0
+        },
+        {
+          "x": 96,
+          "y": 36,
+          "z": 0
+        },
+        {
+          "x": 120,
+          "y": 29,
+          "z": 0
+        },
+        {
+          "x": 145,
+          "y": 33,
+          "z": 0
+        },
+        {
+          "x": 145,
+          "y": 48,
+          "z": 0
+        },
+        {
+          "x": 120,
+          "y": 44,
+          "z": 0
+        },
+        {
+          "x": 95,
+          "y": 50,
+          "z": 0
+        },
+        {
+          "x": 70,
+          "y": 45,
+          "z": 0
+        },
+        {
+          "x": 45,
+          "y": 51,
+          "z": 0
+        },
+        {
+          "x": 20,
+          "y": 47,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 54,
+          "z": 0
+        }
+      ],
+      "elevation_band": [
+        0.08,
+        0.11
+      ],
+      "soil_family": "river_channel",
+      "moisture": 1,
+      "disturbance": 0.12,
+      "provenance": {
+        "source_kind": "watercourse_state",
+        "source_id": "river",
+        "event_ids": [
+          "event:river"
+        ],
+        "source_year": 240
+      },
+      "surface_kind": "water"
+    }
+  ],
+  "roads": [
+    {
+      "road_id": "road:market",
+      "centerline": {
+        "points": [
+          {
+            "x": 14,
+            "y": 72,
+            "z": 0
+          },
+          {
+            "x": 42,
+            "y": 68,
+            "z": 0
+          },
+          {
+            "x": 68,
+            "y": 67,
+            "z": 0
+          },
+          {
+            "x": 92,
+            "y": 70,
+            "z": 0
+          },
+          {
+            "x": 126,
+            "y": 77,
+            "z": 0
+          }
+        ]
+      },
+      "width_m": 3.8,
+      "surface_family": "compacted_gravel",
+      "use_intensity": 0.86,
+      "condition": 0.72,
+      "provenance": {
+        "source_kind": "road",
+        "source_id": "market",
+        "event_ids": [
+          "event:market"
+        ],
+        "source_year": 74
+      }
+    },
+    {
+      "road_id": "road:ford",
+      "centerline": {
+        "points": [
+          {
+            "x": 68,
+            "y": 67,
+            "z": 0
+          },
+          {
+            "x": 72,
+            "y": 52,
+            "z": 0
+          },
+          {
+            "x": 73,
+            "y": 43,
+            "z": 0
+          },
+          {
+            "x": 77,
+            "y": 30,
+            "z": 0
+          },
+          {
+            "x": 82,
+            "y": 18,
+            "z": 0
+          }
+        ]
+      },
+      "width_m": 2.7,
+      "surface_family": "packed_earth",
+      "use_intensity": 0.58,
+      "condition": 0.54,
+      "provenance": {
+        "source_kind": "road",
+        "source_id": "ford",
+        "event_ids": [
+          "event:ford"
+        ],
+        "source_year": 89
+      }
+    },
+    {
+      "road_id": "road:west",
+      "centerline": {
+        "points": [
+          {
+            "x": 42,
+            "y": 68,
+            "z": 0
+          },
+          {
+            "x": 30,
+            "y": 80,
+            "z": 0
+          },
+          {
+            "x": 12,
+            "y": 90,
+            "z": 0
+          }
+        ]
+      },
+      "width_m": 2.3,
+      "surface_family": "packed_earth",
+      "use_intensity": 0.35,
+      "condition": 0.48,
+      "provenance": {
+        "source_kind": "road",
+        "source_id": "west",
+        "event_ids": [
+          "event:west"
+        ],
+        "source_year": 101
+      }
+    }
+  ],
+  "buildings": [
+    {
+      "building_id": "building:1",
+      "parcel_id": "parcel:1",
+      "position": {
+        "x": 30,
+        "y": 73,
+        "z": 0
+      },
+      "facing_degrees": 8,
+      "function": "home",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "modest",
+      "maintenance": 0.65,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:1:foundation",
+          "year": 33,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "1-foundation",
+            "event_ids": [
+              "event:1-foundation"
+            ],
+            "source_year": 33
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "1",
+        "event_ids": [
+          "event:1"
+        ],
+        "source_year": 33
+      },
+      "footprint_size_m": [
+        10,
+        7
+      ]
+    },
+    {
+      "building_id": "building:2",
+      "parcel_id": "parcel:2",
+      "position": {
+        "x": 43,
+        "y": 74,
+        "z": 0
+      },
+      "facing_degrees": 352,
+      "function": "bakery",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "comfortable",
+      "maintenance": 0.82,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:2:foundation",
+          "year": 34,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "2-foundation",
+            "event_ids": [
+              "event:2-foundation"
+            ],
+            "source_year": 34
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "2",
+        "event_ids": [
+          "event:2"
+        ],
+        "source_year": 34
+      },
+      "footprint_size_m": [
+        12,
+        8
+      ]
+    },
+    {
+      "building_id": "building:3",
+      "parcel_id": "parcel:3",
+      "position": {
+        "x": 57,
+        "y": 70,
+        "z": 0
+      },
+      "facing_degrees": 6,
+      "function": "inn",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "prosperous",
+      "maintenance": 0.86,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:3:foundation",
+          "year": 35,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "3-foundation",
+            "event_ids": [
+              "event:3-foundation"
+            ],
+            "source_year": 35
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "3",
+        "event_ids": [
+          "event:3"
+        ],
+        "source_year": 35
+      },
+      "footprint_size_m": [
+        14,
+        9
+      ]
+    },
+    {
+      "building_id": "building:4",
+      "parcel_id": "parcel:4",
+      "position": {
+        "x": 72,
+        "y": 72,
+        "z": 0
+      },
+      "facing_degrees": 1,
+      "function": "home",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "comfortable",
+      "maintenance": 0.74,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:4:foundation",
+          "year": 36,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "4-foundation",
+            "event_ids": [
+              "event:4-foundation"
+            ],
+            "source_year": 36
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "4",
+        "event_ids": [
+          "event:4"
+        ],
+        "source_year": 36
+      },
+      "footprint_size_m": [
+        11,
+        8
+      ]
+    },
+    {
+      "building_id": "building:5",
+      "parcel_id": "parcel:5",
+      "position": {
+        "x": 86,
+        "y": 73,
+        "z": 0
+      },
+      "facing_degrees": 9,
+      "function": "smithy",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "prosperous",
+      "maintenance": 0.67,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:5:foundation",
+          "year": 37,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "5-foundation",
+            "event_ids": [
+              "event:5-foundation"
+            ],
+            "source_year": 37
+          }
+        },
+        {
+          "phase_id": "phase:5:fire",
+          "year": 219,
+          "action": "damage",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0.46,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "fire_event",
+            "source_id": "smithy-fire",
+            "event_ids": [
+              "event:smithy-fire"
+            ],
+            "source_year": 219
+          }
+        },
+        {
+          "phase_id": "phase:5:repair",
+          "year": 226,
+          "action": "repair",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "imported_slate"
+          ],
+          "damage_fraction": 0.46,
+          "repair_fraction": 0.39,
+          "provenance": {
+            "source_kind": "repair_event",
+            "source_id": "smithy-repair",
+            "event_ids": [
+              "event:smithy-repair"
+            ],
+            "source_year": 226
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "5",
+        "event_ids": [
+          "event:5"
+        ],
+        "source_year": 37
+      },
+      "footprint_size_m": [
+        15,
+        10
+      ]
+    },
+    {
+      "building_id": "building:6",
+      "parcel_id": "parcel:6",
+      "position": {
+        "x": 103,
+        "y": 76,
+        "z": 0
+      },
+      "facing_degrees": 14,
+      "function": "home",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "modest",
+      "maintenance": 0.55,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:6:foundation",
+          "year": 38,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "6-foundation",
+            "event_ids": [
+              "event:6-foundation"
+            ],
+            "source_year": 38
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "6",
+        "event_ids": [
+          "event:6"
+        ],
+        "source_year": 38
+      },
+      "footprint_size_m": [
+        9,
+        7
+      ]
+    },
+    {
+      "building_id": "building:7",
+      "parcel_id": "parcel:7",
+      "position": {
+        "x": 119,
+        "y": 80,
+        "z": 0
+      },
+      "facing_degrees": 18,
+      "function": "storehouse",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "comfortable",
+      "maintenance": 0.71,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:7:foundation",
+          "year": 39,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "7-foundation",
+            "event_ids": [
+              "event:7-foundation"
+            ],
+            "source_year": 39
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "7",
+        "event_ids": [
+          "event:7"
+        ],
+        "source_year": 39
+      },
+      "footprint_size_m": [
+        13,
+        8
+      ]
+    },
+    {
+      "building_id": "building:8",
+      "parcel_id": "parcel:8",
+      "position": {
+        "x": 51,
+        "y": 61,
+        "z": 0
+      },
+      "facing_degrees": 92,
+      "function": "home",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "modest",
+      "maintenance": 0.61,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:8:foundation",
+          "year": 40,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "8-foundation",
+            "event_ids": [
+              "event:8-foundation"
+            ],
+            "source_year": 40
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "8",
+        "event_ids": [
+          "event:8"
+        ],
+        "source_year": 40
+      },
+      "footprint_size_m": [
+        9,
+        7
+      ]
+    },
+    {
+      "building_id": "building:9",
+      "parcel_id": "parcel:9",
+      "position": {
+        "x": 65,
+        "y": 59,
+        "z": 0
+      },
+      "facing_degrees": 88,
+      "function": "weaver",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "comfortable",
+      "maintenance": 0.77,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:9:foundation",
+          "year": 41,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "9-foundation",
+            "event_ids": [
+              "event:9-foundation"
+            ],
+            "source_year": 41
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "9",
+        "event_ids": [
+          "event:9"
+        ],
+        "source_year": 41
+      },
+      "footprint_size_m": [
+        12,
+        8
+      ]
+    },
+    {
+      "building_id": "building:10",
+      "parcel_id": "parcel:10",
+      "position": {
+        "x": 85,
+        "y": 60,
+        "z": 0
+      },
+      "facing_degrees": 93,
+      "function": "home",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "modest",
+      "maintenance": 0.58,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:10:foundation",
+          "year": 42,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "10-foundation",
+            "event_ids": [
+              "event:10-foundation"
+            ],
+            "source_year": 42
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "10",
+        "event_ids": [
+          "event:10"
+        ],
+        "source_year": 42
+      },
+      "footprint_size_m": [
+        10,
+        7
+      ]
+    },
+    {
+      "building_id": "building:11",
+      "parcel_id": "parcel:11",
+      "position": {
+        "x": 100,
+        "y": 63,
+        "z": 0
+      },
+      "facing_degrees": 86,
+      "function": "guildhall",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "prosperous",
+      "maintenance": 0.91,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:11:foundation",
+          "year": 43,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "11-foundation",
+            "event_ids": [
+              "event:11-foundation"
+            ],
+            "source_year": 43
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "11",
+        "event_ids": [
+          "event:11"
+        ],
+        "source_year": 43
+      },
+      "footprint_size_m": [
+        14,
+        9
+      ]
+    },
+    {
+      "building_id": "building:12",
+      "parcel_id": "parcel:12",
+      "position": {
+        "x": 78,
+        "y": 22,
+        "z": 0
+      },
+      "facing_degrees": 2,
+      "function": "ferry_house",
+      "style_lineage_ids": [
+        "style:river-founders"
+      ],
+      "wealth_band": "comfortable",
+      "maintenance": 0.69,
+      "occupancy": "occupied",
+      "phases": [
+        {
+          "phase_id": "phase:12:foundation",
+          "year": 44,
+          "action": "construct",
+          "footprint_scale": 1,
+          "material_families": [
+            "local_stone",
+            "oak"
+          ],
+          "damage_fraction": 0,
+          "repair_fraction": 0,
+          "provenance": {
+            "source_kind": "construction_event",
+            "source_id": "12-foundation",
+            "event_ids": [
+              "event:12-foundation"
+            ],
+            "source_year": 44
+          }
+        }
+      ],
+      "provenance": {
+        "source_kind": "building",
+        "source_id": "12",
+        "event_ids": [
+          "event:12"
+        ],
+        "source_year": 44
+      },
+      "footprint_size_m": [
+        11,
+        8
+      ]
+    }
+  ],
+  "vegetation_zones": [
+    {
+      "zone_id": "vegetation:north-forest",
+      "boundary": [
+        {
+          "x": 0,
+          "y": 82,
+          "z": 0
+        },
+        {
+          "x": 23,
+          "y": 78,
+          "z": 0
+        },
+        {
+          "x": 48,
+          "y": 84,
+          "z": 0
+        },
+        {
+          "x": 72,
+          "y": 80,
+          "z": 0
+        },
+        {
+          "x": 96,
+          "y": 84,
+          "z": 0
+        },
+        {
+          "x": 145,
+          "y": 83,
+          "z": 0
+        },
+        {
+          "x": 145,
+          "y": 100,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 100,
+          "z": 0
+        }
+      ],
+      "community_family": "temperate_oak_forest",
+      "density": 0.84,
+      "maturity": 0.72,
+      "disturbance": 0.18,
+      "provenance": {
+        "source_kind": "ecology_state",
+        "source_id": "north-forest",
+        "event_ids": [
+          "event:north-forest"
+        ],
+        "source_year": 240
+      }
+    },
+    {
+      "zone_id": "vegetation:south-meadow",
+      "boundary": [
+        {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 145,
+          "y": 0,
+          "z": 0
+        },
+        {
+          "x": 145,
+          "y": 22,
+          "z": 0
+        },
+        {
+          "x": 118,
+          "y": 26,
+          "z": 0
+        },
+        {
+          "x": 95,
+          "y": 20,
+          "z": 0
+        },
+        {
+          "x": 70,
+          "y": 24,
+          "z": 0
+        },
+        {
+          "x": 42,
+          "y": 19,
+          "z": 0
+        },
+        {
+          "x": 20,
+          "y": 25,
+          "z": 0
+        },
+        {
+          "x": 0,
+          "y": 20,
+          "z": 0
+        }
+      ],
+      "community_family": "wet_meadow",
+      "density": 0.52,
+      "maturity": 0.64,
+      "disturbance": 0.31,
+      "provenance": {
+        "source_kind": "ecology_state",
+        "source_id": "south-meadow",
+        "event_ids": [
+          "event:south-meadow"
+        ],
+        "source_year": 240
+      }
+    }
+  ],
+  "population": [
+    {
+      "person_id": "person:101",
+      "position": {
+        "x": 58,
+        "y": 67,
+        "z": 0
+      },
+      "representation_tier": "embodied",
+      "species_id": "human",
+      "age_years": 37,
+      "occupation_id": "innkeeper",
+      "culture_ids": [
+        "culture:riverwatch"
+      ],
+      "wealth_band": "comfortable",
+      "rank_id": null,
+      "injury_markers": [],
+      "appearance_seed": 1101,
+      "provenance": {
+        "source_kind": "person",
+        "source_id": "101",
+        "event_ids": [
+          "event:101"
+        ],
+        "source_year": 240
+      }
+    },
+    {
+      "person_id": "person:102",
+      "position": {
+        "x": 84,
+        "y": 69,
+        "z": 0
+      },
+      "representation_tier": "marker",
+      "species_id": "human",
+      "age_years": 29,
+      "occupation_id": "smith",
+      "culture_ids": [
+        "culture:riverwatch"
+      ],
+      "wealth_band": "comfortable",
+      "rank_id": "iron",
+      "injury_markers": [
+        "left_forearm_burn"
+      ],
+      "appearance_seed": 1102,
+      "provenance": {
+        "source_kind": "person",
+        "source_id": "102",
+        "event_ids": [
+          "event:102"
+        ],
+        "source_year": 240
+      }
+    },
+    {
+      "person_id": "person:103",
+      "position": {
+        "x": 69,
+        "y": 58,
+        "z": 0
+      },
+      "representation_tier": "marker",
+      "species_id": "elf",
+      "age_years": 91,
+      "occupation_id": "weaver",
+      "culture_ids": [
+        "culture:riverwatch"
+      ],
+      "wealth_band": "comfortable",
+      "rank_id": null,
+      "injury_markers": [],
+      "appearance_seed": 1103,
+      "provenance": {
+        "source_kind": "person",
+        "source_id": "103",
+        "event_ids": [
+          "event:103"
+        ],
+        "source_year": 240
+      }
+    },
+    {
+      "person_id": "person:104",
+      "position": {
+        "x": 74,
+        "y": 46,
+        "z": 0
+      },
+      "representation_tier": "marker",
+      "species_id": "human",
+      "age_years": 17,
+      "occupation_id": null,
+      "culture_ids": [
+        "culture:riverwatch"
+      ],
+      "wealth_band": "modest",
+      "rank_id": null,
+      "injury_markers": [],
+      "appearance_seed": 1104,
+      "provenance": {
+        "source_kind": "person",
+        "source_id": "104",
+        "event_ids": [
+          "event:104"
+        ],
+        "source_year": 240
+      }
+    },
+    {
+      "person_id": "person:105",
+      "position": {
+        "x": 79,
+        "y": 24,
+        "z": 0
+      },
+      "representation_tier": "marker",
+      "species_id": "merfolk",
+      "age_years": 44,
+      "occupation_id": "ferryman",
+      "culture_ids": [
+        "culture:riverwatch"
+      ],
+      "wealth_band": "modest",
+      "rank_id": "iron",
+      "injury_markers": [],
+      "appearance_seed": 1105,
+      "provenance": {
+        "source_kind": "person",
+        "source_id": "105",
+        "event_ids": [
+          "event:105"
+        ],
+        "source_year": 240
+      }
+    }
+  ],
+  "weather": {
+    "condition": "light_rain",
+    "cloud_fraction": 0.81,
+    "precipitation": 0.34,
+    "wind_mps": 5.2,
+    "visibility_km": 8,
+    "surface_wetness": 0.67,
+    "provenance": {
+      "source_kind": "weather_state",
+      "source_id": "rain-240",
+      "event_ids": [
+        "event:rain-240"
+      ],
+      "source_year": 240
+    }
+  },
+  "magic_manifestations": [
+    {
+      "manifestation_id": "magic:ward-3",
+      "position": {
+        "x": 111,
+        "y": 64,
+        "z": 1.3
+      },
+      "phenomenon_family": "persistent_ward",
+      "intensity": 0.42,
+      "radius_m": 4.5,
+      "persistent": true,
+      "provenance": {
+        "source_kind": "magic_effect",
+        "source_id": "ward-3",
+        "event_ids": [
+          "event:ward-3"
+        ],
+        "source_year": 237
+      }
+    }
+  ],
+  "metadata": {
+    "scenario": "riverwatch_debug_fixture",
+    "note": "hand-authored renderer fixture; not canonical world history"
+  },
+  "schema_version": "ate.visual-spec.v0"
+}

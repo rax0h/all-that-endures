@@ -14,6 +14,18 @@ Real runtime depth includes terrain/elevation, volumetric architecture and props
 
 Stone, timber, metal, cloth, soil, water, bark, foliage, fur and skin must read credibly. Surfaces carry age, use, moisture, damage, repair and environmental history. Physically coherent response is the foundation; artistic exaggeration of value, edge, atmosphere and light produces the illustrated result.
 
+## Physical credibility and restrained magic
+
+Visual design begins with physical credibility. An asset should first read as a believable object, material, organism or structure with convincing mass, construction, wear, function and age. Magic is expressed through that physical substrate rather than replacing it with generic fantasy decoration.
+
+A magical stone should still read as stone. A magical weapon should still communicate how it was forged, held, damaged and repaired. Architecture, armor, tools, creatures and artifacts should remain materially and mechanically legible even when supernatural forces alter what they can do.
+
+Prefer supernatural expression that appears embedded in or acting upon real matter: subsurface light, crystalline inclusions, altered tissue, heat, frost, stress fractures, phase changes, local deformation, atmospheric interaction or other effects supported by the object's history and capabilities. Avoid gratuitous neon filigree, homogeneous glow, decorative runes without cultural or causal justification, excessive bloom and other effects that make magic feel painted onto the asset.
+
+**Generated assets are judged on physical credibility first and spectacle second.** Text-to-3D, image-guided generation, authored modeling and future generation methods may all be used where appropriate, but they pass through the same art gate. Hero assets may justify tighter reference-driven art direction; ordinary props may use faster generation paths. The production method never lowers the final visual standard.
+
+The target feeling is tactile: objects should look as though they could be picked up, weighed, handled, weathered and broken. Supernatural elements should make that reality stranger, not erase it.
+
 ## Environment
 
 Major buildings, bridges, cliffs, walls, stairs, terrain and other spatially consequential structures should generally be true geometry/material systems rather than painted cards. Dense vegetation is layered ecologically: canopy, understory, shrubs, grasses, flowers, deadfall, litter, moss, fungi and disturbance states as appropriate.

@@ -1,0 +1,24 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ATE: Run simulation tests",
+      "type": "shell",
+      "command": "pytest -vv --durations=20 simulation/tests",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "ATE: 10-year probe",
+      "type": "shell",
+      "command": "python simulation/specific_test.py --seed 843000 --years 10 --section all",
+      "problemMatcher": []
+    },
+    {
+      "label": "ATE: 100-year smoke history",
+      "type": "shell",
+      "command": "python simulation/run_long_history.py 843000 100",
+      "problemMatcher": []
+    }
+  ]
+}
