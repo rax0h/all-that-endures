@@ -1653,3 +1653,118 @@ The production order should not confuse long-term aspiration with validated comp
 **Verification requirements before implementation acceptance:** Shared-time continuity; no roster-forced meetings; death retains historical consequences; correct character-relative knowledge; held identity and lawful release/return; autonomous goal abandonment and completion grounded in actual work; real magic rarity and irreversible commitment; genuine mundane alternatives; Mirage/live-world separation; multi-seed causal richness without scripted quotas; bounded per-person Agency and persistence; and a playable interface exposing legitimate opportunities without omniscience.
 
 **Relationship to current architecture:** Extend existing Agency, goal/memory, information, profession, event, identity, magic, economy, institutional, provenance and persistence mechanisms. Do not introduce parallel story, player-NPC, historical artifact, AI companion, loot or world-truth registries where existing primitives can be extended. This design update makes **no claim** that these proposed systems are already implemented, nor does it approve changes to the in-progress Stage 0.5 closeout branch.
+
+## 53. Product scale decision: Game 1 is one deeply lived kingdom
+
+**Adopted scope direction (2026-10-11):** Build and finish **Game 1 as one geographically coherent, deeply simulated kingdom or kingdom-scale region supporting approximately 1,500 living people at a time**. This is not a temporary fake map, a mandatory tutorial, a single-city quest hub, or an unfinished fragment of a promised continent-spanning game. It is the proposed **complete setting for the first finished, polished, independently released game**. The broader multi-kingdom/civilization ambition remains valuable, but Game 1's release must not depend on already supporting millions of simultaneous people.
+
+The same kingdom can support a development vertical slice, then a public-facing demo, then a complete Game 1:
+
+- **Development vertical slice:** Prove a genuinely playable and visually realized portion of the real kingdom, including ordinary life, travel, danger, professions, magic where available, relationships, character inhabitation/release, and persistent consequences. Scope small enough to implement and measure. It is a proof of integration, not the finished game.
+- **Public demo:** A representative, engaging segment of the actual game that demonstrates its central promise without inventing fake quests, simulated cinematic history, or systems that disappear in the release. Demo extent, starting conditions and accessibility remain to design.
+- **Finished Game 1:** The connected kingdom with sufficient geographic, social, professional, ecological, magical, historical and gameplay breadth to stand alone as a substantial RPG. Multiple lives and play styles are genuinely supported; it should not feel like a prototype waiting for a second game to become complete.
+
+The kingdom's boundaries, travel times, geographic footprint, political structure, number of settlements and starting historical age will be determined by world generation, design/testing and playable realization—not fixed by this section. A plausible mixture might include a principal market town, agricultural communities, smaller villages/hamlets, working sites, wilderness, routes and ruins; this is a **possibility**, not a prescribed generated map or settlement quota. Concentrate population and meaningful interactions enough for an inhabited society. Do not stretch roughly 1,500 people across many empty continents to claim map size.
+
+**Approximately 1,500 is an observed current scale and a practical initial performance/design target, not an immutable population law.** Birth, death, disease, migration, settlement growth and loss remain causal. Do not stop births or manufacture deaths when a population counter reaches an exact target. The actual supported operating range, seed distributions and upper acceptable performance bounds are to be established with evidence. Test whether such a society can sustain enough food, labor, trade, family continuity, specialization, ranks, defense, institutions and meaningful player opportunities without implausible occupational staffing. Do not fabricate a huge metropolis or empire inside a population that cannot maintain it.
+
+The full standard set of Game 1 design promises still applies at this smaller scope: autonomous individual lives, player-controlled and released people, six-or-more created-life design target, optional mundane and magical paths, Essence acquisition, Mirage experimentation, combat, professions, families, institutions, real deaths, long history, causal environments, and consequences. Narrower geography does **not** authorize a shallow simulation.
+
+### Small-population conflict and historical weight
+
+At this scale, small groups can matter profoundly. Conflict may consist of a feud, a robbery, threatened violence, a raid involving a handful of people, a skirmish among settlement defenders, or a prolonged series of retaliations and truces. There need not be a single pitched battle for a warlike relationship to exist.
+
+A battle with **100–200 total participants** is a conceivable **exceptional** local engagement, not a required or default size: at 1,500 total living people it involves approximately 7–13% of the entire world's current population, before accounting for children, elders, noncombatants, distance, loyalty, ability, injuries and logistical commitments. The actual scale emerges from who is available and who can be recruited, supplied, persuaded or compelled. Never conjure an army of thousands to make a cinematic scene, or treat every polity as capable of standing battalions.
+
+Consequences must propagate beyond casualty counts: fewer workers and caregivers; damaged farms and trade; widowhood, succession and inheritance; interrupted learning, teaching and professions; food shortages; refugees; trauma, injury and recovery; inter-family grievances; shifts in legitimacy; and alliances or institutions that may endure for generations. A 15-person raid may have more historical consequence than a larger battle if particular participants and dependencies make it so.
+
+Ranked magic changes military capability without removing the need for physical logistics, situated information, relationships, recruitment, organizational competence or exposure to actual countermeasures. A few powerful people might deter a war, destabilize an institution or make a coalition possible. They do not create extra population for free. Rare **cosmic or existential threats** may plausibly motivate extraordinary alliances and mobilization, but no threat is required to trigger scripted climaxes, and no emergency creates nonexistent soldiers or unsupported magical resources.
+
+### Game 2 or later: expansion, not a debt Game 1 must repay
+
+**Larger and fundamentally different population scales may belong to a later game or a future architecture generation**, particularly if better tooling or a more advanced simulation approach is necessary. Multi-kingdom politics, very large armies, continent-spanning supply systems, empires and millions of living people are **future ambitions, not Game 1 release requirements**. This is a scope boundary, not a cancellation or a promise of a particular sequel.
+
+Preserve extensible IDs, world truth, causal semantics, bounded history access and versioned persistence where reasonable; do not force today's team to build a million-person runtime before delivering the 1,500-person kingdom. Game 1 must stand alone. Later technical work can expand it or inform a successor without retroactively making the original product incomplete.
+
+## 54. Human and civilizational causality: research into why people and groups act
+
+**Research direction, not a claim of completed scientific validation.** To make unscripted love, leadership, innovation, cooperation, greatness, conflict, peace and war possible, ATE must investigate the underlying causes of those outcomes. Do **not** start from lists of compelling stories and then reverse-engineer NPC behavior to guarantee them.
+
+Study human history and relevant empirical/theoretical work across individual psychology, social psychology, anthropology, political science, economic history, ecology, institutional economics, collective action, military history and disaster studies. Separate established evidence, contested theories, useful modeling approximations and fantasy-specific rules. Historical cases should inform *mechanisms*, not become plot templates or universal claims about human nature.
+
+### Individual development: greatness is not a hidden stat
+
+Distinguish **character and ethics**, **developed competence**, **social recognition**, and **historical consequence**. Exceptional influence may arise through an interaction of temperament, goals, sustained practice, opportunity, health, knowledge, environment, upbringing, mentors, social access, institutions, timing, luck and earlier consequences. No universal innate hero/villain/greatness score. Do not assume famous equals good or ordinary equals insignificant. A well-prepared farmer may save a community; an extraordinary fighter may leave only destruction; a capable scholar may go unrecognized because access was denied.
+
+Build individual trajectories as feedback loops: experience changes memory, belief, skill, trust, resources, health, obligations and future opportunity. A person's choices must remain situated, uncertain, and changeable. Investigate the conditions that enable or block excellence, including ordinary failure, stable competence, unfair advantage, mentorship and cooperation.
+
+### Group formation and durable coordination
+
+Study how kin groups, crews, adventuring parties, households, workshops, guilds and settlements coordinate: shared purposes, complementary skills, trust, reciprocity, leadership, conflict resolution, collective knowledge, norms, institutions, training, access to resources and credible commitments. A group is not merely the sum of individual capability scores, but neither should it receive a free mystical teamwork bonus.
+
+Group effectiveness should arise from what members actually know about one another, what routines and commitments they share, and what relationships and institutions persist. A party assembled through adventures may become extremely capable, fragment, or continue after its leader dies. Ordinary communities must have the same causal access to collective competence as player-associated groups.
+
+### Conflict and war: explain causes and constraints
+
+A conflict need not be driven by innate aggression, arbitrary faction hostility or an abstract war-frequency timer. Investigate interacting causes such as conflicting claims or interests, resources, unequal political access, leadership incentives, fear, inaccurate intelligence, grievances, social bonds, breakdown of negotiation, uncertainty about opponents, credibility of agreements and changing balances of power.
+
+Also simulate the practical *capacity* for organized violence: willing or coerced participants, hierarchy, equipment, transport, food, money, communication, local support, terrain, rank asymmetry and the opportunity cost of removing people from ordinary life. Incentives and fears can produce a failed negotiation even when peace might be materially better; institutions, credible agreements, interdependence and trusted relationships can also prevent war. **The same pressure must be capable of producing cooperation, migration, adaptation or conflict depending on circumstances.**
+
+Do not hard-code any fantasy race, ancestry, religion or cultural group as inherently warlike, cowardly, peaceful or destined to rule. Peoples, institutions and beliefs have history and internal diversity. Avoid false universal rules such as "drought causes war" or "trade guarantees peace."
+
+### Environment is a pressure; vulnerability and response make the consequences
+
+Climate, flood, drought, fire, disease, ecological change, monster activity and other hazards operate through actual systems, not narrative disaster schedules. The harm from the same physical event depends on settlement placement, food stocks, health, housing, infrastructure, transport, prior preparation, warning, resources, governance, trust, magic, and people's choices.
+
+A drought can produce cooperation, altered crop choices, rationing, hardship, migration, banditry or political conflict. Every outcome should be traceable through real states and actions, not a disaster-to-plot lookup table. Investigate especially the social and economic mechanisms that make an event survivable in one community and catastrophic in another.
+
+### Research outputs and experimental method
+
+Prepare a **separate, evidence-grounded Human and Civilizational Causality research record** when the research work begins. Record for each proposed mechanism: the question, source/case, competing explanations, confidence and limitations, candidate world variables, causal process, required domain system, observable consequences, counterexamples, and expected computational cost. Promote findings into design authority only after scrutiny; this section is the research mandate, not proof all models are correct.
+
+Test competing initial conditions using reproducible seed pairs and controlled counterfactuals. Useful questions include:
+
+- Why did one talented person flourish and another lose access to training or opportunity?
+- How did a particular group become coordinated, and what happened after a trusted leader left or died?
+- Why did one water dispute end in negotiation while another escalated to raids?
+- How did real farming, business preparedness, equipment or local trust change survival under hardship?
+- What caused a kingdom to develop a school, establish a guild, lose specialist knowledge, or recover after a disaster?
+- Which meaningful histories became accessible to a chef, merchant, scholar, parent or adventurer through legitimate information routes?
+- When a seed experiences a long peaceful period, what institutions and incentives maintained it? When a seed stagnates, which causal opportunities were absent?
+
+Do not require a war, spectacular romance, legendary leader or catastrophe in each seed. Seek credible, varied causal histories and meaningful gameplay; investigate stagnation without injecting scripted drama.
+
+The results must eventually become **specific, bounded engineering hypotheses** for Agency and other existing systems: what facts are represented, when decisions occur, how resources constrain attempts, how group/institution processes resolve, how events persist, how subjective knowledge travels, and how simulation quality is measured over long timelines. Defer detailed implementations and tuning until Stage 0.5 closeout and subsequent authorized simulation development. Research does not require modifying persistence or implementing Stage 1 prematurely.
+
+## 55. Population scale and simulation fidelity are separate engineering budgets
+
+Stage 0.5 is primarily a **persistence, identity, history, retrieval, recovery and bounded-storage architecture investment**, not proof that millions of simultaneously living people can think, work, socialize and fight with full detail.
+
+Distinguish at least three workloads:
+
+1. **Historical scale:** Many distinct people, events, relationships, items and institutions recorded across centuries, most no longer actively living.
+2. **Concurrent living population:** People whose biographies and material circumstances continue to evolve during the same world-time interval.
+3. **Immediate high-resolution play:** Nearby actions, physics, combat, dialogue, animated characters, detailed spaces and precise reactions actually being experienced.
+
+Do not infer one capacity from another. Paired 1,000/10,000 archived-history or page-backing tests establish properties of the tested history operations, **not** the ability to simulate 10,000 living agents. The historical roughly 1,300–1,500 living-person millennium workload is useful evidence for existing versions, not a promise of a million living people or a certified Game 1 performance envelope.
+
+For a future larger population, explore legitimate variable-resolution and event-driven processing without granting distant people a different fictional physics. Active local people may require high-resolution interactions; regional people may update around obligations and consequential events; distant people may use coarser but still causally constrained schedules. **Less frequent computation must not mean fabricating accomplishments, learning, resources or changed relationships when the player returns.** Truth, knowledge, persistent identity, inventories, resource constraints and consequences remain authoritative at every resolution.
+
+Measure separate budgets for storage, retained history, memory, CPU per simulated year, rendered-frame cost, local active people, number of interacting relationships, event volume, family growth, professional specialization, magical-rank ecology and extreme disasters. Test high and low population seeds, demographic variation and long-horizon sustainability—not only the mean headcount. Never use artificial population deaths, frozen offscreen lives or secret resource injection to hide performance defects.
+
+**Game 1 acceptance focus:** a polished kingdom-scale 1,500-ish concurrent population with robust variation, sustainable historical change and richly playable lives on realistic target hardware. **Future scalability focus:** preserve architecture options for larger games without consuming Game 1's delivery budget to prove million-agent runtime today.
+
+## 56. Scope decision register (Sections 53–55)
+
+**Adopted:**
+- Game 1 is a **complete, satisfying single-kingdom/kingdom-scale living RPG**, not a prelude that requires another title to become whole.
+- Plan around approximately **1,500 simultaneous living people initially**, not 1,500 total people across all history; do not enforce a hard birth/death cap. Final acceptable population/performance range is evidence-dependent.
+- Build an actual integrated playable vertical slice, then a credible public demo, then finish the connected kingdom as Game 1.
+- Natural conflict at this scale is likely often personal or small-group; 100–200 total combatants is an **exceptional conceivable** event, never a forced quota. Cosmic threats may produce extraordinary mobilization but no artificial armies.
+- Research individual/group/civilizational motives, cooperation, hardship, war prevention and conflict escalation to inform **causal mechanics**, not a story generator.
+- Preserve deeper simulated personhood and meaningful consequences at the smaller geographical scale.
+- Larger civilizations, armies, continents and potentially millions of living agents may belong to a future game/architecture; they are not dependencies of Game 1 or claims made about completed Stage 0.5.
+
+**Open until tested/designed:** exact kingdom geography and settlement count; economically viable profession/rank/ecology distribution; demographic and simulated population limits; age and scope of generated prehistory; precise combat formations and recruitment; actual hardware budgets; what the public demo exposes; future sequel/expansion structure; and the evidence-supported causal rules derived from research.
+
+**Do not infer implemented status** from a design section. No change here approves new Stage 0.5 scope, PR merge, million-person optimization work, population balancing or simulation-rule changes without explicit development authorization.
