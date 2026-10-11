@@ -1,5 +1,49 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: readonly histories and native recursive Event snapshots (October11 UTC)
+
+Source local `56fbe32670a1f18e2e2a4e128cde4aeef74bd91f`, public
+`7a0d700e8cab80100226938fe326183c362e5fa4`, exact matching tree
+`90773efffcaf127a49d132fdc9821befbfd90b42`; leased non-force update succeeded.
+Closed frozen-list/map roles reuse existing list pages/map entries with exact
+readonly descriptor/reference/dependency roles. Portable materialization returns
+native FrozenList/FrozenDict. No second registry, serializer or publisher.
+
+Native recursive Events now admit/save/reopen with native class, sharing and
+absent/false/true seal metadata. Sealing preserves the native container snapshot
+copy behavior and mutable record child behavior. Snapshot views reject mutation
+before consuming caller inputs. Pickled snapshots contain standalone native
+values. Held old mutable containers retain private edits independently.
+
+Affected gate **236 passed in122.01s**, final focused **44 passed in4.09s**;
+zero failures/errors, overlapping counts. Production source matches both gates;
+the second covers extra old-pin/readonly retirement/legacy role tests added after
+the first. Complete case properties, source hashes and scope are retained in
+`stage_0_5_recursive_event_snapshot_validation.json`.
+
+Event header edit/save/no-op at H1k/H10k has exactly **115 reads,4 writes,
+778 metadata rows** each; Event archive reads and global registry inventory are
+forbidden by the probe. Existing native-record work stays120/4/793.
+Old-pin readonly point reads have fixed paired payload work. Frozen backings
+complete existing bounded retirement scopes; legacy jobs cannot claim new roles.
+
+Sealing exposed synchronized unpublished old-child routes whose payload was
+omitted after replacement. Cancel only unowned new D routes and cascade outgoing
+D edges; held private graph revival retains its exact incarnation/values.
+Uncached Event descendants during detach also exposed a mutation-only discovery
+guard; read-only discovery validates its pin and permits staging while public
+mutation remains blocked. Recovery probes use the existing resolve_save API.
+
+**Scope boundary:** Existing World-log Events with eager TrackedDict children
+still need explicit conversion. Admission rejects atomically rather than copying
+and splitting held aliases. New readonly roles do not prove deep immutability;
+P3B sealed segments still require their native immutable value contract. Complete
+sealed tail/segment integration, special root collection imports, actual schema
+and byte closure, persisted promotion, exotic equality, capability6 ordinary
+open/source copy, integrated bounds/P5, the one final full suite and independent
+review remain pending. P5 and PR14 are unchanged. No Stage1, gameplay, new
+endurance, merge or complete-format acceptance claim.
+
 ## Latest checkpoint: native recursive records in the existing publisher (October11 UTC)
 
 Published source local `6ce93958f6748c1256f5be947041014bfa137401`, public
