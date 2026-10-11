@@ -280,15 +280,24 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
             return
         if isinstance(index, slice):
             raw_values = tuple(value)
-            if self._recursive_runtime is not None:
-                for item in raw_values:
-                    self._recursive_runtime.validate_native(item)
+            # __index__ can mutate the incoming native graph. Finish caller
+            # callbacks before certifying that graph for its checked build.
             start, stop, step = index.indices(self._length)
+            if self._recursive_runtime is not None:
+                self._recursive_runtime.validate_native_batch(raw_values, self._value_validator)
             if step != 1 and len(raw_values) != len(range(start, stop, step)):
                 raise ValueError(f'attempt to assign sequence of size {len(raw_values)} to extended slice of size {len(range(start, stop, step))}')
+            if self._recursive_runtime is not None:
+                raw_values = self._recursive_runtime._admit_validated_batch(raw_values)
             value = [self._validate(item) for item in raw_values]
             values = list(self)
-            values[index] = value
+            if step == 1:
+                values[start:stop] = value
+            else:
+                # Reusing the caller slice would invoke __index__ twice. A
+                # normalized negative stop also cannot be resliced verbatim.
+                for position, item in zip(range(start, stop, step), value):
+                    values[position] = item
             self._replace_all(values)
         else:
             index = self._normalize(index)

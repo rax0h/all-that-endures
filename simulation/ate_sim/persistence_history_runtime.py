@@ -101,6 +101,23 @@ class RecursiveHistoryRuntime:
         self.validate_native(value)
         return self._initial_validated_values(kind, value)
 
+    def validate_native_batch(self, values, validator=None):
+        """Check a finite operation's actual input once, before any allocation."""
+        if type(values) not in (list, tuple):
+            raise TypeError('recursive batch preflight requires finite builtin input')
+        self.session()._ensure_people_mutation_allowed()
+        completed = {}
+        for value in values:
+            self.validate_native(value, completed=completed)
+        if validator is not None:
+            for value in values:
+                validator(value)
+
+    def _admit_validated_batch(self, values):
+        # Only finite, preflighted public operations use this builder. There is
+        # no callback/yield or retained validation memo between check and build.
+        return tuple(self._admit_validated(value) for value in values)
+
     def _initial_validated_values(self, kind, value):
         if kind == 'map':
             return {key: self._admit_validated(child) for key, child in value.items()}

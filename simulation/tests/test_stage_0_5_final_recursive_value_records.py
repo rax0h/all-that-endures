@@ -169,3 +169,146 @@ def test_completed_native_validation_is_not_reused_after_caller_changes_source(t
         assert session.skills[1, 'craft'].provenance is root
         assert session._registry.next_incarnation == before
         assert session.save() == session.pin.captured_head
+
+
+@pytest.mark.parametrize('operation', ['list_slice', 'counted_slice', 'counted_extend'])
+def test_finite_recursive_batches_validate_shared_record_child_once(tmp_path, record_property, operation):
+    from simulation.tests.test_stage_0_5_final_world_unpublished_promotion import counted_catalog
+    target = converted_catalog(tmp_path) if operation == 'list_slice' else counted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        session.skills[1, 'craft'].provenance = [1]
+        root = session.skills[1, 'craft'].provenance
+        if operation != 'list_slice':
+            session.world.households[1].members = root
+            session.world.households[1].members = [1]
+        session.save()
+        scalar = 999992
+        shared = [scalar, Ref('person', 7), Layer.SOCIETY]
+        visits = []
+        encode = session.store.codec.encode
+        def measured(value):
+            if type(value) is int and value == scalar:
+                visits.append(value)
+            return encode(value)
+        session.store.codec.encode = measured
+        if operation == 'counted_extend':
+            root.extend([shared] * 48)
+        else:
+            root[:] = [shared] * 48
+        assert root[-1] is root[-2]
+        assert len(visits) <= 8
+        record_property('batch_operation', operation)
+        record_property('sharing_placements', 48)
+        record_property('incoming_scalar_codec_visits', len(visits))
+        session.save()
+        assert list(root[-1]) == shared
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        root = session.skills[1, 'craft'].provenance
+        assert root[-1] is root[-2]
+        assert root[-1][1] == Ref('person', 7)
+
+
+@pytest.mark.parametrize('operation', ['list_slice', 'counted_slice', 'counted_extend'])
+def test_finite_batch_rechecks_caller_sources_after_prior_admission(tmp_path, operation):
+    from simulation.tests.test_stage_0_5_final_world_unpublished_promotion import counted_catalog
+    target = converted_catalog(tmp_path) if operation == 'list_slice' else counted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        session.skills[1, 'craft'].provenance = [1]
+        root = session.skills[1, 'craft'].provenance
+        if operation != 'list_slice':
+            session.world.households[1].members = root
+            session.world.households[1].members = [1]
+        source = [Ref('person', 7)]
+        root.append(source)
+        session.save()
+        before = session._registry.next_incarnation
+        old_child = root[-1]
+        source.append(object())
+        with pytest.raises(TypeError):
+            if operation == 'counted_extend':
+                root.extend([source] * 4)
+            else:
+                root[:] = [source] * 4
+        assert root[-1] is old_child and list(root[-1]) == [Ref('person', 7)]
+        assert session._registry.next_incarnation == before
+        assert session.save() == session.pin.captured_head
+
+
+@pytest.mark.parametrize('kind', ['list', 'sequence'])
+def test_slice_index_callback_finishes_before_native_batch_preflight(tmp_path, kind):
+    from simulation.tests.test_stage_0_5_final_world_unpublished_promotion import counted_catalog
+    target = converted_catalog(tmp_path) if kind == 'list' else counted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        session.skills[1, 'craft'].provenance = [1]
+        root = session.skills[1, 'craft'].provenance
+        if kind == 'sequence':
+            session.world.households[1].members = root
+            session.world.households[1].members = [1]
+        session.save()
+        later = [Ref('person', 7)]
+        calls = []
+        class Start:
+            def __index__(self):
+                calls.append('index')
+                later.append(object())
+                return 0
+        before = session._registry.next_incarnation
+        with pytest.raises(TypeError):
+            root[Start():] = [[4], later]
+        assert calls == ['index']
+        assert list(root) == [1]
+        assert session._registry.next_incarnation == before
+        assert not session._nested_dirty
+        assert session.save() == session.pin.captured_head
+
+
+def test_recursive_list_slice_invokes_index_callback_once_like_native_list(tmp_path):
+    target = converted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        session.skills[1, 'craft'].provenance = [1]
+        root = session.skills[1, 'craft'].provenance
+        shared = [Ref('person', 7)]
+        calls = []
+        class Start:
+            def __index__(self):
+                calls.append('index')
+                shared.append(Ref('person', 8))
+                return 0
+        root[Start():] = [shared]
+        assert calls == ['index']
+        assert list(root[0]) == [Ref('person', 7), Ref('person', 8)]
+        session.save()
+
+
+@pytest.mark.parametrize('selection,replacements', [
+    (slice(None, None, -1), 6),
+    (slice(5, None, -2), 3),
+    (slice(1, 5, 2), 2),
+    (slice(4, 2), 2),
+    (slice(-99, 99), 2),
+])
+def test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child(tmp_path, selection, replacements):
+    target = converted_catalog(tmp_path)
+    shared = [Ref('person', 7), Layer.SOCIETY]
+    native = list(range(6))
+    native[selection] = [shared] * replacements
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        session.skills[1, 'craft'].provenance = list(range(6))
+        root = session.skills[1, 'craft'].provenance
+        root[selection] = [shared] * replacements
+        assert root.materialize() == native
+        children = [item for item in root if type(item) is not int]
+        assert all(child is children[0] for child in children)
+        session.save()
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        root = session.skills[1, 'craft'].provenance
+        assert root.materialize() == native
+        children = [item for item in root if type(item) is not int]
+        assert all(child is children[0] for child in children)

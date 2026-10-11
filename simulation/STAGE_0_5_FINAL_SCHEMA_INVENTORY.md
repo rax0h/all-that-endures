@@ -8,7 +8,9 @@ must be recursively immutable and its state exactly kind/id. Foreign frozen
 classes/enums and mutable record payloads remain excluded. This does not replace
 the pending mutable-record representations below. Evidence:
 `stage_0_5_recursive_value_record_validation.json` (16 focused, 288 affected;
-overlapping counts).
+overlapping counts). Finite admission/callback follow-up now covers30 permanent
+value/admission cases within302 affected cases; see
+`stage_0_5_recursive_finite_batch_validation.json`.
 
 | Record.field | Classification | Growth writer / guard | Actual bound | Representation |
 |---|---|---|---|---|

@@ -1,5 +1,43 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: finite recursive batch preflight and slice callbacks (October 11 UTC)
+
+Continued from public `21d98070a298e4997acc78784b6f271aaddccab7`, local
+`fe4db7fa1020914eee0f81745f6d257c8dbe396b`, matching tree
+`d962735dea15f94a4c9c5e4fc4b8f0e8ac7c112a`.
+
+Append-list slice replacement, counted slice replacement and finite builtin
+list/tuple counted extension now preflight each unique native input subtree
+once. Builders use that checked graph without repeating deep validation for
+every shared placement. A temporary map retains actual sources through preflight;
+no check result survives a public operation. Finite owner-policy checks and
+extended-slice shape checks precede admission. The existing generator/streamed
+extension behavior is unchanged.
+
+**Ruling: callbacks precede finite input certification.** Slice `__index__`
+callbacks can alter incoming native children. Complete bounds callbacks before
+preflight; an invalid later child then rejects before allocating an earlier valid
+child. The append-list path previously invoked slice callbacks twice by applying
+the original slice to its native work list. It now uses normalized positions,
+including explicit negative-step assignment, so the caller callback executes
+once and negative-stop normalization preserves native order.
+
+Three48-placement shared-child probes each dropped from **97 to2 scalar codec
+checks**. Permanent value/admission cases now total30. Current-source affected
+gate: **302 passed in116.19s**, exit0, no failures/errors. Focused and compatibility
+gate: **83 passed in15.22s**. These counts overlap. Existing paired H1k/H10k
+recursive routing remains104 reads,10 writes and738 metadata rows at each scale.
+Evidence with exact commands, cases/properties and all source/test hashes:
+`stage_0_5_recursive_finite_batch_validation.json`. Earlier value-record evidence
+remains tied to its own source checkpoint.
+
+This closes the tested finite-admission cost/callback gaps, not Stage0.5. The
+major remaining blocks are unchanged: mutable registered-record closure,
+persisted append/count-tree promotion, exotic exact equality, complete capability6
+ordinary open/source-preserving upgrade, integrated bounds/P5/final suite and
+fresh independent review. PR14 reverified draft/open/unmerged at
+`c29e3d06a0c9d219235e2b3f0390271bd1245aea`; no new endurance or acceptance.
+
 ## Latest checkpoint: concrete recursive value records and unique native input (October 11 UTC)
 
 Continued from public `baf594c4c32b864713797e6f09e19c4840acf6d0`, local

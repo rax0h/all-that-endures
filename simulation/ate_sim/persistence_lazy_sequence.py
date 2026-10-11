@@ -539,8 +539,8 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
             if self._recursive_runtime is not None and type(values) in (list, tuple):
                 # Finite inputs have no iteration callbacks. Reject an invalid
                 # later member before allocating any earlier native child.
-                for value in values:
-                    self._recursive_runtime.validate_native(value)
+                self._recursive_runtime.validate_native_batch(values, self._value_validator)
+                values = self._recursive_runtime._admit_validated_batch(values)
             iterator = iter(values)
             while True:
                 try:
@@ -654,13 +654,16 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
                 self._assign(rank, self._validate(value))
                 return
             raw_values = tuple(value)
-            if self._recursive_runtime is not None:
-                for item in raw_values:
-                    self._recursive_runtime.validate_native(item)
+            # Slice bounds may invoke caller __index__ and alter raw children.
+            # Preflight must describe the graph after those callbacks finish.
             start, stop, step = index.indices(self._length)
             positions = range(start, stop, step)
+            if self._recursive_runtime is not None:
+                self._recursive_runtime.validate_native_batch(raw_values, self._value_validator)
             if step != 1 and len(raw_values) != len(positions):
                 raise ValueError(f'attempt to assign sequence of size {len(raw_values)} to extended slice of size {len(positions)}')
+            if self._recursive_runtime is not None:
+                raw_values = self._recursive_runtime._admit_validated_batch(raw_values)
             values = tuple(self._validate(v) for v in raw_values)
             if step != 1:
                 for rank, item in zip(positions, values):
