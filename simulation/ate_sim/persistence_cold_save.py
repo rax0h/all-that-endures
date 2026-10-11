@@ -509,7 +509,8 @@ def prepare_cold_save(session, *, force=False, token=None):
         if namespace != "world.events" or key < D1:
             continue
         event = _storage_event(log, key, decoded_chunks)
-        _validate_suffix_event(event, key)
+        _validate_suffix_event(event, key,
+            snapshot_authority=getattr(session, "_snapshot_authority", None))
         if event.year != _indexed_suffix_year(log, key):
             raise StoreIntegrityError(
                 "dirty cold Event year disagrees with EventLog year index"

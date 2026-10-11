@@ -39,6 +39,24 @@ def iter_mutable_event_owners(log):
         )
 
 
+def is_sealed_snapshot_owner(event):
+    from .core import Event
+    from .persistence_lazy_nested_history import HISTORY_CLASSES, reference
+    return (type(event) is Event and vars(event).get('_sealed') is True
+            and (type(event.data) is HISTORY_CLASSES['frozen-map']
+                 or (reference(event.data) and event.data.kind == 'frozen-map')))
+
+
+def iter_sealed_snapshot_owners(log):
+    """Only resident tail snapshot custody; no mutable Event root identity."""
+    log._ensure_backend_readable()
+    first = log._disk_count + len(log._chunks) * log.chunk_size
+    for offset, event in enumerate(log._tail):
+        if is_sealed_snapshot_owner(event):
+            index = first + offset
+            yield ('world.events', index), event, (('field', 'events'), ('index', index))
+
+
 class IdentityOccurrenceIndex:
     def __init__(
         self, codec, record_fields, *, mutable_event_tail_only=False

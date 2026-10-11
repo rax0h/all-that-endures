@@ -3249,6 +3249,7 @@ def _initialize_eager_tracker(
     tracker._foreign_child_types = (LazySoulTrackedList, LazySoulTrackedSet)
     tracker._prepare_event_ids = session._prepare_event_id_facade
     tracker._external_event_id_changed = session._event_id_facade_changed
+    tracker._snapshot_authority = session._snapshot_authority
     if 'world.households' in session._scalar_tables:
         tracker._prepare_record_child = session._prepare_counted_record_child
     try:
@@ -10921,6 +10922,7 @@ class LazyWorldSession:
         bridge = WorldIdentityBridge(self)
         dependencies = BackingDependencyPool(self.store, self.pin)
         for proxy in tuple(self._nested_lists.values()):
+            self._recursive_histories.bind(proxy)
             dependencies.acquire(proxy)
         self._identity_bridge = bridge
         self._identity_coordinator = bridge.coordinator
@@ -12346,6 +12348,10 @@ class LazyWorldSession:
             self._nested_dirty[incarnation.value] = backing
         return incarnation
 
+    def _snapshot_authority(self, value):
+        runtime = getattr(self, "_recursive_histories", None)
+        return runtime is not None and runtime.sealed_snapshot_authority(value)
+
     def _eager_nested_owners(self):
         # Eager headers already undergo bootstrap traversal. Compact history
         # references are leaves; no history page is visited by this pass.
@@ -12357,6 +12363,8 @@ class LazyWorldSession:
                 continue
             if namespace == 'world.events':
                 yield from iter_mutable_event_owners(self.world.events)
+                from .persistence_identity import iter_sealed_snapshot_owners
+                yield from iter_sealed_snapshot_owners(self.world.events)
                 continue
             collection = _at_path(self.world, _namespace_path(namespace))
             if isinstance(collection, (LazyRecordTable, LazyLineageChildrenTable)):
@@ -12443,9 +12451,9 @@ class LazyWorldSession:
 
     def _eager_nested_owner_value(self, owner):
         if owner[0] == 'world.events':
-            for candidate, value, _path in iter_mutable_event_owners(self.world.events):
-                if candidate == owner:
-                    return value
+            value = self._eager_tracker._owner_value(owner, include_sealed_snapshot=True)
+            if value is not None:
+                return value
             raise KeyError(owner)
         return _relative_get(self.world, _owner_path(self.manifest, owner))
 
@@ -17985,7 +17993,7 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
 
             prefix = SealedEventPrefix.from_active_read_transaction(store)
             suffix = _read_suffix(
-                store, tail_descriptor, prefix_descriptor
+                store, tail_descriptor, prefix_descriptor, captured_generation=head.generation
             )
             log = EventLog.from_disk_prefix(
                 prefix,

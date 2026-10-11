@@ -120,6 +120,9 @@ def verify_type_witnesses(store, pin):
             base_kind = kind.removeprefix('frozen-') if type(kind) is str else kind
             if base_kind not in KINDS or kind not in HISTORY_CLASSES:
                 raise StoreIntegrityError('history type witness has unknown backing kind')
+            if kind in ("frozen-map", "frozen-list"):
+                from .persistence_frozen_snapshots import checked_frozen_descriptor
+                checked_frozen_descriptor(descriptor, kind=kind)
             # Partly reclaimed trees are deliberately no longer readable at
             # the current generation. Their checked queue retains the descriptor.
             if store.contains_lazy_key(pin, RETIREMENT, incarnation):
@@ -143,6 +146,9 @@ def verify_type_witnesses(store, pin):
                     continue
             history = HISTORY_CLASSES[kind](store, pin, incarnation, checked_types=True, recursive=True)
             history._member_types.verify_values(history)
+            if kind in ("frozen-map", "frozen-list"):
+                from .persistence_frozen_snapshots import verify_frozen_certification
+                verify_frozen_certification(history)
     if descriptors != witnesses:
         raise StoreIntegrityError('history type witness inventory is incomplete or extra')
     return len(witnesses)

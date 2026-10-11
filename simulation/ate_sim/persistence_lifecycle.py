@@ -48,7 +48,8 @@ def verify_history(session):
             if len(chunk) != CHUNK_SIZE:
                 raise StoreIntegrityError("pending cold EventLog chunk has wrong size")
             for event in chunk:
-                _validate_suffix_event(event, expected_index)
+                _validate_suffix_event(event, expected_index,
+                snapshot_authority=getattr(session, "_snapshot_authority", None))
                 if event.__dict__.get("_sealed") is not True:
                     raise StoreIntegrityError(
                         "pending cold EventLog event is not sealed"
@@ -63,7 +64,8 @@ def verify_history(session):
                 inspected += 1
 
         for event in log._tail:
-            _validate_suffix_event(event, expected_index)
+            _validate_suffix_event(event, expected_index,
+                snapshot_authority=getattr(session, "_snapshot_authority", None))
             if previous_year is not None and event.year < previous_year:
                 raise StoreIntegrityError(
                     "cold EventLog tail chronology violation"
@@ -117,7 +119,8 @@ def _standalone_log(old_log, session):
 
     def inspect(event, *, require_sealed):
         nonlocal expected_id, previous_year, absolute
-        _validate_suffix_event(event, absolute)
+        _validate_suffix_event(event, absolute,
+            snapshot_authority=getattr(session, "_snapshot_authority", None))
         if event.id != expected_id:
             raise StoreIntegrityError("detach event ID discontinuity")
         if previous_year is not None and event.year < previous_year:

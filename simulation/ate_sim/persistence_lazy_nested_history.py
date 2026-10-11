@@ -168,6 +168,10 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
     def _descriptor_kind(self):
         return self._kind
 
+    def _descriptor(self, count, next_ordinal):
+        value = (self._descriptor_kind, count, next_ordinal)
+        return value + (self._deep_immutable,) if self._descriptor_kind.startswith('frozen-') else value
+
     def __init__(self, store, pin, incarnation, *, guard=None, changed=None,
                  initial_values=None, cache_budget=None, checked_types=None, recursive=False):
         if type(incarnation) is not int or incarnation <= 0:
@@ -192,11 +196,15 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
                 self._append(self._validate(value))
         else:
             value = checked_value(store, pin, DESCRIPTOR_NAMESPACE, incarnation)
-            if (type(value) is not tuple or len(value) != 3 or value[0] != self._descriptor_kind
+            frozen = self._descriptor_kind.startswith('frozen-')
+            if (type(value) is not tuple or len(value) != (4 if frozen else 3) or value[0] != self._descriptor_kind
+                    or (frozen and type(value[3]) is not bool)
                     or type(value[1]) is not int or value[1] < 0
                     or type(value[2]) is not int or value[2] != value[1]):
                 raise StoreIntegrityError('invalid nested list descriptor')
             self._length = self._base_length = value[1]
+            if frozen:
+                self._deep_immutable = value[3]
             checked_list_extent(store, pin, incarnation, self._length)
         self._member_types.check_length(self._length)
 
@@ -492,7 +500,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         self._ensure()
         out = list(self._member_types.pending_changes(self._length))
         if self._new or self._length != self._base_length:
-            out.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, (self._descriptor_kind, self._length, self._length), record_schema=RECORD_SCHEMA))
+            out.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, self._descriptor(self._length, self._length), record_schema=RECORD_SCHEMA))
         for number, page in sorted(self._dirty_pages.items()):
             key = (self._incarnation, number)
             if number * PAGE_SIZE >= self._length:
@@ -637,6 +645,8 @@ class _ScalarHistory(CleanCacheOwner):
     def _descriptor_kind(self):
         return self._kind
 
+    _descriptor = LazyHistoryList._descriptor
+
     def __init__(self, store, pin, incarnation, *, initial_values=None, cache_budget=None, checked_types=None, recursive=False):
         if type(incarnation) is not int or incarnation <= 0:
             raise ValueError('invalid nested history incarnation')
@@ -658,11 +668,15 @@ class _ScalarHistory(CleanCacheOwner):
                 self._set(key, value)
         else:
             value = checked_value(store, pin, DESCRIPTOR_NAMESPACE, incarnation)
-            if (type(value) is not tuple or len(value) != 3 or value[0] != self._descriptor_kind
+            frozen = self._descriptor_kind.startswith('frozen-')
+            if (type(value) is not tuple or len(value) != (4 if frozen else 3) or value[0] != self._descriptor_kind
+                    or (frozen and type(value[3]) is not bool)
                     or type(value[1]) is not int or value[1] < 0 or type(value[2]) is not int
                     or value[2] < value[1]):
                 raise StoreIntegrityError('invalid nested scalar descriptor')
-            _, self._count, self._next_ordinal = value
+            _, self._count, self._next_ordinal = value[:3]
+            if frozen:
+                self._deep_immutable = value[3]
             self._base_count, self._base_next = self._count, self._next_ordinal
         self._member_types.check_length(self._count)
 
@@ -808,7 +822,7 @@ class _ScalarHistory(CleanCacheOwner):
         self._ensure()
         changes = list(self._member_types.pending_changes(self._count))
         if self._new or (self._count, self._next_ordinal) != (self._base_count, self._base_next):
-            changes.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, (self._descriptor_kind, self._count, self._next_ordinal), record_schema=RECORD_SCHEMA))
+            changes.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, self._descriptor(self._count, self._next_ordinal), record_schema=RECORD_SCHEMA))
         for canonical, entry in sorted(self._dirty_entries.items(), key=lambda item: self._store.codec.encode(item[0])):
             changes.append(VersionChange(ENTRY_NAMESPACE, (self._incarnation, canonical), entry, record_schema=RECORD_SCHEMA,
                 delete=entry is None, memberships=() if entry is None else (Membership('incarnation', self._incarnation, entry[0]),)))
@@ -1098,6 +1112,14 @@ for _promoted_method in ('bind', 'storage_reference', '__len__', '__getitem__',
 
 
 class _FrozenHistory:
+    def __init__(self, *args, reference_is_immutable=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self._new:
+            from .persistence_frozen_snapshots import immutable_snapshot_value
+            values = (value for page in self._dirty_pages.values() for value in page) if self._kind == 'list' else (
+                entry[2] for entry in self._dirty_entries.values() if entry is not None)
+            self._deep_immutable = all(immutable_snapshot_value(value, reference_is_immutable) for value in values)
+
     def __reduce__(self):
         # Pending EventLog chunks own snapshot bytes, independently of the
         # publisher lease and any later edits to mutable native record children.

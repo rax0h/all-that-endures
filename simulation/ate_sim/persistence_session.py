@@ -257,7 +257,7 @@ def _read_event_descriptors(store):
     return prefix, tail, commit
 
 
-def _validate_suffix_event(event, absolute_index):
+def _validate_suffix_event(event, absolute_index, *, snapshot_authority=None):
     if type(event) is not Event:
         raise StoreFormatError("cold event suffix requires Event values")
     if type(event.id) is not int or event.id != absolute_index + 1:
@@ -282,11 +282,16 @@ def _validate_suffix_event(event, absolute_index):
     ):
         raise StoreFormatError("invalid cold event causes")
     if sealed:
-        _validate_sealed_event(event)
+        from .event_log import FrozenDict
+        if type(event.data) is FrozenDict:
+            _validate_sealed_event(event)
+        elif snapshot_authority is None or not snapshot_authority(event.data):
+            raise StoreFormatError("sealed suffix lacks checked deep immutable snapshot authority")
     return event
 
 
-def _read_suffix(store, tail, prefix):
+def _read_suffix(store, tail, prefix, *, captured_generation):
+    from .persistence_frozen_snapshots import read_capture_certification
     rows = store.read_records(
         "world.events", expected_record_schema=RECORD_SCHEMA
     )
@@ -314,7 +319,8 @@ def _read_suffix(store, tail, prefix):
     suffix = []
     previous_year = prefix.last_year
     for index in expected_keys:
-        event = _validate_suffix_event(by_index[index], index)
+        event = _validate_suffix_event(by_index[index], index,
+            snapshot_authority=lambda value: read_capture_certification(store, captured_generation, value))
         if previous_year is not None and event.year < previous_year:
             raise StoreIntegrityError("cold event suffix chronology violation")
         if index < tail.sealed_events:
@@ -386,7 +392,7 @@ def _capture_cold_world(store):
             raise StoreIntegrityError("captured prefix disagrees with descriptor")
 
         suffix = _read_suffix(
-            store, tail_descriptor, prefix_descriptor
+            store, tail_descriptor, prefix_descriptor, captured_generation=head.generation
         )
         log = EventLog.from_disk_prefix(
             prefix_reader,

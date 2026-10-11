@@ -54,7 +54,7 @@ class WorldIdentityBridge:
             adapter = FAMILIES.get(owner[0])
             if (adapter is not None and adapter.collection_kind in ('dict', 'events')
                     and owner[0] not in session._family_bindings.tables):
-                value = None if owner in tracker._deleted else tracker._owner_value(owner)
+                value = None if owner in tracker._deleted else tracker._owner_value(owner, include_sealed_snapshot=True)
                 self._synchronize_owner(owner, value is not None)
 
     def synchronize_event_id_placements(self):
@@ -198,7 +198,11 @@ class WorldIdentityBridge:
                 originals = {path[len(absolute):]: obj for _ident, obj, path
                     in tracker._identity_index.owner_occurrences.get(owner, ())}
                 rows = []
-                tracker._identity_index._scan(value, (), rows)
+                from .persistence_identity import is_sealed_snapshot_owner
+                if owner[0] == "world.events" and is_sealed_snapshot_owner(value):
+                    rows.append((id(value.data), value.data, (("field", "data"),)))
+                else:
+                    tracker._identity_index._scan(value, (), rows)
                 for _ident, child, path in rows:
                     inc = registry.incarnation_for_object(child)
                     if inc is None and path in before and originals.get(path) is child:

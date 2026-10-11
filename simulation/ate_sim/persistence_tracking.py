@@ -1880,7 +1880,7 @@ class IncrementalWorldSession:
             self._merge_identity_patch(removed, added)
         self._identity_dirty_owners.clear()
 
-    def _owner_value(self, owner):
+    def _owner_value(self, owner, *, include_sealed_snapshot=False):
         namespace, key = owner
         if namespace in self._scalar_fields:
             obj, name = self._scalar_fields[namespace]
@@ -1907,7 +1907,9 @@ class IncrementalWorldSession:
                     return None
                 event = container._tail[local]
                 if event.__dict__.get("_sealed") is True:
-                    return None
+                    from .persistence_identity import is_sealed_snapshot_owner
+                    if not include_sealed_snapshot or not is_sealed_snapshot_owner(event):
+                        return None
                 return event
             if kind in ("list", "EventLog"):
                 return container[key]

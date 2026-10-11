@@ -218,7 +218,7 @@ class RuntimeFamilyBindings:
         if owner == (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY):
             return root
         if adapter.collection_kind == 'events':
-            value = session._eager_tracker._owner_value(owner)
+            value = session._eager_tracker._owner_value(owner, include_sealed_snapshot=True)
             if value is not None:
                 return value
             raise StoreIntegrityError('identity owner is not a mutable event')

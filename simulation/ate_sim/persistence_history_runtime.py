@@ -251,7 +251,8 @@ class RecursiveHistoryRuntime:
             values = self._initial_validated_values(kind, value)
             incarnation = session._registry.allocator.allocate()
             proxy = HISTORY_CLASSES[kind](session.store, session.pin, incarnation.value,
-                initial_values=values, cache_budget=session._history_cache_budget, recursive=True)
+                initial_values=values, cache_budget=session._history_cache_budget, recursive=True,
+                **({'reference_is_immutable': self.frozen_reference_is_immutable} if kind.startswith('frozen-') else {}))
             session._registry.bind(proxy, incarnation=incarnation)
             tracker._remember_memo(value, proxy)
             self.remember_source(value, proxy)
@@ -273,6 +274,28 @@ class RecursiveHistoryRuntime:
         if type(value) is tuple:
             return tuple(self.admitted_value(child) for child in value)
         return value
+
+    def sealed_snapshot_authority(self, value):
+        from .persistence_lazy_nested_history import HISTORY_CLASSES
+        if type(value) is not HISTORY_CLASSES['frozen-map']:
+            return False
+        value._ensure()
+        session = self.session()
+        if value._store is not session.store or value._pin is not session.pin:
+            raise StoreIntegrityError('sealed snapshot belongs to another publisher')
+        return value._deep_immutable is True
+
+    def frozen_reference_is_immutable(self, value):
+        if not reference(value) or value.kind not in ('frozen-list', 'frozen-map'):
+            return False
+        session = self.session()
+        child = session._registry.object_for_incarnation(IncarnationId(session.store.store_identity, value.incarnation))
+        if child is None or type(child) is not HISTORY_CLASSES[value.kind]:
+            raise StoreIntegrityError('frozen certification lost its canonical child')
+        child._ensure()
+        if child._store is not session.store or child._pin != session.pin:
+            raise StoreError('frozen certification has a different publisher lease')
+        return child._deep_immutable
 
     def check_assignment_cycle(self, record, value):
         """Check the actual incoming native graph, never walk a clean history."""

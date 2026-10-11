@@ -32,6 +32,18 @@ source. Event frozen snapshots, RecordTable/special collection imports and
 exhaustive generated/import byte classifications are still pending. Evidence:
 `stage_0_5_recursive_record_runtime_validation.json`.
 
+Sealed-tail integration follow-up (October11 UTC): native Events can now retain
+checked readonly snapshot data while resident in the World-log tail. Frozen
+list/map descriptors require an exact deep-immutability boolean, computed from
+actual incoming values and checked child frozen descriptors. Mutable records or
+mutable history references make certification false; such data remains valid
+readonly recursive data but cannot enter sealed World suffix storage. Only the
+snapshot's data backing retains physical World ownership after mutable Event
+identity retires. Ordinary suffix validation reads checked metadata, while full
+scrub, detach and segment packing explicitly inspect/materialize values. This is
+staging integration, not ordinary complete-format activation or exhaustive field
+and byte closure. See the sealed-tail plan and validation checkpoint.
+
 | Record.field | Classification | Growth writer / guard | Actual bound | Representation |
 |---|---|---|---|---|
 | AbilityProgress.aura | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
