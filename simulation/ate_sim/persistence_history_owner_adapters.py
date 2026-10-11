@@ -139,11 +139,45 @@ class HistoryOwnerAdapter:
         return replace(value, physical)
 
 
-AUXILIARY_OWNER_FAMILIES = MappingProxyType({
+@dataclass(frozen=True)
+class RecordOwnerAdapter(HistoryOwnerAdapter):
+    def validate_key(self, key):
+        if (type(key) is not tuple or len(key) != 2 or not _positive(key[0])
+                or type(key[1]) is not int or key[1] != 0):
+            raise StoreIntegrityError('invalid physical record owner key')
+
+    def validate_path(self, path):
+        if type(path) is not tuple or any(type(c) is not tuple or len(c) != 2 for c in path):
+            raise StoreIntegrityError('invalid physical record member path')
+        if path and (path[0][0] != 'field' or type(path[0][1]) is not str or not path[0][1]
+                or any(kind != 'index' or type(slot) is not int or slot < 0 for kind, slot in path[1:])):
+            raise StoreIntegrityError('invalid physical record member path')
+
+    def validate_source(self, source, storage_kind, codec):
+        from .persistence_record_headers import checked_record_header
+        self.validate_key(source.key)
+        if storage_kind != 'lazy' or source.record_schema != self.record_schema or source.memberships:
+            raise StoreIntegrityError('physical record owner requires its versioned schema')
+        if not source.delete:
+            checked_record_header(source.value)
+
+    def reference_placements(self, value):
+        from .persistence_record_headers import record_reference_placements
+        return record_reference_placements(value)
+
+    def _physical_path(self, value, path):
+        from .persistence_record_headers import record_physical_path
+        self.validate_path(path)
+        return record_physical_path(value, path)
+
+
+from .persistence_record_headers import NAMESPACE as RECORD_HEADER_NAMESPACE
+
+AUXILIARY_OWNER_FAMILIES = MappingProxyType({**{
     namespace: HistoryOwnerAdapter(namespace, kind)
     for namespace, kind in (
         ('aux.lazy.nested.list_pages', 'page'),
         ('aux.lazy.nested.entries', 'entry'),
         ('aux.lazy.sequence.nodes', 'leaf'),
     )
-})
+}, RECORD_HEADER_NAMESPACE: RecordOwnerAdapter(RECORD_HEADER_NAMESPACE, 'record')})

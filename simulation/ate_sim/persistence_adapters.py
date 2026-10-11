@@ -23,6 +23,7 @@ from .incremental_store import (
     StoreFormatError, StoreIntegrityError,
 )
 from .persistence_schema import RECORD_FIELDS, ROOT_TYPES, ROOT_FIELDS
+from .persistence_record_headers import RecordReference, record_reference, REFERENCE_TAG as RECORD_REFERENCE_TAG
 from . import advancement, social, communities, magic_resources, materials, agency
 
 SCHEMA = 'ate-world-p2a/1'
@@ -92,6 +93,10 @@ class WorldCodec(TypedCodec):
 
     def _encode_value(self, value, active, seen_mutable):
         cls = type(value)
+        if cls is RecordReference:
+            if not record_reference(value):
+                raise CodecError('invalid typed record reference')
+            return [RECORD_REFERENCE_TAG, value.incarnation]
         if cls is HistoryReference:
             if not history_reference(value):
                 raise CodecError('invalid typed history reference')
@@ -152,6 +157,10 @@ class WorldCodec(TypedCodec):
 
     def _decode_value(self, node):
         if isinstance(node, list) and node:
+            if node[0] == RECORD_REFERENCE_TAG:
+                if len(node) != 2 or type(node[1]) is not int or node[1] <= 0:
+                    raise CodecError('invalid typed record reference')
+                return RecordReference(node[1])
             if node[0] == REFERENCE_TAG:
                 if len(node) != 3 or node[1] not in ('list', 'map', 'set', 'sequence') or type(node[2]) is not int or node[2] <= 0:
                     raise CodecError('invalid typed history reference')
