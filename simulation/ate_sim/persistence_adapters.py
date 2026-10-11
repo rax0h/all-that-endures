@@ -14,7 +14,7 @@ import zlib
 from .core import World, Event, Layer
 from .event_log import EventLog, FrozenDict, FrozenList
 from .persistence_event_ids import EventIdSet, RANGE_TAG, EXCEPTION_TAG
-from .persistence_lazy_nested_history import LazyHistoryList, LazyHistoryMap, LazyHistorySet, HISTORY_TYPES, HistoryReference, REFERENCE_TAG, reference as history_reference
+from .persistence_lazy_nested_history import LazyHistoryList, LazyHistoryMap, LazyHistorySet, LazyFrozenHistoryList, LazyFrozenHistoryMap, HISTORY_TYPES, HistoryReference, REFERENCE_TAG, reference as history_reference
 from .persistence_lazy_sequence import LazyOrderedSequence
 from .persistence_identity import iter_mutable_event_items
 from .record_index import RecordTable, IndexedRecord
@@ -142,15 +142,15 @@ class WorldCodec(TypedCodec):
                 return ['set', encoded]
             finally:
                 active.remove(id(value))
-        if cls in (FrozenDict, FrozenList):
+        if cls in (FrozenDict, FrozenList, LazyFrozenHistoryList, LazyFrozenHistoryMap):
             self._enter(value, active, seen_mutable, mutable=False)
             try:
-                if cls is FrozenDict:
+                if cls in (FrozenDict, LazyFrozenHistoryMap):
                     content = [[self._encode_value(k, active, seen_mutable),
                                 self._encode_value(v, active, seen_mutable)] for k, v in value.items()]
                 else:
                     content = [self._encode_value(v, active, seen_mutable) for v in value]
-                return ['ate_frozen_dict/v1' if cls is FrozenDict else 'ate_frozen_list/v1', content]
+                return ['ate_frozen_dict/v1' if cls in (FrozenDict, LazyFrozenHistoryMap) else 'ate_frozen_list/v1', content]
             finally:
                 active.remove(id(value))
         return super()._encode_value(value, active, seen_mutable)
@@ -162,7 +162,7 @@ class WorldCodec(TypedCodec):
                     raise CodecError('invalid typed record reference')
                 return RecordReference(node[1])
             if node[0] == REFERENCE_TAG:
-                if len(node) != 3 or node[1] not in ('list', 'map', 'set', 'sequence') or type(node[2]) is not int or node[2] <= 0:
+                if len(node) != 3 or node[1] not in ('list', 'map', 'set', 'sequence', 'frozen-list', 'frozen-map') or type(node[2]) is not int or node[2] <= 0:
                     raise CodecError('invalid typed history reference')
                 return HistoryReference(node[1], node[2])
             if node[0] == 'ate_event/v1':

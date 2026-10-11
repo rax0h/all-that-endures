@@ -25,12 +25,12 @@ class HistoryReference:
     incarnation: int
 
     def __post_init__(self):
-        if self.kind not in ('list', 'map', 'set', 'sequence') or type(self.incarnation) is not int or self.incarnation <= 0:
+        if self.kind not in ('list', 'map', 'set', 'sequence', 'frozen-list', 'frozen-map') or type(self.incarnation) is not int or self.incarnation <= 0:
             raise ValueError('invalid typed history reference')
 
 
 def reference(value):
-    return (type(value) is HistoryReference and value.kind in ('list', 'map', 'set', 'sequence')
+    return (type(value) is HistoryReference and value.kind in ('list', 'map', 'set', 'sequence', 'frozen-list', 'frozen-map')
             and type(value.incarnation) is int and value.incarnation > 0)
 
 
@@ -75,6 +75,9 @@ def materialize_history_value(value, memo):
             memo[id(value)] = result
             for field in RECORD_FIELDS[type(value)]:
                 object.__setattr__(result, field, materialize_history_value(getattr(value, field), memo))
+            from .core import Event
+            if type(value) is Event and '_sealed' in vars(value):
+                object.__setattr__(result, '_sealed', vars(value)['_sealed'])
         return memo[id(value)]
     if type(value) is tuple:
         if id(value) not in memo:
@@ -85,14 +88,18 @@ def materialize_history_value(value, memo):
     if id(value) in memo:
         return memo[id(value)]
     kind = value._kind
-    result = {} if kind == 'map' else set() if kind == 'set' else []
+    from .event_log import FrozenDict, FrozenList
+    result = (FrozenDict() if type(value) is LazyFrozenHistoryMap else
+              FrozenList() if type(value) is LazyFrozenHistoryList else
+              {} if kind == 'map' else set() if kind == 'set' else [])
     memo[id(value)] = result
     if kind == 'map':
-        result.update((key, materialize_history_value(child, memo)) for key, child in value.items())
+        for key, child in value.items():
+            dict.__setitem__(result, key, materialize_history_value(child, memo))
     elif kind == 'set':
         result.update(value)
     else:
-        result.extend(materialize_history_value(child, memo) for child in value)
+        list.extend(result, (materialize_history_value(child, memo) for child in value))
     return result
 
 
@@ -157,6 +164,10 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
     __hash__ = None
     _kind = 'list'
 
+    @property
+    def _descriptor_kind(self):
+        return self._kind
+
     def __init__(self, store, pin, incarnation, *, guard=None, changed=None,
                  initial_values=None, cache_budget=None, checked_types=None, recursive=False):
         if type(incarnation) is not int or incarnation <= 0:
@@ -181,7 +192,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
                 self._append(self._validate(value))
         else:
             value = checked_value(store, pin, DESCRIPTOR_NAMESPACE, incarnation)
-            if (type(value) is not tuple or len(value) != 3 or value[0] != 'list'
+            if (type(value) is not tuple or len(value) != 3 or value[0] != self._descriptor_kind
                     or type(value[1]) is not int or value[1] < 0
                     or type(value[2]) is not int or value[2] != value[1]):
                 raise StoreIntegrityError('invalid nested list descriptor')
@@ -195,7 +206,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         return self
 
     def storage_reference(self):
-        return HistoryReference('list', self._incarnation)
+        return HistoryReference(self._descriptor_kind, self._incarnation)
 
     def _ensure(self):
         self._store._ensure_open()
@@ -481,7 +492,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         self._ensure()
         out = list(self._member_types.pending_changes(self._length))
         if self._new or self._length != self._base_length:
-            out.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, ('list', self._length, self._length), record_schema=RECORD_SCHEMA))
+            out.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, (self._descriptor_kind, self._length, self._length), record_schema=RECORD_SCHEMA))
         for number, page in sorted(self._dirty_pages.items()):
             key = (self._incarnation, number)
             if number * PAGE_SIZE >= self._length:
@@ -622,6 +633,10 @@ class _ScalarHistory(CleanCacheOwner):
     _kind = None
     __hash__ = None
 
+    @property
+    def _descriptor_kind(self):
+        return self._kind
+
     def __init__(self, store, pin, incarnation, *, initial_values=None, cache_budget=None, checked_types=None, recursive=False):
         if type(incarnation) is not int or incarnation <= 0:
             raise ValueError('invalid nested history incarnation')
@@ -643,7 +658,7 @@ class _ScalarHistory(CleanCacheOwner):
                 self._set(key, value)
         else:
             value = checked_value(store, pin, DESCRIPTOR_NAMESPACE, incarnation)
-            if (type(value) is not tuple or len(value) != 3 or value[0] != self._kind
+            if (type(value) is not tuple or len(value) != 3 or value[0] != self._descriptor_kind
                     or type(value[1]) is not int or value[1] < 0 or type(value[2]) is not int
                     or value[2] < value[1]):
                 raise StoreIntegrityError('invalid nested scalar descriptor')
@@ -656,7 +671,7 @@ class _ScalarHistory(CleanCacheOwner):
         return self
 
     def storage_reference(self):
-        return HistoryReference(self._kind, self._incarnation)
+        return HistoryReference(self._descriptor_kind, self._incarnation)
 
     def _ensure(self):
         self._store._ensure_open()
@@ -793,7 +808,7 @@ class _ScalarHistory(CleanCacheOwner):
         self._ensure()
         changes = list(self._member_types.pending_changes(self._count))
         if self._new or (self._count, self._next_ordinal) != (self._base_count, self._base_next):
-            changes.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, (self._kind, self._count, self._next_ordinal), record_schema=RECORD_SCHEMA))
+            changes.append(VersionChange(DESCRIPTOR_NAMESPACE, self._incarnation, (self._descriptor_kind, self._count, self._next_ordinal), record_schema=RECORD_SCHEMA))
         for canonical, entry in sorted(self._dirty_entries.items(), key=lambda item: self._store.codec.encode(item[0])):
             changes.append(VersionChange(ENTRY_NAMESPACE, (self._incarnation, canonical), entry, record_schema=RECORD_SCHEMA,
                 delete=entry is None, memberships=() if entry is None else (Membership('incarnation', self._incarnation, entry[0]),)))
@@ -1082,8 +1097,45 @@ for _promoted_method in ('bind', 'storage_reference', '__len__', '__getitem__',
         _promoted_method, getattr(LazyHistoryList, _promoted_method)))
 
 
+class _FrozenHistory:
+    def __reduce__(self):
+        # Pending EventLog chunks own snapshot bytes, independently of the
+        # publisher lease and any later edits to mutable native record children.
+        native = materialize_history_value(self, {})
+        values = dict(native) if isinstance(native, dict) else list(native)
+        return type(native), (values,)
+
+    def _mutation(self, *args, **kwargs):
+        self._ensure()
+        raise TypeError('sealed historical events are immutable; append a new cause')
+
+
+class LazyFrozenHistoryList(_FrozenHistory, LazyHistoryList):
+    """Readonly list snapshot with its own mandatory descriptor/reference role."""
+    @property
+    def _descriptor_kind(self):
+        return 'frozen-list'
+
+    __setitem__ = __delitem__ = append = extend = insert = pop = remove = clear = _FrozenHistory._mutation
+    sort = reverse = __iadd__ = __imul__ = _FrozenHistory._mutation
+
+
+class LazyFrozenHistoryMap(_FrozenHistory, LazyHistoryMap):
+    """Readonly mapping snapshot; mutable record children retain their aliases."""
+    @property
+    def _descriptor_kind(self):
+        return 'frozen-map'
+
+    __setitem__ = __delitem__ = update = setdefault = pop = popitem = clear = __ior__ = _FrozenHistory._mutation
+
+
+def history_storage_kind(value):
+    return getattr(value, '_descriptor_kind', value._kind)
+
+
 HISTORY_CLASSES = {'list': LazyHistoryList, 'map': LazyHistoryMap, 'set': LazyHistorySet,
-                   'sequence': LazyOrderedSequence}
+                   'sequence': LazyOrderedSequence, 'frozen-list': LazyFrozenHistoryList,
+                   'frozen-map': LazyFrozenHistoryMap}
 HISTORY_TYPES = tuple(HISTORY_CLASSES.values())
 
 
@@ -1096,9 +1148,9 @@ def has_pending_overlay(history):
         raise TypeError('expected typed history')
     if history._new:
         return True
-    if type(history) is LazyHistoryList:
+    if isinstance(history, LazyHistoryList):
         return bool(history._dirty_pages) or history._length != history._base_length
-    if type(history) in (LazyHistoryMap, LazyHistorySet):
+    if isinstance(history, _ScalarHistory):
         return bool(history._dirty_entries) or (
             history._count, history._next_ordinal) != (history._base_count, history._base_next)
     return bool(history._dirty) or history._store.codec.encode(

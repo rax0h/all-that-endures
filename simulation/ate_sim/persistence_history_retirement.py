@@ -24,11 +24,13 @@ LEGACY_SCOPES = {'list': (PAGE_NAMESPACE, HISTORY_DESCRIPTOR),
           'sequence': tuple(ns for ns in SEQUENCE_NAMESPACES if ns != SEQUENCE_DESCRIPTOR) + (SEQUENCE_DESCRIPTOR,)}
 SCOPES = {kind: scopes[:-1] + (MEMBER_TYPES, scopes[-1]) for kind, scopes in LEGACY_SCOPES.items()}
 SCOPES['record'] = (RECORD_HEADER,)
+SCOPES['frozen-list'] = SCOPES['list']
+SCOPES['frozen-map'] = SCOPES['map']
 
 
 def _scopes(job):
-    if job[1] == 'record' and job[0] == 'history-retirement/v1':
-        raise StoreIntegrityError('legacy retirement cannot claim a record backing')
+    if job[1] not in LEGACY_SCOPES and job[0] == 'history-retirement/v1':
+        raise StoreIntegrityError('legacy retirement cannot claim a new backing role')
     return LEGACY_SCOPES[job[1]] if job[0] == 'history-retirement/v1' else SCOPES[job[1]]
 
 

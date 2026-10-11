@@ -337,6 +337,7 @@ def test_native_record_admission_is_closed_and_failed_input_allocates_nothing(tm
         record = Foreign(1)
     else:
         record = Event(1, 0, 'birth', Layer.SOCIETY)
+        object.__setattr__(record, '_sealed', 1)
     target = converted_catalog(tmp_path)
     with open_bridge(target, rules_id=RULES) as session:
         activate(session)
@@ -506,3 +507,29 @@ def test_identical_record_assignment_and_return_to_baseline_are_noop_saves(tmp_p
         record.strength = .9
         record.strength = .5
         assert session.save() == generation
+
+
+def test_unpublished_replaced_record_child_routes_cancel_and_private_graph_revives(tmp_path):
+    target = converted_catalog(tmp_path)
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        record = SkillHistory(7, 'alchemy', provenance={'values':[1]})
+        session.skills[1, 'craft'].provenance = [record]
+        private = record.provenance
+        child = private['values']
+        private_inc, child_inc = private._incarnation, child._incarnation
+        # Reading the private child already synchronized its physical route.
+        record.provenance = {'values':[9]}
+        child.append(2)
+        session.save()
+        from ate_sim.persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE
+        assert not session.store.contains_lazy_key(session.pin, DESCRIPTOR_NAMESPACE, private_inc)
+        assert not session.store.contains_lazy_key(session.pin, DESCRIPTOR_NAMESPACE, child_inc)
+        assert list(child) == [1, 2]
+        record.provenance = private
+        session.save()
+        assert record.provenance._incarnation == private_inc
+        assert record.provenance['values'] is child
+    with open_bridge(target, rules_id=RULES) as session:
+        activate(session)
+        assert list(session.skills[1, 'craft'].provenance[0].provenance['values']) == [1, 2]

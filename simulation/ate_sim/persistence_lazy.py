@@ -49,6 +49,7 @@ from .persistence_lazy_nested_history import (
     ENTRY_NAMESPACE as NESTED_ENTRY_NAMESPACE,
     immutable_value as nested_immutable_value,
     has_pending_overlay as history_has_pending_overlay,
+    history_storage_kind,
 )
 from .persistence_lazy_budget import SharedCacheBudget, RecordCacheLRU, RECORD_BYTES
 from .persistence_lazy_families import RuntimeFamilyBindings
@@ -12151,13 +12152,15 @@ class LazyWorldSession:
                 self._registry.detach_occurrence(occurrence, expected=old)
             self._registry.attach_existing(actual, occurrence)
             return proxy
-        actual_kind = value.kind if nested_reference(value) else value._kind if type(value) in HISTORY_TYPES else None
+        actual_kind = value.kind if nested_reference(value) else history_storage_kind(value) if type(value) in HISTORY_TYPES else None
+        if actual_kind in ('frozen-list', 'frozen-map') and kind in (None, actual_kind.removeprefix('frozen-')):
+            kind = actual_kind
         if actual_kind == 'sequence' and kind in (None, 'list', 'sequence'):
             kind = 'sequence'
         if kind == 'sequence' and type(value) is LazyHistoryList:
             self._promote_unpublished_history(value)
         if kind is None:
-            kind = value.kind if nested_reference(value) else value._kind if type(value) in HISTORY_TYPES else {list: 'list', dict: 'map', set: 'set'}.get(type(value))
+            kind = value.kind if nested_reference(value) else history_storage_kind(value) if type(value) in HISTORY_TYPES else {list: 'list', dict: 'map', set: 'set'}.get(type(value))
         if kind not in HISTORY_CLASSES:
             raise TypeError('invalid typed history kind')
         tracker = getattr(self, '_eager_tracker', None)
@@ -14328,6 +14331,7 @@ class LazyWorldSession:
         if self._identity_bridge is not None:
             self._recursive_histories.collect_source_memos()
             self._identity_bridge.synchronize_lazy_placements()
+            self._recursive_histories.retire_unowned_new_routes()
             with self._recursive_histories.prepared_routes():
                 for proxy in tuple(self._nested_dirty.values()):
                     if history_has_pending_overlay(proxy):

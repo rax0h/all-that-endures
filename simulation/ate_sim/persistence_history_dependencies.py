@@ -18,11 +18,11 @@ from .incremental_store import StoreConflictError, StoreIntegrityError, StoreErr
 from .persistence_lazy_store import VersionChange, MAX_PINS
 from .persistence_lazy_families import ParticipantDelta
 from .persistence_lazy_budget import resident_bytes
-from .persistence_lazy_nested_history import HISTORY_TYPES
+from .persistence_lazy_nested_history import HISTORY_TYPES, history_storage_kind
 
 NAMESPACE = 'aux.lazy.history.dependencies'
 TAG = 'history-backing-dependencies/v1'
-KINDS = ('list', 'map', 'set', 'sequence', 'record')
+KINDS = ('list', 'map', 'set', 'sequence', 'record', 'frozen-list', 'frozen-map')
 
 
 def dependency_value(kind, tokens=()):
@@ -99,7 +99,7 @@ class BackingDependencyPool:
         if ((type(alias) not in HISTORY_TYPES and backing is None)
                 or metadata._store is not self.store or metadata._pin != self.pin):
             raise StoreConflictError('backing dependency has a different publisher lease')
-        incarnation, kind = metadata._incarnation, metadata._kind
+        incarnation, kind = metadata._incarnation, history_storage_kind(metadata)
         previous = self._aliases.get(incarnation)
         if previous is not None:
             if previous[0]() is not alias or previous[1] != kind:

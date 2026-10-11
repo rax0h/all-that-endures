@@ -136,14 +136,19 @@ class RecordBinding:
         if tracker._suspended:
             return None
         _check_record(obj)
+        if type(obj) is Event and vars(obj).get('_sealed', False):
+            raise TypeError('sealed historical events are immutable; append a new cause')
+        if type(obj) is Event and name == '_sealed':
+            if type(value) is not bool:
+                raise TypeError('Event seal state must be a boolean')
+            self._record_backing._ensure()
+            return 'event-state', name, value, value
         if name not in RECORD_FIELDS[type(obj)]:
             from .record_index import IndexedRecord
             if name in CACHES.get(type(obj), ()) or (
                     isinstance(obj, IndexedRecord) and name in ('_index_table', '_index_key')):
                 return None
             raise TypeError('native record assignment has an undeclared field')
-        if type(obj) is Event and vars(obj).get('_sealed', False):
-            raise TypeError('sealed historical events are immutable; append a new cause')
         backing = self._record_backing
         backing._ensure()
         runtime = backing._runtime
@@ -160,13 +165,17 @@ class RecordBinding:
         from .persistence_schema import RECORD_FIELDS
         backing = self._record_backing
         fields = list(backing._header[2])
-        fields[RECORD_FIELDS[type(obj)].index(name)] = token[2]
+        if token[0] != 'event-state':
+            fields[RECORD_FIELDS[type(obj)].index(name)] = token[2]
         backing._header = record_header(obj, values=tuple(fields))
         backing.changed()
         session = backing._runtime.session()
         for table, key in session._shared_object_routes(obj):
             table.changed(key)
         self.session._mark_many(session._nested_eager_owners(obj))
+
+    def event_sealed(self, event):
+        self.session._event_sealed(event)
 
 
 def bind_record(runtime, record, incarnation, header, *, new):

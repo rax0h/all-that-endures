@@ -15,6 +15,7 @@ from .persistence_lazy_identity import IncarnationId, Occurrence
 from .persistence_lazy_nested_history import (
     HISTORY_TYPES, HISTORY_CLASSES, reference, immutable_value,
     LazyHistoryList, LazyHistoryMap, PAGE_NAMESPACE, ENTRY_NAMESPACE, PAGE_SIZE,
+    history_storage_kind,
 )
 from .persistence_history_owner_adapters import AUXILIARY_OWNER_FAMILIES
 from .persistence_lazy_identity_catalog import OWNER_NAMESPACE
@@ -26,6 +27,7 @@ from .persistence_record_headers import (
 from .persistence_record_runtime import (
     mutable_record, record_backing, backing_for, canonical_for, RecordBacking, bind_record,
 )
+from .event_log import FrozenDict, FrozenList
 
 
 @dataclass(frozen=True)
@@ -127,9 +129,9 @@ class RecursiveHistoryRuntime:
         return tuple(self._admit_validated(value) for value in values)
 
     def _initial_validated_values(self, kind, value):
-        if kind == 'map':
+        if kind in ('map', 'frozen-map'):
             return {key: self._admit_validated(child) for key, child in value.items()}
-        if kind in ('list', 'sequence'):
+        if kind in ('list', 'sequence', 'frozen-list'):
             return [self._admit_validated(child) for child in value]
         return value
 
@@ -147,7 +149,7 @@ class RecursiveHistoryRuntime:
             session.store.codec.encode(value)
             return
         is_record = mutable_record(value)
-        if type(value) not in (list, dict, tuple, set) and not is_record:
+        if type(value) not in (list, dict, tuple, set, FrozenDict, FrozenList) and not is_record:
             raise TypeError('recursive history value is outside the typed container schema')
         if id(value) in active:
             raise TypeError('cyclic history value is outside the typed container schema')
@@ -155,16 +157,16 @@ class RecursiveHistoryRuntime:
             return
         active.add(id(value))
         try:
+            if type(value) in (FrozenDict, FrozenList) and vars(value):
+                raise TypeError('frozen snapshot has unclassified non-field state')
             if is_record:
                 from .persistence_adapters import _check_record
                 from .persistence_schema import RECORD_FIELDS
                 from .persistence_tracking import _binding
                 from .core import Event
                 _check_record(value)
-                # Frozen Event.data needs its distinct immutable snapshot
-                # representation; do not silently turn it into mutable history.
-                if type(value) is Event:
-                    raise TypeError('recursive Event backing requires frozen snapshot integration')
+                if type(value) is Event and '_sealed' in vars(value) and type(vars(value)['_sealed']) is not bool:
+                    raise TypeError('Event seal state must be a boolean')
                 bound = _binding(value)
                 if bound is not None and bound.session is not session._eager_tracker:
                     raise StoreError('cross-session recursive record')
@@ -173,7 +175,7 @@ class RecursiveHistoryRuntime:
                     backing._ensure()
                 for field in RECORD_FIELDS[type(value)]:
                     self.validate_native(getattr(value, field), active, completed)
-            elif type(value) is dict:
+            elif type(value) in (dict, FrozenDict):
                 from .persistence_lazy_nested_history import equality_key
                 for key, child in value.items():
                     session.store.codec.encode(equality_key(key))
@@ -232,7 +234,7 @@ class RecursiveHistoryRuntime:
             return backing.storage_reference()
         if type(value) is tuple:
             return tuple(self._admit_validated(child) for child in value)
-        if type(value) not in (list, dict, set):
+        if type(value) not in (list, dict, set, FrozenDict, FrozenList):
             raise TypeError('recursive history value is outside the typed container schema')
         tracker = session._eager_tracker
         memo = tracker._memo.get(id(value))
@@ -244,7 +246,8 @@ class RecursiveHistoryRuntime:
             raise TypeError('cyclic history value is outside the typed container schema')
         self._admitting.add(id(value))
         try:
-            kind = {list: 'list', dict: 'map', set: 'set'}[type(value)]
+            kind = {list: 'list', dict: 'map', set: 'set',
+                    FrozenDict: 'frozen-map', FrozenList: 'frozen-list'}[type(value)]
             values = self._initial_validated_values(kind, value)
             incarnation = session._registry.allocator.allocate()
             proxy = HISTORY_CLASSES[kind](session.store, session.pin, incarnation.value,
@@ -284,10 +287,10 @@ class RecursiveHistoryRuntime:
                 from .persistence_schema import RECORD_FIELDS
                 for field in RECORD_FIELDS[type(child)]:
                     visit(getattr(child, field))
-            elif type(child) in (list, tuple):
+            elif type(child) in (list, tuple, FrozenList):
                 for member in child:
                     visit(member)
-            elif type(child) is dict:
+            elif type(child) in (dict, FrozenDict):
                 for member in child.values():
                     visit(member)
         visit(value)
@@ -321,10 +324,10 @@ class RecursiveHistoryRuntime:
                     incoming.add(inc.value)
                 for field in RECORD_FIELDS[type(child)]:
                     visit(getattr(child, field))
-            elif type(child) in (list, tuple):
+            elif type(child) in (list, tuple, FrozenList):
                 for member in child:
                     visit(member)
-            elif type(child) is dict:
+            elif type(child) in (dict, FrozenDict):
                 for member in child.values():
                     visit(member)
         visit(value)
@@ -363,9 +366,6 @@ class RecursiveHistoryRuntime:
         from .persistence_schema import RECORD_FIELDS
         header = read_record_header(session.store, session.pin, value.incarnation)
         result = restore_record_header(header) if current is None else current
-        from .core import Event
-        if type(result) is Event:
-            raise StoreIntegrityError('recursive Event header has no activated snapshot runtime')
         if current is not None:
             if not mutable_record(current) or type(current) is not type(restore_record_header(header)):
                 raise StoreIntegrityError('record reference has a different canonical type')
@@ -450,7 +450,7 @@ class RecursiveHistoryRuntime:
                 child = getattr(parent_backing, '_recursive_pending_children', {}).get(value.incarnation)
                 if source is not None and not source.delete and child is not None:
                     current = AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(source.value, path)
-                    if current != value or (reference(value) and backing_for(child)._kind != value.kind):
+                    if current != value or (reference(value) and history_storage_kind(backing_for(child)) != value.kind):
                         raise StoreIntegrityError('private recursive reference disagrees with its pending value')
                     return child
             if owner[0] == NODE_NAMESPACE:
@@ -471,7 +471,7 @@ class RecursiveHistoryRuntime:
                         session._registry.bind(child, incarnation=IncarnationId(session.store.store_identity, value.incarnation))
                         session._register_nested_overlay(child)
                         self.bind(child)
-                    if current != value or (reference(value) and backing_for(child)._kind != value.kind):
+                    if current != value or (reference(value) and history_storage_kind(backing_for(child)) != value.kind):
                         raise StoreIntegrityError('pending recursive reference lacks its canonical child')
                     return child
             if session._lifecycle_operation is None:
@@ -482,7 +482,7 @@ class RecursiveHistoryRuntime:
             if marker not in rows or rows[marker][2] != value.incarnation:
                 raise StoreIntegrityError('recursive reference lacks its checked physical placement')
             if record_reference(value):
-                coord.discover_group(value.incarnation)
+                coord.discover_group(value.incarnation, read_only=True)
                 result = self.load_record(value)
                 session._registry.attach_occurrence(result, Occurrence(*owner, path))
                 return result
@@ -515,9 +515,9 @@ class RecursiveHistoryRuntime:
         if type(proxy) is RecordBacking:
             yield from proxy.pending_changes()
             return
-        if type(proxy) is LazyHistoryList:
+        if isinstance(proxy, LazyHistoryList):
             owners = ((PAGE_NAMESPACE, (proxy._incarnation, number)) for number in tuple(proxy._dirty_pages))
-        elif type(proxy) is LazyHistoryMap:
+        elif isinstance(proxy, LazyHistoryMap):
             owners = ((ENTRY_NAMESPACE, (proxy._incarnation, key)) for key in tuple(proxy._dirty_entries))
         elif type(proxy) is LazyOrderedSequence:
             owners = (owner for owner in tuple(proxy._dirty) if owner[0] == NODE_NAMESPACE)
@@ -535,14 +535,14 @@ class RecursiveHistoryRuntime:
             raise StoreIntegrityError('physical history owner belongs to another backing')
         if type(proxy) is RecordBacking and namespace == RECORD_NAMESPACE and key[1] == 0:
             return VersionChange(namespace, key, proxy._header)
-        if type(proxy) is LazyHistoryList and namespace == PAGE_NAMESPACE:
+        if isinstance(proxy, LazyHistoryList) and namespace == PAGE_NAMESPACE:
             number = key[1]
             if number not in proxy._dirty_pages:
                 return None
             deleted = number * PAGE_SIZE >= proxy._length
             value = None if deleted else tuple(proxy._dirty_pages[number])
             return VersionChange(namespace, key, value, delete=deleted)
-        if type(proxy) is LazyHistoryMap and namespace == ENTRY_NAMESPACE and key[1] in proxy._dirty_entries:
+        if isinstance(proxy, LazyHistoryMap) and namespace == ENTRY_NAMESPACE and key[1] in proxy._dirty_entries:
             entry = proxy._dirty_entries[key[1]]
             return VersionChange(namespace, key, entry, delete=entry is None,
                 memberships=() if entry is None else (Membership('incarnation', proxy._incarnation, entry[0]),))
@@ -575,6 +575,41 @@ class RecursiveHistoryRuntime:
                 # This physical source never published and is removed from D.
                 # Its cancelled routes need no witness/header/tombstone.
                 coord.dirty_owners.discard(owner)
+
+    def retire_unowned_new_routes(self):
+        """Cancel only actual unpublished D which lost its owning placement.
+
+        Removing one private parent's routes can orphan its new children. The
+        queue visits those outgoing D edges once; published backing retirement
+        remains the existing bounded retirement participant's responsibility.
+        """
+        session = self.session()
+        coord = session._identity_coordinator
+        pending = deque(session._nested_dirty.values())
+        retired = set()
+        while pending:
+            proxy = pending.popleft()
+            inc = proxy._incarnation
+            if not proxy._new or inc in retired:
+                continue
+            if (session._registry.occurrences_for_incarnation(
+                    IncarnationId(session.store.store_identity, inc))
+                    or session._nested_eager_owners(canonical_for(proxy))):
+                continue
+            retired.add(inc)
+            for source in self._changes(proxy):
+                owner = source.namespace, source.key
+                if owner not in coord.dirty_owners and owner not in coord._by_owner:
+                    continue
+                rows = coord._owner_changes(owner, ())
+                children = {child for _path, _original, child in rows.values() if child is not None}
+                coord.retire_owner(owner)
+                coord.dirty_owners.discard(owner)
+                self.release_unowned_memos(children)
+                for child in children:
+                    backing = session._nested_dirty.get(child)
+                    if backing is not None:
+                        pending.append(backing)
 
     def release_unowned_memos(self, incarnations):
         session = self.session()
@@ -693,7 +728,7 @@ class RecursiveHistoryRuntime:
         incarnation = session._registry.incarnation_for_object(obj)
         if (not (reference(current) or record_reference(current)) or incarnation is None
                 or current.incarnation != incarnation.value
-                or (reference(current) and current.kind != backing_for(obj)._kind)
+                or (reference(current) and current.kind != history_storage_kind(backing_for(obj)))
                 or (record_reference(current) and record_backing(obj) is None)
                 or session._registry.object_for_incarnation(incarnation) is not obj):
             raise StoreIntegrityError('recursive reference resolves to a different canonical object')

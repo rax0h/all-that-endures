@@ -117,7 +117,8 @@ def verify_type_witnesses(store, pin):
             if type(descriptor) is not tuple or not descriptor:
                 raise StoreIntegrityError('invalid history type backing descriptor')
             kind = 'sequence' if namespace == SEQUENCE_DESCRIPTOR else descriptor[0]
-            if kind not in KINDS:
+            base_kind = kind.removeprefix('frozen-') if type(kind) is str else kind
+            if base_kind not in KINDS or kind not in HISTORY_CLASSES:
                 raise StoreIntegrityError('history type witness has unknown backing kind')
             # Partly reclaimed trees are deliberately no longer readable at
             # the current generation. Their checked queue retains the descriptor.
@@ -127,7 +128,7 @@ def verify_type_witnesses(store, pin):
                     raise StoreIntegrityError('history retirement type disagrees with backing')
                 if job[4]:
                     if incarnation in witnesses:
-                        types = HistoryMemberTypes(store, pin, incarnation, kind, required=True)
+                        types = HistoryMemberTypes(store, pin, incarnation, base_kind, required=True)
                         position = 3 if kind == 'sequence' else 1
                         if len(descriptor) <= position or type(descriptor[position]) is not int:
                             raise StoreIntegrityError('invalid retiring history descriptor count')
@@ -140,7 +141,7 @@ def verify_type_witnesses(store, pin):
                             raise StoreIntegrityError('retiring history lost its type witness early')
                         descriptors.remove(incarnation)
                     continue
-            history = HISTORY_CLASSES[kind](store, pin, incarnation, checked_types=True)
+            history = HISTORY_CLASSES[kind](store, pin, incarnation, checked_types=True, recursive=True)
             history._member_types.verify_values(history)
     if descriptors != witnesses:
         raise StoreIntegrityError('history type witness inventory is incomplete or extra')

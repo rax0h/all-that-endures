@@ -96,8 +96,11 @@ class IdentityCoordinator:
                 break  # Actual unsaved group state is reported separately.
             self._drop(key)
 
-    def discover_group(self, incarnation):
-        self.preflight()
+    def discover_group(self, incarnation, *, read_only=False):
+        if read_only:
+            self.store._require_pin(self.pin)
+        else:
+            self.preflight()
         inc = incarnation.value if isinstance(incarnation, IncarnationId) else incarnation
         key = self.pin.captured_head, inc
         if key in self.discovered_groups:

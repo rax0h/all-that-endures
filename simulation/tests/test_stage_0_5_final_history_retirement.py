@@ -22,7 +22,7 @@ def module():
 def fixture(store, size, kind='list', *, checked_types=False):
     mod = module()
     pool = BackingDependencyPool(store, store.capture_pin())
-    values = {key: key for key in range(size)} if kind == 'map' else range(size)
+    values = {key: key for key in range(size)} if kind in ('map', 'frozen-map') else range(size)
     alias = HISTORY_CLASSES[kind](store, pool.pin, 1, initial_values=values,
                                   checked_types=checked_types,
                                   **({'value_mode': 'native'} if kind == 'sequence' else {}))
@@ -99,7 +99,7 @@ def test_catalog_does_not_compact_a_group_while_its_backing_job_is_pending(tmp_p
         assert store.contains_lazy_key(pin, mod.NAMESPACE, 1)
 
 
-@pytest.mark.parametrize('kind', ['list', 'map', 'set', 'sequence'])
+@pytest.mark.parametrize('kind', ['list', 'map', 'set', 'sequence', 'frozen-list', 'frozen-map'])
 def test_all_backing_scopes_finish_then_catalog_header_can_compact(tmp_path, kind):
     mod = module()
     with store_at(tmp_path / 'kinds.sqlite') as store:
