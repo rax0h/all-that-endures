@@ -2,6 +2,14 @@
 
 This is the exhaustive baseline classification. Planned compact representations are requirements, not implementation claims. Imported values have no generated-world bound. Package 5 must replace pending representations with tested evidence before acceptance.
 
+Implemented value-record slice (October 11 UTC): exact `Ref` and `Layer` values
+are admitted in recursive histories through the existing World codec. Ref fields
+must be recursively immutable and its state exactly kind/id. Foreign frozen
+classes/enums and mutable record payloads remain excluded. This does not replace
+the pending mutable-record representations below. Evidence:
+`stage_0_5_recursive_value_record_validation.json` (16 focused, 288 affected;
+overlapping counts).
+
 | Record.field | Classification | Growth writer / guard | Actual bound | Representation |
 |---|---|---|---|---|
 | AbilityProgress.aura | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |

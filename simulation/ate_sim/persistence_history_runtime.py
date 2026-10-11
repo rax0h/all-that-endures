@@ -99,16 +99,20 @@ class RecursiveHistoryRuntime:
 
     def initial_values(self, kind, value):
         self.validate_native(value)
+        return self._initial_validated_values(kind, value)
+
+    def _initial_validated_values(self, kind, value):
         if kind == 'map':
-            return {key: self.admit(child) for key, child in value.items()}
+            return {key: self._admit_validated(child) for key, child in value.items()}
         if kind in ('list', 'sequence'):
-            return [self.admit(child) for child in value]
+            return [self._admit_validated(child) for child in value]
         return value
 
-    def validate_native(self, value, active=None):
+    def validate_native(self, value, active=None, completed=None):
         """Validate actual incoming D before allocating children or changing owners."""
         session = self.session()
         active = set() if active is None else active
+        completed = {} if completed is None else completed
         if type(value) in HISTORY_TYPES:
             if value._store is not session.store or value._pin != session.pin:
                 raise StoreError('cross-session recursive history')
@@ -121,20 +125,25 @@ class RecursiveHistoryRuntime:
             raise TypeError('recursive history value is outside the typed container schema')
         if id(value) in active:
             raise TypeError('cyclic history value is outside the typed container schema')
+        if completed.get(id(value)) is value:
+            return
         active.add(id(value))
         try:
             if type(value) is dict:
                 from .persistence_lazy_nested_history import equality_key
                 for key, child in value.items():
                     session.store.codec.encode(equality_key(key))
-                    self.validate_native(child, active)
+                    self.validate_native(child, active, completed)
             elif type(value) is set:
                 from .persistence_lazy_nested_history import equality_key
                 for key in value:
                     session.store.codec.encode(equality_key(key))
             else:
                 for child in value:
-                    self.validate_native(child, active)
+                    self.validate_native(child, active, completed)
+            # Actual input objects live until this preflight returns; callback
+            # collection/address reuse cannot make another source look checked.
+            completed[id(value)] = value
         finally:
             active.remove(id(value))
 
@@ -142,6 +151,16 @@ class RecursiveHistoryRuntime:
         session = self.session()
         session._ensure_people_mutation_allowed()
         self.validate_native(value)
+        return self._admit_validated(value)
+
+    def _admit_validated(self, value):
+        """Build only the graph which the public entry preflight just checked.
+
+        Exact builtin containers have no caller iteration callbacks. This path
+        never consumes generators or keeps validation state across operations.
+        """
+        session = self.session()
+        session._ensure_people_mutation_allowed()
         if type(value) in HISTORY_TYPES:
             session._register_nested_overlay(value)
             self.bind(value)
@@ -149,7 +168,7 @@ class RecursiveHistoryRuntime:
         if reference(value) or immutable_value(value):
             return value
         if type(value) is tuple:
-            return tuple(self.admit(child) for child in value)
+            return tuple(self._admit_validated(child) for child in value)
         if type(value) not in (list, dict, set):
             raise TypeError('recursive history value is outside the typed container schema')
         tracker = session._eager_tracker
@@ -163,7 +182,7 @@ class RecursiveHistoryRuntime:
         self._admitting.add(id(value))
         try:
             kind = {list: 'list', dict: 'map', set: 'set'}[type(value)]
-            values = self.initial_values(kind, value)
+            values = self._initial_validated_values(kind, value)
             incarnation = session._registry.allocator.allocate()
             proxy = HISTORY_CLASSES[kind](session.store, session.pin, incarnation.value,
                 initial_values=values, cache_budget=session._history_cache_budget, recursive=True)

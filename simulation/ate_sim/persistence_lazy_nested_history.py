@@ -34,10 +34,29 @@ def reference(value):
             and type(value.incarnation) is int and value.incarnation > 0)
 
 
-def immutable_value(value):
+def immutable_value(value, active=None):
     if value is None or type(value) in (bool, int, float, str, bytes):
         return True
-    return type(value) in (tuple, frozenset) and all(immutable_value(item) for item in value)
+    # Import on use: core itself imports the concrete history classes.
+    # Ref is the schema's sole frozen record; Layer is its concrete enum.
+    # Do not infer value semantics from arbitrary dataclass/enum classes.
+    from .core import Ref, Layer
+    if type(value) is Layer:
+        return True
+    if type(value) not in (tuple, frozenset, Ref):
+        return False
+    active = set() if active is None else active
+    if id(value) in active:
+        return False
+    active.add(id(value))
+    try:
+        if type(value) is Ref:
+            if set(vars(value)) != {'kind', 'id'}:
+                return False
+            return immutable_value(value.kind, active) and immutable_value(value.id, active)
+        return all(immutable_value(item, active) for item in value)
+    finally:
+        active.remove(id(value))
 
 
 def stored_value(value):
@@ -484,6 +503,11 @@ def equality_key(value):
     if not immutable_value(value):
         raise TypeError('typed history keys must be immutable schema values')
     hash(value)
+    from .core import Ref, Layer
+    if type(value) is Layer:
+        return value.value
+    if type(value) is Ref:
+        return Ref(equality_key(value.kind), equality_key(value.id))
     if type(value) is bool:
         return int(value)
     if type(value) is float and value.is_integer():

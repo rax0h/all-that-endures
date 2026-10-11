@@ -1,5 +1,53 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: concrete recursive value records and unique native input (October 11 UTC)
+
+Continued from public `baf594c4c32b864713797e6f09e19c4840acf6d0`, local
+`b0f2d547f84b98b7d82e36b8fab27f098219ef3c`, matching tree
+`d1ad1c9908e9c05d3da87cc1ffe11162adc7a4dd`. This is an implementation
+checkpoint, not completion or acceptance of Stage0.5.
+
+Recursive list/map/set/tuple values now explicitly admit the World schema's sole
+frozen record, `Ref`, and concrete `Layer` enum through the existing checked
+World codec. Materialization preserves their actual types. Numeric-equal Ref
+keys and Layer/string-equal keys use the existing indexed map/set route while
+keeping the first stored key representative. Reopened equal-value assignments
+and duplicate set additions remain no-op saves.
+
+**Ruling: closed value-record allowlist.** Admit exactly Ref and Layer, not
+inferred frozen dataclasses or enums. Ref's actual fields must be exactly kind/id
+and recursively immutable; forged cycles, hidden mutable children, missing/extra
+state and foreign classes reject before owner edits or incarnation allocation.
+This retains existing codec value semantics without adding a generic serializer
+or changing mutable-record identity rules. A schema coverage check fails if a new
+frozen record is declared without an explicit admission decision. Mutable-record
+closure is still pending; NaN/identity-sensitive key cases remain separately open.
+
+**Ruling: one preflight per unique native container graph.** Each public admission
+keeps a temporary identity-to-actual-source map for completed native list/dict/
+set/tuple subtrees. Sources stay alive until preflight returns, so address reuse
+cannot confer validation on another object. This is actual incoming D, not a
+session cache or second registry. Builders consume only the exact builtin graph
+just checked; streaming/generator contracts are unchanged. Every new public
+operation checks the original input afresh, including sources already aliased in
+the canonical memo. Caller changes introducing an invalid value still reject
+before allocation and preserve the old owner value.
+
+A 48-placement shared-child probe fell from **147 to 3 scalar codec checks**.
+Permanent new cases: **16 passed in2.99s**. Current-source affected gate:
+**288 passed in158.55s**, exit0, zero failures/errors. Counts overlap and are not
+additive. The preceding159-case gate preceded the unique-input optimization.
+Paired H1k/H10k recursive routing remains exactly104 payload reads,10 writes,
+738 metadata rows; 25 dirty histories still require50 save-projection visits.
+Commands, case names/properties and exact source/test hashes are in
+`stage_0_5_recursive_value_record_validation.json`.
+
+Remaining: mutable registered-record backing/schema closure, persisted append/
+count-tree promotion, exotic equality, complete capability-6 ordinary open and
+source-preserving copy upgrade, integrated bounds/P5 and the final applicable
+suite plus fresh independent review. No new endurance, capability6 publication,
+PR14 alteration or production acceptance is claimed.
+
 ## Latest checkpoint: recursive input lifetime and failed-edit bounds (October 10 UTC)
 
 Continued from public `afdf39e84ed7fbb86edb6f01db2dde8b1eefd3e9`, local
