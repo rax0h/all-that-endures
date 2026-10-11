@@ -186,3 +186,20 @@ def test_recursive_snapshot_transfers_to_strict_standalone_event_segment(tmp_pat
         assert s.world.events._disk_count == CHUNK_SIZE
         assert type(s.world.events[0].data) is FrozenDict
         assert s.world.events[0].data['values'] == [1]
+
+
+def test_first_seal_through_resident_world_log_activates_backing_before_snapshot_assignment(tmp_path):
+    from simulation.tests.test_stage_0_5_final_world_native_event_peers import with_native_event
+    target = with_native_event(tmp_path)
+    with open_bridge(target, rules_id=RULES) as s:
+        activate(s)
+        event = s.world.events[0]
+        # No recursive Event record has been loaded through the history owner.
+        event.seal()
+        assert event is s.skills[1, 'craft'].provenance[0]
+        assert event.data._deep_immutable is True
+        s.save()
+    with open_bridge(target, rules_id=RULES) as s:
+        activate(s)
+        assert s.world.events[0].data is s.skills[1, 'craft'].provenance[0].data
+        assert list(s.world.events[0].data['values']) == [1]
