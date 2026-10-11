@@ -22,6 +22,16 @@ preserve native Event sealing through runtime bindings. Evidence:
 affected; overlapping). Live integration remains Task2–3 of the approved native
 record plan.
 
+Native record integration follow-up (October11 UTC): closed non-Event record
+input now has canonical native bindings, child references and the existing World
+publication/dependency/retirement path.35 actual native/cycle cases exercise
+SkillHistory and ActionRecord, not all actual field values. With fixed related U,
+H1k/H10k record edit/save/no-op uses120 reads,4 writes,793 metadata rows. The483
+broad gate precedes only final owner preflight;136 affected cases verify current
+source. Event frozen snapshots, RecordTable/special collection imports and
+exhaustive generated/import byte classifications are still pending. Evidence:
+`stage_0_5_recursive_record_runtime_validation.json`.
+
 | Record.field | Classification | Growth writer / guard | Actual bound | Representation |
 |---|---|---|---|---|
 | AbilityProgress.aura | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |

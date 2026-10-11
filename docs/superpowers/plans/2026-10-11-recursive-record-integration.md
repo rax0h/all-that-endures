@@ -63,6 +63,15 @@
 - [ ] Route pending record bytes through nested_history_version_changes and its existing acknowledgement boundary; avoid scanning clean registry or headers.
 - [ ] Run focused and affected tests, record source/bounds evidence and commit [skip ci].
 
+**October11 implementation checkpoint:** Non-Event native bindings, compact
+children, actual record dependency leases, frozen hybrid publication/recovery and
+single-header retirement are implemented.35 native/cycle cases pass in the
+current136-case affected gate.483 broader cases precede only the final owner-cycle
+preflight. Task2–3 checkboxes remain open because Event snapshots/special collection
+bodies and exhaustive field graphs are not closed. Next integrate immutable Event
+data with explicit backing authority; preserve seal semantics and avoid inline
+unbounded record headers. No capability6 claim.
+
 ### Task4: Exhaustive schema evidence and integration boundary
 
 **Files:** STAGE_0_5_FINAL_SCHEMA_INVENTORY.md; STAGE_0_5_FINAL_PROGRESS.md; machine-readable validation artifact; record/schema tests.

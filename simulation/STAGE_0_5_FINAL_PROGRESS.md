@@ -1,5 +1,52 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: native recursive records in the existing publisher (October11 UTC)
+
+Published source local `6ce93958f6748c1256f5be947041014bfa137401`, public
+`661874db2f721d657209bc71b5612615fc4438aa`, matching tree
+`fe5bcca1a230f70bad25df9ac521a50c3006a410`; leased non-force branch update succeeded.
+The sole canonical object is the actual declared dataclass. Its private backing
+metadata borrows the existing assignment bindings and registry. Normalized child
+histories/records preserve identity, and record bytes/witnesses/dependencies use
+the existing nested-history participant and one frozen World transaction.
+
+Native tests cover aliases, child replacement, eager action and cold lazy-family
+peers, finite append/count batches, private orphan edits/revival, weak collection,
+closed/stale guards, old pins, bounded retirement and both save fault phases.
+A cold family first edit initially changed only its family header, leaving the
+record backing stale; binding selection now occurs before the original setter.
+Already-bound ancestor references also exposed cycles. Check incoming D and
+related checked physical parent placements without reading child history payloads.
+A final owner-cycle probe rejected only after changing an unbacked family field;
+the additional family preflight now rejects before field edit/allocation.
+
+Gate **483 passed in144.85s**, plus focused **78 passed in15.56s**, preceded only
+that final four-line family preflight. Exact published-source affected gate:
+**136 passed in95.10s**, zero failures/errors. There are35 permanent native
+record/cycle cases; counts overlap. Exact source boundaries/hashes, commands,
+cases and reproduced failures are retained in
+`stage_0_5_recursive_record_runtime_validation.json`. The first broad launcher
+omitted PYTHONPATH and produced18 collection errors; corrected environment was
+applied explicitly before the successful483-case run.
+
+At unrelated H1k/H10k, record edit/save/no-op used exactly **120 reads,4 writes,
+793 metadata rows** at each scale. The probe holds the same related owner aliases
+at both scales, so temporary alias collection does not change dependency pruning.
+Existing recursive-history routing stays104 reads,10 writes,738 metadata rows;
+finite shared-child preflight stays2 scalar checks per48-placement batch.
+Ancestor checks follow actual D/related placement metadata, not a claimed constant
+for arbitrary depth/sharing. Imported tuple/string/bytes and special record
+collection bodies have no newly certified bound.
+
+**Scope boundary:** Event input/header activation remains explicitly excluded
+until frozen snapshot integration. The35 native cases do not certify actual
+values of every mutable class. RecordTable/special root collection imports,
+exhaustive schema/byte bounds and complete ordinary capability6 open/copy upgrade
+remain pending. This is implementation in the checked staging lane, not complete
+format activation. Persisted promotion, exotic equality, integrated bounds/P5,
+the one final full suite and fresh independent review also remain. P5 and PR14
+are unchanged; no Stage1, gameplay, new endurance, merge or acceptance claim.
+
 ## Latest checkpoint: closed registered-record header primitives (October 11 UTC)
 
 The interrupted affected run completed: **427 passed in132.30s**, exit0,
