@@ -116,6 +116,23 @@ def _install_assignment_hooks():
 
         def hooked(self, name, value, _original=original):
             bound = _binding(self)
+            if bound is None:
+                table_ref = vars(self).get('_index_table')
+                table = None if table_ref is None else table_ref()
+                world_session = getattr(table, '_session', None)
+                if getattr(world_session, '_identity_coordinator', None) is not None:
+                    from .persistence_record_headers import NAMESPACE as RECORD_HEADER
+                    incarnation = world_session._registry.incarnation_for_object(self)
+                    if incarnation is not None and world_session.store.contains_lazy_key(
+                            world_session.pin, RECORD_HEADER, (incarnation.value, 0)):
+                        # A cold backed family record can gain its binding while
+                        # routing loads a peer. Certify incoming values first;
+                        # choose that binding before the original setter edits.
+                        preflight = getattr(table, 'preflight_value', None)
+                        if preflight is not None:
+                            preflight(self._index_key, name, value)
+                        world_session._shared_object_routes(self)
+                        bound = _binding(self)
             token = None
             assigned = value
             if bound is not None:
@@ -123,6 +140,9 @@ def _install_assignment_hooks():
                     bound.session._ensure_mutation_allowed(
                         subject=self, field=name, value=value
                     )
+                    bound = _binding(self)
+                    if bound is None:
+                        raise StoreError('record binding disappeared during mutation preflight')
                 token = bound.before_assignment(self, name, value)
                 if token is not None and token[0] in ("owned", "root_collection", "root_collection_normalize"):
                     assigned = token[-1]
@@ -1209,7 +1229,7 @@ class IncrementalWorldSession:
         bound = _binding(value)
         if bound is not None and bound.session is self:
             bound.owners.discard(owner)
-            if not bound.owners and bound.root_fields is None:
+            if not bound.owners and bound.root_fields is None and not hasattr(bound, '_record_backing'):
                 _BINDINGS.pop(id(value), None)
                 self._bound_ids.discard(id(value))
         if isinstance(value, _NestedMixin):
@@ -2482,11 +2502,18 @@ class IncrementalWorldSession:
     def reset_changed_member_work(self):
         self._changed_member_work = 0
 
-    def _clear_bindings(self):
+    def _clear_bindings(self, *, detached=False):
         for ident in self._bound_ids:
             bound = _BINDINGS.get(ident)
             if bound is not None and bound.session is self:
-                _BINDINGS.pop(ident, None)
+                if hasattr(bound, '_record_backing'):
+                    # Held native aliases keep a tiny closed mutation guard;
+                    # their weak object callback removes it after collection.
+                    bound.close()
+                    if detached:
+                        _BINDINGS.pop(ident, None)
+                else:
+                    _BINDINGS.pop(ident, None)
         self._bound_ids.clear()
 
     def _unwrap_value(self, value, memo):

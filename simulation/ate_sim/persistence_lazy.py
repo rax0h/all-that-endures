@@ -3417,6 +3417,10 @@ class LazyRecordTable(RecordTable):
         self._ensure_mutation()
         self._session._preflight_history_owner(value,
             Occurrence(self._namespace, key, (("field", field),)))
+        if self._session._identity_coordinator is not None:
+            record = dict.get(self, key)
+            if record is not None and field in RECORD_FIELDS.get(type(record), ()):
+                self._session._recursive_histories.check_assignment_cycle(record, value)
 
     def __init__(self, session, *, clean_limit=CLEAN_GROUP_LIMIT):
         dict.__init__(self)
@@ -10986,6 +10990,11 @@ class LazyWorldSession:
         self, *, subject=None, field=None, value=None
     ):
         self._ensure_people_mutation_allowed()
+        from .persistence_record_runtime import record_backing
+        if subject is not None and record_backing(subject) is not None:
+            # The native record binding performs closed graph preflight and
+            # checked shared routing before calling the original setter.
+            return
         if self._identity_bridge is not None:
             from .agency import ActionRecord
             from .persistence_event_ids import EventIdSet
@@ -12303,17 +12312,19 @@ class LazyWorldSession:
 
     def _register_nested_overlay(self, proxy):
         """Admit a canonical same-session child and journal its private edits."""
-        if proxy._store is not self.store:
+        from .persistence_record_runtime import backing_for
+        backing = backing_for(proxy)
+        if backing._store is not self.store:
             raise StoreError('cross-session nested history')
         incarnation = self._registry.incarnation_for_object(proxy)
-        if incarnation is None or incarnation.value != proxy._incarnation:
+        if incarnation is None or incarnation.value != backing._incarnation:
             raise StoreIntegrityError('nested history lacks its current incarnation')
-        self._nested_lists[incarnation.value] = proxy
+        self._nested_lists[incarnation.value] = backing
         if self._backing_dependencies is not None:
             self._backing_dependencies.acquire(proxy)
-        if history_has_pending_overlay(proxy):
+        if history_has_pending_overlay(backing):
             # Reattachment must publish private edits with the owner's header.
-            self._nested_dirty[incarnation.value] = proxy
+            self._nested_dirty[incarnation.value] = backing
         return incarnation
 
     def _eager_nested_owners(self):
@@ -14320,7 +14331,8 @@ class LazyWorldSession:
             with self._recursive_histories.prepared_routes():
                 for proxy in tuple(self._nested_dirty.values()):
                     if history_has_pending_overlay(proxy):
-                        self._shared_object_routes(proxy, placements_synchronized=True)
+                        from .persistence_record_runtime import canonical_for
+                        self._shared_object_routes(canonical_for(proxy), placements_synchronized=True)
         nested_history_identity_changes = self._prepare_eager_nested_identities()
         scalar_record_plans = tuple(
             ScalarRecordSavePlan(namespace, *table.prepare_save_changes())
@@ -14499,8 +14511,11 @@ class LazyWorldSession:
         event_incarnations = {proxy._incarnation for proxy in event_histories}
         nested_changes = []
         for incarnation, proxy in sorted(self._nested_dirty.items()):
-            if not (incarnation in event_incarnations or self._registry.occurrences_for_incarnation(IncarnationId(self.store.store_identity, incarnation)) or self._nested_eager_owners(proxy)):
+            from .persistence_record_runtime import canonical_for, RecordBacking
+            if not (incarnation in event_incarnations or self._registry.occurrences_for_incarnation(IncarnationId(self.store.store_identity, incarnation)) or self._nested_eager_owners(canonical_for(proxy))):
                 self._nested_dirty.pop(incarnation, None)
+                if type(proxy) is RecordBacking:
+                    proxy._dirty_record = None
                 continue
             changes = proxy.pending_changes()
             if not changes:
@@ -17326,7 +17341,7 @@ class LazyWorldSession:
         finally:
             tracker._suspended -= 1
 
-        tracker._clear_bindings()
+        tracker._clear_bindings(detached=True)
         tracker._active = False
         tracker._cold_state = "closed"
         tracker._cold_plan = None

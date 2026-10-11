@@ -22,7 +22,7 @@ from .persistence_lazy_nested_history import HISTORY_TYPES
 
 NAMESPACE = 'aux.lazy.history.dependencies'
 TAG = 'history-backing-dependencies/v1'
-KINDS = ('list', 'map', 'set', 'sequence')
+KINDS = ('list', 'map', 'set', 'sequence', 'record')
 
 
 def dependency_value(kind, tokens=()):
@@ -89,14 +89,17 @@ class BackingDependencyPool:
         self.closed = False
 
     def acquire(self, alias):
+        from .persistence_record_runtime import record_backing
+        backing = record_backing(alias)
+        metadata = alias if backing is None else backing
         if self.closed:
             raise StoreError('backing dependency pool is closed')
         if self._prepared is not None:
             raise StoreConflictError('backing dependencies have a frozen save plan')
-        if (type(alias) not in HISTORY_TYPES or alias._store is not self.store
-                or alias._pin != self.pin):
+        if ((type(alias) not in HISTORY_TYPES and backing is None)
+                or metadata._store is not self.store or metadata._pin != self.pin):
             raise StoreConflictError('backing dependency has a different publisher lease')
-        incarnation, kind = alias._incarnation, alias._kind
+        incarnation, kind = metadata._incarnation, metadata._kind
         previous = self._aliases.get(incarnation)
         if previous is not None:
             if previous[0]() is not alias or previous[1] != kind:
@@ -113,7 +116,7 @@ class BackingDependencyPool:
                             pool._prepared_target is None or incarnation not in pool._prepared_target):
                         pool._new.discard(incarnation)
         self._aliases[incarnation] = weakref.ref(alias, collected), kind
-        if alias._new:
+        if metadata._new:
             self._new.add(incarnation)
 
     def protected_incarnations(self):

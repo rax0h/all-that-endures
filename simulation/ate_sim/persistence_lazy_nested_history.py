@@ -61,11 +61,21 @@ def immutable_value(value, active=None):
 
 def stored_value(value):
     """Closed recursive backing values; mutable objects live behind references."""
-    return reference(value) or immutable_value(value) or (type(value) is tuple and all(stored_value(v) for v in value))
+    from .persistence_record_headers import record_reference
+    return reference(value) or record_reference(value) or immutable_value(value) or (type(value) is tuple and all(stored_value(v) for v in value))
 
 
 def materialize_history_value(value, memo):
     """Explicit full materialization shares one memo across all descendants."""
+    from .persistence_record_runtime import mutable_record, record_backing
+    if mutable_record(value) and record_backing(value) is not None:
+        from .persistence_schema import RECORD_FIELDS
+        if id(value) not in memo:
+            result = object.__new__(type(value))
+            memo[id(value)] = result
+            for field in RECORD_FIELDS[type(value)]:
+                object.__setattr__(result, field, materialize_history_value(getattr(value, field), memo))
+        return memo[id(value)]
     if type(value) is tuple:
         if id(value) not in memo:
             memo[id(value)] = tuple(materialize_history_value(v, memo) for v in value)
@@ -201,11 +211,11 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
         if self._changed is not None:
             self._changed()
 
-    def _validate(self, value):
-        if self._value_validator is not None:
+    def _validate(self, value, *, stored=False):
+        if self._value_validator is not None and not stored:
             self._value_validator(value)
-        if self._recursive_runtime is not None:
-            value = self._recursive_runtime.admit(value)
+        if self._recursive_runtime is not None and not stored:
+            value = self._recursive_runtime.admit(value, destination=self)
         if not (stored_value(value) if self._recursive else immutable_value(value)):
             raise TypeError('typed history values must be immutable schema values')
         self._store.codec.encode(value)
@@ -284,13 +294,14 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
             # callbacks before certifying that graph for its checked build.
             start, stop, step = index.indices(self._length)
             if self._recursive_runtime is not None:
-                self._recursive_runtime.validate_native_batch(raw_values, self._value_validator)
+                self._recursive_runtime.validate_native_batch(raw_values, self._value_validator, destination=self)
             if step != 1 and len(raw_values) != len(range(start, stop, step)):
                 raise ValueError(f'attempt to assign sequence of size {len(raw_values)} to extended slice of size {len(range(start, stop, step))}')
             if self._recursive_runtime is not None:
                 raw_values = self._recursive_runtime._admit_validated_batch(raw_values)
-            value = [self._validate(item) for item in raw_values]
-            values = list(self)
+            stored = self._recursive_runtime is not None
+            value = [self._validate(item, stored=stored) for item in raw_values]
+            values = [self._validate(item) for item in self] if stored else list(self)
             if step == 1:
                 values[start:stop] = value
             else:
@@ -298,7 +309,7 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
                 # normalized negative stop also cannot be resliced verbatim.
                 for position, item in zip(range(start, stop, step), value):
                     values[position] = item
-            self._replace_all(values)
+            self._replace_all(values, stored=stored)
         else:
             index = self._normalize(index)
             value = self._validate(value)
@@ -374,8 +385,8 @@ class LazyHistoryList(CleanCacheOwner, MutableSequence):
             self._replace_all(values)
         self._notify()
 
-    def _replace_all(self, values):
-        values = [self._validate(value) for value in values]
+    def _replace_all(self, values, *, stored=False):
+        values = [self._validate(value, stored=stored) for value in values]
         old_pages = (max(self._length, self._base_length) + PAGE_SIZE - 1) // PAGE_SIZE
         for number in range(max(old_pages, (len(values) + PAGE_SIZE - 1) // PAGE_SIZE)):
             if number * PAGE_SIZE < self._base_length and number not in self._baseline_page_bytes:
@@ -711,7 +722,7 @@ class _ScalarHistory(CleanCacheOwner):
             self._recursive_runtime.validate_physical_children(
                 (ENTRY_NAMESPACE, (self._incarnation, canonical)), old)
         if self._recursive_runtime is not None and self._kind == 'map':
-            value = self._recursive_runtime.admit(value)
+            value = self._recursive_runtime.admit(value, destination=self)
         if not (stored_value(value) if self._recursive else immutable_value(value)):
             raise TypeError('typed history values must be immutable schema values')
         self._store.codec.encode(value)
@@ -1078,6 +1089,9 @@ HISTORY_TYPES = tuple(HISTORY_CLASSES.values())
 
 def has_pending_overlay(history):
     """Inspect unsaved state without loading pages or freezing a sequence."""
+    from .persistence_record_runtime import RecordBacking
+    if type(history) is RecordBacking:
+        return history.has_pending_overlay()
     if type(history) not in HISTORY_TYPES:
         raise TypeError('expected typed history')
     if history._new:

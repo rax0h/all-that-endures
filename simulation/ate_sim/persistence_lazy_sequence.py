@@ -134,11 +134,11 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
             self._read_guard()
         self._store._require_pin(self._pin)
 
-    def _validate(self, value):
-        if self._value_validator is not None:
+    def _validate(self, value, *, stored=False):
+        if self._value_validator is not None and not stored:
             self._value_validator(value)
-        if self._recursive_runtime is not None:
-            value = self._recursive_runtime.admit(value)
+        if self._recursive_runtime is not None and not stored:
+            value = self._recursive_runtime.admit(value, destination=self)
         if not self._valid_value(value):
             if self._value_mode == 'native':
                 raise TypeError('sequence values must be immutable schema values')
@@ -531,6 +531,7 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
 
     def extend(self, values):
         input_error = None
+        stored = False
         with self._mutation():
             if values is self:
                 values = tuple(self)
@@ -539,8 +540,9 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
             if self._recursive_runtime is not None and type(values) in (list, tuple):
                 # Finite inputs have no iteration callbacks. Reject an invalid
                 # later member before allocating any earlier native child.
-                self._recursive_runtime.validate_native_batch(values, self._value_validator)
+                self._recursive_runtime.validate_native_batch(values, self._value_validator, destination=self)
                 values = self._recursive_runtime._admit_validated_batch(values)
+                stored = True
             iterator = iter(values)
             while True:
                 try:
@@ -555,7 +557,7 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
                     break
                 # Invalid stored values or tree/index failures still leave
                 # this scope exceptionally and roll back its entire journal.
-                self._insert(self._length, self._validate(value))
+                self._insert(self._length, self._validate(value, stored=stored))
         if input_error is not None:
             raise input_error
 
@@ -659,12 +661,12 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
             start, stop, step = index.indices(self._length)
             positions = range(start, stop, step)
             if self._recursive_runtime is not None:
-                self._recursive_runtime.validate_native_batch(raw_values, self._value_validator)
+                self._recursive_runtime.validate_native_batch(raw_values, self._value_validator, destination=self)
             if step != 1 and len(raw_values) != len(positions):
                 raise ValueError(f'attempt to assign sequence of size {len(raw_values)} to extended slice of size {len(positions)}')
             if self._recursive_runtime is not None:
                 raw_values = self._recursive_runtime._admit_validated_batch(raw_values)
-            values = tuple(self._validate(v) for v in raw_values)
+            values = tuple(self._validate(v, stored=self._recursive_runtime is not None) for v in raw_values)
             if step != 1:
                 for rank, item in zip(positions, values):
                     self._assign(rank, item)
