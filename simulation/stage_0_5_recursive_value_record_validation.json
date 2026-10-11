@@ -1951,5 +1951,11 @@
     "Exotic NaN/identity-sensitive immutable key semantics remain open",
     "Persisted append/count-tree promotion and complete capability-6 open/copy upgrade remain open",
     "No final full suite, new endurance, capability-6 publication, production acceptance or PR14 changes"
-  ]
+  ],
+  "publication": {
+    "local_source_commit": "b72c7dce8c7aa68d4f74ddbeb4a426206766da05",
+    "public_source_commit": "e6aaa01a39922bd416342adfbd374cda74775234",
+    "matching_source_tree": "e55f15a392bb03c7a82e6849899fa3663b7fe06c",
+    "mode": "leased non-force update on implementation branch"
+  }
 }

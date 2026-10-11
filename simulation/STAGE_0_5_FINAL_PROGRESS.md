@@ -4,8 +4,12 @@
 
 Continued from public `baf594c4c32b864713797e6f09e19c4840acf6d0`, local
 `b0f2d547f84b98b7d82e36b8fab27f098219ef3c`, matching tree
-`d1ad1c9908e9c05d3da87cc1ffe11162adc7a4dd`. This is an implementation
-checkpoint, not completion or acceptance of Stage0.5.
+`d1ad1c9908e9c05d3da87cc1ffe11162adc7a4dd`. Published source
+`e6aaa01a39922bd416342adfbd374cda74775234`, local source
+`b72c7dce8c7aa68d4f74ddbeb4a426206766da05`, matching tree
+`e55f15a392bb03c7a82e6849899fa3663b7fe06c`. Leased non-force publication
+succeeded on the implementation branch. This is an implementation checkpoint,
+not completion or acceptance of Stage0.5.
 
 Recursive list/map/set/tuple values now explicitly admit the World schema's sole
 frozen record, `Ref`, and concrete `Layer` enum through the existing checked
