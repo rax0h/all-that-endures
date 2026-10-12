@@ -1,5 +1,52 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: explicit raw legacy graph NaN normalization (October 12)
+
+Parent local `2b0d321`, public `7b789947a52fadadae95aea20a129fd5d7b566fc`,
+matching tree `59648ba14ca18f4f90ac0462a1b5a8c475061ee0`.
+
+The continuing legacy audit reproduced all eight float/tuple/frozenset/Ref map/set
+cases: graph copy published successfully, but its own returned key was absent.
+Explicit normalization now projects raw keys and values into the existing checked
+NaN atom bodies. Copied map/set builders consume closed stored keys using their
+existing key-runtime seam. No second persistent registry or publisher was added.
+New atom bodies, dependencies, owner/group witnesses and allocator publish in the
+same private-copy commit, followed by full verification and no-overwrite publish.
+
+Transient position anchors borrow the nearest checked mutable ancestor. Map key
+slots include logical ordinal as well as exact source bytes, so equal-bit distinct
+NaN keys survive. Immutable map values use a separate ordinal slot; key/value
+positions do not collapse. Frozenset/set slots use canonical source byte order.
+Original float sign/payload bits survive. Genuine legacy had no float identity
+labels: this preserves its captured decoded state and container aliases, not an
+inferred pre-save float sharing relation absent from those bytes. Already checked
+current copies retain their recorded atom identities.
+
+A native action alias exposed a projection mismatch between its current float and
+its checked atom header. The runtime now checks the exact bits and full native
+record body before binding existing float aliases into the sole conditional
+registry. Public values remain native floats. Record tuple fields retain their
+existing compact comparison. Wrong bodies/bit disagreements still reject.
+
+Stable affected gate: **259 passed in 42.63s**, plus the scalar advancement scaling
+case passed on identical production source in the earlier combined run. That run
+had one negative-test fixture error (ordinary read of a lazy treasury); the fixture
+was fixed and all 259 non-scaling cases rerun. No production fix was needed for
+that fixture. Counts overlap; exact hashes/cases/properties/source boundaries:
+`stage_0_5_legacy_nonreflexive_copy_validation.json`.
+
+Coverage includes raw legacy shared Event/currency containers, all four key shapes,
+equal-bit distinct keys and values, native scalar aliases, source-preserving
+rejection of conflicting aliases, sealed snapshots, checked current copy,
+cache clearing, save/reopen and full materializing detach. Ordinary legacy open
+still keeps compatibility behavior; capability6 is withheld.
+
+Next concrete gate: normalize raw NaNs and other admissible descendants already
+inside older page-backed histories, rather than only newly converted raw root
+subgraphs. Then close complete root/reader-floor/open/upgrade activation and run
+integrated P5/final stable-source suite and independent architecture acceptance.
+No gameplay/rank issue17 work, PR14 promotion, force push or new endurance.
+
 ## Latest checkpoint: compact advancement roots and imported mutable topology (October 12)
 
 Parent local `649d79008dca4699c8a641a18736a6011c9ffbef`, public

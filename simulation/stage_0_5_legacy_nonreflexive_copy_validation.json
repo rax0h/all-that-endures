@@ -1,0 +1,1970 @@
+{
+  "date_utc": "2026-10-12",
+  "checkpoint": "Explicit raw legacy graph NaN atom normalization",
+  "parent_local": "2b0d321",
+  "parent_public": "7b789947a52fadadae95aea20a129fd5d7b566fc",
+  "parent_tree": "59648ba14ca18f4f90ac0462a1b5a8c475061ee0",
+  "sha256": {
+    "simulation/ate_sim/persistence_event_copy_normalization.py": "394d7cd70c2679d5f1b73bf57734bc7073c856c05479d52108348974eb4bd0c7",
+    "simulation/ate_sim/persistence_history_runtime.py": "790511cbb868c4fd44b87936d63ed35e1b9ece7fba37b10a32d3a2e6832ec526",
+    "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py": "d41475575459dc2f02aaa8b47067600f7335a76644c500ec13741facbbfaa7a8"
+  },
+  "initial_RED": "All 8 native float/tuple/frozenset/Ref map/set keys returned by copied container iteration were unusable as keys",
+  "integration_RED": [
+    "two equal-bit distinct legacy map keys collapsed under a byte-only key slot",
+    "separate equal-bit NaN map values needed their own ordinal positions",
+    "a native current action float disagreed with the corresponding backed atom reference; the full body must agree before binding its existing native alias"
+  ],
+  "source_identity_boundary": "Genuine raw legacy never recorded float identity labels. Explicit copy normalizes captured decoded positions under the nearest checked mutable ancestor. Aliases of a captured container share its slots. It does not infer pre-save key/value float identity that the legacy bytes never recorded. Already checked current copies retain recorded atom IDs and sharing.",
+  "gates": [
+    {
+      "name": "legacy-nan-affected-stable",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "259",
+        "time": "42.550",
+        "timestamp": "2026-10-12T19:05:29.017992-04:00",
+        "hostname": "4a45d3c852af"
+      },
+      "cases": [
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[map-float]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.183"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[map-tuple]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.166"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[map-frozenset]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.163"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[map-ref]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.166"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[set-float]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.181"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[set-tuple]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.193"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[set-frozenset]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.174"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[set-ref]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.234"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_equal_bit_distinct_nan_members_are_not_collapsed[map]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "47",
+          "time": "0.164"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_equal_bit_distinct_nan_members_are_not_collapsed[set]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "47",
+          "time": "0.131"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_nan_scalar_in_shared_native_action_preserves_public_float_type",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "65",
+          "time": "0.169"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_nan_values_and_frozen_keys_reopen_copy_and_detach[False]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "85",
+          "time": "0.242"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_nan_values_and_frozen_keys_reopen_copy_and_detach[True]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "85",
+          "time": "0.220"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_equal_bit_nan_values_have_distinct_position_atoms",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "105",
+          "time": "0.128"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_alias_nan_bit_disagreement_rejects_without_destination",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "120",
+          "time": "0.076"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_raw_shared_event_data_copy_keeps_incarnations_and_physical_child_routes",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "19",
+          "time": "0.186"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_copy_rejects_conflicting_legacy_alias_bodies_before_publish[event-data]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "60",
+          "time": "0.070"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_copy_rejects_conflicting_legacy_alias_bodies_before_publish[action-root]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "60",
+          "time": "0.069"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_event_child_retains_existing_skill_history_alias",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "93",
+          "time": "0.177"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_native_record_shared_by_event_payloads_mutates_and_reopens",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "109",
+          "time": "0.159"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_sealed_native_event_value_graph_allocates_readonly_backings_in_copy",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "125",
+          "time": "0.143"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_record_normalized_from_event_data_reuses_related_eager_action_root[True]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "145",
+          "time": "0.167"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_record_normalized_from_event_data_reuses_related_eager_action_root[False]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "145",
+          "time": "0.164"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_skill_record_keeps_one_body_when_native_root_edits_first[True]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "169",
+          "time": "0.177"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_skill_record_keeps_one_body_when_native_root_edits_first[False]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "169",
+          "time": "0.217"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_sealed_event_shared_by_mutable_payloads_has_one_readonly_body",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "192",
+          "time": "0.148"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[before_catalog_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "212",
+          "time": "0.175"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[after_catalog_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "212",
+          "time": "0.171"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[before_publish]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "212",
+          "time": "0.216"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_copy_preserves_held_source_pin_and_pending_overlays",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "232",
+          "time": "0.163"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_copy_uses_compact_root_and_preserves_shared_imported_samples",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "27",
+          "time": "0.306"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_recursive_advancement_recovery_keeps_exact_shared_model[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "75",
+          "time": "0.335"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_recursive_advancement_recovery_keeps_exact_shared_model[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "75",
+          "time": "0.328"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_recursive_advancement_detach_materializes_one_shared_native_graph",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "95",
+          "time": "0.238"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_rank_scope_sees_direct_cold_ability_and_membership_edits",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "106",
+          "time": "2.079"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_rejected_replacement_preserves_original_root_and_routing",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "125",
+          "time": "0.286"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_orphan_path_edits_do_not_resurrect_replaced_owner_and_can_be_reinserted",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "142",
+          "time": "0.339"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_cross_family_record_alias_survives_advancement_normalization[reopen]",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "165",
+          "time": "0.439"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_cross_family_record_alias_survives_advancement_normalization[detach]",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "165",
+          "time": "0.418"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_cross_family_record_alias_survives_advancement_normalization[copy-input]",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "165",
+          "time": "0.372"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_unsaved_recursive_children_close_without_weak_callback_iteration_failure",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "198",
+          "time": "0.204"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_checked_current_copy_retains_compact_shared_advancement_graph",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "209",
+          "time": "0.510"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+          "name": "test_foreign_replacement_rejects_before_detaching_current_root",
+          "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+          "line": "231",
+          "time": "0.431"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_copy_preserves_shared_map_and_descendants[root-wallets]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "17",
+          "time": "0.212"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_copy_preserves_shared_map_and_descendants[root-treasuries]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "17",
+          "time": "0.204"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_copy_preserves_shared_map_and_descendants[event-wallets]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "17",
+          "time": "0.189"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_copy_preserves_shared_map_and_descendants[event-treasuries]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "17",
+          "time": "0.173"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_removal_keeps_shared_alias_without_resurrecting_root[replace]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "41",
+          "time": "0.172"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_removal_keeps_shared_alias_without_resurrecting_root[delete]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "41",
+          "time": "0.171"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_backed_root_assigns_to_second_family_and_detaches_portably",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "63",
+          "time": "0.185"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_backing_and_event_alias_resolve_one_save[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "82",
+          "time": "0.163"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_backing_and_event_alias_resolve_one_save[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "82",
+          "time": "0.180"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_point_save_does_not_walk_map_history",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "104",
+          "time": "11.895"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_rejected_currency_root_assignment_preserves_old_occurrence[foreign]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "156",
+          "time": "0.287"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_rejected_currency_root_assignment_preserves_old_occurrence[undeclared]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "156",
+          "time": "0.279"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_explicit_graph_copy_normalizes_currency_roots_without_event_aliases",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "183",
+          "time": "0.158"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_checked_current_copy_preserves_currency_root_id_and_source_overlay",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "204",
+          "time": "0.329"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "21",
+          "time": "0.107"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "21",
+          "time": "0.108"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "21",
+          "time": "0.107"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "21",
+          "time": "0.109"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "21",
+          "time": "0.114"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "21",
+          "time": "0.110"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "21",
+          "time": "0.112"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "21",
+          "time": "0.115"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "38",
+          "time": "0.136"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "38",
+          "time": "0.149"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "38",
+          "time": "0.153"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "38",
+          "time": "0.155"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_numeric_equality_representatives_remain_one_key[map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "62",
+          "time": "0.119"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_numeric_equality_representatives_remain_one_key[set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "62",
+          "time": "0.139"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "80",
+          "time": "0.137"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "80",
+          "time": "0.145"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "80",
+          "time": "0.137"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "80",
+          "time": "0.145"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "80",
+          "time": "0.138"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "80",
+          "time": "0.149"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "80",
+          "time": "0.140"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_keys",
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py",
+          "line": "80",
+          "time": "0.153"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_shared_by_recursive_owners_mutates_and_reopens",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "12",
+          "time": "0.181"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_children_share_histories_and_replacement_preserves_old_alias",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "36",
+          "time": "0.201"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_graph_preflight_rejects_cycle_before_allocating_earlier_children",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "62",
+          "time": "0.056"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_assignment_preflights_invalid_graph_and_closed_alias_rejects",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "76",
+          "time": "0.112"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_save_fault_preserves_exact_frozen_world_plan[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "93",
+          "time": "0.163"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_save_fault_preserves_exact_frozen_world_plan[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "93",
+          "time": "0.150"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_held_orphan_record_keeps_private_edit_and_revives_same_incarnation",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "119",
+          "time": "0.239"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_clean_record_body_and_binding_are_weak_after_parent_cache_releases",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "145",
+          "time": "0.120"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_corrupt_physical_placement_rejects_before_native_field_edit",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "164",
+          "time": "0.113"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_detach_materializes_one_plain_shared_native_graph",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "180",
+          "time": "0.077"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_shared_with_existing_eager_packed_action_is_one_native_object",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "195",
+          "time": "0.176"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_last_physical_owner_retirement_preserves_old_pin_and_reclaims_children",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "216",
+          "time": "0.485"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_stale_session_reads_pinned_body_but_rejects_mutation_and_cross_session",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "246",
+          "time": "0.129"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_point_edit_save_and_noop_are_independent_of_unrelated_history",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "270",
+          "time": "0.698"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_can_contain_shared_native_record_child_and_replace_it",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "303",
+          "time": "0.169"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[extra]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "323",
+          "time": "0.057"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[missing]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "323",
+          "time": "0.055"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[foreign]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "323",
+          "time": "0.056"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_admission_is_closed_and_failed_input_allocates_nothing[event]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "323",
+          "time": "0.056"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_record_self_assignment_rejects_before_owner_and_allocator_changes",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "350",
+          "time": "0.099"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[record_field]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "364",
+          "time": "0.125"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[list_append]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "364",
+          "time": "0.127"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[map_set]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "364",
+          "time": "0.131"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_existing_canonical_reference_cycle_rejects_without_archive_walk[finite_slice]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "364",
+          "time": "0.133"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_unsaved_record_close_does_not_keep_native_body_alive",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "390",
+          "time": "0.085"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_finite_record_batches_keep_shared_native_identity_after_reopen[list_slice]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "404",
+          "time": "0.398"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_finite_record_batches_keep_shared_native_identity_after_reopen[counted_slice]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "404",
+          "time": "0.486"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_finite_record_batches_keep_shared_native_identity_after_reopen[counted_extend]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "404",
+          "time": "0.500"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_top_level_lazy_record_peer_keeps_backing_and_family_header_consistent",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "429",
+          "time": "0.205"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_materialized_detach_releases_native_record_that_now_has_only_eager_owner",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "449",
+          "time": "0.156"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_native_record_backing_is_rechecked_before_field_edit",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "463",
+          "time": "0.102"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_cold_lazy_family_first_assignment_updates_its_shared_record_backing",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "477",
+          "time": "0.195"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_identical_record_assignment_and_return_to_baseline_are_noop_saves",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "496",
+          "time": "0.116"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_records",
+          "name": "test_unpublished_replaced_record_child_routes_cancel_and_private_graph_revives",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_records.py",
+          "line": "511",
+          "time": "0.217"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_catalog_copy_preserves_source_and_checks_all_physical_owner_witnesses",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "53",
+          "time": "0.116"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_private_copy]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "92",
+          "time": "0.049"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[before_catalog_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "92",
+          "time": "0.070"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "92",
+          "time": "0.068"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_validation]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "92",
+          "time": "0.087"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_competing_destination_is_not_overwritten",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "107",
+          "time": "0.089"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_same_source_and_destination_rejects_without_change",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "119",
+          "time": "0.032"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copied_aliases_continue_independently_and_reject_foreign_source_alias",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "127",
+          "time": "0.142"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_keeps_original_collection_ordinals_and_high_water",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "149",
+          "time": "0.110"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_source_advance_after_capture_cannot_mix_copy_generations",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "176",
+          "time": "0.092"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_corrupt_source_fails_before_destination_publication",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "195",
+          "time": "0.036"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_catalog_bootstrap_cannot_relabel_an_already_staged_catalog",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "207",
+          "time": "0.103"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_counted_leaf_owners_are_checked_without_claiming_branch_ownership",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "219",
+          "time": "1.022"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "245",
+          "time": "0.123"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "245",
+          "time": "0.125"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_keeps_checked_immutable_event_segments",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "266",
+          "time": "0.764"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_catalog_copy_requires_an_explicit_bounded_authority_source",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "290",
+          "time": "0.049"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_rejects_dangling_root_history_reference_before_publication",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "302",
+          "time": "0.060"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_preserves_already_held_source_alias_and_excludes_unsaved_overlay",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "322",
+          "time": "0.120"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_preserves_ordinary_query_memberships",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "341",
+          "time": "0.111"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_real_tracked_log_event_copy_admits_and_reopens_without_changing_source",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "11",
+          "time": "0.168"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_record_table_copy_keeps_internal_sharing_and_leaves_source_indexes_bound",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "38",
+          "time": "0.198"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_already_backed_records_and_histories_produces_portable_values",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "68",
+          "time": "0.135"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_preserves_exact_event_seal_presence_and_readonly_container_roles[None]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "91",
+          "time": "0.127"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_preserves_exact_event_seal_presence_and_readonly_container_roles[False]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "91",
+          "time": "0.125"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_preserves_exact_event_seal_presence_and_readonly_container_roles[True]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "91",
+          "time": "0.125"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_invalid_input_preserves_destination_allocator_and_recovers_guard[cycle]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "111",
+          "time": "0.053"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_invalid_input_preserves_destination_allocator_and_recovers_guard[unknown]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "111",
+          "time": "0.053"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_invalid_input_preserves_destination_allocator_and_recovers_guard[subclass]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "111",
+          "time": "0.054"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_invalid_input_preserves_destination_allocator_and_recovers_guard[record-state]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "111",
+          "time": "0.054"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_invalid_input_preserves_destination_allocator_and_recovers_guard[snapshot-state]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "111",
+          "time": "0.052"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_known_tracking_container_classes_normalize_without_source_writes[TrackedDict]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "138",
+          "time": "0.051"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_known_tracking_container_classes_normalize_without_source_writes[TrackedList]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "138",
+          "time": "0.053"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_known_tracking_container_classes_normalize_without_source_writes[TrackedSet]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "138",
+          "time": "0.053"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_known_tracking_container_classes_normalize_without_source_writes[_RootDict]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "138",
+          "time": "0.052"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_known_tracking_container_classes_normalize_without_source_writes[_RootList]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "138",
+          "time": "0.053"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_known_tracking_container_classes_normalize_without_source_writes[_RootSet]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "138",
+          "time": "0.056"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_known_tracking_container_classes_normalize_without_source_writes[_RootRecordTable]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "138",
+          "time": "0.050"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_default_native_world_and_indexed_state_uses_actual_declared_fields",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "166",
+          "time": "0.858"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_blocks_mutating_read_callback_and_clears_lifecycle_guard",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "192",
+          "time": "0.051"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_closed_source_or_destination_rejects_explicitly",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "210",
+          "time": "0.103"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_requires_same_publisher_for_live_bound_sources",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "226",
+          "time": "0.100"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copy_backed_frozen_snapshot_materializes_native_readonly_values",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "239",
+          "time": "0.132"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copied_input_save_fault_keeps_native_source_and_resolves_existing_plan[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "253",
+          "time": "0.166"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_native_copy_input",
+          "name": "test_copied_input_save_fault_keeps_native_source_and_resolves_existing_plan[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_native_copy_input.py",
+          "line": "253",
+          "time": "0.140"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_closed_record_fields_and_concrete_values_round_trip",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "20",
+          "time": "0.001"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Event]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Person]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Household]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Settlement]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Cell]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LocalState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TradeRoute]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[World]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Genealogy]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Relationship]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocialGraph]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Property]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Economy]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeClaim]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Practice]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution0]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Law]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CulturalState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageNode]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Community]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CommunityState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Transmission]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TransmissionState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillHistory]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Infrastructure]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InfrastructureState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MotiveState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ActionRecord]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AgencyState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Understanding]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AbilityProgress]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[EssencePath]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdvancementState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResponseModel]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicAspiration]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResource]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResourceState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution1]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Branch]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicUserRecord]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdventureNotice]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyApplication]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InstitutionState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SoulState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResurrectionToken]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MetaphysicalState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[God]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[GreatAstralBeing]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Church]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[DivineState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialLot]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CraftedItem]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialEconomy]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientField]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.001"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientMagicState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Conflict]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[WarfareState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.001"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Inquiry]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyAccountabilityState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[RankedCurrencyState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicalThreat]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ThreatEcologyState]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "37",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_event_header_preserves_exact_seal_metadata[absent]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "49",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_event_header_preserves_exact_seal_metadata[False]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "49",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_event_header_preserves_exact_seal_metadata[True]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "49",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[frozen]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "62",
+          "time": "0.001"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[foreign]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "62",
+          "time": "0.001"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[missing]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "62",
+          "time": "0.001"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[extra]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "62",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[mutable_child]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "62",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[tag]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "77",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[class]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "77",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[short]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "77",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[long]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "77",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[mutable]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "77",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[metadata]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "77",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[event_metadata]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "77",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_references_use_closed_codec_tag_and_reject_forged_ids",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "96",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_owner_requires_exact_complete_child_placements",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "119",
+          "time": "0.012"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[1000]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "148",
+          "time": "0.050"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[10000]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "148",
+          "time": "0.448"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key0-path0]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "175",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key1-path1]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "175",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key2-path2]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "175",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key3-path3]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "175",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[1-path4]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "175",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key5-path5]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "175",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key6-path6]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "175",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key7-path7]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "175",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_path_must_belong_to_its_declared_record",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "190",
+          "time": "0.001"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[ordinary]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "200",
+          "time": "0.006"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[schema]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "200",
+          "time": "0.006"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[membership]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "200",
+          "time": "0.006"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_reference_wire_shape_is_closed[node0]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "213",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_reference_wire_shape_is_closed[node1]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "213",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_reference_wire_shape_is_closed[node2]",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "213",
+          "time": "0.000"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "name": "test_record_header_reads_after_fresh_store_open_without_bootstrap",
+          "file": "simulation/tests/test_stage_0_5_final_record_headers.py",
+          "line": "218",
+          "time": "0.009"
+        }
+      ],
+      "properties": [
+        {
+          "name": "H1000_payload_reads",
+          "value": "80"
+        },
+        {
+          "name": "H1000_payload_writes",
+          "value": "10"
+        },
+        {
+          "name": "H1000_metadata_rows",
+          "value": "615"
+        },
+        {
+          "name": "H1000_noop_descriptor_reads",
+          "value": "3"
+        },
+        {
+          "name": "H1000_noop_metadata_rows",
+          "value": "37"
+        },
+        {
+          "name": "H10000_payload_reads",
+          "value": "80"
+        },
+        {
+          "name": "H10000_payload_writes",
+          "value": "10"
+        },
+        {
+          "name": "H10000_metadata_rows",
+          "value": "615"
+        },
+        {
+          "name": "H10000_noop_descriptor_reads",
+          "value": "3"
+        },
+        {
+          "name": "H10000_noop_metadata_rows",
+          "value": "37"
+        },
+        {
+          "name": "H1000_payload_reads",
+          "value": "120"
+        },
+        {
+          "name": "H1000_payload_writes",
+          "value": "4"
+        },
+        {
+          "name": "H1000_metadata_rows",
+          "value": "803"
+        },
+        {
+          "name": "H10000_payload_reads",
+          "value": "120"
+        },
+        {
+          "name": "H10000_payload_writes",
+          "value": "4"
+        },
+        {
+          "name": "H10000_metadata_rows",
+          "value": "803"
+        },
+        {
+          "name": "history",
+          "value": "1000"
+        },
+        {
+          "name": "payload_reads",
+          "value": "1"
+        },
+        {
+          "name": "metadata_rows",
+          "value": "2"
+        },
+        {
+          "name": "payload_read_bytes",
+          "value": "191"
+        },
+        {
+          "name": "history",
+          "value": "10000"
+        },
+        {
+          "name": "payload_reads",
+          "value": "1"
+        },
+        {
+          "name": "metadata_rows",
+          "value": "2"
+        },
+        {
+          "name": "payload_read_bytes",
+          "value": "191"
+        }
+      ]
+    },
+    {
+      "name": "stable-production imported advancement scaling",
+      "case": {
+        "classname": "simulation.tests.test_stage_0_5_final_advancement_graph",
+        "name": "test_scalar_edit_does_not_read_or_write_imported_sample_history",
+        "file": "simulation/tests/test_stage_0_5_final_advancement_graph.py",
+        "line": "50",
+        "time": "180.589"
+      },
+      "properties": [
+        {
+          "name": "H1000_advancement_scalar",
+          "value": "LazyStoreDiagnostics(payload_reads=96, payload_read_bytes=16626, payload_check_reads=105, payload_check_bytes=17975, payload_writes=7, payload_write_bytes=1023, metadata_rows=671, query_rows=0, pin_rows=566, maintenance_rows=16, temporary_keys_peak=0, maintenance_removed_rows=8)"
+        },
+        {
+          "name": "H10000_advancement_scalar",
+          "value": "LazyStoreDiagnostics(payload_reads=96, payload_read_bytes=16679, payload_check_reads=105, payload_check_bytes=18032, payload_writes=7, payload_write_bytes=1025, metadata_rows=671, query_rows=0, pin_rows=566, maintenance_rows=16, temporary_keys_peak=0, maintenance_removed_rows=8)"
+        }
+      ],
+      "boundary": "The earlier combined run had 259 passing cases and one failing negative test setup using the ordinary reader for a lazy treasury; that test setup was corrected and the 259 non-scaling affected cases rerun above. No production code changed between the combined measurement and final affected run. Counts overlap."
+    }
+  ],
+  "scope": "Legacy Event/currency/native advancement raw graphs now project keys and values into the existing checked atom body namespace and conditional runtime registry. Current native scalar aliases bind only after complete body/bit validation. Source bytes, exact native types, bit payloads, equal-bit distinct members, order, mutable container sharing, frozen snapshots, checked current copies and detach are covered. Existing raw atoms inside already page-backed legacy histories still need their own normalization gate; complete format is withheld.",
+  "completion": "Stage 0.5 unfinished. Existing legacy backing/root normalization, complete markers/reader floor/open/upgrade, integrated P5/final suite and independent architecture review remain pending."
+}

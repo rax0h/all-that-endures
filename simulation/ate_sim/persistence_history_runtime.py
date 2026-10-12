@@ -549,7 +549,20 @@ class RecursiveHistoryRuntime:
         if current is not None:
             if not mutable_record(current) or type(current) is not type(restore_record_header(header)):
                 raise StoreIntegrityError('record reference has a different canonical type')
-            def compact(child):
+            matched_atoms = []
+            def compact(child, expected=None):
+                if nonreflexive_key_reference(expected):
+                    import math
+                    if type(child) is not float or not math.isnan(child):
+                        return child
+                    checked = read_nonreflexive_key_header(session.store, session.pin, expected.incarnation)
+                    if nonreflexive_key_header(child) != checked:
+                        raise StoreIntegrityError('eager and backed native NaN bits disagree')
+                    inc = session._registry.incarnation_for_object(child)
+                    if inc is not None and inc.value != expected.incarnation:
+                        raise StoreIntegrityError('eager native NaN has a different incarnation')
+                    matched_atoms.append((child, expected, checked))
+                    return expected
                 if type(child) is EventIdSet:
                     return self.event_id_storage_reference(child)
                 if type(child) in HISTORY_TYPES:
@@ -561,12 +574,22 @@ class RecursiveHistoryRuntime:
                         raise StoreIntegrityError('eager record child lacks checked identity')
                     return RecordReference(inc.value)
                 if type(child) is tuple:
-                    return tuple(compact(member) for member in child)
+                    values = expected if type(expected) is tuple and len(expected) == len(child) else (None,) * len(child)
+                    return tuple(compact(member, counterpart) for member, counterpart in zip(child, values))
                 return child
-            projected = record_header(current, values=tuple(compact(getattr(current, field))
-                                      for field in RECORD_FIELDS[type(current)]))
+            projected = record_header(current, values=tuple(compact(getattr(current, field), expected)
+                                      for field, expected in zip(RECORD_FIELDS[type(current)], header[2])))
             if session.store.codec.encode(projected) != session.store.codec.encode(header):
                 raise StoreIntegrityError('eager and backed record payloads disagree')
+            # Only after the entire native body agrees, retain its float aliases
+            # in the sole conditional registry. Decode then reuses those atoms.
+            for child, ref, checked in matched_atoms:
+                inc = IncarnationId(session.store.store_identity, ref.incarnation)
+                if session._registry.object_for_incarnation(inc) is None:
+                    session._registry.bind_nonreflexive_key(child, incarnation=inc)
+                    root = session._registry.nonreflexive_root_for(child)
+                    root.backing = NonreflexiveKeyBacking(self, root, inc, checked, new=False)
+                    session._register_nested_overlay(child)
         actual = session._registry.incarnation_for_object(result)
         if actual is not None and actual != incarnation:
             raise StoreIntegrityError('resident record has a different canonical incarnation')

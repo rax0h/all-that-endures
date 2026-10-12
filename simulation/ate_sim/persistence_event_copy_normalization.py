@@ -5,8 +5,9 @@ objects. Existing source labels identify mutable bodies; frozen values allocate
 new destination IDs because legacy snapshots have no mutable identity labels.
 """
 from dataclasses import replace
+import math
 
-from .core import Event
+from .core import Event, Ref
 from .event_log import FrozenDict, FrozenList
 from .incremental_store import StoreIntegrityError, StoreFormatError
 from .persistence_lazy_store import VersionChange, IdentityOccurrenceChange
@@ -30,6 +31,21 @@ from .persistence_adapters import (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY,
     PACKED_LIST_KIND, PACKED_LIST_PAYLOAD, META, COLLECTION_LAYOUT)
 from .incremental_store import RecordChange
 
+from .persistence_nonreflexive_keys import (
+    NonreflexiveKeyReference, nonreflexive_key_reference, nonreflexive_key_header,
+    NAMESPACE as NAN_HEADERS, storage_equality_key, stored_immutable_key,
+)
+
+
+class _StoredCopyKeys:
+    """Project already checked stored keys in the private full-copy builder."""
+    @staticmethod
+    def project_key(value, *, allocate=False, canonical=True):
+        if not stored_immutable_key(value):
+            raise StoreIntegrityError('copy key is outside the closed immutable schema')
+        return storage_equality_key(value) if canonical else value
+
+
 CURRENCY_ROOTS = ('world.currency.wallets', 'world.currency.treasuries')
 
 
@@ -38,6 +54,10 @@ def capture_bodies(store, pin, dependencies):
     bodies, frozen = {}, {}
     for dep in dependencies:
         inc, kind = dep.key, dep.value[1]
+        if kind == 'nan-key':
+            bodies[inc] = store.codec.encode(store.read_version(pin, NAN_HEADERS, (inc, 0), expected_record_schema=1).value)
+            frozen[inc] = True
+            continue
         if kind == 'record':
             bodies[inc] = store.codec.encode(store.read_version(pin, RECORD_HEADERS, (inc, 0), expected_record_schema=1).value)
             continue
@@ -58,6 +78,7 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
         for p in placements}
     selected, built, signatures, active, added = {}, {}, {}, set(), []
     readonly_ids = {}
+    atom_ids = {}
     cuts = {}
     facade_inc = labels.get((codec.encode(('world.event_ids', 0)), codec.encode(())))
     facade_rows = [(c.key, c.value[1]) for c in ordinary if c.namespace == 'world.event_ids' and not c.delete]
@@ -97,8 +118,48 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
             raise StoreIntegrityError('legacy Event mutable value has no checked source label')
         return inc
 
-    def encode(source, owner, path):
-        if reference(source) or record_reference(source) or event_id_reference(source):
+    def encode_atom(source, owner, path):
+        nonlocal next_incarnation
+        # Genuine legacy has no float identity labels. Pin each decoded value
+        # position to its nearest checked mutable ancestor so aliases of that
+        # same container agree, without inventing key/value float sharing.
+        anchor = ('owner', codec.encode(owner), codec.encode(path))
+        for length in range(len(path), -1, -1):
+            ancestor = labels.get(marker(owner, path[:length]))
+            if ancestor is not None:
+                anchor = ('ancestor', ancestor, codec.encode(path[length:]))
+                break
+        header = nonreflexive_key_header(source)
+        if anchor not in atom_ids:
+            inc = next_incarnation
+            next_incarnation += 1
+            atom_ids[anchor] = inc
+            added.append(VersionChange(NAN_HEADERS, (inc, 0), header))
+            built[inc] = dependency_value('nan-key')
+            signatures[inc] = codec.encode(header)
+            frozen[inc] = True
+        inc = atom_ids[anchor]
+        if signatures[inc] != codec.encode(header):
+            raise StoreIntegrityError('legacy aliases disagree with captured NaN bits')
+        return NonreflexiveKeyReference(inc)
+
+    def encode_immutable(source, owner, path):
+        if type(source) is float and math.isnan(source):
+            return encode_atom(source, owner, path)
+        if type(source) is tuple:
+            return tuple(encode_immutable(v, owner, path + (('index', n),)) for n, v in enumerate(source))
+        if type(source) is frozenset:
+            # Set iteration order is not an identity authority. Canonical byte
+            # order, including repeated equal-bit NaNs, gives each value slot.
+            values = sorted(source, key=codec.encode)
+            return frozenset(encode_immutable(v, owner, path + (('set-slot', n),)) for n, v in enumerate(values))
+        if type(source) is Ref:
+            return Ref(encode_immutable(source.kind, owner, path + (('field', 'kind'),)),
+                       encode_immutable(source.id, owner, path + (('field', 'id'),)))
+        return source
+
+    def encode(source, owner, path, *, atom_path=None):
+        if reference(source) or record_reference(source) or event_id_reference(source) or nonreflexive_key_reference(source):
             return source
         if type(source) is tuple:
             if source == AUTHORITY_REFERENCE and marker(owner, path) in labels:
@@ -109,9 +170,11 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
                 selected[inc] = EventIdReference(inc)
                 cuts.setdefault(codec.encode(owner), set()).add(path)
                 return selected[inc]
-            return tuple(encode(v, owner, path + (('index', n),)) for n, v in enumerate(source))
+            return tuple(encode(v, owner, path + (('index', n),),
+                                atom_path=atom_path + (('index', n),) if atom_path is not None else None)
+                         for n, v in enumerate(source))
         if immutable_value(source):
-            return source
+            return encode_immutable(source, owner, path if atom_path is None else atom_path)
         cls = type(source)
         if cls not in (dict, list, set, FrozenDict, FrozenList) and not mutable_record(source):
             raise StoreFormatError('legacy Event payload has an undeclared graph value')
@@ -135,15 +198,18 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
                 signature = codec.encode(payload)
             elif kind in ('map', 'frozen-map'):
                 payload = {}
-                for key, child in source.items():
+                for ordinal, (key, child) in enumerate(source.items()):
                     if not immutable_value(key):
                         raise StoreFormatError('legacy Event map has an unsupported key')
-                    payload[key] = encode(child, owner, path + (('key', key),))
+                    stored_key = encode_immutable(key, owner, path + (('map-key', (ordinal, codec.encode(key))),))
+                    atom_path = path + (('map-value', ordinal),) if immutable_value(child) else None
+                    payload[stored_key] = encode(child, owner, path + (('key', key),), atom_path=atom_path)
                 signature = codec.encode(tuple(payload.items()))
             elif kind == 'set':
-                payload = frozenset(source)
-                if any(not immutable_value(v) for v in payload):
+                if any(not immutable_value(v) for v in source):
                     raise StoreFormatError('legacy Event set has an unsupported member')
+                payload = frozenset(encode_immutable(v, owner, path + (('set-slot', n),))
+                                    for n, v in enumerate(sorted(source, key=codec.encode)))
                 signature = codec.encode(payload)
             else:
                 payload = tuple(encode(v, owner, path + (('index', n),)) for n, v in enumerate(source))
@@ -159,6 +225,8 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
                 changes = (VersionChange(RECORD_HEADERS, (inc, 0), payload),)
             else:
                 arguments = dict(initial_values=payload, checked_types=True, recursive=True)
+                if kind in ('map', 'set', 'frozen-map'):
+                    arguments['key_runtime'] = _StoredCopyKeys()
                 if kind.startswith('frozen-'):
                     arguments['reference_is_immutable'] = lambda child: frozen.get(child.incarnation, False)
                 builder = HISTORY_CLASSES[kind](target, pin, inc, **arguments)
