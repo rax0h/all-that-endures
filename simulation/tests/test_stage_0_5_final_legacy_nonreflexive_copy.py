@@ -139,3 +139,47 @@ def test_legacy_alias_nan_bit_disagreement_rejects_without_destination(tmp_path)
     with pytest.raises(StoreIntegrityError,match='disagree'):
         module()._copy_with_checked_catalog(source,target,rules_id=RULES,normalize_events=True)
     assert sha(source)==before and not target.exists()
+
+
+@pytest.mark.parametrize('kind', ['map', 'set', 'list'])
+def test_older_page_backing_raw_nan_slots_upgrade_to_usable_atoms(tmp_path, kind):
+    from ate_sim.metaphysics import SoulState
+    nan=float('nan')
+    def configure(world):
+        soul=SoulState(1);world.metaphysics.souls[1]=soul
+        if kind=='set':soul.marks={nan};values=soul.marks
+        elif kind=='map':soul.cosmic_links={nan:nan};values=soul.cosmic_links
+        else:
+            world.skills.skills[1,'craft'].provenance=[nan];values=world.skills.skills[1,'craft'].provenance
+        world.currency.wallets[1]={'values':values}
+    source=legacy_lazy(tmp_path,configure=configure);before=sha(source);target=tmp_path/'normalized.sqlite'
+    module()._copy_with_checked_catalog(source,target,rules_id=RULES,normalize_events=True)
+    assert sha(source)==before
+    with open_bridge(target,rules_id=RULES) as s:
+        activate(s)
+        values=s.wallets[1]['values']
+        other=s.skills[1,'craft'].provenance if kind=='list' else getattr(s.souls[1], 'marks' if kind=='set' else 'cosmic_links')
+        assert values is other
+        held=values[0] if kind=='list' else next(iter(values))
+        values._clear_cache()
+        if kind=='list':assert values[0] is held
+        else:assert held in values
+        s.save()
+
+
+def test_legacy_atom_normalization_composes_with_counted_copy_promotion(tmp_path):
+    from simulation.tests.test_stage_0_5_final_catalog_copy import opened
+    def configure(world):world.skills.skills[1,'craft'].provenance=[float('nan')]
+    source=legacy_lazy(tmp_path,configure=configure)
+    with opened(source) as store:
+        pin=store.capture_pin()
+        inc=store.read_version(pin,'world.skills.skills',(1,'craft'),expected_record_schema=1).value.provenance.incarnation
+        store.release_pin(pin)
+    target=tmp_path/'promoted.sqlite'
+    module()._copy_with_checked_catalog(source,target,rules_id=RULES,normalize_events=True,promote_lists=(inc,))
+    with open_bridge(target,rules_id=RULES) as s:
+        activate(s)
+        values=s.skills[1,'craft'].provenance;held=values[0]
+        values._clear_cache()
+        assert values[0] is held
+        s.save()

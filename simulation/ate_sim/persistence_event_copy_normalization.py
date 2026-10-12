@@ -13,12 +13,12 @@ from .incremental_store import StoreIntegrityError, StoreFormatError
 from .persistence_lazy_store import VersionChange, IdentityOccurrenceChange
 from .persistence_lazy_nested_history import (
     HISTORY_CLASSES, HistoryReference, reference, immutable_value,
-    DESCRIPTOR_NAMESPACE, ENTRY_NAMESPACE,
+    DESCRIPTOR_NAMESPACE, ENTRY_NAMESPACE, PAGE_NAMESPACE,
 )
 from .persistence_history_types import NAMESPACE as TYPES
 from .persistence_history_retirement import NAMESPACE as RETIREMENT
 from .persistence_record_headers import (
-    RecordReference, record_reference, record_header, NAMESPACE as RECORD_HEADERS,
+    RecordReference, record_reference, record_header, checked_record_header, NAMESPACE as RECORD_HEADERS,
 )
 from .persistence_record_runtime import mutable_record
 from .persistence_schema import RECORD_FIELDS
@@ -237,6 +237,43 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
             built[inc] = dependency_value(kind)
         return ref
 
+    # Earlier typed histories may still contain literal NaNs. Project their
+    # physical slots during this explicit full copy, retaining parent IDs and
+    # member ordinals. Rekeyed scalar entries keep their collection-order row.
+    atom_rows, owner_moves = [], {}
+    rewritten_backings = []
+    for change in versions:
+        if change.delete or change.namespace not in (PAGE_NAMESPACE, ENTRY_NAMESPACE, RECORD_HEADERS):
+            rewritten_backings.append(change)
+            continue
+        owner = change.namespace, change.key
+        if change.namespace == PAGE_NAMESPACE:
+            value = tuple(encode_immutable(v, owner, (('index', n),)) for n, v in enumerate(change.value))
+            key = change.key
+        elif change.namespace == ENTRY_NAMESPACE:
+            ordinal, original_key, child = change.value
+            stored_key = encode_immutable(original_key, owner, (('index', 1),))
+            value = (ordinal, stored_key, encode_immutable(child, owner, (('index', 2),)))
+            key = change.key[0], storage_equality_key(stored_key)
+        else:
+            cls, values, state = checked_record_header(change.value)
+            value = (change.value[0], change.value[1], tuple(
+                encode_immutable(v, owner, (('field', field),))
+                for field, v in zip(RECORD_FIELDS[cls], values)), state)
+            key = change.key
+        replacement = replace(change, key=key, value=value)
+        rewritten_backings.append(replacement)
+        if codec.encode((key, value)) != codec.encode((change.key, change.value)):
+            atom_rows.append(replacement)
+            owner_moves[codec.encode(owner)] = (change.namespace, key)
+    versions = rewritten_backings
+    if owner_moves:
+        placements = tuple(replace(p, owner_key=owner_moves[codec.encode((p.owner_namespace, p.owner_key))][1])
+                           if codec.encode((p.owner_namespace, p.owner_key)) in owner_moves else p for p in placements)
+        orders = tuple((ns, codec.encode(owner_moves[codec.encode((ns, codec.decode(key)))][1]), ordinal)
+                       if codec.encode((ns, codec.decode(key))) in owner_moves else (ns, key, ordinal)
+                       for ns, key, ordinal in orders)
+
     # These concrete root tables now accept the same checked map headers. Seed
     # their graphs even without an Event alias; explicit copy closes the whole
     # currency bucket rather than leaving a resident legacy subtree behind.
@@ -381,10 +418,17 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
             change = replace(change, value=dict(change.value, collections=layout) if change.key == 'manifest' else layout)
         rewritten_metadata.append(change)
     ordinary = tuple(rewritten_metadata)
-    for change in added:
+    retained_markers = {marker((p.owner_namespace, p.owner_key), p.occurrence_path): p.incarnation_id for p in retained}
+    for change in (*added, *atom_rows):
         adapter = AUXILIARY_OWNER_FAMILIES.get(change.namespace)
         if adapter is not None:
-            retained.extend(IdentityOccurrenceChange(change.namespace, change.key, path, child)
-                for path, child in adapter.reference_placements(change.value))
+            for path, child in adapter.reference_placements(change.value):
+                placement_marker = marker((change.namespace, change.key), path)
+                if placement_marker in retained_markers:
+                    if retained_markers[placement_marker] != child:
+                        raise StoreIntegrityError('copied atom slot conflicts with its source placement')
+                    continue
+                retained.append(IdentityOccurrenceChange(change.namespace, change.key, path, child))
+                retained_markers[placement_marker] = child
     dependencies = dependencies + tuple(VersionChange(DEPENDENCIES, inc, value) for inc, value in built.items())
     return (*reconcile_copy(codec, versions, ordinary, tuple(retained), dependencies, orders, states), next_incarnation)

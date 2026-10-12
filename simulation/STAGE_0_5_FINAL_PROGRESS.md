@@ -1,5 +1,40 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: older page-backed atom slots and promotion composition (October 12)
+
+Parent public `0317a42dffce4b24c33e7d9d5c97789447e90131`, matching tree
+`614553b05e08d94d37d627efa7e2dfd4c7330b8f`.
+
+Three unmarked REDs confirmed a remaining genuine legacy boundary: old flat
+scalar maps/sets returned unusable NaN keys, and an old list reloaded a different
+NaN after cache eviction. Explicit graph copy now projects raw atoms already in
+physical page/entry/record-header slots. Parent backing incarnations and member
+ordinals survive. Scalar entries rekey to closed references, their collection
+order rows follow the new keys, and existing physical placements retarget without
+splitting unrelated child identities. New atom edges deduplicate against retained
+placements; competing labels reject. One existing private-copy commit publishes
+all body/reference, dependency, allocator and checked catalog changes.
+
+A separate RED caught counted promotion consuming its pre-normalization capture
+and reintroducing raw NaNs. Promotion now consumes normalized physical pages and
+requires their extent to equal the captured list length; it never trims an import.
+Counted and flat aliases preserve held native atom identity after cache clearing.
+
+Affected **262 passed in 43.92s** before the final catalog-only composition repair.
+Final legacy/catalog/copy-promotion **59 passed in 10.96s** after that repair.
+Counts overlap; actual cases/hashes and source boundaries:
+`stage_0_5_legacy_backing_atom_validation.json`. Earlier advancement byte evidence
+remains at its recorded boundary; no new scalar scaling claim is made here.
+This physical projection is explicitly full-copy work, outside ordinary hot paths.
+
+Next: EventIdSet's live unsupported-key predicate still sends NaN additions through
+resident O(H) fallback even though checked recursive sets now support atom keys.
+Add a checked-capability gate and compose its component callbacks with the same
+runtime. Preserve genuine legacy behavior and avoid hidden migration. Then finish
+root/complete-format open/upgrade contracts, integrated P5/final source suite and
+independent architecture acceptance. Stage 0.5 remains unfinished; no rank/gameplay,
+PR14 promotion, force push or new endurance work.
+
 ## Latest checkpoint: explicit raw legacy graph NaN normalization (October 12)
 
 Parent local `2b0d321`, public `7b789947a52fadadae95aea20a129fd5d7b566fc`,

@@ -364,6 +364,18 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                         all_versions, all_ordinary, placements, dependencies, orders, states,
                         next_incarnation, captured_bodies, normalize_advancement=normalize_advancement)
                 if promoted:
+                    if normalize_graph:
+                        # Promotion must consume the already normalized physical
+                        # pages, rather than reintroducing captured raw atoms.
+                        pages = {}
+                        for change in all_versions:
+                            if change.namespace == PAGE_NAMESPACE and not change.delete and change.key[0] in promoted:
+                                pages.setdefault(change.key[0], []).append((change.key[1], change.value))
+                        normalized = {inc: tuple(value for _number, page in sorted(pages.get(inc, ())) for value in page)
+                                      for inc in promoted}
+                        if any(len(normalized[inc]) != len(values) for inc, values in promoted.items()):
+                            raise StoreIntegrityError('normalized promoted list extent disagrees with capture')
+                        promoted = normalized
                     (all_versions, all_ordinary, placements, dependencies, orders, states,
                      versions, ordinary) = transform_copy(target, pin, promoted, all_versions,
                         all_ordinary, placements, dependencies, orders, states)
