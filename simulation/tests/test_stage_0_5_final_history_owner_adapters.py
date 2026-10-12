@@ -60,7 +60,7 @@ def test_all_concrete_physical_owner_families_have_checked_group_and_source(tmp_
     (PAGE_NAMESPACE, (True, 0), PAGE_PATH),
     (PAGE_NAMESPACE, (1, -1), PAGE_PATH),
     (PAGE_NAMESPACE, (1, 0), (('index', 128),)),
-    (ENTRY_NAMESPACE, (1, 'key'), (('index', 1),)),
+    (ENTRY_NAMESPACE, (1, 'key'), (('index', 0),)),
     (NODE_NAMESPACE, (1, 0), LEAF_PATH),
     (NODE_NAMESPACE, (1, 2), (('index', 0),)),
     (NODE_NAMESPACE, (1, 2), (('key', True),)),

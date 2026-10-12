@@ -14,12 +14,8 @@ def _positive(value):
 
 
 def _stored_value(value):
-    from .persistence_lazy_nested_history import immutable_value, reference
-    from .persistence_record_headers import record_reference
-    from .persistence_event_id_reference import event_id_reference
-    if reference(value) or record_reference(value) or event_id_reference(value) or immutable_value(value):
-        return True
-    return type(value) is tuple and all(_stored_value(item) for item in value)
+    from .persistence_lazy_nested_history import stored_value
+    return stored_value(value)
 
 
 @dataclass(frozen=True)
@@ -29,17 +25,18 @@ class HistoryOwnerAdapter:
     record_schema: int = 1
 
     def validate_key(self, key):
-        from .persistence_lazy_nested_history import immutable_value
+        from .persistence_nonreflexive_keys import stored_immutable_key
         if type(key) is not tuple or len(key) != 2 or not _positive(key[0]):
             raise StoreIntegrityError('invalid physical history owner key')
         part = key[1]
         valid = (type(part) is int and part >= 0 if self.owner_kind == 'page'
                  else _positive(part) if self.owner_kind == 'leaf'
-                 else immutable_value(part))
+                 else stored_immutable_key(part))
         if not valid:
             raise StoreIntegrityError('invalid physical history owner key')
 
     def validate_path(self, path):
+        from .persistence_nonreflexive_keys import valid_immutable_member_steps
         if type(path) is not tuple or any(type(c) is not tuple or len(c) != 2 for c in path):
             raise StoreIntegrityError('invalid physical history member path')
         # Empty is used to check an owner itself; it is not a child placement.
@@ -47,9 +44,9 @@ class HistoryOwnerAdapter:
             return
         first = path[0]
         valid = (first[0] == 'index' and type(first[1]) is int and 0 <= first[1] < 128
-                 if self.owner_kind == 'page' else first == ('index', 2)
+                 if self.owner_kind == 'page' else first[0] == 'index' and type(first[1]) is int and first[1] in (1, 2)
                  if self.owner_kind == 'entry' else first[0] == 'key' and _positive(first[1]))
-        if not valid or any(kind != 'index' or type(slot) is not int or slot < 0 for kind, slot in path[1:]):
+        if not valid or not valid_immutable_member_steps(path[1:]):
             raise StoreIntegrityError('invalid physical history member path')
 
     def absolute_path(self, key, relative=()):
@@ -60,7 +57,7 @@ class HistoryOwnerAdapter:
         return (('key', self.namespace), ('key', key)) + relative
 
     def validate_source(self, source, storage_kind, codec):
-        from .persistence_lazy_nested_history import immutable_value, equality_key
+        from .persistence_nonreflexive_keys import stored_immutable_key, storage_equality_key
         self.validate_key(source.key)
         if storage_kind != 'lazy' or source.record_schema != self.record_schema:
             raise StoreIntegrityError('physical history owner requires its versioned schema')
@@ -72,8 +69,8 @@ class HistoryOwnerAdapter:
             expected_members = ()
         elif self.owner_kind == 'entry':
             valid = (type(value) is tuple and len(value) == 3 and type(value[0]) is int and value[0] >= 0
-                     and immutable_value(value[1]) and _stored_value(value[2])
-                     and codec.encode(equality_key(value[1])) == codec.encode(source.key[1]))
+                     and stored_immutable_key(value[1]) and _stored_value(value[2])
+                     and codec.encode(storage_equality_key(value[1])) == codec.encode(source.key[1]))
             expected_members = (Membership('incarnation', source.key[0], value[0]),) if valid else ()
         else:
             valid = (type(value) is tuple and len(value) == 2 and value[0] == 'leaf'
@@ -85,24 +82,17 @@ class HistoryOwnerAdapter:
             raise StoreIntegrityError('invalid physical history owner payload or projection')
 
     def reference_placements(self, value):
-        from .persistence_lazy_nested_history import reference
-        from .persistence_record_headers import record_reference
-        from .persistence_event_id_reference import event_id_reference
+        from .persistence_nonreflexive_keys import stored_reference_placements
         result = []
-        def visit(item, path):
-            if reference(item) or record_reference(item) or event_id_reference(item):
-                result.append((path, item.incarnation))
-            elif type(item) is tuple:
-                for slot, child in enumerate(item):
-                    visit(child, path + (('index', slot),))
         if self.owner_kind == 'page':
             for slot, item in enumerate(value):
-                visit(item, (('index', slot),))
+                result.extend(stored_reference_placements(item, (('index', slot),)))
         elif self.owner_kind == 'entry':
-            visit(value[2], (('index', 2),))
+            result.extend(stored_reference_placements(value[1], (('index', 1),)))
+            result.extend(stored_reference_placements(value[2], (('index', 2),)))
         else:
             for occurrence, item in value[1]:
-                visit(item, (('key', occurrence),))
+                result.extend(stored_reference_placements(item, (('key', occurrence),)))
         return tuple(result)
 
     def _physical_path(self, value, path):
@@ -122,25 +112,12 @@ class HistoryOwnerAdapter:
         return (('index', 1), ('index', matches[0]), ('index', 1)) + path[1:]
 
     def resolve_path(self, value, path):
-        for _, slot in self._physical_path(value, path):
-            try:
-                value = value[slot]
-            except (IndexError, TypeError) as exc:
-                raise StoreIntegrityError('physical history member path is absent') from exc
-        return value
+        from .persistence_nonreflexive_keys import resolve_stored_member_path
+        return resolve_stored_member_path(value, self._physical_path(value, path))
 
     def replace_path(self, value, path, replacement):
-        physical = self._physical_path(value, path)
-        def replace(item, remaining):
-            if not remaining:
-                return replacement
-            _, slot = remaining[0]
-            if type(item) is not tuple or slot >= len(item):
-                raise StoreIntegrityError('physical history member path is absent')
-            values = list(item)
-            values[slot] = replace(values[slot], remaining[1:])
-            return tuple(values)
-        return replace(value, physical)
+        from .persistence_nonreflexive_keys import replace_stored_member_path
+        return replace_stored_member_path(value, self._physical_path(value, path), replacement)
 
 
 @dataclass(frozen=True)
@@ -151,10 +128,11 @@ class RecordOwnerAdapter(HistoryOwnerAdapter):
             raise StoreIntegrityError('invalid physical record owner key')
 
     def validate_path(self, path):
+        from .persistence_nonreflexive_keys import valid_immutable_member_steps
         if type(path) is not tuple or any(type(c) is not tuple or len(c) != 2 for c in path):
             raise StoreIntegrityError('invalid physical record member path')
         if path and (path[0][0] != 'field' or type(path[0][1]) is not str or not path[0][1]
-                or any(kind != 'index' or type(slot) is not int or slot < 0 for kind, slot in path[1:])):
+                or not valid_immutable_member_steps(path[1:])):
             raise StoreIntegrityError('invalid physical record member path')
 
     def validate_source(self, source, storage_kind, codec):

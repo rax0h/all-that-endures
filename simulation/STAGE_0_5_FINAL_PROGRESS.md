@@ -1,5 +1,33 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: checked key-component ownership paths (October12 UTC)
+
+Physical ownership now includes references in scalar-entry keys as well as
+values. Closed traversal resolves tuple indexes, declared Ref kind/id fields
+and semantic frozenset-member keys across pages, entries, sequence leaves and
+record headers. Canonical projected payload keys must agree with the physical
+address. Genuine legacy immutable keys retain their representation. Catalog
+construction detects an omitted shared key/value placement; malformed/wrong-shape
+paths fail with integrity errors. A fresh RED caught boolean True being accepted
+as entry index1; entry prefixes now require exact integer indexes.
+
+Initial **21 RED failures / 6 passing controls** preceded implementation.
+The first focused run had two failures: its new shared-link fixture omitted
+world_identity_links from head inventory, and an old negative test assumed key
+index1 was invalid. The fixture now includes the atom body/link inventory; the
+negative case uses ordinal index0. Focused **155 passed in3.80s** and affected
+**147 passed / 12 pending in22.80s** precede only the bool-prefix hardening.
+Final combined gate **303 passed / 12 strict xfailed in24.55s** matches final
+production and tests. Counts overlap. Cases, source hashes and exact boundaries
+are in `stage_0_5_nonreflexive_owners_validation.json`. `git diff --check` passed.
+
+The complete remaining-work inventory is `STAGE_0_5_REMAINING_WORK.md`.
+Next is atom backing metadata/lifetime and live scalar-history integration;
+all 12 NaN map/set failures remain explicitly pending. Compatibility/root
+closure, schema/byte closure, complete format activation, integrated bounds/P5,
+one final applicable suite and independent review still remain. No capability6
+or release claim. Rank, gameplay, PR14 and prior P5 are unchanged.
+
 ## Latest checkpoint: exact native key projection primitives (October12 UTC)
 
 The interrupted prior save was verified live at public

@@ -63,7 +63,8 @@ def stored_value(value):
     """Closed recursive backing values; mutable objects live behind references."""
     from .persistence_record_headers import record_reference
     from .persistence_event_id_reference import event_id_reference
-    return reference(value) or record_reference(value) or event_id_reference(value) or immutable_value(value) or (type(value) is tuple and all(stored_value(v) for v in value))
+    from .persistence_nonreflexive_keys import stored_immutable_key
+    return reference(value) or record_reference(value) or event_id_reference(value) or stored_immutable_key(value) or (type(value) is tuple and all(stored_value(v) for v in value))
 
 
 def materialize_history_value(value, memo):

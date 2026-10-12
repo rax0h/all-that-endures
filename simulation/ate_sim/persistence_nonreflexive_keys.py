@@ -141,3 +141,86 @@ def restore_immutable_key(value, restore_nan):
             raise StoreIntegrityError('key reference did not resolve to its native NaN')
         return result
     return _key_tree(value, checked_restore, canonical=False)
+
+
+def stored_immutable_key(value):
+    """Accept genuine legacy immutable values and the closed projected schema."""
+    from .persistence_lazy_nested_history import immutable_value
+    return immutable_value(value) or _stored_key_value(value)
+
+
+def storage_equality_key(value):
+    from .persistence_lazy_nested_history import immutable_value, equality_key
+    return equality_key(value) if immutable_value(value) else canonical_stored_key(value)
+
+
+def stored_reference_placements(value, path=()):
+    """Enumerate references in a checked value, including immutable components."""
+    from .core import Ref
+    from .persistence_lazy_nested_history import reference
+    from .persistence_record_headers import record_reference
+    from .persistence_event_id_reference import event_id_reference
+    out = []
+    def visit(item, current):
+        if reference(item) or record_reference(item) or event_id_reference(item) or nonreflexive_key_reference(item):
+            out.append((current, item.incarnation))
+        elif type(item) is tuple:
+            for slot, child in enumerate(item):
+                visit(child, current + (('index', slot),))
+        elif type(item) is Ref:
+            visit(item.kind, current + (('field', 'kind'),))
+            visit(item.id, current + (('field', 'id'),))
+        elif type(item) is frozenset:
+            for child in item:
+                visit(child, current + (('key', child),))
+    visit(value, path)
+    return tuple(out)
+
+
+def valid_immutable_member_steps(path):
+    return type(path) is tuple and all(
+        type(part) is tuple and len(part) == 2 and type(part[0]) is str and (
+            part[0] == 'index' and type(part[1]) is int and part[1] >= 0
+            or part[0] == 'field' and type(part[1]) is str and part[1] in ('kind', 'id')
+            or part[0] == 'key' and stored_immutable_key(part[1]))
+        for part in path)
+
+
+def _stored_member(value, step):
+    from .core import Ref
+    kind, slot = step
+    if kind == 'index' and type(value) is tuple and type(slot) is int and 0 <= slot < len(value):
+        return value[slot]
+    if kind == 'field' and type(value) is Ref and slot in ('kind', 'id'):
+        return getattr(value, slot)
+    if kind == 'key' and type(value) is frozenset:
+        matches = [child for child in value if child is slot or child == slot]
+        if len(matches) == 1:
+            return matches[0]
+    raise StoreIntegrityError('stored immutable member path is absent or has the wrong shape')
+
+
+def resolve_stored_member_path(value, path):
+    if not valid_immutable_member_steps(path):
+        raise StoreIntegrityError('invalid stored immutable member path')
+    for step in path:
+        value = _stored_member(value, step)
+    return value
+
+
+def replace_stored_member_path(value, path, replacement):
+    from .core import Ref
+    if not valid_immutable_member_steps(path):
+        raise StoreIntegrityError('invalid stored immutable member path')
+    if not path:
+        return replacement
+    kind, slot = path[0]
+    old = _stored_member(value, path[0])
+    updated = replace_stored_member_path(old, path[1:], replacement)
+    if kind == 'index':
+        values = list(value)
+        values[slot] = updated
+        return tuple(values)
+    if kind == 'field':
+        return Ref(updated, value.id) if slot == 'kind' else Ref(value.kind, updated)
+    return frozenset(updated if child is old else child for child in value)

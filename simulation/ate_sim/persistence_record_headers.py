@@ -46,11 +46,8 @@ def _declared_class(name):
 
 
 def stored_record_field(value):
-    from .persistence_lazy_nested_history import immutable_value, reference
-    from .persistence_event_id_reference import event_id_reference
-    if record_reference(value) or reference(value) or event_id_reference(value) or immutable_value(value):
-        return True
-    return type(value) is tuple and all(stored_record_field(v) for v in value)
+    from .persistence_lazy_nested_history import stored_value
+    return stored_value(value)
 
 
 def checked_record_header(value):
@@ -126,18 +123,11 @@ def read_record_header(store, pin, incarnation):
 
 def record_reference_placements(header):
     from .persistence_schema import RECORD_FIELDS
-    from .persistence_lazy_nested_history import reference
-    from .persistence_event_id_reference import event_id_reference
+    from .persistence_nonreflexive_keys import stored_reference_placements
     cls, values, _state = checked_record_header(header)
     out = []
-    def visit(value, path):
-        if record_reference(value) or reference(value) or event_id_reference(value):
-            out.append((path, value.incarnation))
-        elif type(value) is tuple:
-            for slot, child in enumerate(value):
-                visit(child, path + (('index', slot),))
     for field, value in zip(RECORD_FIELDS[cls], values):
-        visit(value, (('field', field),))
+        out.extend(stored_reference_placements(value, (('field', field),)))
     return tuple(out)
 
 

@@ -1,0 +1,4176 @@
+{
+  "date_utc": "2026-10-12",
+  "checkpoint": "Checked immutable key-component physical ownership paths",
+  "parent_source": {
+    "local": "7d20708d0b3fec311480dc1edbbc600e34fb928c",
+    "public": "7313f41e979cb41a82df9e916260519973bf0c12",
+    "tree": "6a9f5072b3b2215fd00a9a615bbf6b87b6ce3a12"
+  },
+  "sha256": {
+    "simulation/ate_sim/persistence_nonreflexive_keys.py": "14824a5e4473cc9b26ed2e53a6ce8311a3adeca09b2d9f7b944d06cbac40fdc4",
+    "simulation/ate_sim/persistence_lazy_nested_history.py": "41a7612f4b40254c0fb315331a27ce874c3dabd5b3e267505c37df41c78af915",
+    "simulation/ate_sim/persistence_record_headers.py": "3450f8974a9a26035415b8230b7ad6b1706a4c90d55731ff80732275f56a2761",
+    "simulation/ate_sim/persistence_history_owner_adapters.py": "ce836aa2ab7253c35d2098523bf73c327a116d7b5b605b4c391cbd9b8067f50e",
+    "simulation/tests/test_stage_0_5_final_nonreflexive_owners.py": "de39d3a220d8416c9a86dac774d4e833f323fdedae0c868a3487b46b34824658",
+    "simulation/tests/test_stage_0_5_final_history_owner_adapters.py": "f1c7103bed868d37cc638b80b837c3728903362e25be991a03815f44e18ce4e9"
+  },
+  "gates": [
+    {
+      "scope": "initial RED",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "21",
+        "skipped": "0",
+        "tests": "27",
+        "time": "0.363",
+        "timestamp": "2026-10-12T15:08:19.031975-05:00",
+        "hostname": "0c1f238d9f33"
+      },
+      "cases": [
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-page]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-entry]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner key"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-leaf]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-record]",
+          "result": "failed",
+          "failure": "TypeError: record backing fields require closed values or checked references"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-page]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-entry]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner key"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-leaf]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-record]",
+          "result": "failed",
+          "failure": "TypeError: record backing fields require closed values or checked references"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-page]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-entry]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner key"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-leaf]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-record]",
+          "result": "failed",
+          "failure": "TypeError: record backing fields require closed values or checked references"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-page]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-entry]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner key"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-leaf]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-record]",
+          "result": "failed",
+          "failure": "TypeError: record backing fields require closed values or checked references"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-page]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-entry]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner key"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-leaf]",
+          "result": "failed",
+          "failure": "ate_sim.incremental_store.StoreIntegrityError: invalid physical history owner payload or projection"
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-record]",
+          "result": "failed",
+          "failure": "TypeError: record backing fields require closed values or checked references"
+        },
+        {
+          "name": "test_entry_key_and_value_sharing_requires_both_checked_placements",
+          "result": "failed",
+          "failure": "AssertionError: assert () == (((('index', ...ex', 2),), 2))\n  \n  Right contains 2 more items, first extra item: ((('index', 1), ('field', 'id')), 2)\n  Use -v to get more diff"
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_missing_or_wrong_shape_key_paths_fail_with_integrity_errors",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_entry_address_must_match_canonical_projected_payload_key",
+          "result": "passed",
+          "failure": null
+        }
+      ]
+    },
+    {
+      "scope": "initial focused",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "2",
+        "skipped": "0",
+        "tests": "155",
+        "time": "3.336",
+        "timestamp": "2026-10-12T15:11:28.421400-05:00",
+        "hostname": "0c1f238d9f33"
+      },
+      "cases": [
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_entry_key_and_value_sharing_requires_both_checked_placements",
+          "result": "failed",
+          "failure": "ValueError: head namespace inventory omits retained namespace: ['world_identity_links']"
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_missing_or_wrong_shape_key_paths_fail_with_integrity_errors",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_entry_address_must_match_canonical_projected_payload_key",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_all_concrete_physical_owner_families_have_checked_group_and_source",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key0-path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key1-path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key2-path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key3-path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.entries-key4-path4]",
+          "result": "failed",
+          "failure": "Failed: DID NOT RAISE StoreIntegrityError"
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.sequence.nodes-key5-path5]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.sequence.nodes-key6-path6]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.sequence.nodes-key7-path7]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_other_auxiliary_authorities_are_not_identity_owners",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_physical_history_owner_cannot_be_an_ordinary_record",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_sequence_path_follows_occurrence_identity_through_leaf_reordering",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_leaf_move_only_changes_its_two_physical_owner_witnesses[1000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_leaf_move_only_changes_its_two_physical_owner_witnesses[10000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_new_source_references_require_exact_complete_placements[placements0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_new_source_references_require_exact_complete_placements[placements1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_changed_reference_requires_payload_and_matching_placement",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_child_value_edit_forces_each_unchanged_physical_reference_header",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_retiring_physical_parent_reanchors_child_without_loading_payload",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_physical_owners_join_exact_central_publication_and_fault_recovery[before_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_physical_owners_join_exact_central_publication_and_fault_recovery[after_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_corrupt_recursive_group_is_rejected_before_child_value_changes",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_closed_record_fields_and_concrete_values_round_trip",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Event]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Person]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Household]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Settlement]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Cell]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LocalState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TradeRoute]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[World]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Genealogy]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Relationship]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocialGraph]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Property]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Economy]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeClaim]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Practice]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Law]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CulturalState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageNode]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Community]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CommunityState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Transmission]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TransmissionState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillHistory]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Infrastructure]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InfrastructureState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MotiveState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ActionRecord]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AgencyState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Understanding]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AbilityProgress]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[EssencePath]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdvancementState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResponseModel]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicAspiration]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResource]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResourceState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Branch]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicUserRecord]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdventureNotice]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyApplication]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InstitutionState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SoulState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResurrectionToken]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MetaphysicalState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[God]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[GreatAstralBeing]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Church]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[DivineState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialLot]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CraftedItem]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialEconomy]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientField]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientMagicState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Conflict]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[WarfareState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Inquiry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyAccountabilityState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[RankedCurrencyState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicalThreat]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ThreatEcologyState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[absent]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[frozen]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[foreign]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[missing]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[extra]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[mutable_child]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[tag]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[class]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[short]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[long]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[mutable]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[metadata]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[event_metadata]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_references_use_closed_codec_tag_and_reject_forged_ids",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_owner_requires_exact_complete_child_placements",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[1000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[10000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key0-path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key1-path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key2-path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key3-path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[1-path4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key5-path5]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key6-path6]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key7-path7]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_path_must_belong_to_its_declared_record",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[ordinary]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[schema]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[membership]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_header_reads_after_fresh_store_open_without_bootstrap",
+          "result": "passed",
+          "failure": null
+        }
+      ]
+    },
+    {
+      "scope": "focused before boolean hardening",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "155",
+        "time": "3.790",
+        "timestamp": "2026-10-12T15:13:12.344625-05:00",
+        "hostname": "0c1f238d9f33"
+      },
+      "cases": [
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_entry_key_and_value_sharing_requires_both_checked_placements",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_missing_or_wrong_shape_key_paths_fail_with_integrity_errors",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_entry_address_must_match_canonical_projected_payload_key",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_all_concrete_physical_owner_families_have_checked_group_and_source",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key0-path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key1-path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key2-path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key3-path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.entries-key4-path4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.sequence.nodes-key5-path5]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.sequence.nodes-key6-path6]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.sequence.nodes-key7-path7]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_other_auxiliary_authorities_are_not_identity_owners",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_physical_history_owner_cannot_be_an_ordinary_record",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_sequence_path_follows_occurrence_identity_through_leaf_reordering",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_leaf_move_only_changes_its_two_physical_owner_witnesses[1000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_leaf_move_only_changes_its_two_physical_owner_witnesses[10000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_new_source_references_require_exact_complete_placements[placements0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_new_source_references_require_exact_complete_placements[placements1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_changed_reference_requires_payload_and_matching_placement",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_child_value_edit_forces_each_unchanged_physical_reference_header",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_retiring_physical_parent_reanchors_child_without_loading_payload",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_physical_owners_join_exact_central_publication_and_fault_recovery[before_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_physical_owners_join_exact_central_publication_and_fault_recovery[after_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_corrupt_recursive_group_is_rejected_before_child_value_changes",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_closed_record_fields_and_concrete_values_round_trip",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Event]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Person]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Household]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Settlement]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Cell]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LocalState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TradeRoute]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[World]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Genealogy]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Relationship]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocialGraph]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Property]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Economy]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeClaim]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Practice]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Law]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CulturalState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageNode]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Community]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CommunityState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Transmission]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TransmissionState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillHistory]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Infrastructure]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InfrastructureState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MotiveState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ActionRecord]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AgencyState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Understanding]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AbilityProgress]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[EssencePath]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdvancementState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResponseModel]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicAspiration]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResource]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResourceState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Branch]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicUserRecord]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdventureNotice]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyApplication]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InstitutionState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SoulState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResurrectionToken]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MetaphysicalState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[God]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[GreatAstralBeing]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Church]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[DivineState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialLot]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CraftedItem]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialEconomy]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientField]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientMagicState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Conflict]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[WarfareState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Inquiry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyAccountabilityState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[RankedCurrencyState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicalThreat]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ThreatEcologyState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[absent]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[frozen]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[foreign]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[missing]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[extra]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[mutable_child]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[tag]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[class]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[short]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[long]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[mutable]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[metadata]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[event_metadata]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_references_use_closed_codec_tag_and_reject_forged_ids",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_owner_requires_exact_complete_child_placements",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[1000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[10000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key0-path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key1-path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key2-path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key3-path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[1-path4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key5-path5]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key6-path6]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key7-path7]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_path_must_belong_to_its_declared_record",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[ordinary]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[schema]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[membership]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_header_reads_after_fresh_store_open_without_bootstrap",
+          "result": "passed",
+          "failure": null
+        }
+      ]
+    },
+    {
+      "scope": "affected before boolean hardening",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "12",
+        "tests": "159",
+        "time": "22.799",
+        "timestamp": "2026-10-12T15:15:27.065849-05:00",
+        "hostname": "0c1f238d9f33"
+      },
+      "cases": [
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[float]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[tuple]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[frozenset]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[ref]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[deep]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_shared_nan_components_keep_native_composite_key_equality",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_finite_key_preflight_rejects_entire_bad_input_before_nan_allocation[bad0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_finite_key_preflight_rejects_entire_bad_input_before_nan_allocation[bad1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_finite_key_preflight_rejects_entire_bad_input_before_nan_allocation[bad2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_finite_key_preflight_rejects_entire_bad_input_before_nan_allocation[bad3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_lookup_only_projection_never_allocates_for_an_unknown_nan",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_projection_rejects_an_unchecked_callback_result[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_projection_rejects_an_unchecked_callback_result[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_projection_rejects_an_unchecked_callback_result[token]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_projection_rejects_an_unchecked_callback_result[bad3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_stored_key_validation_rejects_unprojected_or_undeclared_values[nan]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_stored_key_validation_rejects_unprojected_or_undeclared_values[bad1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_stored_key_validation_rejects_unprojected_or_undeclared_values[bad2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_stored_key_validation_rejects_unprojected_or_undeclared_values[bad3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_restoration_rejects_a_non_native_nan_canonical_object[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_restoration_rejects_a_non_native_nan_canonical_object[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_restoration_rejects_a_non_native_nan_canonical_object[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_restoration_rejects_a_non_native_nan_canonical_object[nan]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_forged_reference_is_rejected_in_stored_keys_and_projection_callback",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_restored_nested_component_preserves_identity_after_original_key_is_released",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_nan_reference_has_a_closed_codec_tag",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[-1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_preserves_exact_nan_bits_and_native_float_type[9221120237041090561]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_preserves_exact_nan_bits_and_native_float_type[18444492273895866370]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_preserves_exact_nan_bits_and_native_float_type[9218868437227405313]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[inf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[nan]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[tag]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[short]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[long]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[mutable]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[size]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[finite]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_atom_header_is_a_checked_physical_owner_with_no_children",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_missing_or_invalid_stored_atom_is_an_integrity_failure",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_cannot_silently_skip_unintegrated_atom_references",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_atom_point_reads_and_pins_do_not_depend_on_history_size",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_objects_have_distinct_ids_and_repeated_binding_reuses_id",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unheld_nan_releases_forward_and_reverse_identity",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[tuple]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[frozenset]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[<lambda>]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_collection_checks_only_its_bounded_queue",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nan_rebinding_uses_existing_checked_incarnation_rules",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[inf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[nan]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[value6]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_float_subclasses",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normal_mutable_bindings_remain_weak_and_close_releases_nan_roots",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[-1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[257]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_work_is_fixed_for_different_live_key_history_sizes",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_apis_obey_registry_close_guard",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unsealed_event_record_data_aliases_mutate_and_reopen",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_seal_copies_mutable_container_aliases_and_persists_immutable_snapshot[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_seal_copies_mutable_container_aliases_and_persists_immutable_snapshot[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_freeze_preserves_native_mutable_record_child_behavior",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_snapshot_save_fault_preserves_retry_and_alias[before_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_snapshot_save_fault_preserves_retry_and_alias[after_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_detach_reads_uncached_record_and_snapshot_descendants",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_edit_save_has_fixed_unrelated_history_work",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_legacy_tracked_world_event_input_rejects_before_recursive_admission",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_is_a_closed_codec_value_and_physical_child_edge",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[-1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_codec_rejects_malformed_tag[node0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_codec_rejects_malformed_tag[node1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_codec_rejects_malformed_tag[node2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_codec_rejects_malformed_tag[node3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_explicit_event_graph_copy_keeps_one_event_id_authority_and_literal_marker",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_recursive_admission_borrows_same_facade_without_copying_members",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_graph_copy_keeps_existing_soul_authority_marker_compatibility",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_graph_detach_uses_one_portable_native_set",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_event_id_copy_rejects_foreign_publisher_before_member_visits",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_graph_alias_and_exception_backings_resolve_one_save[before_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_graph_alias_and_exception_backings_resolve_one_save[after_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_current_copy_keeps_physical_event_id_reference",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_point_publish_has_fixed_history_work",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_reference_scrub_rejects_wrong_or_competing_event_id_authority[root_ids0-backings0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_reference_scrub_rejects_wrong_or_competing_event_id_authority[root_ids1-backings1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_scrub_preserves_unused_legacy_facade_snapshot_without_typed_edge",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_alias_copy_rejects_invalid_compact_root_before_publish",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_current_copy_rejects_invalid_facade_with_valid_catalog_witness",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_raw_shared_event_data_copy_keeps_incarnations_and_physical_child_routes",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_copy_rejects_conflicting_legacy_alias_bodies_before_publish[event-data]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_copy_rejects_conflicting_legacy_alias_bodies_before_publish[action-root]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_event_child_retains_existing_skill_history_alias",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_native_record_shared_by_event_payloads_mutates_and_reopens",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_sealed_native_event_value_graph_allocates_readonly_backings_in_copy",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_normalized_from_event_data_reuses_related_eager_action_root[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_normalized_from_event_data_reuses_related_eager_action_root[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_skill_record_keeps_one_body_when_native_root_edits_first[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_skill_record_keeps_one_body_when_native_root_edits_first[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_sealed_event_shared_by_mutable_payloads_has_one_readonly_body",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[before_catalog_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[after_catalog_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[before_publish]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_copy_preserves_held_source_pin_and_pending_overlays",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[self]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[two]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_keeps_shared_acyclic_backing_diamond",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_empty_physical_page_without_its_backing_descriptor",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_scrubs_preexisting_counted_backing_not_only_new_promotions",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.parents]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.occurrences]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.members]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.member_directory]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[set]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-set]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-set]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-set]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-set]",
+          "result": "passed",
+          "failure": null
+        }
+      ]
+    },
+    {
+      "scope": "final combined focused and affected",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "12",
+        "tests": "315",
+        "time": "24.542",
+        "timestamp": "2026-10-12T15:18:14.187087-05:00",
+        "hostname": "0c1f238d9f33"
+      },
+      "cases": [
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[direct-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[tuple-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[ref-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[frozenset-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-page]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-entry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-leaf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_key_component_paths_are_complete_and_resolve_native_reference[deep-record]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_entry_key_and_value_sharing_requires_both_checked_placements",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_key_component_paths_reject_undeclared_or_invalid_steps[path4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_missing_or_wrong_shape_key_paths_fail_with_integrity_errors",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_entry_address_must_match_canonical_projected_payload_key",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_all_concrete_physical_owner_families_have_checked_group_and_source",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key0-path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key1-path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key2-path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.list_pages-key3-path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.nested.entries-key4-path4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.sequence.nodes-key5-path5]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.sequence.nodes-key6-path6]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_owner_keys_and_member_paths_are_rejected[aux.lazy.sequence.nodes-key7-path7]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_other_auxiliary_authorities_are_not_identity_owners",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_invalid_physical_source_cannot_acquire_an_owner_witness[source4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_physical_history_owner_cannot_be_an_ordinary_record",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_sequence_path_follows_occurrence_identity_through_leaf_reordering",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_leaf_move_only_changes_its_two_physical_owner_witnesses[1000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_leaf_move_only_changes_its_two_physical_owner_witnesses[10000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_new_source_references_require_exact_complete_placements[placements0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_new_source_references_require_exact_complete_placements[placements1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_changed_reference_requires_payload_and_matching_placement",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_child_value_edit_forces_each_unchanged_physical_reference_header",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_retiring_physical_parent_reanchors_child_without_loading_payload",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_physical_owners_join_exact_central_publication_and_fault_recovery[before_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_physical_owners_join_exact_central_publication_and_fault_recovery[after_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_corrupt_recursive_group_is_rejected_before_child_value_changes",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_closed_record_fields_and_concrete_values_round_trip",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Event]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Person]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Household]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Settlement]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Cell]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LocalState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TradeRoute]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[World]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Genealogy]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Relationship]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocialGraph]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Property]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Economy]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeClaim]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Practice]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Law]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CulturalState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageNode]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Community]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CommunityState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Transmission]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TransmissionState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillHistory]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Infrastructure]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InfrastructureState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MotiveState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ActionRecord]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AgencyState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Understanding]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AbilityProgress]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[EssencePath]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdvancementState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResponseModel]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicAspiration]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResource]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResourceState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Branch]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicUserRecord]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdventureNotice]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyApplication]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InstitutionState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SoulState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResurrectionToken]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MetaphysicalState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[God]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[GreatAstralBeing]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Church]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[DivineState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialLot]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CraftedItem]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialEconomy]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientField]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientMagicState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Conflict]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[WarfareState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Inquiry]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyAccountabilityState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[RankedCurrencyState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicalThreat]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ThreatEcologyState]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[absent]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[frozen]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[foreign]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[missing]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[extra]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[mutable_child]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[tag]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[class]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[short]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[long]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[mutable]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[metadata]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[event_metadata]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_references_use_closed_codec_tag_and_reject_forged_ids",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_owner_requires_exact_complete_child_placements",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[1000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[10000]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key0-path0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key1-path1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key2-path2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key3-path3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[1-path4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key5-path5]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key6-path6]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key7-path7]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_path_must_belong_to_its_declared_record",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[ordinary]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[schema]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[membership]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_header_reads_after_fresh_store_open_without_bootstrap",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[float]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[tuple]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[frozenset]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[ref]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_keys_have_distinct_encoded_addresses_and_exact_native_restoration[deep]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_shared_nan_components_keep_native_composite_key_equality",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_existing_numeric_enum_and_container_equality_remains_canonical[values4]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_finite_key_preflight_rejects_entire_bad_input_before_nan_allocation[bad0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_finite_key_preflight_rejects_entire_bad_input_before_nan_allocation[bad1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_finite_key_preflight_rejects_entire_bad_input_before_nan_allocation[bad2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_finite_key_preflight_rejects_entire_bad_input_before_nan_allocation[bad3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_lookup_only_projection_never_allocates_for_an_unknown_nan",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_projection_rejects_an_unchecked_callback_result[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_projection_rejects_an_unchecked_callback_result[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_projection_rejects_an_unchecked_callback_result[token]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_projection_rejects_an_unchecked_callback_result[bad3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_stored_key_validation_rejects_unprojected_or_undeclared_values[nan]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_stored_key_validation_rejects_unprojected_or_undeclared_values[bad1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_stored_key_validation_rejects_unprojected_or_undeclared_values[bad2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_stored_key_validation_rejects_unprojected_or_undeclared_values[bad3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_restoration_rejects_a_non_native_nan_canonical_object[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_restoration_rejects_a_non_native_nan_canonical_object[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_restoration_rejects_a_non_native_nan_canonical_object[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_restoration_rejects_a_non_native_nan_canonical_object[nan]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_forged_reference_is_rejected_in_stored_keys_and_projection_callback",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_restored_nested_component_preserves_identity_after_original_key_is_released",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_nan_reference_has_a_closed_codec_tag",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[-1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_ids_are_positive_exact_integers[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_preserves_exact_nan_bits_and_native_float_type[9221120237041090561]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_preserves_exact_nan_bits_and_native_float_type[18444492273895866370]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_preserves_exact_nan_bits_and_native_float_type[9218868437227405313]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[inf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[nan]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_header_admission_rejects_other_values[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[tag]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[short]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[long]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[mutable]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[size]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_header_validation_fails_closed[finite]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_atom_header_is_a_checked_physical_owner_with_no_children",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_missing_or_invalid_stored_atom_is_an_integrity_failure",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_cannot_silently_skip_unintegrated_atom_references",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_atom_point_reads_and_pins_do_not_depend_on_history_size",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_objects_have_distinct_ids_and_repeated_binding_reuses_id",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unheld_nan_releases_forward_and_reverse_identity",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[tuple]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[frozenset]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[<lambda>]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_collection_checks_only_its_bounded_queue",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nan_rebinding_uses_existing_checked_incarnation_rules",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[inf]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[nan]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[value6]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_float_subclasses",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normal_mutable_bindings_remain_weak_and_close_releases_nan_roots",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[-1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[257]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_collection_work_is_fixed_for_different_live_key_history_sizes",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_nonreflexive_apis_obey_registry_close_guard",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_unsealed_event_record_data_aliases_mutate_and_reopen",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_seal_copies_mutable_container_aliases_and_persists_immutable_snapshot[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_seal_copies_mutable_container_aliases_and_persists_immutable_snapshot[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_freeze_preserves_native_mutable_record_child_behavior",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_snapshot_save_fault_preserves_retry_and_alias[before_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_snapshot_save_fault_preserves_retry_and_alias[after_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_detach_reads_uncached_record_and_snapshot_descendants",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_header_edit_save_has_fixed_unrelated_history_work",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_legacy_tracked_world_event_input_rejects_before_recursive_admission",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_is_a_closed_codec_value_and_physical_child_edge",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[-1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[1.0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_rejects_nonpositive_or_noninteger_incarnation[None]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_codec_rejects_malformed_tag[node0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_codec_rejects_malformed_tag[node1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_codec_rejects_malformed_tag[node2]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_codec_rejects_malformed_tag[node3]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_explicit_event_graph_copy_keeps_one_event_id_authority_and_literal_marker",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_recursive_admission_borrows_same_facade_without_copying_members",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_graph_copy_keeps_existing_soul_authority_marker_compatibility",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_graph_detach_uses_one_portable_native_set",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_native_event_id_copy_rejects_foreign_publisher_before_member_visits",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_graph_alias_and_exception_backings_resolve_one_save[before_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_graph_alias_and_exception_backings_resolve_one_save[after_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_current_copy_keeps_physical_event_id_reference",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_reference_point_publish_has_fixed_history_work",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_reference_scrub_rejects_wrong_or_competing_event_id_authority[root_ids0-backings0]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_reference_scrub_rejects_wrong_or_competing_event_id_authority[root_ids1-backings1]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_reference_scrub_preserves_unused_legacy_facade_snapshot_without_typed_edge",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_event_id_alias_copy_rejects_invalid_compact_root_before_publish",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_checked_current_copy_rejects_invalid_facade_with_valid_catalog_witness",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_raw_shared_event_data_copy_keeps_incarnations_and_physical_child_routes",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_copy_rejects_conflicting_legacy_alias_bodies_before_publish[event-data]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_copy_rejects_conflicting_legacy_alias_bodies_before_publish[action-root]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_event_child_retains_existing_skill_history_alias",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_native_record_shared_by_event_payloads_mutates_and_reopens",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_sealed_native_event_value_graph_allocates_readonly_backings_in_copy",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_normalized_from_event_data_reuses_related_eager_action_root[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_record_normalized_from_event_data_reuses_related_eager_action_root[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_skill_record_keeps_one_body_when_native_root_edits_first[True]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_skill_record_keeps_one_body_when_native_root_edits_first[False]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_sealed_event_shared_by_mutable_payloads_has_one_readonly_body",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[before_catalog_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[after_catalog_commit]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[before_publish]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_normalized_copy_preserves_held_source_pin_and_pending_overlays",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[self]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[two]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_keeps_shared_acyclic_backing_diamond",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_empty_physical_page_without_its_backing_descriptor",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_scrubs_preexisting_counted_backing_not_only_new_promotions",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.parents]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.occurrences]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.members]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.member_directory]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-map]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-set]",
+          "result": "pending",
+          "failure": null
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[set]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-set]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-set]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-set]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-map]",
+          "result": "passed",
+          "failure": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-set]",
+          "result": "passed",
+          "failure": null
+        }
+      ]
+    }
+  ],
+  "supplemental_RED": {
+    "case": "test_key_component_paths_reject_undeclared_or_invalid_steps[path4]",
+    "observed_failure": "bool True was accepted as entry index 1",
+    "resolution": "entry prefix now requires an exact integer"
+  },
+  "fixture_and_contract_adjustments": [
+    "New shared key/value case creates the existing current identity-link authority, so its test head declares world_identity_links and includes the checked atom body. Initial fixture omitted that inventory.",
+    "The old entry invalid-path case used index1. That is now intentionally the key field; the negative case uses ordinal index0, which remains invalid."
+  ],
+  "semantics": [
+    "Physical references include both scalar-entry keys and values.",
+    "Tuple indexes, declared Ref kind/id fields and semantic frozenset-member keys resolve and replace through closed schema operations.",
+    "Page, entry, sequence leaf and record-header adapters share the checked traversal.",
+    "Missing one of two shared key/value placements rejects catalog construction.",
+    "Canonical projected payload keys must match the physical entry address.",
+    "Genuine legacy immutable keys retain their prior representation.",
+    "Malformed steps, wrong shapes and boolean indexes fail closed."
+  ],
+  "limits": [
+    "Live scalar-history key projection and atom metadata/publication are not yet selected.",
+    "The 12 existing NaN map/set failures remain strict pending cases.",
+    "Copy guard remains until complete source mapping and target validation."
+  ],
+  "rank_changed": false,
+  "full_suite_run": false,
+  "capability6": false,
+  "release_accepted": false
+}
