@@ -1,5 +1,45 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: checked currency root graph copies (October12 UTC)
+
+Source local `de0d55a95050ef08f200fc893fb36a8d347c0494`, public
+`14f01bce370032da0cee795f7ae7d6e3983cbb58`, exact matching tree
+`233e0008a85040ddbbe06b2492d83c02344d22bb`; leased non-force update succeeded.
+
+The existing wallet/treasury tables now accept checked map-reference root headers.
+Explicit graph copy seeds all current raw currency roots, including ones with no
+Event alias, preserving original IDs, child sharing and values/order. Root and
+Event-first access select one map backing and canonical native children. Checked
+native dictionary assignment uses existing recursive admission; ordinary genuine
+legacy compatibility retains its dictionary path. Generated denomination guards
+are distinguished from unrestricted imported maps in the field policy inventory.
+
+Additional RED cases caught post-freeze lease acquisition at acknowledgement,
+portable detach's concrete-dict assumption, and old occurrence retirement before
+foreign/undeclared replacement rejection. Acknowledgement uses registered identity
+without acquiring a new dependency; detach uses the existing materialization memo;
+finite incoming graph/lease validation now precedes old root detachment.
+Replacement/deletion, two-family aliases, private source overlays, copied current
+IDs and exact before/after-commit save recovery pass.
+
+At H1,000/H10,000 a point map edit/save has identical **80 payload reads, 10
+writes, 607 metadata rows** with map archive iteration and registry inventory
+forbidden. No-op save reads only three fixed Event-storage descriptor rows, has
+zero archive reads/writes and 35 metadata rows. Explicit O(H) copy setup is outside
+these measurements. Final focused **28 passed in49.17s** precedes only the final
+checked-current-copy test and field-policy documentation. Supplemental **18 passed
+in6.30s** includes that last test and exhaustive field contracts, excluding only
+already measured point save. Final affected **48 passed in156.51s** matches all
+production code and precedes only policy documentation. Early affected91 is
+recorded with its earlier source boundary. Counts overlap; no final suite claim.
+`git diff --check` passed. Cases/hashes: `stage_0_5_currency_root_copy_validation.json`.
+
+Whole Stage0.5 remains open: special Event-ID copy aliases and other root
+conversion boundaries, actual schema/byte closure, exotic equality, complete
+capability/ordinary activation, integrated bounds/P5, final applicable full suite
+and independent review. Rank issue17, gameplay, PR14, prior P5 certification and
+production status are unchanged. No new endurance.
+
 ## Latest checkpoint: legacy Event graph copy normalization (October12 UTC)
 
 Source local `a0e4db38f86d67bfe6d5c21b81ccb8c3e428ee3e`, public
