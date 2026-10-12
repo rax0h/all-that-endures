@@ -21,7 +21,7 @@ from .persistence_lazy_store import (
 from .persistence_lazy_families import IDENTITY_OWNER_FAMILIES, AUXILIARY_OWNER_FAMILIES
 from .persistence_lazy_identity_catalog import (
     IdentityCatalog, initial_catalog_delta, CATALOG_NAMESPACE, OWNER_NAMESPACE,
-    GROUP_NAMESPACE, LINK_NAMESPACE,
+    GROUP_NAMESPACE, LINK_NAMESPACE, OWNER_TREE_NAMESPACE, CATALOG_TAG,
 )
 from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE, PAGE_NAMESPACE, ENTRY_NAMESPACE
 from .persistence_lazy_sequence import (
@@ -85,9 +85,11 @@ def _backing_rosters(store, pin, next_incarnation):
 
 def _verify_catalog(store, pin):
     catalog = IdentityCatalog(store)
-    catalog._descriptor(pin)
+    descriptor = catalog._descriptor(pin)
+    links, expected_nodes, live_owners = 0, set(), set()
     for incarnation in store.iter_keys(pin, GROUP_NAMESPACE):
         group = catalog.read_identity_group(pin, incarnation)
+        links += len(group.links)
         for values in (group.occurrences, group.links):
             if hasattr(values, 'close'):
                 values.close()
@@ -95,6 +97,29 @@ def _verify_catalog(store, pin):
         checked = catalog.read_owner_identity(pin, owner)
         if hasattr(checked.occurrences, 'close'):
             checked.occurrences.close()
+        header = catalog._owner(pin, owner)
+        if header[1]:
+            live_owners.add(store.codec.encode(owner))
+        pending = [header[6:]] if header[6] is not None else []
+        while pending:
+            prefix, count, checksum = pending.pop()
+            marker = store.codec.encode((*owner, prefix))
+            if marker in expected_nodes:
+                raise StoreIntegrityError('duplicate identity owner tree node')
+            expected_nodes.add(marker)
+            node = catalog._node(pin, owner, prefix, count, checksum)
+            if node[0] == 'owner-branch/v1':
+                pending.extend(child[1:] for child in node[2])
+    if links != store.namespace_size(pin, LINK_NAMESPACE):
+        raise StoreIntegrityError('identity link inventory is incomplete or extra')
+    versions, ordinary = _owner_sources(store, pin)
+    if live_owners != {store.codec.encode((v.namespace, v.key)) for v in (*versions, *ordinary)}:
+        raise StoreIntegrityError('identity owner witness inventory is incomplete or extra')
+    if expected_nodes != {store.codec.encode(key) for key in store.iter_keys(pin, OWNER_TREE_NAMESPACE)}:
+        raise StoreIntegrityError('extra/missing identity owner tree authority')
+    if descriptor[0] == CATALOG_TAG:
+        from .persistence_lazy_identity_retired import RetiredIdentityRanges
+        RetiredIdentityRanges(store, pin, header=descriptor[4]).scrub()
     verify_type_witnesses(store, pin)
     from .persistence_history_retirement import NAMESPACE as RETIREMENT, _job
     for incarnation in store.iter_keys(pin, SEQUENCE_DESCRIPTOR):
@@ -331,6 +356,77 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
             except BaseException:
                 # The file is unpublished and will be removed. Do not mask the
                 # original preparation/commit fault by releasing an unresolved pin.
+                raise
+            else:
+                target.release_pin(pin)
+        _copy_phase('before_publish', private)
+        _publish_private_cold_file(private, destination)
+    return {'source_generation': copied.generation, 'generation': generation,
+            'store_identity': identity, 'source_preserved': True, 'complete_format': False}
+
+
+def _copy_current_checked_catalog(source, destination, *, rules_id):
+    """Copy already backed current authority without relabeling or format claims.
+
+    Existing catalog commitments/retired intervals and physical rows remain
+    unchanged. The destination's existing commit installs empty backing leases
+    and its coherent cold commit descriptor after a source-preserving capture.
+    """
+    from .persistence_history_dependencies import _checked_value as checked_dependency
+    source, destination = _preflight_conversion_paths(source, destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    codec = WorldCodec(identity_links_recorded=True)
+    with tempfile.TemporaryDirectory(prefix='.ate-checked-current-copy-', dir=destination.parent) as directory:
+        private = Path(directory) / 'destination.sqlite'
+        copied = LazyRecordStore.copy_current_head(source, private, codec=codec,
+            expected_simulation_schema=SCHEMA, expected_rules_id=rules_id)
+        _copy_phase('after_private_copy', private)
+        with LazyRecordStore.open(private, codec=codec, expected_simulation_schema=SCHEMA,
+                                  expected_rules_id=rules_id) as target:
+            pin = target.capture_pin()
+            try:
+                with target.read_snapshot(pin):
+                    if target._namespace_state_at(CATALOG_NAMESPACE, pin.captured_head) is None:
+                        raise StoreFormatError('checked current copy requires an existing checked catalog')
+                    floor = int(target.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
+                    if floor != BOUNDED_AUTHORITY_FORMAT_VERSION:
+                        raise StoreFormatError('checked current copy requires bounded-authority format5')
+                    _verify_catalog(target, pin)
+                    rosters = _backing_rosters(target, pin, target.read_identity_state(pin))
+                    if set(target.iter_keys(pin, DEPENDENCIES)) != {r.key for r in rosters}:
+                        raise StoreIntegrityError('checked copy dependency roster inventory is incomplete or extra')
+                    for roster in rosters:
+                        if checked_dependency(target, pin, roster.key)[1] != roster.value[1]:
+                            raise StoreIntegrityError('checked copy dependency roster has wrong backing kind')
+                    versions = []
+                    namespaces = tuple(ns for (ns,) in target.db.execute(
+                        'SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? '
+                        'AND (valid_to IS NULL OR ?<valid_to)', (pin.captured_head, pin.captured_head)))
+                    for ns in namespaces:
+                        for key in target.iter_keys(pin, ns):
+                            row = target._visible_record_row(pin.captured_head, ns, codec.encode(key))
+                            value, schema, _a, _b, members = target._check_record_row(ns, codec.encode(key), row, decode=True)
+                            versions.append(VersionChange(ns, key, value, record_schema=schema,
+                                memberships=tuple(Membership(*m) for m in members)))
+                    ordinary = tuple(codec.decode(payload) for (payload,) in target.db.execute('SELECT payload FROM records'))
+                    _check_reference_targets((*ordinary, *(v.value for v in versions)), rosters)
+                    _check_backing_graph(codec, versions, rosters)
+                    metadata = target.head_metadata()
+                token = uuid.uuid4().hex
+                _copy_phase('before_catalog_commit', private)
+                committed = target.commit(pin, commit_token=token,
+                    changes=(RecordChange(EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY,
+                        (1, pin.captured_head + 1, token)),),
+                    version_changes=rosters, identity_changes=(), new_segments=(),
+                    required_format_version=floor, metadata=metadata)
+                pin = committed.pin
+                _copy_phase('after_catalog_commit', private)
+                target.verify_all()
+                _verify_catalog(target, pin)
+                generation, identity = target.generation, target.store_identity
+                _copy_phase('after_catalog_validation', private)
+            except BaseException:
+                # The unpublished file is discarded, including ambiguous plans.
                 raise
             else:
                 target.release_pin(pin)
