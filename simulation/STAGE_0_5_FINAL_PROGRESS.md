@@ -1,5 +1,58 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: point-backed knowledge archives and byte-audit counterexample (October 12)
+
+Parent local `3f088d44b47c31dbe0c08197a46bc5bd584a48c0`, public
+`458fd9d39a5db834be0c02e839cd574c2e4d9add`, matching tree
+`417561c4d7939f20e43a1d9e23b87c37bf6698b7`.
+
+`KnowledgeState.claims` and its `(subject, proposition)` index now select the
+existing versioned scalar record/map families in fresh explicit conversion.
+`KnowledgeClaim` borrows the existing IndexedRecord notification and disposable
+metadata contract; stored fields, IDs, truth values and teaching behavior are
+unchanged. Both archives open with zero decoded records. Existing claim lookup
+loads one semantic-index row; fetching the claim loads one record. Newly created
+claims and index entries publish with the head/counter in the existing transaction.
+
+Generated semantic keys are exact string pairs with exact integer claim IDs.
+Marked conversion rejects non-string imported semantic keys, without changing
+the source or publishing a destination. Genuine earlier eager markers remain
+readable and mutable; ordinary open does not migrate them. Explicit portable
+detach uses the standard RecordTable mapping for claim records and a native dict
+for the scalar index. Checked-catalog bootstrap/current copy and before/after-
+commit recovery preserve the pair of authorities. This is a concrete generated-
+archive closure, not unrestricted root-graph or complete-format acceptance.
+
+Initial RED: 2 missing-lazy-authority failures / 4 behavior controls. Integration
+RED identified KnowledgeClaim's missing IndexedRecord runtime metadata/callback
+contract. Final focused **11 passed in 19.24s**; affected **214 passed in 77.67s**;
+codec/schema/history archive **37 passed in 44.78s** before the last test-only
+compatibility/rejection additions. No production behavior changed after these
+runs. Field-policy prose changed to describe the actual writer/representation.
+Counts overlap; exact source hashes and cases:
+`stage_0_5_knowledge_authorities_validation.json`.
+
+H1,000/H10,000 existing claim edit plus new claim: **8 payload reads / 689 bytes,
+7 writes / 8,292 versus 8,297 bytes, 233 metadata rows**, one decoded existing
+claim, zero decoded semantic-index records. The five-byte difference is counter/
+ordinal digit width; no historical claim/index payload is traversed.
+
+The next byte audit reproduced an already required but unresolved imported-
+topology boundary. A scalar edit to an EssencePath containing a ResponseModel
+with 1,000 versus 10,000 imported samples preserves every sample but reads
+**219,431 versus 2,190,431 payload bytes**, writes **219,072 versus 2,190,072 bytes**,
+and visits **2,216 versus 20,216 metadata rows**. Both have eight payload reads
+and three writes: record counts alone conceal the scaling defect. This is an
+explicit counterexample, not a passing bound or a new release gate. Actual
+results/source hashes: `stage_0_5_imported_topology_byte_diagnosis.json`.
+
+Next: page unrestricted imported advancement/response-model topology using the
+accepted recursive records/history machinery while keeping generated 3-base /
+20-ability and 3/5-sample writer semantics. Complete root normalization, field/
+byte closure, capability6/open/upgrade activation, integrated P5/final suite and
+Astra acceptance remain pending. Rank issue17, gameplay, PR14, previous P5 and
+production promotion remain unchanged. No new endurance or merge.
+
 ## Latest checkpoint: native NaN runtime and checked current copies (October 12)
 
 Recovered the interrupted seven-file runtime integration atop local `abfcebb`

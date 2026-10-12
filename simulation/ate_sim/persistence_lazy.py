@@ -30,6 +30,7 @@ from .transmission import Transmission
 from .agency import MotiveState
 from .social import Relationship
 from .skills import SkillHistory
+from .knowledge import KnowledgeClaim
 from .lineage import LineageNode
 from .warfare import Conflict
 from .society_accountability import Inquiry
@@ -210,6 +211,7 @@ CLEAN_GROUP_LIMIT = 256
 # description tag distinguishes complete empty authority from a legacy field.
 SCALAR_RECORD_KINDS = {'dict-scalar/v1': 'dict', 'RecordTable-scalar/v1': 'RecordTable'}
 SCALAR_RECORD_SPECS = {
+    'world.knowledge.claims': (KnowledgeClaim, {}),
     'world.households': (Household, {('alive',): 'alive', ('settlement',): 'settlement', ('alive', 'settlement'): 'alive_settlement'}),
     'world.communities.communities': (Community, MINIMUM_FIELDS['world.communities.communities']),
     'world.metaphysics.resurrection_tokens': (ResurrectionToken, MINIMUM_FIELDS['world.metaphysics.resurrection_tokens']),
@@ -262,6 +264,7 @@ NESTED_FIELD_KINDS = {
     ('world.divinity.churches', 'doctrine_claims'): 'set',
 }
 SCALAR_MAP_SPECS = {
+    'world.knowledge.claim_index': (tuple, (int,)),
     ADOPTION_NAMESPACE: (tuple, (int, float)),
     'world.threat_ecology.resolutions': (int, (int,)),
     'world.knowledge.beliefs': (tuple, (int, float)),
@@ -271,6 +274,8 @@ SCALAR_NAMESPACES = (*SCALAR_RECORD_SPECS, *SCALAR_MAP_SPECS)
 
 def _valid_scalar_map_key(namespace, key):
     key_type, _value_types = SCALAR_MAP_SPECS[namespace]
+    if namespace == 'world.knowledge.claim_index':
+        return type(key) is tuple and len(key) == 2 and all(type(part) is str for part in key)
     if key_type is tuple:
         return type(key) is tuple and len(key) == 2 and all(type(part) is int for part in key)
     return type(key) is key_type

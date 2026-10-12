@@ -1,0 +1,1526 @@
+{
+  "date_utc": "2026-10-12",
+  "checkpoint": "Knowledge claims and semantic-key index scalar authorities",
+  "parent_public": "458fd9d39a5db834be0c02e839cd574c2e4d9add",
+  "parent_local": "3f088d44b47c31dbe0c08197a46bc5bd584a48c0",
+  "sha256": {
+    "simulation/ate_sim/knowledge.py": "71d2f5a80380d6e63d0b9e995f3f7ddf26045491bf3ef080d0def7f03a9742d0",
+    "simulation/ate_sim/persistence_lazy.py": "e7b5e49bde9ee5289bb8d12b6155cc06ec6d89f2849bfe166fdd4196cee053ad",
+    "simulation/ate_sim/persistence_lazy_families.py": "089133d94e33205d092c798f30e7d1f50cce1b0e30317d2a1f638c47c081117d",
+    "simulation/tests/test_stage_0_5_final_knowledge_authorities.py": "c875a8216e6776f69b3ad3c0df59713ed02e2a04356e9a0a9dbb2a7a387ca5af"
+  },
+  "initial_RED": {
+    "failed": 2,
+    "passed": 4,
+    "cause": "both growing roots remained eager dictionaries on open"
+  },
+  "integration_RED": [
+    "KnowledgeClaim needed the existing IndexedRecord callbacks and disposable metadata allowance"
+  ],
+  "test_adjustment": "Portable claim records use the existing RecordTable dictionary subtype; assert mapping behavior rather than exact builtin dict class.",
+  "gates": [
+    {
+      "name": "knowledge-affected",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "214",
+        "time": "77.656",
+        "timestamp": "2026-10-12T16:26:47.094438-05:00",
+        "hostname": "0c1f238d9f33"
+      },
+      "properties": [
+        {
+          "name": "H1000_payload_reads",
+          "value": "100"
+        },
+        {
+          "name": "H1000_payload_read_bytes",
+          "value": "20890"
+        },
+        {
+          "name": "H1000_metadata_rows",
+          "value": "705"
+        },
+        {
+          "name": "H10000_payload_reads",
+          "value": "100"
+        },
+        {
+          "name": "H10000_payload_read_bytes",
+          "value": "19674"
+        },
+        {
+          "name": "H10000_metadata_rows",
+          "value": "705"
+        },
+        {
+          "name": "sharing_placements",
+          "value": "48"
+        },
+        {
+          "name": "incoming_scalar_codec_visits",
+          "value": "3"
+        },
+        {
+          "name": "batch_operation",
+          "value": "list_slice"
+        },
+        {
+          "name": "sharing_placements",
+          "value": "48"
+        },
+        {
+          "name": "incoming_scalar_codec_visits",
+          "value": "2"
+        },
+        {
+          "name": "batch_operation",
+          "value": "counted_slice"
+        },
+        {
+          "name": "sharing_placements",
+          "value": "48"
+        },
+        {
+          "name": "incoming_scalar_codec_visits",
+          "value": "2"
+        },
+        {
+          "name": "batch_operation",
+          "value": "counted_extend"
+        },
+        {
+          "name": "sharing_placements",
+          "value": "48"
+        },
+        {
+          "name": "incoming_scalar_codec_visits",
+          "value": "2"
+        },
+        {
+          "name": "history",
+          "value": "1000"
+        },
+        {
+          "name": "payload_reads",
+          "value": "1"
+        },
+        {
+          "name": "metadata_rows",
+          "value": "2"
+        },
+        {
+          "name": "payload_read_bytes",
+          "value": "191"
+        },
+        {
+          "name": "history",
+          "value": "10000"
+        },
+        {
+          "name": "payload_reads",
+          "value": "1"
+        },
+        {
+          "name": "metadata_rows",
+          "value": "2"
+        },
+        {
+          "name": "payload_read_bytes",
+          "value": "191"
+        },
+        {
+          "name": "H1000_nan_edit",
+          "value": "LazyStoreDiagnostics(payload_reads=137, payload_read_bytes=26263, payload_check_reads=172, payload_check_bytes=31841, payload_writes=15, payload_write_bytes=2290, metadata_rows=887, query_rows=12, pin_rows=798, maintenance_rows=60, temporary_keys_peak=0, maintenance_removed_rows=30)"
+        },
+        {
+          "name": "H1000_nan_noop",
+          "value": "LazyStoreDiagnostics(payload_reads=3, payload_read_bytes=217, payload_check_reads=3, payload_check_bytes=217, payload_writes=0, payload_write_bytes=0, metadata_rows=37, query_rows=0, pin_rows=0, maintenance_rows=0, temporary_keys_peak=0, maintenance_removed_rows=0)"
+        },
+        {
+          "name": "H10000_nan_edit",
+          "value": "LazyStoreDiagnostics(payload_reads=137, payload_read_bytes=26217, payload_check_reads=172, payload_check_bytes=31749, payload_writes=15, payload_write_bytes=2290, metadata_rows=887, query_rows=12, pin_rows=797, maintenance_rows=60, temporary_keys_peak=0, maintenance_removed_rows=30)"
+        },
+        {
+          "name": "H10000_nan_noop",
+          "value": "LazyStoreDiagnostics(payload_reads=3, payload_read_bytes=217, payload_check_reads=3, payload_check_bytes=217, payload_writes=0, payload_write_bytes=0, metadata_rows=37, query_rows=0, pin_rows=0, maintenance_rows=0, temporary_keys_peak=0, maintenance_removed_rows=0)"
+        }
+      ],
+      "cases": [
+        {
+          "name": "test_closed_history_does_not_load_on_open_or_active_queries[1000]",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_closed_history_does_not_load_on_open_or_active_queries[10000]",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_direct_edits_memberships_and_single_family_save",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_scalar_save_failure_resolves_with_frozen_evidence[before_commit]",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_scalar_save_failure_resolves_with_frozen_evidence[after_commit]",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_shared_wallet_mutation_reopen_and_portable_detach",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_delete_reinsert_preserves_native_order_and_layout",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_scalar_predicate_preserves_native_numeric_equality",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_scalar_residency_sidecars_remain_bounded_and_retained_object_mutates",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_legacy_scalar_fields_remain_eager_and_open_preserves_bytes",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_marked_empty_scalar_family_requires_checked_namespace_authority",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_failed_detach_retains_scalar_mutation_authority",
+          "classname": "simulation.tests.test_persistence_lazy_cold_scalar_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_all_concrete_tables_bound_once_without_loading_owners",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_cold_indexed_alias_gets_its_authority_callback_before_mutation[skill]",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_cold_indexed_alias_gets_its_authority_callback_before_mutation[lineage]",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_cold_skill_child_alias_routes_before_mutation",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_eager_settlement_record_alias_reuses_concrete_lazy_authority[skill-False]",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_eager_settlement_record_alias_reuses_concrete_lazy_authority[skill-True]",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_eager_settlement_record_alias_reuses_concrete_lazy_authority[lineage-False]",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_direct_eager_skill_child_alias_partial_extend_is_saved",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_direct_eager_skill_child_alias_retired_placement_does_not_return",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_direct_eager_soul_child_partial_set_mutation_is_saved[update-second-expected0]",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_direct_eager_soul_child_partial_set_mutation_is_saved[difference_update-first-expected1]",
+          "classname": "simulation.tests.test_stage_0_5_final_runtime_families",
+          "result": "passed"
+        },
+        {
+          "name": "test_actual_world_routes_cold_peer_and_forces_both_headers_at_paired_scales",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_actual_world_missing_cold_group_occurrence_rejects_before_edit",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_actual_world_deleted_cold_owner_is_not_resurrected_by_retained_alias",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_actual_world_replaced_child_routes_old_alias_only_to_remaining_peer",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_actual_world_owner_inventory_is_checked_before_binding",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_catalog_activation_rejects_existing_unsaved_family_edits",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_preparation_failure_thaws_new_catalog_freeze_only",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_catalog_noop_save_has_no_archive_or_identity_work",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_actual_world_catalog_rollback_and_lost_ack_recover_exactly[before_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_actual_world_catalog_rollback_and_lost_ack_recover_exactly[after_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "result": "passed"
+        },
+        {
+          "name": "test_catalog_copy_preserves_source_and_checks_all_physical_owner_witnesses",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_private_copy]",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[before_catalog_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_validation]",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_competing_destination_is_not_overwritten",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_same_source_and_destination_rejects_without_change",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_copied_aliases_continue_independently_and_reject_foreign_source_alias",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_copy_keeps_original_collection_ordinals_and_high_water",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_source_advance_after_capture_cannot_mix_copy_generations",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_corrupt_source_fails_before_destination_publication",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_catalog_bootstrap_cannot_relabel_an_already_staged_catalog",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_counted_leaf_owners_are_checked_without_claiming_branch_ownership",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[before_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[after_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_copy_keeps_checked_immutable_event_segments",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_private_catalog_copy_requires_an_explicit_bounded_authority_source",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_copy_rejects_dangling_root_history_reference_before_publication",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_copy_preserves_already_held_source_alias_and_excludes_unsaved_overlay",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_copy_preserves_ordinary_query_memberships",
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_current_copy_preserves_native_graph_and_incarnations",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_rejects_unreachable_catalog_metadata[owner-node]",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_rejects_unreachable_catalog_metadata[retired-node]",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_rejects_unreachable_catalog_metadata[unindexed-link]",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_clears_only_destination_dependency_tokens_and_keeps_source_overlay",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_commit_fault_preserves_source_and_exact_retry[before_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_commit_fault_preserves_source_and_exact_retry[after_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_rejects_legacy_source_without_bootstrapping_it",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_missing_dependency_roster_is_corruption",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_source_advance_after_capture_cannot_mix_native_graphs",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_competing_destination_is_not_overwritten",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_preserves_compact_retired_ranges_without_recreating_group_rows",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_requires_empty_physical_owner_witness_too",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_captures_committed_head_while_source_acknowledgement_is_unresolved[before_commit-0.5]",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_checked_copy_captures_committed_head_while_source_acknowledgement_is_unresolved[after_commit-0.9]",
+          "classname": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "result": "passed"
+        },
+        {
+          "name": "test_registered_value_records_and_enums_round_trip_in_recursive_history",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key0-equal0]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key1-equal1]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key2-equal2]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[society-society]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key4-equal4]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_recursive_map_value_keys_follow_native_equality_and_keep_representative[key5-equal5]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_recursive_set_value_keys_keep_native_enum_and_ref_representatives",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_mutable_child_hidden_in_frozen_ref_rejects_before_owner_or_allocator_edit",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_undeclared_or_invalid_value_records_fail_closed_before_admission[cycle]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_undeclared_or_invalid_value_records_fail_closed_before_admission[extra]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_undeclared_or_invalid_value_records_fail_closed_before_admission[foreign_record]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_undeclared_or_invalid_value_records_fail_closed_before_admission[foreign_enum]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_all_declared_frozen_records_are_explicitly_accounted_for",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_shared_native_subtree_is_validated_by_unique_input_graph_not_every_placement",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_completed_native_validation_is_not_reused_after_caller_changes_source",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_finite_recursive_batches_validate_shared_record_child_once[list_slice]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_finite_recursive_batches_validate_shared_record_child_once[counted_slice]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_finite_recursive_batches_validate_shared_record_child_once[counted_extend]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_finite_batch_rechecks_caller_sources_after_prior_admission[list_slice]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_finite_batch_rechecks_caller_sources_after_prior_admission[counted_slice]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_finite_batch_rechecks_caller_sources_after_prior_admission[counted_extend]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_slice_index_callback_finishes_before_native_batch_preflight[list]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_slice_index_callback_finishes_before_native_batch_preflight[sequence]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_recursive_list_slice_invokes_index_callback_once_like_native_list",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection0-6]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection1-3]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection2-2]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection3-2]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_normalized_recursive_slices_match_native_order_and_preserve_shared_record_child[selection4-2]",
+          "classname": "simulation.tests.test_stage_0_5_final_recursive_value_records",
+          "result": "passed"
+        },
+        {
+          "name": "test_closed_record_fields_and_concrete_values_round_trip",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Event]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Person]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Household]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Settlement]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Cell]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LocalState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TradeRoute]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[World]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Genealogy]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Relationship]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocialGraph]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Property]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Economy]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeClaim]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[KnowledgeState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Practice]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution0]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Law]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CulturalState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageNode]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[LineageState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Community]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CommunityState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Transmission]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[TransmissionState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillHistory]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SkillState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Infrastructure]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InfrastructureState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MotiveState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ActionRecord]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AgencyState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Understanding]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AbilityProgress]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[EssencePath]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdvancementState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResponseModel]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicAspiration]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResource]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicResourceState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Institution1]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Branch]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicUserRecord]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AdventureNotice]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyApplication]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[InstitutionState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SoulState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ResurrectionToken]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MetaphysicalState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[God]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[GreatAstralBeing]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Church]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[DivineState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialLot]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[CraftedItem]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MaterialEconomy]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientField]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[AmbientMagicState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Conflict]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[WarfareState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[Inquiry]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[SocietyAccountabilityState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[RankedCurrencyState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[MagicalThreat]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_each_declared_mutable_record_has_exact_header_field_coverage[ThreatEcologyState]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[absent]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[False]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_event_header_preserves_exact_seal_metadata[True]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[frozen]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[foreign]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[missing]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[extra]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_unclassified_or_unprojected_record_input_fails_closed[mutable_child]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[tag]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[class]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[short]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[long]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[mutable]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[metadata]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_malformed_stored_headers_fail_with_integrity_error[event_metadata]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_references_use_closed_codec_tag_and_reject_forged_ids",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_owner_requires_exact_complete_child_placements",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[1000]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_point_reads_and_old_generation_are_independent_of_unrelated_headers[10000]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key0-path0]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key1-path1]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key2-path2]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key3-path3]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[1-path4]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key5-path5]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key6-path6]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_paths_reject_invalid_owner_addresses[key7-path7]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_path_must_belong_to_its_declared_record",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[ordinary]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[schema]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_physical_source_cannot_acquire_incompatible_authority[membership]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node0]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node1]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_reference_wire_shape_is_closed[node2]",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_record_header_reads_after_fresh_store_open_without_bootstrap",
+          "classname": "simulation.tests.test_stage_0_5_final_record_headers",
+          "result": "passed"
+        },
+        {
+          "name": "test_one_nan_is_shared_by_map_key_value_ref_and_frozenset_after_reopen",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_unpublished_nan_insert_remove_preserves_native_semantics[map]",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_unpublished_nan_insert_remove_preserves_native_semantics[set]",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_nan_input_and_sharing_survive_frozen_save_recovery[before_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_nan_input_and_sharing_survive_frozen_save_recovery[after_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_invalid_map_value_rejects_before_nan_allocation_or_entry_mutation",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_unheld_nan_sources_release_roots_after_acknowledgement",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_nan_lookup_rejects_closed_session",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_nan_atom_cannot_resolve_to_a_live_container_incarnation",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_frozen_nan_snapshot_certification_survives_reopen",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_nan_local_edit_cost_is_independent_of_unrelated_history",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_cancelled_unheld_nan_input_does_not_leak_conditional_roots",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_cancelled_held_nan_can_be_reattached_after_an_unrelated_save",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_direct_soul_map_and_set_admission_share_native_nan_identity",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        },
+        {
+          "name": "test_nan_value_replacement_then_reversion_restores_checked_sharing",
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "knowledge-schema",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "37",
+        "time": "44.762",
+        "timestamp": "2026-10-12T16:28:06.449511-05:00",
+        "hostname": "0c1f238d9f33"
+      },
+      "properties": [
+        {
+          "name": "H1000_knowledge_edit",
+          "value": "LazyStoreDiagnostics(payload_reads=8, payload_read_bytes=689, payload_check_reads=14, payload_check_bytes=9019, payload_writes=7, payload_write_bytes=8292, metadata_rows=233, query_rows=0, pin_rows=231, maintenance_rows=8, temporary_keys_peak=0, maintenance_removed_rows=4)"
+        },
+        {
+          "name": "H10000_knowledge_edit",
+          "value": "LazyStoreDiagnostics(payload_reads=8, payload_read_bytes=689, payload_check_reads=14, payload_check_bytes=9024, payload_writes=7, payload_write_bytes=8297, metadata_rows=233, query_rows=0, pin_rows=231, maintenance_rows=8, temporary_keys_peak=0, maintenance_removed_rows=4)"
+        }
+      ],
+      "cases": [
+        {
+          "name": "test_real_world_roundtrip_and_continuation[False-0]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_real_world_roundtrip_and_continuation[False-12]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_real_world_roundtrip_and_continuation[True-30]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_empty_world_defaults_and_all_declared_fields",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_every_registered_record_field_roundtrips_without_defaults",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_unclassified_fields_types_and_hidden_state_fail",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_shared_mutable_children_preserved_and_cycles_rejected",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_detached_identity_and_record_table_notifications",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_order_typed_keys_and_special_numeric_values",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_cold_events_and_mutable_tail_exactly_preserved",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_event_indexes_not_silently_repaired",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_archive_linked_history_equal",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_committed_but_invalid_adapter_records_rejected[missing_root]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_committed_but_invalid_adapter_records_rejected[extra_root]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_committed_but_invalid_adapter_records_rejected[missing_row]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_committed_but_invalid_adapter_records_rejected[ordinal]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_committed_but_invalid_adapter_records_rejected[schema]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_committed_but_invalid_adapter_records_rejected[version]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_committed_but_invalid_adapter_records_rejected[namespace]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_committed_but_invalid_adapter_records_rejected[identity]",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_wrong_rules_and_unpublished_store_rejected",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_failed_bootstrap_does_not_publish",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_schema_checked_reads_and_pinned_generation",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_no_creation_hooks_and_both_supported_import_paths",
+          "classname": "simulation.tests.test_persistence_adapters",
+          "result": "passed"
+        },
+        {
+          "name": "test_real_life_teaching_and_provenance_survive_export",
+          "classname": "simulation.tests.test_history_archive",
+          "result": "passed"
+        },
+        {
+          "name": "test_deterministic_archive_checkpoint_and_no_simulation_effect",
+          "classname": "simulation.tests.test_history_archive",
+          "result": "passed"
+        },
+        {
+          "name": "test_long_chains_are_iterative_bounded_and_missing_causes_fail",
+          "classname": "simulation.tests.test_history_archive",
+          "result": "passed"
+        },
+        {
+          "name": "test_personhood_does_not_invent_mental_or_biological_facts",
+          "classname": "simulation.tests.test_history_archive",
+          "result": "passed"
+        },
+        {
+          "name": "test_settlement_windows_and_explicit_uncertainty",
+          "classname": "simulation.tests.test_history_archive",
+          "result": "passed"
+        },
+        {
+          "name": "test_open_and_point_claim_lookup_do_not_load_the_knowledge_archive[1000]",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_open_and_point_claim_lookup_do_not_load_the_knowledge_archive[10000]",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_new_claim_reuses_exact_semantic_key_and_mutation_survives_reopen",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_claim_and_index_publish_together_through_save_recovery[before_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_claim_and_index_publish_together_through_save_recovery[after_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_knowledge_tables_materialize_on_explicit_detach",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_loaded_claim_scalar_edit_is_saved_and_detached_record_remains_mutable",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_knowledge_point_edit_and_insert_have_fixed_archive_cost",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "name": "knowledge-final",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "11",
+        "time": "19.213",
+        "timestamp": "2026-10-12T16:32:21.314407-05:00",
+        "hostname": "0c1f238d9f33"
+      },
+      "properties": [
+        {
+          "name": "H1000_knowledge_edit",
+          "value": "LazyStoreDiagnostics(payload_reads=8, payload_read_bytes=689, payload_check_reads=14, payload_check_bytes=9019, payload_writes=7, payload_write_bytes=8292, metadata_rows=233, query_rows=0, pin_rows=231, maintenance_rows=8, temporary_keys_peak=0, maintenance_removed_rows=4)"
+        },
+        {
+          "name": "H10000_knowledge_edit",
+          "value": "LazyStoreDiagnostics(payload_reads=8, payload_read_bytes=689, payload_check_reads=14, payload_check_bytes=9024, payload_writes=7, payload_write_bytes=8297, metadata_rows=233, query_rows=0, pin_rows=231, maintenance_rows=8, temporary_keys_peak=0, maintenance_removed_rows=4)"
+        }
+      ],
+      "cases": [
+        {
+          "name": "test_open_and_point_claim_lookup_do_not_load_the_knowledge_archive[1000]",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_open_and_point_claim_lookup_do_not_load_the_knowledge_archive[10000]",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_new_claim_reuses_exact_semantic_key_and_mutation_survives_reopen",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_claim_and_index_publish_together_through_save_recovery[before_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_claim_and_index_publish_together_through_save_recovery[after_commit]",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_knowledge_tables_materialize_on_explicit_detach",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_loaded_claim_scalar_edit_is_saved_and_detached_record_remains_mutable",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_knowledge_point_edit_and_insert_have_fixed_archive_cost",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_genuine_earlier_eager_knowledge_authority_remains_readable",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_knowledge_uses_the_checked_coordinator_and_current_copy_lane",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        },
+        {
+          "name": "test_non_string_legacy_semantic_key_rejects_conversion_without_changing_source",
+          "classname": "simulation.tests.test_stage_0_5_final_knowledge_authorities",
+          "result": "passed"
+        }
+      ]
+    }
+  ],
+  "limits": [
+    "Only exact string-pair semantic keys select the marked new scalar index; non-string imported keys reject explicit conversion without changing source or publishing destination",
+    "Genuine earlier unmarked eager knowledge roots remain readable and mutable without hidden migration",
+    "Generated body fields have scalar size cost; arbitrary imported field/topology byte closure remains a separate gate",
+    "Counts overlap; no whole-stage full-suite, P5, capability6 or release acceptance claim"
+  ],
+  "rank_changed": false,
+  "full_suite_run": false,
+  "capability6": false,
+  "release_accepted": false
+}

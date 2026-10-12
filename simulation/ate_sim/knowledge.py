@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+from .record_index import IndexedRecord
 
 @dataclass
-class KnowledgeClaim:
+class KnowledgeClaim(IndexedRecord):
     id:int; subject:str; proposition:str; truth:bool|None; origin_event:int|None
 
 @dataclass

@@ -1,0 +1,49 @@
+{
+  "purpose": "Counterexample for remaining imported-topology byte closure; not a pass/acceptance gate",
+  "date_utc": "2026-10-12",
+  "rows": [
+    {
+      "imported_samples": 1000,
+      "samples_preserved": 1000,
+      "costs": {
+        "payload_reads": 8,
+        "payload_read_bytes": 219431,
+        "payload_check_reads": 10,
+        "payload_check_bytes": 657283,
+        "payload_writes": 3,
+        "payload_write_bytes": 219072,
+        "metadata_rows": 2216,
+        "query_rows": 0,
+        "pin_rows": 207,
+        "maintenance_rows": 4,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 2
+      }
+    },
+    {
+      "imported_samples": 10000,
+      "samples_preserved": 10000,
+      "costs": {
+        "payload_reads": 8,
+        "payload_read_bytes": 2190431,
+        "payload_check_reads": 10,
+        "payload_check_bytes": 6570283,
+        "payload_writes": 3,
+        "payload_write_bytes": 2190072,
+        "metadata_rows": 20216,
+        "query_rows": 0,
+        "pin_rows": 207,
+        "maintenance_rows": 4,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 2
+      }
+    }
+  ],
+  "generated_guards": "trial caps generated samples at 3/5; direct imported ResponseModel samples remain unrestricted",
+  "required_next_action": "Reuse existing recursive backings for unrestricted imported topology and preserve generated writer semantics; no gameplay/rank changes",
+  "source_sha256": {
+    "simulation/ate_sim/persistence_lazy.py": "e7b5e49bde9ee5289bb8d12b6155cc06ec6d89f2849bfe166fdd4196cee053ad",
+    "simulation/ate_sim/mastery_training.py": "a8b73f56b280f5e7c136dcd1453206ee9575d2191ea97c8f39472629f06c5cb3",
+    "simulation/ate_sim/advancement.py": "5a515f36e79276b9a2ae2717ce0cb45f4c26a514a2415f9d74a1afa115a8c281"
+  }
+}

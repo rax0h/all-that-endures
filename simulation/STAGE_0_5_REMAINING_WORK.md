@@ -24,7 +24,12 @@ body; held aliases can be admitted again. Deferred cleanup remains bounded.
 Current-copy target validation now checks the atom role rather than using the
 former unconditional guard. Genuine legacy normalization remains a separate gate.
 
-Next concrete field/root audit: `KnowledgeState.claims` and `claim_index` still
-use eager outer authorities, although `KnowledgeState.claim` grows both for each
-new subject/proposition. Close these concrete growth paths using the existing
-scalar record/map family machinery; preserve keys, IDs, mutations and teaching.
+Knowledge claims and their exact string-pair semantic index now use the existing
+scalar record/map family machinery in fresh explicit conversion. Genuine earlier
+eager markers retain their compatibility reader. Point reads/edits/creation,
+atomic fault recovery, checked-catalog copy and portable detach are covered.
+
+Next concrete field/byte audit: distinguish advancement and response-model
+generated writer guards from unrestricted imported topology. Imported oversized
+collections must retain exact values and a justified storage boundary; generated
+3-base/20-ability and 3/5-sample guards cannot certify unrestricted imports.
