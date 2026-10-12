@@ -1,5 +1,48 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: typed Event-ID graph references (October12 UTC)
+
+Source local `85a4f09e0c2cbef7ce07145e6cae645bbcebf18c`, public
+`ef8b2fd347cf6643e74a3cbcde0be325d1b3b73c`, exact matching tree
+`87c34a0d7e6fe904e126249b6926408f78878820`; leased non-force update succeeded.
+
+Closed `EventIdReference` carries the checked World owner-zero incarnation into
+recursive pages, map entries and native record fields. The existing native
+World.event_ids facade remains the sole value authority: no member snapshot,
+new descriptor, lease pool, registry or transaction is introduced. Runtime
+admission/resolution checks the native publisher and checked root group without
+member iteration. Physical routes, shared dirty headers and exception backings
+publish through the existing frozen save plan. Readonly certification treats
+this pointer as mutable. Full detach uses the existing memo for one native set.
+
+Explicit graph copy converts only source tuple markers with matching captured
+facade labels; literal lookalike tuples remain values. Existing family markers
+retain compatibility. A redundant destination legacy set snapshot under that
+ID is removed only when no stored typed-set owner or retirement consumes it;
+source bytes and identities remain intact. Current checked copies preserve
+physical facade pointers under an independent store UUID.
+
+Two fresh RED cases tightened copy verification: an unused legacy snapshot
+without any typed facade edge must remain compatible; a malformed compact root
+with fully refreshed valid catalog witnesses must reject before publication.
+Reference scrubbing now checks role competition for consumed typed edges and
+validates their one compact root descriptor, separate from witness integrity.
+
+Fresh focused **26 passed in5.35s** and final affected copy **59 passed in20.20s**
+match final production. Resumed affected **165 passed in57.87s** matches final
+runtime, preceding only the final copy checks and two extra focused cases.
+At H1,000/H10,000 shared exception edits use identical **410 payload reads,
+29 writes, 2,611 metadata rows, zero Event-ID member visits**, with registry
+inventory and owner graph identity searches forbidden. Copy/fixture setup is
+outside measurement. Cases/hashes: `stage_0_5_event_id_graph_reference_validation.json`.
+Counts overlap. `git diff --check` passed. No full-suite or capability6 claim.
+
+Remaining: exotic exact key/equality states and unsupported legacy root
+consumers, other concrete root conversion boundaries, actual schema/byte closure,
+complete capability/ordinary activation, integrated bounds/P5, final applicable
+suite and independent review. Rank issue17, gameplay, PR14 and prior P5
+certification remain unchanged. No new endurance or production promotion.
+
 ## Latest checkpoint: checked currency root graph copies (October12 UTC)
 
 Source local `de0d55a95050ef08f200fc893fb36a8d347c0494`, public
