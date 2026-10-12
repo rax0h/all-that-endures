@@ -1,0 +1,514 @@
+{
+  "date_utc": "2026-10-12",
+  "checkpoint": "Checked current catalog source copy with independent destination leases",
+  "publication": {
+    "local_source_commit": "1cc52c8f152ab207297db7e2ed05ed479330eff6",
+    "public_source_commit": "cd2bf6012a17b842eee0e4031cbca88599f746ff",
+    "tree": "195d3c1a388908dffe2230caa4f72fed29be64cd",
+    "leased_nonforce_update": true
+  },
+  "sha256": {
+    "docs/superpowers/plans/2026-10-12-checked-current-copy.md": "80957ee4698e097dc9831ee3fc78828147b3a1e7c13af0ac7a78536f444dc8bc",
+    "simulation/ate_sim/persistence_catalog_copy.py": "0c725b7ce9176c86468acb9365b71a4198a52362eab9314f35d6c960cfd13e4f",
+    "simulation/tests/test_stage_0_5_final_checked_current_copy.py": "6c8e4cb3cf354bc4efbb8b18c7ebf80380977fee72544290310ef495a8afab09"
+  },
+  "gates": [
+    {
+      "scope": "focused",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 5.905,
+      "source_boundary": "final source",
+      "cases": [
+        {
+          "name": "test_checked_current_copy_preserves_native_graph_and_incarnations",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.49
+        },
+        {
+          "name": "test_checked_copy_rejects_unreachable_catalog_metadata[owner-node]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.326
+        },
+        {
+          "name": "test_checked_copy_rejects_unreachable_catalog_metadata[retired-node]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.337
+        },
+        {
+          "name": "test_checked_copy_rejects_unreachable_catalog_metadata[unindexed-link]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.322
+        },
+        {
+          "name": "test_checked_copy_clears_only_destination_dependency_tokens_and_keeps_source_overlay",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.431
+        },
+        {
+          "name": "test_checked_copy_commit_fault_preserves_source_and_exact_retry[before_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.477
+        },
+        {
+          "name": "test_checked_copy_commit_fault_preserves_source_and_exact_retry[after_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.455
+        },
+        {
+          "name": "test_checked_copy_rejects_legacy_source_without_bootstrapping_it",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.047
+        },
+        {
+          "name": "test_checked_copy_missing_dependency_roster_is_corruption",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.333
+        },
+        {
+          "name": "test_checked_copy_source_advance_after_capture_cannot_mix_native_graphs",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.457
+        },
+        {
+          "name": "test_checked_copy_competing_destination_is_not_overwritten",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.395
+        },
+        {
+          "name": "test_checked_copy_preserves_compact_retired_ranges_without_recreating_group_rows",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.457
+        },
+        {
+          "name": "test_checked_copy_requires_empty_physical_owner_witness_too",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.321
+        },
+        {
+          "name": "test_checked_copy_captures_committed_head_while_source_acknowledgement_is_unresolved[before_commit-0.5]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.453
+        },
+        {
+          "name": "test_checked_copy_captures_committed_head_while_source_acknowledgement_is_unresolved[after_commit-0.9]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.442
+        }
+      ]
+    },
+    {
+      "scope": "affected",
+      "tests": 62,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 13.188,
+      "source_boundary": "final production; preceding paired unresolved-source-acknowledgement tests",
+      "cases": [
+        {
+          "name": "test_checked_current_copy_preserves_native_graph_and_incarnations",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.489
+        },
+        {
+          "name": "test_checked_copy_rejects_unreachable_catalog_metadata[owner-node]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.324
+        },
+        {
+          "name": "test_checked_copy_rejects_unreachable_catalog_metadata[retired-node]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.318
+        },
+        {
+          "name": "test_checked_copy_rejects_unreachable_catalog_metadata[unindexed-link]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.343
+        },
+        {
+          "name": "test_checked_copy_clears_only_destination_dependency_tokens_and_keeps_source_overlay",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.471
+        },
+        {
+          "name": "test_checked_copy_commit_fault_preserves_source_and_exact_retry[before_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.544
+        },
+        {
+          "name": "test_checked_copy_commit_fault_preserves_source_and_exact_retry[after_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.518
+        },
+        {
+          "name": "test_checked_copy_rejects_legacy_source_without_bootstrapping_it",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.05
+        },
+        {
+          "name": "test_checked_copy_missing_dependency_roster_is_corruption",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.404
+        },
+        {
+          "name": "test_checked_copy_source_advance_after_capture_cannot_mix_native_graphs",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.493
+        },
+        {
+          "name": "test_checked_copy_competing_destination_is_not_overwritten",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.408
+        },
+        {
+          "name": "test_checked_copy_preserves_compact_retired_ranges_without_recreating_group_rows",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.463
+        },
+        {
+          "name": "test_checked_copy_requires_empty_physical_owner_witness_too",
+          "class": "simulation.tests.test_stage_0_5_final_checked_current_copy",
+          "seconds": 0.343
+        },
+        {
+          "name": "test_catalog_copy_preserves_source_and_checks_all_physical_owner_witnesses",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.111
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_private_copy]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.047
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[before_catalog_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.064
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.067
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_validation]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.09
+        },
+        {
+          "name": "test_competing_destination_is_not_overwritten",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.091
+        },
+        {
+          "name": "test_same_source_and_destination_rejects_without_change",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.032
+        },
+        {
+          "name": "test_copied_aliases_continue_independently_and_reject_foreign_source_alias",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.143
+        },
+        {
+          "name": "test_copy_keeps_original_collection_ordinals_and_high_water",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.11
+        },
+        {
+          "name": "test_source_advance_after_capture_cannot_mix_copy_generations",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.095
+        },
+        {
+          "name": "test_corrupt_source_fails_before_destination_publication",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.036
+        },
+        {
+          "name": "test_catalog_bootstrap_cannot_relabel_an_already_staged_catalog",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.127
+        },
+        {
+          "name": "test_counted_leaf_owners_are_checked_without_claiming_branch_ownership",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 1.073
+        },
+        {
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[before_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.132
+        },
+        {
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[after_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.121
+        },
+        {
+          "name": "test_copy_keeps_checked_immutable_event_segments",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.745
+        },
+        {
+          "name": "test_private_catalog_copy_requires_an_explicit_bounded_authority_source",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.046
+        },
+        {
+          "name": "test_copy_rejects_dangling_root_history_reference_before_publication",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.058
+        },
+        {
+          "name": "test_copy_preserves_already_held_source_alias_and_excludes_unsaved_overlay",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.103
+        },
+        {
+          "name": "test_copy_preserves_ordinary_query_memberships",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.092
+        },
+        {
+          "name": "test_persisted_append_copy_promotes_same_incarnation_and_shared_aliases",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.974
+        },
+        {
+          "name": "test_copy_promotion_handles_empty_and_leaf_boundaries[0]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.145
+        },
+        {
+          "name": "test_copy_promotion_handles_empty_and_leaf_boundaries[1]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.134
+        },
+        {
+          "name": "test_copy_promotion_handles_empty_and_leaf_boundaries[128]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.43
+        },
+        {
+          "name": "test_copy_promotion_handles_empty_and_leaf_boundaries[129]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.403
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected0]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.032
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected1]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.034
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected2]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.034
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected3]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.033
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected4]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.034
+        },
+        {
+          "name": "test_missing_selected_backing_is_not_an_empty_list",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.053
+        },
+        {
+          "name": "test_separate_equal_lists_keep_different_incarnations_after_copy",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.229
+        },
+        {
+          "name": "test_promoted_persisted_list_can_join_counted_household_without_archive_conversion",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.209
+        },
+        {
+          "name": "test_promotion_commit_fault_keeps_source_and_retry_exact[before_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.185
+        },
+        {
+          "name": "test_promotion_commit_fault_keeps_source_and_retry_exact[after_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.187
+        },
+        {
+          "name": "test_recursive_page_placement_becomes_permanent_sequence_leaf_placement",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.18
+        },
+        {
+          "name": "test_copy_rejects_extra_promoted_sequence_locator_before_publication",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.13
+        },
+        {
+          "name": "test_selected_map_is_not_silently_promoted_as_list",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.061
+        },
+        {
+          "name": "test_selected_retiring_list_cannot_be_promoted",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.057
+        },
+        {
+          "name": "test_selected_source_alias_keeps_its_original_class_pin_and_pending_overlay",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.154
+        },
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[self]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.065
+        },
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[two]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.069
+        },
+        {
+          "name": "test_copy_keeps_shared_acyclic_backing_diamond",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.131
+        },
+        {
+          "name": "test_copy_rejects_empty_physical_page_without_its_backing_descriptor",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.063
+        },
+        {
+          "name": "test_copy_scrubs_preexisting_counted_backing_not_only_new_promotions",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.119
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.parents]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.065
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.occurrences]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.071
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.members]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.069
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.member_directory]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.065
+        }
+      ]
+    },
+    {
+      "scope": "dependencies",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 0.308,
+      "source_boundary": "final production",
+      "cases": [
+        {
+          "name": "test_private_orphan_survives_many_saves_without_old_snapshot_pressure[1000]",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.034
+        },
+        {
+          "name": "test_private_orphan_survives_many_saves_without_old_snapshot_pressure[10000]",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.05
+        },
+        {
+          "name": "test_weak_collection_defers_one_central_publication_and_reacquire_coalesces",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.025
+        },
+        {
+          "name": "test_failed_commit_preserves_frozen_dependencies_and_exact_retry",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.009
+        },
+        {
+          "name": "test_missing_dependency_after_publication_fails_before_acknowledgement",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.007
+        },
+        {
+          "name": "test_releasing_publisher_pin_expires_dependency_without_another_generation",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.008
+        },
+        {
+          "name": "test_unpublished_collection_drops_metadata_and_foreign_leases_are_rejected",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.019
+        },
+        {
+          "name": "test_dependency_roster_is_reused_across_publisher_close_and_reopen",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.026
+        },
+        {
+          "name": "test_multiple_publishers_keep_the_existing_snapshot_pressure_contract",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.009
+        },
+        {
+          "name": "test_missing_or_malformed_required_dependency_authority_is_corruption",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.006
+        },
+        {
+          "name": "test_collection_during_frozen_preparation_is_deferred_and_abort_reclaims_metadata",
+          "class": "simulation.tests.test_stage_0_5_final_backing_dependencies",
+          "seconds": 0.016
+        }
+      ]
+    }
+  ],
+  "red_evidence": [
+    "Initial backed native graph copy failed: missing _copy_current_checked_catalog helper",
+    "Unreachable owner node, retired node, unindexed link and missing empty physical owner witness were accepted; all four now fail full semantic verification"
+  ],
+  "contracts": [
+    "Existing current-head capture creates independent UUID with source unchanged and committed snapshot only",
+    "Preserves current physical placements, incarnation IDs, current row authority, order/high-water counters, immutable segments and compact retirement commitments",
+    "One existing commit replaces destination dependency rosters with empty tokens and advances cold commit descriptor; no relabeling or new publisher",
+    "Full owner/node/link/retirement/type/sequence/dependency/target/cycle checks before no-overwrite publication",
+    "Held source overlays/pins and native canonical objects remain intact",
+    "Source before/after commit unresolved acknowledgement captures old/new committed snapshot exactly, without changing source pending plan; source resolution still succeeds",
+    "Real destination before/after commit faults discard unpublished files and retry succeeds",
+    "Source advance after capture cannot mix graphs; competing destination never overwritten"
+  ],
+  "limits": [
+    "Private checked format5 current copy, complete_format=False; legacy bootstrap remains separate",
+    "Explicit full-copy work/capture materialization, not an ordinary-operation bound",
+    "No promotion or raw source graph normalization in this path",
+    "Counts overlap; no final full suite/P5/endurance/independent acceptance claim",
+    "Rank issue17, gameplay, PR14 and P5 certification unchanged"
+  ],
+  "remaining": [
+    "complete legacy/raw graph normalization and ordinary format activation",
+    "actual schema/byte closure",
+    "exotic exact equality",
+    "integrated bounds/P5, one final applicable full suite and independent review"
+  ]
+}

@@ -1,5 +1,47 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: checked current catalog source copy (October12 UTC)
+
+Source local `1cc52c8f152ab207297db7e2ed05ed479330eff6`, public
+`cd2bf6012a17b842eee0e4031cbca88599f746ff`, exact matching tree
+`195d3c1a388908dffe2230caa4f72fed29be64cd`; leased non-force update succeeded.
+
+The new private `_copy_current_checked_catalog` captures already-backed current
+authority with the existing current-head copier. Current record bytes, physical
+placements, catalog commitments, ordinals/high-water counters, compact retired
+intervals and immutable segments remain intact under an independent store UUID.
+One existing commit installs empty destination dependency rosters and advances
+its cold commit descriptor. Full semantic verification precedes no-overwrite
+publication. Legacy bootstrap remains separate and still rejects an existing
+catalog; this path requires a checked format5 source and emits no complete marker.
+
+Native mutable record/World-log peers, shared readonly snapshots and history
+aliases keep their stored incarnation IDs and values through copy/edit/save/
+reopen. Held source aliases, original pins, pending overlays and unresolved save
+plans are unchanged. Before/after source acknowledgement faults capture exactly
+the committed old/new head respectively; original resolution still works.
+Real destination commit faults discard private files and exact retry succeeds.
+Source advancement after capture cannot mix graphs; competing files are untouched.
+Compact retired intervals survive without reconstructing per-ID group rows.
+
+Four additional RED corruption cases exposed unreachable owner/retirement nodes,
+unindexed links and a missing empty physical-owner witness. Shared full-copy
+catalog verification now checks live owner witness inventory, every reachable
+owner node versus actual node rows, aggregate checked link inventory and the
+existing retired-directory full scrub. Dependency roster absence/kind and full
+reference graph checks precede destination lease replacement.
+
+Final focused **15 passed in5.91s**. Affected **62 passed in13.19s** precedes only
+the final two unresolved-source-acknowledgement tests; production matches both
+gates. Existing dependency gate **11 passed in0.31s**. Counts overlap.
+`git diff --check` passed. Exact cases/hashes: `stage_0_5_checked_current_copy_validation.json`.
+
+Whole Stage0.5 is still open: complete legacy/raw graph rewrite and ordinary
+format activation, actual schema/byte closure, exotic equality, integrated
+bounds/P5, one final applicable full suite and independent review. No capability6
+claim, endurance or production promotion. Rank issue17, gameplay and PR14 stay
+unchanged; P5 certification remains only at its prior source.
+
 ## Latest checkpoint: full-copy physical backing graph integrity (October12 UTC)
 
 Source local `ca2a7a0c582773abe21667a47fa8526f164723bd`, public
