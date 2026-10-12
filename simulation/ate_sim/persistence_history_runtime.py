@@ -110,6 +110,22 @@ class RecursiveHistoryRuntime:
         self.validate_native(value)
         return self._initial_validated_values(kind, value)
 
+    def copy_input(self, value):
+        """Explicit full input staging; ordinary admission preserves its source.
+
+        This creates new native objects and does not carry source incarnation
+        assignments. The full store converter owns that separate checked mapping.
+        """
+        from .persistence_native_copy import copy_native_input
+        session = self.session()
+        session._begin_lifecycle_operation('copy-history-input')
+        try:
+            copied = copy_native_input(value, publisher=session)
+            self.validate_native(copied)
+            return copied
+        finally:
+            session._end_lifecycle_operation('copy-history-input')
+
     def validate_native_batch(self, values, validator=None, *, destination=None):
         """Check a finite operation's actual input once, before any allocation."""
         if type(values) not in (list, tuple):
