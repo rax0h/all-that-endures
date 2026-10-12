@@ -1,5 +1,36 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: native NaN identity registry foundation (October12 UTC)
+
+The sole existing LazyIdentityRegistry now has an explicit exact-native-NaN
+binding operation. It borrows the existing forward/reverse maps, token checks
+and allocator. Mutable objects remain weak. Conditional native-float roots
+preserve held tuple/frozenset/Ref components without substituting a float
+subclass, and release when their root is the sole remaining reference.
+Reclamation checks at most 256 FIFO markers per call; no live-map or owner
+inventory. Diagnostics expose strong root count, queue length and check work;
+close clears all roots. This uses the accepted CPython source-memo lifetime
+mechanism for a type that cannot support weak references.
+
+Original **19 RED failures** preceded implementation. Final focused registry
+and existing identity tests: **47 passed in1.81s**. Affected backing/source
+lifetime and compaction tests plus equality controls: **31 passed / 12 strict
+xfailed in14.80s**, with three existing xunit2 record-property warnings. That
+run matches final behavior, preceding only annotation/doc updates and three
+supplemental registry cases. At 1,000/10,000 deliberately held native keys,
+collection performs exactly **256/256 checks**, no inventory. Of 600 keys with
+one retained alias, batches release **256,256,87**, then release the final root
+only after its caller drops it. Cases/hashes and precise boundaries are in
+`stage_0_5_nonreflexive_registry_validation.json`; counts overlap.
+
+This is a checked implementation foundation, not the completed persisted-key
+fix. Scalar histories have not selected it: all 12 prior NaN equality failures
+remain explicitly pending. Next integrate closed atom/key references with
+physical owner witnesses, finite admission, one publisher and copy/detach.
+New input D must be held through publication and released directly at
+acknowledgement; the deferred queue alone is not an archive-memory proof.
+No capability6, full-suite, P5 or release claim. Rank and PR14 are unchanged.
+
 ## Latest checkpoint: nonreflexive key RED gates (October12 UTC)
 
 Production remains exactly the Event-ID checkpoint tree. A permanent native

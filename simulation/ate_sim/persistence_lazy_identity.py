@@ -8,6 +8,8 @@ placement without archive-sized strong retention.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from collections import deque
+import math
 import sys
 import weakref
 from typing import Any, Iterable
@@ -15,6 +17,21 @@ from typing import Any, Iterable
 
 class IdentityRegistryError(RuntimeError):
     pass
+
+
+class _NonreflexiveKeyRoot:
+    """One native NaN held conditionally in the existing identity maps.
+
+    Native floats cannot be weakly referenced. The queue releases this root
+    when its value has no other owners; it never substitutes a float subclass.
+    """
+    __slots__ = ('value',)
+
+    def __init__(self, value):
+        self.value = value
+
+    def __call__(self):
+        return self.value
 
 
 @dataclass(frozen=True, order=True)
@@ -86,8 +103,9 @@ class IncarnationAllocator:
 class LazyIdentityRegistry:
     """Weak live-object registry plus current occurrence placement.
 
-    The registry never owns registered mutable objects strongly.  Occurrence
-    placement stores only IncarnationId values.  A live object can therefore
+    The registry never owns registered mutable objects strongly. Native NaN
+    key components use explicit conditional roots and bounded reclamation.
+    Occurrence placement stores only IncarnationId values. A live object can therefore
     outlive every canonical occurrence through an external alias without being
     silently rebound to a later object at the old occurrence.
     """
@@ -105,9 +123,11 @@ class LazyIdentityRegistry:
         # the checked on-disk occurrence index remains authoritative.
         self._prune_dead_occurrences = prune_dead_occurrences
         self.allocator = IncarnationAllocator(store_identity, next_incarnation)
-        self._by_incarnation: dict[IncarnationId, weakref.ReferenceType[Any]] = {}
+        self._by_incarnation: dict[
+            IncarnationId, weakref.ReferenceType[Any] | _NonreflexiveKeyRoot
+        ] = {}
         self._by_object_id: dict[
-            int, tuple[weakref.ReferenceType[Any], IncarnationId, int]
+            int, tuple[weakref.ReferenceType[Any] | _NonreflexiveKeyRoot, IncarnationId, int]
         ] = {}
         self._occurrences: dict[Occurrence, IncarnationId] = {}
         self._occurrences_by_incarnation: dict[IncarnationId, set[Occurrence]] = {}
@@ -118,6 +138,9 @@ class LazyIdentityRegistry:
             tuple[str, Any], set[Occurrence]
         ] = {}
         self._next_runtime_token = 1
+        self._nonreflexive_queue = deque()
+        self._nonreflexive_roots = 0
+        self._nonreflexive_checks = 0
         self._closed = False
 
     @property
@@ -136,9 +159,9 @@ class LazyIdentityRegistry:
         object_id: int,
         incarnation: IncarnationId,
         token: int,
-        reference: weakref.ReferenceType[Any],
+        reference: weakref.ReferenceType[Any] | _NonreflexiveKeyRoot,
     ) -> None:
-        """Weakref callback with token/reference checks against id reuse."""
+        """Release a dead weak binding or conditional root, guarding id reuse."""
         reverse = self._by_object_id.get(object_id)
         if (
             reverse is not None
@@ -150,6 +173,8 @@ class LazyIdentityRegistry:
         forward = self._by_incarnation.get(incarnation)
         if forward is reference:
             self._by_incarnation.pop(incarnation, None)
+            if type(reference) is _NonreflexiveKeyRoot:
+                self._nonreflexive_roots -= 1
             if not self._prune_dead_occurrences:
                 return
             # Runtime occurrences exist to route writes from *live* aliases.
@@ -162,7 +187,7 @@ class LazyIdentityRegistry:
                 self.detach_occurrence(occurrence, expected=incarnation)
 
     def _install(
-        self, obj: Any, incarnation: IncarnationId
+        self, obj: Any, incarnation: IncarnationId, *, nonreflexive_key=False
     ) -> IncarnationId:
         self._check_incarnation(incarnation)
         object_id = id(obj)
@@ -201,16 +226,70 @@ class LazyIdentityRegistry:
             if registry is not None:
                 registry._cleanup(_id, _inc, _token, reference)
 
-        try:
-            reference = weakref.ref(obj, cleanup)
-        except TypeError as exc:
-            raise TypeError(
-                "persistable mutable objects must support weak references"
-            ) from exc
+        if nonreflexive_key:
+            reference = _NonreflexiveKeyRoot(obj)
+        else:
+            try:
+                reference = weakref.ref(obj, cleanup)
+            except TypeError as exc:
+                raise TypeError(
+                    "persistable mutable objects must support weak references"
+                ) from exc
         self._by_object_id[object_id] = (reference, incarnation, token)
         self._by_incarnation[incarnation] = reference
+        if nonreflexive_key:
+            self._nonreflexive_roots += 1
+            self._nonreflexive_queue.append((object_id, incarnation, token))
         self.allocator.observe(incarnation)
         return incarnation
+
+    def bind_nonreflexive_key(self, obj, *, incarnation=None):
+        """Bind an exact native NaN using this registry and its one allocator.
+
+        Callers integrating storage must hold new input D until publication.
+        Ordinary mutable binding and its weak lifetime are unchanged.
+        """
+        self._ensure_open()
+        if type(obj) is not float or not math.isnan(obj):
+            raise TypeError('nonreflexive key identity requires a native NaN')
+        if incarnation is not None:
+            self._check_incarnation(incarnation)
+        existing = self.incarnation_for_object(obj)
+        if existing is not None:
+            if incarnation is not None and incarnation != existing:
+                raise IdentityRegistryError('live object is already bound to another incarnation')
+            return existing
+        chosen = incarnation if incarnation is not None else self.allocator.allocate()
+        return self._install(obj, chosen, nonreflexive_key=True)
+
+    def collect_nonreflexive_keys(self, *, budget=256):
+        """Check <=256 conditional roots, without enumerating identity maps.
+
+        CPython: the root's value and the getrefcount argument are the only
+        references when no caller/container/cache holds the native float.
+        Queue markers contain IDs, never the native value. A live nested key
+        component therefore retains identity even after its parent is evicted.
+        """
+        self._ensure_open()
+        if type(budget) is not int or not 0 <= budget <= 256:
+            raise ValueError('nonreflexive collection budget must be an integer in [0, 256]')
+        removed = 0
+        for _ in range(min(budget, len(self._nonreflexive_queue))):
+            marker = self._nonreflexive_queue.popleft()
+            object_id, incarnation, token = marker
+            row = self._by_object_id.get(object_id)
+            if row is None or row[1:] != (incarnation, token):
+                continue
+            reference = row[0]
+            if type(reference) is not _NonreflexiveKeyRoot:
+                raise IdentityRegistryError('nonreflexive queue addresses a weak binding')
+            self._nonreflexive_checks += 1
+            if sys.getrefcount(reference.value) == 2:
+                self._cleanup(object_id, incarnation, token, reference)
+                removed += 1
+            else:
+                self._nonreflexive_queue.append(marker)
+        return removed
 
     def bind(
         self,
@@ -442,18 +521,21 @@ class LazyIdentityRegistry:
             + sys.getsizeof(self._occurrences)
             + sys.getsizeof(self._occurrences_by_incarnation)
             + sys.getsizeof(self._occurrences_by_owner)
+            + sys.getsizeof(self._nonreflexive_queue)
         )
         return {
             "live_incarnations": live,
-            "weak_forward_entries": len(self._by_incarnation),
-            "weak_reverse_entries": len(self._by_object_id),
+            "weak_forward_entries": len(self._by_incarnation) - self._nonreflexive_roots,
+            "weak_reverse_entries": len(self._by_object_id) - self._nonreflexive_roots,
             "occurrences": len(self._occurrences),
             "incarnations_with_occurrences": len(self._occurrences_by_incarnation),
             "owners_with_occurrences": len(self._occurrences_by_owner),
             "owner_groups": len(groups),
             "max_owner_group_size": max_group,
             "metadata_container_bytes": metadata_bytes,
-            "strong_object_roots": 0,
+            "strong_object_roots": self._nonreflexive_roots,
+            "nonreflexive_key_queue": len(self._nonreflexive_queue),
+            "nonreflexive_key_checks": self._nonreflexive_checks,
             "next_incarnation": self.next_incarnation,
         }
 
@@ -465,4 +547,6 @@ class LazyIdentityRegistry:
         self._occurrences.clear()
         self._occurrences_by_incarnation.clear()
         self._occurrences_by_owner.clear()
+        self._nonreflexive_queue.clear()
+        self._nonreflexive_roots = 0
         self._closed = True

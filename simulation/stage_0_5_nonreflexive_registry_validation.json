@@ -1,0 +1,527 @@
+{
+  "date_utc": "2026-10-12",
+  "checkpoint": "Conditional native NaN roots in the sole existing registry",
+  "parent_source": {
+    "local": "3af2808225ad98ca98a44742a5765ba599729302",
+    "public": "45b8c657af0ab0b4647b7344678f93d265d9e4ab",
+    "tree": "44429abecd18ecf4b1c970d4aae9c5be5f661c86"
+  },
+  "sha256": {
+    "simulation/ate_sim/persistence_lazy_identity.py": "a895f9dd6a4d46a2c4f5d0ddff6573e11bf63f7ea10a435c43920a0b177cc14b",
+    "simulation/tests/test_stage_0_5_final_nonreflexive_registry.py": "9bb788b627a13b14709d82f6103a5679b23d318c0ff34b47da53e2c2b24c11fc",
+    "docs/superpowers/plans/2026-10-12-nonreflexive-key-registry.md": "cac293853c692c070950c933059734b1d453e5f8a4540bf06d694dfed8088b8b"
+  },
+  "gates": [
+    {
+      "scope": "RED",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "19",
+        "skipped": "0",
+        "tests": "19",
+        "time": "0.205",
+        "timestamp": "2026-10-12T17:10:25.971689+09:00",
+        "hostname": "aa3294d21670"
+      },
+      "source_boundary": "pre-implementation; original 19 tests",
+      "cases": [
+        {
+          "name": "test_distinct_nan_objects_have_distinct_ids_and_repeated_binding_reuses_id",
+          "result": "failed"
+        },
+        {
+          "name": "test_unheld_nan_releases_forward_and_reverse_identity",
+          "result": "failed"
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[tuple]",
+          "result": "failed"
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[frozenset]",
+          "result": "failed"
+        },
+        {
+          "name": "test_nonreflexive_collection_checks_only_its_bounded_queue",
+          "result": "failed"
+        },
+        {
+          "name": "test_nan_rebinding_uses_existing_checked_incarnation_rules",
+          "result": "failed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[True]",
+          "result": "failed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[1]",
+          "result": "failed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[1.0]",
+          "result": "failed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[inf]",
+          "result": "failed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[nan]",
+          "result": "failed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[None]",
+          "result": "failed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[value6]",
+          "result": "failed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_float_subclasses",
+          "result": "failed"
+        },
+        {
+          "name": "test_normal_mutable_bindings_remain_weak_and_close_releases_nan_roots",
+          "result": "failed"
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[-1]",
+          "result": "failed"
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[257]",
+          "result": "failed"
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[True]",
+          "result": "failed"
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[1.0]",
+          "result": "failed"
+        }
+      ]
+    },
+    {
+      "scope": "focused and existing identity",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "47",
+        "time": "1.805",
+        "timestamp": "2026-10-12T17:13:20.148897+09:00",
+        "hostname": "aa3294d21670"
+      },
+      "source_boundary": "final registry source and tests",
+      "cases": [
+        {
+          "name": "test_distinct_nan_objects_have_distinct_ids_and_repeated_binding_reuses_id",
+          "result": "passed"
+        },
+        {
+          "name": "test_unheld_nan_releases_forward_and_reverse_identity",
+          "result": "passed"
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[tuple]",
+          "result": "passed"
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[frozenset]",
+          "result": "passed"
+        },
+        {
+          "name": "test_native_nested_key_component_keeps_one_identity_until_key_is_released[<lambda>]",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_collection_checks_only_its_bounded_queue",
+          "result": "passed"
+        },
+        {
+          "name": "test_nan_rebinding_uses_existing_checked_incarnation_rules",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[True]",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[1]",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[1.0]",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[inf]",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[nan]",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[None]",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_other_types_without_allocating[value6]",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_binding_rejects_float_subclasses",
+          "result": "passed"
+        },
+        {
+          "name": "test_normal_mutable_bindings_remain_weak_and_close_releases_nan_roots",
+          "result": "passed"
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[-1]",
+          "result": "passed"
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[257]",
+          "result": "passed"
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[True]",
+          "result": "passed"
+        },
+        {
+          "name": "test_collection_budget_is_an_exact_bounded_integer[1.0]",
+          "result": "passed"
+        },
+        {
+          "name": "test_collection_work_is_fixed_for_different_live_key_history_sizes",
+          "result": "passed"
+        },
+        {
+          "name": "test_nonreflexive_apis_obey_registry_close_guard",
+          "result": "passed"
+        },
+        {
+          "name": "test_equal_distinct_objects_get_distinct_incarnations_and_old_alias_stays_old",
+          "result": "passed"
+        },
+        {
+          "name": "test_owner_occurrence_index_tracks_attach_move_detach_and_replace",
+          "result": "passed"
+        },
+        {
+          "name": "test_move_remove_and_reinsert_same_object_preserves_incarnation",
+          "result": "passed"
+        },
+        {
+          "name": "test_delete_then_different_object_never_reuses_incarnation",
+          "result": "passed"
+        },
+        {
+          "name": "test_retained_child_survives_parent_collection_with_owner_placement_intact",
+          "result": "passed"
+        },
+        {
+          "name": "test_cross_owner_sharing_merges_and_split_changes_only_projection",
+          "result": "passed"
+        },
+        {
+          "name": "test_group_merge_via_shared_incarnation_does_not_rewrite_other_incarnations",
+          "result": "passed"
+        },
+        {
+          "name": "test_weak_cleanup_drops_live_maps_without_global_sweep_but_keeps_occurrence_label",
+          "result": "passed"
+        },
+        {
+          "name": "test_stale_cleanup_token_cannot_remove_newer_live_binding",
+          "result": "passed"
+        },
+        {
+          "name": "test_persisted_occurrence_can_be_seeded_before_object_load_then_bound_exactly",
+          "result": "passed"
+        },
+        {
+          "name": "test_foreign_incarnation_and_duplicate_live_instance_are_rejected",
+          "result": "passed"
+        },
+        {
+          "name": "test_close_drops_registry_metadata_without_mutating_user_objects",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_reads_only_one_checked_group[1000]",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_reads_only_one_checked_group[10000]",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_preserves_old_pin_after_replacement",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_checks_rows_and_requires_explicit_index_upgrade",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_rejects_invalid_incarnation[0]",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_rejects_invalid_incarnation[-1]",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_rejects_invalid_incarnation[True]",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_rejects_invalid_incarnation[1.0]",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_rejects_invalid_incarnation[1]",
+          "result": "passed"
+        },
+        {
+          "name": "test_explicit_current_head_copy_adds_reverse_index_without_changing_source",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_rejects_semantically_invalid_checked_rows[overlap]",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_rejects_semantically_invalid_checked_rows[path]",
+          "result": "passed"
+        },
+        {
+          "name": "test_reverse_identity_lookup_rejects_semantically_invalid_checked_rows[allocator]",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "scope": "affected source/backing lifetimes, compaction and pending key gates",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "12",
+        "tests": "43",
+        "time": "14.797",
+        "timestamp": "2026-10-12T17:11:58.369879+09:00",
+        "hostname": "aa3294d21670"
+      },
+      "source_boundary": "final behavior; before registry annotation/doc updates and three supplemental registry tests",
+      "cases": [
+        {
+          "name": "test_unheld_native_sources_do_not_pin_all_recursive_children_after_save[1000]",
+          "result": "passed"
+        },
+        {
+          "name": "test_unheld_native_sources_do_not_pin_all_recursive_children_after_save[10000]",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_native_source_reuses_its_exact_proxy_and_releases_after_caller_drops_it",
+          "result": "passed"
+        },
+        {
+          "name": "test_recursive_save_routes_one_complete_dirty_projection_instead_of_rescanning_it_per_child",
+          "result": "passed"
+        },
+        {
+          "name": "test_released_input_aliases_are_collected_with_a_fixed_noop_save_budget",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_retained_orphan_survives_unrelated_saves_on_one_publisher_pin[1000]",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_retained_orphan_survives_unrelated_saves_on_one_publisher_pin[10000]",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_dependency_fault_retains_the_exact_joint_plan[before_commit]",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_dependency_fault_retains_the_exact_joint_plan[after_commit]",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_missing_mandatory_dependency_rejects_save_without_dropping_edit",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_read_only_acquisition_does_not_create_a_generation",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_weak_alias_collection_defers_dependency_release_to_real_save",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_new_history_creates_dependency_authority_in_same_save",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_losing_writer_can_close_without_thawing_stale_plan",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_failed_publisher_release_preserves_dependency_and_usable_session[close]",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_failed_publisher_release_preserves_dependency_and_usable_session[detach]",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_compacts_groups_after_backing_retirement_on_real_saves",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_keeps_retained_history_group_then_can_reattach_same_identity",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_revives_retained_record_from_compacted_range_in_joint_publication",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_identity_compaction_joins_exact_save_recovery[before_commit]",
+          "result": "passed"
+        },
+        {
+          "name": "test_world_identity_compaction_joins_exact_save_recovery[after_commit]",
+          "result": "passed"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-map]",
+          "result": "pending"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-set]",
+          "result": "pending"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-map]",
+          "result": "pending"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-set]",
+          "result": "pending"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-map]",
+          "result": "pending"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-set]",
+          "result": "pending"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-map]",
+          "result": "pending"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-set]",
+          "result": "pending"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-map]",
+          "result": "pending"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-set]",
+          "result": "pending"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-map]",
+          "result": "pending"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-set]",
+          "result": "pending"
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[map]",
+          "result": "passed"
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[set]",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-map]",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-set]",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-map]",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-set]",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-map]",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-set]",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-map]",
+          "result": "passed"
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-set]",
+          "result": "passed"
+        }
+      ]
+    }
+  ],
+  "measured_work": {
+    "retained_keys": [
+      1000,
+      10000
+    ],
+    "conditional_root_checks": [
+      256,
+      256
+    ],
+    "released_600_keys_with_one_retained_alias": [
+      256,
+      256,
+      87
+    ],
+    "inventory_calls": 0
+  },
+  "limits": [
+    "This is the native registry foundation only. Runtime scalar admission has not selected these bindings.",
+    "The existing 12 persisted-key RED gates remain strict pending failures.",
+    "Storage integration must retain actual input D until publication and directly release new D after acknowledgement; bounded deferred queue alone is not archive-memory acceptance.",
+    "Reference count lifetime mechanism uses CPython, as does existing recursive source memo cleanup."
+  ],
+  "new_registry": false,
+  "rank_changed": false,
+  "full_suite_run": false,
+  "capability6": false,
+  "release_accepted": false
+}
