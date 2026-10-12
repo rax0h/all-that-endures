@@ -1,5 +1,41 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: explicit native copy-input normalization (October12 UTC)
+
+Source local `0e24f2a2d59066a29012ddf7e293b760d5f54a4c`, public
+`7792847557fd89b5ebed973d1ba8a66915135076`, exact matching tree
+`3413cf011dcef96c69b3c15c632b73b14a6ef406`; leased non-force update succeeded.
+
+The explicit recursive runtime `copy_input` now stages standalone native input
+from concrete tracked dictionaries/lists/sets, root wrappers and RecordTable,
+plus declared native records and same-publisher history aliases. One temporary
+memo preserves internal sharing. Source objects, bindings, table indexes,
+backing incarnations and pending values remain unchanged. Existing admission
+and the same save publisher consume the copied graph. Readonly roles and exact
+Event seal metadata presence survive. A protected lifecycle operation blocks
+mutating read callbacks and unwinds on failure.
+
+Initial RED showed missing copy_input. Foreign live backed input was initially
+accepted without a separate coherent source capture; the explicit runtime API
+now rejects that boundary before reading its graph. A full store converter owns
+cross-store capture and persistent incarnation mapping. This helper assigns no
+persistent identities and does not relax ordinary identity-preserving admission.
+
+Final focused **25 passed in3.08s**. Affected recursive **102 passed in20.80s**
+precedes only the final backed-readonly and paired commit-fault cases; production
+matches both gates. Counts overlap. Actual tracked World-log Event copy/edit/save/
+reopen, indexed native table metadata, all seven tracking wrapper classes, native
+default World/state fields and indexed SkillState, shared backed record/history/
+counted aliases, invalid graph/state/subclass/cycle rejection, closed sessions,
+mutating callbacks and both save fault phases are covered. `git diff --check`
+passed. Full evidence: `stage_0_5_native_copy_input_validation.json`.
+
+This closes a finite input-normalization primitive, not the complete source-copy
+graph rewrite, EventLog partition conversion, actual schema/byte inventory, or
+format6 activation. Remaining whole Stage0.5 gates include those integrations,
+exotic equality, integrated bounds/P5, the one final applicable full suite and
+independent review. Rank issue17, gameplay, PR14 and P5 certification stay unchanged.
+
 ## Latest checkpoint: explicit persisted append-list copy promotion (October12 UTC)
 
 Source local `ad8d4fd7a83fc7b237c9d99bf730e818b34e3963`, public
