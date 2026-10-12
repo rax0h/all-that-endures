@@ -1,5 +1,40 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: explicit persisted append-list copy promotion (October12 UTC)
+
+Source local `ad8d4fd7a83fc7b237c9d99bf730e818b34e3963`, public
+`1f1ac7baf8299ecb6684370f04b5be1a477d2579`, exact matching tree
+`be6cae44a2d01d68a7f15ffc011dac6f9a8b9470`; leased non-force update succeeded.
+
+The private catalog copy now accepts explicit `promote_lists` incarnation IDs.
+It captures their committed append values, uses the existing counted sequence
+builder in the unpublished destination, rewrites copied reference roles, and
+replaces old page ownership with permanent sequence-leaf occurrence ownership.
+Incarnations, order, duplicate values, shared aliases, separate equal lists,
+unrelated current rows and collection high-water metadata are preserved. Source
+bytes, held aliases, their original class/pin, and unsaved overlays remain intact.
+No live authority move, hidden assignment migration, second publisher or registry.
+
+Initial RED reproduced the absent API. An extra checksum-valid generated
+locator initially passed destination validation; the existing full sequence scrub
+now rejects it before publication. Missing/wrong-kind/retiring and invalid
+selections fail without publication. Real before/after commit failures leave
+source intact and retry succeeds. Promoted history can join a counted household
+without a source sequence traversal. Recursive child placements and save/reopen
+sharing are covered.
+
+Final focused **20 passed in3.58s**. Affected **96 passed in99.27s**, preceding
+only the extra held-source-alias test, covered by focused20; production source
+matches both gates. Counts overlap. `git diff --check` passed. Exact cases/hashes:
+`stage_0_5_copy_promotion_validation.json`.
+
+Scope remains opt-in private explicit full-copy work, not ordinary format6
+activation or an ordinary-operation bound. Output floor5/complete_format=False.
+Rank issue17 stays deferred; PR14, P5 certification, and gameplay are unchanged.
+Remaining: legacy/root graph normalization, actual schema/byte closure, exotic
+equality, complete format6 ordinary open/source-copy integration, integrated
+bounds/P5, one final applicable full suite and independent review.
+
 ## Latest checkpoint: private checked-catalog source-copy bootstrap (October11 UTC)
 
 Source local `6bcc2f1ecd03ec5032205aa47e28a8717ac5a097`, public
