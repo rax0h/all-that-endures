@@ -1,5 +1,36 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: full-copy physical backing graph integrity (October12 UTC)
+
+Source local `ca2a7a0c582773abe21667a47fa8526f164723bd`, public
+`64e1840b13910784b7378957ce79c8561e788e47`, exact matching tree
+`32914700c5ddd8d4119d1ad6b6c54c0035140d5a`; leased non-force update succeeded.
+
+Eight checksum-valid semantic defects reproduced acceptance by the private
+copy: self/two-backing cycles, an empty page without a backing descriptor, an
+extra locator in a preexisting sequence, and orphan sequence parent/locator/
+member/directory projections. Full-copy preparation now checks physical parent
+roles against checked backing rosters, validates concrete owner payloads and
+uses transient iterative traversal to reject cycles in the existing physical
+ownership relation. No new persisted graph, registry or ordinary-operation scan.
+All complete destination counted sequences receive the existing full scrub,
+including ones carried from the source; checked partial retirement keeps its
+existing exception. Source and private transformed output both receive role and
+cycle checks before publication.
+
+Final focused **9 passed in0.82s** and affected **80 passed in8.80s**; the latter
+precedes only the valid shared-diamond test. Production matches both gates.
+The diamond preserves two parent paths to one canonical child on reopen.
+Initial sequence projection key checking incorrectly assumed all second keys
+were integers; concrete directory bytes-prefix keys are now correctly handled.
+`git diff --check` passed. Exact cases/hashes/source boundaries are in
+`stage_0_5_copy_graph_validation.json`. Counts overlap; no final suite claim.
+
+Stage0.5 remains in implementation. Complete-format source graph conversion,
+ordinary activation, exhaustive actual schema/byte closure, exotic equality,
+integrated bounds/P5 and final suite/review remain. Rank issue17 is deferred;
+PR14, gameplay and prior P5 certification are unchanged. No new endurance.
+
 ## Latest checkpoint: explicit native copy-input normalization (October12 UTC)
 
 Source local `0e24f2a2d59066a29012ddf7e293b760d5f54a4c`, public

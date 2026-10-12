@@ -1,0 +1,502 @@
+{
+  "date_utc": "2026-10-12",
+  "checkpoint": "Full-copy physical backing graph integrity",
+  "publication": {
+    "local_source_commit": "ca2a7a0c582773abe21667a47fa8526f164723bd",
+    "public_source_commit": "64e1840b13910784b7378957ce79c8561e788e47",
+    "tree": "32914700c5ddd8d4119d1ad6b6c54c0035140d5a",
+    "leased_nonforce_update": true
+  },
+  "sha256": {
+    "docs/superpowers/plans/2026-10-12-copy-graph-integrity.md": "341beead9107111a860152301bb6dbf1ed6fae30344b446bb2df5d0c7e0fcfe2",
+    "simulation/ate_sim/persistence_catalog_copy.py": "53e3d5619830184d39680f9790abe6af911c03329e79b3b88fff106334366c62",
+    "simulation/tests/test_stage_0_5_final_copy_graph_integrity.py": "9aaa9db30e0061204d2de309bdbeadbe7f7e9cfbe45280c6a913109d5e733865"
+  },
+  "gates": [
+    {
+      "scope": "focused",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 0.819,
+      "source_boundary": "final source",
+      "cases": [
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[self]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.065
+        },
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[two]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.066
+        },
+        {
+          "name": "test_copy_keeps_shared_acyclic_backing_diamond",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.128
+        },
+        {
+          "name": "test_copy_rejects_empty_physical_page_without_its_backing_descriptor",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.059
+        },
+        {
+          "name": "test_copy_scrubs_preexisting_counted_backing_not_only_new_promotions",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.099
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.parents]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.058
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.occurrences]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.059
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.members]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.056
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.member_directory]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.058
+        }
+      ]
+    },
+    {
+      "scope": "affected",
+      "tests": 80,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 8.793,
+      "source_boundary": "final production; preceding valid shared-diamond test",
+      "cases": [
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[self]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.069
+        },
+        {
+          "name": "test_copy_rejects_cyclic_compact_backings_before_publication[two]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.063
+        },
+        {
+          "name": "test_copy_rejects_empty_physical_page_without_its_backing_descriptor",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.069
+        },
+        {
+          "name": "test_copy_scrubs_preexisting_counted_backing_not_only_new_promotions",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.102
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.parents]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.059
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.occurrences]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.061
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.members]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.06
+        },
+        {
+          "name": "test_copy_rejects_orphan_sequence_projection_without_descriptor[aux.lazy.sequence.member_directory]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_graph_integrity",
+          "seconds": 0.06
+        },
+        {
+          "name": "test_persisted_append_copy_promotes_same_incarnation_and_shared_aliases",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 1.004
+        },
+        {
+          "name": "test_copy_promotion_handles_empty_and_leaf_boundaries[0]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.126
+        },
+        {
+          "name": "test_copy_promotion_handles_empty_and_leaf_boundaries[1]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.135
+        },
+        {
+          "name": "test_copy_promotion_handles_empty_and_leaf_boundaries[128]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.417
+        },
+        {
+          "name": "test_copy_promotion_handles_empty_and_leaf_boundaries[129]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.4
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected0]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.032
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected1]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.033
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected2]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.033
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected3]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.034
+        },
+        {
+          "name": "test_invalid_promotion_selection_does_not_touch_source_or_destination[selected4]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.033
+        },
+        {
+          "name": "test_missing_selected_backing_is_not_an_empty_list",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.052
+        },
+        {
+          "name": "test_separate_equal_lists_keep_different_incarnations_after_copy",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.236
+        },
+        {
+          "name": "test_promoted_persisted_list_can_join_counted_household_without_archive_conversion",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.18
+        },
+        {
+          "name": "test_promotion_commit_fault_keeps_source_and_retry_exact[before_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.208
+        },
+        {
+          "name": "test_promotion_commit_fault_keeps_source_and_retry_exact[after_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.191
+        },
+        {
+          "name": "test_recursive_page_placement_becomes_permanent_sequence_leaf_placement",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.176
+        },
+        {
+          "name": "test_copy_rejects_extra_promoted_sequence_locator_before_publication",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.125
+        },
+        {
+          "name": "test_selected_map_is_not_silently_promoted_as_list",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.063
+        },
+        {
+          "name": "test_selected_retiring_list_cannot_be_promoted",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.061
+        },
+        {
+          "name": "test_selected_source_alias_keeps_its_original_class_pin_and_pending_overlay",
+          "class": "simulation.tests.test_stage_0_5_final_copy_promotion",
+          "seconds": 0.138
+        },
+        {
+          "name": "test_catalog_copy_preserves_source_and_checks_all_physical_owner_witnesses",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.097
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_private_copy]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.044
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[before_catalog_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.066
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.065
+        },
+        {
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_validation]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.083
+        },
+        {
+          "name": "test_competing_destination_is_not_overwritten",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.084
+        },
+        {
+          "name": "test_same_source_and_destination_rejects_without_change",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.032
+        },
+        {
+          "name": "test_copied_aliases_continue_independently_and_reject_foreign_source_alias",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.154
+        },
+        {
+          "name": "test_copy_keeps_original_collection_ordinals_and_high_water",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.11
+        },
+        {
+          "name": "test_source_advance_after_capture_cannot_mix_copy_generations",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.09
+        },
+        {
+          "name": "test_corrupt_source_fails_before_destination_publication",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.038
+        },
+        {
+          "name": "test_catalog_bootstrap_cannot_relabel_an_already_staged_catalog",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.103
+        },
+        {
+          "name": "test_counted_leaf_owners_are_checked_without_claiming_branch_ownership",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 1.068
+        },
+        {
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[before_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.117
+        },
+        {
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[after_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.127
+        },
+        {
+          "name": "test_copy_keeps_checked_immutable_event_segments",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.871
+        },
+        {
+          "name": "test_private_catalog_copy_requires_an_explicit_bounded_authority_source",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.05
+        },
+        {
+          "name": "test_copy_rejects_dangling_root_history_reference_before_publication",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.062
+        },
+        {
+          "name": "test_copy_preserves_already_held_source_alias_and_excludes_unsaved_overlay",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.109
+        },
+        {
+          "name": "test_copy_preserves_ordinary_query_memberships",
+          "class": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "seconds": 0.097
+        },
+        {
+          "name": "test_counter_changes_and_cancellation_preserve_exact_representatives[list]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.011
+        },
+        {
+          "name": "test_counter_changes_and_cancellation_preserve_exact_representatives[set]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.012
+        },
+        {
+          "name": "test_counter_changes_and_cancellation_preserve_exact_representatives[map]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.013
+        },
+        {
+          "name": "test_counter_changes_and_cancellation_preserve_exact_representatives[sequence]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.021
+        },
+        {
+          "name": "test_missing_or_wrong_count_required_witness_fails_without_history_scan[list]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.01
+        },
+        {
+          "name": "test_missing_or_wrong_count_required_witness_fails_without_history_scan[set]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.009
+        },
+        {
+          "name": "test_missing_or_wrong_count_required_witness_fails_without_history_scan[map]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.01
+        },
+        {
+          "name": "test_missing_or_wrong_count_required_witness_fails_without_history_scan[sequence]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.011
+        },
+        {
+          "name": "test_sequence_validation_failure_rolls_back_type_counter_with_tree",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.011
+        },
+        {
+          "name": "test_explicit_scrub_rejects_a_semantically_false_checked_witness",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.009
+        },
+        {
+          "name": "test_old_pin_reads_the_original_type_witness_and_values[list]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.009
+        },
+        {
+          "name": "test_old_pin_reads_the_original_type_witness_and_values[set]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.009
+        },
+        {
+          "name": "test_old_pin_reads_the_original_type_witness_and_values[map]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.01
+        },
+        {
+          "name": "test_old_pin_reads_the_original_type_witness_and_values[sequence]",
+          "class": "simulation.tests.test_stage_0_5_final_history_type_witnesses",
+          "seconds": 0.012
+        },
+        {
+          "name": "test_old_pin_and_live_alias_block_reclamation_then_batches_make_progress[1000]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.032
+        },
+        {
+          "name": "test_old_pin_and_live_alias_block_reclamation_then_batches_make_progress[10000]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.107
+        },
+        {
+          "name": "test_catalog_does_not_compact_a_group_while_its_backing_job_is_pending",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.018
+        },
+        {
+          "name": "test_all_backing_scopes_finish_then_catalog_header_can_compact[list]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.024
+        },
+        {
+          "name": "test_all_backing_scopes_finish_then_catalog_header_can_compact[map]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.032
+        },
+        {
+          "name": "test_all_backing_scopes_finish_then_catalog_header_can_compact[set]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.03
+        },
+        {
+          "name": "test_all_backing_scopes_finish_then_catalog_header_can_compact[sequence]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.054
+        },
+        {
+          "name": "test_all_backing_scopes_finish_then_catalog_header_can_compact[frozen-list]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.027
+        },
+        {
+          "name": "test_all_backing_scopes_finish_then_catalog_header_can_compact[frozen-map]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.03
+        },
+        {
+          "name": "test_frozen_retirement_batch_resolves_exactly_once[before_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.024
+        },
+        {
+          "name": "test_frozen_retirement_batch_resolves_exactly_once[after_commit]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.022
+        },
+        {
+          "name": "test_scope_range_is_indexed_and_cannot_select_another_incarnation",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.045
+        },
+        {
+          "name": "test_retirement_rejects_stale_writer_and_missing_dependency_authority",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.018
+        },
+        {
+          "name": "test_retirement_reclaims_checked_type_authority_before_final_descriptor[list]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.019
+        },
+        {
+          "name": "test_retirement_reclaims_checked_type_authority_before_final_descriptor[map]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.027
+        },
+        {
+          "name": "test_retirement_reclaims_checked_type_authority_before_final_descriptor[set]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.025
+        },
+        {
+          "name": "test_retirement_reclaims_checked_type_authority_before_final_descriptor[sequence]",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.054
+        },
+        {
+          "name": "test_legacy_retirement_job_preserves_its_original_phase_interpretation",
+          "class": "simulation.tests.test_stage_0_5_final_history_retirement",
+          "seconds": 0.022
+        }
+      ]
+    }
+  ],
+  "red_evidence": [
+    "Self/two-backing cycle, empty orphan page and preexisting extra counted locator were accepted by explicit copy (four RED cases)",
+    "Orphan counted parent/locator/member/directory projections were accepted (four additional RED cases)",
+    "An overstrict projection-key check rejected legitimate bytes-prefix directory keys; corrected against concrete sequence schema before final successful affected gate"
+  ],
+  "contracts": [
+    "Explicit captured-source/transformed-copy parent-kind checks over existing physical authority",
+    "Concrete owner schema/projection verification with existing adapters",
+    "Transient iterative cycle traversal; no second persistent DAG or ordinary-operation scan",
+    "All complete destination counted sequences receive full existing orphan/index scrub, including preexisting backings",
+    "Existing checked partial-retirement exception remains",
+    "Corrupt input is rejected before no-overwrite publication and source bytes remain unchanged",
+    "Valid shared diamond retains one canonical child behind both parent paths after copy/reopen"
+  ],
+  "limits": [
+    "Explicit O(H) conversion work only",
+    "Private staging floor5/complete_format=False; no capability6 activation",
+    "Counts overlap; no final full suite, P5 refresh, endurance or independent acceptance",
+    "Rank issue17, gameplay, PR14 and prior P5 certification unchanged"
+  ]
+}
