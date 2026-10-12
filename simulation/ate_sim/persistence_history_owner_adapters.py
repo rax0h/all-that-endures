@@ -16,7 +16,8 @@ def _positive(value):
 def _stored_value(value):
     from .persistence_lazy_nested_history import immutable_value, reference
     from .persistence_record_headers import record_reference
-    if reference(value) or record_reference(value) or immutable_value(value):
+    from .persistence_event_id_reference import event_id_reference
+    if reference(value) or record_reference(value) or event_id_reference(value) or immutable_value(value):
         return True
     return type(value) is tuple and all(_stored_value(item) for item in value)
 
@@ -86,9 +87,10 @@ class HistoryOwnerAdapter:
     def reference_placements(self, value):
         from .persistence_lazy_nested_history import reference
         from .persistence_record_headers import record_reference
+        from .persistence_event_id_reference import event_id_reference
         result = []
         def visit(item, path):
-            if reference(item) or record_reference(item):
+            if reference(item) or record_reference(item) or event_id_reference(item):
                 result.append((path, item.incarnation))
             elif type(item) is tuple:
                 for slot, child in enumerate(item):

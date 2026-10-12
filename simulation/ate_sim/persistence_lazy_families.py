@@ -287,6 +287,9 @@ class RuntimeFamilyBindings:
         if owner[0] in AUXILIARY_OWNER_FAMILIES:
             AUXILIARY_OWNER_FAMILIES[owner[0]].absolute_path(owner[1], path)
             from .persistence_lazy_identity_headers import encode_identity_header
+            from .persistence_event_ids import EventIdSet
+            if type(value) is EventIdSet:
+                return session.store.codec.encode(session._recursive_histories.event_id_storage_reference(value))
             return encode_identity_header(session.store, session.pin, value)
         adapter = self._adapter(owner, path)
         return adapter.identity_payload_bytes(session.store, session.pin, value, path)

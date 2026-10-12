@@ -30,6 +30,7 @@ from .persistence_lazy_sequence import (
 )
 from .persistence_record_headers import NAMESPACE as RECORD_HEADERS
 from .persistence_record_headers import record_reference
+from .persistence_event_id_reference import event_id_reference, check_compact_authority
 from .persistence_lazy_nested_history import reference
 from .persistence_schema import RECORD_FIELDS
 from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES, dependency_value
@@ -182,12 +183,20 @@ def _check_backing_graph(codec, versions, dependencies):
             pending.extend((child, False) for child in edges.get(incarnation, ()))
 
 
-def _check_reference_targets(values, dependencies):
+def _check_reference_targets(values, dependencies, *, event_id_incarnations=()):
     """Explicit conversion scrub, including compact refs inside eager headers."""
     kinds = {change.key: change.value[1] for change in dependencies}
+    used_facades = set()
     pending, seen = list(values), set()
     while pending:
         value = pending.pop()
+        if event_id_reference(value):
+            if value.incarnation not in event_id_incarnations:
+                raise StoreIntegrityError('catalog copy Event-ID reference lacks owner-zero identity')
+            if value.incarnation in kinds:
+                raise StoreIntegrityError('Event-ID facade competes with a recursive backing incarnation')
+            used_facades.add(value.incarnation)
+            continue
         if reference(value) or record_reference(value):
             expected = value.kind if reference(value) else 'record'
             if kinds.get(value.incarnation) != expected:
@@ -203,6 +212,7 @@ def _check_reference_targets(values, dependencies):
             pending.extend(value)
         elif is_dataclass(value) and type(value) in RECORD_FIELDS:
             pending.extend(getattr(value, field) for field in RECORD_FIELDS[type(value)])
+    return used_facades
 
 
 def _empty_destination(store, source_head, segments, format_floor):
@@ -345,7 +355,10 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                      versions, ordinary) = transform_copy(target, pin, promoted, all_versions,
                         all_ordinary, placements, dependencies, orders, states)
                 if promoted or normalize_events:
-                    _check_reference_targets((v.value for v in (*all_versions, *all_ordinary)), dependencies)
+                    facade_ids = {p.incarnation_id for p in placements if
+                        (p.owner_namespace, p.owner_key, p.occurrence_path) == ('world.event_ids', 0, ())}
+                    _check_reference_targets((v.value for v in (*all_versions, *all_ordinary)), dependencies,
+                        event_id_incarnations=facade_ids)
                     _check_backing_graph(codec, all_versions, dependencies)
                     delta = initial_catalog_delta(codec, versions, placements, ordinary_changes=ordinary,
                         next_incarnation_id=next_incarnation, generation=pin.captured_head + 1)
@@ -419,7 +432,23 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
                             versions.append(VersionChange(ns, key, value, record_schema=schema,
                                 memberships=tuple(Membership(*m) for m in members)))
                     ordinary = tuple(codec.decode(payload) for (payload,) in target.db.execute('SELECT payload FROM records'))
-                    _check_reference_targets((*ordinary, *(v.value for v in versions)), rosters)
+                    facade = IdentityCatalog(target).read_owner_identity(pin, ('world.event_ids', 0))
+                    try:
+                        facade_ids = {inc for path, inc in facade.occurrences if not path}
+                    finally:
+                        if hasattr(facade.occurrences, 'close'): facade.occurrences.close()
+                    used_facades = _check_reference_targets((*ordinary, *(v.value for v in versions)), rosters,
+                        event_id_incarnations=facade_ids)
+                    if used_facades:
+                        namespace = 'world.event_ids'
+                        if target._namespace_state_at(namespace, pin.captured_head) is None:
+                            envelope = target.read_record(namespace, 0, expected_record_schema=1)
+                            if type(envelope) is not tuple or len(envelope) != 2:
+                                raise StoreIntegrityError('Event-ID graph copy has an invalid root authority envelope')
+                            authority = envelope[1]
+                        else:
+                            authority = target.read_version(pin, namespace, 0, expected_record_schema=1).value
+                        check_compact_authority(authority)
                     _check_backing_graph(codec, versions, rosters)
                     metadata = target.head_metadata()
                 token = uuid.uuid4().hex

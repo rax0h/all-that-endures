@@ -24,6 +24,8 @@ from .persistence_record_headers import (
     RecordReference, record_reference, record_header, read_record_header,
     restore_record_header, NAMESPACE as RECORD_NAMESPACE,
 )
+from .persistence_event_id_reference import EventIdReference, event_id_reference
+from .persistence_event_ids import EventIdSet
 from .persistence_record_runtime import (
     mutable_record, record_backing, backing_for, canonical_for, RecordBacking, bind_record,
 )
@@ -156,6 +158,9 @@ class RecursiveHistoryRuntime:
         session = self.session()
         active = set() if active is None else active
         completed = {} if completed is None else completed
+        if type(value) is EventIdSet:
+            self.event_id_storage_reference(value)
+            return
         if type(value) in HISTORY_TYPES:
             if value._store is not session.store or value._pin != session.pin:
                 raise StoreError('cross-session recursive history')
@@ -224,6 +229,8 @@ class RecursiveHistoryRuntime:
         """
         session = self.session()
         session._ensure_people_mutation_allowed()
+        if type(value) is EventIdSet:
+            return self.event_id_storage_reference(value, bind=True)
         if type(value) in HISTORY_TYPES:
             session._register_nested_overlay(value)
             self.bind(value)
@@ -280,7 +287,7 @@ class RecursiveHistoryRuntime:
 
     def admitted_value(self, value):
         """Resolve newly checked incoming D, before its placement is installed."""
-        if reference(value) or record_reference(value):
+        if reference(value) or record_reference(value) or event_id_reference(value):
             session = self.session()
             result = session._registry.object_for_incarnation(
                 IncarnationId(session.store.store_identity, value.incarnation))
@@ -435,6 +442,8 @@ class RecursiveHistoryRuntime:
             if not mutable_record(current) or type(current) is not type(restore_record_header(header)):
                 raise StoreIntegrityError('record reference has a different canonical type')
             def compact(child):
+                if type(child) is EventIdSet:
+                    return self.event_id_storage_reference(child)
                 if type(child) in HISTORY_TYPES:
                     child._ensure()
                     return child.storage_reference()
@@ -461,6 +470,35 @@ class RecursiveHistoryRuntime:
         for field, child in zip(RECORD_FIELDS[type(result)], header[2]):
             object.__setattr__(result, field, self.decode(child, owner, (('field', field),)))
         return result
+
+    def event_id_storage_reference(self, value, *, bind=False):
+        """Read only the one checked root authority; never visit its members."""
+        session = self.session()
+        from .persistence_lazy_identity_headers import _IdentityHeaderCodec
+        _IdentityHeaderCodec(session.store, session.pin)._check_event_authority(value)
+        if value is not session.world.event_ids or value.descriptor() is None:
+            raise StoreError('recursive Event-ID reference requires the current compact World authority')
+        owner = ('world.event_ids', 0)
+        coord = session._identity_coordinator
+        rows = coord._owner_changes(owner, ())
+        root = rows.get(coord._marker(owner, ()))
+        if root is None or root[2] is None:
+            raise StoreIntegrityError('Event-ID authority lacks its checked owner-zero incarnation')
+        incarnation = IncarnationId(session.store.store_identity, root[2])
+        coord.discover_group(incarnation, read_only=True)
+        actual = session._registry.incarnation_for_object(value)
+        if actual is not None and actual != incarnation:
+            raise StoreIntegrityError('Event-ID facade has a different checked incarnation')
+        if bind and actual is None:
+            session._registry.bind(value, incarnation=incarnation)
+        return EventIdReference(incarnation.value)
+
+    def load_event_id_reference(self, value):
+        session = self.session()
+        facade = session.world.event_ids
+        if self.event_id_storage_reference(facade, bind=True) != value:
+            raise StoreIntegrityError('Event-ID graph reference disagrees with World authority')
+        return facade
 
     def bind(self, proxy):
         session = self.session()
@@ -508,7 +546,7 @@ class RecursiveHistoryRuntime:
         proxy._recursive_pending_children = children
 
     def decode(self, value, owner, path):
-        if reference(value) or record_reference(value):
+        if reference(value) or record_reference(value) or event_id_reference(value):
             session = self.session()
             parent = session._registry.object_for_incarnation(
                 IncarnationId(session.store.store_identity, owner[1][0]))
@@ -531,7 +569,9 @@ class RecursiveHistoryRuntime:
                     current = AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(parent._dirty[owner], path)
                     child = session._registry.object_for_incarnation(
                         IncarnationId(session.store.store_identity, value.incarnation))
-                    if child is None and record_reference(value):
+                    if child is None and event_id_reference(value):
+                        child = self.load_event_id_reference(value)
+                    elif child is None and record_reference(value):
                         child = self.load_record(value)
                     elif child is None:
                         child = HISTORY_CLASSES[value.kind](session.store, session.pin, value.incarnation,
@@ -549,6 +589,10 @@ class RecursiveHistoryRuntime:
             marker = coord._marker(owner, path)
             if marker not in rows or rows[marker][2] != value.incarnation:
                 raise StoreIntegrityError('recursive reference lacks its checked physical placement')
+            if event_id_reference(value):
+                result = self.load_event_id_reference(value)
+                session._registry.attach_occurrence(result, Occurrence(*owner, path))
+                return result
             if record_reference(value):
                 coord.discover_group(value.incarnation, read_only=True)
                 result = self.load_record(value)
@@ -744,7 +788,7 @@ class RecursiveHistoryRuntime:
                     current = {path: inc for path, _, inc in before.values() if inc is not None}
                     for _path, inc in refs:
                         child = session._registry.object_for_incarnation(IncarnationId(session.store.store_identity, inc))
-                        if child is not None and backing_for(child)._new and inc not in processed:
+                        if child is not None and type(child) is not EventIdSet and backing_for(child)._new and inc not in processed:
                             session._register_nested_overlay(child)
                             pending.append(backing_for(child))
                     if current == dict(refs):
@@ -758,7 +802,9 @@ class RecursiveHistoryRuntime:
                         child = session._registry.object_for_incarnation(IncarnationId(session.store.store_identity, inc))
                         if child is None:
                             ref = adapter.resolve_path(source.value, path)
-                            if record_reference(ref):
+                            if event_id_reference(ref):
+                                child = self.load_event_id_reference(ref)
+                            elif record_reference(ref):
                                 child = self.load_record(ref)
                             else:
                                 child = HISTORY_CLASSES[ref.kind](session.store, session.pin, inc,
@@ -794,10 +840,11 @@ class RecursiveHistoryRuntime:
         physical = self.load_owner(owner)
         current = AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(physical.value, path)
         incarnation = session._registry.incarnation_for_object(obj)
-        if (not (reference(current) or record_reference(current)) or incarnation is None
+        if (not (reference(current) or record_reference(current) or event_id_reference(current)) or incarnation is None
                 or current.incarnation != incarnation.value
                 or (reference(current) and current.kind != history_storage_kind(backing_for(obj)))
                 or (record_reference(current) and record_backing(obj) is None)
+                or (event_id_reference(current) and obj is not session.world.event_ids)
                 or session._registry.object_for_incarnation(incarnation) is not obj):
             raise StoreIntegrityError('recursive reference resolves to a different canonical object')
 

@@ -45,6 +45,13 @@ def copy_native_input(value, *, publisher=None):
             raise TypeError('cyclic native copy input is outside the typed schema')
         if ident in memo:
             return memo[ident]
+        if cls is EventIdSet:
+            lease = getattr(source, '_persistence_tracker_ref', None)
+            if lease is not None:
+                tracker = lease()
+                if tracker is None:
+                    raise StoreError('native Event-ID copy has an expired publisher lease')
+                check_tracker(tracker)
         if cls not in (*dictionaries, *lists, *sets, *HISTORY_TYPES, tuple) and cls not in RECORD_FIELDS:
             raise TypeError('native copy input has an undeclared source class')
         # Read existing backing leases, never fire mutation/index callbacks.

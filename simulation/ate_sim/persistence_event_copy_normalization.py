@@ -12,7 +12,10 @@ from .incremental_store import StoreIntegrityError, StoreFormatError
 from .persistence_lazy_store import VersionChange, IdentityOccurrenceChange
 from .persistence_lazy_nested_history import (
     HISTORY_CLASSES, HistoryReference, reference, immutable_value,
+    DESCRIPTOR_NAMESPACE, ENTRY_NAMESPACE,
 )
+from .persistence_history_types import NAMESPACE as TYPES
+from .persistence_history_retirement import NAMESPACE as RETIREMENT
 from .persistence_record_headers import (
     RecordReference, record_reference, record_header, NAMESPACE as RECORD_HEADERS,
 )
@@ -22,6 +25,7 @@ from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES, depende
 from .persistence_lazy_families import FAMILIES, AUXILIARY_OWNER_FAMILIES
 from .persistence_history_copy_promotion import reconcile_copy
 from .persistence_event_ids import AUTHORITY_REFERENCE
+from .persistence_event_id_reference import EventIdReference, event_id_reference, check_compact_authority
 from .persistence_adapters import (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY,
     PACKED_LIST_KIND, PACKED_LIST_PAYLOAD, META, COLLECTION_LAYOUT)
 from .incremental_store import RecordChange
@@ -55,6 +59,19 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
     selected, built, signatures, active, added = {}, {}, {}, set(), []
     readonly_ids = {}
     cuts = {}
+    facade_inc = labels.get((codec.encode(('world.event_ids', 0)), codec.encode(())))
+    facade_rows = [(c.key, c.value[1]) for c in ordinary if c.namespace == 'world.event_ids' and not c.delete]
+    facade_rows += [(c.key, c.value) for c in versions if c.namespace == 'world.event_ids' and not c.delete]
+    facade_checked = False
+
+    def check_facade_authority():
+        nonlocal facade_checked
+        if facade_checked:
+            return
+        if len(facade_rows) != 1 or facade_rows[0][0] != 0:
+            raise StoreIntegrityError('Event-ID graph copy lacks its single captured root authority')
+        check_compact_authority(facade_rows[0][1])
+        facade_checked = True
 
     def marker(owner, path):
         return codec.encode(owner), codec.encode(path)
@@ -81,11 +98,17 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
         return inc
 
     def encode(source, owner, path):
-        if reference(source) or record_reference(source):
+        if reference(source) or record_reference(source) or event_id_reference(source):
             return source
         if type(source) is tuple:
             if source == AUTHORITY_REFERENCE and marker(owner, path) in labels:
-                raise StoreFormatError('Event-ID root alias needs its special copy authority')
+                inc = labels[marker(owner, path)]
+                if inc != facade_inc:
+                    raise StoreIntegrityError('legacy Event-ID alias disagrees with owner-zero identity')
+                check_facade_authority()
+                selected[inc] = EventIdReference(inc)
+                cuts.setdefault(codec.encode(owner), set()).add(path)
+                return selected[inc]
             return tuple(encode(v, owner, path + (('index', n),)) for n, v in enumerate(source))
         if immutable_value(source):
             return source
@@ -162,6 +185,10 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
 
     def rewrite(source, owner, path=(), *, root=False):
         inc = labels.get(marker(owner, path))
+        if owner == ('world.event_ids', 0):
+            return source  # Preserve the one real compact value authority.
+        if type(source) is tuple and source == AUTHORITY_REFERENCE and inc == facade_inc:
+            return source  # Existing concrete family adapters keep compatibility markers.
         if root and inc in selected and mutable_record(source):
             # Concrete native family records remain physical bodies. Validate
             # their fields against the recursively backed alias before publish,
@@ -206,8 +233,36 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
     ordinary = tuple(rewritten)
     versions = [replace(v, value=rewrite(v.value, (v.namespace, v.key), root=True))
         if v.namespace in FAMILIES and not v.delete else v for v in versions] + added
+    # Earlier conversion could leave an unused set snapshot under the facade's
+    # same incarnation. The native World root is its value authority. Remove
+    # that destination-only legacy snapshot when no stored set edge consumes it;
+    # never publish two concrete bodies for the newly typed facade reference.
+    removed_facade_set = False
+    if facade_inc in selected and facade_inc in known:
+        if known[facade_inc] != 'set':
+            raise StoreIntegrityError('Event-ID facade competes with another backing kind')
+        pending = [c.value for c in (*versions, *ordinary) if not c.delete]
+        while pending:
+            value = pending.pop()
+            if reference(value) and value.incarnation == facade_inc:
+                raise StoreFormatError('legacy Event-ID set backing still has typed owners requiring their root adapter')
+            if type(value) is dict:
+                pending.extend(value.values())
+            elif type(value) in (list, tuple, set, frozenset):
+                pending.extend(value)
+            elif mutable_record(value):
+                pending.extend(getattr(value, field) for field in RECORD_FIELDS[type(value)])
+        if any(c.namespace == RETIREMENT and c.key == facade_inc and not c.delete for c in versions):
+            raise StoreFormatError('legacy Event-ID set backing has unresolved retirement authority')
+        versions = [c for c in versions if not (
+            (c.namespace in (DESCRIPTOR_NAMESPACE, TYPES) and c.key == facade_inc)
+            or (c.namespace == ENTRY_NAMESPACE and c.key[0] == facade_inc))]
+        dependencies = tuple(c for c in dependencies if c.key != facade_inc)
+        removed_facade_set = True
     retained = []
     for p in placements:
+        if removed_facade_set and p.owner_namespace == ENTRY_NAMESPACE and p.owner_key[0] == facade_inc:
+            continue
         paths = cuts.get(codec.encode((p.owner_namespace, p.owner_key)), ())
         if not any(len(prefix) < len(p.occurrence_path) and p.occurrence_path[:len(prefix)] == prefix for prefix in paths):
             retained.append(p)

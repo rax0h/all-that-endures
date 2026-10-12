@@ -62,11 +62,17 @@ def immutable_value(value, active=None):
 def stored_value(value):
     """Closed recursive backing values; mutable objects live behind references."""
     from .persistence_record_headers import record_reference
-    return reference(value) or record_reference(value) or immutable_value(value) or (type(value) is tuple and all(stored_value(v) for v in value))
+    from .persistence_event_id_reference import event_id_reference
+    return reference(value) or record_reference(value) or event_id_reference(value) or immutable_value(value) or (type(value) is tuple and all(stored_value(v) for v in value))
 
 
 def materialize_history_value(value, memo):
     """Explicit full materialization shares one memo across all descendants."""
+    from .persistence_event_ids import EventIdSet
+    if type(value) is EventIdSet:
+        if id(value) not in memo:
+            memo[id(value)] = set(value)
+        return memo[id(value)]
     from .persistence_record_runtime import mutable_record, record_backing
     if mutable_record(value) and record_backing(value) is not None:
         from .persistence_schema import RECORD_FIELDS
