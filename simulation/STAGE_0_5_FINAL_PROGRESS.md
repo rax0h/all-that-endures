@@ -1,5 +1,40 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: legacy Event graph copy normalization (October12 UTC)
+
+Source local `a0e4db38f86d67bfe6d5c21b81ccb8c3e428ee3e`, public
+`24a2fc59d1f6c65af281ddbcd2c1ddf8ca1bfe3f`, exact matching tree
+`14230b6574813767bc4dafeb51ec6234da229e52`; leased non-force update succeeded.
+
+Explicit `_copy_with_checked_catalog(normalize_events=True)` now converts raw
+legacy Event payload maps/lists/sets and declared mutable records into existing
+backings under their captured mutable IDs. Existing counted/list histories retain
+roles and aliases. Concrete page/entry/record-field child routes replace ancestor
+owned deep paths. Readonly descendants allocate destination IDs, anchored to the
+nearest checked mutable record/path across separately decoded source aliases.
+
+Shared payloads and related native family records keep one canonical body across
+edit/save/reopen. The copied action root uses the existing packed list authority;
+logical occurrence positions and current manifest/overlay layout are remapped.
+Generic recursive record access reuses related native family roots. Contradictory
+raw aliases, including an eager root versus its backed peer, reject before publish.
+Sealed log entries retain their existing value-snapshot boundary; mutable payload
+record identity is not imposed on sealed EventLog history.
+
+Final focused **15 passed in5.00s**. Affected **120 passed in133.00s**, with three
+pytest JUnit-property-format warnings, precedes only copy-placement ordering /
+deduplication cleanup and the extra focused tests; runtime source is identical.
+Held source pins/aliases/unsaved overlays remain intact; copies use committed
+values. Private destination fault cleanup and retry pass. `git diff --check`
+passed. Exact cases/hashes/metrics: `stage_0_5_legacy_event_copy_validation.json`.
+Counts overlap. This is a staged format5 copy helper, not a complete upgrade.
+
+Remaining complete-copy boundaries include special Event-ID authority aliases and
+raw concrete family root-container aliases, plus ordinary capability6 activation.
+Actual schema/byte closure, exotic equality, integrated bounds/P5, one final suite
+and independent review remain. Rank issue17, gameplay, PR14 and prior P5
+certification stay unchanged. No new endurance or production promotion.
+
 ## Latest checkpoint: checked current catalog source copy (October12 UTC)
 
 Source local `1cc52c8f152ab207297db7e2ed05ed479330eff6`, public
