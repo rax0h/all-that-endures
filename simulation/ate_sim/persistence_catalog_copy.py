@@ -31,6 +31,7 @@ from .persistence_lazy_sequence import (
 from .persistence_record_headers import NAMESPACE as RECORD_HEADERS
 from .persistence_record_headers import record_reference
 from .persistence_event_id_reference import event_id_reference, check_compact_authority
+from .persistence_nonreflexive_keys import nonreflexive_key_reference
 from .persistence_lazy_nested_history import reference
 from .persistence_schema import RECORD_FIELDS
 from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES, dependency_value
@@ -190,6 +191,11 @@ def _check_reference_targets(values, dependencies, *, event_id_incarnations=()):
     pending, seen = list(values), set()
     while pending:
         value = pending.pop()
+        if nonreflexive_key_reference(value):
+            # The closed backing primitive precedes runtime/copy projection.
+            # Until that mapping is integrated, never skip a typed edge and
+            # publish a destination with unchecked native-key identity.
+            raise StoreFormatError('native NaN key reference copy requires completed graph normalization')
         if event_id_reference(value):
             if value.incarnation not in event_id_incarnations:
                 raise StoreIntegrityError('catalog copy Event-ID reference lacks owner-zero identity')

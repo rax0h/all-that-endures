@@ -176,6 +176,33 @@ class RecordOwnerAdapter(HistoryOwnerAdapter):
 
 
 from .persistence_record_headers import NAMESPACE as RECORD_HEADER_NAMESPACE
+from .persistence_nonreflexive_keys import NAMESPACE as NONREFLEXIVE_KEY_NAMESPACE
+
+
+@dataclass(frozen=True)
+class NonreflexiveKeyOwnerAdapter(RecordOwnerAdapter):
+    """One immutable native NaN body; it has no child graph or mutable paths."""
+
+    def validate_path(self, path):
+        if type(path) is not tuple or path:
+            raise StoreIntegrityError('native NaN key body has no member paths')
+
+    def validate_source(self, source, storage_kind, codec):
+        from .persistence_nonreflexive_keys import checked_nonreflexive_key_header
+        self.validate_key(source.key)
+        if storage_kind != 'lazy' or source.record_schema != self.record_schema or source.memberships:
+            raise StoreIntegrityError('native NaN key body requires its versioned schema')
+        if not source.delete:
+            checked_nonreflexive_key_header(source.value)
+
+    def reference_placements(self, value):
+        from .persistence_nonreflexive_keys import checked_nonreflexive_key_header
+        checked_nonreflexive_key_header(value)
+        return ()
+
+    def _physical_path(self, value, path):
+        self.validate_path(path)
+        return ()
 
 AUXILIARY_OWNER_FAMILIES = MappingProxyType({**{
     namespace: HistoryOwnerAdapter(namespace, kind)
@@ -184,4 +211,5 @@ AUXILIARY_OWNER_FAMILIES = MappingProxyType({**{
         ('aux.lazy.nested.entries', 'entry'),
         ('aux.lazy.sequence.nodes', 'leaf'),
     )
-}, RECORD_HEADER_NAMESPACE: RecordOwnerAdapter(RECORD_HEADER_NAMESPACE, 'record')})
+}, RECORD_HEADER_NAMESPACE: RecordOwnerAdapter(RECORD_HEADER_NAMESPACE, 'record'),
+    NONREFLEXIVE_KEY_NAMESPACE: NonreflexiveKeyOwnerAdapter(NONREFLEXIVE_KEY_NAMESPACE, 'nan-key')})

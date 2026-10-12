@@ -205,7 +205,13 @@ def test_event_id_reference_point_publish_has_fixed_history_work(tmp_path, recor
         with open_bridge(target, rules_id=RULES) as session:
             activate(session)
             ids = session.world.event_ids
+            # Keep the same R cohort through both publications. Unheld old
+            # histories can otherwise be collected at different GC points,
+            # adding dependency-roster releases to only one measurement.
+            previous = session.skills[1, 'craft'].provenance
             session.skills[1, 'craft'].provenance = [ids, {'ids': ids}]
+            root = session.skills[1, 'craft'].provenance
+            mapping = root[1]
             session.save()
             session._registry.live_bindings = lambda: pytest.fail('Event-ID graph publish inventoried registry')
             session._eager_tracker._contains_identity = lambda *_: pytest.fail('Event-ID graph publish searched owners')
@@ -218,6 +224,8 @@ def test_event_id_reference_point_publish_has_fixed_history_work(tmp_path, recor
             for label, count in zip(('payload_reads', 'payload_writes', 'metadata_rows'), metric):
                 record_property(f'H{size}_{label}', count)
             assert ids.diagnostics()['member_visits'] == 0
+            assert len(previous) == size
+            assert root[0] is mapping['ids'] is ids
     assert metrics[0] == metrics[1]
 
 

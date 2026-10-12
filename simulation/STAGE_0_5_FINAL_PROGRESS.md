@@ -1,5 +1,44 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: checked native NaN backing primitives (October12 UTC)
+
+Closed `NonreflexiveKeyReference` has a positive exact-ID codec tag. An eight-byte
+native float body at `aux.lazy.keys.nan_atoms (inc,0)` preserves sign and NaN
+payload bits, including a signaling payload. The physical owner requires its
+versioned schema, has no child references or writable member paths, and borrows
+the existing catalog/store/publisher. Malformed/finite bodies and absent authority
+fail closed. Explicit copies reject the newly declared typed edge until complete
+runtime/copy normalization exists; a fresh RED caught the previous scrub silently
+skipping it. Registration does not enable ordinary recursive key admission.
+
+Initial **25 RED cases** preceded the primitive implementation. Focused primitives
+and fixed-R Event-ID metric: **26 passed in2.13s** before only the added copy guard.
+Affected runtime/header/identity/lifetime suite: **212 passed / 12 strict xfailed
+in17.97s**, same final runtime/codec/adapters, before that copy-only guard. Final
+primitive and affected copy gate: **70 passed in11.27s**, matching all production
+and tests. Counts overlap; no full-suite claim. Point body reads at H1,000/H10,000
+are identical **2 payload reads / 4 metadata rows**, including two captured pins.
+
+The first affected run had **190 passed / 12 pending / one failure**: the existing
+Event-ID point benchmark measured (413,30,2623) versus (407,28,2599). A standalone
+candidate reproduced (410,29,2611) versus (407,28,2599); saved registry baseline
+was (407,28,2599) at both sizes. A temporary commit trace isolated the differing
+writes to dependency-roster release for unheld old/new histories; all other write
+namespace counts matched. Holding only the new aliases after the initial save
+still varied the old-history release. The benchmark now holds its previous
+shared provenance, new root and nested map before initial publication and through
+measurement: R is fixed and strict equality remains. Final focused and affected
+runs both measure **407 reads / 28 writes / 2,599 metadata rows**, zero member
+visits at both H sizes. Separate unheld-source/backing lifetime gates still pass.
+Actual failed runs, source boundaries, cases and hashes are preserved in
+`stage_0_5_nonreflexive_headers_validation.json`.
+
+Next integrate these immutable atoms into recursive key/value projection,
+physical placement paths, one registry and the existing save acknowledgement,
+then complete source-copy/detach and exact equality gates. All 12 persisted-key
+NaN failures remain pending; Stage0.5 is unfinished. Rank, gameplay, PR14, prior
+P5 and complete-format activation are unchanged.
+
 ## Latest checkpoint: native NaN identity registry foundation (October12 UTC)
 
 The sole existing LazyIdentityRegistry now has an explicit exact-native-NaN

@@ -25,6 +25,10 @@ from .incremental_store import (
 from .persistence_schema import RECORD_FIELDS, ROOT_TYPES, ROOT_FIELDS
 from .persistence_record_headers import RecordReference, record_reference, REFERENCE_TAG as RECORD_REFERENCE_TAG
 from .persistence_event_id_reference import EventIdReference, event_id_reference, REFERENCE_TAG as EVENT_ID_REFERENCE_TAG
+from .persistence_nonreflexive_keys import (
+    NonreflexiveKeyReference, nonreflexive_key_reference,
+    REFERENCE_TAG as NONREFLEXIVE_KEY_REFERENCE_TAG,
+)
 from . import advancement, social, communities, magic_resources, materials, agency
 
 SCHEMA = 'ate-world-p2a/1'
@@ -94,6 +98,10 @@ class WorldCodec(TypedCodec):
 
     def _encode_value(self, value, active, seen_mutable):
         cls = type(value)
+        if cls is NonreflexiveKeyReference:
+            if not nonreflexive_key_reference(value):
+                raise CodecError('invalid typed native NaN key reference')
+            return [NONREFLEXIVE_KEY_REFERENCE_TAG, value.incarnation]
         if cls is EventIdReference:
             if not event_id_reference(value):
                 raise CodecError('invalid typed Event-ID authority reference')
@@ -162,6 +170,10 @@ class WorldCodec(TypedCodec):
 
     def _decode_value(self, node):
         if isinstance(node, list) and node:
+            if node[0] == NONREFLEXIVE_KEY_REFERENCE_TAG:
+                if len(node) != 2 or type(node[1]) is not int or node[1] <= 0:
+                    raise CodecError('invalid typed native NaN key reference')
+                return NonreflexiveKeyReference(node[1])
             if node[0] == EVENT_ID_REFERENCE_TAG:
                 if len(node) != 2 or type(node[1]) is not int or node[1] <= 0:
                     raise CodecError('invalid typed Event-ID authority reference')

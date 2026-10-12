@@ -30,5 +30,13 @@ non-weak-referenceable key components require the same explicit accounting.
 5. Remove pending equality markers only after the 12 exposed RED cases and
    key-component sharing, fault and H-scaling tests pass against final integration.
 
+The next primitive uses a positive exact-ID NonreflexiveKeyReference codec tag
+and one checked eight-byte native NaN body at `aux.lazy.keys.nan_atoms (inc,0)`.
+Register that immutable body as a physical owner with no children or writable
+member paths. Preserve sign/payload bits, reject finite floats/malformed bodies,
+and prove old-pin point reads at H1,000/H10,000. This registration does not select
+recursive key admission; runtime/copy projection and alias-preserving restoration
+remain the next integration step.
+
 Rank, gameplay, PR14 and prior P5 certification remain unchanged. Run the final
 applicable suite and independent review only after the complete .5 source is stable.
