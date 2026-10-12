@@ -14,6 +14,7 @@ from .persistence_history_dependencies import (NAMESPACE as DEPENDENCIES,
     active_backing_dependencies, _checked_value as checked_dependencies)
 from .persistence_history_types import NAMESPACE as MEMBER_TYPES
 from .persistence_record_headers import NAMESPACE as RECORD_HEADER, checked_record_header
+from .persistence_nonreflexive_keys import NAMESPACE as NAN_HEADER, checked_nonreflexive_key_header
 
 NAMESPACE = 'aux.lazy.history.retirement'
 TAG = 'history-retirement/v2'
@@ -24,6 +25,7 @@ LEGACY_SCOPES = {'list': (PAGE_NAMESPACE, HISTORY_DESCRIPTOR),
           'sequence': tuple(ns for ns in SEQUENCE_NAMESPACES if ns != SEQUENCE_DESCRIPTOR) + (SEQUENCE_DESCRIPTOR,)}
 SCOPES = {kind: scopes[:-1] + (MEMBER_TYPES, scopes[-1]) for kind, scopes in LEGACY_SCOPES.items()}
 SCOPES['record'] = (RECORD_HEADER,)
+SCOPES['nan-key'] = (NAN_HEADER,)
 SCOPES['frozen-list'] = SCOPES['list']
 SCOPES['frozen-map'] = SCOPES['map']
 
@@ -62,6 +64,13 @@ def pending_retirement(store, pin, incarnation):
 
 
 def _scope_keys(store, pin, namespace, incarnation, *, limit):
+    if namespace == NAN_HEADER:
+        try:
+            checked_nonreflexive_key_header(store.read_version(pin, namespace, (incarnation, 0),
+                expected_record_schema=1).value)
+        except KeyError as exc:
+            raise StoreIntegrityError('native NaN retirement header is absent') from exc
+        return ((incarnation, 0),)
     if namespace == RECORD_HEADER:
         try:
             checked_record_header(store.read_version(pin, namespace, (incarnation, 0),
@@ -140,13 +149,15 @@ def prepare_retirement_delta(store, pin, *, row_budget=256, protected_incarnatio
             if dependencies[1] != job[1]:
                 raise StoreIntegrityError('history retirement kind disagrees with dependency authority')
             try:
-                descriptor_key = (incarnation, 0) if job[1] == 'record' else incarnation
+                descriptor_key = (incarnation, 0) if job[1] in ('record', 'nan-key') else incarnation
                 descriptor = store.read_version(pin, _scopes(job)[-1], descriptor_key,
                                                 expected_record_schema=1).value
             except KeyError as exc:
                 raise StoreIntegrityError('history retirement backing descriptor is absent') from exc
             if job[1] == 'record':
                 checked_record_header(descriptor)
+            elif job[1] == 'nan-key':
+                checked_nonreflexive_key_header(descriptor)
             elif (type(descriptor) is not tuple or not descriptor
                     or (job[1] == 'sequence' and descriptor[0] not in ('ordered-sequence/v1', 'ordered-sequence/v2'))
                     or (job[1] != 'sequence' and descriptor[0] != job[1])):
@@ -215,15 +226,19 @@ def prepare_world_retirement_delta(store, pin, coordinator, dependencies, *, row
             if not last_removed:
                 continue
             kinds = []
-            for namespace in (HISTORY_DESCRIPTOR, SEQUENCE_DESCRIPTOR, RECORD_HEADER):
+            for namespace in (HISTORY_DESCRIPTOR, SEQUENCE_DESCRIPTOR, RECORD_HEADER, NAN_HEADER):
                 try:
-                    key = (inc, 0) if namespace == RECORD_HEADER else inc
+                    key = (inc, 0) if namespace in (RECORD_HEADER, NAN_HEADER) else inc
                     value = store.read_version(pin, namespace, key, expected_record_schema=1).value
                 except KeyError:
                     continue
                 if namespace == RECORD_HEADER:
                     checked_record_header(value)
                     kinds.append('record')
+                    continue
+                if namespace == NAN_HEADER:
+                    checked_nonreflexive_key_header(value)
+                    kinds.append('nan-key')
                     continue
                 kind = 'sequence' if namespace == SEQUENCE_DESCRIPTOR else value[0] if type(value) is tuple and value else None
                 if (kind not in SCOPES or type(value) is not tuple or not value

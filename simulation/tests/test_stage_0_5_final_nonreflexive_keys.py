@@ -1,8 +1,4 @@
-"""Native equality gates for the pending nonreflexive-key storage extension.
-
-Run with --runxfail to expose the unresolved Stage 0.5 cases. Strict xfails
-keep this incomplete boundary explicit; they are not release acceptance.
-"""
+"""Native equality gates for checked recursive nonreflexive keys."""
 import pytest
 
 from ate_sim.core import Ref
@@ -17,17 +13,12 @@ SHAPES = {
     'frozenset': lambda value: frozenset(('key', value)),
     'ref': lambda value: Ref('key', value),
 }
-PENDING = pytest.mark.xfail(
-    strict=True,
-    reason='Stage 0.5: encoded scalar keys collapse distinct NaN identities',
-)
 
 
 def native_container(kind, keys):
     return dict(zip(keys, range(len(keys)))) if kind == 'map' else set(keys)
 
 
-@PENDING
 @pytest.mark.parametrize('kind', ['map', 'set'])
 @pytest.mark.parametrize('shape', SHAPES)
 def test_distinct_nan_probe_is_absent_after_save(tmp_path, kind, shape):
@@ -45,7 +36,6 @@ def test_distinct_nan_probe_is_absent_after_save(tmp_path, kind, shape):
         assert probe not in backed
 
 
-@PENDING
 @pytest.mark.parametrize('kind', ['map', 'set'])
 @pytest.mark.parametrize('shape', ['float', 'tuple'])
 def test_two_distinct_nan_keys_survive_save_and_reopen(tmp_path, kind, shape):

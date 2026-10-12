@@ -341,7 +341,13 @@ class IdentityCoordinator:
                 raise ValueError('duplicate, absent or out-of-scope identity placement')
             # Validate every incoming mutable/codec/lease before allocating or
             # changing any route. A failed caller iterator leaves no journal.
-            weakref.ref(obj)
+            if type(obj) is float:
+                # Native NaN atoms were preflighted and bound by the recursive
+                # runtime. Borrow that sole conditional binding; floats cannot
+                # support a second weak binding here.
+                self.registry.nonreflexive_root_for(obj)
+            else:
+                weakref.ref(obj)
             if self.encode_placement is None:
                 self.store.codec.encode(obj)
             else:
@@ -359,7 +365,8 @@ class IdentityCoordinator:
                 self.discover_group(inc)
         chosen = {}
         for marker, (path, obj) in incoming.items():
-            chosen[marker] = self.registry.bind(obj).value
+            incarnation = self.registry.incarnation_for_object(obj)
+            chosen[marker] = (incarnation or self.registry.bind(obj)).value
             if marker not in changes:
                 original = self.catalog.read_identity_membership(self.pin, owner, path)
                 changes[marker] = path, original, original

@@ -31,7 +31,9 @@ from .persistence_lazy_sequence import (
 from .persistence_record_headers import NAMESPACE as RECORD_HEADERS
 from .persistence_record_headers import record_reference
 from .persistence_event_id_reference import event_id_reference, check_compact_authority
-from .persistence_nonreflexive_keys import nonreflexive_key_reference
+from .persistence_nonreflexive_keys import (
+    nonreflexive_key_reference, NAMESPACE as NAN_HEADERS, checked_nonreflexive_key_header,
+)
 from .persistence_lazy_nested_history import reference
 from .persistence_schema import RECORD_FIELDS
 from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES, dependency_value
@@ -74,11 +76,15 @@ def _owner_sources(store, pin):
 
 def _backing_rosters(store, pin, next_incarnation):
     kinds = {}
-    for namespace in (DESCRIPTOR_NAMESPACE, SEQUENCE_DESCRIPTOR, RECORD_HEADERS):
+    for namespace in (DESCRIPTOR_NAMESPACE, SEQUENCE_DESCRIPTOR, RECORD_HEADERS, NAN_HEADERS):
         for key in store.iter_keys(pin, namespace):
             value = store.read_version(pin, namespace, key, expected_record_schema=1).value
-            inc = key[0] if namespace == RECORD_HEADERS and type(key) is tuple else key
-            kind = 'record' if namespace == RECORD_HEADERS else 'sequence' if namespace == SEQUENCE_DESCRIPTOR else value[0]
+            inc = key[0] if namespace in (RECORD_HEADERS, NAN_HEADERS) and type(key) is tuple else key
+            kind = ('nan-key' if namespace == NAN_HEADERS else 'record' if namespace == RECORD_HEADERS
+                    else 'sequence' if namespace == SEQUENCE_DESCRIPTOR else value[0])
+            if namespace == NAN_HEADERS:
+                AUXILIARY_OWNER_FAMILIES[namespace].validate_source(
+                    VersionChange(namespace, key, value), 'lazy', store.codec)
             if (type(inc) is not int or not 0 < inc < next_incarnation or inc in kinds):
                 raise StoreIntegrityError('duplicate or unallocated backing in catalog copy')
             kinds[inc] = kind
@@ -141,7 +147,7 @@ def _check_backing_graph(codec, versions, dependencies):
     kinds = {change.key: change.value[1] for change in dependencies}
     expected = {PAGE_NAMESPACE: ('list', 'frozen-list'),
         ENTRY_NAMESPACE: ('map', 'set', 'frozen-map'),
-        RECORD_HEADERS: ('record',)}
+        RECORD_HEADERS: ('record',), NAN_HEADERS: ('nan-key',)}
     expected.update((ns, ('sequence',)) for ns in SEQUENCE_NAMESPACES if ns != SEQUENCE_DESCRIPTOR)
     edges = {}
     for change in versions:
@@ -192,10 +198,9 @@ def _check_reference_targets(values, dependencies, *, event_id_incarnations=()):
     while pending:
         value = pending.pop()
         if nonreflexive_key_reference(value):
-            # The closed backing primitive precedes runtime/copy projection.
-            # Until that mapping is integrated, never skip a typed edge and
-            # publish a destination with unchecked native-key identity.
-            raise StoreFormatError('native NaN key reference copy requires completed graph normalization')
+            if kinds.get(value.incarnation) != 'nan-key':
+                raise StoreIntegrityError('catalog copy native NaN reference has missing or wrong-kind backing')
+            continue
         if event_id_reference(value):
             if value.incarnation not in event_id_incarnations:
                 raise StoreIntegrityError('catalog copy Event-ID reference lacks owner-zero identity')

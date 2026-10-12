@@ -1,13 +1,22 @@
 """Deep immutable certification reuses checked frozen backing descriptors."""
 from .incremental_store import StoreIntegrityError
 from .persistence_lazy_nested_history import reference, immutable_value, DESCRIPTOR_NAMESPACE
+from .persistence_nonreflexive_keys import nonreflexive_key_reference, read_nonreflexive_key_header
 
 
 def immutable_snapshot_value(value, reference_is_immutable=None):
+    if nonreflexive_key_reference(value):
+        return reference_is_immutable is not None and reference_is_immutable(value)
     if reference(value):
         return (value.kind in ('frozen-list', 'frozen-map')
                 and reference_is_immutable is not None and reference_is_immutable(value))
     if type(value) is tuple:
+        return all(immutable_snapshot_value(child, reference_is_immutable) for child in value)
+    from .core import Ref
+    if type(value) is Ref:
+        return (immutable_snapshot_value(value.kind, reference_is_immutable)
+                and immutable_snapshot_value(value.id, reference_is_immutable))
+    if type(value) is frozenset:
         return all(immutable_snapshot_value(child, reference_is_immutable) for child in value)
     return immutable_value(value)
 
@@ -25,6 +34,9 @@ def checked_frozen_descriptor(value, *, kind=None):
 
 
 def read_frozen_certification(store, pin, value):
+    if nonreflexive_key_reference(value):
+        read_nonreflexive_key_header(store, pin, value.incarnation)
+        return True
     if not reference(value) or value.kind not in ('frozen-list', 'frozen-map'):
         return False
     try:
@@ -47,17 +59,23 @@ def verify_frozen_certification(history):
 
 def read_capture_certification(store, generation, value):
     """Check one descriptor in the caller's already active capture transaction."""
-    if not reference(value) or value.kind != 'frozen-map':
+    atom = nonreflexive_key_reference(value)
+    if not atom and (not reference(value) or value.kind != 'frozen-map'):
         return False
     if (not hasattr(store, '_visible_record_row')
             or not getattr(store, '_active_read_transaction', False)
             or not store.db.in_transaction):
         raise StoreIntegrityError('frozen snapshot capture requires checked lazy transaction')
-    key = store.codec.encode(value.incarnation)
-    row = store._visible_record_row(generation, DESCRIPTOR_NAMESPACE, key)
+    from .persistence_nonreflexive_keys import NAMESPACE as NAN_HEADERS, checked_nonreflexive_key_header
+    namespace = NAN_HEADERS if atom else DESCRIPTOR_NAMESPACE
+    key = store.codec.encode((value.incarnation, 0) if atom else value.incarnation)
+    row = store._visible_record_row(generation, namespace, key)
     if row is None:
         raise StoreIntegrityError('frozen snapshot descriptor is absent')
-    descriptor, schema, *_ = store._check_record_row(DESCRIPTOR_NAMESPACE, key, row, decode=True)
+    descriptor, schema, *_ = store._check_record_row(namespace, key, row, decode=True)
     if schema != 1:
         raise StoreIntegrityError('frozen snapshot descriptor schema mismatch')
+    if atom:
+        checked_nonreflexive_key_header(descriptor)
+        return True
     return checked_frozen_descriptor(descriptor, kind=value.kind)[3]

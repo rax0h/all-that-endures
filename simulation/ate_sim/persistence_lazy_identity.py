@@ -25,10 +25,11 @@ class _NonreflexiveKeyRoot:
     Native floats cannot be weakly referenced. The queue releases this root
     when its value has no other owners; it never substitutes a float subclass.
     """
-    __slots__ = ('value',)
+    __slots__ = ('value', 'backing', '__weakref__')
 
     def __init__(self, value):
         self.value = value
+        self.backing = None
 
     def __call__(self):
         return self.value
@@ -284,12 +285,36 @@ class LazyIdentityRegistry:
             if type(reference) is not _NonreflexiveKeyRoot:
                 raise IdentityRegistryError('nonreflexive queue addresses a weak binding')
             self._nonreflexive_checks += 1
-            if sys.getrefcount(reference.value) == 2:
+            if (not getattr(reference.backing, '_input_pending', False)
+                    and sys.getrefcount(reference.value) == 2):
                 self._cleanup(object_id, incarnation, token, reference)
                 removed += 1
             else:
                 self._nonreflexive_queue.append(marker)
         return removed
+
+    def nonreflexive_root_for(self, obj):
+        """Borrow private lifetime metadata from the sole canonical binding."""
+        self._ensure_open()
+        row = self._by_object_id.get(id(obj))
+        if row is None or type(row[0]) is not _NonreflexiveKeyRoot or row[0]() is not obj:
+            raise IdentityRegistryError('native NaN has no conditional binding')
+        return row[0]
+
+    def release_nonreflexive_incarnations(self, incarnations):
+        """Release actual acknowledged D directly; never inventory clean keys."""
+        self._ensure_open()
+        for incarnation in incarnations:
+            self._check_incarnation(incarnation)
+            root = self._by_incarnation.get(incarnation)
+            if type(root) is not _NonreflexiveKeyRoot:
+                continue
+            if root.backing is not None:
+                root.backing._input_pending = False
+            if sys.getrefcount(root.value) == 2:
+                object_id = id(root.value)
+                row = self._by_object_id[object_id]
+                self._cleanup(object_id, incarnation, row[2], root)
 
     def bind(
         self,

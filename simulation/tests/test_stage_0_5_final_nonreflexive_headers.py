@@ -115,11 +115,10 @@ def test_missing_or_invalid_stored_atom_is_an_integrity_failure(tmp_path):
             m.read_nonreflexive_key_header(store, pin, 1)
 
 
-def test_copy_cannot_silently_skip_unintegrated_atom_references():
+def test_copy_cannot_silently_skip_unbacked_atom_references():
     m = api()
     from ate_sim.persistence_catalog_copy import _check_reference_targets
-    from ate_sim.incremental_store import StoreFormatError
-    with pytest.raises(StoreFormatError, match='NaN.*normalization'):
+    with pytest.raises(StoreIntegrityError, match='NaN.*backing'):
         _check_reference_targets(({'key': m.NonreflexiveKeyReference(1)},), ())
 
 

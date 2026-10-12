@@ -14,7 +14,7 @@ from .persistence_lazy_store import VersionChange
 from .persistence_lazy_identity import IncarnationId, Occurrence
 from .persistence_lazy_nested_history import (
     HISTORY_TYPES, HISTORY_CLASSES, reference, immutable_value,
-    LazyHistoryList, LazyHistoryMap, PAGE_NAMESPACE, ENTRY_NAMESPACE, PAGE_SIZE,
+    LazyHistoryList, LazyHistoryMap, LazyHistorySet, PAGE_NAMESPACE, ENTRY_NAMESPACE, PAGE_SIZE,
     history_storage_kind,
 )
 from .persistence_history_owner_adapters import AUXILIARY_OWNER_FAMILIES
@@ -30,6 +30,12 @@ from .persistence_record_runtime import (
     mutable_record, record_backing, backing_for, canonical_for, RecordBacking, bind_record,
 )
 from .event_log import FrozenDict, FrozenList
+from .persistence_nonreflexive_keys import (
+    NonreflexiveKeyReference, NonreflexiveKeyBacking, nonreflexive_key_reference,
+    nonreflexive_key_header, read_nonreflexive_key_header,
+    restore_nonreflexive_key_header, project_immutable_key,
+    NAMESPACE as NAN_NAMESPACE,
+)
 
 
 @dataclass(frozen=True)
@@ -48,6 +54,7 @@ class RecursiveHistoryRuntime:
         self._new_sources = []
         self._source_queue = deque()
         self._source_release_checks = 0
+        self._new_nan_incarnations = []
 
     def remember_source(self, source, proxy):
         """Track only input D/U; the existing memo owns each actual source."""
@@ -86,12 +93,60 @@ class RecursiveHistoryRuntime:
             if not self._release_source(marker):
                 self._source_queue.append(marker)
         self._new_sources.clear()
+        session = self.session()
+        session._registry.release_nonreflexive_incarnations(self._new_nan_incarnations)
+        self._new_nan_incarnations.clear()
 
     def collect_source_memos(self, budget=256):
         for _ in range(min(budget, len(self._source_queue))):
             marker = self._source_queue.popleft()
             if not self._release_source(marker):
                 self._source_queue.append(marker)
+        self.session()._registry.collect_nonreflexive_keys(budget=budget)
+
+    def project_nan(self, value, *, allocate):
+        session = self.session()
+        incarnation = session._registry.incarnation_for_object(value)
+        if incarnation is None:
+            if not allocate:
+                raise KeyError(value)
+            incarnation = session._registry.bind_nonreflexive_key(value)
+            root = session._registry.nonreflexive_root_for(value)
+            root.backing = NonreflexiveKeyBacking(self, root, incarnation,
+                nonreflexive_key_header(value), new=True)
+            self._new_nan_incarnations.append(incarnation)
+        else:
+            backing = session._registry.nonreflexive_root_for(value).backing
+            if backing._new and not backing._input_pending:
+                backing._input_pending = True
+                self._new_nan_incarnations.append(incarnation)
+        session._register_nested_overlay(value)
+        return NonreflexiveKeyReference(incarnation.value)
+
+    def project_key(self, value, *, allocate=False, canonical=True):
+        return project_immutable_key(value,
+            lambda nan: self.project_nan(nan, allocate=allocate), canonical=canonical)
+
+    def load_nan(self, ref):
+        session = self.session()
+        incarnation = IncarnationId(session.store.store_identity, ref.incarnation)
+        current = session._registry.object_for_incarnation(incarnation)
+        if current is not None:
+            import math
+            if (type(current) is not float or not math.isnan(current)
+                    or type(self.backing_for(current)) is not NonreflexiveKeyBacking):
+                raise StoreIntegrityError('native NaN reference has a different canonical type')
+            return current
+        header = read_nonreflexive_key_header(session.store, session.pin, ref.incarnation)
+        value = restore_nonreflexive_key_header(header)
+        session._registry.bind_nonreflexive_key(value, incarnation=incarnation)
+        root = session._registry.nonreflexive_root_for(value)
+        root.backing = NonreflexiveKeyBacking(self, root, incarnation, header, new=False)
+        session._register_nested_overlay(value)
+        return value
+
+    def backing_for(self, value):
+        return backing_for(value, self.session()._registry)
 
     def source_diagnostics(self):
         return {'source_memo_leases': len(self._source_leases),
@@ -235,8 +290,10 @@ class RecursiveHistoryRuntime:
             session._register_nested_overlay(value)
             self.bind(value)
             return value.storage_reference()
-        if reference(value) or immutable_value(value):
+        if reference(value):
             return value
+        if immutable_value(value):
+            return self.project_key(value, allocate=True, canonical=False)
         if mutable_record(value):
             backing = record_backing(value)
             if backing is not None:
@@ -275,6 +332,7 @@ class RecursiveHistoryRuntime:
             incarnation = session._registry.allocator.allocate()
             proxy = HISTORY_CLASSES[kind](session.store, session.pin, incarnation.value,
                 initial_values=values, cache_budget=session._history_cache_budget, recursive=True,
+                **({'key_runtime': self} if kind in ('map', 'set', 'frozen-map') else {}),
                 **({'reference_is_immutable': self.frozen_reference_is_immutable} if kind.startswith('frozen-') else {}))
             session._registry.bind(proxy, incarnation=incarnation)
             tracker._remember_memo(value, proxy)
@@ -287,7 +345,7 @@ class RecursiveHistoryRuntime:
 
     def admitted_value(self, value):
         """Resolve newly checked incoming D, before its placement is installed."""
-        if reference(value) or record_reference(value) or event_id_reference(value):
+        if reference(value) or record_reference(value) or event_id_reference(value) or nonreflexive_key_reference(value):
             session = self.session()
             result = session._registry.object_for_incarnation(
                 IncarnationId(session.store.store_identity, value.incarnation))
@@ -296,6 +354,11 @@ class RecursiveHistoryRuntime:
             return result
         if type(value) is tuple:
             return tuple(self.admitted_value(child) for child in value)
+        from .core import Ref
+        if type(value) is Ref:
+            return Ref(self.admitted_value(value.kind), self.admitted_value(value.id))
+        if type(value) is frozenset:
+            return frozenset(self.admitted_value(child) for child in value)
         return value
 
     def sealed_snapshot_authority(self, value):
@@ -309,6 +372,10 @@ class RecursiveHistoryRuntime:
         return value._deep_immutable is True
 
     def frozen_reference_is_immutable(self, value):
+        if nonreflexive_key_reference(value):
+            child = self.load_nan(value)
+            self.backing_for(child)  # Only checked immutable body metadata qualifies.
+            return True
         if not reference(value) or value.kind not in ('frozen-list', 'frozen-map'):
             return False
         session = self.session()
@@ -504,6 +571,8 @@ class RecursiveHistoryRuntime:
         session = self.session()
         proxy._recursive = True
         proxy._recursive_runtime = self
+        if isinstance(proxy, (LazyHistoryMap, LazyHistorySet)):
+            proxy._key_runtime = self
         self.retain_pending_children(proxy)
         def guard():
             session._shared_object_routes(proxy)
@@ -546,17 +615,17 @@ class RecursiveHistoryRuntime:
         proxy._recursive_pending_children = children
 
     def decode(self, value, owner, path):
-        if reference(value) or record_reference(value) or event_id_reference(value):
+        if reference(value) or record_reference(value) or event_id_reference(value) or nonreflexive_key_reference(value):
             session = self.session()
             parent = session._registry.object_for_incarnation(
                 IncarnationId(session.store.store_identity, owner[1][0]))
-            parent_backing = backing_for(parent) if parent is not None else None
+            parent_backing = self.backing_for(parent) if parent is not None else None
             if parent_backing is not None and parent_backing._new:
                 source = self._source_change(parent_backing, owner)
                 child = getattr(parent_backing, '_recursive_pending_children', {}).get(value.incarnation)
                 if source is not None and not source.delete and child is not None:
                     current = AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(source.value, path)
-                    if current != value or (reference(value) and history_storage_kind(backing_for(child)) != value.kind):
+                    if current != value or (reference(value) and history_storage_kind(self.backing_for(child)) != value.kind):
                         raise StoreIntegrityError('private recursive reference disagrees with its pending value')
                     return child
             if owner[0] == NODE_NAMESPACE:
@@ -571,6 +640,8 @@ class RecursiveHistoryRuntime:
                         IncarnationId(session.store.store_identity, value.incarnation))
                     if child is None and event_id_reference(value):
                         child = self.load_event_id_reference(value)
+                    elif child is None and nonreflexive_key_reference(value):
+                        child = self.load_nan(value)
                     elif child is None and record_reference(value):
                         child = self.load_record(value)
                     elif child is None:
@@ -579,7 +650,7 @@ class RecursiveHistoryRuntime:
                         session._registry.bind(child, incarnation=IncarnationId(session.store.store_identity, value.incarnation))
                         session._register_nested_overlay(child)
                         self.bind(child)
-                    if current != value or (reference(value) and history_storage_kind(backing_for(child)) != value.kind):
+                    if current != value or (reference(value) and history_storage_kind(self.backing_for(child)) != value.kind):
                         raise StoreIntegrityError('pending recursive reference lacks its canonical child')
                     return child
             if session._lifecycle_operation is None:
@@ -589,6 +660,11 @@ class RecursiveHistoryRuntime:
             marker = coord._marker(owner, path)
             if marker not in rows or rows[marker][2] != value.incarnation:
                 raise StoreIntegrityError('recursive reference lacks its checked physical placement')
+            if nonreflexive_key_reference(value):
+                coord.discover_group(value.incarnation, read_only=True)
+                result = self.load_nan(value)
+                session._registry.attach_occurrence(result, Occurrence(*owner, path))
+                return result
             if event_id_reference(value):
                 result = self.load_event_id_reference(value)
                 session._registry.attach_occurrence(result, Occurrence(*owner, path))
@@ -602,6 +678,12 @@ class RecursiveHistoryRuntime:
                 IncarnationId(session.store.store_identity, value.incarnation), kind=value.kind)
         if type(value) is tuple:
             return tuple(self.decode(child, owner, path + (('index', slot),)) for slot, child in enumerate(value))
+        from .core import Ref
+        if type(value) is Ref:
+            return Ref(self.decode(value.kind, owner, path + (('field', 'kind'),)),
+                       self.decode(value.id, owner, path + (('field', 'id'),)))
+        if type(value) is frozenset:
+            return frozenset(self.decode(child, owner, path + (('key', child),)) for child in value)
         return value
 
     def validate_physical_children(self, owner, value):
@@ -624,13 +706,14 @@ class RecursiveHistoryRuntime:
             coord.discover_group(inc)
 
     def _changes(self, proxy):
-        if type(proxy) is RecordBacking:
+        if type(proxy) in (RecordBacking, NonreflexiveKeyBacking):
             yield from proxy.pending_changes()
             return
         if isinstance(proxy, LazyHistoryList):
             owners = ((PAGE_NAMESPACE, (proxy._incarnation, number)) for number in tuple(proxy._dirty_pages))
-        elif isinstance(proxy, LazyHistoryMap):
-            owners = ((ENTRY_NAMESPACE, (proxy._incarnation, key)) for key in tuple(proxy._dirty_entries))
+        elif isinstance(proxy, (LazyHistoryMap, LazyHistorySet)):
+            owners = ((ENTRY_NAMESPACE, (proxy._incarnation, key))
+                      for key in tuple(proxy._dirty_entries.keys() | proxy._cancelled_entries))
         elif type(proxy) is LazyOrderedSequence:
             owners = (owner for owner in tuple(proxy._dirty) if owner[0] == NODE_NAMESPACE)
         else:
@@ -647,6 +730,8 @@ class RecursiveHistoryRuntime:
             raise StoreIntegrityError('physical history owner belongs to another backing')
         if type(proxy) is RecordBacking and namespace == RECORD_NAMESPACE and key[1] == 0:
             return VersionChange(namespace, key, proxy._header)
+        if type(proxy) is NonreflexiveKeyBacking and namespace == NAN_NAMESPACE and key[1] == 0:
+            return VersionChange(namespace, key, proxy._header)
         if isinstance(proxy, LazyHistoryList) and namespace == PAGE_NAMESPACE:
             number = key[1]
             if number not in proxy._dirty_pages:
@@ -654,8 +739,10 @@ class RecursiveHistoryRuntime:
             deleted = number * PAGE_SIZE >= proxy._length
             value = None if deleted else tuple(proxy._dirty_pages[number])
             return VersionChange(namespace, key, value, delete=deleted)
-        if isinstance(proxy, LazyHistoryMap) and namespace == ENTRY_NAMESPACE and key[1] in proxy._dirty_entries:
-            entry = proxy._dirty_entries[key[1]]
+        if isinstance(proxy, (LazyHistoryMap, LazyHistorySet)) and namespace == ENTRY_NAMESPACE and (
+                key[1] in proxy._dirty_entries or key[1] in proxy._cancelled_entries):
+            entry = (proxy._dirty_entries[key[1]] if key[1] in proxy._dirty_entries
+                     else proxy._baseline(key[1]))
             return VersionChange(namespace, key, entry, delete=entry is None,
                 memberships=() if entry is None else (Membership('incarnation', proxy._incarnation, entry[0]),))
         if type(proxy) is LazyOrderedSequence and namespace == NODE_NAMESPACE and owner in proxy._dirty:
@@ -734,6 +821,11 @@ class RecursiveHistoryRuntime:
             try:
                 if not current:
                     session._eager_tracker._drop_memo_if_unowned(obj)
+                    backing = self.backing_for(obj)
+                    if type(backing) is NonreflexiveKeyBacking and backing._new:
+                        backing._input_pending = False
+                        session._backing_dependencies.discard_unpublished_atom(inc)
+                        session._nested_dirty.pop(inc, None)
             finally:
                 if hasattr(current, 'close'):
                     current.close()
@@ -763,6 +855,8 @@ class RecursiveHistoryRuntime:
                 processed.add(proxy._incarnation)
                 for source in self._changes(proxy):
                     owner = source.namespace, source.key
+                    cancelled = (isinstance(proxy, (LazyHistoryMap, LazyHistorySet))
+                                 and source.key[1] in proxy._cancelled_entries)
                     adapter = AUXILIARY_OWNER_FAMILIES[source.namespace]
                     refs = () if source.delete else adapter.reference_placements(source.value)
                     # Earlier scalar-only pages have no physical catalog owner.
@@ -781,6 +875,8 @@ class RecursiveHistoryRuntime:
                             coord.retire_owner(owner)
                             self.release_unowned_memos(removed)
                         coord.dirty_owners.discard(owner)
+                        if isinstance(proxy, (LazyHistoryMap, LazyHistorySet)):
+                            proxy._cancelled_entries.discard(source.key[1])
                         continue
                     if not refs and present is None and source_present is not None and owner not in coord.dirty_owners:
                         continue
@@ -788,14 +884,18 @@ class RecursiveHistoryRuntime:
                     current = {path: inc for path, _, inc in before.values() if inc is not None}
                     for _path, inc in refs:
                         child = session._registry.object_for_incarnation(IncarnationId(session.store.store_identity, inc))
-                        if child is not None and type(child) is not EventIdSet and backing_for(child)._new and inc not in processed:
+                        if child is not None and type(child) is not EventIdSet and self.backing_for(child)._new and inc not in processed:
                             session._register_nested_overlay(child)
-                            pending.append(backing_for(child))
+                            pending.append(self.backing_for(child))
                     if current == dict(refs):
                         # New scalar-only pages also need an empty completeness
                         # witness, before a later edit introduces references.
                         if present is not None or source_present is None:
                             coord.dirty_owners.add(owner)
+                        if cancelled:
+                            proxy._cancelled_entries.discard(source.key[1])
+                            if source_present is not None and not coord._by_owner.get(owner):
+                                coord.dirty_owners.discard(owner)
                         continue
                     placements = []
                     for path, inc in refs:
@@ -804,6 +904,8 @@ class RecursiveHistoryRuntime:
                             ref = adapter.resolve_path(source.value, path)
                             if event_id_reference(ref):
                                 child = self.load_event_id_reference(ref)
+                            elif nonreflexive_key_reference(ref):
+                                child = self.load_nan(ref)
                             elif record_reference(ref):
                                 child = self.load_record(ref)
                             else:
@@ -815,6 +917,10 @@ class RecursiveHistoryRuntime:
                         placements.append((path, child))
                     coord.replace_owner(owner, placements)
                     self.release_unowned_memos(set(current.values()) - {inc for _path, inc in refs})
+                    if cancelled:
+                        proxy._cancelled_entries.discard(source.key[1])
+                        if source_present is not None and not coord._by_owner.get(owner):
+                            coord.dirty_owners.discard(owner)
         finally:
             self._synchronizing = False
 
@@ -840,9 +946,10 @@ class RecursiveHistoryRuntime:
         physical = self.load_owner(owner)
         current = AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(physical.value, path)
         incarnation = session._registry.incarnation_for_object(obj)
-        if (not (reference(current) or record_reference(current) or event_id_reference(current)) or incarnation is None
+        if (not (reference(current) or record_reference(current) or event_id_reference(current) or nonreflexive_key_reference(current)) or incarnation is None
                 or current.incarnation != incarnation.value
-                or (reference(current) and current.kind != history_storage_kind(backing_for(obj)))
+                or (reference(current) and current.kind != history_storage_kind(self.backing_for(obj)))
+                or (nonreflexive_key_reference(current) and type(self.backing_for(obj)) is not NonreflexiveKeyBacking)
                 or (record_reference(current) and record_backing(obj) is None)
                 or (event_id_reference(current) and obj is not session.world.event_ids)
                 or session._registry.object_for_incarnation(incarnation) is not obj):

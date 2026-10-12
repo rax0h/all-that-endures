@@ -6,6 +6,7 @@ Native object identity belongs to LazyIdentityRegistry, not this module.
 from dataclasses import dataclass
 import math
 import struct
+import weakref
 
 from .incremental_store import StoreIntegrityError
 
@@ -58,6 +59,40 @@ def read_nonreflexive_key_header(store, pin, incarnation):
         raise StoreIntegrityError('mandatory native NaN key body is absent') from exc
     checked_nonreflexive_key_header(value)
     return value
+
+
+class NonreflexiveKeyBacking:
+    """Immutable body metadata, owned by the existing conditional identity root."""
+    _kind = 'nan-key'
+
+    def __init__(self, runtime, root, incarnation, header, *, new):
+        session = runtime.session()
+        checked_nonreflexive_key_header(header)
+        self._store, self._pin = session.store, session.pin
+        self._incarnation, self._new = incarnation.value, new
+        self._input_pending = new
+        self._root_ref = weakref.ref(root)
+        self._header = header
+
+    def canonical(self):
+        root = self._root_ref()
+        if root is None:
+            raise StoreIntegrityError('native NaN backing lost its canonical root')
+        return root.value
+
+    def has_pending_overlay(self):
+        return self._new
+
+    def pending_changes(self):
+        from .persistence_lazy_store import VersionChange
+        return ((VersionChange(NAMESPACE, (self._incarnation, 0), self._header),)
+                if self._new else ())
+
+    def accept_save(self, pin):
+        self._pin, self._new = pin, False
+
+    def _clear_cache(self):
+        pass
 
 
 def _key_tree(value, visit_nan, *, canonical):

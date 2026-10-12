@@ -582,6 +582,7 @@ def initial_scalar_changes(incarnation, kind, values, codec, *, checked_types=Fa
 
 
 def checked_scalar_entry(store, pin, incarnation, canonical, *, recursive=False):
+    from .persistence_nonreflexive_keys import stored_immutable_key, storage_equality_key
     owns_snapshot = not getattr(store, '_active_read_transaction', False)
     generation = store._read_snapshot_start(pin) if owns_snapshot else pin.captured_head
     key = store.codec.encode((incarnation, canonical))
@@ -598,8 +599,8 @@ def checked_scalar_entry(store, pin, incarnation, canonical, *, recursive=False)
             return None
         value, schema, *_rest, memberships = store._check_record_row(ENTRY_NAMESPACE, key, row, decode=True)
         if (schema != RECORD_SCHEMA or order is None or type(value) is not tuple or len(value) != 3
-                or type(value[0]) is not int or value[0] < 0 or not immutable_value(value[1])
-                or not (stored_value(value[2]) if recursive else immutable_value(value[2])) or store.codec.encode(equality_key(value[1])) != store.codec.encode(canonical)
+                or type(value[0]) is not int or value[0] < 0 or not (stored_immutable_key(value[1]) if recursive else immutable_value(value[1]))
+                or not (stored_value(value[2]) if recursive else immutable_value(value[2])) or store.codec.encode(storage_equality_key(value[1]) if recursive else equality_key(value[1])) != store.codec.encode(canonical)
                 or memberships != (('incarnation', incarnation, value[0]),)):
             raise StoreIntegrityError('invalid nested scalar entry')
         encoded_incarnation = store.codec.encode(incarnation)
@@ -620,7 +621,7 @@ def checked_scalar_entry(store, pin, incarnation, canonical, *, recursive=False)
 class _HistoryIterator:
     def __init__(self, history, entries, *, reverse=False):
         self._history = history
-        keys = [entry[1] for entry in entries]
+        keys = [history._native_key(entry) for entry in entries]
         self._state = dict.fromkeys(keys) if history._kind == 'map' else set(keys)
         self._iterator = reversed(self._state) if reverse else iter(self._state)
 
@@ -654,7 +655,7 @@ class _ScalarHistory(CleanCacheOwner):
 
     _descriptor = LazyHistoryList._descriptor
 
-    def __init__(self, store, pin, incarnation, *, initial_values=None, cache_budget=None, checked_types=None, recursive=False):
+    def __init__(self, store, pin, incarnation, *, initial_values=None, cache_budget=None, checked_types=None, recursive=False, key_runtime=None):
         if type(incarnation) is not int or incarnation <= 0:
             raise ValueError('invalid nested history incarnation')
         self._store, self._pin, self._incarnation = store, pin, incarnation
@@ -662,9 +663,11 @@ class _ScalarHistory(CleanCacheOwner):
         self._key_validator = self._batch_validator = None
         self._recursive = recursive
         self._recursive_runtime = None
+        self._key_runtime = key_runtime
         self._initialize_cache(cache_budget)
         self._iterators = weakref.WeakSet()
         self._dirty_entries, self._baseline_bytes = {}, {}
+        self._cancelled_entries = set()
         self._entry_loads = self._structure_revision = 0
         self._new = initial_values is not None
         self._member_types = HistoryMemberTypes(store, pin, incarnation, self._kind, new=self._new, required=checked_types)
@@ -708,10 +711,18 @@ class _ScalarHistory(CleanCacheOwner):
         if self._changed is not None:
             self._changed()
 
-    def _canonical(self, key):
-        key = equality_key(key)
+    def _canonical(self, key, *, allocate=False):
+        key = (self._key_runtime.project_key(key, allocate=allocate)
+               if self._key_runtime is not None else equality_key(key))
         self._store.codec.encode(key)
         return key
+
+    def _native_key(self, entry):
+        if self._recursive_runtime is None:
+            return entry[1]
+        from .persistence_nonreflexive_keys import storage_equality_key
+        return self._recursive_runtime.decode(entry[1],
+            (ENTRY_NAMESPACE, (self._incarnation, storage_equality_key(entry[1]))), (('index', 1),))
 
     def _baseline(self, canonical):
         if canonical in self._cache:
@@ -730,7 +741,7 @@ class _ScalarHistory(CleanCacheOwner):
         value = self._dirty_entries[canonical] if canonical in self._dirty_entries else self._baseline(canonical)
         if value is not None and self._key_validator is not None:
             try:
-                self._key_validator(value[1])
+                self._key_validator(self._native_key(value))
             except TypeError as exc:
                 raise StoreIntegrityError('stored history member violates its current owner type') from exc
         return value
@@ -745,14 +756,23 @@ class _ScalarHistory(CleanCacheOwner):
         if encoded == self._baseline_bytes[canonical]:
             self._dirty_entries.pop(canonical, None)
             self._baseline_bytes.pop(canonical, None)
+            if self._recursive_runtime is not None:
+                # Reconcile observed physical placements even when bytes
+                # revert to the exact original entry or an absent baseline.
+                self._cancelled_entries.add(canonical)
         else:
+            self._cancelled_entries.discard(canonical)
             self._dirty_entries[canonical] = entry
         self._drop_clean(canonical)
 
     def _set(self, key, value):
         if self._key_validator is not None:
             self._key_validator(key)
-        canonical = self._canonical(key)
+        if self._recursive_runtime is not None and self._kind == 'map':
+            self._recursive_runtime.validate_native(value)
+        canonical = self._canonical(key, allocate=True)
+        stored_key = (self._key_runtime.project_key(key, allocate=True, canonical=False)
+                      if self._key_runtime is not None else key)
         old = self._entry(canonical)
         if old is not None and self._recursive_runtime is not None:
             self._recursive_runtime.validate_physical_children(
@@ -764,7 +784,7 @@ class _ScalarHistory(CleanCacheOwner):
         self._store.codec.encode(value)
         self._remember_baseline(canonical)
         if old is None:
-            entry = (self._next_ordinal, key, value)
+            entry = (self._next_ordinal, stored_key, value)
             self._next_ordinal += 1
             self._count += 1
             self._member_types.add(key)
@@ -783,13 +803,14 @@ class _ScalarHistory(CleanCacheOwner):
         if self._recursive_runtime is not None:
             self._recursive_runtime.validate_physical_children(
                 (ENTRY_NAMESPACE, (self._incarnation, canonical)), old)
+        native_key = self._native_key(old)
         self._remember_baseline(canonical)
         self._journal(canonical, None)
         self._count -= 1
-        self._member_types.add(old[1], -1)
+        self._member_types.add(native_key, -1)
         self._structure_revision += 1
         for iterator in self._iterators:
-            iterator.removed(old[1])
+            iterator.removed(native_key)
         # Reclaim only unpublished trailing ordinals, including add/remove.
         self._next_ordinal = max((entry[0] + 1 for entry in self._dirty_entries.values() if entry is not None), default=self._base_next)
         self._next_ordinal = max(self._base_next, self._next_ordinal)
@@ -801,7 +822,11 @@ class _ScalarHistory(CleanCacheOwner):
 
     def __contains__(self, key):
         self._ensure()
-        return self._entry(self._canonical(key)) is not None
+        try:
+            canonical = self._canonical(key)
+        except KeyError:
+            return False
+        return self._entry(canonical) is not None
 
     def _ordered_entries(self):
         self._ensure()
@@ -917,7 +942,7 @@ class LazyHistoryMap(_ScalarHistory, MutableMapping):
         entries = self._ordered_entries()
         if not entries:
             raise KeyError('popitem(): dictionary is empty')
-        key = entries[-1][1]
+        key = self._native_key(entries[-1])
         return key, self.pop(key)
 
     def __reversed__(self):
@@ -1171,7 +1196,8 @@ HISTORY_TYPES = tuple(HISTORY_CLASSES.values())
 def has_pending_overlay(history):
     """Inspect unsaved state without loading pages or freezing a sequence."""
     from .persistence_record_runtime import RecordBacking
-    if type(history) is RecordBacking:
+    from .persistence_nonreflexive_keys import NonreflexiveKeyBacking
+    if type(history) in (RecordBacking, NonreflexiveKeyBacking):
         return history.has_pending_overlay()
     if type(history) not in HISTORY_TYPES:
         raise TypeError('expected typed history')

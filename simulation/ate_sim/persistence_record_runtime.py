@@ -24,12 +24,20 @@ def record_backing(value):
     return getattr(bound, '_record_backing', None)
 
 
-def backing_for(value):
+def backing_for(value, registry=None):
+    if registry is not None and type(value) is float:
+        import math
+        if math.isnan(value):
+            backing = registry.nonreflexive_root_for(value).backing
+            if backing is None:
+                raise StoreIntegrityError('native NaN lacks checked backing metadata')
+            return backing
     return record_backing(value) or value
 
 
 def canonical_for(backing):
-    return backing.canonical() if type(backing) is RecordBacking else backing
+    from .persistence_nonreflexive_keys import NonreflexiveKeyBacking
+    return backing.canonical() if type(backing) in (RecordBacking, NonreflexiveKeyBacking) else backing
 
 
 class RecordBacking:

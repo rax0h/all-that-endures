@@ -22,7 +22,7 @@ from .persistence_lazy_nested_history import HISTORY_TYPES, history_storage_kind
 
 NAMESPACE = 'aux.lazy.history.dependencies'
 TAG = 'history-backing-dependencies/v1'
-KINDS = ('list', 'map', 'set', 'sequence', 'record', 'frozen-list', 'frozen-map')
+KINDS = ('list', 'map', 'set', 'sequence', 'record', 'frozen-list', 'frozen-map', 'nan-key')
 
 
 def dependency_value(kind, tokens=()):
@@ -88,21 +88,25 @@ class BackingDependencyPool:
         self._prepared_target = None
         self.closed = False
 
-    def acquire(self, alias):
+    def acquire(self, alias, *, atom_root=None):
         from .persistence_record_runtime import record_backing
+        from .persistence_nonreflexive_keys import NonreflexiveKeyBacking
         backing = record_backing(alias)
-        metadata = alias if backing is None else backing
+        metadata = atom_root.backing if atom_root is not None else alias if backing is None else backing
+        lifetime = atom_root if atom_root is not None else alias
+        atom = (atom_root is not None and atom_root.value is alias
+                and type(metadata) is NonreflexiveKeyBacking)
         if self.closed:
             raise StoreError('backing dependency pool is closed')
         if self._prepared is not None:
             raise StoreConflictError('backing dependencies have a frozen save plan')
-        if ((type(alias) not in HISTORY_TYPES and backing is None)
+        if ((type(alias) not in HISTORY_TYPES and backing is None and not atom)
                 or metadata._store is not self.store or metadata._pin != self.pin):
             raise StoreConflictError('backing dependency has a different publisher lease')
         incarnation, kind = metadata._incarnation, history_storage_kind(metadata)
         previous = self._aliases.get(incarnation)
         if previous is not None:
-            if previous[0]() is not alias or previous[1] != kind:
+            if previous[0]() is not lifetime or previous[1] != kind:
                 raise StoreIntegrityError('backing dependency has a different canonical proxy')
             return
         pool_ref = weakref.ref(self)
@@ -115,12 +119,24 @@ class BackingDependencyPool:
                     if incarnation not in pool._persisted and (
                             pool._prepared_target is None or incarnation not in pool._prepared_target):
                         pool._new.discard(incarnation)
-        self._aliases[incarnation] = weakref.ref(alias, collected), kind
+        self._aliases[incarnation] = weakref.ref(lifetime, collected), kind
         if metadata._new:
             self._new.add(incarnation)
 
     def protected_incarnations(self):
         return tuple(self._aliases)
+
+    def discard_unpublished_atom(self, incarnation):
+        """Cancelled atom D has no on-disk lease or body to preserve."""
+        if self.closed or self._prepared is not None:
+            raise StoreConflictError('cannot cancel a frozen backing dependency')
+        row = self._aliases.get(incarnation)
+        if row is None:
+            return
+        if row[1] != 'nan-key' or incarnation not in self._new or incarnation in self._persisted:
+            raise StoreIntegrityError('atom cancellation requires an unpublished dependency')
+        self._aliases.pop(incarnation)
+        self._new.discard(incarnation)
 
     def check_unpublished_promotion(self, alias):
         """A kind change is allowed only before this backing's first publication."""

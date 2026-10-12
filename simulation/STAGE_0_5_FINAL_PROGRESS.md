@@ -1,5 +1,53 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: native NaN runtime and checked current copies (October 12)
+
+Recovered the interrupted seven-file runtime integration atop local `abfcebb`
+and public `94370b7239d07751123185fc70f66a2ce670c4b8`, exact baseline tree
+`77831a8542879505b737bc0c2688ce8caa01a226`. Preserved the existing registry,
+publisher, physical catalog and receipt/recovery authority.
+
+Recursive scalar admission, lookup and iteration now project native NaN keys
+and values through checked atom references. The conditional native float root
+owns only private backing metadata; canonical values remain exact native floats.
+Direct soul map/set constructors select the same projection. Original member
+representatives, finite numeric equality and distinct/shared NaN identity survive
+save/reopen, cache clearing and materializing detach. Checked current copies
+retain source atom IDs and references under a new destination UUID, fully check
+target backing roles, preserve source bytes and permit independent continuation.
+Frozen snapshot certification checks immutable atom bodies through existing readers.
+
+The recovered edits reproduced 20 failures / 2 controls because the coordinator
+attempted a weak float binding. All 22 original key gates subsequently passed;
+the 12 strict pending markers have been removed. Supplemental REDs exposed
+cancelled new-entry routes, retained unpublished atom roots/dependencies, direct
+soul constructor projection, wrong canonical atom types, frozen certification,
+and value-replacement reversion. Cancellation and reversion now reconcile only
+the touched physical owner even when storage bytes return to baseline. An
+unpublished cancelled atom never publishes a dependency claiming an absent body;
+its held native alias can be reattached under the same incarnation.
+
+H1,000/H10,000 point edit holds both native keys, their map/set aliases and the
+previous provenance alias. This fixes R rather than measuring nondeterministic
+weak-alias release. Reads/writes/bytes and metadata are identical at both sizes:
+137 payload reads / 26,217 bytes; 15 writes / 2,290 bytes; 879 metadata rows;
+maintenance removes 30 rows within the existing ordinary-operation budget.
+No-op saves have zero archive reads/writes and read only the three existing
+world_event_storage metadata records: 217 bytes, 35 metadata rows.
+
+Results and exact source hashes are recorded in
+`stage_0_5_nonreflexive_runtime_validation.json`. The broad affected gate is
+477 passed in 234.73 seconds before the final reversion repair; final exact-source
+coverage is 232 passed in 97.63 seconds on stable production and tests. Counts overlap and must not be added. This is
+component/integration evidence, not a final applicable full-suite or P5 rerun.
+
+The remaining-work inventory now starts with concrete legacy/root and schema
+closure. Knowledge claims and their semantic-key index still grow in eager outer
+authorities; the next bounded step admits them through existing scalar families.
+Capability 6, ordinary complete-format open, integrated P5/final-suite evidence
+and Astra acceptance remain pending. Rank issue 17, gameplay, PR14 and previous
+P5 certification remain unchanged. No new endurance or promotion.
+
 ## Latest checkpoint: checked key-component ownership paths (October12 UTC)
 
 Physical ownership now includes references in scalar-entry keys as well as

@@ -12227,6 +12227,8 @@ class LazyWorldSession:
                       if self._identity_coordinator is not None else value)
             proxy = history_class(self.store, self.pin, incarnation.value, initial_values=values,
                                   cache_budget=self._history_cache_budget,
+                                  **({'key_runtime': self._recursive_histories}
+                                     if self._identity_coordinator is not None and kind in ('map', 'set') else {}),
                                   **({'value_mode': 'native'} if kind == 'sequence' else {}),
                                   **({'recursive': True} if self._identity_coordinator is not None else {}))
             self._registry.bind(proxy, incarnation=incarnation)
@@ -12344,7 +12346,7 @@ class LazyWorldSession:
     def _register_nested_overlay(self, proxy):
         """Admit a canonical same-session child and journal its private edits."""
         from .persistence_record_runtime import backing_for
-        backing = backing_for(proxy)
+        backing = backing_for(proxy, self._registry)
         if backing._store is not self.store:
             raise StoreError('cross-session nested history')
         incarnation = self._registry.incarnation_for_object(proxy)
@@ -12352,7 +12354,10 @@ class LazyWorldSession:
             raise StoreIntegrityError('nested history lacks its current incarnation')
         self._nested_lists[incarnation.value] = backing
         if self._backing_dependencies is not None:
-            self._backing_dependencies.acquire(proxy)
+            from .persistence_nonreflexive_keys import NonreflexiveKeyBacking
+            self._backing_dependencies.acquire(proxy, atom_root=(
+                self._registry.nonreflexive_root_for(proxy)
+                if type(backing) is NonreflexiveKeyBacking else None))
         if history_has_pending_overlay(backing):
             # Reattachment must publish private edits with the owner's header.
             self._nested_dirty[incarnation.value] = backing
