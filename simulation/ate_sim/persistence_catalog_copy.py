@@ -170,8 +170,10 @@ def _restore_copy_ordinals(store, generation, orders, states):
         raise
 
 
-def _copy_with_checked_catalog(source, destination, *, rules_id):
+def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=()):
     """Explicit staging copy, never ordinary-open migration or complete format6."""
+    from .persistence_history_copy_promotion import selection, capture_lists, transform_copy
+    selected = selection(promote_lists)
     source, destination = _preflight_conversion_paths(source, destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     codec = WorldCodec(identity_links_recorded=True)
@@ -203,6 +205,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id):
                         ordinary_changes=ordinary, next_incarnation_id=next_incarnation,
                         generation=pin.captured_head + 1)
                     dependencies = _backing_rosters(store, pin, next_incarnation)
+                    promoted = capture_lists(store, pin, selected)
                     head, metadata = store._checked_head_row(), store.head_metadata()
                     segments = tuple(store.db.execute('SELECT * FROM segments'))
                     all_versions = []
@@ -240,6 +243,13 @@ def _copy_with_checked_catalog(source, destination, *, rules_id):
             token = uuid.uuid4().hex
             pin = target.capture_pin()
             try:
+                if promoted:
+                    (all_versions, all_ordinary, placements, dependencies, orders, states,
+                     versions, ordinary) = transform_copy(target, pin, promoted, all_versions,
+                        all_ordinary, placements, dependencies, orders, states)
+                    _check_reference_targets((v.value for v in (*all_versions, *all_ordinary)), dependencies)
+                    delta = initial_catalog_delta(codec, versions, placements, ordinary_changes=ordinary,
+                        next_incarnation_id=next_incarnation, generation=pin.captured_head + 1)
                 _copy_phase('before_catalog_commit', private)
                 committed = target.commit(pin, commit_token=token,
                     changes=all_ordinary + (RecordChange(EVENT_STORAGE,
@@ -252,6 +262,11 @@ def _copy_with_checked_catalog(source, destination, *, rules_id):
                 _restore_copy_ordinals(target, pin.captured_head, orders, states)
                 target.verify_all()
                 _verify_catalog(target, pin)
+                if promoted:
+                    from .persistence_lazy_sequence import LazyOrderedSequence
+                    for incarnation in promoted:
+                        LazyOrderedSequence(target, pin, incarnation, value_mode='native',
+                            checked_types=True, recursive=True).scrub()
                 generation, identity = target.generation, target.store_identity
                 _copy_phase('after_catalog_validation', private)
             except BaseException:
