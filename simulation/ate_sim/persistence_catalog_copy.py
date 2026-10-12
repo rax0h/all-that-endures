@@ -23,8 +23,11 @@ from .persistence_lazy_identity_catalog import (
     IdentityCatalog, initial_catalog_delta, CATALOG_NAMESPACE, OWNER_NAMESPACE,
     GROUP_NAMESPACE, LINK_NAMESPACE,
 )
-from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE
-from .persistence_lazy_sequence import DESCRIPTOR_NAMESPACE as SEQUENCE_DESCRIPTOR
+from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE, PAGE_NAMESPACE, ENTRY_NAMESPACE
+from .persistence_lazy_sequence import (
+    DESCRIPTOR_NAMESPACE as SEQUENCE_DESCRIPTOR, NODE_NAMESPACE, DIRECTORY_NAMESPACE,
+    NAMESPACES as SEQUENCE_NAMESPACES, LazyOrderedSequence,
+)
 from .persistence_record_headers import NAMESPACE as RECORD_HEADERS
 from .persistence_record_headers import record_reference
 from .persistence_lazy_nested_history import reference
@@ -93,6 +96,65 @@ def _verify_catalog(store, pin):
         if hasattr(checked.occurrences, 'close'):
             checked.occurrences.close()
     verify_type_witnesses(store, pin)
+    from .persistence_history_retirement import NAMESPACE as RETIREMENT, _job
+    for incarnation in store.iter_keys(pin, SEQUENCE_DESCRIPTOR):
+        if store.contains_lazy_key(pin, RETIREMENT, incarnation) and _job(store, pin, incarnation)[4]:
+            # Checked retirement deliberately leaves an unreadable partial tree.
+            continue
+        LazyOrderedSequence(store, pin, incarnation, value_mode='native',
+            checked_types=True, recursive=True).scrub()
+
+
+def _check_backing_graph(codec, versions, dependencies):
+    """Scrub the existing physical ownership relation during explicit full copy.
+
+    The temporary traversal state is discarded before publication. No new
+    persistent dependency graph, registry or ordinary-operation scan is added.
+    """
+    kinds = {change.key: change.value[1] for change in dependencies}
+    expected = {PAGE_NAMESPACE: ('list', 'frozen-list'),
+        ENTRY_NAMESPACE: ('map', 'set', 'frozen-map'),
+        RECORD_HEADERS: ('record',)}
+    expected.update((ns, ('sequence',)) for ns in SEQUENCE_NAMESPACES if ns != SEQUENCE_DESCRIPTOR)
+    edges = {}
+    for change in versions:
+        adapter = AUXILIARY_OWNER_FAMILIES.get(change.namespace)
+        if change.namespace not in expected or change.delete:
+            continue
+        if adapter is not None:
+            adapter.validate_key(change.key)
+        elif (type(change.key) is not tuple or len(change.key) != 2
+                or type(change.key[0]) is not int or change.key[0] <= 0
+                or (type(change.key[1]) is not bytes or len(change.key[1]) > 32
+                    if change.namespace == DIRECTORY_NAMESPACE
+                    else type(change.key[1]) is not int or change.key[1] <= 0)):
+            raise StoreIntegrityError('invalid physical sequence projection key')
+        parent = change.key[0]
+        if kinds.get(parent) not in expected[change.namespace]:
+            raise StoreIntegrityError('physical owner has missing or wrong-kind backing')
+        if adapter is None:
+            continue
+        if change.namespace == NODE_NAMESPACE and type(change.value) is tuple and change.value and change.value[0] == 'branch':
+            continue
+        adapter.validate_source(change, 'lazy', codec)
+        for _path, child in adapter.reference_placements(change.value):
+            edges.setdefault(parent, set()).add(child)
+    colors = {}
+    for root in edges:
+        pending = [(root, False)]
+        while pending:
+            incarnation, finished = pending.pop()
+            if finished:
+                colors[incarnation] = 2
+                continue
+            color = colors.get(incarnation, 0)
+            if color == 2:
+                continue
+            if color == 1:
+                raise StoreIntegrityError('cyclic copy backing ownership relation')
+            colors[incarnation] = 1
+            pending.append((incarnation, True))
+            pending.extend((child, False) for child in edges.get(incarnation, ()))
 
 
 def _check_reference_targets(values, dependencies):
@@ -236,6 +298,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                         for ns, key, payload, schema in store.db.execute('SELECT namespace,typed_key,payload,record_schema FROM records')
                         if ns != LINK_NAMESPACE and (ns, codec.decode(key)) != (EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY))
                     _check_reference_targets((value.value for value in (*all_versions, *all_ordinary)), dependencies)
+                    _check_backing_graph(codec, all_versions, dependencies)
             finally:
                 store.release_pin(pin)
         with LazyRecordStore.create(private, codec=codec, simulation_schema=SCHEMA, rules_id=rules_id) as target:
@@ -248,6 +311,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                      versions, ordinary) = transform_copy(target, pin, promoted, all_versions,
                         all_ordinary, placements, dependencies, orders, states)
                     _check_reference_targets((v.value for v in (*all_versions, *all_ordinary)), dependencies)
+                    _check_backing_graph(codec, all_versions, dependencies)
                     delta = initial_catalog_delta(codec, versions, placements, ordinary_changes=ordinary,
                         next_incarnation_id=next_incarnation, generation=pin.captured_head + 1)
                 _copy_phase('before_catalog_commit', private)
@@ -262,11 +326,6 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                 _restore_copy_ordinals(target, pin.captured_head, orders, states)
                 target.verify_all()
                 _verify_catalog(target, pin)
-                if promoted:
-                    from .persistence_lazy_sequence import LazyOrderedSequence
-                    for incarnation in promoted:
-                        LazyOrderedSequence(target, pin, incarnation, value_mode='native',
-                            checked_types=True, recursive=True).scrub()
                 generation, identity = target.generation, target.store_identity
                 _copy_phase('after_catalog_validation', private)
             except BaseException:
