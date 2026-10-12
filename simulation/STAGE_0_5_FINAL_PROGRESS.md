@@ -1,5 +1,25 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: nonreflexive key RED gates (October12 UTC)
+
+Production remains exactly the Event-ID checkpoint tree. A permanent native
+oracle now covers direct NaN, tuple, frozenset and Ref keys in recursive maps
+and sets. Fresh `--runxfail` exposes **12 failures / 10 passing controls in2.39s**:
+eight distinct probes wrongly match after save; four two-key cases reject save
+with duplicate hybrid backing/owner authority. The default focused run is
+**10 passed / 12 strict xfailed in4.06s**, explicitly not equality acceptance.
+No implementation fix, complete-format activation, full suite or release claim.
+
+Root cause: `_ScalarHistory._canonical` retains native NaN objects in memory,
+but persisted entry addresses encode them as identical codec bytes. Ordinary
+bool/int/float equality passes. Held-key lookup/update/removal after clean cache
+eviction also passes and must remain passing; comparing a newly decoded payload
+key to every probe would break that behavior. A correct extension must retain
+native identity for nested NaN components while respecting the sole registry,
+checked physical owners, finite preflight, publisher and bounded clean lifetime.
+`stage_0_5_nonreflexive_key_diagnosis.json` records source hashes, every exposed
+failure and explicit implementation/validation requirements. Rank is unchanged.
+
 ## Latest checkpoint: typed Event-ID graph references (October12 UTC)
 
 Source local `85a4f09e0c2cbef7ce07145e6cae645bbcebf18c`, public

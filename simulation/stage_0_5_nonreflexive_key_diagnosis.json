@@ -1,0 +1,280 @@
+{
+  "date_utc": "2026-10-12",
+  "checkpoint": "Nonreflexive key diagnosis and acceptance gates; implementation still open",
+  "source_boundary": {
+    "local_head": "7042bc6cf6ab1004ca1821401142b4788853c2c2",
+    "public_head": "39be3f7b1f8f21c4580f3d3d84154e88b00492f6",
+    "tree": "ff713ea422160a8a711e4aa8af8970968976a769",
+    "production_changes": false
+  },
+  "sha256": {
+    "simulation/tests/test_stage_0_5_final_nonreflexive_keys.py": "0769b513851e471564e4eb2b53d9ee0d5c46f46465630b12bbe0c5444f029efa",
+    "simulation/ate_sim/persistence_lazy_nested_history.py": "946ee6ff89045d98bbdc11bb3c01a9eedcadc418fba1368f2c59ed69bfe482f8",
+    "simulation/ate_sim/persistence_adapters.py": "ef61712af2402b4e5cab885eb487d1546147dadde4d9554a3efdebc10ed8d9c9",
+    "simulation/ate_sim/persistence_lazy_identity.py": "c26c62f90c1f05d7d24ae34609b993765a8b4fa5ce45f540a29e6090f90de988"
+  },
+  "gates": [
+    {
+      "scope": "exposed known failures",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "12",
+        "skipped": "0",
+        "tests": "22",
+        "time": "2.383",
+        "timestamp": "2026-10-12T08:44:03.746552+02:00",
+        "hostname": "cb26e2aa50f7"
+      },
+      "cases": [
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-map]",
+          "result": "failure",
+          "detail": "assert nan not in <ate_sim.persistence_lazy_nested_history.LazyHistoryMap object at 0x7f39bfdf9ee0>"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-set]",
+          "result": "failure",
+          "detail": "assert nan not in <ate_sim.persistence_lazy_nested_history.LazyHistorySet object at 0x7f39bfdf9eb0>"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-map]",
+          "result": "failure",
+          "detail": "AssertionError: assert ('key', nan) not in <ate_sim.persistence_lazy_nested_history.LazyHistoryMap object at 0x7f39bfe61d60>"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-set]",
+          "result": "failure",
+          "detail": "AssertionError: assert ('key', nan) not in <ate_sim.persistence_lazy_nested_history.LazyHistorySet object at 0x7f39bfe63470>"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-map]",
+          "result": "failure",
+          "detail": "AssertionError: assert frozenset({nan, 'key'}) not in <ate_sim.persistence_lazy_nested_history.LazyHistoryMap object at 0x7f39bfdf8e00>"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-set]",
+          "result": "failure",
+          "detail": "AssertionError: assert frozenset({nan, 'key'}) not in <ate_sim.persistence_lazy_nested_history.LazyHistorySet object at 0x7f39bfed9850>"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-map]",
+          "result": "failure",
+          "detail": "AssertionError: assert Ref(kind='key', id=nan) not in <ate_sim.persistence_lazy_nested_history.LazyHistoryMap object at 0x7f39bffbeb10>"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-set]",
+          "result": "failure",
+          "detail": "AssertionError: assert Ref(kind='key', id=nan) not in <ate_sim.persistence_lazy_nested_history.LazyHistorySet object at 0x7f39bfd25190>"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-map]",
+          "result": "failure",
+          "detail": "ate_sim.incremental_store.StoreIntegrityError: duplicate hybrid backing or owner authority"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-set]",
+          "result": "failure",
+          "detail": "ate_sim.incremental_store.StoreIntegrityError: duplicate hybrid backing or owner authority"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-map]",
+          "result": "failure",
+          "detail": "ate_sim.incremental_store.StoreIntegrityError: duplicate hybrid backing or owner authority"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-set]",
+          "result": "failure",
+          "detail": "ate_sim.incremental_store.StoreIntegrityError: duplicate hybrid backing or owner authority"
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[set]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-set]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-set]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-set]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-set]",
+          "result": "passed",
+          "detail": null
+        }
+      ]
+    },
+    {
+      "scope": "strict pending markers and controls",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "12",
+        "tests": "22",
+        "time": "4.060",
+        "timestamp": "2026-10-12T08:43:37.318253+02:00",
+        "hostname": "cb26e2aa50f7"
+      },
+      "cases": [
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-map]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[float-set]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-map]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[tuple-set]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-map]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[frozenset-set]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-map]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_distinct_nan_probe_is_absent_after_save[ref-set]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-map]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[float-set]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-map]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_two_distinct_nan_keys_survive_save_and_reopen[tuple-set]",
+          "result": "pending",
+          "detail": "Stage 0.5: encoded scalar keys collapse distinct NaN identities"
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_numeric_equality_representatives_remain_one_key[set]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[float-set]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[tuple-set]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[frozenset-set]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-map]",
+          "result": "passed",
+          "detail": null
+        },
+        {
+          "name": "test_held_nan_key_remains_usable_across_cache_clear[ref-set]",
+          "result": "passed",
+          "detail": null
+        }
+      ]
+    }
+  ],
+  "root_cause": "equality_key retains NaN identity in memory, but codec bytes used as entry authority collapse distinct native NaN objects. Fresh probes falsely match persisted rows; two native keys emit duplicate backing authority.",
+  "acceptance_requirements": [
+    "Distinct direct and recursively nested NaN keys remain distinct.",
+    "Held native keys remain usable after save and clean cache eviction.",
+    "Map order, set equality, numeric bool/int/float representatives and Ref/tuple/frozenset keys remain native.",
+    "Integrate with the existing catalog, registry, allocator and publisher; no shadow live-object registry.",
+    "Account for non-weak-referenceable floats and externally held immutable key components; no archive-sized clean strong retention.",
+    "Validate explicit source copy, portable detach, closed schema, faults and H scaling before ordinary format activation."
+  ],
+  "release_accepted": false,
+  "rank_changed": false,
+  "full_suite_run": false
+}
