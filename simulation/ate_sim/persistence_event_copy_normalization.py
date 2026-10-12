@@ -26,6 +26,8 @@ from .persistence_adapters import (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY,
     PACKED_LIST_KIND, PACKED_LIST_PAYLOAD, META, COLLECTION_LAYOUT)
 from .incremental_store import RecordChange
 
+CURRENCY_ROOTS = ('world.currency.wallets', 'world.currency.treasuries')
+
 
 def capture_bodies(store, pin, dependencies):
     """Explicit full-copy comparison material; never ordinary open/admission."""
@@ -144,6 +146,13 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
             built[inc] = dependency_value(kind)
         return ref
 
+    # These concrete root tables now accept the same checked map headers. Seed
+    # their graphs even without an Event alias; explicit copy closes the whole
+    # currency bucket rather than leaving a resident legacy subtree behind.
+    for change in (*versions, *ordinary):
+        if change.namespace in CURRENCY_ROOTS and not change.delete:
+            value = change.value[1] if isinstance(change, RecordChange) else change.value
+            encode(value, (change.namespace, change.key), ())
     # Source Event envelopes are current ordinary record authority.
     for change in ordinary:
         if change.namespace == 'world.events' and not change.delete:
@@ -160,7 +169,8 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
             encode(source, owner, path)
             cuts[codec.encode(owner)].discard(path)
         if root and inc in selected and not mutable_record(source) and not reference(source):
-            raise StoreFormatError('raw Event alias to concrete family container needs its root adapter')
+            if owner[0] not in CURRENCY_ROOTS or selected[inc].kind != 'map':
+                raise StoreFormatError('raw Event alias to concrete family container needs its root adapter')
         if inc in selected and not (root and mutable_record(source)):
             return encode(source, owner, path)
         if type(source) in (FrozenDict, FrozenList):

@@ -8251,6 +8251,14 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
         super().__init__(session, namespace, clean_limit=clean_limit)
         self._baseline_identity_labels = {}
 
+    def __setitem__(self, key, value):
+        self._ensure_mutation()
+        if type(value) is LazyHistoryMap or (self._session._identity_coordinator is not None and type(value) is dict):
+            # Reject the entire incoming graph/lease before the parent table
+            # detaches the currently visible root or allocates a replacement.
+            self._session._recursive_histories.validate_native(value)
+        super().__setitem__(key, value)
+
     def _baseline_labels(self, key):
         if key not in self._baseline_identity_labels:
             self._baseline_identity_labels[key] = dict(
@@ -8261,6 +8269,8 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
         return dict(self._baseline_identity_labels[key])
 
     def _plain(self, value):
+        if type(value) is LazyHistoryMap:
+            return value.storage_reference()
         def compact(child):
             from .persistence_event_ids import EventIdSet, AUTHORITY_REFERENCE
             if type(child) is EventIdSet and child is self._session.world.event_ids:
@@ -8282,7 +8292,7 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
         return compact(dict(value))
 
     def _valid_plain(self, value):
-        return type(value) is dict
+        return type(value) is dict or (nested_reference(value) and value.kind == 'map')
 
     def _bind_loaded_bucket(self, key, value):
         return self._session._bind_loaded_currency_bucket(
@@ -8413,7 +8423,7 @@ class LazyCurrencyBucketTable(_LazyMaterialContainerTable):
                     self._plain(bucket)
                 )
                 labels = self._session._currency_incarnation_labels(
-                    self._namespace, key, bucket
+                    self._namespace, key, bucket, register_histories=False
                 )
                 self._baseline_identity_labels[key] = labels
                 self._baseline_incarnation[key] = labels.get(())
@@ -13096,7 +13106,7 @@ class LazyWorldSession:
         return Occurrence(namespace, key, tuple(path))
 
     def _currency_incarnation_labels(
-        self, namespace, key, bucket
+        self, namespace, key, bucket, *, register_histories=True
     ):
         owner = (namespace, key)
         owner_path = _owner_path(self.manifest, owner)
@@ -13118,7 +13128,10 @@ class LazyWorldSession:
             )
             incarnation = self._registry.incarnation_for_object(obj)
             if type(obj) in HISTORY_TYPES:
-                incarnation = self._register_nested_overlay(obj)
+                if register_histories:
+                    incarnation = self._register_nested_overlay(obj)
+                elif incarnation is None:
+                    raise StoreIntegrityError('committed currency history lost its canonical incarnation')
             if incarnation is None:
                 try:
                     incarnation = self._registry.bind(obj)
@@ -13163,6 +13176,8 @@ class LazyWorldSession:
     def _bind_assigned_currency_bucket(
         self, table, namespace, key, value
     ):
+        if type(value) is LazyHistoryMap or (self._identity_coordinator is not None and type(value) is dict):
+            return self._bind_history_list(value, self._currency_occurrence(namespace, key), kind='map')
         if isinstance(value, LazyTrackedDict):
             wrapper = value
         else:
@@ -13239,6 +13254,14 @@ class LazyWorldSession:
         top_incarnation = IncarnationId(
             self.store.store_identity, labels[()]
         )
+        if nested_reference(value):
+            if value.kind != 'map' or set(labels) != {()}:
+                raise StoreIntegrityError('currency map reference has wrong kind or extra placements')
+            result = self._bind_history_list(value, self._currency_occurrence(namespace, key), top_incarnation, kind='map')
+            table._baseline_incarnation[key] = top_incarnation.value
+            if hasattr(table, '_baseline_identity_labels'):
+                table._baseline_identity_labels[key] = dict(labels)
+            return result
         live = self._registry.object_for_incarnation(
             top_incarnation
         )
@@ -17153,13 +17176,13 @@ class LazyWorldSession:
             replacements = {}
         for key in table:
             bucket = table[key]
-            if not isinstance(bucket, (dict, LazyTrackedDict)):
+            if not isinstance(bucket, (dict, LazyTrackedDict)) and type(bucket) is not LazyHistoryMap:
                 raise StoreIntegrityError(
                     "lazy detach encountered non-dict currency bucket"
                 )
             replacement = replacements.get(id(bucket))
             if replacement is None:
-                replacement = dict(bucket)
+                replacement = bucket.materialize(replacements) if type(bucket) is LazyHistoryMap else dict(bucket)
                 replacements[id(bucket)] = replacement
             # A paged member list shared with a separate lazy owner becomes
             # one ordinary list during explicit materialization, without
