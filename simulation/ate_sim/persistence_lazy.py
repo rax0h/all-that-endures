@@ -9069,6 +9069,10 @@ class LazySoulTrackedList(_LazySoulBindingMixin, list):
 
 def _plain_advancement_value(value, memo=None):
     """Remove runtime lazy wrappers while preserving the path value graph."""
+    from .persistence_record_runtime import record_backing
+    backing = record_backing(value)
+    if backing is not None:
+        return backing.storage_reference()
     if memo is None:
         memo = {}
     cls = type(value)
@@ -9179,7 +9183,8 @@ class LazyAdvancementPathTable(LazyRecordTable):
             key,
             expected_record_schema=LAZY_ADVANCEMENT_SCHEMA,
         )
-        if not isinstance(checked.value, EssencePath):
+        from .persistence_record_headers import record_reference
+        if not isinstance(checked.value, EssencePath) and not record_reference(checked.value):
             raise StoreFormatError(
                 "lazy advancement payload is not EssencePath"
             )
@@ -9253,6 +9258,8 @@ class LazyAdvancementPathTable(LazyRecordTable):
         )
         if old is path and currently_visible:
             return
+        if self._session._identity_coordinator is not None:
+            self._session._recursive_histories.validate_native(path)
         was_removed = key in self._removed
         if old is not None and old is not path:
             self._session._detach_assigned_advancement_path(key, old)
@@ -11418,6 +11425,14 @@ class LazyWorldSession:
         return tuple(rows)
 
     def _reconcile_advancement_graph(self, key, path):
+        from .persistence_record_runtime import record_backing
+        backing = record_backing(path)
+        if backing is not None:
+            if self._identity_coordinator is None or backing._runtime.session() is not self:
+                raise StoreError('advancement record has a different publisher lease')
+            incarnation = self._register_nested_overlay(path)
+            self._registry.attach_occurrence(path, self._advancement_occurrence(key))
+            return path, {(): incarnation.value}
         path = self._wrap_advancement_value(key, path)
         current = {}
         for relative, obj in self._probe_advancement_occurrences(key, path):
@@ -11440,10 +11455,35 @@ class LazyWorldSession:
         return path, current
 
     def _advancement_incarnation_labels(self, key, path):
+        from .persistence_record_runtime import record_backing
+        backing = record_backing(path)
+        if backing is not None:
+            # Acknowledgement consumes the frozen plan; it must not reacquire
+            # dependencies or discover/admit mutable input at publication.
+            incarnation = self._registry.incarnation_for_object(path)
+            if incarnation is None or incarnation.value != backing._incarnation:
+                raise StoreIntegrityError('compact advancement lost its incarnation')
+            return {(): incarnation.value}
         _path, labels = self._reconcile_advancement_graph(key, path)
         return labels
 
     def _bind_loaded_advancement_path(self, key, path):
+        from .persistence_record_headers import record_reference
+        if record_reference(path):
+            if self._identity_coordinator is None:
+                raise StoreFormatError('compact advancement requires explicitly activated checked authority')
+            labels = dict(self._owner_identity_labels(self.pin, ADVANCEMENT_NAMESPACE, key))
+            if labels != {(): path.incarnation}:
+                raise StoreIntegrityError('compact advancement root has invalid identity labels')
+            result = self._recursive_histories.load_record(path)
+            if type(result) is not EssencePath:
+                raise StoreIntegrityError('compact advancement root is not EssencePath')
+            object.__setattr__(result, '_index_table', weakref.ref(self.advancement_paths))
+            object.__setattr__(result, '_index_key', key)
+            self._registry.attach_occurrence(result, self._advancement_occurrence(key))
+            self.advancement_paths._baseline_identity_labels[key] = labels
+            self.advancement_paths._baseline_incarnation[key] = path.incarnation
+            return result
         labels = dict(
             self._owner_identity_labels(
                 self.pin, ADVANCEMENT_NAMESPACE, key
@@ -11511,10 +11551,19 @@ class LazyWorldSession:
         return path
 
     def _bind_assigned_advancement_path(self, key, path):
+        if self._identity_coordinator is not None:
+            self._recursive_histories.admit(path)
+            object.__setattr__(path, '_index_table', weakref.ref(self.advancement_paths))
+            object.__setattr__(path, '_index_key', key)
         path, _labels = self._reconcile_advancement_graph(key, path)
         return path
 
     def _detach_advancement_runtime_bindings(self, key, path):
+        from .persistence_record_runtime import record_backing
+        if record_backing(path) is not None:
+            self._registry.detach_occurrence(self._advancement_occurrence(key))
+            object.__setattr__(path, '_index_table', None)
+            return
         for relative, obj in self._probe_advancement_occurrences(key, path):
             occurrence = self._advancement_occurrence(key, relative)
             incarnation = self._registry.incarnation_for_object(obj)
@@ -16876,6 +16925,7 @@ class LazyWorldSession:
         if ident in replacements:
             memo[ident] = replacements[ident]
             return replacements[ident]
+        history_kind = history_storage_kind(value) if type(value) in HISTORY_TYPES else None
 
         if is_dataclass(value):
             memo[ident] = value
@@ -16894,25 +16944,25 @@ class LazyWorldSession:
                     assignments.append((value, name, replacement))
             return value
 
-        if isinstance(value, dict):
-            plain = {}
+        if isinstance(value, dict) or history_kind in ('map', 'frozen-map'):
+            plain = FrozenDict() if history_kind == 'frozen-map' else {}
             memo[ident] = plain
             replacements[ident] = plain
             for key, child in value.items():
-                plain[key] = self._stage_plain_advancement_value(
+                dict.__setitem__(plain, key, self._stage_plain_advancement_value(
                     child,
                     replacements,
                     assignments,
                     records,
                     memo,
-                )
+                ))
             return plain
 
-        if isinstance(value, list):
-            plain = []
+        if isinstance(value, list) or history_kind in ('list', 'sequence', 'frozen-list'):
+            plain = FrozenList() if history_kind == 'frozen-list' else []
             memo[ident] = plain
             replacements[ident] = plain
-            plain.extend(
+            list.extend(plain, (
                 self._stage_plain_advancement_value(
                     child,
                     replacements,
@@ -16921,11 +16971,11 @@ class LazyWorldSession:
                     memo,
                 )
                 for child in value
-            )
+            ))
             return plain
 
         from .persistence_event_ids import EventIdSet
-        if isinstance(value, (set, EventIdSet)):
+        if isinstance(value, (set, EventIdSet)) or history_kind == 'set':
             plain = set(value)
             memo[ident] = plain
             replacements[ident] = plain
@@ -16969,10 +17019,14 @@ class LazyWorldSession:
                 memo,
             )
             if staged is not path:
-                raise StoreIntegrityError(
-                    "advancement detach replaced top-level path identity"
-                )
-            detached[key] = path
+                from .persistence_record_runtime import record_backing
+                if record_backing(path) is None or type(staged) is not EssencePath:
+                    raise StoreIntegrityError(
+                        "advancement detach replaced top-level path identity"
+                    )
+                # An earlier family already materialized this canonical body.
+                # Reuse its shared memo result throughout the portable World.
+            detached[key] = staged
         if len(detached) != expected:
             raise StoreIntegrityError(
                 "lazy detach advancement path count mismatch"

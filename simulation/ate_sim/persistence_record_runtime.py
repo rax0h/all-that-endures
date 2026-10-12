@@ -177,6 +177,7 @@ class RecordBinding:
             fields[RECORD_FIELDS[type(obj)].index(name)] = token[2]
         backing._header = record_header(obj, values=tuple(fields))
         backing.changed()
+        backing._runtime.invalidate_advancement_ancestors(obj)
         session = backing._runtime.session()
         for table, key in session._shared_object_routes(obj):
             table.changed(key)

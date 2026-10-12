@@ -50,7 +50,7 @@ def capture_bodies(store, pin, dependencies):
 
 
 def normalize_events(target, pin, versions, ordinary, placements, dependencies,
-                     orders, states, next_incarnation, captured):
+                     orders, states, next_incarnation, captured, *, normalize_advancement=False):
     codec = target.codec
     bodies, frozen = captured
     known = {d.key: d.value[1] for d in dependencies}
@@ -176,6 +176,12 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
         if change.namespace in CURRENCY_ROOTS and not change.delete:
             value = change.value[1] if isinstance(change, RecordChange) else change.value
             encode(value, (change.namespace, change.key), ())
+        if normalize_advancement and change.namespace == 'world.advancement.paths' and not change.delete:
+            from .advancement import EssencePath
+            value = change.value[1] if isinstance(change, RecordChange) else change.value
+            if type(value) is not EssencePath:
+                raise StoreIntegrityError('advancement normalization requires a captured native EssencePath')
+            encode(value, (change.namespace, change.key), ())
     # Source Event envelopes are current ordinary record authority.
     for change in ordinary:
         if change.namespace == 'world.events' and not change.delete:
@@ -189,6 +195,8 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
             return source  # Preserve the one real compact value authority.
         if type(source) is tuple and source == AUTHORITY_REFERENCE and inc == facade_inc:
             return source  # Existing concrete family adapters keep compatibility markers.
+        if root and normalize_advancement and owner[0] == 'world.advancement.paths':
+            return encode(source, owner, path)
         if root and inc in selected and mutable_record(source):
             # Concrete native family records remain physical bodies. Validate
             # their fields against the recursively backed alias before publish,

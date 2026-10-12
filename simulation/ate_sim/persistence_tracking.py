@@ -2505,7 +2505,9 @@ class IncrementalWorldSession:
         self._changed_member_work = 0
 
     def _clear_bindings(self, *, detached=False):
-        for ident in self._bound_ids:
+        # Closing a parent can collect pending children; their weak callbacks
+        # remove IDs from this same set during teardown.
+        for ident in tuple(self._bound_ids):
             bound = _BINDINGS.get(ident)
             if bound is not None and bound.session is self:
                 if hasattr(bound, '_record_backing'):

@@ -465,6 +465,37 @@ class RecursiveHistoryRuntime:
                 if hasattr(placements, 'close'):
                     placements.close()
 
+    def invalidate_advancement_ancestors(self, value):
+        """Invalidate cached ranks through the existing physical placement relation.
+
+        Only an active, populated rank scope needs this work. Related parents
+        are followed without loading clean child payloads or another owner map.
+        """
+        session = self.session()
+        state = session.world.advancement
+        if not state.__dict__.get('_rank_cache'):
+            return
+        incarnation = session._registry.incarnation_for_object(value)
+        if incarnation is None:
+            return
+        coord = session._identity_coordinator
+        pending, checked = deque((incarnation.value,)), set()
+        while pending:
+            current = pending.popleft()
+            if current in checked:
+                continue
+            checked.add(current)
+            placements = coord._current_placements(coord.discover_group(current))
+            try:
+                for namespace, key, _path in placements:
+                    if namespace == 'world.advancement.paths':
+                        state._invalidate_rank(key)
+                    elif namespace in AUXILIARY_OWNER_FAMILIES:
+                        pending.append(key[0])
+            finally:
+                if hasattr(placements, 'close'):
+                    placements.close()
+
     def load_record(self, value):
         session = self.session()
         incarnation = IncarnationId(session.store.store_identity, value.incarnation)
@@ -492,6 +523,16 @@ class RecursiveHistoryRuntime:
                     if namespace not in FAMILIES or (path and not packed):
                         continue
                     table = session._family_bindings.tables.get(namespace)
+                    if namespace == 'world.advancement.paths':
+                        # A compact family root borrows this same checked body.
+                        # Loading its table here would recursively request it.
+                        root = session.store.read_version(session.pin, namespace, key,
+                            expected_record_schema=1).value
+                        if record_reference(root):
+                            from .advancement import EssencePath
+                            if root != value or type(restore_record_header(header)) is not EssencePath:
+                                raise StoreIntegrityError('compact advancement root has a different record body')
+                            continue
                     if packed:
                         candidate = session.world.agency.actions[path[0][1]]
                     else:
@@ -579,6 +620,7 @@ class RecursiveHistoryRuntime:
         def changed():
             self.retain_pending_children(proxy)
             session._shared_object_routes(proxy)
+            self.invalidate_advancement_ancestors(proxy)
             incarnation = session._registry.incarnation_for_object(proxy)
             coord = session._identity_coordinator
             placements = coord._current_placements(coord.discover_group(incarnation))

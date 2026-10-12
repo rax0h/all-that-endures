@@ -54,6 +54,10 @@ def copy_native_input(value, *, publisher=None):
                 check_tracker(tracker)
         if cls not in (*dictionaries, *lists, *sets, *HISTORY_TYPES, tuple) and cls not in RECORD_FIELDS:
             raise TypeError('native copy input has an undeclared source class')
+        # One explicit copy memo retains source bodies through page eviction.
+        # Weak canonical children must not reload or recycle their Python IDs
+        # while later aliases are still being visited. This dies with the copy.
+        memo.setdefault(('copy-source', ident), source)
         # Read existing backing leases, never fire mutation/index callbacks.
         backing = record_backing(source) if cls in RECORD_FIELDS else None
         if backing is not None:

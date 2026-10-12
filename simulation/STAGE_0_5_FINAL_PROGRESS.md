@@ -1,5 +1,62 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: compact advancement roots and imported mutable topology (October 12)
+
+Parent local `649d79008dca4699c8a641a18736a6011c9ffbef`, public
+`d872639e76a405db64c805db70b4079652ce0ab6`, matching tree
+`2f24cc55e4525931784556252e18c4cbe9986637`.
+
+Explicit `_copy_with_checked_catalog(normalize_advancement=True)` now uses the
+existing graph-normalization pass to store each EssencePath root as one checked
+RecordReference. AbilityProgress, ResponseModel, Understanding and all mutable
+collections use the existing recursive record/history backings. Existing source
+incarnations and values survive; oversized imports are preserved in full. The
+pass also retains its accepted Event/currency normalization and packed actions.
+This is an optional private source-preserving copy, not ordinary migration or
+capability6 activation. Genuine earlier advancement roots keep their reader.
+
+The runtime now loads, edits, replaces, deletes and reinserts compact roots through
+one registry/catalog/publisher. Root acknowledgement consumes the frozen plan
+without reacquiring dependencies. Before replacement, incoming graph preflight
+rejects invalid/foreign values without detaching the original owner. Nested edits
+invalidate an active rank cache through related physical ancestor placements;
+rank formulas and issue17 are untouched. Shared ability/model identity survives
+before/after-commit faults, checked current copy and independent continuation.
+
+Full detach stages recursive collections with the existing sharing memo and
+reuses a root already cloned by another family. A RED cross-family wallet/skill/
+advancement case caught clean source children collecting during traversal: a
+later alias could reload a different Python body or encounter a recycled ID.
+Explicit materialization and native input copy now hold sources in that same
+operation-local memo until completion. No persistent authority or ordinary scan
+was added. Teardown snapshots the live binding IDs because closing a parent can
+collect children and invoke weak callbacks against that set.
+
+Validation: **290 passed in 55.21s** affected; **51 passed in 15.56s** schema/key
+gates; final native-copy/advancement **38 passed in 9.53s** after the last copy-only
+repair. Fixed-work scaling **1 passed in 167.95s**, including O(H) fixture copies.
+Counts overlap; exact cases, hashes and source boundaries are recorded in
+`stage_0_5_advancement_graph_validation.json`.
+
+| Scalar path edit, two sharing placements | H1,000 | H10,000 |
+|---|---:|---:|
+| Payload reads | 96 | 96 |
+| Payload read bytes | 16,626 | 16,679 |
+| Payload writes | 7 | 7 |
+| Payload write bytes | 1,023 | 1,025 |
+| Metadata rows | 671 | 671 |
+| Ability/sample pages loaded | 0 | 0 |
+| Maintenance rows removed | 8 | 8 |
+
+The 53-byte read/two-byte write difference is bounded header digit width. This
+closes the prior imported-sample scaling counterexample in the explicitly checked
+lane; genuine legacy resident costs remain disclosed. Immutable imported tuple/
+scalar sizes, unsupported raw legacy descendant shapes and the complete root/
+reader-floor contract remain separate inventory gates. Next: finish those source
+normalization boundaries before capability6/open/upgrade activation, then integrated
+P5, final stable-source suite and independent architecture review. No new endurance,
+PR14 promotion, gameplay work or force push.
+
 ## Latest checkpoint: point-backed knowledge archives and byte-audit counterexample (October 12)
 
 Parent local `3f088d44b47c31dbe0c08197a46bc5bd584a48c0`, public

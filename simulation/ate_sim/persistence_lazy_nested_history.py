@@ -75,6 +75,13 @@ def materialize_history_value(value, memo):
             memo[id(value)] = set(value)
         return memo[id(value)]
     from .persistence_record_runtime import mutable_record, record_backing
+    if ((mutable_record(value) and record_backing(value) is not None)
+            or type(value) in HISTORY_TYPES or type(value) is tuple):
+        # This explicit full traversal may evict clean parent pages while
+        # visiting siblings. Keep sources alive for its one sharing memo so
+        # weak canonical bodies cannot be reloaded, or their IDs recycled.
+        # The memo (and these roots) is discarded when detach/copy completes.
+        memo.setdefault(('materialize-source', id(value)), value)
     if mutable_record(value) and record_backing(value) is not None:
         from .persistence_schema import RECORD_FIELDS
         if id(value) not in memo:
