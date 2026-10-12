@@ -38,5 +38,18 @@ and prove old-pin point reads at H1,000/H10,000. This registration does not sele
 recursive key admission; runtime/copy projection and alias-preserving restoration
 remain the next integration step.
 
+Key projection now has separate canonical-address and original-representative
+modes. Finite native-key validation and hashing precede any NaN resolver call.
+Stored keys admit only the closed immutable schema plus checked NaN references;
+raw stored NaNs are rejected. Restoration uses the existing registry callback,
+not a new memo or lookup table. Next wire these helpers into scalar-history
+admission/lookup and checked entry validation, including references in map keys.
+Physical paths must cover Ref fields and frozenset components as well as tuples.
+Private atom metadata must borrow the existing registry/publisher and retain D
+through acknowledgement; float roots must not become registered backing objects.
+Keep the explicit copy guard until full target verification and source mapping
+support these references. Preserve native value/key NaN sharing, not merely
+unique per-entry tokens. Complete source-copy and detach gates before activation.
+
 Rank, gameplay, PR14 and prior P5 certification remain unchanged. Run the final
 applicable suite and independent review only after the complete .5 source is stable.

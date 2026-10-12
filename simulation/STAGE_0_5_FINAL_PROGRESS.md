@@ -1,5 +1,37 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: exact native key projection primitives (October12 UTC)
+
+The interrupted prior save was verified live at public
+`6e7c23e50b412ea55cbf8d2d30b08b02fecc9dc3`, exactly matching local
+`e1755657cedf6cda309bb67340142ba307f50944`, tree
+`8405303dc5802ac9e4749fb2f8e4ca909fa630a5`.
+
+Closed projection now handles direct, tuple, frozenset, Ref and deeply nested
+NaN key components via the existing registry callback. Canonical-address mode
+preserves native bool/int/integral-float, negative-zero and Layer/string equality;
+payload mode retains original representatives for native restoration. Shared
+components receive one incarnation, distinct NaNs have different encoded
+addresses, and restored held components remain usable after original key release.
+Finite closed-key validation and hashing precede allocation callbacks. Lookup-only
+projection can report an unknown NaN without allocating. Stored-key validation
+rejects raw NaNs, undeclared objects and forged references. No new authority or
+object registry is introduced.
+
+Original **28 RED failures** preceded implementation. Initial projection/header/
+registry **76 passed in0.73s** precedes only two supplemental projection cases.
+Final focused plus Event-ID/copy/equality boundary **123 passed / 12 strict xfailed
+in8.33s** matches final production and tests. Counts overlap. Cases/source hashes:
+`stage_0_5_nonreflexive_projection_validation.json`. `git diff --check` passed.
+
+This is the projection integration foundation, not the live scalar-history fix.
+All 12 persisted-key NaN failures remain explicitly pending. Next wire canonical
+key/payload projection and restoration into entry admission/reads; extend checked
+physical paths to key/Ref/frozenset components; integrate immutable atom metadata
+and D acknowledgement with the existing publisher; finish source-copy/detach
+mapping before removing the copy guard. Whole Stage0.5 and capability6 remain
+open. Rank, PR14, gameplay, prior P5 and final-suite status are unchanged.
+
 ## Latest checkpoint: checked native NaN backing primitives (October12 UTC)
 
 Closed `NonreflexiveKeyReference` has a positive exact-ID codec tag. An eight-byte
