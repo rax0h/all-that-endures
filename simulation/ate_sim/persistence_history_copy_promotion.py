@@ -96,12 +96,17 @@ def transform_copy(target, pin, captured, versions, ordinary, placements, depend
             for path, child in AUXILIARY_OWNER_FAMILIES[NODE_NAMESPACE].reference_placements(change.value):
                 placements.append(IdentityOccurrenceChange(NODE_NAMESPACE, change.key, path, child))
     dependencies = tuple(replace(v, value=dependency_value('sequence')) if v.key in selected else v for v in dependencies)
+    return reconcile_copy(target.codec, versions, ordinary, tuple(placements), dependencies, orders, states)
+
+
+def reconcile_copy(codec, versions, ordinary, placements, dependencies, orders, states):
+    """Reconcile explicit copied authority, using captured order high water."""
     # Rebuild catalog input from actual resulting physical authority.
     owners = [v for v in versions if not v.delete and v.namespace in IDENTITY_OWNER_FAMILIES
               and not (v.namespace == NODE_NAMESPACE and v.value[0] == 'branch')]
     eager = tuple(v for v in ordinary if v.namespace in IDENTITY_OWNER_FAMILIES)
     # Retain surviving order positions; new rows start at the source high water.
-    final = {(v.namespace, target.codec.encode(v.key)) for v in versions if not v.delete}
+    final = {(v.namespace, codec.encode(v.key)) for v in versions if not v.delete}
     source_orders = {(ns, key): ordinal for ns, key, ordinal in orders}
     counts = Counter(ns for ns, _key in final)
     highs = {ns: high for ns, _count, high in states}

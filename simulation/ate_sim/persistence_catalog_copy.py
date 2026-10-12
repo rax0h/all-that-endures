@@ -257,10 +257,13 @@ def _restore_copy_ordinals(store, generation, orders, states):
         raise
 
 
-def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=()):
+def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(), normalize_events=False):
     """Explicit staging copy, never ordinary-open migration or complete format6."""
     from .persistence_history_copy_promotion import selection, capture_lists, transform_copy
+    from .persistence_event_copy_normalization import capture_bodies, normalize_events as normalize_event_graph
     selected = selection(promote_lists)
+    if type(normalize_events) is not bool:
+        raise TypeError('normalize_events must be bool')
     source, destination = _preflight_conversion_paths(source, destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     codec = WorldCodec(identity_links_recorded=True)
@@ -293,6 +296,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                         generation=pin.captured_head + 1)
                     dependencies = _backing_rosters(store, pin, next_incarnation)
                     promoted = capture_lists(store, pin, selected)
+                    captured_bodies = capture_bodies(store, pin, dependencies) if normalize_events else None
                     head, metadata = store._checked_head_row(), store.head_metadata()
                     segments = tuple(store.db.execute('SELECT * FROM segments'))
                     all_versions = []
@@ -331,10 +335,16 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
             token = uuid.uuid4().hex
             pin = target.capture_pin()
             try:
+                if normalize_events:
+                    (all_versions, all_ordinary, placements, dependencies, orders, states,
+                     versions, ordinary, next_incarnation) = normalize_event_graph(target, pin,
+                        all_versions, all_ordinary, placements, dependencies, orders, states,
+                        next_incarnation, captured_bodies)
                 if promoted:
                     (all_versions, all_ordinary, placements, dependencies, orders, states,
                      versions, ordinary) = transform_copy(target, pin, promoted, all_versions,
                         all_ordinary, placements, dependencies, orders, states)
+                if promoted or normalize_events:
                     _check_reference_targets((v.value for v in (*all_versions, *all_ordinary)), dependencies)
                     _check_backing_graph(codec, all_versions, dependencies)
                     delta = initial_catalog_delta(codec, versions, placements, ordinary_changes=ordinary,

@@ -405,25 +405,31 @@ class RecursiveHistoryRuntime:
         from .persistence_schema import RECORD_FIELDS
         header = read_record_header(session.store, session.pin, value.incarnation)
         if current is None:
-            from .core import Event
-            if type(restore_record_header(header)) is Event:
-                # Only checked related mutable-log root occurrences are read.
-                # The resident Event predates recursive access and must become
-                # the sole canonical body, not another equal decoded copy.
-                coord = session._identity_coordinator
-                placements = coord._current_placements(coord.discover_group(value.incarnation, read_only=True))
-                try:
-                    for namespace, key, path in placements:
-                        if namespace == 'world.events' and not path:
-                            candidate = session._eager_tracker._owner_value((namespace, key))
-                            if type(candidate) is not Event:
-                                raise StoreIntegrityError('record Event placement lacks its mutable log body')
-                            if current is not None and current is not candidate:
-                                raise StoreIntegrityError('record Event has distinct resident log bodies')
-                            current = candidate
-                finally:
-                    if hasattr(placements, 'close'):
-                        placements.close()
+            from .persistence_lazy_families import FAMILIES
+            from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY
+            # Only related checked family record roots are read. Reuse their
+            # native body before recursive access creates another decoded copy.
+            coord = session._identity_coordinator
+            placements = coord._current_placements(coord.discover_group(value.incarnation, read_only=True))
+            try:
+                for namespace, key, path in placements:
+                    packed = (namespace == AGENCY_ACTIONS_NAMESPACE and key == PACKED_LIST_KEY
+                        and len(path) == 1 and path[0][0] == 'index')
+                    if namespace not in FAMILIES or (path and not packed):
+                        continue
+                    table = session._family_bindings.tables.get(namespace)
+                    if packed:
+                        candidate = session.world.agency.actions[path[0][1]]
+                    else:
+                        candidate = (table[key] if table is not None else session._eager_tracker._owner_value((namespace, key)))
+                    if candidate is None or not mutable_record(candidate) or type(candidate) is not type(restore_record_header(header)):
+                        raise StoreIntegrityError('record placement lacks its matching native family body')
+                    if current is not None and current is not candidate:
+                        raise StoreIntegrityError('record has distinct native family bodies')
+                    current = candidate
+            finally:
+                if hasattr(placements, 'close'):
+                    placements.close()
         result = restore_record_header(header) if current is None else current
         if current is not None:
             if not mutable_record(current) or type(current) is not type(restore_record_header(header)):
