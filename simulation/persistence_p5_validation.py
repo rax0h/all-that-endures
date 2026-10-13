@@ -131,7 +131,9 @@ def _run_unbound(seed, years):
     return world
 
 
-def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id, paged_households=False, counted_households=False, native_graph_buckets=False):
+def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id, paged_households=False, counted_households=False, native_graph_buckets=False, complete_format=False):
+    if complete_format:
+        native_graph_buckets = True
     if counted_households or native_graph_buckets:
         paged_households = False
     total_years = pre_years + continuation_years
@@ -174,6 +176,13 @@ def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id, pa
     if cold_source.digest() != pre_digest:
         raise AssertionError("cold bootstrap mutated its source World")
     conversion_result = convert_cold_to_lazy(cold, lazy, rules_id=rules_id, paged_household_members=paged_households, counted_households=counted_households, native_graph_buckets=native_graph_buckets)
+    if complete_format:
+        from ate_sim.persistence_complete_format import upgrade_lazy_snapshot
+        complete_path = workdir / 'p5-complete.sqlite'
+        if complete_path.exists():
+            complete_path.unlink()
+        conversion_result = upgrade_lazy_snapshot(lazy, complete_path, rules_id=rules_id)
+        lazy = complete_path
     timings["fixture_creation_seconds"] = time.perf_counter() - started
 
     with open_lazy_world_session(lazy, rules_id=rules_id, paged_household_members=paged_households) as session:
@@ -243,6 +252,7 @@ def run(seed, pre_years, continuation_years, reopen_years, workdir, rules_id, pa
         "final_year": final_years,
         "checkpoint_schema": checkpoint.CHECKPOINT_SCHEMA,
         "rules_id": rules_id,
+        "complete_format": complete_format,
         "control_total_digest": control_total["digest"],
         "control_final_digest": control_final["digest"],
         "events_total": len(control_final["events"]),
@@ -286,6 +296,7 @@ def main():
     parser.add_argument("--paged-households", action="store_true")
     parser.add_argument("--counted-households", action="store_true")
     parser.add_argument("--native-graph-buckets", action="store_true")
+    parser.add_argument("--complete-format", action="store_true")
     args = parser.parse_args()
 
     if min(args.pre_years, args.continuation_years, args.reopen_years) < 0:
@@ -302,6 +313,7 @@ def main():
             paged_households=args.paged_households,
             counted_households=args.counted_households,
             native_graph_buckets=args.native_graph_buckets,
+            complete_format=args.complete_format,
         )
     else:
         with tempfile.TemporaryDirectory(prefix="ate-p5-") as directory:
@@ -315,6 +327,7 @@ def main():
                 paged_households=args.paged_households,
                 counted_households=args.counted_households,
                 native_graph_buckets=args.native_graph_buckets,
+                complete_format=args.complete_format,
             )
 
     rendered = json.dumps(summary, indent=2, sort_keys=True)

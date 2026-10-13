@@ -3420,6 +3420,12 @@ class ScalarRecordSavePlan:
 class LazyRecordTable(RecordTable):
     """RecordTable-compatible lazy people authority with a bounded clean cache."""
 
+    def __setattr__(self,name,value):
+        if name in ('_dirty','_removed','_new_keys','_reinserted') and type(value) is set:
+            from .persistence_lazy_world_identity import OwnerKeyJournal
+            value=OwnerKeyJournal(self,value)
+        object.__setattr__(self,name,value)
+
     def preflight_value(self, key, field, value):
         self._ensure_mutation()
         self._session._preflight_history_owner(value,
@@ -10476,7 +10482,8 @@ class LazyWorldSession:
         object.__setattr__(world.skills, "skills", self.skills)
 
         self._nested_lists = weakref.WeakValueDictionary()
-        self._nested_dirty = {}
+        from .persistence_history_runtime import DirtyBackingJournal
+        self._nested_dirty = DirtyBackingJournal(self)
         self._eager_nested_labels = {}
         self._scalar_tables = {}
         for namespace in _scalar_authorities(store, manifest, pin.captured_head):
@@ -10960,6 +10967,9 @@ class LazyWorldSession:
         self._identity_coordinator = bridge.coordinator
         self._eager_tracker._checked_identity_coordinator = bridge.coordinator
         self._backing_dependencies = dependencies
+        from .persistence_lazy_world_identity import EagerOwnerJournal
+        self._eager_tracker._dirty=EagerOwnerJournal(bridge,self._eager_tracker._dirty)
+        self._eager_tracker._deleted=EagerOwnerJournal(bridge,self._eager_tracker._deleted)
         self._prepare_event_id_facade(self.world.event_ids)
         from .persistence_adapters import PACKED_LIST_KIND
         if self._eager_tracker._manifest['collections'][AGENCY_ACTIONS_NAMESPACE][0] == PACKED_LIST_KIND:
@@ -12395,17 +12405,21 @@ class LazyWorldSession:
 
     def _prepare_counted_record_child(self, record, field, value=None, owners=None):
         """Normalize counted eager Settlement fields at assignment, before exposure."""
-        selected = isinstance(record, Settlement) and field == 'households'
+        from .culture import Institution as CulturalInstitution
+        cultural = self._identity_coordinator is not None and type(record) is CulturalInstitution and field == 'practices'
+        selected = isinstance(record, Settlement) and (field == 'households' or
+            (field == 'memory' and self._identity_coordinator is not None)) or cultural
         if owners is None:
             return selected
         if not selected:
             raise StoreIntegrityError('unsupported counted record child')
         result = value
         for namespace, key in owners:
-            if namespace != 'world.settlements':
+            if namespace != ('world.culture.institutions' if cultural else 'world.settlements'):
                 continue
             result = self._bind_history_list(result,
-                Occurrence(namespace, key, (("field", field),)), kind='sequence')
+                Occurrence(namespace, key, (("field", field),)),
+                kind='set' if cultural else 'sequence' if field == 'households' else 'map')
         return result
 
     def _register_nested_overlay(self, proxy):
@@ -18033,7 +18047,9 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
                     "cold commit generation disagrees with lazy head"
                 )
             scalar_namespaces = _scalar_authorities(store, manifest, head.generation)
-            links = _read_current_identity_links(store)
+            from .persistence_complete_format import check_open
+            checked_identity_count = check_open(store, pin, head, manifest)
+            links = () if checked_identity_count is not None else _read_current_identity_links(store)
             baseline_ordinals = _capture_cold_baseline_ordinals(
                 store,
                 manifest,
@@ -18076,6 +18092,8 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
                     "prefix": prefix_descriptor,
                     "tail": tail_descriptor,
                 },
+                **({'checked_identity_count': checked_identity_count}
+                   if checked_identity_count is not None else {}),
             )
 
             description = manifest["collections"]["world.events"]
@@ -18212,6 +18230,8 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
                 commit_descriptor=commit_descriptor,
                 paged_household_members=paged_household_members,
             )
+            if checked_identity_count is not None:
+                session._activate_checked_identity_catalog()
             if paged_household_members:
                 if session._deferred_household_cross_links:
                     session._cross_boundary_links += (

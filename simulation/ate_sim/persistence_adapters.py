@@ -774,7 +774,10 @@ def _read_cold_manifest(store):
     cold_keys = {
         'schema', 'collections', 'identity_storage', 'event_storage'
     }
-    if keys != cold_keys:
+    from .persistence_complete_format import selected
+    floor = int(store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
+    complete = selected(manifest, floor)
+    if not complete and keys != cold_keys:
         legacy_current = {
             'schema', 'collections', 'identity_storage'
         }
@@ -784,7 +787,7 @@ def _read_cold_manifest(store):
                 'cold capture requires conversion to sealed-prefix-tail/v1'
             )
         raise StoreFormatError('mixed/unsupported cold World manifest')
-    if manifest['identity_storage'] != IDENTITY_STORAGE_CURRENT:
+    if not complete and manifest['identity_storage'] != IDENTITY_STORAGE_CURRENT:
         raise StoreFormatError('unknown identity storage mode')
     if manifest['event_storage'] != 'sealed-prefix-tail/v1':
         raise StoreFormatError('unknown cold event storage mode')

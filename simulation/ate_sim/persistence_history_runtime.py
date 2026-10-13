@@ -45,6 +45,18 @@ class PhysicalHistoryOwner:
     value: tuple
 
 
+class DirtyBackingJournal(dict):
+    """The existing pending values also notify unsynchronized backing IDs."""
+    def __init__(self,session):
+        super().__init__();self._session_ref=weakref.ref(session)
+
+    def __setitem__(self,incarnation,backing):
+        super().__setitem__(incarnation,backing)
+        session=self._session_ref()
+        runtime=getattr(session,'_recursive_histories',None) if session is not None else None
+        if runtime is not None:runtime._pending_backings.add(incarnation)
+
+
 class RecursiveHistoryRuntime:
     def __init__(self, session):
         self._session_ref = weakref.ref(session)
@@ -55,6 +67,8 @@ class RecursiveHistoryRuntime:
         self._source_queue = deque()
         self._source_release_checks = 0
         self._new_nan_incarnations = []
+        self._pending_backings=set()
+        self._synchronized_backings=set()
 
     def remember_source(self, source, proxy):
         """Track only input D/U; the existing memo owns each actual source."""
@@ -93,6 +107,7 @@ class RecursiveHistoryRuntime:
             if not self._release_source(marker):
                 self._source_queue.append(marker)
         self._new_sources.clear()
+        self._synchronized_backings.clear()
         session = self.session()
         session._registry.release_nonreflexive_incarnations(self._new_nan_incarnations)
         self._new_nan_incarnations.clear()
@@ -916,7 +931,9 @@ class RecursiveHistoryRuntime:
         coord = session._identity_coordinator
         self._synchronizing = True
         try:
-            pending = deque(session._nested_dirty.values())
+            selected=set(self._pending_backings)
+            self._pending_backings.difference_update(selected)
+            pending=deque(session._nested_dirty[inc] for inc in selected if inc in session._nested_dirty)
             processed = set()
             while pending:
                 proxy = pending.popleft()
@@ -927,6 +944,7 @@ class RecursiveHistoryRuntime:
                         IncarnationId(session.store.store_identity, proxy._incarnation))
                     if not any(o.owner_namespace not in AUXILIARY_OWNER_FAMILIES
                                or o.owner_key[0] in processed
+                               or (o.owner_key[0] in self._synchronized_backings and o.owner_key[0] not in selected)
                                or o.owner_key[0] not in session._nested_dirty for o in placements):
                         continue  # Unattached input D belongs only to private aliases.
                 processed.add(proxy._incarnation)
@@ -998,6 +1016,10 @@ class RecursiveHistoryRuntime:
                         proxy._cancelled_entries.discard(source.key[1])
                         if source_present is not None and not coord._by_owner.get(owner):
                             coord.dirty_owners.discard(owner)
+                self._synchronized_backings.add(proxy._incarnation)
+        except BaseException:
+            self._pending_backings.update(selected)
+            raise
         finally:
             self._synchronizing = False
 

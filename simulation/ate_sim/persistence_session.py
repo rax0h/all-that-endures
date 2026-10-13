@@ -169,7 +169,7 @@ def _count(head, namespace):
     return head.namespace_counts.get(namespace, (0, 0))
 
 
-def _validate_head_inventory(head, manifest, links, event_records):
+def _validate_head_inventory(head, manifest, links, event_records, *, checked_identity_count=None):
     collection_namespaces = _expected_collection_namespaces()
     expected_inventory = (
         collection_namespaces
@@ -187,7 +187,8 @@ def _validate_head_inventory(head, manifest, links, event_records):
     } else 1
     if _count(head, META) != (meta_rows, 0):
         raise StoreIntegrityError("snapshot metadata count disagrees with head")
-    if _count(head, IDENTITY_LINKS) != (len(links), 0):
+    identity_count = len(links) if checked_identity_count is None else checked_identity_count
+    if _count(head, IDENTITY_LINKS) != (identity_count, 0):
         raise StoreIntegrityError("identity link count disagrees with head")
     if _count(head, EVENT_STORAGE) != (3, 0):
         raise StoreIntegrityError("event descriptor count disagrees with head")

@@ -9,9 +9,58 @@ from .persistence_lazy_nested_history import HISTORY_TYPES
 from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY, PACKED_LIST_KIND
 
 
+class OwnerKeyJournal(set):
+    """Existing dirty keys notify their actual owner; no second value journal."""
+    def __init__(self,table,values=()):
+        super().__init__(values)
+        self._table_ref=weakref.ref(table)
+
+    def add(self,key):
+        super().add(key)
+        self._notify(key)
+
+    def _notify(self,key):
+        table=self._table_ref()
+        bridge=getattr(table._session,'_identity_bridge',None) if table is not None else None
+        if bridge is not None:bridge.note_owner((table._namespace,key))
+
+    def discard(self,key):
+        if key in self:
+            super().discard(key);self._notify(key)
+
+    def remove(self,key):
+        super().remove(key);self._notify(key)
+
+    def update(self,*others):
+        for other in others:
+            for key in other:self.add(key)
+
+    def __ior__(self,other):
+        self.update(other);return self
+
+
+class EagerOwnerJournal(set):
+    def __init__(self,bridge,values=()):
+        super().__init__(values);self._bridge_ref=weakref.ref(bridge)
+
+    def add(self,owner):
+        super().add(owner)
+        bridge=self._bridge_ref()
+        if bridge is not None:bridge.note_owner(owner)
+
+    def update(self,*others):
+        for other in others:
+            for owner in other:self.add(owner)
+
+    def __ior__(self,other):
+        self.update(other);return self
+
+
 class WorldIdentityBridge:
     def __init__(self, session):
         self._session_ref = weakref.ref(session)
+        self._pending_owners=set()
+        self._synchronizing=False
         bindings = session._family_bindings
         self.coordinator = IdentityCoordinator(session.store, session.pin, session._registry,
             load_owner=bindings.load_owner, resolve_path=bindings.resolve_path,
@@ -20,13 +69,16 @@ class WorldIdentityBridge:
             encode_placement=bindings.encode_placement,
             prepare_owner_header=bindings.unchanged_owner_header)
 
+    def note_owner(self,owner):
+        self._pending_owners.add(owner)
+
     def _mark_dirty(self, owner):
         session = self._session_ref()
         table = session._family_bindings.tables.get(owner[0])
         # A removed owner already has an explicit family deletion journal.
         # Routing retirement must not ask changed() to resurrect that header.
         if table is not None and not table._visible(owner[1]):
-            if owner[1] not in table._removed:
+            if owner[1] not in table._removed and table._baseline_exists(owner[1]):
                 raise StoreIntegrityError('retired owner has no family deletion journal')
             return
         if table is None and owner in session._eager_tracker._deleted:
@@ -41,21 +93,31 @@ class WorldIdentityBridge:
         before shared routing, so pending replacement wins over pinned placement.
         """
         session = self._session_ref()
+        if self._synchronizing:return
+        self._synchronizing=True
+        try:self._synchronize_pending(session)
+        finally:self._synchronizing=False
+
+    def _synchronize_pending(self,session):
         session._recursive_histories.synchronize()
-        for namespace, table in session._family_bindings.tables.items():
-            for key in tuple(table._effective_touched()):
-                self._synchronize_owner((namespace, key), table._visible(key))
         tracker = session._eager_tracker
-        if ('world.event_ids', 0) in tracker._dirty:
-            self.synchronize_event_id_placements()
-        if any(owner[0] == AGENCY_ACTIONS_NAMESPACE for owner in tracker._dirty | tracker._deleted):
-            self.synchronize_packed_actions()
-        for owner in tuple(tracker._dirty | tracker._deleted):
-            adapter = FAMILIES.get(owner[0])
-            if (adapter is not None and adapter.collection_kind in ('dict', 'events')
-                    and owner[0] not in session._family_bindings.tables):
-                value = None if owner in tracker._deleted else tracker._owner_value(owner, include_sealed_snapshot=True)
-                self._synchronize_owner(owner, value is not None)
+        pending=tuple(self._pending_owners)
+        self._pending_owners.difference_update(pending)
+        try:
+            if ('world.event_ids',0) in pending:self.synchronize_event_id_placements()
+            if any(owner[0]==AGENCY_ACTIONS_NAMESPACE for owner in pending):self.synchronize_packed_actions()
+            for owner in pending:
+                table=session._family_bindings.tables.get(owner[0])
+                if table is not None:
+                    self._synchronize_owner(owner,table._visible(owner[1]))
+                else:
+                    adapter=FAMILIES.get(owner[0])
+                    if adapter is not None and adapter.collection_kind in ('dict','events'):
+                        value=None if owner in tracker._deleted else tracker._owner_value(owner,include_sealed_snapshot=True)
+                        self._synchronize_owner(owner,value is not None)
+        except BaseException:
+            self._pending_owners.update(pending)
+            raise
 
     def synchronize_event_id_placements(self):
         """Project the facade and its two fixed descriptor backing slots.

@@ -320,6 +320,18 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
         if change.namespace in CURRENCY_ROOTS and not change.delete:
             value = change.value[1] if isinstance(change, RecordChange) else change.value
             encode(value, (change.namespace, change.key), ())
+        if change.namespace == 'world.settlements' and not change.delete:
+            from .core import Settlement
+            value = change.value[1] if isinstance(change, RecordChange) else change.value
+            if type(value) is not Settlement:
+                raise StoreIntegrityError('settlement normalization requires a captured native Settlement')
+            encode(value.memory, (change.namespace, change.key), (('field', 'memory'),))
+        if change.namespace == 'world.culture.institutions' and not change.delete:
+            from .culture import Institution as CulturalInstitution
+            value = change.value[1] if isinstance(change, RecordChange) else change.value
+            if type(value) is not CulturalInstitution:
+                raise StoreIntegrityError('cultural institution normalization requires its captured native record')
+            encode(value.practices, (change.namespace, change.key), (('field', 'practices'),))
         if normalize_advancement and change.namespace == 'world.advancement.paths' and not change.delete:
             from .advancement import EssencePath
             value = change.value[1] if isinstance(change, RecordChange) else change.value

@@ -1,50 +1,29 @@
 # Stage 0.5 schema and growth inventory
 
-This is the exhaustive baseline classification. Planned compact representations are requirements, not implementation claims. Imported values have no generated-world bound. Package 5 must replace pending representations with tested evidence before acceptance.
+Final candidate inventory, October 13 UTC. All 483 declared stored fields have a closed classification; the machine manifest rejects newly added or obsolete fields. This table describes capability 6 selected by explicit `upgrade_lazy_snapshot`, with genuine format 3/4/5 compatibility kept separate. The final P5 and full-suite results are recorded in the closeout ledger, not inferred from this inventory.
 
-Implemented value-record slice (October 11 UTC): exact `Ref` and `Layer` values
-are admitted in recursive histories through the existing World codec. Ref fields
-must be recursively immutable and its state exactly kind/id. Foreign frozen
-classes/enums and mutable record payloads remain excluded. This does not replace
-the pending mutable-record representations below. Evidence:
-`stage_0_5_recursive_value_record_validation.json` (16 focused, 288 affected;
-overlapping counts). Finite admission/callback follow-up now covers30 permanent
-value/admission cases within302 affected cases; see
-`stage_0_5_recursive_finite_batch_validation.json`.
+Historical mutable children use the existing recursive history/record authority, checked identity catalog and sole hybrid publisher. Whole-container iteration, full scrub, conversion and portable detach intentionally cost the visited values. Point edit costs include actual dirty input D, related identity placements U, current resident topology C and the bytes of values requested or held by callers. Scalar text, integer size and immutable tuples are not universally constant-size; preserving a caller-held imported tuple may require encoding its complete current value. Tests measure those bytes separately rather than relabeling an unrestricted import as bounded.
 
-Implemented record-header primitive (October11 UTC): every declared mutable
-class has closed ordered-field/parser coverage, with one record backing namespace
-and checked physical field/tuple placements. At unrelated H1k/H10k, a point read
-uses1 payload read,2 metadata rows and191 bytes. This does not yet admit mutable
-records into live histories, certify their actual child graphs/import bounds, or
-preserve native Event sealing through runtime bindings. Evidence:
-`stage_0_5_recursive_record_header_validation.json` (101 new,133 focused,427
-affected; overlapping). Live integration remains Task2–3 of the approved native
-record plan.
+## Concrete writer and import closure
 
-Native record integration follow-up (October11 UTC): closed non-Event record
-input now has canonical native bindings, child references and the existing World
-publication/dependency/retirement path.35 actual native/cycle cases exercise
-SkillHistory and ActionRecord, not all actual field values. With fixed related U,
-H1k/H10k record edit/save/no-op uses120 reads,4 writes,793 metadata rows. The483
-broad gate precedes only final owner preflight;136 affected cases verify current
-source. Event frozen snapshots, RecordTable/special collection imports and
-exhaustive generated/import byte classifications are still pending. Evidence:
-`stage_0_5_recursive_record_runtime_validation.json`.
+| Field or family | Actual producer / generated guard | Capability 6 / import treatment | Permanent evidence |
+|---|---|---|---|
+| Household.members; Settlement.households | engine demography/adoption changes exact membership; duplicates and extinct references remain valid | counted sequence references; local page/path changes; no truncation | final_household_sequences test families |
+| Settlement.memory | Simulation._pressure writes monster_surge/decays values; update_warfare writes war | unrestricted imported map and replacement become checked map; scalar owner edits read zero memory entries at H1k/H10k | final_settlement_memory; stage_0_5_settlement_memory_validation.json |
+| culture.Institution.practices | civilization_step creates `set(strong[:4])`; at most three generated institutions per settlement; no later growth writer | generated child <=4; unrestricted import/replacement becomes checked set even without another alias | final_settlement_memory imported cultural practices regression |
+| Advancement child graphs | add_essence stops at MAX_BASE_ESSENCES=3; ability admission uses SKILLS_PER_ESSENCE and MAX_SKILLS=20 | imports need not obey generated guards; recursive checked records/lists/maps preserve exact graph | final_advancement_graph, final_world_recursive_records tests |
+| Understanding / ResponseModel | mastery_training.needs_trial and trial limit generated successful trials; trial trims samples to 3/5; solve emits <=5 coefficients | evidence/maps/transfers and imported oversized samples remain checked histories; no import cap | final_advancement_graph and final_world_recursive_records tests |
+| currency wallets/treasuries | credit/transfer/consume/exchange validate six COIN_VALUE denomination keys | direct/imported maps unrestricted and checked; exact NaN atom keys retain identity and bits | final_currency_runtime, final_event_id_nonreflexive tests |
+| Agency.actions | agency_step trims generated actions to the last 50,000 | accepted current packed body; imported larger bodies preserved, with explicit C/input bytes and full current-body action synchronization | final_world_packed_actions tests; P5 |
+| World.event_ids | World.emit appends consecutive IDs; public exact set operations may create exceptions | compact captured prefix and counted removed/typed added histories; NaNs and immutable key containers remain paged; full copy scrubs exception semantics | final_event_id_exceptions, final_event_id_nonreflexive, final_complete_format tests |
+| World.events / Event.data | World.emit snapshots data; event_log seals certified immutable tails | immutable disk segments plus checked recursive frozen snapshot data; mutable event identity retires while snapshot child ownership persists | final_world_recursive_events, final_legacy_event_copy tests |
+| Person.parents; scalar species | demography assigns generated parent tuple; direct imported tuple/text size unrestricted | exact immutable value, held current-record byte cost measured separately; no clean-cache retention above budget | final_immutable_input_cost; parents 51,145/456,145 read bytes and 14,966/149,966 written; species 12,463/39,463 read and 2,072/11,072 written at 1k/10k |
+| Genealogy/social/material index buckets and knowledge claims/index | actual family append/add/claim allocation can grow with history | checked bucket references or versioned scalar family; outer current key topology explicitly accounted for | final_graph_buckets, final_knowledge*, final_world_recursive* tests |
+| Cells, local state, trade topology and other current roots | simulation steps visit current world topology C | resident current topology remains charged to C; no history-independence claim for explicitly visiting all current entities | ordinary complete open/P5; FIELD_POLICIES exhaustive schema test |
 
-Sealed-tail integration follow-up (October11 UTC): native Events can now retain
-checked readonly snapshot data while resident in the World-log tail. Frozen
-list/map descriptors require an exact deep-immutability boolean, computed from
-actual incoming values and checked child frozen descriptors. Mutable records or
-mutable history references make certification false; such data remains valid
-readonly recursive data but cannot enter sealed World suffix storage. Only the
-snapshot's data backing retains physical World ownership after mutable Event
-identity retires. Ordinary suffix validation reads checked metadata, while full
-scrub, detach and segment packing explicitly inspect/materialize values. This is
-staging integration, not ordinary complete-format activation or exhaustive field
-and byte closure. See the sealed-tail plan and validation checkpoint.
+All mutable-field rows below use implemented compact storage in the capability 6 lane. Legacy resident compatibility costs apply only when opening a genuine earlier representation. For record field collections, whole replacement costs actual incoming values, even when generated values are small. The exact operation and scope are important: a constant number of metadata rows is not a constant byte claim.
 
-| Record.field | Classification | Growth writer / guard | Actual bound | Representation |
+| Record.field | Classification | Growth writer / guard | Actual bound | Capability 6 representation |
 |---|---|---|---|---|
 | AbilityProgress.aura | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | AbilityProgress.awakened_year | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -57,11 +36,11 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | AbilityProgress.origin_event | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | AbilityProgress.progress | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | AbilityProgress.rank | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| AbilityProgress.response_model | bounded-generated-record | advancement.py: AbilityProgress writers | generated guards only; unrestricted imports are materialized compatibility state | resident tracked topology; oversized import requires explicit classification before new-format conversion |
+| AbilityProgress.response_model | bounded-generated-record | advancement.py: AbilityProgress writers | generated guards only; explicit checked advancement copy preserves unrestricted imports in compact recursive storage | explicit checked advancement copy uses recursive record/history references; genuine legacy paths retain resident costs |
 | AbilityProgress.semantic_key | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | AbilityProgress.source | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | AbilityProgress.special | scalar | AbilityProgress field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| AbilityProgress.understanding | bounded-generated-record | advancement.py: AbilityProgress writers | generated guards only; unrestricted imports are materialized compatibility state | resident tracked topology; oversized import requires explicit classification before new-format conversion |
+| AbilityProgress.understanding | bounded-generated-record | advancement.py: AbilityProgress writers | generated guards only; explicit checked advancement copy preserves unrestricted imports in compact recursive storage | explicit checked advancement copy uses recursive record/history references; genuine legacy paths retain resident costs |
 | ActionRecord.action | scalar | ActionRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | ActionRecord.event_id | scalar | ActionRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | ActionRecord.motive | scalar | ActionRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -69,7 +48,7 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | ActionRecord.strength | scalar | ActionRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | ActionRecord.year | scalar | ActionRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | AdvancementState.paths | root-collection | advancement.py: AdvancementState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| AdventureNotice.assigned_to | fixed-tuple | institutions.py: AdventureNotice writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| AdventureNotice.assigned_to | fixed-tuple | institutions.py: AdventureNotice writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | AdventureNotice.branch | scalar | AdventureNotice field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | AdventureNotice.cause_event | scalar | AdventureNotice field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | AdventureNotice.id | scalar | AdventureNotice field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -91,11 +70,11 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | Branch.founded_year | scalar | Branch field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Branch.id | scalar | Branch field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Branch.institution | scalar | Branch field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Branch.notices | set-history | institutions.py: Branch writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| Branch.notices | set-history | institutions.py: Branch writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | Branch.origin_event | scalar | Branch field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Branch.records | set-history | institutions.py: Branch writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| Branch.records | set-history | institutions.py: Branch writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | Branch.settlement | scalar | Branch field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Branch.trainees | map-history | institutions.py: Branch writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| Branch.trainees | map-history | institutions.py: Branch writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | Cell.elevation | scalar | Cell field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Cell.fertility | scalar | Cell field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Cell.forest | scalar | Cell field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -104,9 +83,9 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | Cell.x | scalar | Cell field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Cell.y | scalar | Cell field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Church.authority | scalar | Church field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Church.clergy | set-history | divinity.py: Church writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
-| Church.doctrine_claims | set-history | divinity.py: Church writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
-| Church.followers | set-history | divinity.py: Church writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| Church.clergy | set-history | divinity.py: Church writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
+| Church.doctrine_claims | set-history | divinity.py: Church writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
+| Church.followers | set-history | divinity.py: Church writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | Church.founded_year | scalar | Church field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Church.god | scalar | Church field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Church.id | scalar | Church field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -143,8 +122,8 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | CraftedItem.item_rank | scalar | CraftedItem field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | CraftedItem.kind | scalar | CraftedItem field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | CraftedItem.magical | scalar | CraftedItem field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| CraftedItem.magical_properties | fixed-tuple | materials.py: CraftedItem writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
-| CraftedItem.materials | fixed-tuple | materials.py: CraftedItem writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| CraftedItem.magical_properties | fixed-tuple | materials.py: CraftedItem writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
+| CraftedItem.materials | fixed-tuple | materials.py: CraftedItem writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | CraftedItem.origin_event | scalar | CraftedItem field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | CraftedItem.owner_id | scalar | CraftedItem field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | CraftedItem.owner_kind | scalar | CraftedItem field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -164,15 +143,15 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | DivineState.next_church | scalar | DivineState field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Economy.next_property | scalar | Economy field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Economy.property | root-collection | economy.py: Economy writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| EssencePath.abilities | bounded-generated-list | advancement.py: EssencePath writers | generated guards only; unrestricted imports are materialized compatibility state; add_essence <=3 base, _semantic_ability <=20 abilities | resident tracked topology; oversized import requires explicit classification before new-format conversion |
-| EssencePath.base_essences | bounded-generated-list | advancement.py: EssencePath writers | generated guards only; unrestricted imports are materialized compatibility state; add_essence <=3 base, _semantic_ability <=20 abilities | resident tracked topology; oversized import requires explicit classification before new-format conversion |
+| EssencePath.abilities | bounded-generated-list | advancement.py: EssencePath writers | generated guards only; explicit checked advancement copy preserves unrestricted imports in compact recursive storage; add_essence <=3 base, _semantic_ability <=20 abilities | explicit checked advancement copy uses recursive record/history references; genuine legacy paths retain resident costs |
+| EssencePath.base_essences | bounded-generated-list | advancement.py: EssencePath writers | generated guards only; explicit checked advancement copy preserves unrestricted imports in compact recursive storage; add_essence <=3 base, _semantic_ability <=20 abilities | explicit checked advancement copy uses recursive record/history references; genuine legacy paths retain resident costs |
 | EssencePath.confluence | scalar | EssencePath field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| EssencePath.confluence_concepts | fixed-tuple | advancement.py: EssencePath writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| EssencePath.confluence_concepts | fixed-tuple | advancement.py: EssencePath writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | EssencePath.confluence_name | scalar | EssencePath field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | EssencePath.core_fraction | scalar | EssencePath field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Event.actors | fixed-tuple | core.py: Event writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
-| Event.causes | fixed-tuple | core.py: Event writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
-| Event.data | value-history | core.py: Event writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| Event.actors | fixed-tuple | core.py: Event writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
+| Event.causes | fixed-tuple | core.py: Event writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
+| Event.data | value-history | core.py: Event writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | Event.id | scalar | Event field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Event.kind | scalar | Event field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Event.layer | scalar | Event field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -180,19 +159,19 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | Event.year | scalar | Event field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Genealogy.children | root-collection | genealogy.py: Genealogy writers | unbounded historical buckets; candidate lane uses compact headers and bounded point additions | typed list reference in explicit native-graph conversion; legacy buckets remain readable with resident costs |
 | Genealogy.parents | root-collection | genealogy.py: Genealogy writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| God.domains | fixed-tuple | divinity.py: God writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| God.domains | fixed-tuple | divinity.py: God writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | God.id | scalar | God field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| God.manifestations | list-history | divinity.py: God writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| God.manifestations | list-history | divinity.py: God writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | God.name | scalar | God field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | God.ontology | scalar | God field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| God.relationships | map-history | divinity.py: God writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| God.relationships | map-history | divinity.py: God writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | God.transcendent | scalar | God field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| GreatAstralBeing.authorities | fixed-tuple | divinity.py: GreatAstralBeing writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| GreatAstralBeing.authorities | fixed-tuple | divinity.py: GreatAstralBeing writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | GreatAstralBeing.id | scalar | GreatAstralBeing field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| GreatAstralBeing.interventions | list-history | divinity.py: GreatAstralBeing writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| GreatAstralBeing.interventions | list-history | divinity.py: GreatAstralBeing writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | GreatAstralBeing.name | scalar | GreatAstralBeing field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | GreatAstralBeing.ontology | scalar | GreatAstralBeing field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| GreatAstralBeing.relationships | map-history | divinity.py: GreatAstralBeing writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| GreatAstralBeing.relationships | map-history | divinity.py: GreatAstralBeing writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | GreatAstralBeing.transcendent | scalar | GreatAstralBeing field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Household.alive | scalar | Household field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Household.food | scalar | Household field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -208,8 +187,8 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | Infrastructure.id | scalar | Infrastructure field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Infrastructure.kind | scalar | Infrastructure field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Infrastructure.origin_event | scalar | Infrastructure field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Infrastructure.provenance | list-history | infrastructure.py: Infrastructure writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
-| Infrastructure.settlements | fixed-tuple | infrastructure.py: Infrastructure writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| Infrastructure.provenance | list-history | infrastructure.py: Infrastructure writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
+| Infrastructure.settlements | fixed-tuple | infrastructure.py: Infrastructure writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | InfrastructureState.assets | root-collection | infrastructure.py: InfrastructureState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
 | InfrastructureState.next_id | scalar | InfrastructureState field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Inquiry.branch | scalar | Inquiry field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -239,8 +218,8 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | KnowledgeClaim.subject | scalar | KnowledgeClaim field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | KnowledgeClaim.truth | scalar | KnowledgeClaim field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | KnowledgeState.beliefs | root-collection | knowledge.py: KnowledgeState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| KnowledgeState.claim_index | root-collection | knowledge.py: KnowledgeState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| KnowledgeState.claims | root-collection | knowledge.py: KnowledgeState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
+| KnowledgeState.claim_index | root-collection | knowledge.py: KnowledgeState.claim inserts the exact subject/proposition pair with its claim ID | unbounded outer map; generated keys are string pairs and values exact integer IDs | versioned scalar map family; marked conversion validates exact string-pair keys; genuine earlier eager authority remains readable |
+| KnowledgeState.claims | root-collection | knowledge.py: KnowledgeState.claim allocates one claim for each new semantic pair | unbounded claim archive; point operations load/write only affected records; scalar string/bytes sizes remain actual value cost | versioned scalar record family; genuine earlier eager authority remains readable; portable detach uses the standard record table |
 | KnowledgeState.next_claim | scalar | KnowledgeState field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Law.domain | scalar | Law field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Law.enforcement | scalar | Law field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -252,7 +231,7 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | LineageNode.kind | scalar | LineageNode field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | LineageNode.origin_event | scalar | LineageNode field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | LineageNode.origin_year | scalar | LineageNode field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| LineageNode.parents | fixed-tuple | lineage.py: LineageNode writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| LineageNode.parents | fixed-tuple | lineage.py: LineageNode writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | LineageState.children | root-collection | lineage.py: LineageState writers | unbounded historical buckets; candidate lane uses compact headers and bounded point additions | typed set reference in explicit native-graph conversion; legacy buckets remain readable with resident costs |
 | LineageState.nodes | root-collection | lineage.py: LineageState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
 | LocalState.drought | scalar | LocalState field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -262,8 +241,8 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | MagicAspiration.adventurer_aspiration | scalar | MagicAspiration field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicAspiration.completion_goal | scalar | MagicAspiration field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicAspiration.compromise_tolerance | scalar | MagicAspiration field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| MagicAspiration.desired_abilities | fixed-tuple | magic_resources.py: MagicAspiration writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
-| MagicAspiration.desired_base_essences | fixed-tuple | magic_resources.py: MagicAspiration writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| MagicAspiration.desired_abilities | fixed-tuple | magic_resources.py: MagicAspiration writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
+| MagicAspiration.desired_base_essences | fixed-tuple | magic_resources.py: MagicAspiration writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | MagicAspiration.drive | scalar | MagicAspiration field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicAspiration.formed_year | scalar | MagicAspiration field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicAspiration.preparation | scalar | MagicAspiration field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -289,20 +268,20 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | MagicResourceState.next_id | scalar | MagicResourceState field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicResourceState.owner_index | root-collection | magic_resources.py: MagicResourceState writers | unbounded historical buckets; candidate lane uses compact headers and bounded point additions | typed set reference in explicit native-graph conversion; legacy buckets remain readable with resident costs |
 | MagicResourceState.resources | root-collection | magic_resources.py: MagicResourceState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| MagicUserRecord.abilities | fixed-tuple | institutions.py: MagicUserRecord writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
-| MagicUserRecord.ability_names | fixed-tuple | institutions.py: MagicUserRecord writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| MagicUserRecord.abilities | fixed-tuple | institutions.py: MagicUserRecord writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
+| MagicUserRecord.ability_names | fixed-tuple | institutions.py: MagicUserRecord writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | MagicUserRecord.branch | scalar | MagicUserRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicUserRecord.confluence_id | scalar | MagicUserRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicUserRecord.confluence_name | scalar | MagicUserRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicUserRecord.disclosure | scalar | MagicUserRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| MagicUserRecord.essence_ids | fixed-tuple | institutions.py: MagicUserRecord writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| MagicUserRecord.essence_ids | fixed-tuple | institutions.py: MagicUserRecord writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | MagicUserRecord.id | scalar | MagicUserRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicUserRecord.person | scalar | MagicUserRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicUserRecord.source_event | scalar | MagicUserRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicUserRecord.year | scalar | MagicUserRecord field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicalThreat.ambient | scalar | MagicalThreat field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicalThreat.created_year | scalar | MagicalThreat field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| MagicalThreat.environment_tags | fixed-tuple | threat_ecology.py: MagicalThreat writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| MagicalThreat.environment_tags | fixed-tuple | threat_ecology.py: MagicalThreat writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | MagicalThreat.form | scalar | MagicalThreat field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicalThreat.id | scalar | MagicalThreat field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MagicalThreat.kind | scalar | MagicalThreat field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -320,7 +299,7 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | MaterialLot.created_year | scalar | MaterialLot field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MaterialLot.id | scalar | MaterialLot field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MaterialLot.kind | scalar | MaterialLot field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| MaterialLot.magical_properties | fixed-tuple | materials.py: MaterialLot writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| MaterialLot.magical_properties | fixed-tuple | materials.py: MaterialLot writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | MaterialLot.material_rank | scalar | MaterialLot field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MaterialLot.origin_event | scalar | MaterialLot field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | MaterialLot.owner_id | scalar | MaterialLot field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -353,7 +332,7 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | Person.id | scalar | Person field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Person.inhibition | scalar | Person field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Person.occupation | scalar | Person field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Person.parents | fixed-tuple | core.py: Person writers | immutable tuple; writer-specific generated length, imported tuple unrestricted | exact tuple values; no mutable history flattening |
+| Person.parents | fixed-tuple | core.py: Person writers | generated writer-specific tuple; imported tuple/element bytes unrestricted and preserved | exact native immutable current value; requested/held input bytes charged separately |
 | Person.rank | scalar | Person field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Person.settlement | scalar | Person field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Person.species | scalar | Person field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -365,20 +344,20 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | Practice.origin_settlement | scalar | Practice field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Practice.origin_year | scalar | Practice field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Practice.parent | scalar | Practice field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Practice.traits | map-history | culture.py: Practice writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| Practice.traits | map-history | culture.py: Practice writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | Property.created | scalar | Property field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Property.id | scalar | Property field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Property.kind | scalar | Property field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Property.owner_id | scalar | Property field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Property.owner_kind | scalar | Property field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Property.ownership | list-history | economy.py: Property writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
-| Property.provenance | list-history | economy.py: Property writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| Property.ownership | list-history | economy.py: Property writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
+| Property.provenance | list-history | economy.py: Property writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | Property.settlement | scalar | Property field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Property.value | scalar | Property field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | RankedCurrencyState.consumed | root-collection | currency.py: RankedCurrencyState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
 | RankedCurrencyState.minted | root-collection | currency.py: RankedCurrencyState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| RankedCurrencyState.treasuries | root-collection | currency.py: RankedCurrencyState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| RankedCurrencyState.wallets | root-collection | currency.py: RankedCurrencyState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
+| RankedCurrencyState.treasuries | root-collection | currency.py: treasury_transfer | generated denomination keys guarded by COIN_VALUE; direct/imported dictionaries unrestricted and not truncated | lazy outer currency table; checked map root/physical entries in explicit graph-copy lane and native checked assignment; resident dict legacy compatibility |
+| RankedCurrencyState.wallets | root-collection | currency.py: wallet, credit, transfer, consume, exchange | generated denomination keys guarded by COIN_VALUE; direct/imported dictionaries unrestricted and not truncated | lazy outer currency table; checked map root/physical entries in explicit graph-copy lane and native checked assignment; resident dict legacy compatibility |
 | Ref.id | scalar | Ref field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Ref.kind | scalar | Ref field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Relationship.a | scalar | Relationship field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -390,8 +369,8 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | Relationship.resentment | scalar | Relationship field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Relationship.shared_history | list-history | social.py: Relationship writers | unbounded; compact header, bounded point/tail operations; whole-list edits remain explicit O(H) | typed list reference with current-owner integer event-ID validation; genuine legacy lists remain readable with resident costs |
 | Relationship.trust | scalar | Relationship field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| ResponseModel.coefficients | bounded-generated-list | mastery_training.py: ResponseModel writers | generated guards only; unrestricted imports are materialized compatibility state; trial trims samples to 3/5, solve coefficients <=5 | resident tracked topology; oversized import requires explicit classification before new-format conversion |
-| ResponseModel.samples | bounded-generated-list | mastery_training.py: ResponseModel writers | generated guards only; unrestricted imports are materialized compatibility state; trial trims samples to 3/5, solve coefficients <=5 | resident tracked topology; oversized import requires explicit classification before new-format conversion |
+| ResponseModel.coefficients | bounded-generated-list | mastery_training.py: ResponseModel writers | generated guards only; explicit checked advancement copy preserves unrestricted imports in compact recursive storage; trial trims samples to 3/5, solve coefficients <=5 | explicit checked advancement copy uses recursive record/history references; genuine legacy paths retain resident costs |
+| ResponseModel.samples | bounded-generated-list | mastery_training.py: ResponseModel writers | generated guards only; explicit checked advancement copy preserves unrestricted imports in compact recursive storage; trial trims samples to 3/5, solve coefficients <=5 | explicit checked advancement copy uses recursive record/history references; genuine legacy paths retain resident costs |
 | ResponseModel.trials | scalar | ResponseModel field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | ResponseModel.validated | scalar | ResponseModel field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | ResurrectionToken.consumed_event | scalar | ResurrectionToken field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -407,7 +386,7 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | Settlement.households | ordered-history | core.py: Settlement writers | unbounded; exact order, duplicates and extinct occurrences | counted HistoryReference in counted conversion lane; legacy eager mode remains explicit |
 | Settlement.id | scalar | Settlement field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Settlement.irrigation | scalar | Settlement field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Settlement.memory | current-map | core.py: Settlement writers | generated keys monster_surge/war; imported arbitrary map unrestricted | resident current map with explicit imported-value classification |
+| Settlement.memory | current-map | engine.py: Simulation._pressure writes monster_surge and decays values; warfare.py: update_warfare writes war | generated keys monster_surge/war; imported arbitrary map unrestricted and preserved | checked map reference in explicit graph-copy lane and checked assignment; genuine legacy remains resident compatibility |
 | Settlement.prosperity | scalar | Settlement field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Settlement.roads | scalar | Settlement field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | Settlement.x | scalar | Settlement field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
@@ -471,10 +450,10 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | Transmission.year | scalar | Transmission field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | TransmissionState.next_id | scalar | TransmissionState field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | TransmissionState.records | root-collection | transmission.py: TransmissionState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| Understanding.applications | bounded-generated-map | advancement.py: Understanding writers | generated guards only; unrestricted imports are materialized compatibility state; mastery_training.needs_trial caps successful applications and transfers; evidence writer reviewed separately | resident tracked topology; oversized import requires explicit classification before new-format conversion |
-| Understanding.evidence | bounded-generated-map | advancement.py: Understanding writers | generated guards only; unrestricted imports are materialized compatibility state; mastery_training.needs_trial caps successful applications and transfers; evidence writer reviewed separately | resident tracked topology; oversized import requires explicit classification before new-format conversion |
+| Understanding.applications | bounded-generated-map | advancement.py: Understanding writers | generated guards only; explicit checked advancement copy preserves unrestricted imports in compact recursive storage; mastery_training.needs_trial caps successful applications and transfers; evidence writer reviewed separately | explicit checked advancement copy uses recursive record/history references; genuine legacy paths retain resident costs |
+| Understanding.evidence | bounded-generated-map | advancement.py: Understanding writers | generated guards only; explicit checked advancement copy preserves unrestricted imports in compact recursive storage; mastery_training.needs_trial caps successful applications and transfers; evidence writer reviewed separately | explicit checked advancement copy uses recursive record/history references; genuine legacy paths retain resident costs |
 | Understanding.integration | scalar | Understanding field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| Understanding.transfers | bounded-generated-list | advancement.py: Understanding writers | generated guards only; unrestricted imports are materialized compatibility state; mastery_training.needs_trial caps successful applications and transfers; evidence writer reviewed separately | resident tracked topology; oversized import requires explicit classification before new-format conversion |
+| Understanding.transfers | bounded-generated-list | advancement.py: Understanding writers | generated guards only; explicit checked advancement copy preserves unrestricted imports in compact recursive storage; mastery_training.needs_trial caps successful applications and transfers; evidence writer reviewed separately | explicit checked advancement copy uses recursive record/history references; genuine legacy paths retain resident costs |
 | WarfareState.conflicts | root-collection | warfare.py: WarfareState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
 | WarfareState.next_conflict | scalar | WarfareState field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | WarfareState.tensions | root-collection | warfare.py: WarfareState writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
@@ -487,7 +466,7 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | World.currency | state-root | core.py: World writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
 | World.divinity | state-root | core.py: World writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
 | World.economy | state-root | core.py: World writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
-| World.event_ids | set-history | core.py: World.emit and exact set mutations | consecutive range and admissible candidate exceptions have bounded point edits; whole-set and exotic-key compatibility retain O(H) costs | range descriptor or captured range plus counted removed IDs and typed additional set; complete equality-directory/lease closure pending |
+| World.event_ids | set-history | core.py: World.emit and exact set mutations | prefix does not materialize; local exception work; explicit whole-set iteration visits requested members | captured range or paged exceptions, checked NaN atoms and shared component authority; full-copy semantic scrub |
 | World.events | root-collection | core.py: World writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
 | World.genealogy | state-root | core.py: World writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
 | World.households | root-collection | core.py: World writers | current work or historical outer collection; concrete family boundary governs payload loading | registered root/family; legacy eager costs disclosed |
@@ -520,12 +499,12 @@ and byte closure. See the sealed-tail plan and validation checkpoint.
 | culture.Institution.id | scalar | culture.Institution field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | culture.Institution.kind | scalar | culture.Institution field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | culture.Institution.legitimacy | scalar | culture.Institution field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| culture.Institution.practices | set-history | culture.py: Institution writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| culture.Institution.practices | set-history | civilization.py: civilization_step creates set(strong[:4]); culture.py reads support | generated <=4 practices; imported set unrestricted and preserved | checked set reference in explicit upgrade and checked replacement; genuine legacy resident |
 | culture.Institution.settlement | scalar | culture.Institution field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| institutions.Institution.branches | list-history | institutions.py: Institution writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| institutions.Institution.branches | list-history | institutions.py: Institution writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | institutions.Institution.founded_year | scalar | institutions.Institution field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | institutions.Institution.id | scalar | institutions.Institution field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | institutions.Institution.kind | scalar | institutions.Institution field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
-| institutions.Institution.members | set-history | institutions.py: Institution writers | unbounded; must use compact backing for ordinary operations | typed history reference (existing or pending integration); event data uses immutable segment values |
+| institutions.Institution.members | set-history | institutions.py: Institution writers | unbounded; must use compact backing for ordinary operations | checked recursive history reference; Event snapshot data uses frozen histories/immutable segments; genuine legacy remains resident |
 | institutions.Institution.name | scalar | institutions.Institution field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |
 | institutions.Institution.origin_event | scalar | institutions.Institution field assignment | one exact scalar; imported string/bytes length is not bounded | checked record/header scalar |

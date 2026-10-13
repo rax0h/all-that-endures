@@ -1,0 +1,1203 @@
+{
+  "parent_public": "a90e50645dd7bcbad22882f8fc34596a72cd4f33",
+  "parent_local": "3e040b4",
+  "sha256": {
+    "simulation/ate_sim/persistence_event_copy_normalization.py": "5d9255eefebbe5a6847a8607a8f96f3d2bbe484438a4a3b3751565e10b62a55a",
+    "simulation/ate_sim/persistence_lazy.py": "e6b8881e5b2ea209ffc6128e525491dad9608fcaace1eaef65c04c1326445887",
+    "simulation/tests/test_stage_0_5_final_settlement_memory.py": "444c7dcec8abe8d6fe78f5484dfd81d553e3465d1db9402b54f4e9b578ca4000"
+  },
+  "gates": [
+    {
+      "name": "settlement-memory",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "6",
+        "time": "12.938",
+        "timestamp": "2026-10-12T20:55:31.227690-04:00",
+        "hostname": "8148d537dbc0"
+      },
+      "cases": [
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_imported_memory_is_one_compact_map_across_eager_and_lazy_roots",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "20",
+          "time": "0.257"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_imported_memory_is_compact_without_an_incidental_currency_alias",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "36",
+          "time": "0.157"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_memory_replacement_and_shared_child_recover_atomically[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "44",
+          "time": "0.301"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_memory_replacement_and_shared_child_recover_atomically[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "44",
+          "time": "0.249"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_invalid_or_foreign_replacement_preserves_memory_before_change",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "70",
+          "time": "0.344"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_scalar_settlement_edit_has_fixed_imported_memory_work",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "84",
+          "time": "11.462"
+        }
+      ],
+      "properties": [
+        {
+          "name": "h1k_h10k_settlement_memory_io",
+          "value": "[{'payload_reads': 38, 'payload_read_bytes': 6440, 'payload_check_reads': 44, 'payload_check_bytes': 7556, 'payload_writes': 6, 'payload_write_bytes': 1097, 'metadata_rows': 369, 'query_rows': 0, 'pin_rows': 369, 'maintenance_rows': 10, 'temporary_keys_peak': 0, 'maintenance_removed_rows': 5}, {'payload_reads': 38, 'payload_read_bytes': 6440, 'payload_check_reads': 44, 'payload_check_bytes': 7556, 'payload_writes': 6, 'payload_write_bytes': 1097, 'metadata_rows': 369, 'query_rows': 0, 'pin_rows': 369, 'maintenance_rows': 10, 'temporary_keys_peak': 0, 'maintenance_removed_rows': 5}]"
+        }
+      ]
+    },
+    {
+      "name": "settlement-memory-affected",
+      "summary": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "143",
+        "time": "57.920",
+        "timestamp": "2026-10-12T20:56:42.539907-04:00",
+        "hostname": "8148d537dbc0"
+      },
+      "cases": [
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_imported_memory_is_one_compact_map_across_eager_and_lazy_roots",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "20",
+          "time": "0.222"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_imported_memory_is_compact_without_an_incidental_currency_alias",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "36",
+          "time": "0.137"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_memory_replacement_and_shared_child_recover_atomically[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "44",
+          "time": "0.272"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_memory_replacement_and_shared_child_recover_atomically[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "44",
+          "time": "0.234"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_invalid_or_foreign_replacement_preserves_memory_before_change",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "70",
+          "time": "0.302"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_settlement_memory",
+          "name": "test_scalar_settlement_edit_has_fixed_imported_memory_work",
+          "file": "simulation/tests/test_stage_0_5_final_settlement_memory.py",
+          "line": "84",
+          "time": "11.822"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_scalar_household_edit_loads_no_member_nodes[1000]",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "28",
+          "time": "0.443"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_scalar_household_edit_loads_no_member_nodes[10000]",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "28",
+          "time": "3.609"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_counted_member_middle_edit_and_living_order[1000]",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "48",
+          "time": "0.521"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_counted_member_middle_edit_and_living_order[10000]",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "48",
+          "time": "3.634"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_settlement_preserves_extinct_duplicates_and_first_removal",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "65",
+          "time": "0.079"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_wallet_alias_and_detach_share_one_member_list",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "78",
+          "time": "0.100"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_sequence_rollback_thaws_after_checked_uncommitted_result[during_version_writes]",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "91",
+          "time": "0.105"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_sequence_rollback_thaws_after_checked_uncommitted_result[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "91",
+          "time": "0.109"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_sequence_lost_acknowledgement_resolves_once",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "111",
+          "time": "0.072"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_replacement_new_owner_and_unowned_sequence_reattachment",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "130",
+          "time": "0.127"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_shared_new_households_bind_one_sequence",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "152",
+          "time": "0.105"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_unloaded_owner_deletion_does_not_read_sequence_nodes",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "165",
+          "time": "0.404"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_household_sequences",
+          "name": "test_failed_central_preparation_releases_sequence_freeze",
+          "file": "simulation/tests/test_stage_0_5_final_household_sequences.py",
+          "line": "175",
+          "time": "0.084"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_actual_world_routes_cold_peer_and_forces_both_headers_at_paired_scales",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "161",
+          "time": "0.598"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_actual_world_missing_cold_group_occurrence_rejects_before_edit",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "179",
+          "time": "0.053"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_actual_world_deleted_cold_owner_is_not_resurrected_by_retained_alias",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "192",
+          "time": "0.108"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_actual_world_replaced_child_routes_old_alias_only_to_remaining_peer",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "208",
+          "time": "0.127"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_actual_world_owner_inventory_is_checked_before_binding",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "226",
+          "time": "0.049"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_catalog_activation_rejects_existing_unsaved_family_edits",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "238",
+          "time": "0.048"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_world_preparation_failure_thaws_new_catalog_freeze_only",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "248",
+          "time": "0.092"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_catalog_noop_save_has_no_archive_or_identity_work",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "273",
+          "time": "0.094"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_actual_world_catalog_rollback_and_lost_ack_recover_exactly[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "292",
+          "time": "0.104"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_catalog_bridge",
+          "name": "test_actual_world_catalog_rollback_and_lost_ack_recover_exactly[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py",
+          "line": "292",
+          "time": "0.085"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_catalog_copy_preserves_source_and_checks_all_physical_owner_witnesses",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "53",
+          "time": "0.118"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_private_copy]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "92",
+          "time": "0.054"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[before_catalog_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "92",
+          "time": "0.062"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "92",
+          "time": "0.065"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_copy_fault_leaves_source_and_final_destination_untouched[after_catalog_validation]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "92",
+          "time": "0.084"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_competing_destination_is_not_overwritten",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "107",
+          "time": "0.085"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_same_source_and_destination_rejects_without_change",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "119",
+          "time": "0.033"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copied_aliases_continue_independently_and_reject_foreign_source_alias",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "127",
+          "time": "0.139"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_keeps_original_collection_ordinals_and_high_water",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "149",
+          "time": "0.112"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_source_advance_after_capture_cannot_mix_copy_generations",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "176",
+          "time": "0.102"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_corrupt_source_fails_before_destination_publication",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "195",
+          "time": "0.035"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_catalog_bootstrap_cannot_relabel_an_already_staged_catalog",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "207",
+          "time": "0.102"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_counted_leaf_owners_are_checked_without_claiming_branch_ownership",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "219",
+          "time": "1.043"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "245",
+          "time": "0.124"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_real_commit_fault_discards_only_private_copy_and_retry_succeeds[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "245",
+          "time": "0.127"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_keeps_checked_immutable_event_segments",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "266",
+          "time": "0.770"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_private_catalog_copy_requires_an_explicit_bounded_authority_source",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "290",
+          "time": "0.046"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_rejects_dangling_root_history_reference_before_publication",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "302",
+          "time": "0.076"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_preserves_already_held_source_alias_and_excludes_unsaved_overlay",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "322",
+          "time": "0.109"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_catalog_copy",
+          "name": "test_copy_preserves_ordinary_query_memberships",
+          "file": "simulation/tests/test_stage_0_5_final_catalog_copy.py",
+          "line": "341",
+          "time": "0.099"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_copy_preserves_shared_map_and_descendants[root-wallets]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "17",
+          "time": "0.169"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_copy_preserves_shared_map_and_descendants[root-treasuries]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "17",
+          "time": "0.190"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_copy_preserves_shared_map_and_descendants[event-wallets]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "17",
+          "time": "0.181"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_copy_preserves_shared_map_and_descendants[event-treasuries]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "17",
+          "time": "0.191"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_removal_keeps_shared_alias_without_resurrecting_root[replace]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "41",
+          "time": "0.184"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_removal_keeps_shared_alias_without_resurrecting_root[delete]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "41",
+          "time": "0.163"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_backed_root_assigns_to_second_family_and_detaches_portably",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "63",
+          "time": "0.217"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_backing_and_event_alias_resolve_one_save[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "82",
+          "time": "0.175"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_backing_and_event_alias_resolve_one_save[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "82",
+          "time": "0.169"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_currency_root_point_save_does_not_walk_map_history",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "104",
+          "time": "12.100"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_rejected_currency_root_assignment_preserves_old_occurrence[foreign]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "156",
+          "time": "0.258"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_rejected_currency_root_assignment_preserves_old_occurrence[undeclared]",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "156",
+          "time": "0.250"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_explicit_graph_copy_normalizes_currency_roots_without_event_aliases",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "183",
+          "time": "0.141"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_currency_root_copy",
+          "name": "test_checked_current_copy_preserves_currency_root_id_and_source_overlay",
+          "file": "simulation/tests/test_stage_0_5_final_currency_root_copy.py",
+          "line": "204",
+          "time": "0.257"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_raw_shared_event_data_copy_keeps_incarnations_and_physical_child_routes",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "19",
+          "time": "0.172"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_copy_rejects_conflicting_legacy_alias_bodies_before_publish[event-data]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "60",
+          "time": "0.066"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_copy_rejects_conflicting_legacy_alias_bodies_before_publish[action-root]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "60",
+          "time": "0.066"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_event_child_retains_existing_skill_history_alias",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "93",
+          "time": "0.172"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_native_record_shared_by_event_payloads_mutates_and_reopens",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "109",
+          "time": "0.154"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_sealed_native_event_value_graph_allocates_readonly_backings_in_copy",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "125",
+          "time": "0.133"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_record_normalized_from_event_data_reuses_related_eager_action_root[True]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "145",
+          "time": "0.151"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_record_normalized_from_event_data_reuses_related_eager_action_root[False]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "145",
+          "time": "0.149"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_skill_record_keeps_one_body_when_native_root_edits_first[True]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "169",
+          "time": "0.169"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_skill_record_keeps_one_body_when_native_root_edits_first[False]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "169",
+          "time": "0.199"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_sealed_event_shared_by_mutable_payloads_has_one_readonly_body",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "192",
+          "time": "0.146"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[before_catalog_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "212",
+          "time": "0.181"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[after_catalog_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "212",
+          "time": "0.179"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_event_copy_fault_discards_private_graph_and_can_retry[before_publish]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "212",
+          "time": "0.221"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_event_copy",
+          "name": "test_normalized_copy_preserves_held_source_pin_and_pending_overlays",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_event_copy.py",
+          "line": "232",
+          "time": "0.158"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[map-float]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.159"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[map-tuple]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.165"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[map-frozenset]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.180"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[map-ref]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.167"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[set-float]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.165"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[set-tuple]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.172"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[set-frozenset]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.168"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_event_key_copy_retains_exact_nan_and_shared_container[set-ref]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "15",
+          "time": "0.166"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_equal_bit_distinct_nan_members_are_not_collapsed[map]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "47",
+          "time": "0.135"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_equal_bit_distinct_nan_members_are_not_collapsed[set]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "47",
+          "time": "0.126"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_nan_scalar_in_shared_native_action_preserves_public_float_type",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "65",
+          "time": "0.167"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_nan_values_and_frozen_keys_reopen_copy_and_detach[False]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "85",
+          "time": "0.233"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_nan_values_and_frozen_keys_reopen_copy_and_detach[True]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "85",
+          "time": "0.251"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_equal_bit_nan_values_have_distinct_position_atoms",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "105",
+          "time": "0.128"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_alias_nan_bit_disagreement_rejects_without_destination",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "120",
+          "time": "0.068"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_older_page_backing_raw_nan_slots_upgrade_to_usable_atoms[map]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "143",
+          "time": "0.142"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_older_page_backing_raw_nan_slots_upgrade_to_usable_atoms[set]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "143",
+          "time": "0.138"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_older_page_backing_raw_nan_slots_upgrade_to_usable_atoms[list]",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "143",
+          "time": "0.140"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_legacy_nonreflexive_copy",
+          "name": "test_legacy_atom_normalization_composes_with_counted_copy_promotion",
+          "file": "simulation/tests/test_stage_0_5_final_legacy_nonreflexive_copy.py",
+          "line": "169",
+          "time": "0.111"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_one_nan_is_shared_by_map_key_value_ref_and_frozenset_after_reopen",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "11",
+          "time": "0.139"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_unpublished_nan_insert_remove_preserves_native_semantics[map]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "29",
+          "time": "0.119"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_unpublished_nan_insert_remove_preserves_native_semantics[set]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "29",
+          "time": "0.113"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_nan_input_and_sharing_survive_frozen_save_recovery[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "49",
+          "time": "0.150"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_nan_input_and_sharing_survive_frozen_save_recovery[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "49",
+          "time": "0.149"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_invalid_map_value_rejects_before_nan_allocation_or_entry_mutation",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "78",
+          "time": "0.098"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_unheld_nan_sources_release_roots_after_acknowledgement",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "91",
+          "time": "0.152"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_held_nan_lookup_rejects_closed_session",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "111",
+          "time": "0.106"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_nan_atom_cannot_resolve_to_a_live_container_incarnation",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "123",
+          "time": "0.050"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_frozen_nan_snapshot_certification_survives_reopen",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "134",
+          "time": "0.122"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_nan_local_edit_cost_is_independent_of_unrelated_history",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "150",
+          "time": "1.148"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_cancelled_unheld_nan_input_does_not_leak_conditional_roots",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "197",
+          "time": "0.145"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_cancelled_held_nan_can_be_reattached_after_an_unrelated_save",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "214",
+          "time": "0.517"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_direct_soul_map_and_set_admission_share_native_nan_identity",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "234",
+          "time": "0.175"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_nonreflexive_runtime",
+          "name": "test_nan_value_replacement_then_reversion_restores_checked_sharing",
+          "file": "simulation/tests/test_stage_0_5_final_nonreflexive_runtime.py",
+          "line": "256",
+          "time": "0.405"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_recursive_list_map_and_tuple_preserve_shared_child_after_reopen",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "8",
+          "time": "0.207"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_recursive_children_share_the_world_fault_recovery_plan[before_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "32",
+          "time": "0.155"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_recursive_children_share_the_world_fault_recovery_plan[after_commit]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "32",
+          "time": "0.114"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_pending_child_replacement_wins_over_retained_alias",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "55",
+          "time": "0.190"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_missing_recursive_occurrence_rejects_before_value_edit",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "77",
+          "time": "0.103"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_recursive_value_routing_is_independent_of_unrelated_history",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "94",
+          "time": "0.736"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_recursive_descendants_survive_counted_admission_and_leaf_split",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "126",
+          "time": "1.129"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_recursive_retirement_removes_physical_placements_and_protects_old_pin",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "148",
+          "time": "0.641"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_recursive_detach_materializes_one_shared_native_graph",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "178",
+          "time": "0.073"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_cyclic_recursive_assignment_leaves_the_owner_and_journals_unchanged",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "192",
+          "time": "0.058"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_parent_member_edit_checks_its_existing_child_group_before_changing_value[list]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "208",
+          "time": "0.120"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_parent_member_edit_checks_its_existing_child_group_before_changing_value[map]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "208",
+          "time": "0.116"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_counted_position_edit_checks_child_groups_before_rebalancing",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "226",
+          "time": "0.175"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_stale_recursive_session_can_read_pinned_children_but_cannot_edit",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "243",
+          "time": "0.122"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_cyclic_soul_assignment_is_rejected_before_owner_edit",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "257",
+          "time": "0.076"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_new_scalar_physical_owner_can_gain_recursive_members_after_save[list]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "276",
+          "time": "0.171"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_new_scalar_physical_owner_can_gain_recursive_members_after_save[map]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "276",
+          "time": "0.147"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_new_scalar_physical_owner_can_gain_recursive_members_after_save[sequence]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "276",
+          "time": "0.193"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_counted_recursive_bulk_failure_restores_placement_and_value_journals[False]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "298",
+          "time": "0.216"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_counted_recursive_bulk_failure_restores_placement_and_value_journals[True]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "298",
+          "time": "0.271"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_invalid_counted_bulk_input_does_not_allocate_or_publish_earlier_native_children",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "326",
+          "time": "0.173"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_rejected_assignment_does_not_admit_native_children[list-index]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "344",
+          "time": "0.113"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_rejected_assignment_does_not_admit_native_children[list-extended_slice]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "344",
+          "time": "0.112"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_rejected_assignment_does_not_admit_native_children[list-invalid_slice_member]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "344",
+          "time": "0.119"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_rejected_assignment_does_not_admit_native_children[sequence-index]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "344",
+          "time": "0.217"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_rejected_assignment_does_not_admit_native_children[sequence-extended_slice]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "344",
+          "time": "0.133"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_rejected_assignment_does_not_admit_native_children[sequence-invalid_slice_member]",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "344",
+          "time": "0.148"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_cancelled_unpublished_recursive_page_retires_its_checked_placements",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "372",
+          "time": "0.137"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_counted_recursive_iterator_sees_native_prefix_and_preserves_it_on_input_failure",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "394",
+          "time": "0.245"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_invalid_streamed_recursive_input_preserves_private_alias_without_publishing_orphan_graph",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "421",
+          "time": "0.270"
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_world_recursive_histories",
+          "name": "test_cancelled_recursive_replacement_restores_persisted_page_projection",
+          "file": "simulation/tests/test_stage_0_5_final_world_recursive_histories.py",
+          "line": "459",
+          "time": "0.186"
+        }
+      ],
+      "properties": [
+        {
+          "name": "h1k_h10k_settlement_memory_io",
+          "value": "[{'payload_reads': 38, 'payload_read_bytes': 6440, 'payload_check_reads': 44, 'payload_check_bytes': 7556, 'payload_writes': 6, 'payload_write_bytes': 1097, 'metadata_rows': 369, 'query_rows': 0, 'pin_rows': 369, 'maintenance_rows': 10, 'temporary_keys_peak': 0, 'maintenance_removed_rows': 5}, {'payload_reads': 38, 'payload_read_bytes': 6440, 'payload_check_reads': 44, 'payload_check_bytes': 7556, 'payload_writes': 6, 'payload_write_bytes': 1097, 'metadata_rows': 369, 'query_rows': 0, 'pin_rows': 369, 'maintenance_rows': 10, 'temporary_keys_peak': 0, 'maintenance_removed_rows': 5}]"
+        },
+        {
+          "name": "H1000_payload_reads",
+          "value": "100"
+        },
+        {
+          "name": "H1000_payload_read_bytes",
+          "value": "20890"
+        },
+        {
+          "name": "H1000_metadata_rows",
+          "value": "705"
+        },
+        {
+          "name": "H10000_payload_reads",
+          "value": "100"
+        },
+        {
+          "name": "H10000_payload_read_bytes",
+          "value": "19674"
+        },
+        {
+          "name": "H10000_metadata_rows",
+          "value": "705"
+        },
+        {
+          "name": "H1000_payload_reads",
+          "value": "80"
+        },
+        {
+          "name": "H1000_payload_writes",
+          "value": "10"
+        },
+        {
+          "name": "H1000_metadata_rows",
+          "value": "615"
+        },
+        {
+          "name": "H1000_noop_descriptor_reads",
+          "value": "3"
+        },
+        {
+          "name": "H1000_noop_metadata_rows",
+          "value": "37"
+        },
+        {
+          "name": "H10000_payload_reads",
+          "value": "80"
+        },
+        {
+          "name": "H10000_payload_writes",
+          "value": "10"
+        },
+        {
+          "name": "H10000_metadata_rows",
+          "value": "615"
+        },
+        {
+          "name": "H10000_noop_descriptor_reads",
+          "value": "3"
+        },
+        {
+          "name": "H10000_noop_metadata_rows",
+          "value": "37"
+        },
+        {
+          "name": "H1000_nan_edit",
+          "value": "LazyStoreDiagnostics(payload_reads=137, payload_read_bytes=26263, payload_check_reads=172, payload_check_bytes=31841, payload_writes=15, payload_write_bytes=2290, metadata_rows=887, query_rows=12, pin_rows=798, maintenance_rows=60, temporary_keys_peak=0, maintenance_removed_rows=30)"
+        },
+        {
+          "name": "H1000_nan_noop",
+          "value": "LazyStoreDiagnostics(payload_reads=3, payload_read_bytes=217, payload_check_reads=3, payload_check_bytes=217, payload_writes=0, payload_write_bytes=0, metadata_rows=37, query_rows=0, pin_rows=0, maintenance_rows=0, temporary_keys_peak=0, maintenance_removed_rows=0)"
+        },
+        {
+          "name": "H10000_nan_edit",
+          "value": "LazyStoreDiagnostics(payload_reads=137, payload_read_bytes=26217, payload_check_reads=172, payload_check_bytes=31749, payload_writes=15, payload_write_bytes=2290, metadata_rows=887, query_rows=12, pin_rows=797, maintenance_rows=60, temporary_keys_peak=0, maintenance_removed_rows=30)"
+        },
+        {
+          "name": "H10000_nan_noop",
+          "value": "LazyStoreDiagnostics(payload_reads=3, payload_read_bytes=217, payload_check_reads=3, payload_check_bytes=217, payload_writes=0, payload_write_bytes=0, metadata_rows=37, query_rows=0, pin_rows=0, maintenance_rows=0, temporary_keys_peak=0, maintenance_removed_rows=0)"
+        },
+        {
+          "name": "H1000_payload_reads",
+          "value": "104"
+        },
+        {
+          "name": "H1000_payload_writes",
+          "value": "10"
+        },
+        {
+          "name": "H1000_metadata_rows",
+          "value": "748"
+        },
+        {
+          "name": "H10000_payload_reads",
+          "value": "104"
+        },
+        {
+          "name": "H10000_payload_writes",
+          "value": "10"
+        },
+        {
+          "name": "H10000_metadata_rows",
+          "value": "748"
+        }
+      ]
+    }
+  ],
+  "RED": "An unaliased imported settlement memory retained one eager map after explicit checked graph copy",
+  "representation": "Existing checked recursive map, shared catalog/runtime/publisher; compatibility legacy unchanged",
+  "remaining": "Complete root/immutable inventory and format activation; integrated P5/full suite; independent acceptance"
+}

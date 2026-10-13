@@ -1,0 +1,9 @@
+# Independent candidate architecture review and repair receipt
+
+One fresh-context, read-only review was performed under the approved inline execution plan. No second backend/catalog/publisher was proposed. The reviewer found two material issues and a documentation gap: a semantic exception-set full-copy scrub gap; cumulative dirty reconciliation that could be quadratic; and a stale field inventory. All three received a repair pass. Permanent regressions reproduced the first two before the fixes. The exact gates, diagnostics, source hashes and limits are retained in stage_0_5_complete_candidate_validation.json.
+
+The full-copy scrub now checks exception counts, strictly ordered positive in-prefix removals and additions overlapping the surviving prefix. Ordinary removal probes validate the queried value and adjacent values; they do not enumerate the captured range. Imported cultural Institution.practices was additionally found in the concrete root audit and normalized through the existing checked set authority.
+
+Dirty owner/backing reconciliation now consumes notifications from the existing dirty journals. It does not introduce another persisted ownership authority or an archive inventory. Explicit save/cleanup may still visit actual D; current packed Agency.actions synchronization retains its accepted C cost. The generated 0+1+0 probe passed with an exact independent digest after these fixes. It does not replace the required final 3+4+3 test.
+
+This receipt does not certify final full-suite/P5 results before they finish. The review was not an exhaustive proof of every source line and preceded the final repair pass. The final source validation and release-policy decisions are tracked separately. No main/PR14 promotion, checkpoint-default replacement, rank gameplay change or endurance run occurred.

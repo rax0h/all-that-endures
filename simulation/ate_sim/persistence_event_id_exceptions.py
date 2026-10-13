@@ -11,6 +11,33 @@ from .persistence_event_ids import EventIdSet, EXCEPTION_TAG
 from .persistence_lazy_nested_history import HistoryReference, immutable_value
 
 
+def verify_exception_descriptor(store, pin, value):
+    """Explicit full-copy scrub; never a captured-prefix enumeration."""
+    checked_descriptor(value)
+    from .persistence_lazy_sequence import LazyOrderedSequence
+    from .persistence_lazy_nested_history import LazyHistorySet
+    removed=LazyOrderedSequence(store,pin,value[2].incarnation,value_mode='native',
+        checked_types=True,recursive=True)
+    added=LazyHistorySet(store,pin,value[3].incarnation,checked_types=True,recursive=True)
+    authority=PagedEventIdExceptions(value[1],removed,added,expected_length=value[4])
+    previous=0
+    for member in removed:
+        if type(member) is not int or not previous<member<=value[1]:
+            raise StoreIntegrityError('exception removed IDs are not strictly ordered within the prefix')
+        previous=member
+    for member in added:
+        # Closed tuple/Ref/atom references cannot compare equal to an integer.
+        if type(member) in (bool,int,float) and member in authority.prefix:
+            if not authority._removed_contains(int(member)):
+                raise StoreIntegrityError('exception additions overlap the surviving prefix')
+
+
+class _CheckedRemoved:
+    def __init__(self, authority):self.authority=authority
+    def __len__(self):return len(self.authority.removed)
+    def __getitem__(self,position):return self.authority._removed_at(position)
+
+
 def checked_descriptor(value):
     if (type(value) is not tuple or len(value) != 5 or value[0] != EXCEPTION_TAG
             or type(value[1]) is not int or value[1] < 0
@@ -28,6 +55,7 @@ class PagedEventIdExceptions(MutableSet):
     def __init__(self, end, removed, added, *, expected_length=None):
         self.prefix = EventIdSet.from_range_descriptor(end)
         self.removed, self.added = removed, added
+        self._checked_removed = _CheckedRemoved(self)
         if len(removed) > end or (expected_length is not None and len(self) != expected_length):
             raise StoreIntegrityError('exceptional event-ID counts disagree')
 
@@ -67,12 +95,26 @@ class PagedEventIdExceptions(MutableSet):
         return hash(value)
 
     def _removed_contains(self, value):
-        position = bisect_left(self.removed, value)
-        return position < len(self.removed) and self.removed[position] == value
+        position = bisect_left(self._checked_removed, value)
+        return position < len(self.removed) and self._removed_at(position) == value
+
+    def _removed_at(self, position):
+        length=len(self.removed)
+        position=position if position>=0 else length+position
+        value=self.removed[position]
+        if type(value) is not int or not 0<value<=self.prefix.range_end:
+            raise StoreIntegrityError('exception removed ID lies outside its captured prefix')
+        for neighbor,lower in ((position-1,True),(position+1,False)):
+            if 0<=neighbor<length:
+                other=self.removed[neighbor]
+                if (type(other) is not int or not 0<other<=self.prefix.range_end
+                        or not (other<value if lower else value<other)):
+                    raise StoreIntegrityError('exception removed-ID order is inconsistent')
+        return value
 
     def _remove_prefix_value(self, value):
-        position = bisect_left(self.removed, value)
-        if position == len(self.removed) or self.removed[position] != value:
+        position = bisect_left(self._checked_removed, value)
+        if position == len(self.removed) or self._removed_at(position) != value:
             self.removed.insert(position, value)
 
     def __iter__(self):
@@ -86,7 +128,7 @@ class PagedEventIdExceptions(MutableSet):
         if value in self:
             return
         if type(value) is int and value in self.prefix:
-            del self.removed[bisect_left(self.removed, value)]
+            del self.removed[bisect_left(self._checked_removed, value)]
         else:
             # Keep True/1.0 as the representative after deleting integer1.
             self.added.add(value)
@@ -114,17 +156,17 @@ class PagedEventIdExceptions(MutableSet):
         end, count = self.prefix.range_end, len(self.removed)
         if end == count:
             raise KeyError('pop from an empty set')
-        if count and self.removed[-1] == end:
+        if count and self._removed_at(-1) == end:
             # Sorted holes have monotone value-rank. Locate the consecutive
             # removed suffix without walking every hole in that suffix.
             low, high, target = 0, count, end - count + 1
             while low < high:
                 middle = (low + high) // 2
-                if self.removed[middle] - middle < target:
+                if self._removed_at(middle) - middle < target:
                     low = middle + 1
                 else:
                     high = middle
-            end = self.removed[low] - 1
+            end = self._removed_at(low) - 1
         self._remove_prefix_value(end)
         return end
 

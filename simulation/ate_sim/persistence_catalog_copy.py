@@ -136,6 +136,15 @@ def _verify_catalog(store, pin):
             continue
         LazyOrderedSequence(store, pin, incarnation, value_mode='native',
             checked_types=True, recursive=True).scrub()
+    if store._namespace_state_at('world.event_ids',pin.captured_head) is None:
+        envelope=store.read_record('world.event_ids',0,expected_record_schema=1)
+        authority=envelope[1] if type(envelope) is tuple and len(envelope)==2 else None
+    else:
+        authority=store.read_version(pin,'world.event_ids',0,expected_record_schema=1).value
+    from .persistence_event_ids import EXCEPTION_TAG
+    if type(authority) is tuple and authority and authority[0]==EXCEPTION_TAG:
+        from .persistence_event_id_exceptions import verify_exception_descriptor
+        verify_exception_descriptor(store,pin,authority)
 
 
 def _check_backing_graph(codec, versions, dependencies):
@@ -279,7 +288,7 @@ def _restore_copy_ordinals(store, generation, orders, states):
 
 
 def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(), normalize_events=False,
-                               normalize_advancement=False):
+                               normalize_advancement=False, complete_format=False):
     """Explicit staging copy, never ordinary-open migration or complete format6."""
     from .persistence_history_copy_promotion import selection, capture_lists, transform_copy
     from .persistence_event_copy_normalization import capture_bodies, normalize_events as normalize_event_graph
@@ -287,6 +296,8 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
     if type(normalize_events) is not bool or type(normalize_advancement) is not bool:
         raise TypeError('graph normalization options must be bool')
     normalize_graph = normalize_events or normalize_advancement
+    if type(complete_format) is not bool or (complete_format and not (normalize_events and normalize_advancement)):
+        raise ValueError('complete format requires explicit Event and advancement graph normalization')
     source, destination = _preflight_conversion_paths(source, destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     codec = WorldCodec(identity_links_recorded=True)
@@ -387,6 +398,13 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                     _check_backing_graph(codec, all_versions, dependencies)
                     delta = initial_catalog_delta(codec, versions, placements, ordinary_changes=ordinary,
                         next_incarnation_id=next_incarnation, generation=pin.captured_head + 1)
+                if complete_format:
+                    from dataclasses import replace
+                    from .persistence_complete_format import marked_manifest, FORMAT_VERSION
+                    from .persistence_adapters import META
+                    all_ordinary = tuple(replace(c, value=marked_manifest(c.value))
+                        if c.namespace == META and c.key == 'manifest' and not c.delete else c for c in all_ordinary)
+                    floor = max(floor, FORMAT_VERSION)
                 _copy_phase('before_catalog_commit', private)
                 committed = target.commit(pin, commit_token=token,
                     changes=all_ordinary + (RecordChange(EVENT_STORAGE,
@@ -399,6 +417,10 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                 _restore_copy_ordinals(target, pin.captured_head, orders, states)
                 target.verify_all()
                 _verify_catalog(target, pin)
+                if complete_format:
+                    from .persistence_adapters import _read_cold_manifest
+                    from .persistence_complete_format import check_open
+                    check_open(target, pin, target.checked_head(), _read_cold_manifest(target))
                 generation, identity = target.generation, target.store_identity
                 _copy_phase('after_catalog_validation', private)
             except BaseException:
@@ -410,7 +432,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
         _copy_phase('before_publish', private)
         _publish_private_cold_file(private, destination)
     return {'source_generation': copied.generation, 'generation': generation,
-            'store_identity': identity, 'source_preserved': True, 'complete_format': False}
+            'store_identity': identity, 'source_preserved': True, 'complete_format': complete_format}
 
 
 def _copy_current_checked_catalog(source, destination, *, rules_id):
@@ -437,8 +459,13 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
                     if target._namespace_state_at(CATALOG_NAMESPACE, pin.captured_head) is None:
                         raise StoreFormatError('checked current copy requires an existing checked catalog')
                     floor = int(target.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
-                    if floor != BOUNDED_AUTHORITY_FORMAT_VERSION:
-                        raise StoreFormatError('checked current copy requires bounded-authority format5')
+                    from .persistence_complete_format import FORMAT_VERSION as COMPLETE_VERSION, check_open
+                    if floor not in (BOUNDED_AUTHORITY_FORMAT_VERSION, COMPLETE_VERSION):
+                        raise StoreFormatError('checked current copy requires bounded or complete authority')
+                    complete_format = floor == COMPLETE_VERSION
+                    if complete_format:
+                        from .persistence_adapters import _read_cold_manifest
+                        check_open(target, pin, target.checked_head(), _read_cold_manifest(target))
                     _verify_catalog(target, pin)
                     rosters = _backing_rosters(target, pin, target.read_identity_state(pin))
                     if set(target.iter_keys(pin, DEPENDENCIES)) != {r.key for r in rosters}:
@@ -497,4 +524,4 @@ def _copy_current_checked_catalog(source, destination, *, rules_id):
         _copy_phase('before_publish', private)
         _publish_private_cold_file(private, destination)
     return {'source_generation': copied.generation, 'generation': generation,
-            'store_identity': identity, 'source_preserved': True, 'complete_format': False}
+            'store_identity': identity, 'source_preserved': True, 'complete_format': complete_format}

@@ -1,5 +1,39 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: complete-format candidate, root audit and review repairs (October 13 UTC)
+
+Complete-format capability6 now selects the existing checked runtime on ordinary open. Exact feature/floor/catalog checks reject missing or competing authority without repair. Explicit `upgrade_lazy_snapshot` publishes only a private source-preserving fully normalized format5 copy through the existing transaction/publisher. Earlier formats use their established explicit conversion first; no hidden migration or default checkpoint change.
+
+The root audit closed unaliased Settlement.memory and culture.Institution.practices imports/replacements through the existing map/set binder. The 483-field inventory now discloses actual generated guards, unrestricted imports and current immutable byte costs. Independent review found an exception semantic full-scrub gap and cumulative owner/backing reconciliation. Both were reproduced and repaired with permanent regressions. The generated 0+1+0 independent-control probe now passes (first continuation 10.707s); it is not the required acceptance P5.
+
+Final-source focused gates: **78 passed in79.44s** (complete open/copy/Event-ID) and **17 passed in18.34s** (root/import bytes/incremental reconciliation/schema); counts overlap the broader **88 passed in22.45s** recursive affected gate. Final-source four-phase cross-family commit/copy/reopen/recovery passed. Exact metrics and source SHA256 map: `stage_0_5_complete_candidate_validation.json`. Review receipt: `STAGE_0_5_COMPLETE_REVIEW.md`.
+
+Required seed8430003+4+3 complete-format P5 and the one full applicable simulation suite are running asynchronously on unchanged production source. Earlier interrupted runs and the instrumented diagnostic exit139 are explicitly not passing certification. Stage0.5 is not yet accepted. Pressure cold-miss/latency and endurance release policy remain separate owner decisions. Rank issue17, main, PR14 and endurance remain untouched.
+
+## Latest checkpoint: imported settlement memory root (resumed closeout)
+
+Parent public `a90e50645dd7bcbad22882f8fc34596a72cd4f33`, local `3e040b4`,
+matching tree `2765c0341850ab2b34b8e4026dfee68d27f4fd70`.
+
+The root audit reproduced an unaliased imported Settlement.memory map still
+being eager after checked graph copy. Copy normalization now selects that
+concrete child even without an incidental Event/currency alias. Checked field
+assignment reuses the existing recursive map binder, with original-owner
+preservation on invalid/foreign replacement. Generated engine/warfare keys
+remain monster_surge/war; imported entries are preserved without a size cap.
+
+**6 passed in 12.94s** new memory gates; **143 passed in 57.93s** affected
+household/settlement/catalog/currency/legacy/recursive gates. Counts overlap.
+H1k/H10k scalar defense edits read no imported memory entries; counts and byte
+measurements are recorded in `stage_0_5_settlement_memory_validation.json`.
+Before/after commit faults, replacement with shared children, independent root
+aliases, source-preserving copy and full detach are covered.
+
+Next: complete-format marker/reader-floor/open/upgrade integration and final
+root/immutable-field classification, integrated P5/recovery and final stable
+source suite. Stage remains unfinished; no capability6, rank issue17, PR14 or
+endurance claim. This implements the existing architecture, not a new scope.
+
 ## Latest checkpoint: checked Event-ID atom keys and genuine legacy upgrade (October 13 UTC)
 
 Recovered parent public `136eea844d99094cd8c3e3568507fceded4f2a63`;

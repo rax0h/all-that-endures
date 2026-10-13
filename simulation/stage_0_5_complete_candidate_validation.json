@@ -1,0 +1,493 @@
+{
+  "status": "complete-format candidate; required final acceptance runs in progress",
+  "public_parent": "a90e50645dd7bcbad22882f8fc34596a72cd4f33",
+  "capability": 6,
+  "source_sha256": {
+    "simulation/ate_sim/__init__.py": "5df339589dc36704a1989c3b23440d9f5a0d26f53def1d161225b5340b2d0a50",
+    "simulation/ate_sim/advancement.py": "5a515f36e79276b9a2ae2717ce0cb45f4c26a514a2415f9d74a1afa115a8c281",
+    "simulation/ate_sim/agency.py": "38d0538421cc714fa51f602995cb7eeaa230b2d192c9a2d7fd68faeb0eacf01d",
+    "simulation/ate_sim/ambient_magic.py": "222fa056814e4fde2f8053a85a89cbf6971b3b6c5e839fe482a29cde0277c3bf",
+    "simulation/ate_sim/biology.py": "0630c0da55e1365e8781afb22e87cc899881b667193388b3dd2f838a2b5a54ef",
+    "simulation/ate_sim/canonical_stream.py": "9e1d880d139a6dd916645610cbf9840fa0056825c6cb2d7affc606f7576b9fdd",
+    "simulation/ate_sim/checkpoint.py": "7d352786deee49042eb964fa5f7de4221114a3086ea9cfbe587bb5794ec438f2",
+    "simulation/ate_sim/civilization.py": "d57cf1bd9941d2cca12cebb1fab0d3766506a07123f25ca143c71e8c43395504",
+    "simulation/ate_sim/communities.py": "f7730f609951e4ed9665921ae0a743a60d6f533f85cc78af2cc2927f6b17260d",
+    "simulation/ate_sim/core.py": "b344eb1e75f9a2e2d934de2445eeec8dd9a0d746ffe50845822fc95c2b328cdc",
+    "simulation/ate_sim/core_types.py": "a29cfac62ed6c7acf19f134f24573f16a9637da1d37cee4783b88d55770c2098",
+    "simulation/ate_sim/craft_careers.py": "7f3259268d6dc874108c78a31e4d7f6d98a5e9ba441f1f24c17d5c76cb05597a",
+    "simulation/ate_sim/culture.py": "9bd8a14708df44d6d7971dac12761fd06f4129c55ada7af4e037021d3d928b27",
+    "simulation/ate_sim/currency.py": "3ab604771bbc305943e92e56d5d256ec8b7cea72fb6b1cada8baa681438de21b",
+    "simulation/ate_sim/development.py": "2cd38306d0bf1c0ae48b07d7ff849e9cb1b2a2131db0792402109e497527b0d7",
+    "simulation/ate_sim/diagnostics.py": "80a711e5432bfc05356a56988b89e84e160ddccba8d56420e80f1683af07dacb",
+    "simulation/ate_sim/divinity.py": "b0fe2c96f506b1d10c3ae3319ad45e130e99d062fd2ed0e27fdd35fd2fe3a6dc",
+    "simulation/ate_sim/economy.py": "7f953b791030be6521ae75d220f12d0b7c88d62f343439819ee3bc7e850bc492",
+    "simulation/ate_sim/engine.py": "8b80094af38a2b0c5155d8422df136cc9c70107d21d6a56de03c7a38a64ca4d8",
+    "simulation/ate_sim/event_log.py": "baa09dfaad18846236d9e681623f1f85b483afcceacb8a88ae1720e3fcbcbd0f",
+    "simulation/ate_sim/genealogy.py": "c089d815ed43e521f3c949bc1991fdbce7899f2eabf174e7b62255b6125b412c",
+    "simulation/ate_sim/history_archive.py": "a0589272e6124f9f07b4beb9f831a3c0924ecbf6f09c3f19ecaedb3febf82597",
+    "simulation/ate_sim/household_queries.py": "dc382c6ff85b5f576e9c8f935920491cc61f15c45e22f937b2d897b0403c5194",
+    "simulation/ate_sim/households.py": "d62054b9ae99d316c7c1c0bdc0a4952db1e205c065c000d0d2b5e91505a8dccc",
+    "simulation/ate_sim/incremental_store.py": "3d38fd9ec7df434d1668adabf602c2f2a38266b5f8e08304e8733366514b3019",
+    "simulation/ate_sim/infrastructure.py": "539bfd6902c5bde44c7eae23b651cfd832c1ba10c908a73d27de75a59b73ddc1",
+    "simulation/ate_sim/institutions.py": "0e1504808d3013d2d8f42eb07d0965a32203bf989afe94c45abcdccbf3c0b9e0",
+    "simulation/ate_sim/knowledge.py": "71d2f5a80380d6e63d0b9e995f3f7ddf26045491bf3ef080d0def7f03a9742d0",
+    "simulation/ate_sim/lineage.py": "48212f0ef7c8af23162e502d8fbe400d54fafebe4fba7e1b7a621d8e0259992d",
+    "simulation/ate_sim/magic_catalog.py": "313f22190afed3b25637ea5c0d3b717a644efda888ca9992dd26346657480edf",
+    "simulation/ate_sim/magic_economy.py": "988824adaf5d3baff84de0591acadb989ac581e01868b5042104f31c2c49dcbe",
+    "simulation/ate_sim/magic_progression.py": "5f379223dc01df6837700a7596708b69015021a3aaa7495709b5a34e660fc4e3",
+    "simulation/ate_sim/magic_resources.py": "32790d5febcce77258b7ae297704806ed0dee848e7b899c67de0152ce658d1c0",
+    "simulation/ate_sim/magical_civilization.py": "f05ba2c5ba7a820f021e09be65a5d371cf3cba2b42571e6533268ee2182310f9",
+    "simulation/ate_sim/mastery_training.py": "a8b73f56b280f5e7c136dcd1453206ee9575d2191ea97c8f39472629f06c5cb3",
+    "simulation/ate_sim/materials.py": "f94e69db5972b055f8a187349c6b796b9031cebea6c67159b54c51b5e95e2622",
+    "simulation/ate_sim/metaphysics.py": "a31809d4d8d4002b3e1eb02e4e5fbdb64afeae512026b34f9d1718087be0c120",
+    "simulation/ate_sim/mortality.py": "e47a7dee1f55eb38c3edd44f81742904f1d2fd4e0987848fa5c46853e1eb069b",
+    "simulation/ate_sim/narrative_sampler.py": "8c628eafe91ad3a16d0574aa41d810f2623e9e0999c59616016f694f51a575b9",
+    "simulation/ate_sim/persistence_adapters.py": "8beb8f308452f5d3ac7982fbbf770a0bc791d690e5eb999880de03cbea6e6846",
+    "simulation/ate_sim/persistence_catalog_copy.py": "4bfc934c27225fdd0cc91b83dc3827f58d38b79ffb467a1f85b93fb1851b2ce3",
+    "simulation/ate_sim/persistence_cold_save.py": "93e5dcacd3227578e981df74186e98d6ad9a915e1d612e3a245498fbbd9d0fb9",
+    "simulation/ate_sim/persistence_complete_format.py": "05f192635211a48079a685e8cd0a646ca9000ab6592c0597ffd984b121f0c5ee",
+    "simulation/ate_sim/persistence_event_copy_normalization.py": "8c93c07a3fabf0e7ae82fd23386382e3fbe648ac21b24c303f99b9a29de49b59",
+    "simulation/ate_sim/persistence_event_id_exceptions.py": "9e30bab005c87e0bbc217c82f725252314d90d67c6e2abbd6c997306d3dca0b0",
+    "simulation/ate_sim/persistence_event_id_reference.py": "baae936ab3c7c2e475de9641eca75762efae3f58c846e6b84371f176e6443d20",
+    "simulation/ate_sim/persistence_event_ids.py": "1e5f2a993aa6d3cec3894356415c74302a1fe8eb5375edcb47f584f37c3b4286",
+    "simulation/ate_sim/persistence_events.py": "ad22e1e187d3e052de1857382e23b47abd356352c7589f7e1c29e4b4443d8149",
+    "simulation/ate_sim/persistence_frozen_snapshots.py": "d3d0fec467c17f3330655cb3ed3f570e7a895be5aacf11391ce3cc809a27ede9",
+    "simulation/ate_sim/persistence_history_copy_promotion.py": "8fb160326b284139a30b63d82c835a52c197062df756a97aa7729477c93f591c",
+    "simulation/ate_sim/persistence_history_dependencies.py": "769dc53a43d3dd4d34378ceb605f4abcae85b8b3e2d83b526ebff69a668f1c11",
+    "simulation/ate_sim/persistence_history_leases.py": "f7804b75302c5a5927ea523375f916639744a5b44daa33c5023115566717596e",
+    "simulation/ate_sim/persistence_history_owner_adapters.py": "ce836aa2ab7253c35d2098523bf73c327a116d7b5b605b4c391cbd9b8067f50e",
+    "simulation/ate_sim/persistence_history_promotion.py": "5ade872c1ef9209b72d2ee511f1c5f0533bb8772e57c511bd4880d1e767c538a",
+    "simulation/ate_sim/persistence_history_retirement.py": "e3013300f99885cb59e97376cd261845d38061b3d32e8ead26a79e92599948c7",
+    "simulation/ate_sim/persistence_history_runtime.py": "c75f6a40cfbe4fcd5c2be271c470f5234e7e38844d49ec35847ebffa2b85dab9",
+    "simulation/ate_sim/persistence_history_types.py": "bb96b59b610e86e835fcf9b141af319585a5c790156a0cec805b2b1033628544",
+    "simulation/ate_sim/persistence_identity.py": "26a757e0d971f248414b058a10f8e8dc9e0d2c47ac82711c81e095746e87bbb8",
+    "simulation/ate_sim/persistence_lazy.py": "83dd69d97fbe14ca31b9417b2837cb037b000181a8dc881e8d536cf669d3bbff",
+    "simulation/ate_sim/persistence_lazy_adoption.py": "731c977d07d90fda2af136b331506e8e85c75965e7d2417e1824bcbd9d6e031d",
+    "simulation/ate_sim/persistence_lazy_budget.py": "0f5ea4bd091d323c9a231e63cfa83a93915d93aa43f1e70f53920b452e30e490",
+    "simulation/ate_sim/persistence_lazy_families.py": "a5a7e535d6b4207d8ed6a928de00b549fd9b9e55f59473e22ff89751622250ec",
+    "simulation/ate_sim/persistence_lazy_graph_buckets.py": "edd61463433bde9049f2311aa407962bf6f1c7e933a834cfe4f61a4025af44dd",
+    "simulation/ate_sim/persistence_lazy_household_members.py": "229727ad99ff05c234ec0baf38f9335994829d878d656254f9f772c82723e569",
+    "simulation/ate_sim/persistence_lazy_identity.py": "023f3e1d2893df9207aafd5c04084fb2aac7a1fda2182d760eb8f0aa26f942b9",
+    "simulation/ate_sim/persistence_lazy_identity_catalog.py": "1a175a9d55f30421ebe4849780ed474ba9a30154985d8c83d7aadd7a7fe1ef9d",
+    "simulation/ate_sim/persistence_lazy_identity_coordinator.py": "9cbb8ecc321a6382073b41b7d04e455c55ee725b2128ea2dfe16195721ac1c97",
+    "simulation/ate_sim/persistence_lazy_identity_headers.py": "6e148202d363cd956109fd039d3be727f3c819485c5377077ec8ac94f349a143",
+    "simulation/ate_sim/persistence_lazy_identity_retired.py": "1ec014f44b26a52ab8b6424501f30328f8cba7a06c8329a49bb44a948494376f",
+    "simulation/ate_sim/persistence_lazy_lineage_children.py": "24214b874a8ae6daca0fbb3aaeef8ea65cef1b2c95f647695c476af8944faf0e",
+    "simulation/ate_sim/persistence_lazy_minimum.py": "031ad6d4e9d6ccf65653a4dd7a8a83c55496ec75d9ac7ddc7ee4cbcc9381b173",
+    "simulation/ate_sim/persistence_lazy_nested_history.py": "172582194e589a37e47ed65bdcd859865373dd1ab0014efc0d94ad71a71d693b",
+    "simulation/ate_sim/persistence_lazy_participants.py": "0a2279fb5a32401cfefd5339735d169ed8e0f1ae3a32eccf77fcc560a2a1a02f",
+    "simulation/ate_sim/persistence_lazy_publication_guard.py": "cf55ca044c65e544e8ee23d38e27ee186105e6c2d9b605eb0de8a3a93b97b12c",
+    "simulation/ate_sim/persistence_lazy_sequence.py": "98e4ad0ece4e11507f3ae4302f83c28b327be3208a14553999ea37f7679ab7b5",
+    "simulation/ate_sim/persistence_lazy_spill.py": "967139e2ab700e34655c221e205f70dcfbfc53d3b360cd9d0240ca81b9860f3b",
+    "simulation/ate_sim/persistence_lazy_store.py": "e2ca9e1c35ef16fda3cc0c34254214faa5ad64d891e3a6ca5c16e34a276b4585",
+    "simulation/ate_sim/persistence_lazy_world_identity.py": "2052f1c94e82f26dad1b2ef6976041600db27b221087af8573e56a01f3711d61",
+    "simulation/ate_sim/persistence_lifecycle.py": "d032474911ecc188240be6174111e59674e2e2e155f8a401fb43f78fb777e754",
+    "simulation/ate_sim/persistence_native_copy.py": "34367c156353a8e8e932754e4bbd0f622218a211a6417f15ecc8fe8d4b812d9b",
+    "simulation/ate_sim/persistence_nonreflexive_keys.py": "1e1dee3749293132dfcbf494979159352e8cea891da9494839cfe52ff490e15d",
+    "simulation/ate_sim/persistence_pressure.py": "e9b4da79b286cd95c63a37d755ec8dcf87c6748277c3b1f42978b0fdfd15d980",
+    "simulation/ate_sim/persistence_record_headers.py": "3450f8974a9a26035415b8230b7ad6b1706a4c90d55731ff80732275f56a2761",
+    "simulation/ate_sim/persistence_record_runtime.py": "caa560e3a5e9d61ce9e0f142048e0af061bb7cd9093169b541d47f7ca92be0f1",
+    "simulation/ate_sim/persistence_schema.py": "2a59036c05436fc75ce42ac42d194a49351855345c4f2c7891d0b565bf7beb17",
+    "simulation/ate_sim/persistence_session.py": "6a02b654c2f42cd9a10d28a561c7d8c9b738c6d57915d28ca6282cd086a2f8a4",
+    "simulation/ate_sim/persistence_tracking.py": "290d9f6ab130ae66548a6eb10efb6045b08962f81d28f9b80c4e8f018cb91d99",
+    "simulation/ate_sim/personhood.py": "4f5e59e989e1e0b72204f12b0ece54300e972aecfe7bb83adf3d787cdcd1b791",
+    "simulation/ate_sim/query.py": "1fa1f3cf96513ed03399a47363cf23780a4c9683872f6052a7ec8b43455e531f",
+    "simulation/ate_sim/rank.py": "a7c9e09848fd74d71e5115afb803459fdbc08e7c3690ab412edd2d8a656848f2",
+    "simulation/ate_sim/rank_ecology.py": "32e11fecab133652a8fcbbbe2968945bccdfca88c9c31bc583cd6c2e940531f3",
+    "simulation/ate_sim/record_index.py": "002202d5c2f089c67575b389cecce367bbccc3cb6b744f459f2c9f97ce070837",
+    "simulation/ate_sim/resource_offers.py": "4a993be903065269eca28774770513dabca43e0f94c7acec7acc5f5ba194cb0b",
+    "simulation/ate_sim/selection_pool.py": "6403fbebd605d4eca3da4fd484a22f02505ac282c56c89947fe120239ca63cad",
+    "simulation/ate_sim/semantic_dictionary.py": "e3c9a23eb615a7929fce12837448e44578c63f096e909c62844f44584efc5000",
+    "simulation/ate_sim/skills.py": "fee6d7989a5b30586ea0f953dcefef68995324fd8ab59a766599c0bf266517a7",
+    "simulation/ate_sim/social.py": "93ba7265c92ec8765f427d99d901fbe3745e88a709692b5a6699daf68342e08e",
+    "simulation/ate_sim/society_accountability.py": "1f1c28e76d74604056a30531a20a2a08e49a9ea1f4741169b4cab3821ad33623",
+    "simulation/ate_sim/society_careers.py": "65f349628b10ebbc446c333040a7e4e852cbc04c3204cb3732e4fbf8d34aab27",
+    "simulation/ate_sim/species.py": "7efbb902f694fc275c40f120e04c24de613ed5a75c0b9d7f1e07b989dadd95ac",
+    "simulation/ate_sim/threat_ecology.py": "c2905b5435243f81b8c200f01298346a79ff602a31507c56c2368e7c6e2a1ff9",
+    "simulation/ate_sim/transmission.py": "8558dba05caed70cb872ce470f51ca9ec92c058fd20c75a49045e7ba82d67619",
+    "simulation/ate_sim/warfare.py": "b0fc2c2da2480badee25757780d96d7dde7f6a409b852376eb3fbc94fd79679d",
+    "simulation/ate_sim/worldgen.py": "a97dcded3d0917c176ddb469c1a61f2d3b920e3f030b81f49302538e0c0b9f4d",
+    "simulation/persistence_p5_validation.py": "7be874e8461199349fff77d665d350f4f7179144af04fedede708e21300cc915",
+    "simulation/measure_stage_0_5_complete_recovery.py": "4e2cd3be8d065bcd3c8186de9b21ff98c4d7c08b8db96202c6cc6a10b5dbef79"
+  },
+  "focused_gates": [
+    {
+      "tests": 78,
+      "seconds": 79.44,
+      "scope": "Event-ID exceptional/nonreflexive, checked copy, complete format"
+    },
+    {
+      "tests": 17,
+      "seconds": 18.34,
+      "scope": "settlement memory/cultural import, immutable bytes, incremental notifications, schema contracts"
+    },
+    {
+      "tests": 88,
+      "seconds": 22.45,
+      "scope": "recursive histories/records/source lifetimes/promotion/Event-ID after backing notification fix"
+    }
+  ],
+  "focused_counts_overlap": true,
+  "measured_properties": {
+    "test_nan_point_edit_has_fixed_work_at_h1k_h10k.h1k_h10k_nan_event_id_io": [
+      {
+        "payload_reads": 203,
+        "payload_read_bytes": 56278,
+        "payload_check_reads": 218,
+        "payload_check_bytes": 65938,
+        "payload_writes": 27,
+        "payload_write_bytes": 12746,
+        "metadata_rows": 1478,
+        "query_rows": 1,
+        "pin_rows": 1342,
+        "maintenance_rows": 28,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 14,
+        "no_op_metadata_reads": 3
+      },
+      {
+        "payload_reads": 203,
+        "payload_read_bytes": 56284,
+        "payload_check_reads": 218,
+        "payload_check_bytes": 65947,
+        "payload_writes": 27,
+        "payload_write_bytes": 12749,
+        "metadata_rows": 1478,
+        "query_rows": 1,
+        "pin_rows": 1342,
+        "maintenance_rows": 28,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 14,
+        "no_op_metadata_reads": 3
+      }
+    ],
+    "test_complete_point_edit_and_noop_have_fixed_history_work.h1k_h10k_complete_point_io": [
+      {
+        "payload_reads": 114,
+        "payload_read_bytes": 23859,
+        "payload_check_reads": 144,
+        "payload_check_bytes": 32719,
+        "payload_writes": 14,
+        "payload_write_bytes": 3932,
+        "metadata_rows": 718,
+        "query_rows": 1,
+        "pin_rows": 616,
+        "maintenance_rows": 32,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 16
+      },
+      {
+        "payload_reads": 114,
+        "payload_read_bytes": 23859,
+        "payload_check_reads": 144,
+        "payload_check_bytes": 32720,
+        "payload_writes": 14,
+        "payload_write_bytes": 3933,
+        "metadata_rows": 718,
+        "query_rows": 1,
+        "pin_rows": 616,
+        "maintenance_rows": 32,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 16
+      }
+    ],
+    "test_scalar_settlement_edit_has_fixed_imported_memory_work.h1k_h10k_settlement_memory_io": [
+      {
+        "payload_reads": 31,
+        "payload_read_bytes": 4992,
+        "payload_check_reads": 37,
+        "payload_check_bytes": 6108,
+        "payload_writes": 6,
+        "payload_write_bytes": 1097,
+        "metadata_rows": 337,
+        "query_rows": 0,
+        "pin_rows": 349,
+        "maintenance_rows": 10,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 5
+      },
+      {
+        "payload_reads": 31,
+        "payload_read_bytes": 4992,
+        "payload_check_reads": 37,
+        "payload_check_bytes": 6108,
+        "payload_writes": 6,
+        "payload_write_bytes": 1097,
+        "metadata_rows": 337,
+        "query_rows": 0,
+        "pin_rows": 349,
+        "maintenance_rows": 10,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 5
+      }
+    ],
+    "test_imported_native_tuple_and_scalar_have_explicit_byte_cost[parents].parents_h1k_h10k_current_immutable_io": [
+      {
+        "payload_reads": 42,
+        "payload_read_bytes": 50440,
+        "payload_check_reads": 45,
+        "payload_check_bytes": 79769,
+        "payload_writes": 4,
+        "payload_write_bytes": 14966,
+        "metadata_rows": 472,
+        "query_rows": 4,
+        "pin_rows": 431,
+        "maintenance_rows": 10,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 5
+      },
+      {
+        "payload_reads": 42,
+        "payload_read_bytes": 455440,
+        "payload_check_reads": 45,
+        "payload_check_bytes": 754769,
+        "payload_writes": 4,
+        "payload_write_bytes": 149966,
+        "metadata_rows": 472,
+        "query_rows": 4,
+        "pin_rows": 431,
+        "maintenance_rows": 10,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 5
+      }
+    ],
+    "test_imported_native_tuple_and_scalar_have_explicit_byte_cost[species].species_h1k_h10k_current_immutable_io": [
+      {
+        "payload_reads": 42,
+        "payload_read_bytes": 11758,
+        "payload_check_reads": 45,
+        "payload_check_bytes": 15299,
+        "payload_writes": 4,
+        "payload_write_bytes": 2072,
+        "metadata_rows": 472,
+        "query_rows": 4,
+        "pin_rows": 431,
+        "maintenance_rows": 10,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 5
+      },
+      {
+        "payload_reads": 42,
+        "payload_read_bytes": 38758,
+        "payload_check_reads": 45,
+        "payload_check_bytes": 60299,
+        "payload_writes": 4,
+        "payload_write_bytes": 11072,
+        "metadata_rows": 472,
+        "query_rows": 4,
+        "pin_rows": 431,
+        "maintenance_rows": 10,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 5
+      }
+    ]
+  },
+  "cross_family_recovery": {
+    "passed": true,
+    "complete_format": true,
+    "cases": [
+      {
+        "phase": "during_version_writes",
+        "resolved_generation": 3,
+        "copied_generation": 3,
+        "shared_skill_wallet_event_identity": true,
+        "exact_native_key_membership": true,
+        "passed": true
+      },
+      {
+        "phase": "during_ordinary_writes",
+        "resolved_generation": 3,
+        "copied_generation": 3,
+        "shared_skill_wallet_event_identity": true,
+        "exact_native_key_membership": true,
+        "passed": true
+      },
+      {
+        "phase": "before_commit",
+        "resolved_generation": 3,
+        "copied_generation": 3,
+        "shared_skill_wallet_event_identity": true,
+        "exact_native_key_membership": true,
+        "passed": true
+      },
+      {
+        "phase": "after_commit",
+        "resolved_generation": 4,
+        "copied_generation": 4,
+        "shared_skill_wallet_event_identity": true,
+        "exact_native_key_membership": true,
+        "passed": true
+      }
+    ]
+  },
+  "short_generated_probe": {
+    "seed": 843000,
+    "pre_years": 0,
+    "continuation_years": 1,
+    "reopen_years": 0,
+    "total_year": 1,
+    "final_year": 1,
+    "checkpoint_schema": 8,
+    "rules_id": "complete-p5-short-after-sync",
+    "complete_format": true,
+    "control_total_digest": "cb84f83abe5fb780c3bda2e473794df9fd518fa9f6054d5f2776c559202df512",
+    "control_final_digest": "cb84f83abe5fb780c3bda2e473794df9fd518fa9f6054d5f2776c559202df512",
+    "events_total": 128,
+    "last_event_id": 128,
+    "cold_file_bytes": 1036288,
+    "lazy_file_bytes": 51544064,
+    "relocated_file_bytes": 51544064,
+    "cold_sha256": "a5e1f98ff4ccfd3f9aa7e9c689c3d030f3c47db732d84536075c1a716dd19078",
+    "lazy_sha256": "acef02a17240e07bc627a009986482b2638a6274d462958de0384886496ebb69",
+    "relocated_sha256": "6a00c1608c390feb503f09aa2698cc538e99bc009dae8f309ed6d78355c32b8d",
+    "checkpoint_bytes": 159332,
+    "detached_checkpoint_bytes": 272002,
+    "open_io": {
+      "payload_reads": 1141,
+      "payload_read_bytes": 334301,
+      "payload_writes": 0,
+      "payload_write_bytes": 0
+    },
+    "first_continuation_simulation_seconds": 10.70718252200004,
+    "first_save_io": {
+      "payload_reads": 36173,
+      "payload_read_bytes": 11035617,
+      "payload_writes": 9321,
+      "payload_write_bytes": 2086595
+    },
+    "first_full_audit_io": {
+      "payload_reads": 9709,
+      "payload_read_bytes": 1608542,
+      "payload_writes": 0,
+      "payload_write_bytes": 0
+    },
+    "second_continuation_simulation_seconds": 0.10768763999976727,
+    "second_save_io": {
+      "payload_reads": 3,
+      "payload_read_bytes": 222,
+      "payload_writes": 0,
+      "payload_write_bytes": 0
+    },
+    "second_full_audit_io": {
+      "payload_reads": 8697,
+      "payload_read_bytes": 1531599,
+      "payload_writes": 0,
+      "payload_write_bytes": 0
+    },
+    "fixture_creation": {
+      "cold": {
+        "final_generation": 2,
+        "commit_token": "9e87037767a34ce49dd5a73345927d9a",
+        "event_count": 65,
+        "disk_segments": 0,
+        "disk_events": 0,
+        "remaining_suffix_records": 65,
+        "transferred_events": 0,
+        "deleted_event_rows": 0,
+        "transfer_commits": 0,
+        "largest_transfer_batch_chunks": 0,
+        "staging_io": {
+          "payload_reads": 0,
+          "payload_read_bytes": 0,
+          "payload_writes": 1842,
+          "payload_write_bytes": 560380
+        },
+        "transfer_io": {
+          "payload_reads": 0,
+          "payload_read_bytes": 0,
+          "payload_writes": 0,
+          "payload_write_bytes": 0
+        },
+        "finalize_io": {
+          "payload_reads": 1,
+          "payload_read_bytes": 7666,
+          "payload_writes": 4,
+          "payload_write_bytes": 7953
+        },
+        "validation_io": {
+          "payload_reads": 3757,
+          "payload_read_bytes": 1166655,
+          "payload_writes": 0,
+          "payload_write_bytes": 0
+        },
+        "final_file_bytes": 1036288
+      },
+      "lazy": {
+        "source_generation": 2,
+        "generation": 3,
+        "store_identity": "05583cb9-75f4-4855-864b-21c2215c68c2",
+        "source_preserved": true,
+        "complete_format": true
+      }
+    },
+    "timings": {
+      "control_total_seconds": 0.05172421099996427,
+      "control_final_seconds": 0.05087582600026508,
+      "checkpoint_lane_seconds": 0.10164618399994652,
+      "fixture_creation_seconds": 12.910533003999717
+    },
+    "passed": true
+  },
+  "short_probe_does_not_replace_required_3_4_3": true,
+  "independent_review": {
+    "reviewer": "fresh-context stage05_independent_review",
+    "mode": "read-only",
+    "findings": [
+      {
+        "priority": "P2",
+        "finding": "full checked-copy scrub accepted semantically invalid exceptional removed-ID state",
+        "repair": "strict positive in-prefix sorted removal checks and addition/prefix overlap scrub; bounded local neighbor validation on removed-ID reads",
+        "validation": "RED copy unexpectedly accepted removed 0; GREEN source-preserving rejection, plus 78 affected cases"
+      },
+      {
+        "priority": "P2",
+        "finding": "successive guarded mutations rescanned cumulative dirty owner/backing state",
+        "repair": "existing dirty journals notify actual changed owners/backings; pending reconciliation is incremental, not a separate persisted authority",
+        "validation": "RED 600 owner and 576 backing scans for 24 edits; permanent bounds pass, generated 0+1+0 probe passed with first continuation 10.707 seconds"
+      },
+      {
+        "priority": "P2",
+        "finding": "schema inventory retained provisional representations and incomplete actual guard/evidence descriptions",
+        "repair": "regenerated all 483 fields with complete-lane representation, concrete writer/import table and immutable byte disclosure",
+        "validation": "exhaustive schema contract included in 17-case gate"
+      }
+    ],
+    "limitations": "Review covered candidate architecture at its invocation, not every later line; repaired changes validated through regressions and pending final suite. Pressure and endurance release decisions remain separate."
+  },
+  "discarded_attempts": [
+    {
+      "run": "earlier full-suite attempts",
+      "result": "interrupted after fixture/root audit correction; not certification"
+    },
+    {
+      "run": "earlier required P5",
+      "result": "interrupted after diagnosing repeated dirty scans; not certification"
+    },
+    {
+      "run": "cProfile plus faulthandler diagnostic",
+      "result": "diagnostic process exited 139; no production-failure or passing claim based on it"
+    },
+    {
+      "run": "earlier plain 0+1+0 probe",
+      "result": "interrupted before backing reconciliation fix"
+    },
+    {
+      "run": "nonexistent recursive_batches test filename",
+      "result": "pytest usage error; no tests run; corrected gate passed"
+    }
+  ],
+  "remaining": [
+    "required seed843000 3+4+3 P5, exact independent controls/digests and portable lanes",
+    "one full applicable suite on unchanged production source",
+    "retain final reports and retrievable restored checkpoint receipt",
+    "owner pressure cold-miss arithmetic/latency decision and endurance release policy; no new endurance authorized"
+  ],
+  "scope_guards": [
+    "rank issue17 deferred",
+    "PR14/main untouched",
+    "checkpoint default unchanged",
+    "no force push",
+    "no source snapshot overwrite",
+    "no endurance/millennium run"
+  ]
+}
