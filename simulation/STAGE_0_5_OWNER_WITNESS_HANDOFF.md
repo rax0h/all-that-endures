@@ -43,8 +43,12 @@ timeout. No gameplay, format, pressure arithmetic, RNG or save authority changed
 
 ## Validation and acceptance
 
-Exact-candidate GitHub validation is pending. The isolated validation workflow
-will run the affected gate, complete simulation/tests suite, and four disposable
+Exact candidate `ce7a5b5c0e195e3abf1aad99bbf6ad9039838877`, tree
+`c40c4bfde4c79a20669685ff04086697e599505c`, is now running in
+[GitHub run 38421286147](https://github.com/rax0h/all-that-endures/actions/runs/38421286147).
+Workflow-only commit `a45edbf5409ab614df4ebe1cba15640ea8e65f1f` pins
+that source explicitly. Results are pending. The isolated workflow
+runs the affected gate, complete simulation/tests suite, and four disposable
 year-7-to-8 continuations: baseline and candidate, each profiled and unprofiled,
 on the same runner with the same updated harness and original checksum-verified
 restore. Every lane requires exact independent eager authority and the known
