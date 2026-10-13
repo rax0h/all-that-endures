@@ -69,6 +69,16 @@ Minor deferred: reusing a complete harness workdir encounters an existing
 complete destination after setup; every workflow run uses a fresh workdir and
 existing destinations remain protected. No automatic reruns are configured.
 
-Launch receipt and results will be appended after GitHub assigns the run ID.
+## Launch receipt
+
+- [Run38447779260](https://github.com/rax0h/all-that-endures/actions/runs/38447779260): in progress at publication.
+- Exact candidate: `bdde5bc20c40583045fcb3562698847db460b080`.
+- Candidate tree: `9a3857db96d01de8c7aa8ed091702c2e964b5dc0`.
+- Workflow-only commit: `53ec46fd9f95098ec202cddcc043656197bef8c4`.
+- Latest local focused check including initialization regression:32 passed,
+  one previously verified long integration case deselected,1.01seconds.
+- Initialization regression observed RED before its repair; whole exact-source
+  suite and all recovery/horizon evidence are pending in this run.
+
 Final Stage0.5 release acceptance remains pending the exact-source jobs and
 explicit performance-policy assessment. No merge or promotion is performed.
