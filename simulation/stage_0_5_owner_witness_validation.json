@@ -5,19 +5,73 @@
   "workflow_commit": "a45edbf5409ab614df4ebe1cba15640ea8e65f1f",
   "run": 38421286147,
   "url": "https://github.com/rax0h/all-that-endures/actions/runs/38421286147",
-  "status_at_publication": "in_progress",
-  "conclusion": null,
-  "local_affected": {"passed": 62, "deselected": 6, "seconds": 21.70},
+  "status_at_publication": "completed",
+  "conclusion": "success",
+  "local_affected": {
+    "passed": 62,
+    "deselected": 6,
+    "seconds": 21.7
+  },
   "independent_review": {
     "verdict": "ready for exact-candidate validation; no outstanding Critical or Important findings in scope",
     "independent_tests_passed": 18,
-    "seconds": 0.70,
-    "repaired_findings": ["store decoder identity missing from epoch", "same-connection DDL not represented by data counters"],
+    "seconds": 0.7,
+    "repaired_findings": [
+      "store decoder identity missing from epoch",
+      "same-connection DDL not represented by data counters"
+    ],
     "scope": "bounded owner-cache validity, snapshot/pin/retention, spill and residency budgets, coordinator overlays, diagnostic harness and validation workflow"
   },
   "restore_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
   "required_final_digest": "fce95e6b2541500e5104be2d92a2cbdc00255f70e20ed3755ee7472a2b9fa733",
   "final_architecture_acceptance": "pending",
   "endurance_rerun": false,
-  "promotion": false
+  "promotion": false,
+  "artifacts": [
+    {
+      "id": 11830644931,
+      "name": "owner-witness-full-suite",
+      "digest": "sha256:fd5258595ce814665e5c35ae839a520ff5610c88a6f72c4edb2d649c5a4fa105",
+      "expires_at": "2026-10-27T16:46:25Z"
+    },
+    {
+      "id": 11826179195,
+      "name": "owner-witness-bounded-comparison",
+      "digest": "sha256:03bfcf07aea74dd774c7daa59933bb9e7e564bf65d84903cd056a89328c9d55f",
+      "expires_at": "2026-10-27T15:25:27Z"
+    },
+    {
+      "id": 11825409977,
+      "name": "owner-witness-affected",
+      "digest": "sha256:5712d9e42b8fb182791906e70a6c9d4731522993a36e30c0edde75a63867d685",
+      "expires_at": "2026-10-27T15:22:28Z"
+    }
+  ],
+  "affected": {
+    "job": 115378967160,
+    "tests": 129,
+    "junit_seconds": 80.106,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "pytest_summary": "129 passed, 4 warnings in 80.11s (0:01:20)"
+  },
+  "full_suite": {
+    "job": 115379747504,
+    "tests": 2433,
+    "junit_seconds": 5023.095,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "pytest_summary": "2431 passed, 38 warnings, 2 subtests passed in 5023.20s (1:23:43)"
+  },
+  "comparison": {
+    "job": 115379747758,
+    "raw_receipt": "stage_0_5_owner_witness_comparison.json",
+    "all_four_lanes_passed": true,
+    "seconds_fraction": 0.13818703691795975,
+    "payload_reads_fraction": 0.32560240283643094,
+    "read_bytes_fraction": 0.17819216904073
+  },
+  "artifact_zip_checksums_independently_verified": true
 }

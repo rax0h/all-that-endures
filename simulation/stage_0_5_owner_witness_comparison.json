@@ -1,0 +1,484 @@
+{
+  "sources": {
+    "baseline": [
+      "b91b0c8aa0d94bd99777e6ec14a125f947e1074a",
+      "08a4c45971090584793dcdd3c7352b5945727360"
+    ],
+    "candidate": [
+      "ce7a5b5c0e195e3abf1aad99bbf6ad9039838877",
+      "c40c4bfde4c79a20669685ff04086697e599505c"
+    ]
+  },
+  "runs": {
+    "baseline-profiled": {
+      "source_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
+      "budget_seconds_per_phase": 90.0,
+      "profiled": true,
+      "phases": {
+        "open": {
+          "status": "completed",
+          "seconds": 13.917945788000004,
+          "sqlite_vm_instructions_approx": null
+        },
+        "simulation": {
+          "status": "completed",
+          "seconds": 25.998702073000004,
+          "sqlite_vm_instructions_approx": 15960000,
+          "io": {
+            "payload_reads": 44281,
+            "payload_read_bytes": 15565858,
+            "payload_check_reads": 46338,
+            "payload_check_bytes": 16297607,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 278617,
+            "query_rows": 2032,
+            "pin_rows": 566713,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 17,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "save": {
+          "status": "completed",
+          "seconds": 15.191116584,
+          "sqlite_vm_instructions_approx": 8170000,
+          "io": {
+            "payload_reads": 24436,
+            "payload_read_bytes": 13120854,
+            "payload_check_reads": 31629,
+            "payload_check_bytes": 14844701,
+            "payload_writes": 5779,
+            "payload_write_bytes": 1593125,
+            "metadata_rows": 130344,
+            "query_rows": 2230,
+            "pin_rows": 255549,
+            "maintenance_rows": 256,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 128
+          }
+        },
+        "audit": {
+          "status": "completed",
+          "seconds": 8.242234898999996,
+          "sqlite_vm_instructions_approx": 5450000,
+          "io": {
+            "payload_reads": 19534,
+            "payload_read_bytes": 3689985,
+            "payload_check_reads": 25023,
+            "payload_check_bytes": 4713987,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 91830,
+            "query_rows": 5489,
+            "pin_rows": 210479,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 128,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "close": {
+          "status": "completed",
+          "seconds": 0.06412217899999462,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 12,
+            "maintenance_rows": 512,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 256
+          }
+        }
+      },
+      "passed": true,
+      "start_year": 7,
+      "start_generation": 4,
+      "final_digest": "fce95e6b2541500e5104be2d92a2cbdc00255f70e20ed3755ee7472a2b9fa733",
+      "final_year": 8
+    },
+    "candidate-profiled": {
+      "source_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
+      "budget_seconds_per_phase": 90.0,
+      "profiled": true,
+      "phases": {
+        "open": {
+          "status": "completed",
+          "seconds": 12.271793998999996,
+          "sqlite_vm_instructions_approx": null
+        },
+        "simulation": {
+          "status": "completed",
+          "seconds": 20.562161108999987,
+          "sqlite_vm_instructions_approx": 12460000,
+          "io": {
+            "payload_reads": 29863,
+            "payload_read_bytes": 12792144,
+            "payload_check_reads": 31920,
+            "payload_check_bytes": 13523893,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 206732,
+            "query_rows": 2032,
+            "pin_rows": 465083,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 17,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "save": {
+          "status": "completed",
+          "seconds": 14.725788262000009,
+          "sqlite_vm_instructions_approx": 8190000,
+          "io": {
+            "payload_reads": 24368,
+            "payload_read_bytes": 13107876,
+            "payload_check_reads": 31561,
+            "payload_check_bytes": 14831723,
+            "payload_writes": 5779,
+            "payload_write_bytes": 1593125,
+            "metadata_rows": 130004,
+            "query_rows": 2230,
+            "pin_rows": 255069,
+            "maintenance_rows": 256,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 128
+          }
+        },
+        "audit": {
+          "status": "completed",
+          "seconds": 8.121941577000001,
+          "sqlite_vm_instructions_approx": 5310000,
+          "io": {
+            "payload_reads": 18918,
+            "payload_read_bytes": 3530683,
+            "payload_check_reads": 24407,
+            "payload_check_bytes": 4554685,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 89127,
+            "query_rows": 5489,
+            "pin_rows": 204837,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 128,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "close": {
+          "status": "completed",
+          "seconds": 0.06544367300000431,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 12,
+            "maintenance_rows": 512,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 256
+          }
+        }
+      },
+      "passed": true,
+      "start_year": 7,
+      "start_generation": 4,
+      "final_digest": "fce95e6b2541500e5104be2d92a2cbdc00255f70e20ed3755ee7472a2b9fa733",
+      "final_year": 8
+    },
+    "baseline-unprofiled": {
+      "source_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
+      "budget_seconds_per_phase": 90.0,
+      "profiled": false,
+      "phases": {
+        "open": {
+          "status": "completed",
+          "seconds": 4.314718599999992,
+          "sqlite_vm_instructions_approx": null
+        },
+        "simulation": {
+          "status": "completed",
+          "seconds": 9.237777561999991,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 44281,
+            "payload_read_bytes": 15565858,
+            "payload_check_reads": 46338,
+            "payload_check_bytes": 16297607,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 278617,
+            "query_rows": 2032,
+            "pin_rows": 566713,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 17,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "save": {
+          "status": "completed",
+          "seconds": 5.389926368999994,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 24436,
+            "payload_read_bytes": 13120854,
+            "payload_check_reads": 31629,
+            "payload_check_bytes": 14844701,
+            "payload_writes": 5779,
+            "payload_write_bytes": 1593125,
+            "metadata_rows": 130344,
+            "query_rows": 2230,
+            "pin_rows": 255549,
+            "maintenance_rows": 256,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 128
+          }
+        },
+        "audit": {
+          "status": "completed",
+          "seconds": 3.1544461969999986,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 19534,
+            "payload_read_bytes": 3689985,
+            "payload_check_reads": 25023,
+            "payload_check_bytes": 4713987,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 91830,
+            "query_rows": 5489,
+            "pin_rows": 210479,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 128,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "close": {
+          "status": "completed",
+          "seconds": 0.03437837699999591,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 12,
+            "maintenance_rows": 512,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 256
+          }
+        }
+      },
+      "passed": true,
+      "start_year": 7,
+      "start_generation": 4,
+      "final_digest": "fce95e6b2541500e5104be2d92a2cbdc00255f70e20ed3755ee7472a2b9fa733",
+      "final_year": 8
+    },
+    "candidate-unprofiled": {
+      "source_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
+      "budget_seconds_per_phase": 90.0,
+      "profiled": false,
+      "phases": {
+        "open": {
+          "status": "completed",
+          "seconds": 4.366615607999989,
+          "sqlite_vm_instructions_approx": null
+        },
+        "simulation": {
+          "status": "completed",
+          "seconds": 7.961236452999998,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 29863,
+            "payload_read_bytes": 12792144,
+            "payload_check_reads": 31920,
+            "payload_check_bytes": 13523893,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 206732,
+            "query_rows": 2032,
+            "pin_rows": 465083,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 17,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "save": {
+          "status": "completed",
+          "seconds": 5.4359802649999835,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 24375,
+            "payload_read_bytes": 13109338,
+            "payload_check_reads": 31568,
+            "payload_check_bytes": 14833185,
+            "payload_writes": 5779,
+            "payload_write_bytes": 1593125,
+            "metadata_rows": 130035,
+            "query_rows": 2230,
+            "pin_rows": 255114,
+            "maintenance_rows": 256,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 128
+          }
+        },
+        "audit": {
+          "status": "completed",
+          "seconds": 3.2273650820000057,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 19130,
+            "payload_read_bytes": 3547431,
+            "payload_check_reads": 24619,
+            "payload_check_bytes": 4571433,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 89833,
+            "query_rows": 5489,
+            "pin_rows": 207169,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 128,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "close": {
+          "status": "completed",
+          "seconds": 0.037145358000003625,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 12,
+            "maintenance_rows": 512,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 256
+          }
+        }
+      },
+      "passed": true,
+      "start_year": 7,
+      "start_generation": 4,
+      "final_digest": "fce95e6b2541500e5104be2d92a2cbdc00255f70e20ed3755ee7472a2b9fa733",
+      "final_year": 8
+    }
+  },
+  "attribution": {
+    "baseline-profiled": [
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 323,
+        "function": "_synchronize_owner",
+        "calls": 3359,
+        "self_seconds": 0.023994920000000003,
+        "cumulative_seconds": 6.834338565
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1244,
+        "function": "_read_snapshot_start",
+        "calls": 108028,
+        "self_seconds": 0.187864673,
+        "cumulative_seconds": 8.348576891
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 288,
+        "function": "_owner_changes",
+        "calls": 4833,
+        "self_seconds": 0.025013925000000003,
+        "cumulative_seconds": 7.810875909000001
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 350,
+        "function": "read_owner_identity",
+        "calls": 6134,
+        "self_seconds": 0.074812765,
+        "cumulative_seconds": 9.004527959
+      },
+      {
+        "file": "persistence_lazy_sequence.py",
+        "line": 1018,
+        "function": "candidate_positions",
+        "calls": 118,
+        "self_seconds": 0.010099694000000001,
+        "cumulative_seconds": 5.405661712000001
+      }
+    ],
+    "candidate-profiled": [
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1244,
+        "function": "_read_snapshot_start",
+        "calls": 87702,
+        "self_seconds": 0.151418411,
+        "cumulative_seconds": 6.538680512
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 323,
+        "function": "_synchronize_owner",
+        "calls": 3359,
+        "self_seconds": 0.019668497,
+        "cumulative_seconds": 3.720885227
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 288,
+        "function": "_owner_changes",
+        "calls": 4833,
+        "self_seconds": 0.020128439,
+        "cumulative_seconds": 3.452392203
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 405,
+        "function": "read_owner_identity",
+        "calls": 6134,
+        "self_seconds": 0.053776957,
+        "cumulative_seconds": 4.732653411
+      },
+      {
+        "file": "persistence_lazy_sequence.py",
+        "line": 1018,
+        "function": "candidate_positions",
+        "calls": 118,
+        "self_seconds": 0.0093278,
+        "cumulative_seconds": 5.052632770000001
+      }
+    ]
+  },
+  "observed_simulation_reductions": {
+    "seconds_fraction": 0.13818703691795975,
+    "payload_reads_fraction": 0.32560240283643094,
+    "read_bytes_fraction": 0.17819216904073
+  },
+  "limitations": [
+    "One ordered pair per mode on one runner, not a statistically stable speed estimate.",
+    "Ordinary I/O diagnostics remain in unprofiled mode.",
+    "Save and audit counters differ slightly across candidate modes; cache residency and work are not claimed mode-independent.",
+    "Named phase totals exclude independent eager control construction.",
+    "Profile attribution times overlap and must not be added."
+  ]
+}
