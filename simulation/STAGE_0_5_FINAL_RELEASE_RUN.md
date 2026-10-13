@@ -108,3 +108,10 @@ The revised workflow adds these dependency tests to the first gate and retains
 disposable recovery databases on failure for further diagnosis. All original
 exact-source, correctness and long-run gates remain in force. A new run will
 follow because rerunning the old pinned workflow would test the old source.
+
+Repair launch: [run38459262962](https://github.com/rax0h/all-that-endures/actions/runs/38459262962)
+is in progress. Exact candidate `2bc3c85389760ff12578857f7d2a849bc5cf9201`, tree
+`fd232ce57b7e2332c91446d0485fab9a1b2d22e4`; workflow-only commit
+`fb9505a0349e083882672e2de9e8e7735b68fd77`. Recovery, complete suite and
+long-horizon conclusions remain pending. No successful job from the failed
+initial run is being misattributed to this repaired source.
