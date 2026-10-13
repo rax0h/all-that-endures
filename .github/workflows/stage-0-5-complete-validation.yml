@@ -1,0 +1,69 @@
+name: Stage 0.5 complete candidate validation
+
+on:
+  push:
+    branches: [sol/stage-0-5-complete-validation]
+
+permissions:
+  contents: read
+
+jobs:
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PYTHONPATH: .:simulation
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 5bf5c0192b307d15b9ab525cee20938584506ae6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - name: Verify exact candidate source
+        run: test "$(git rev-parse HEAD)" = 5bf5c0192b307d15b9ab525cee20938584506ae6
+      - name: Complete applicable simulation suite
+        run: |
+          mkdir -p "$RUNNER_TEMP/ate-complete-suite"
+          set -o pipefail
+          python -m pytest -vv --durations=25 simulation/tests --junitxml="$RUNNER_TEMP/ate-complete-suite/suite.xml" -o junit_family=legacy 2>&1 | tee "$RUNNER_TEMP/ate-complete-suite/suite.log"
+      - name: Retain suite report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: complete-candidate-full-suite
+          retention-days: 14
+          path: ${{ runner.temp }}/ate-complete-suite
+
+  independent-p5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      PYTHONPATH: .:simulation
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 5bf5c0192b307d15b9ab525cee20938584506ae6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify exact candidate source
+        run: test "$(git rev-parse HEAD)" = 5bf5c0192b307d15b9ab525cee20938584506ae6
+      - name: Independent complete-format seed843000 3+4+3
+        run: |
+          mkdir -p "$RUNNER_TEMP/ate-complete-p5"
+          set -o pipefail
+          python simulation/persistence_p5_validation.py --complete-format --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --rules-id stage-0-5-complete-final --workdir "$RUNNER_TEMP/ate-complete-p5/fixtures" --output "$RUNNER_TEMP/ate-complete-p5/p5.json" 2>&1 | tee "$RUNNER_TEMP/ate-complete-p5/p5.log"
+      - name: Retain P5 result and portable restore artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: complete-candidate-independent-p5
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/ate-complete-p5/p5.json
+            ${{ runner.temp }}/ate-complete-p5/p5.log
+            ${{ runner.temp }}/ate-complete-p5/fixtures/p5-relocated.sqlite
