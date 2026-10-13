@@ -1,0 +1,129 @@
+name: Stage 0.5 owner witness validation
+on:
+  push:
+    branches: [sol/stage-0-5-owner-witness-validation]
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONPATH: .:simulation
+jobs:
+  affected:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ce7a5b5c0e195e3abf1aad99bbf6ad9039838877
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: Exact source and affected gate
+        shell: bash
+        run: |
+          mkdir -p evidence
+          git rev-parse HEAD HEAD^{tree} | tee evidence/source.txt
+          python -m pytest -q --durations=20 --junitxml=evidence/affected.xml \
+            simulation/tests/test_stage_0_5_owner_witness_cache.py \
+            simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py \
+            simulation/tests/test_stage_0_5_final_identity_catalog.py \
+            simulation/tests/test_stage_0_5_final_identity_coordinator.py \
+            simulation/tests/test_stage_0_5_final_world_catalog_bridge.py \
+            simulation/tests/test_stage_0_5_final_complete_format.py \
+            simulation/tests/test_stage_0_5_final_catalog_copy.py \
+            simulation/tests/test_persistence_lazy_store.py | tee evidence/affected.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: owner-witness-affected
+          path: evidence
+          retention-days: 14
+  full-suite:
+    needs: affected
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ce7a5b5c0e195e3abf1aad99bbf6ad9039838877
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - shell: bash
+        run: |
+          mkdir -p evidence
+          git rev-parse HEAD HEAD^{tree} | tee evidence/source.txt
+          python -m pytest -q --durations=30 --junitxml=evidence/full.xml simulation/tests | tee evidence/full.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: owner-witness-full-suite
+          path: evidence
+          retention-days: 14
+  bounded-comparison:
+    needs: affected
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ce7a5b5c0e195e3abf1aad99bbf6ad9039838877
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          ref: b91b0c8aa0d94bd99777e6ec14a125f947e1074a
+          path: baseline
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: complete-candidate-independent-p5
+          run-id: 38335872125
+          github-token: ${{ github.token }}
+          path: original-restore
+      - name: Same fixture, runner and diagnostic harness
+        shell: bash
+        run: |
+          mkdir -p evidence
+          python - <<'PY'
+          import hashlib, pathlib, subprocess, os, json
+          root = pathlib.Path.cwd()
+          sources = list((root / 'original-restore').rglob('p5-relocated.sqlite'))
+          assert len(sources) == 1, sources
+          source = sources[0]
+          expected_hash = 'ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199'
+          assert hashlib.sha256(source.read_bytes()).hexdigest() == expected_hash
+          evidence = root / 'evidence'
+          boundaries = {name: subprocess.check_output(['git', '-C', str(root/name), 'rev-parse', 'HEAD', 'HEAD^{tree}'], text=True).splitlines() for name in ('baseline', 'candidate')}
+          (evidence / 'sources.json').write_text(json.dumps(boundaries, indent=2))
+          # Use exactly the same updated harness for both source trees. python -c
+          # avoids prepending the candidate script directory to baseline sys.path.
+          harness = (root / 'candidate/simulation/profile_complete_restore.py').read_text()
+          for profiled in (True, False):
+              for name in ('baseline', 'candidate'):
+                  label = name + ('-profiled' if profiled else '-unprofiled')
+                  argv = ['python', '-c', harness, str(source), str(evidence / label), '--budget', '90']
+                  if not profiled: argv.append('--unprofiled')
+                  env = dict(os.environ, PYTHONPATH=str(root/name) + ':' + str(root/name/'simulation'))
+                  with (evidence / (label + '.log')).open('w') as log:
+                      subprocess.run(argv, cwd=root/name, env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
+                  result = json.loads((evidence/label/'result.json').read_text())
+                  assert result['passed'] and result['source_sha256'] == expected_hash
+                  assert result['start_year'] == 7 and result['start_generation'] == 4 and result['final_year'] == 8
+                  assert result['final_digest'] == 'fce95e6b2541500e5104be2d92a2cbdc00255f70e20ed3755ee7472a2b9fa733'
+                  assert result['profiled'] == profiled
+          assert hashlib.sha256(source.read_bytes()).hexdigest() == expected_hash
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: owner-witness-bounded-comparison
+          path: |
+            evidence/**/*.json
+            evidence/**/*.txt
+            evidence/**/*.log
+            evidence/**/*.prof
+          retention-days: 14
