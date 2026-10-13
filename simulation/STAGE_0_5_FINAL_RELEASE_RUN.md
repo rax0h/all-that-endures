@@ -71,7 +71,7 @@ existing destinations remain protected. No automatic reruns are configured.
 
 ## Launch receipt
 
-- [Run38447779260](https://github.com/rax0h/all-that-endures/actions/runs/38447779260): in progress at publication.
+- [Run38447779260](https://github.com/rax0h/all-that-endures/actions/runs/38447779260): failed in reopened save; downstream jobs skipped.
 - Exact candidate: `bdde5bc20c40583045fcb3562698847db460b080`.
 - Candidate tree: `9a3857db96d01de8c7aa8ed091702c2e964b5dc0`.
 - Workflow-only commit: `53ec46fd9f95098ec202cddcc043656197bef8c4`.
@@ -82,3 +82,29 @@ existing destinations remain protected. No automatic reruns are configured.
 
 Final Stage0.5 release acceptance remains pending the exact-source jobs and
 explicit performance-policy assessment. No merge or promotion is performed.
+
+## Dependency capture repair
+
+The initial recovery gate passed33 focused tests (81.99s), then failed at the
+year10 reopened save: mandatory dependency authority absent for backing8031.
+No full suite, millennium or late-fixture job ran. Failed job115470568633 and
+artifact11839890191 retain the traceback and focused evidence.
+
+A deterministic small regression reproduced the same error: prepare_delta first
+captured a target containing an unpublished backing; weak collection then removed
+its live alias and _new marker; the subsequent checked read reclassified the
+captured backing as persisted and incorrectly required an existing row.
+
+The repair copies unpublished IDs before capturing the target roster and uses
+that captured status throughout preparation. This is temporary save metadata,
+not a retained live-object root or a second authority. Existing persisted rows
+remain mandatory; validation is not relaxed. Tests cover commit followed by
+lease release, abort without leaked unpublished metadata, and corruption after
+collection of an already persisted alias. Local gate:45 passed0.96s; original
+unpublished race observed RED before the repair. The complete3+4+3 rerun must
+confirm that this resolves the observed integrated failure on the new source.
+
+The revised workflow adds these dependency tests to the first gate and retains
+disposable recovery databases on failure for further diagnosis. All original
+exact-source, correctness and long-run gates remain in force. A new run will
+follow because rerunning the old pinned workflow would test the old source.
