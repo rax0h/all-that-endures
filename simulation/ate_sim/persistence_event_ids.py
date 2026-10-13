@@ -38,6 +38,7 @@ class EventIdSet(MutableSet):
         self._changed_callback = None
         self._member_visits = 0
         self._exception_factory = None
+        self._paged_key_supported = paged_key_supported
         self._pending_descriptor = None
         self._install_values(set(values))
 
@@ -53,7 +54,7 @@ class EventIdSet(MutableSet):
         else:
             self._end, self._exact = None, values
         if self._end is None and self._exception_factory is not None:
-            if all(paged_key_supported(value) for value in self._exact):
+            if all(self._paged_key_supported(value) for value in self._exact):
                 self._exact = self._exception_factory(0, self._exact)
 
     @classmethod
@@ -90,8 +91,9 @@ class EventIdSet(MutableSet):
         result._pending_descriptor = checked_descriptor(value)
         return result
 
-    def enable_paged_exceptions(self, factory):
+    def enable_paged_exceptions(self, factory, *, key_supported=paged_key_supported):
         self._exception_factory = factory
+        self._paged_key_supported = key_supported
 
     def _leave_range(self):
         end = self._end
@@ -156,7 +158,7 @@ class EventIdSet(MutableSet):
         hash(value)  # add, unlike membership, rejects unhashable set probes.
         if value in self:
             return
-        if self._exception_factory is not None and not paged_key_supported(value):
+        if self._exception_factory is not None and not self._paged_key_supported(value):
             # Preserve native set semantics, including multiple distinct NaNs.
             # This explicit compatibility fallback retains its old O(H) cost;
             # it is not claimed as complete capability-6 equality closure.

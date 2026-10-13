@@ -631,14 +631,24 @@ class RecursiveHistoryRuntime:
             raise StoreIntegrityError('Event-ID graph reference disagrees with World authority')
         return facade
 
-    def bind(self, proxy):
+    def bind(self, proxy, *, before_mutation=None, after_change=None):
         session = self.session()
+        # A component may also be exposed through another family. Rebinding
+        # that alias must keep its facade's descriptor notification.
+        if before_mutation is not None:
+            proxy._recursive_before_mutation = before_mutation
+        if after_change is not None:
+            proxy._recursive_after_change = after_change
+        before_mutation = getattr(proxy, '_recursive_before_mutation', None)
+        after_change = getattr(proxy, '_recursive_after_change', None)
         proxy._recursive = True
         proxy._recursive_runtime = self
         if isinstance(proxy, (LazyHistoryMap, LazyHistorySet)):
             proxy._key_runtime = self
         self.retain_pending_children(proxy)
         def guard():
+            if before_mutation is not None:
+                before_mutation()
             session._shared_object_routes(proxy)
         def changed():
             self.retain_pending_children(proxy)
@@ -653,6 +663,8 @@ class RecursiveHistoryRuntime:
             finally:
                 if hasattr(placements, 'close'):
                     placements.close()
+            if after_change is not None:
+                after_change()
         def read_guard():
             session._ensure_active()
             if session._state == 'recovery-required':

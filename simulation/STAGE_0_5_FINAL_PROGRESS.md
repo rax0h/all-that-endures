@@ -1,5 +1,43 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: checked Event-ID atom keys and genuine legacy upgrade (October 13 UTC)
+
+Recovered parent public `136eea844d99094cd8c3e3568507fceded4f2a63`;
+all tracked local parent blobs were verified equal to that public tree.
+The unfinished Event-ID regression was resumed rather than replaced.
+
+RED confirmed that adding a native NaN expanded the captured range. Checked
+facades now select the existing closed immutable key capability; genuine legacy
+facades retain their previous admission and resident compatibility. New exception
+components borrow the existing recursive runtime, catalog, dependency pool and
+single hybrid publisher. No registry or value authority was added.
+
+A shared wallet-component alias RED exposed lost facade notifications after
+rebinding. Recursive bindings now compose and preserve component callbacks;
+faults during version writes, ordinary writes, before commit and after commit
+resolve exactly once, and shared key/component/facade identities survive reopen
+and materializing detach. Explicit full-copy normalization now upgrades genuine
+legacy exact Event-ID rows, including NaN keys, into the same paged exception
+representation. Source bytes remain unchanged. Ordinary open never migrates.
+
+Final new gate: **11 passed in 3.96s**. Stable copy/recursive affected gate:
+**146 passed in 27.55s** (before addition of the measurement-only test).
+Final stable Event-ID/native-key compatibility gate: **185 passed in 57.03s**.
+Counts overlap. Exact hashes/cases/properties are in
+`stage_0_5_event_id_nonreflexive_validation.json`.
+
+H1,000/H10,000 point addition/save: **203/203 payload reads**, **27/27 payload
+writes**, **1,478/1,478 metadata rows**, **56,278/56,284 read bytes** and
+**12,746/12,749 write bytes**. There are zero facade member visits. No-op saves
+read no versioned archive payloads and write nothing; their three fixed cold
+metadata reads total 217 bytes. Explicit conversion fixture setup is full-copy
+work and is excluded from ordinary-operation metrics.
+
+Next: complete root/imported immutable-value classification and complete-format
+reader/open/upgrade integration, followed by integrated P5/recovery and one
+stable-source full suite. Capability6 and independent architecture acceptance
+remain pending. Rank issue17 and PR14 are unchanged; no new endurance.
+
 ## Latest checkpoint: older page-backed atom slots and promotion composition (October 12)
 
 Parent public `0317a42dffce4b24c33e7d9d5c97789447e90131`, matching tree

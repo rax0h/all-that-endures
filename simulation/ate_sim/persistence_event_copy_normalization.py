@@ -25,7 +25,7 @@ from .persistence_schema import RECORD_FIELDS
 from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES, dependency_value
 from .persistence_lazy_families import FAMILIES, AUXILIARY_OWNER_FAMILIES
 from .persistence_history_copy_promotion import reconcile_copy
-from .persistence_event_ids import AUTHORITY_REFERENCE
+from .persistence_event_ids import AUTHORITY_REFERENCE, RANGE_TAG, EXCEPTION_TAG
 from .persistence_event_id_reference import EventIdReference, event_id_reference, check_compact_authority
 from .persistence_adapters import (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY,
     PACKED_LIST_KIND, PACKED_LIST_PAYLOAD, META, COLLECTION_LAYOUT)
@@ -84,6 +84,7 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
     facade_rows = [(c.key, c.value[1]) for c in ordinary if c.namespace == 'world.event_ids' and not c.delete]
     facade_rows += [(c.key, c.value) for c in versions if c.namespace == 'world.event_ids' and not c.delete]
     facade_checked = False
+    facade_upgrade = None
 
     def check_facade_authority():
         nonlocal facade_checked
@@ -236,6 +237,44 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
             added.extend(changes)
             built[inc] = dependency_value(kind)
         return ref
+
+    # Exact legacy member rows remain compatibility authority on ordinary open.
+    # This explicitly captured copy may replace them with the existing paged
+    # exception descriptor, including closed NaN atom keys.
+    source_layout = next(c.value for c in ordinary if c.namespace == META and c.key == 'manifest')['collections']
+    overlay = next((c.value for c in ordinary if c.namespace == META and c.key == COLLECTION_LAYOUT), None)
+    event_description = (overlay or source_layout)['world.event_ids']
+    if event_description[0] not in (RANGE_TAG, EXCEPTION_TAG):
+        if event_description[0] not in ('set', 'set-stable/v1') or len(facade_rows) != event_description[1]:
+            raise StoreIntegrityError('legacy Event-ID member authority disagrees with its layout')
+        if any(not immutable_value(value) for _key, value in facade_rows):
+            raise StoreFormatError('legacy Event-ID member has an unsupported key')
+        removed_inc, added_inc = next_incarnation, next_incarnation + 1
+        next_incarnation += 2
+        values = frozenset(encode_immutable(value, ('world.event_ids', key), (('member', key),))
+                           for key, value in facade_rows)
+        if len(values) != len(facade_rows):
+            raise StoreIntegrityError('legacy Event-ID members contain duplicate native keys')
+        for kind, inc, payload in (('sequence', removed_inc, ()), ('set', added_inc, values)):
+            arguments = dict(initial_values=payload, checked_types=True, recursive=True)
+            if kind == 'set':arguments['key_runtime'] = _StoredCopyKeys()
+            if kind == 'sequence':arguments['value_mode'] = 'native'
+            builder = HISTORY_CLASSES[kind](target, pin, inc, **arguments)
+            added.extend(builder.pending_changes())
+            built[inc] = dependency_value(kind)
+        facade_upgrade = (EXCEPTION_TAG, 0, HistoryReference('sequence', removed_inc),
+                          HistoryReference('set', added_inc), len(values))
+        ordinary = tuple(c for c in ordinary if c.namespace != 'world.event_ids') + (
+            RecordChange('world.event_ids', 0, (0, facade_upgrade)),)
+        versions = [c for c in versions if c.namespace != 'world.event_ids']
+        facade_rows = [(0, facade_upgrade)]
+        # The facade retains its root incarnation; components gain physical
+        # placements in this same destination-only publication.
+        placements = tuple(p for p in placements if p.owner_namespace != 'world.event_ids' or not p.occurrence_path)
+        placements += (IdentityOccurrenceChange('world.event_ids', 0,
+            (('field', '_exact'), ('field', 'removed')), removed_inc),
+            IdentityOccurrenceChange('world.event_ids', 0,
+            (('field', '_exact'), ('field', 'added')), added_inc))
 
     # Earlier typed histories may still contain literal NaNs. Project their
     # physical slots during this explicit full copy, retaining parent IDs and
@@ -415,6 +454,8 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
             layout = dict(change.value['collections'] if change.key == 'manifest' else change.value)
             packed = next(c for c in ordinary if c.namespace == AGENCY_ACTIONS_NAMESPACE and c.key == PACKED_LIST_KEY)
             layout[AGENCY_ACTIONS_NAMESPACE] = (PACKED_LIST_KIND, len(packed.value[1][1]), 0)
+            if facade_upgrade is not None:
+                layout['world.event_ids'] = (EXCEPTION_TAG, facade_upgrade[4], 0)
             change = replace(change, value=dict(change.value, collections=layout) if change.key == 'manifest' else layout)
         rewritten_metadata.append(change)
     ordinary = tuple(rewritten_metadata)

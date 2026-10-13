@@ -10257,7 +10257,7 @@ class _LazyLifetime:
 class LazyWorldSession:
     def _prepare_event_id_facade(self, facade):
         from .persistence_event_id_exceptions import PagedEventIdExceptions
-        from .persistence_event_ids import EXCEPTION_TAG
+        from .persistence_event_ids import EXCEPTION_TAG, paged_key_supported
         enabled = any(description[0] == BUCKET_KIND for description in self.manifest['collections'].values())
         if not enabled and not (facade.descriptor() is not None and facade.descriptor()[0] == EXCEPTION_TAG):
             return
@@ -10276,6 +10276,9 @@ class LazyWorldSession:
                 proxy = history_class(self.store, self.pin, incarnation.value,
                     initial_values=values if ref is None else None,
                     cache_budget=self._history_cache_budget,
+                    **({'recursive': True} if self._identity_coordinator is not None else {}),
+                    **({'key_runtime': self._recursive_histories}
+                       if self._identity_coordinator is not None and kind == 'set' else {}),
                     **({'value_mode': 'native'} if kind == 'sequence' else {}))
                 self._registry.bind(proxy, incarnation=incarnation)
             if type(proxy) is not (LazyOrderedSequence if kind == 'sequence' else LazyHistorySet):
@@ -10291,7 +10294,10 @@ class LazyWorldSession:
                     self._identity_bridge.synchronize_event_id_placements()
                     self._identity_coordinator.stitch_for_read(facade)
                     self._shared_object_routes(proxy)
-            proxy.bind(guard, changed, read_guard)
+            if self._identity_coordinator is not None:
+                self._recursive_histories.bind(proxy, before_mutation=guard, after_change=changed)
+            else:
+                proxy.bind(guard, changed, read_guard)
             self._nested_lists[incarnation.value] = proxy
             if self._backing_dependencies is not None:
                 self._backing_dependencies.acquire(proxy)
@@ -10307,7 +10313,11 @@ class LazyWorldSession:
             facade._exact = PagedEventIdExceptions(descriptor[1], history(descriptor[2], kind='sequence'),
                 history(descriptor[3]), expected_length=descriptor[4])
             facade._pending_descriptor = None
-        facade.enable_paged_exceptions(factory)
+        elif isinstance(facade._exact, PagedEventIdExceptions):
+            history(facade._exact.removed.storage_reference(), kind='sequence')
+            history(facade._exact.added.storage_reference())
+        facade.enable_paged_exceptions(factory, key_supported=(
+            nested_immutable_value if self._identity_coordinator is not None else paged_key_supported))
 
     def _event_id_facade_changed(self, facade):
         if self._identity_bridge is not None:
@@ -10950,6 +10960,7 @@ class LazyWorldSession:
         self._identity_coordinator = bridge.coordinator
         self._eager_tracker._checked_identity_coordinator = bridge.coordinator
         self._backing_dependencies = dependencies
+        self._prepare_event_id_facade(self.world.event_ids)
         from .persistence_adapters import PACKED_LIST_KIND
         if self._eager_tracker._manifest['collections'][AGENCY_ACTIONS_NAMESPACE][0] == PACKED_LIST_KIND:
             try:
