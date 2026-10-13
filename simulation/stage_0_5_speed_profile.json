@@ -1,0 +1,1335 @@
+{
+  "source_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
+  "budget_seconds_per_phase": 90.0,
+  "phases": {
+    "open": {
+      "status": "completed",
+      "seconds": 71.13746326700016,
+      "sqlite_vm_instructions_approx": null
+    },
+    "simulation": {
+      "status": "BudgetExpired: phase diagnostic budget exhausted",
+      "seconds": 90.42084924000028,
+      "sqlite_vm_instructions_approx": 8320000,
+      "io": {
+        "payload_reads": 22403,
+        "payload_read_bytes": 18815350,
+        "payload_check_reads": 22856,
+        "payload_check_bytes": 18981361,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 145535,
+        "query_rows": 453,
+        "pin_rows": 292580,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 17,
+        "maintenance_removed_rows": 0
+      }
+    },
+    "close": {
+      "status": "completed",
+      "seconds": 0.18793091699990327,
+      "sqlite_vm_instructions_approx": null,
+      "io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 1,
+        "query_rows": 0,
+        "pin_rows": 10,
+        "maintenance_rows": 512,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 256
+      }
+    }
+  },
+  "passed": false,
+  "start_year": 7,
+  "start_generation": 4,
+  "stopped": "phase diagnostic budget exhausted",
+  "runtime_source": "c771824d5218ff171be7f034f76e5fc694b3353b",
+  "production_source": "5bf5c0192b307d15b9ab525cee20938584506ae6",
+  "python": "3.12.14",
+  "instrumentation": "cProfile; simulation-only SQLite progress callback every 10000 VM instructions; times include overhead",
+  "interpretation": "Budget-limited partial year, not a failed correctness test or a completed-year benchmark. Save/audit not reached. No production code changed.",
+  "profile_attribution": {
+    "open": [
+      {
+        "file": "profile_complete_restore.py",
+        "line": 81,
+        "function": "<lambda>",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.00038642600000000004,
+        "cumulative_seconds": 71.13655245300001
+      },
+      {
+        "file": "persistence_lazy.py",
+        "line": 17985,
+        "function": "open_lazy_world_session",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.003049509,
+        "cumulative_seconds": 71.136166027
+      },
+      {
+        "file": "persistence_lazy.py",
+        "line": 10941,
+        "function": "_activate_checked_identity_catalog",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.002827308,
+        "cumulative_seconds": 68.675843047
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 99,
+        "function": "discover_group",
+        "primitive_calls": 1360,
+        "calls": 1360,
+        "self_seconds": 0.11744215000000001,
+        "cumulative_seconds": 62.115974186
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 418,
+        "function": "read_identity_group",
+        "primitive_calls": 1360,
+        "calls": 1360,
+        "self_seconds": 0.34169042,
+        "cumulative_seconds": 61.524648919
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 319,
+        "function": "_node",
+        "primitive_calls": 4874,
+        "calls": 4874,
+        "self_seconds": 0.095644644,
+        "cumulative_seconds": 48.034860968000004
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 331,
+        "function": "_point",
+        "primitive_calls": 1360,
+        "calls": 1360,
+        "self_seconds": 0.162251177,
+        "cumulative_seconds": 45.211123151
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 155,
+        "function": "synchronize_packed_actions",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.046348973,
+        "cumulative_seconds": 38.104030558000005
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 212,
+        "function": "stitch_eager_action_peers",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.043286790000000006,
+        "cumulative_seconds": 30.479488387000004
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1350,
+        "function": "read_version",
+        "primitive_calls": 10530,
+        "calls": 10530,
+        "self_seconds": 0.290713484,
+        "cumulative_seconds": 29.699764795
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 229,
+        "function": "_read",
+        "primitive_calls": 10321,
+        "calls": 10321,
+        "self_seconds": 0.075823285,
+        "cumulative_seconds": 29.587681729000003
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 137,
+        "function": "encode",
+        "primitive_calls": 41189,
+        "calls": 41189,
+        "self_seconds": 0.361228337,
+        "cumulative_seconds": 26.532234537
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 59,
+        "function": "node_commit",
+        "primitive_calls": 4874,
+        "calls": 4874,
+        "self_seconds": 1.544828663,
+        "cumulative_seconds": 23.605998236
+      },
+      {
+        "file": "persistence_adapters.py",
+        "line": 99,
+        "function": "_encode_value",
+        "primitive_calls": 41189,
+        "calls": 1789652,
+        "self_seconds": 8.704262028,
+        "cumulative_seconds": 22.338612013000002
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 148,
+        "function": "_encode_value",
+        "primitive_calls": 41189,
+        "calls": 1789652,
+        "self_seconds": 7.25477988,
+        "cumulative_seconds": 21.019538298
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1323,
+        "function": "_check_record_row",
+        "primitive_calls": 10729,
+        "calls": 10729,
+        "self_seconds": 0.524482427,
+        "cumulative_seconds": 19.687363172
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 141,
+        "function": "decode",
+        "primitive_calls": 31564,
+        "calls": 31564,
+        "self_seconds": 0.265652961,
+        "cumulative_seconds": 19.296888897000002
+      },
+      {
+        "file": "persistence_adapters.py",
+        "line": 171,
+        "function": "_decode_value",
+        "primitive_calls": 31564,
+        "calls": 1800106,
+        "self_seconds": 4.630941861,
+        "cumulative_seconds": 16.381232750000002
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 232,
+        "function": "_decode_value",
+        "primitive_calls": 31564,
+        "calls": 1799892,
+        "self_seconds": 7.477245192000001,
+        "cumulative_seconds": 16.080194337000002
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1244,
+        "function": "_read_snapshot_start",
+        "primitive_calls": 18702,
+        "calls": 18702,
+        "self_seconds": 0.372962895,
+        "cumulative_seconds": 10.424754826000001
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 386,
+        "function": "_framed_sha",
+        "primitive_calls": 175486,
+        "calls": 175486,
+        "self_seconds": 2.510816573,
+        "cumulative_seconds": 5.934393121
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 284,
+        "function": "_owner_changes",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.001290116,
+        "cumulative_seconds": 5.510544664
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 350,
+        "function": "read_owner_identity",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.0037060580000000004,
+        "cumulative_seconds": 5.470819714
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 853,
+        "function": "_validated_retention_floor",
+        "primitive_calls": 18702,
+        "calls": 18702,
+        "self_seconds": 0.167365634,
+        "cumulative_seconds": 5.267020973
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 359,
+        "function": "walk",
+        "primitive_calls": 1,
+        "calls": 876,
+        "self_seconds": 0.031602861,
+        "cumulative_seconds": 5.160822862000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 787,
+        "function": "_checked_operational_rows",
+        "primitive_calls": 18703,
+        "calls": 18703,
+        "self_seconds": 0.878591051,
+        "cumulative_seconds": 4.933680854
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 235,
+        "function": "_descriptor",
+        "primitive_calls": 1363,
+        "calls": 1363,
+        "self_seconds": 0.083581686,
+        "cumulative_seconds": 4.545651327
+      },
+      {
+        "file": "__init__.py",
+        "line": 183,
+        "function": "dumps",
+        "primitive_calls": 41189,
+        "calls": 41189,
+        "self_seconds": 0.404178156,
+        "cumulative_seconds": 3.712566364
+      },
+      {
+        "file": "dataclasses.py",
+        "line": 1301,
+        "function": "is_dataclass",
+        "primitive_calls": 1810125,
+        "calls": 1810125,
+        "self_seconds": 2.3973393140000003,
+        "cumulative_seconds": 3.655058206
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'execute' of 'sqlite3.Connection' objects>",
+        "primitive_calls": 129849,
+        "calls": 129849,
+        "self_seconds": 3.545195055,
+        "cumulative_seconds": 3.545195055
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 706,
+        "function": "_checked_head_row",
+        "primitive_calls": 20070,
+        "calls": 20070,
+        "self_seconds": 0.438151245,
+        "cumulative_seconds": 3.3317229430000004
+      },
+      {
+        "file": "encoder.py",
+        "line": 183,
+        "function": "encode",
+        "primitive_calls": 41189,
+        "calls": 41189,
+        "self_seconds": 0.334074652,
+        "cumulative_seconds": 3.2248160550000002
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method builtins.isinstance>",
+        "primitive_calls": 10007055,
+        "calls": 10007055,
+        "self_seconds": 3.0054381350000003,
+        "cumulative_seconds": 3.1387391210000004
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 263,
+        "function": "_owner",
+        "primitive_calls": 1361,
+        "calls": 1361,
+        "self_seconds": 0.057919374,
+        "cumulative_seconds": 2.971252438
+      },
+      {
+        "file": "encoder.py",
+        "line": 205,
+        "function": "iterencode",
+        "primitive_calls": 41189,
+        "calls": 41189,
+        "self_seconds": 2.7689972710000004,
+        "cumulative_seconds": 2.7689972710000004
+      },
+      {
+        "file": "__init__.py",
+        "line": 299,
+        "function": "loads",
+        "primitive_calls": 31564,
+        "calls": 31564,
+        "self_seconds": 0.167430993,
+        "cumulative_seconds": 2.5851564980000004
+      },
+      {
+        "file": "decoder.py",
+        "line": 333,
+        "function": "decode",
+        "primitive_calls": 31564,
+        "calls": 31564,
+        "self_seconds": 0.265105561,
+        "cumulative_seconds": 2.3365073410000003
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1293,
+        "function": "_interval_rows",
+        "primitive_calls": 30304,
+        "calls": 30304,
+        "self_seconds": 0.47814965800000003,
+        "cumulative_seconds": 2.2632705360000003
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 459,
+        "function": "_pin_checksum",
+        "primitive_calls": 57877,
+        "calls": 57877,
+        "self_seconds": 0.32972474500000004,
+        "cumulative_seconds": 2.084273182
+      },
+      {
+        "file": "persistence_lazy_spill.py",
+        "line": 73,
+        "function": "add",
+        "primitive_calls": 4760,
+        "calls": 4760,
+        "self_seconds": 0.10398091200000001,
+        "cumulative_seconds": 2.007458197
+      },
+      {
+        "file": "decoder.py",
+        "line": 344,
+        "function": "raw_decode",
+        "primitive_calls": 31564,
+        "calls": 31564,
+        "self_seconds": 1.841797767,
+        "cumulative_seconds": 1.8418033630000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1837,
+        "function": "iter_identity_occurrences_for_incarnation",
+        "primitive_calls": 2720,
+        "calls": 2720,
+        "self_seconds": 0.113923299,
+        "cumulative_seconds": 1.8235975940000002
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'update' of '_hashlib.HASH' objects>",
+        "primitive_calls": 1779498,
+        "calls": 1779498,
+        "self_seconds": 1.807042741,
+        "cumulative_seconds": 1.807042741
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 775,
+        "function": "_require_pin",
+        "primitive_calls": 20471,
+        "calls": 20471,
+        "self_seconds": 0.09305689,
+        "cumulative_seconds": 1.729810776
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 760,
+        "function": "_checked_pin_row",
+        "primitive_calls": 20471,
+        "calls": 20471,
+        "self_seconds": 0.19940665400000002,
+        "cumulative_seconds": 1.6311368380000002
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method builtins.len>",
+        "primitive_calls": 4815076,
+        "calls": 4815077,
+        "self_seconds": 1.570288539,
+        "cumulative_seconds": 1.581324814
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 508,
+        "function": "_head_checksum",
+        "primitive_calls": 20070,
+        "calls": 20070,
+        "self_seconds": 0.15780172,
+        "cumulative_seconds": 1.5498038060000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method builtins.next>",
+        "primitive_calls": 9196,
+        "calls": 9196,
+        "self_seconds": 0.035366478,
+        "cumulative_seconds": 1.486012872
+      },
+      {
+        "file": "persistence_lazy.py",
+        "line": 10341,
+        "function": "__init__",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.002314904,
+        "cumulative_seconds": 1.481898361
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1314,
+        "function": "_visible_record_row",
+        "primitive_calls": 10729,
+        "calls": 10729,
+        "self_seconds": 0.10287313000000001,
+        "cumulative_seconds": 1.427783456
+      },
+      {
+        "file": "base64.py",
+        "line": 65,
+        "function": "b64decode",
+        "primitive_calls": 330873,
+        "calls": 330873,
+        "self_seconds": 0.596722588,
+        "cumulative_seconds": 1.4171817260000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1271,
+        "function": "read_snapshot",
+        "primitive_calls": 5454,
+        "calls": 5454,
+        "self_seconds": 0.017598993,
+        "cumulative_seconds": 1.341731107
+      },
+      {
+        "file": "contextlib.py",
+        "line": 132,
+        "function": "__enter__",
+        "primitive_calls": 2727,
+        "calls": 2727,
+        "self_seconds": 0.008696476,
+        "cumulative_seconds": 1.338147288
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method builtins.sum>",
+        "primitive_calls": 7694,
+        "calls": 38304,
+        "self_seconds": 0.143361222,
+        "cumulative_seconds": 1.2136617650000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1768,
+        "function": "read_identity_occurrence",
+        "primitive_calls": 1360,
+        "calls": 1360,
+        "self_seconds": 0.030997882,
+        "cumulative_seconds": 1.1568675910000001
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 221,
+        "function": "_enter",
+        "primitive_calls": 386629,
+        "calls": 386629,
+        "self_seconds": 0.6250771,
+        "cumulative_seconds": 1.004450831
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 2016,
+        "function": "_namespace_state_at",
+        "primitive_calls": 11205,
+        "calls": 11205,
+        "self_seconds": 0.108958885,
+        "cumulative_seconds": 0.9923357780000001
+      },
+      {
+        "file": "persistence_lazy_budget.py",
+        "line": 19,
+        "function": "resident_bytes",
+        "primitive_calls": 6120,
+        "calls": 83640,
+        "self_seconds": 0.46064499600000003,
+        "cumulative_seconds": 0.9687499430000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1634,
+        "function": "_decode_memberships",
+        "primitive_calls": 10729,
+        "calls": 10729,
+        "self_seconds": 0.061567283,
+        "cumulative_seconds": 0.9225162490000001
+      },
+      {
+        "file": "persistence_lazy_spill.py",
+        "line": 133,
+        "function": "freeze",
+        "primitive_calls": 6121,
+        "calls": 6121,
+        "self_seconds": 0.075438854,
+        "cumulative_seconds": 0.889445938
+      }
+    ],
+    "simulation": [
+      {
+        "file": "profile_complete_restore.py",
+        "line": 88,
+        "function": "<lambda>",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 1.3507000000000001e-05,
+        "cumulative_seconds": 90.420688704
+      },
+      {
+        "file": "engine.py",
+        "line": 29,
+        "function": "run",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.000160564,
+        "cumulative_seconds": 90.42025796700001
+      },
+      {
+        "file": "engine.py",
+        "line": 56,
+        "function": "step",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.0009292450000000001,
+        "cumulative_seconds": 90.00271295600001
+      },
+      {
+        "file": "persistence_lazy.py",
+        "line": 10898,
+        "function": "_shared_object_routes",
+        "primitive_calls": 1891,
+        "calls": 1891,
+        "self_seconds": 0.036202540000000005,
+        "cumulative_seconds": 58.200751089
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 88,
+        "function": "synchronize_lazy_placements",
+        "primitive_calls": 1909,
+        "calls": 1909,
+        "self_seconds": 0.013443696000000002,
+        "cumulative_seconds": 51.114738076
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 101,
+        "function": "_synchronize_pending",
+        "primitive_calls": 1909,
+        "calls": 1909,
+        "self_seconds": 0.10477710500000001,
+        "cumulative_seconds": 51.101294380000006
+      },
+      {
+        "file": "persistence_tracking.py",
+        "line": 117,
+        "function": "hooked",
+        "primitive_calls": 2026,
+        "calls": 2026,
+        "self_seconds": 0.045376588,
+        "cumulative_seconds": 51.039435204
+      },
+      {
+        "file": "record_index.py",
+        "line": 10,
+        "function": "__setattr__",
+        "primitive_calls": 1682,
+        "calls": 1682,
+        "self_seconds": 0.041031494,
+        "cumulative_seconds": 50.080428095
+      },
+      {
+        "file": "persistence_lazy.py",
+        "line": 3478,
+        "function": "preflight_shared_record",
+        "primitive_calls": 796,
+        "calls": 796,
+        "self_seconds": 0.0037481240000000002,
+        "cumulative_seconds": 38.866900383
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1350,
+        "function": "read_version",
+        "primitive_calls": 24616,
+        "calls": 24616,
+        "self_seconds": 0.588728232,
+        "cumulative_seconds": 29.589277573
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 350,
+        "function": "read_owner_identity",
+        "primitive_calls": 3092,
+        "calls": 3092,
+        "self_seconds": 0.24470727800000003,
+        "cumulative_seconds": 28.620534154
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 284,
+        "function": "_owner_changes",
+        "primitive_calls": 2592,
+        "calls": 2592,
+        "self_seconds": 0.151399422,
+        "cumulative_seconds": 28.411536779000002
+      },
+      {
+        "file": "engine.py",
+        "line": 97,
+        "function": "_demography",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.007551370000000001,
+        "cumulative_seconds": 27.803072513
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 229,
+        "function": "_read",
+        "primitive_calls": 22217,
+        "calls": 22217,
+        "self_seconds": 0.107136302,
+        "cumulative_seconds": 27.112945207000003
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1244,
+        "function": "_read_snapshot_start",
+        "primitive_calls": 55814,
+        "calls": 55814,
+        "self_seconds": 0.688302158,
+        "cumulative_seconds": 26.695523561
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 246,
+        "function": "_synchronize_owner",
+        "primitive_calls": 2176,
+        "calls": 2176,
+        "self_seconds": 0.098781617,
+        "cumulative_seconds": 25.919130699
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 319,
+        "function": "replace_owner",
+        "primitive_calls": 140,
+        "calls": 140,
+        "self_seconds": 0.003670369,
+        "cumulative_seconds": 23.876109795
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 334,
+        "function": "_replace_scope",
+        "primitive_calls": 140,
+        "calls": 140,
+        "self_seconds": 0.033418988000000004,
+        "cumulative_seconds": 23.867998439
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 99,
+        "function": "discover_group",
+        "primitive_calls": 2833,
+        "calls": 2833,
+        "self_seconds": 0.09060773400000001,
+        "cumulative_seconds": 23.609988067
+      },
+      {
+        "file": "agency.py",
+        "line": 38,
+        "function": "agency_step",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.000221985,
+        "cumulative_seconds": 23.418881223000003
+      },
+      {
+        "file": "skills.py",
+        "line": 23,
+        "function": "practice",
+        "primitive_calls": 2,
+        "calls": 2,
+        "self_seconds": 0.000137727,
+        "cumulative_seconds": 23.001810672
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 155,
+        "function": "synchronize_packed_actions",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.006780268000000001,
+        "cumulative_seconds": 22.873731881
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 418,
+        "function": "read_identity_group",
+        "primitive_calls": 781,
+        "calls": 781,
+        "self_seconds": 0.19538361,
+        "cumulative_seconds": 22.682484972
+      },
+      {
+        "file": "engine.py",
+        "line": 79,
+        "function": "_people",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.035349167,
+        "cumulative_seconds": 22.138953107000003
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 319,
+        "function": "_node",
+        "primitive_calls": 6194,
+        "calls": 6194,
+        "self_seconds": 0.08854629400000001,
+        "cumulative_seconds": 20.088406838
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 137,
+        "function": "encode",
+        "primitive_calls": 111647,
+        "calls": 111647,
+        "self_seconds": 0.767970091,
+        "cumulative_seconds": 20.038657428
+      },
+      {
+        "file": "household_queries.py",
+        "line": 9,
+        "function": "living_household_members",
+        "primitive_calls": 59,
+        "calls": 59,
+        "self_seconds": 0.014608544000000001,
+        "cumulative_seconds": 15.833311366
+      },
+      {
+        "file": "persistence_lazy_sequence.py",
+        "line": 1018,
+        "function": "candidate_positions",
+        "primitive_calls": 59,
+        "calls": 59,
+        "self_seconds": 0.057420193,
+        "cumulative_seconds": 15.507948072000001
+      },
+      {
+        "file": "persistence_lazy_sequence.py",
+        "line": 993,
+        "function": "occurrences",
+        "primitive_calls": 10738,
+        "calls": 10738,
+        "self_seconds": 0.220467731,
+        "cumulative_seconds": 15.409540495000002
+      },
+      {
+        "file": "persistence_adapters.py",
+        "line": 99,
+        "function": "_encode_value",
+        "primitive_calls": 111723,
+        "calls": 1115164,
+        "self_seconds": 5.125393833,
+        "cumulative_seconds": 14.571379311000001
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 235,
+        "function": "_descriptor",
+        "primitive_calls": 5081,
+        "calls": 5081,
+        "self_seconds": 0.22300340300000002,
+        "cumulative_seconds": 14.483623095
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 331,
+        "function": "_point",
+        "primitive_calls": 780,
+        "calls": 780,
+        "self_seconds": 0.071527986,
+        "cumulative_seconds": 14.417440151000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 853,
+        "function": "_validated_retention_floor",
+        "primitive_calls": 55814,
+        "calls": 55814,
+        "self_seconds": 0.5463135600000001,
+        "cumulative_seconds": 13.769206647
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 386,
+        "function": "_framed_sha",
+        "primitive_calls": 514673,
+        "calls": 514673,
+        "self_seconds": 6.070083643,
+        "cumulative_seconds": 13.604413532
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 787,
+        "function": "_checked_operational_rows",
+        "primitive_calls": 55814,
+        "calls": 55814,
+        "self_seconds": 2.2436338630000003,
+        "cumulative_seconds": 12.808846387000001
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 148,
+        "function": "_encode_value",
+        "primitive_calls": 111532,
+        "calls": 1114495,
+        "self_seconds": 4.826564141,
+        "cumulative_seconds": 12.638515001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method builtins.next>",
+        "primitive_calls": 50502,
+        "calls": 51625,
+        "self_seconds": 0.18159882300000002,
+        "cumulative_seconds": 11.487999529000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1323,
+        "function": "_check_record_row",
+        "primitive_calls": 22856,
+        "calls": 22856,
+        "self_seconds": 0.564213045,
+        "cumulative_seconds": 11.161060482
+      },
+      {
+        "file": "persistence_lazy.py",
+        "line": 3481,
+        "function": "shared_record_changed",
+        "primitive_calls": 795,
+        "calls": 795,
+        "self_seconds": 0.009055938000000001,
+        "cumulative_seconds": 10.832893467
+      },
+      {
+        "file": "contextlib.py",
+        "line": 132,
+        "function": "__enter__",
+        "primitive_calls": 19583,
+        "calls": 19977,
+        "self_seconds": 0.062434,
+        "cumulative_seconds": 10.185533081
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 141,
+        "function": "decode",
+        "primitive_calls": 58912,
+        "calls": 58912,
+        "self_seconds": 0.40024915200000005,
+        "cumulative_seconds": 9.724689567
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'execute' of 'sqlite3.Connection' objects>",
+        "primitive_calls": 406179,
+        "calls": 406179,
+        "self_seconds": 9.145190316,
+        "cumulative_seconds": 9.147603685
+      },
+      {
+        "file": "persistence_lazy_sequence.py",
+        "line": 921,
+        "function": "_dget",
+        "primitive_calls": 10757,
+        "calls": 10757,
+        "self_seconds": 0.119112854,
+        "cumulative_seconds": 8.77050636
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1271,
+        "function": "read_snapshot",
+        "primitive_calls": 35784,
+        "calls": 35784,
+        "self_seconds": 0.108795715,
+        "cumulative_seconds": 8.588006972
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 159,
+        "function": "routes_for_mutation",
+        "primitive_calls": 1908,
+        "calls": 1908,
+        "self_seconds": 0.034261443,
+        "cumulative_seconds": 7.995797234
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 59,
+        "function": "node_commit",
+        "primitive_calls": 6194,
+        "calls": 6194,
+        "self_seconds": 0.541679189,
+        "cumulative_seconds": 7.895868945
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 168,
+        "function": "_routes_for_mutation",
+        "primitive_calls": 1926,
+        "calls": 1926,
+        "self_seconds": 0.102089838,
+        "cumulative_seconds": 7.89519248
+      },
+      {
+        "file": "persistence_lazy_sequence.py",
+        "line": 908,
+        "function": "_dread",
+        "primitive_calls": 11042,
+        "calls": 11042,
+        "self_seconds": 0.096548384,
+        "cumulative_seconds": 7.678127539
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 359,
+        "function": "walk",
+        "primitive_calls": 2092,
+        "calls": 4535,
+        "self_seconds": 0.030295822000000003,
+        "cumulative_seconds": 7.299427690000001
+      },
+      {
+        "file": "persistence_adapters.py",
+        "line": 171,
+        "function": "_decode_value",
+        "primitive_calls": 58912,
+        "calls": 802405,
+        "self_seconds": 2.325377804,
+        "cumulative_seconds": 7.220147258000001
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 263,
+        "function": "_owner",
+        "primitive_calls": 5080,
+        "calls": 5080,
+        "self_seconds": 0.186818541,
+        "cumulative_seconds": 7.161192602000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 706,
+        "function": "_checked_head_row",
+        "primitive_calls": 56642,
+        "calls": 56642,
+        "self_seconds": 0.8455522670000001,
+        "cumulative_seconds": 7.110458877
+      },
+      {
+        "file": "engine.py",
+        "line": 70,
+        "function": "_production",
+        "primitive_calls": 1,
+        "calls": 1,
+        "self_seconds": 0.00038440500000000004,
+        "cumulative_seconds": 6.6355209870000005
+      },
+      {
+        "file": "persistence_history_runtime.py",
+        "line": 664,
+        "function": "guard",
+        "primitive_calls": 150,
+        "calls": 150,
+        "self_seconds": 0.000560885,
+        "cumulative_seconds": 6.6130811970000005
+      },
+      {
+        "file": "persistence_lazy_sequence.py",
+        "line": 882,
+        "function": "_directory_commit",
+        "primitive_calls": 11073,
+        "calls": 11073,
+        "self_seconds": 0.330227734,
+        "cumulative_seconds": 6.577253891000001
+      },
+      {
+        "file": "incremental_store.py",
+        "line": 232,
+        "function": "_decode_value",
+        "primitive_calls": 58817,
+        "calls": 801950,
+        "self_seconds": 3.1820984730000004,
+        "cumulative_seconds": 6.5594463350000005
+      },
+      {
+        "file": "social.py",
+        "line": 25,
+        "function": "record",
+        "primitive_calls": 26,
+        "calls": 26,
+        "self_seconds": 0.003559506,
+        "cumulative_seconds": 6.404495592
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 775,
+        "function": "_require_pin",
+        "primitive_calls": 69324,
+        "calls": 69324,
+        "self_seconds": 0.5160810210000001,
+        "cumulative_seconds": 6.149250164000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 459,
+        "function": "_pin_checksum",
+        "primitive_calls": 180952,
+        "calls": 180952,
+        "self_seconds": 1.021390312,
+        "cumulative_seconds": 5.969599453000001
+      },
+      {
+        "file": "persistence_lazy_store.py",
+        "line": 1293,
+        "function": "_interval_rows",
+        "primitive_calls": 97909,
+        "calls": 97909,
+        "self_seconds": 1.172182376,
+        "cumulative_seconds": 5.7683153250000005
+      }
+    ]
+  },
+  "component_reproduction": [
+    {
+      "size": 16,
+      "operation": "append_and_reconcile",
+      "seconds": 0.22527766699977292,
+      "group_reads": 0,
+      "owner_reads": 2,
+      "io": {
+        "payload_reads": 44,
+        "payload_read_bytes": 13337,
+        "payload_check_reads": 44,
+        "payload_check_bytes": 13337,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 164,
+        "query_rows": 0,
+        "pin_rows": 123,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      }
+    },
+    {
+      "size": 16,
+      "operation": "scalar_and_reconcile",
+      "seconds": 0.0919713410003169,
+      "group_reads": 0,
+      "owner_reads": 3,
+      "io": {
+        "payload_reads": 60,
+        "payload_read_bytes": 14934,
+        "payload_check_reads": 60,
+        "payload_check_bytes": 14934,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 213,
+        "query_rows": 0,
+        "pin_rows": 138,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      }
+    },
+    {
+      "size": 16,
+      "operation": "unchanged_reconcile",
+      "seconds": 1.2940000033268007e-05,
+      "group_reads": 0,
+      "owner_reads": 0,
+      "io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 0,
+        "query_rows": 0,
+        "pin_rows": 0,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      }
+    },
+    {
+      "size": 128,
+      "operation": "append_and_reconcile",
+      "seconds": 0.8824537959999361,
+      "group_reads": 0,
+      "owner_reads": 2,
+      "io": {
+        "payload_reads": 301,
+        "payload_read_bytes": 95053,
+        "payload_check_reads": 301,
+        "payload_check_bytes": 95053,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 902,
+        "query_rows": 0,
+        "pin_rows": 749,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      }
+    },
+    {
+      "size": 128,
+      "operation": "scalar_and_reconcile",
+      "seconds": 0.837555871999939,
+      "group_reads": 0,
+      "owner_reads": 3,
+      "io": {
+        "payload_reads": 444,
+        "payload_read_bytes": 115419,
+        "payload_check_reads": 444,
+        "payload_check_bytes": 115419,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 1317,
+        "query_rows": 0,
+        "pin_rows": 906,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      }
+    },
+    {
+      "size": 128,
+      "operation": "unchanged_reconcile",
+      "seconds": 1.5582999822072452e-05,
+      "group_reads": 0,
+      "owner_reads": 0,
+      "io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 0,
+        "query_rows": 0,
+        "pin_rows": 0,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      }
+    },
+    {
+      "size": 320,
+      "operation": "append_and_reconcile",
+      "seconds": 10.730332045000068,
+      "group_reads": 329,
+      "owner_reads": 2,
+      "io": {
+        "payload_reads": 3041,
+        "payload_read_bytes": 9710278,
+        "payload_check_reads": 3041,
+        "payload_check_bytes": 9710278,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 15978,
+        "query_rows": 0,
+        "pin_rows": 10698,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      }
+    },
+    {
+      "size": 320,
+      "operation": "scalar_and_reconcile",
+      "seconds": 1.8152305240000715,
+      "group_reads": 0,
+      "owner_reads": 3,
+      "io": {
+        "payload_reads": 1242,
+        "payload_read_bytes": 315834,
+        "payload_check_reads": 1242,
+        "payload_check_bytes": 315834,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 3489,
+        "query_rows": 0,
+        "pin_rows": 2502,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      }
+    },
+    {
+      "size": 320,
+      "operation": "unchanged_reconcile",
+      "seconds": 1.3510999906429788e-05,
+      "group_reads": 0,
+      "owner_reads": 0,
+      "io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 0,
+        "query_rows": 0,
+        "pin_rows": 0,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 0
+      }
+    }
+  ]
+}
