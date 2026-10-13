@@ -22,6 +22,31 @@ def occ(owner, key, *path):
     return Occurrence(owner, key, tuple(path))
 
 
+def test_owner_group_diagnostics_tolerate_cyclic_weak_cleanup(monkeypatch):
+    registry = LazyIdentityRegistry('diagnostic-gc', prune_dead_occurrences=True)
+    live = Box('live')
+    registry.bind(live, occ('people', 1))
+    was_enabled = gc.isenabled()
+    gc.disable()
+    try:
+        cyclic = Box()
+        cyclic.value = cyclic
+        registry.bind(cyclic, occ('people', 2))
+        reference = weakref.ref(cyclic)
+        del cyclic
+        original = Occurrence.owner.fget
+        def collect_during_report(occurrence):
+            gc.collect()
+            return original(occurrence)
+        monkeypatch.setattr(Occurrence, 'owner', property(collect_during_report))
+        registry.derived_owner_groups()
+        assert reference() is None
+        assert registry.derived_owner_groups() == (frozenset({('people', 1)}),)
+    finally:
+        if was_enabled:
+            gc.enable()
+
+
 def test_equal_distinct_objects_get_distinct_incarnations_and_old_alias_stays_old():
     registry = LazyIdentityRegistry("store-a")
     first = Box(1)

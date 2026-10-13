@@ -501,8 +501,10 @@ class LazyIdentityRegistry:
         """Connected owner components induced by shared incarnation occurrences."""
         self._ensure_open()
         adjacency: dict[tuple[str, Any], set[tuple[str, Any]]] = {}
-        for occurrences in self._occurrences_by_incarnation.values():
-            owners = {occ.owner for occ in occurrences}
+        # Allocation during this explicit diagnostic can trigger cyclic GC and
+        # weak cleanup. Snapshot metadata, without retaining the live objects.
+        for occurrences in tuple(self._occurrences_by_incarnation.values()):
+            owners = {occ.owner for occ in tuple(occurrences)}
             for owner in owners:
                 adjacency.setdefault(owner, set()).update(owners - {owner})
         groups = []
@@ -537,7 +539,7 @@ class LazyIdentityRegistry:
 
     def diagnostics(self) -> dict[str, int]:
         self._ensure_open()
-        live = sum(1 for reference in self._by_incarnation.values() if reference() is not None)
+        live = sum(1 for reference in tuple(self._by_incarnation.values()) if reference() is not None)
         groups = self.derived_owner_groups()
         max_group = max((len(group) for group in groups), default=0)
         metadata_bytes = (

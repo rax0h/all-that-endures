@@ -173,8 +173,8 @@ def _audit(world):
     }
 
 
-def _control(seed, milestones):
-    world = generate_world(seed)
+def _control(seed, milestones, *, initialization='founders'):
+    world = generate_world(seed, mature=initialization == 'mature')
     sim = Simulation(world)
     rows = {}
     for mark in milestones:
@@ -193,12 +193,28 @@ def _control(seed, milestones):
     return rows
 
 
-def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workflow_sha):
+def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workflow_sha,
+        *, complete_format=False, initialization='founders'):
+    if initialization not in ('founders', 'mature'):
+        raise ValueError('initialization must be founders or mature')
     milestones = tuple(sorted(set(int(value) for value in milestones)))
     if not milestones or milestones[0] <= bootstrap_year:
         raise ValueError("milestones must be strictly after bootstrap year")
     workdir = Path(workdir)
     workdir.mkdir(parents=True, exist_ok=True)
+    def progress(stage, **details):
+        row = {"stage": stage, "elapsed_seconds": time.perf_counter() - run_started,
+               "product_sha": product_sha, "workflow_sha": workflow_sha,
+               "complete_format": complete_format, "initialization": initialization, **details}
+        with (workdir / 'progress.jsonl').open('a') as stream:
+            stream.write(json.dumps(row, sort_keys=True) + '\n')
+        print(json.dumps(row, sort_keys=True), flush=True)
+
+    def file_hash(path):
+        with path.open('rb') as stream:
+            return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+    run_started = time.perf_counter()
     cold = workdir / "p5-long-cold.sqlite"
     lazy = workdir / "p5-long-lazy.sqlite"
     restore = workdir / "p5-long-restore.sqlite"
@@ -206,40 +222,57 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
         if path.exists():
             path.unlink()
 
+    progress('independent_control_started', milestones=milestones)
     control_started = time.perf_counter()
-    controls = _control(seed, milestones)
+    controls = _control(seed, milestones, initialization=initialization)
     control_seconds = time.perf_counter() - control_started
     gc.collect()
 
-    source = generate_world(seed)
+    progress('bootstrap_started', bootstrap_year=bootstrap_year)
+    source = generate_world(seed, mature=initialization == 'mature')
     started = time.perf_counter()
     Simulation(source).run(bootstrap_year)
     bootstrap_simulation_seconds = time.perf_counter() - started
     source_digest, source_digest_seconds = _digest(source)
 
+    progress('cold_save_started')
     cold_result = write_cold_snapshot(source, cold, rules_id=rules_id)
-    cold_hash_before = hashlib.sha256(cold.read_bytes()).hexdigest()
-    conversion_result = convert_cold_to_lazy(cold, lazy, rules_id=rules_id)
-    cold_hash_after = hashlib.sha256(cold.read_bytes()).hexdigest()
-    if cold_hash_before != cold_hash_after:
-        raise AssertionError("cold source changed during lazy conversion")
     if source.digest() != source_digest:
         raise AssertionError("bootstrap persistence mutated source World")
     del source
     gc.collect()
+    cold_hash_before = file_hash(cold)
+    progress('lazy_conversion_started')
+    conversion_result = convert_cold_to_lazy(cold, lazy, rules_id=rules_id,
+                                            native_graph_buckets=complete_format)
+    if complete_format:
+        from ate_sim.persistence_complete_format import upgrade_lazy_snapshot
+        progress('complete_upgrade_started')
+        complete = workdir / 'p5-long-complete.sqlite'
+        conversion_result = upgrade_lazy_snapshot(lazy, complete, rules_id=rules_id)
+        lazy = complete
+    cold_hash_after = file_hash(cold)
+    if cold_hash_before != cold_hash_after:
+        raise AssertionError("cold source changed during lazy conversion")
 
     lazy_rows = {}
+    progress('lazy_open_started')
     session = open_lazy_world_session(lazy, rules_id=rules_id)
     try:
         if session.world.year != bootstrap_year:
             raise AssertionError("lazy bootstrap opened at wrong year")
+        if complete_format and int(session.store.db.execute(
+                "SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0]) != 6:
+            raise AssertionError('long validation did not open complete format6')
         for mark in milestones:
+            progress('continuation_started', from_year=session.world.year, to_year=mark)
             session.store.reset_diagnostics()
             started = time.perf_counter()
             Simulation(session.world).run(mark - session.world.year)
             simulation_seconds = time.perf_counter() - started
             simulation_io = _io(session.store.diagnostics())
 
+            progress('save_started', year=mark, simulation_seconds=simulation_seconds)
             session.store.reset_diagnostics()
             started = time.perf_counter()
             generation = session.save()
@@ -247,12 +280,14 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
             save_io = _io(session.store.diagnostics())
             working_before_audit = _compact_working_set(session.diagnostics())
 
+            progress('audit_started', year=mark)
             session.store.reset_diagnostics()
             audit = _audit(session.world)
             audit_io = _io(session.store.diagnostics())
             working_after_audit = _compact_working_set(session.diagnostics())
             live_counters = _counters(session.world)
 
+            progress('reopen_started', year=mark)
             session.close()
             session = open_lazy_world_session(lazy, rules_id=rules_id)
             session.store.reset_diagnostics()
@@ -286,7 +321,10 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
                 "reopen_digest_io": reopened_digest_io,
                 "matches_control": True,
             }
+            progress('milestone_verified', year=mark, digest=reopened_digest,
+                     generation=generation)
 
+        progress('backup_started')
         started = time.perf_counter()
         session.store.backup(restore)
         backup_seconds = time.perf_counter() - started
@@ -294,6 +332,7 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
         if session._active:
             session.close()
 
+    progress('restore_verification_started')
     with open_lazy_world_session(restore, rules_id=rules_id) as restored:
         restore_generation = restored.pin.captured_head
         restored_digest, restore_digest_seconds = _digest(restored.world)
@@ -304,10 +343,12 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
             raise AssertionError("durable restore artifact counter mismatch")
         restore_year = restored.world.year
 
-    restore_sha256 = hashlib.sha256(restore.read_bytes()).hexdigest()
+    restore_sha256 = file_hash(restore)
     summary = {
         "schema": 1,
         "passed": True,
+        "complete_format": complete_format,
+        "initialization": initialization,
         "seed": seed,
         "simulation_schema": SCHEMA,
         "rules_id": rules_id,
@@ -341,6 +382,7 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
             ),
         },
     }
+    progress('completed', restore_sha256=restore_sha256, year=restore_year)
     return summary
 
 
@@ -354,6 +396,8 @@ def main():
     parser.add_argument("--output", required=True)
     parser.add_argument("--product-sha", default="")
     parser.add_argument("--workflow-sha", default=os.environ.get("GITHUB_SHA", ""))
+    parser.add_argument("--complete-format", action="store_true")
+    parser.add_argument("--initialization", choices=('founders', 'mature'), default='founders')
     args = parser.parse_args()
 
     summary = run(
@@ -364,6 +408,8 @@ def main():
         args.rules_id,
         args.product_sha,
         args.workflow_sha,
+        complete_format=args.complete_format,
+        initialization=args.initialization,
     )
     rendered = json.dumps(summary, indent=2, sort_keys=True)
     Path(args.output).write_text(rendered + "\n", encoding="utf-8")
