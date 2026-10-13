@@ -1,0 +1,64 @@
+{
+  "status": "final correctness suite and independent P5 passed; final architecture/performance/release acceptance pending",
+  "tested_source_commit": "a65d6afa08921477cbaf419695b08f0f98dea4b1",
+  "tested_source_tree": "f33fa16a1b7b5fa0dd8004bd9673e34b45176d28",
+  "full_suite": {
+    "run_id": 38378944249,
+    "workflow_commit": "cb21c4f502c4190f29b4a40728721d32b64a90ec",
+    "candidate_checkout_pinned": true,
+    "passed": 2406,
+    "subtests_passed": 2,
+    "failed": 0,
+    "seconds": 4988.93,
+    "python": "3.12.15",
+    "all_106_production_script_hashes_match_p5": true,
+    "artifact_id": 11806349572,
+    "artifact_sha256": "4c5e535d8e4857c697050b8abed99b3f4eab2a5cad17910236aa4e549f7f8875",
+    "artifact_expires": "2026-10-27T11:11:45Z"
+  },
+  "independent_p5": {
+    "run_id": 38335872125,
+    "production_commit": "5bf5c0192b307d15b9ab525cee20938584506ae6",
+    "passed": true,
+    "seed": 843000,
+    "pre_years": 3,
+    "continuation_years": 4,
+    "reopen_years": 3,
+    "final_year": 10,
+    "events_total": 439,
+    "final_digest": "3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e",
+    "total_digest": "b31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387",
+    "report": "stage_0_5_complete_p5_final.json",
+    "artifact_id": 11786410897,
+    "artifact_expires": "2026-10-27T02:48:24Z",
+    "artifact_sha256": "2a77fbf1e6d05d89d9a76e2e2f72dc431377d78e8187ae8038e15e3e7503ab85",
+    "relocated_sqlite_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
+    "archive_downloaded_and_checksums_verified": true,
+    "downloaded_restore_verification": "stage_0_5_downloaded_restore_validation.json",
+    "downloaded_restore_matches_eager_year7": true,
+    "retained_archive": {
+      "filename": "stage_0_5_verified_restore.zip",
+      "library_file_id": "libfile_1ecf940f113881918d7d29bcb20889b0",
+      "size_bytes": 12341483,
+      "sha256": "2a77fbf1e6d05d89d9a76e2e2f72dc431377d78e8187ae8038e15e3e7503ab85"
+    }
+  },
+  "review_receipt": "STAGE_0_5_COMPLETE_REVIEW.md",
+  "candidate_measurements": "stage_0_5_complete_candidate_validation.json",
+  "unresolved": [
+    "final independent architecture acceptance",
+    "persistence continuation latency: 603.007s for first4years and1398.147s for reopened3years; cause not yet established",
+    "owner resolution of exact pressure arithmetic/cold-miss latency exception",
+    "separately authorized final-source endurance or explicit release policy",
+    "authorized production promotion"
+  ],
+  "scope_checks": {
+    "pr14_head": "c29e3d06a0c9d219235e2b3f0390271bd1245aea",
+    "pr14_draft": true,
+    "pr14_unmerged": true,
+    "rank_issue17_deferred": true,
+    "checkpoint_default_unchanged": true,
+    "no_new_endurance": true,
+    "production_script_hashes_unchanged": true
+  }
+}

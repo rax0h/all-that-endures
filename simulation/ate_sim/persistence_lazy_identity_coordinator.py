@@ -96,13 +96,17 @@ class IdentityCoordinator:
                 break  # Actual unsaved group state is reported separately.
             self._drop(key)
 
-    def discover_group(self, incarnation, *, read_only=False):
+    def discover_group(self, incarnation, *, read_only=False, recheck=False):
         if read_only:
             self.store._require_pin(self.pin)
         else:
             self.preflight()
         inc = incarnation.value if isinstance(incarnation, IncarnationId) else incarnation
         key = self.pin.captured_head, inc
+        if recheck and key in self.discovered_groups:
+            # A requested mutation may not borrow a warmed certificate after
+            # raw authority corruption. Recheck its actual affected closure.
+            self._drop(key)
         if key in self.discovered_groups:
             self.discovered_groups.move_to_end(key)
             return self.discovered_groups[key]
@@ -354,14 +358,26 @@ class IdentityCoordinator:
                 self.encode_placement(owner, path, obj)
             incoming[marker] = path, obj
         changes = self._owner_changes(owner, prefix)
-        for path, original, old in changes.values():
+        new_identity = object()
+        incoming_ids = {}
+        for marker, (path, obj) in incoming.items():
+            inc = self.registry.incarnation_for_object(obj)
+            incoming_ids[marker] = new_identity if inc is None else inc.value
+        for marker, (path, original, old) in changes.items():
+            # The checked owner projection already proves unchanged membership.
+            # Only changed paths require complete affected-group discovery.
+            # Rechecking every unchanged group makes a suffix append evict and
+            # reload the entire packed current body above the clean-cache cap.
+            if incoming_ids.get(marker) == old:
+                continue
             for inc in {i for i in (original, old) if i is not None}:
                 self.discover_group(inc)
         # Existing incoming identities also require their complete group before
         # any new identity is allocated or any path is installed.
-        for path, obj in incoming.values():
+        for marker, (path, obj) in incoming.items():
             inc = self.registry.incarnation_for_object(obj)
-            if inc is not None:
+            old = changes.get(marker, (None, None, None))[2]
+            if inc is not None and inc.value != old:
                 self.discover_group(inc)
         chosen = {}
         for marker, (path, obj) in incoming.items():

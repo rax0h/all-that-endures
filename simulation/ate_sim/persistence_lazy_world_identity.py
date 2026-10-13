@@ -61,6 +61,9 @@ class WorldIdentityBridge:
         self._session_ref = weakref.ref(session)
         self._pending_owners=set()
         self._synchronizing=False
+        self._marking_packed_payload=False
+        self._packed_action_epoch=None
+        self._packed_scalar_projection=False
         bindings = session._family_bindings
         self.coordinator = IdentityCoordinator(session.store, session.pin, session._registry,
             load_owner=bindings.load_owner, resolve_path=bindings.resolve_path,
@@ -70,7 +73,26 @@ class WorldIdentityBridge:
             prepare_owner_header=bindings.unchanged_owner_header)
 
     def note_owner(self,owner):
+        if owner == (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY) and self._marking_packed_payload:
+            return  # The coordinator already reconciled this physical owner.
         self._pending_owners.add(owner)
+
+    def mark_scalar_action_assignment(self, obj, old, new, owners):
+        from .agency import ActionRecord
+        if type(obj) is not ActionRecord or any(
+                value is not None and type(value) not in (bool, int, float, str, bytes)
+                for value in (old, new)):
+            return False
+        # Scalar value dirt is still published through every real owner. It
+        # does not turn an attached packed-owner binding into a structural
+        # list edit. Logical keys keep using the existing changed-owner journal.
+        marking = self._marking_packed_payload
+        self._marking_packed_payload = True
+        try:
+            self._session_ref()._eager_tracker._mark_many(owners)
+        finally:
+            self._marking_packed_payload = marking
+        return True
 
     def _mark_dirty(self, owner):
         session = self._session_ref()
@@ -83,7 +105,12 @@ class WorldIdentityBridge:
             return
         if table is None and owner in session._eager_tracker._deleted:
             return
-        session._family_bindings.mark_dirty(owner)
+        marking = self._marking_packed_payload
+        self._marking_packed_payload = marking or owner == (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY)
+        try:
+            session._family_bindings.mark_dirty(owner)
+        finally:
+            self._marking_packed_payload = marking
 
     def synchronize_lazy_placements(self):
         """Reconcile only family-touched compact owners, never the live registry.
@@ -105,7 +132,8 @@ class WorldIdentityBridge:
         self._pending_owners.difference_update(pending)
         try:
             if ('world.event_ids',0) in pending:self.synchronize_event_id_placements()
-            if any(owner[0]==AGENCY_ACTIONS_NAMESPACE for owner in pending):self.synchronize_packed_actions()
+            actions = tuple(owner for owner in pending if owner[0]==AGENCY_ACTIONS_NAMESPACE)
+            if actions:self.synchronize_packed_actions(owners=actions)
             for owner in pending:
                 table=session._family_bindings.tables.get(owner[0])
                 if table is not None:
@@ -152,7 +180,24 @@ class WorldIdentityBridge:
         if before != current:
             coord.replace_owner(owner, placements)
 
-    def synchronize_packed_actions(self, subject=None):
+    def _packed_epoch(self):
+        session = self._session_ref()
+        return (session.pin.captured_head, session.store.db.total_changes,
+                session.store.db.execute('PRAGMA data_version').fetchone()[0])
+
+    @staticmethod
+    def _scalar_action(value):
+        from .agency import ActionRecord
+        from .persistence_record_runtime import record_backing
+        from .persistence_schema import RECORD_FIELDS
+        # This is an optimization of actual closed eager values, not type
+        # annotations. Mutable imports/native record backings keep full graph
+        # reconciliation through the existing authority.
+        return (type(value) is ActionRecord and record_backing(value) is None
+                and all(getattr(value, field) is None or type(getattr(value, field))
+                        in (bool, int, float, str, bytes) for field in RECORD_FIELDS[ActionRecord]))
+
+    def synchronize_packed_actions(self, subject=None, *, owners=None):
         """Project the accepted packed current action body, not old histories.
 
         Logical action positions belong to one real packed physical source.
@@ -165,6 +210,31 @@ class WorldIdentityBridge:
         owner = (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY)
         if tracker._manifest['collections'][owner[0]][0] != PACKED_LIST_KIND:
             raise StoreIntegrityError('checked action placements require an explicit packed copy upgrade')
+        notified = tuple(owners if owners is not None else
+                         (item for item in self._pending_owners if item[0] == owner[0]))
+        value = session.world.agency.actions
+        keys = {item[1] for item in notified}
+        if (self._packed_scalar_projection and self._packed_action_epoch == self._packed_epoch()
+                and all(type(key) is int and 0 <= key < len(value) and self._scalar_action(value[key])
+                        for key in keys)):
+            # The existing logical dirty journal supplies D. Exact membership
+            # checks inspect only its paths; an append does not replace every
+            # unrelated group or retain another current-body identity cache.
+            for key in sorted(keys):
+                path = (('index', key),)
+                marker = coord._marker(owner, path)
+                original = coord.catalog.read_identity_membership(session.pin, owner, path)
+                pending = coord.placement_overlay.get(marker)
+                old = original if pending is None else None if pending.delete else pending.incarnation_id
+                current = registry.incarnation_for_object(value[key])
+                if current is None or current.value != old:
+                    coord.replace_placement(owner, path, value[key])
+            self._pending_owners.difference_update(notified)
+            if subject is not None:
+                incarnation = registry.incarnation_for_object(subject)
+                if incarnation is not None:
+                    coord.discover_group(incarnation, recheck=True)
+            return
         changes = coord._owner_changes(owner, ())
         before = {path: old for path, _, old in changes.values() if old is not None}
         originals = {}
@@ -175,7 +245,6 @@ class WorldIdentityBridge:
                 relative = (('index', key),) + path[len(prefix):]
                 if relative in before:
                     originals[ident] = (obj, before[relative])
-        value = session.world.agency.actions
         rows = []
         tracker._identity_index._scan(value, (), rows)
         rows = [(ident, obj, path) for ident, obj, path in rows if path]
@@ -208,6 +277,14 @@ class WorldIdentityBridge:
         current = {path: registry.incarnation_for_object(child).value for path, child in placements}
         if before != current:
             coord.replace_owner(owner, placements)
+        self._packed_scalar_projection = all(len(path) == 1 and self._scalar_action(child)
+                                             for path, child in placements)
+        self._packed_action_epoch = self._packed_epoch()
+        self._pending_owners.difference_update(notified)
+        if subject is not None:
+            incarnation = registry.incarnation_for_object(subject)
+            if incarnation is not None:
+                coord.discover_group(incarnation, recheck=True)
 
     def stitch_eager_action_peers(self):
         """Canonicalize resident current copies before exposing an eager body.

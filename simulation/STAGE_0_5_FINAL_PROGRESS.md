@@ -1,5 +1,13 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: final full suite green; correctness handoff ready (October 13 UTC)
+
+GitHub run38378944249 passed **2406tests and2subtests in4988.93s** (no failures) on immutable candidatea65d6afa08921477cbaf419695b08f0f98dea4b1/treef33fa16a1b7b5fa0dd8004bd9673e34b45176d28. The workflow-only commitcb21c4f502c4190f29b4a40728721d32b64a90ec pins this checkout and verified all106 production/script hashes match passing P5 source5bf5c0192b307d15b9ab525cee20938584506ae6. The intervening changes are the documented stale floor assertion correction and evidence/docs, not runtime edits.
+
+Required complete-format independent seed8430003+4+3 P5 is green at run38335872125: year10,439events, exact baseline finaldigest3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e. All control/checkpoint/reopen/detach/relocated lanes passed. P5 artifact11786410897 was downloaded; ZIP CRC/archive SHA256 and original SQLite SHA256 agree with the published receipt. Its operational copy reopened at year7/337events with exact independent eager authority; World generation4 remains unchanged. The identical ZIP is now retained beyond CI expiry; durable identity and verification are in stage_0_5_downloaded_restore_validation.json. Green full-suite logs/JUnit artifact11806349572 expiresOctober27; P5 artifact also expiresOctober27.
+
+Exact final correctness receipt: `stage_0_5_final_correctness_validation.json`; final independent acceptance handoff: `STAGE_0_5_FINAL_CANDIDATE_HANDOFF.md`. Full correctness checks are complete. Final independent architecture acceptance and performance/release decisions remain open; this is not production acceptance. Current P5 timing603.007s+1398.147s is disclosed without claiming an identified bottleneck or acceptable speed. Pressure arithmetic/cold-miss exception, endurance policy and production promotion remain explicit owner gates. PR14 is still draft/unmerged atc29e3d06a0c9d219235e2b3f0390271bd1245aea; rank issue17 and checkpoint defaults are unchanged.
+
 ## Latest checkpoint: final acceptance results and stale floor assertion repair (October 13 UTC)
 
 Durable CI38335872125 completed against candidate public5bf5c0192b307d15b9ab525cee20938584506ae6 (local0ed4c2b). Required complete-format seed8430003+4+3 P5 **passed**: finalyear10,439events, expected finaldigest3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e and totaldigestb31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387. Independent controls, checkpoint continuation, reopen, detach checkpoint roundtrip and relocated backup checks all passed. Exact report is retained in `stage_0_5_complete_p5_final.json`.

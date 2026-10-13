@@ -1,4 +1,4 @@
-name: Stage 0.5 complete candidate validation
+name: Stage 0.5 speed repair validation
 
 on:
   push:
@@ -6,44 +6,126 @@ on:
 
 permissions:
   contents: read
+  actions: read
+
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
 
 jobs:
-  full-suite:
+  affected-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
-    env:
-      PYTHONPATH: .:simulation
-      PYTHONUNBUFFERED: '1'
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: a65d6afa08921477cbaf419695b08f0f98dea4b1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m pip install -q pytest
-      - name: Verify exact candidate source
-        run: test "$(git rev-parse HEAD)" = a65d6afa08921477cbaf419695b08f0f98dea4b1
-      - name: Confirm unchanged production from passing P5
+      - name: Verify exact candidate checkout
+        env:
+          EXPECTED_CANDIDATE: ${{ github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_CANDIDATE"
+      - name: Affected identity, packing and lifecycle regressions
         run: |
-          python - <<'PY'
-          import hashlib, json
-          from pathlib import Path
-          hashes = json.loads(Path('simulation/stage_0_5_complete_candidate_validation.json').read_text())['source_sha256']
-          changed = [p for p, expected in hashes.items() if hashlib.sha256(Path(p).read_bytes()).hexdigest() != expected]
-          assert not changed, changed
-          print(f'All {len(hashes)} production/script hashes match the passing P5 source')
-          PY
-      - name: Complete applicable simulation suite
-        run: |
-          mkdir -p "$RUNNER_TEMP/ate-complete-suite"
+          mkdir -p "$RUNNER_TEMP/ate-speed-affected"
           set -o pipefail
-          python -m pytest -vv --durations=25 simulation/tests --junitxml="$RUNNER_TEMP/ate-complete-suite/suite.xml" -o junit_family=legacy 2>&1 | tee "$RUNNER_TEMP/ate-complete-suite/suite.log"
-      - name: Retain suite report
+          python -m pytest -vv --durations=25 \
+            simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py \
+            simulation/tests/test_stage_0_5_final_world_packed_actions.py \
+            simulation/tests/test_stage_0_5_final_identity_coordinator.py \
+            simulation/tests/test_stage_0_5_final_coordinator_header_witnesses.py \
+            simulation/tests/test_stage_0_5_final_world_recursive_records.py \
+            simulation/tests/test_stage_0_5_final_world_unpublished_promotion.py \
+            --junitxml="$RUNNER_TEMP/ate-speed-affected/affected.xml" \
+            -o junit_family=legacy 2>&1 | tee "$RUNNER_TEMP/ate-speed-affected/affected.log"
+      - name: Retain affected report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: complete-candidate-full-suite
+          name: speed-repair-affected-tests
           retention-days: 14
-          path: ${{ runner.temp }}/ate-complete-suite
+          path: ${{ runner.temp }}/ate-speed-affected
 
+  bounded-profile:
+    needs: affected-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download original verified restore
+        uses: actions/download-artifact@v4
+        with:
+          name: complete-candidate-independent-p5
+          run-id: 38335872125
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/ate-original-p5
+      - name: Verify original source checksum
+        env:
+          RESTORE_ROOT: ${{ runner.temp }}/ate-original-p5
+        run: |
+          python - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          files = list(Path(os.environ['RESTORE_ROOT']).rglob('p5-relocated.sqlite'))
+          assert len(files) == 1, files
+          source = files[0]
+          digest = hashlib.sha256(source.read_bytes()).hexdigest()
+          assert digest == 'ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199', digest
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write(f'ATE_PROFILE_SOURCE={source}\n')
+          print('Verified original year-7 restore SHA256', digest)
+          PY
+      - name: Fresh component profile
+        run: |
+          mkdir -p "$RUNNER_TEMP/ate-speed-profile"
+          set -o pipefail
+          python simulation/measure_complete_action_reconciliation.py \
+            "$RUNNER_TEMP/ate-speed-profile/component" --sizes 16 128 320 \
+            2>&1 | tee "$RUNNER_TEMP/ate-speed-profile/component.log"
+      - name: Bounded complete restore profile
+        run: |
+          set -o pipefail
+          python simulation/profile_complete_restore.py "$ATE_PROFILE_SOURCE" \
+            "$RUNNER_TEMP/ate-speed-profile/restore" --budget 90 \
+            2>&1 | tee "$RUNNER_TEMP/ate-speed-profile/restore.log"
+      - name: Retain bounded profile evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: speed-repair-bounded-profile
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/ate-speed-profile/*.log
+            ${{ runner.temp }}/ate-speed-profile/component/result.json
+            ${{ runner.temp }}/ate-speed-profile/restore/result.json
+            ${{ runner.temp }}/ate-speed-profile/restore/*.txt
+            ${{ runner.temp }}/ate-speed-profile/restore/*.prof
+
+  full-suite:
+    needs: affected-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -q pytest
+      - name: Complete applicable simulation suite
+        run: |
+          mkdir -p "$RUNNER_TEMP/ate-speed-suite"
+          set -o pipefail
+          python -m pytest -vv --durations=25 simulation/tests \
+            --junitxml="$RUNNER_TEMP/ate-speed-suite/suite.xml" \
+            -o junit_family=legacy 2>&1 | tee "$RUNNER_TEMP/ate-speed-suite/suite.log"
+      - name: Retain full suite report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: speed-repair-full-suite
+          retention-days: 14
+          path: ${{ runner.temp }}/ate-speed-suite

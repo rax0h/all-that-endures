@@ -457,7 +457,7 @@ def prepare_cold_save(session, *, force=False, token=None):
                 tuple(container),
             ),
         )
-        detached, _bytes = _encoded_copy(session.codec, envelope)
+        detached, _bytes = _encoded_copy(session.codec, session._plain(envelope))
         _put_change(
             change_map,
             session.codec,

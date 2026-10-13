@@ -14,6 +14,8 @@ Review focus: marker without floor; floor without marker/catalog; missing checke
 - [x] Integrate bounded head/catalog checks and automatic runtime activation after private restore, preserving legacy selection.
 - [x] Extend the existing private copy transaction to publish complete markers only after Event/advancement normalization; public upgrade delegates to that same publisher.
 - [x] Prove missing/mixed authority and publication faults reject without modifying source/destination; save/reopen retains floor/features.
-- [ ] Run affected complete-format and legacy gates; run generated-world P5 and final source suite after remaining root audit.
+- [x] Run affected complete-format and legacy gates; run generated-world P5 and final source suite after remaining root audit.
 
 Focused complete/current/Event-ID gate: 78 passed in 79.44s. The generated-world 0+1+0 probe passed after notified-owner/backing synchronization repairs; required 3+4+3 P5 and final full suite are running, not certified yet.
+
+Final acceptance correctness: required3+4+3 P5 passed at38335872125. Full suite passed2406tests and2subtests at38378944249, with106 production/script hashes proven identical. Final architecture/performance/release acceptance remains separate.

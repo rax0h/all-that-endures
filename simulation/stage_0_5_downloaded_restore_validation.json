@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "archive_id": 11786410897,
+  "downloaded_archive_unchanged": true,
+  "year": 7,
+  "event_count": 337,
+  "digest": "b31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387",
+  "generation": 4,
+  "original_sqlite_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
+  "seconds": 39.71423422800001,
+  "verification": "downloaded artifact, verified ZIP and original SQLite hashes, reopened complete format, exact independently constructed eager year7 authority",
+  "local_copy_byte_changes": "expected generation-pin capture/release and bounded expired-row cleanup; no simulation save or World generation change",
+  "harness_correction": "initial extra byte-immutability assertion on an opened operational copy was inappropriate; original ZIP stays unchanged",
+  "retained_archive": {
+    "filename": "stage_0_5_verified_restore.zip",
+    "library_file_id": "libfile_1ecf940f113881918d7d29bcb20889b0",
+    "size_bytes": 12341483,
+    "sha256": "2a77fbf1e6d05d89d9a76e2e2f72dc431377d78e8187ae8038e15e3e7503ab85"
+  }
+}

@@ -256,6 +256,9 @@ class _ObjectBinding:
         _, old, owners, wrapped = token
         if old is not wrapped:
             self.session._detach(old, owners)
+        mark_action = getattr(self.session, '_mark_scalar_action_assignment', None)
+        if mark_action is not None and mark_action(obj, old, wrapped, owners):
+            return
         self.session._mark_many(owners)
 
     def event_append_preflight(self, log, event):
@@ -2245,6 +2248,9 @@ class IncrementalWorldSession:
         if ident in memo:
             return memo[ident]
         if is_dataclass(value):
+            if cls in RECORD_FIELDS:
+                from .persistence_adapters import _check_record
+                _check_record(value)
             clone = object.__new__(cls)
             memo[ident] = clone
             for field in fields(cls):
