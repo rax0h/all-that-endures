@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: bdde5bc20c40583045fcb3562698847db460b080
+          ref: 2bc3c85389760ff12578857f7d2a849bc5cf9201
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -25,7 +25,7 @@ jobs:
         run: |
           mkdir -p evidence
           git rev-parse HEAD HEAD^{tree} 2>&1 | tee evidence/source.txt
-          python -m pytest -q -o junit_family=legacy --junitxml=evidence/focused.xml simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_stage_0_5_owner_witness_cache.py simulation/tests/test_stage_0_5_final_long_harness.py 2>&1 | tee evidence/focused.log
+          python -m pytest -q -o junit_family=legacy --junitxml=evidence/focused.xml simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_stage_0_5_owner_witness_cache.py simulation/tests/test_stage_0_5_final_long_harness.py simulation/tests/test_stage_0_5_final_backing_dependencies.py 2>&1 | tee evidence/focused.log
           timeout 35m python simulation/persistence_p5_validation.py --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --complete-format --rules-id stage-0-5-final-release --workdir evidence/p5 --output evidence/p5.json 2>&1 | tee evidence/p5.log
           python - <<'PY'
           import json
@@ -49,6 +49,12 @@ jobs:
           name: final-source-short-restore
           path: evidence/p5/p5-relocated.sqlite
           retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: final-source-recovery-failure-databases
+          path: evidence/p5
+          retention-days: 14
   full-suite:
     needs: recovery-gate
     runs-on: ubuntu-latest
@@ -56,7 +62,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: bdde5bc20c40583045fcb3562698847db460b080
+          ref: 2bc3c85389760ff12578857f7d2a849bc5cf9201
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -79,7 +85,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: bdde5bc20c40583045fcb3562698847db460b080
+          ref: 2bc3c85389760ff12578857f7d2a849bc5cf9201
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -123,7 +129,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: bdde5bc20c40583045fcb3562698847db460b080
+          ref: 2bc3c85389760ff12578857f7d2a849bc5cf9201
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -143,14 +149,14 @@ jobs:
         shell: bash
         run: |
           git rev-parse HEAD HEAD^{tree} 2>&1 | tee evidence/source.txt
-          timeout --signal=TERM --kill-after=30s 350m python simulation/persistence_p5_long_validation.py --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha bdde5bc20c40583045fcb3562698847db460b080 --workflow-sha '${{ github.sha }}' 2>&1 | tee evidence/late.log
+          timeout --signal=TERM --kill-after=30s 350m python simulation/persistence_p5_long_validation.py --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' 2>&1 | tee evidence/late.log
           python - <<'PY'
           import json,hashlib
           r=json.load(open('evidence/late.json'))
           c=json.load(open('canonical-evidence/canonical-receipt.json'))
           assert r['passed'] and r['complete_format'] and r['initialization']=='mature'
           assert r['bootstrap_digest']==c['benchmark']['digest']
-          assert r['product_sha']=='bdde5bc20c40583045fcb3562698847db460b080' and r['milestones']==[1001,1002]
+          assert r['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201' and r['milestones']==[1001,1002]
           assert all(r['p4'][str(y)]['matches_control'] for y in (1001,1002))
           assert r['restore_artifact']['year']==1002
           with open(r['restore_artifact']['path'],'rb') as f:
@@ -180,7 +186,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: bdde5bc20c40583045fcb3562698847db460b080
+          ref: 2bc3c85389760ff12578857f7d2a849bc5cf9201
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -208,7 +214,7 @@ jobs:
           def sha(path):
               with path.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
           expected=r['restore_artifact']
-          assert r['product_sha']=='bdde5bc20c40583045fcb3562698847db460b080' and r['passed'] and r['complete_format']
+          assert r['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201' and r['passed'] and r['complete_format']
           assert sha(source)==expected['sha256']
           assert shutil.disk_usage('.').free > source.stat().st_size+1024**3
           copy=pathlib.Path('operational.sqlite');shutil.copyfile(source,copy)
@@ -220,7 +226,7 @@ jobs:
               assert digest==expected['digest']==r['control']['1002']['digest']
               assert _counters(s.world)==r['control']['1002']['counters']
           assert sha(source)==expected['sha256']
-          result={'passed':True,'candidate':'bdde5bc20c40583045fcb3562698847db460b080','workflow_sha':os.environ['GITHUB_SHA'],'year':1002,'digest':digest,'downloaded_sha256':expected['sha256'],'retained_original_unchanged':True}
+          result={'passed':True,'candidate':'2bc3c85389760ff12578857f7d2a849bc5cf9201','workflow_sha':os.environ['GITHUB_SHA'],'year':1002,'digest':digest,'downloaded_sha256':expected['sha256'],'retained_original_unchanged':True}
           json.dump(result,open('evidence/downloaded-restore.json','w'),indent=2)
           print(json.dumps(result),flush=True)
           PY
