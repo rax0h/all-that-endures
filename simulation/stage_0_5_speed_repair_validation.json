@@ -1,0 +1,221 @@
+{
+  "scope": "bounded packed-action speed repair; not final architecture/release acceptance",
+  "candidate": "26dbdad84a35497480583cfd5afbcbea24d5ccde",
+  "candidate_tree": "907c8fb968d0032e1817c873a6098b97d859f161",
+  "baseline": "65710f7c48dbcc059de6eaadfd18f0187cd1ae03",
+  "run": 38402924015,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/38402924015",
+  "conclusion": "success",
+  "python": "3.12.15",
+  "affected": {
+    "job": 115314908591,
+    "passed": 78,
+    "failures": 0,
+    "seconds": 56.42,
+    "artifact": 11815258762,
+    "zip_sha256": "43f67d9716b85874c5e112a35133308fa587c87ef148ae22d4d0fd0d4ae8d1a6"
+  },
+  "full_suite": {
+    "job": 115315429507,
+    "passed": 2413,
+    "subtests_passed": 2,
+    "junit_cases": 2415,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 3231.81,
+    "artifact": 11821655514,
+    "zip_sha256": "54404f25d6d1c8b9afe563c224809d6be459ee04c64ff62e1af91f420a176fab"
+  },
+  "profile": {
+    "job": 115315429528,
+    "artifact": 11817080143,
+    "zip_sha256": "18d136434aae43d2a91288fb4643e6a6af22937601fa6d259657899aca61f64d",
+    "restore": {
+      "source_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
+      "budget_seconds_per_phase": 90.0,
+      "phases": {
+        "open": {
+          "status": "completed",
+          "seconds": 21.96984018400002,
+          "sqlite_vm_instructions_approx": null
+        },
+        "simulation": {
+          "status": "completed",
+          "seconds": 47.06302996299999,
+          "sqlite_vm_instructions_approx": 15960000,
+          "io": {
+            "payload_reads": 44281,
+            "payload_read_bytes": 15565858,
+            "payload_check_reads": 46338,
+            "payload_check_bytes": 16297607,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 278617,
+            "query_rows": 2032,
+            "pin_rows": 566713,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 17,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "save": {
+          "status": "completed",
+          "seconds": 26.618085586999996,
+          "sqlite_vm_instructions_approx": 8170000,
+          "io": {
+            "payload_reads": 24436,
+            "payload_read_bytes": 13120854,
+            "payload_check_reads": 31629,
+            "payload_check_bytes": 14844701,
+            "payload_writes": 5779,
+            "payload_write_bytes": 1593125,
+            "metadata_rows": 130344,
+            "query_rows": 2230,
+            "pin_rows": 255549,
+            "maintenance_rows": 256,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 128
+          }
+        },
+        "audit": {
+          "status": "completed",
+          "seconds": 14.878409306000009,
+          "sqlite_vm_instructions_approx": 5450000,
+          "io": {
+            "payload_reads": 19534,
+            "payload_read_bytes": 3689985,
+            "payload_check_reads": 25023,
+            "payload_check_bytes": 4713987,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 91830,
+            "query_rows": 5489,
+            "pin_rows": 210479,
+            "maintenance_rows": 0,
+            "temporary_keys_peak": 128,
+            "maintenance_removed_rows": 0
+          }
+        },
+        "close": {
+          "status": "completed",
+          "seconds": 0.093992132000011,
+          "sqlite_vm_instructions_approx": null,
+          "io": {
+            "payload_reads": 0,
+            "payload_read_bytes": 0,
+            "payload_check_reads": 0,
+            "payload_check_bytes": 0,
+            "payload_writes": 0,
+            "payload_write_bytes": 0,
+            "metadata_rows": 1,
+            "query_rows": 0,
+            "pin_rows": 12,
+            "maintenance_rows": 512,
+            "temporary_keys_peak": 0,
+            "maintenance_removed_rows": 256
+          }
+        }
+      },
+      "passed": true,
+      "start_year": 7,
+      "start_generation": 4,
+      "final_digest": "fce95e6b2541500e5104be2d92a2cbdc00255f70e20ed3755ee7472a2b9fa733",
+      "final_year": 8
+    },
+    "component_receipt": "stage_0_5_speed_repair_component.json",
+    "residual_simulation_attribution": [
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 350,
+        "function": "read_owner_identity",
+        "calls": 6134,
+        "self_seconds": 0.139704051,
+        "cumulative_seconds": 16.789355746000002
+      },
+      {
+        "file": "persistence_lazy_identity_catalog.py",
+        "line": 418,
+        "function": "read_identity_group",
+        "calls": 1154,
+        "self_seconds": 0.069289907,
+        "cumulative_seconds": 4.661811149
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 323,
+        "function": "_synchronize_owner",
+        "calls": 3359,
+        "self_seconds": 0.042153531,
+        "cumulative_seconds": 12.708902740000001
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 288,
+        "function": "_owner_changes",
+        "calls": 4833,
+        "self_seconds": 0.046812296,
+        "cumulative_seconds": 14.682159559
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 200,
+        "function": "synchronize_packed_actions",
+        "calls": 100,
+        "self_seconds": 0.0023266660000000002,
+        "cumulative_seconds": 2.8027272130000003
+      },
+      {
+        "file": "persistence_lazy_world_identity.py",
+        "line": 115,
+        "function": "synchronize_lazy_placements",
+        "calls": 2868,
+        "self_seconds": 0.0051634870000000005,
+        "cumulative_seconds": 16.785409529000002
+      },
+      {
+        "file": "persistence_lazy_identity_coordinator.py",
+        "line": 163,
+        "function": "routes_for_mutation",
+        "calls": 2868,
+        "self_seconds": 0.016717586,
+        "cumulative_seconds": 3.5936325300000003
+      }
+    ],
+    "notes": [
+      "Profiling overhead is included.",
+      "The earlier simulation profile was a budget-interrupted prefix; do not compare its work counters or timings as if it completed the same year.",
+      "Baseline and new elapsed timings were collected in different runner environments; zero unchanged-group/owner reads are the component work evidence.",
+      "Actual packed payload bytes remain current-input costs; fixed read counts do not prove universally fixed bytes.",
+      "Compact-owner reconciliation is a separate remaining cost; this profile alone does not prove the previous cumulative-dirty-scan bug has returned."
+    ]
+  },
+  "source_git_blob_sha": {
+    "simulation/ate_sim/persistence_cold_save.py": "60159293c354ba21fcb9976d10d9b2b117600472",
+    "simulation/ate_sim/persistence_lazy.py": "5ace0a4324effc8486a3db073bbc75596d32429e",
+    "simulation/ate_sim/persistence_lazy_identity_coordinator.py": "1322e98ac1f22c676b44658701f9614397467741",
+    "simulation/ate_sim/persistence_lazy_world_identity.py": "ecf3cd183a25aaa9b0d28f2b90384bcd96f6335f",
+    "simulation/ate_sim/persistence_tracking.py": "18f4c2f8224ceadf20202d23d484d5943e6bf346",
+    "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "b8888c147b108f90b01494fcf5ec886507b63400"
+  },
+  "source_sha256": {
+    "simulation/ate_sim/persistence_cold_save.py": "8860d6ee55ad2fa7d18c86747fb239668b7a7474d488b0532cb7bc0eaa22a577",
+    "simulation/ate_sim/persistence_lazy.py": "f619e7cea279ea7ff8ed425f248543713b5b828451b21f752393701713aa6a2e",
+    "simulation/ate_sim/persistence_lazy_identity_coordinator.py": "79be2f610931a03d09934390b6b3aba39fa552d4eb099eada578404f10c77fb4",
+    "simulation/ate_sim/persistence_lazy_world_identity.py": "90b3a91e7de64bba4d490b89caf7ad109ca3161dbffb866fa7c25edd027dde2b",
+    "simulation/ate_sim/persistence_tracking.py": "61946d657854ddb6e723dc2bd32b6b51a03fc79f177cfdb61507e3735de767f9",
+    "simulation/tests/test_stage_0_5_packed_action_reconciliation_cost.py": "8f8a66a292e870b27bca041458863b9d182054307a3dea8a50e764f10f197a6a"
+  },
+  "artifact_expires": "2026-10-27",
+  "review": {
+    "bounded_independent": {
+      "verdict": "approve bounded repair; no blocking correctness findings",
+      "scope": "fresh-context read-only review of the six changed source/test blobs against the diagnostic baseline",
+      "validation_basis": "exact-candidate GitHub evidence; no reviewer local tests or source edits",
+      "nonblocking_note": "Epoch includes captured generation, SQLite total_changes and data_version. It does not include connection object identity; no supported connection replacement path was found."
+    },
+    "final_architecture": "pending"
+  },
+  "endurance_rerun": false,
+  "main_or_pr14_updated": false
+}

@@ -1,0 +1,92 @@
+{
+  "source_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199",
+  "budget_seconds_per_phase": 90.0,
+  "phases": {
+    "open": {
+      "status": "completed",
+      "seconds": 21.96984018400002,
+      "sqlite_vm_instructions_approx": null
+    },
+    "simulation": {
+      "status": "completed",
+      "seconds": 47.06302996299999,
+      "sqlite_vm_instructions_approx": 15960000,
+      "io": {
+        "payload_reads": 44281,
+        "payload_read_bytes": 15565858,
+        "payload_check_reads": 46338,
+        "payload_check_bytes": 16297607,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 278617,
+        "query_rows": 2032,
+        "pin_rows": 566713,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 17,
+        "maintenance_removed_rows": 0
+      }
+    },
+    "save": {
+      "status": "completed",
+      "seconds": 26.618085586999996,
+      "sqlite_vm_instructions_approx": 8170000,
+      "io": {
+        "payload_reads": 24436,
+        "payload_read_bytes": 13120854,
+        "payload_check_reads": 31629,
+        "payload_check_bytes": 14844701,
+        "payload_writes": 5779,
+        "payload_write_bytes": 1593125,
+        "metadata_rows": 130344,
+        "query_rows": 2230,
+        "pin_rows": 255549,
+        "maintenance_rows": 256,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 128
+      }
+    },
+    "audit": {
+      "status": "completed",
+      "seconds": 14.878409306000009,
+      "sqlite_vm_instructions_approx": 5450000,
+      "io": {
+        "payload_reads": 19534,
+        "payload_read_bytes": 3689985,
+        "payload_check_reads": 25023,
+        "payload_check_bytes": 4713987,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 91830,
+        "query_rows": 5489,
+        "pin_rows": 210479,
+        "maintenance_rows": 0,
+        "temporary_keys_peak": 128,
+        "maintenance_removed_rows": 0
+      }
+    },
+    "close": {
+      "status": "completed",
+      "seconds": 0.093992132000011,
+      "sqlite_vm_instructions_approx": null,
+      "io": {
+        "payload_reads": 0,
+        "payload_read_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_check_bytes": 0,
+        "payload_writes": 0,
+        "payload_write_bytes": 0,
+        "metadata_rows": 1,
+        "query_rows": 0,
+        "pin_rows": 12,
+        "maintenance_rows": 512,
+        "temporary_keys_peak": 0,
+        "maintenance_removed_rows": 256
+      }
+    }
+  },
+  "passed": true,
+  "start_year": 7,
+  "start_generation": 4,
+  "final_digest": "fce95e6b2541500e5104be2d92a2cbdc00255f70e20ed3755ee7472a2b9fa733",
+  "final_year": 8
+}

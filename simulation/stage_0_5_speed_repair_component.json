@@ -1,0 +1,191 @@
+[
+  {
+    "size": 16,
+    "operation": "append_and_reconcile",
+    "seconds": 0.0026271720000039522,
+    "group_reads": 0,
+    "owner_reads": 0,
+    "io": {
+      "payload_reads": 8,
+      "payload_read_bytes": 6762,
+      "payload_check_reads": 8,
+      "payload_check_bytes": 6762,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 44,
+      "query_rows": 0,
+      "pin_rows": 28,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 0,
+      "maintenance_removed_rows": 0
+    }
+  },
+  {
+    "size": 16,
+    "operation": "scalar_and_reconcile",
+    "seconds": 0.0015067450000003646,
+    "group_reads": 0,
+    "owner_reads": 0,
+    "io": {
+      "payload_reads": 4,
+      "payload_read_bytes": 3381,
+      "payload_check_reads": 4,
+      "payload_check_bytes": 3381,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 22,
+      "query_rows": 0,
+      "pin_rows": 14,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 0,
+      "maintenance_removed_rows": 0
+    }
+  },
+  {
+    "size": 16,
+    "operation": "unchanged_reconcile",
+    "seconds": 7.77400001084061e-06,
+    "group_reads": 0,
+    "owner_reads": 0,
+    "io": {
+      "payload_reads": 0,
+      "payload_read_bytes": 0,
+      "payload_check_reads": 0,
+      "payload_check_bytes": 0,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 0,
+      "query_rows": 0,
+      "pin_rows": 0,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 0,
+      "maintenance_removed_rows": 0
+    }
+  },
+  {
+    "size": 128,
+    "operation": "append_and_reconcile",
+    "seconds": 0.005429679999991777,
+    "group_reads": 0,
+    "owner_reads": 0,
+    "io": {
+      "payload_reads": 10,
+      "payload_read_bytes": 36214,
+      "payload_check_reads": 10,
+      "payload_check_bytes": 36214,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 48,
+      "query_rows": 0,
+      "pin_rows": 32,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 0,
+      "maintenance_removed_rows": 0
+    }
+  },
+  {
+    "size": 128,
+    "operation": "scalar_and_reconcile",
+    "seconds": 0.0028698330000054284,
+    "group_reads": 0,
+    "owner_reads": 0,
+    "io": {
+      "payload_reads": 5,
+      "payload_read_bytes": 18107,
+      "payload_check_reads": 5,
+      "payload_check_bytes": 18107,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 24,
+      "query_rows": 0,
+      "pin_rows": 16,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 0,
+      "maintenance_removed_rows": 0
+    }
+  },
+  {
+    "size": 128,
+    "operation": "unchanged_reconcile",
+    "seconds": 8.395999998356274e-06,
+    "group_reads": 0,
+    "owner_reads": 0,
+    "io": {
+      "payload_reads": 0,
+      "payload_read_bytes": 0,
+      "payload_check_reads": 0,
+      "payload_check_bytes": 0,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 0,
+      "query_rows": 0,
+      "pin_rows": 0,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 0,
+      "maintenance_removed_rows": 0
+    }
+  },
+  {
+    "size": 320,
+    "operation": "append_and_reconcile",
+    "seconds": 0.007175240999998778,
+    "group_reads": 0,
+    "owner_reads": 0,
+    "io": {
+      "payload_reads": 10,
+      "payload_read_bytes": 57348,
+      "payload_check_reads": 10,
+      "payload_check_bytes": 57348,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 48,
+      "query_rows": 0,
+      "pin_rows": 32,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 0,
+      "maintenance_removed_rows": 0
+    }
+  },
+  {
+    "size": 320,
+    "operation": "scalar_and_reconcile",
+    "seconds": 0.003757887999995546,
+    "group_reads": 0,
+    "owner_reads": 0,
+    "io": {
+      "payload_reads": 5,
+      "payload_read_bytes": 28674,
+      "payload_check_reads": 5,
+      "payload_check_bytes": 28674,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 24,
+      "query_rows": 0,
+      "pin_rows": 16,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 0,
+      "maintenance_removed_rows": 0
+    }
+  },
+  {
+    "size": 320,
+    "operation": "unchanged_reconcile",
+    "seconds": 8.456000003320696e-06,
+    "group_reads": 0,
+    "owner_reads": 0,
+    "io": {
+      "payload_reads": 0,
+      "payload_read_bytes": 0,
+      "payload_check_reads": 0,
+      "payload_check_bytes": 0,
+      "payload_writes": 0,
+      "payload_write_bytes": 0,
+      "metadata_rows": 0,
+      "query_rows": 0,
+      "pin_rows": 0,
+      "maintenance_rows": 0,
+      "temporary_keys_peak": 0,
+      "maintenance_removed_rows": 0
+    }
+  }
+]

@@ -1,6 +1,18 @@
 # Complete candidate acceptance: current run status
 
-## Current full-suite rerun
+## Latest runtime repair validation
+
+[Run38402924015](https://github.com/rax0h/all-that-endures/actions/runs/38402924015)
+completed successfully on exact candidate26dbdad84a35497480583cfd5afbcbea24d5ccde:
+**78 affected tests passed in56.42s; 2,413 full-suite tests plus2subtests passed
+in3231.81s**. Bounded profiling completed open, one-year simulation, save, full
+audit and close; year8 matched independent eager authority exactly. The simulation
+phase took47.063s. See `STAGE_0_5_SPEED_REPAIR_HANDOFF.md` and the committed
+speed-repair receipt for raw metrics, checked artifact hashes and residual costs.
+Final architecture/release acceptance is pending. The previous suite and P5
+results below remain historical evidence for their own source, not this repair.
+
+## Previous original-correctness full-suite rerun
 
 [Run 38378944249](https://github.com/rax0h/all-that-endures/actions/runs/38378944249) completed successfully: **2406 tests and2subtests passed in4988.93s, no failures**. It tests corrected candidate `a65d6afa08921477cbaf419695b08f0f98dea4b1`, tree `f33fa16a1b7b5fa0dd8004bd9673e34b45176d28`. Validation branch commit `cb21c4f502c4190f29b4a40728721d32b64a90ec` adds only the isolated CI workflow; checkout is pinned to the corrected candidate. The job also verifies all106 production/script hashes match the passing P5 source before testing.
 

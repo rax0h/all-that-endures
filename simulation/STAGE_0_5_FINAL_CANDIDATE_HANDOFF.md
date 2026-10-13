@@ -2,7 +2,20 @@
 
 The complete-format implementation has passed its final applicable correctness suite and required independent continuation. Final architecture acceptance and performance/release approval remain open. This handoff contains the tested source boundary and concrete remaining decisions; it does not authorize promotion or further endurance.
 
-## Tested source and evidence
+## Newer runtime boundary: bounded speed repair green
+
+The packed-action repair is now tested separately at candidate
+`26dbdad84a35497480583cfd5afbcbea24d5ccde`: **78 affected tests and 2,413 full-suite
+tests plus 2 subtests passed**. The same verified year-7 restore completed one
+year, save and full audit with exact independent year-8 authority. Profiled
+simulation took 47.063 seconds within its 90-second phase budget. See
+`STAGE_0_5_SPEED_REPAIR_HANDOFF.md` and `stage_0_5_speed_repair_validation.json`
+for exact source hashes, phase metrics, limitations and residual attribution.
+The older suite/P5 evidence below retains its original source boundary; it is
+not silently reattributed to the new runtime. Final architecture and release
+acceptance remain open.
+
+## Original tested source and evidence
 
 | Evidence | Exact boundary / result |
 |---|---|

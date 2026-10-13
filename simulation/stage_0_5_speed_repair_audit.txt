@@ -1,0 +1,96 @@
+         22235090 function calls (20641578 primitive calls) in 14.814 seconds
+
+   Ordered by: cumulative time
+   List reduced from 492 to 50 due to restriction <50>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000   14.878   14.878 profile_complete_restore.py:91(<lambda>)
+        1    0.000    0.000   14.878   14.878 persistence_p5_validation.py:85(_authority)
+        1    0.000    0.000   14.875   14.875 core.py:120(digest)
+        1    0.000    0.000   14.875   14.875 core.py:127(_digest_world_unchecked)
+        1    0.084    0.084   14.875   14.875 canonical_stream.py:13(digest)
+645033/149629    0.194    0.000   14.745    0.000 canonical_stream.py:15(pieces)
+     1662    0.043    0.000    6.585    0.004 persistence_lazy_identity_catalog.py:350(read_owner_identity)
+     1477    0.005    0.000    5.830    0.004 persistence_lazy.py:10985(_owner_identity_labels)
+    17114    0.086    0.000    5.675    0.000 persistence_lazy_store.py:1350(read_version)
+    29715    0.110    0.000    5.325    0.000 persistence_lazy_store.py:1244(_read_snapshot_start)
+   356791    1.615    0.000    3.401    0.000 incremental_store.py:386(_framed_sha)
+    10424    0.013    0.000    3.379    0.000 persistence_lazy_identity_catalog.py:229(_read)
+    29715    0.070    0.000    3.239    0.000 persistence_lazy_store.py:853(_validated_retention_floor)
+    29715    0.402    0.000    3.104    0.000 persistence_lazy_store.py:787(_checked_operational_rows)
+      591    0.009    0.000    2.841    0.005 persistence_lazy.py:5109(__getitem__)
+6848/2730    0.017    0.000    2.557    0.001 {built-in method builtins.sorted}
+5041/1662    0.010    0.000    2.446    0.001 persistence_lazy_identity_catalog.py:359(walk)
+      473    0.007    0.000    2.275    0.005 persistence_lazy.py:11908(_bind_loaded_social_edge)
+    69932    0.130    0.000    2.200    0.000 incremental_store.py:137(encode)
+     5162    0.014    0.000    2.192    0.000 persistence_lazy_identity_catalog.py:319(_node)
+     1207    0.004    0.000    2.128    0.002 persistence_lazy_nested_history.py:855(__iter__)
+    25023    0.120    0.000    2.095    0.000 persistence_lazy_store.py:1323(_check_record_row)
+     1207    0.013    0.000    2.075    0.002 persistence_lazy_nested_history.py:838(_ordered_entries)
+      722    0.008    0.000    2.041    0.003 persistence_lazy.py:6855(__getitem__)
+     2321    0.046    0.000    2.026    0.001 persistence_lazy.py:12247(_bind_history_list)
+      184    0.003    0.000    1.855    0.010 persistence_lazy.py:9892(__getitem__)
+     1731    0.022    0.000    1.836    0.001 persistence_lazy_identity_catalog.py:235(_descriptor)
+9174/9036    0.012    0.000    1.690    0.000 persistence_lazy_nested_history.py:1136(call)
+     2773    0.002    0.000    1.683    0.001 persistence_lazy_nested_history.py:432(__iter__)
+      354    0.004    0.000    1.676    0.005 persistence_lazy.py:9549(__getitem__)
+      821    0.004    0.000    1.669    0.002 persistence_lazy_nested_history.py:301(__getitem__)
+      172    0.005    0.000    1.668    0.010 persistence_lazy.py:13711(_bind_loaded_soul)
+    59502    0.087    0.000    1.474    0.000 incremental_store.py:141(decode)
+8086/5661    0.025    0.000    1.413    0.000 persistence_history_runtime.py:709(decode)
+      245    0.005    0.000    1.399    0.006 persistence_lazy.py:13892(_bind_loaded_skill)
+     3139    0.004    0.000    1.394    0.000 persistence_lazy_nested_history.py:747(_entry)
+232405/69932    0.451    0.000    1.378    0.000 persistence_adapters.py:99(_encode_value)
+   229483    1.335    0.000    1.335    0.000 {method 'execute' of 'sqlite3.Connection' objects}
+     3139    0.008    0.000    1.318    0.000 persistence_lazy_nested_history.py:734(_baseline)
+     2420    0.036    0.000    1.189    0.000 persistence_lazy_nested_history.py:591(checked_scalar_entry)
+    69/23    0.003    0.000    1.183    0.051 persistence_history_runtime.py:514(load_record)
+    30980    0.140    0.000    1.141    0.000 persistence_lazy_store.py:706(_checked_head_row)
+      399    0.001    0.000    1.098    0.003 persistence_lazy.py:7221(_bind_loaded_record)
+      399    0.003    0.000    1.098    0.003 persistence_lazy.py:12691(_bind_loaded_institution_record)
+229878/69627    0.483    0.000    1.089    0.000 incremental_store.py:148(_encode_value)
+     1062    0.010    0.000    1.072    0.001 persistence_lazy_nested_history.py:189(__init__)
+    91619    0.121    0.000    1.026    0.000 persistence_lazy_store.py:459(_pin_checksum)
+276971/59502    0.318    0.000    0.969    0.000 persistence_adapters.py:171(_decode_value)
+    56572    0.209    0.000    0.926    0.000 persistence_lazy_store.py:1293(_interval_rows)
+    32189    0.038    0.000    0.925    0.000 persistence_lazy_store.py:775(_require_pin)
+
+
+         22235090 function calls (20641578 primitive calls) in 14.814 seconds
+
+   Ordered by: internal time
+   List reduced from 492 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   356791    1.615    0.000    3.401    0.000 incremental_store.py:386(_framed_sha)
+   229483    1.335    0.000    1.335    0.000 {method 'execute' of 'sqlite3.Connection' objects}
+  3757842    0.864    0.000    0.864    0.000 {method 'update' of '_hashlib.HASH' objects}
+229878/69627    0.483    0.000    1.089    0.000 incremental_store.py:148(_encode_value)
+274581/59197    0.452    0.000    0.858    0.000 incremental_store.py:232(_decode_value)
+232405/69932    0.451    0.000    1.378    0.000 persistence_adapters.py:99(_encode_value)
+   148788    0.420    0.000    0.420    0.000 {method 'fetchall' of 'sqlite3.Cursor' objects}
+    29715    0.402    0.000    3.104    0.000 persistence_lazy_store.py:787(_checked_operational_rows)
+  1878915    0.370    0.000    0.370    0.000 {method 'to_bytes' of 'int' objects}
+2877647/2877123    0.343    0.000    0.363    0.000 {built-in method builtins.len}
+    81632    0.340    0.000    0.340    0.000 encoder.py:205(iterencode)
+276971/59502    0.318    0.000    0.969    0.000 persistence_adapters.py:171(_decode_value)
+   555460    0.312    0.000    0.419    0.000 incremental_store.py:394(_int_bytes)
+  2012231    0.297    0.000    0.319    0.000 {built-in method builtins.isinstance}
+  1158229    0.254    0.000    0.254    0.000 {method 'encode' of 'str' objects}
+   356999    0.219    0.000    0.219    0.000 {method 'hexdigest' of '_hashlib.HASH' objects}
+    56572    0.209    0.000    0.926    0.000 persistence_lazy_store.py:1293(_interval_rows)
+645033/149629    0.194    0.000   14.745    0.000 canonical_stream.py:15(pieces)
+68765/3069    0.192    0.000    0.399    0.000 persistence_lazy_budget.py:164(schema_resident_bytes)
+    81632    0.174    0.000    0.730    0.000 __init__.py:183(dumps)
+    63169    0.148    0.000    0.148    0.000 {method 'fetchone' of 'sqlite3.Cursor' objects}
+   362330    0.147    0.000    0.147    0.000 {built-in method _hashlib.openssl_sha256}
+105762/10952    0.145    0.000    0.318    0.000 persistence_lazy_budget.py:19(resident_bytes)
+    30980    0.140    0.000    1.141    0.000 persistence_lazy_store.py:706(_checked_head_row)
+   241131    0.131    0.000    0.232    0.000 dataclasses.py:1301(is_dataclass)
+    69932    0.130    0.000    2.200    0.000 incremental_store.py:137(encode)
+    81632    0.123    0.000    0.517    0.000 encoder.py:183(encode)
+    91619    0.121    0.000    1.026    0.000 persistence_lazy_store.py:459(_pin_checksum)
+    25023    0.120    0.000    2.095    0.000 persistence_lazy_store.py:1323(_check_record_row)
+    15421    0.110    0.000    0.110    0.000 {method 'rollback' of 'sqlite3.Connection' objects}
+
+

@@ -1,5 +1,28 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: bounded packed-action repair and full suite green (October 13 UTC)
+
+GitHub run38402924015 passed **78 affected tests in56.42s** and **2,413 full-suite
+tests plus2subtests in3231.81s**, with no failures, on exact runtime candidate
+26dbdad84a35497480583cfd5afbcbea24d5ccde. Its disposable verified year7/generation4
+restore completed year8, save and full audit, matching independent eager authority
+exactly (digestfce95e6b2541500e5104be2d92a2cbdc00255f70e20ed3755ee7472a2b9fa733).
+The profiled phases were open21.970s/simulation47.063s/save26.618s/audit14.878s/
+close0.094s; each completed within90s. Fresh320-action append/scalar reconciliation
+used zero group/owner reads and measured0.007175s/0.003758s on its CI runner.
+Different baseline runner timings do not establish a calibrated speed ratio.
+
+The repair uses existing journals, registry/catalog/coordinator and checked
+publication; actual mutable/native-backed inputs preserve the full graph path.
+The local affected batch previously interrupted at58/78 was never a pass and was
+replaced by the complete durable GitHub result. Compact-owner reconciliation and
+checked snapshot/codec work remain separately measured costs. The old3+4+3 P5
+certifies its original runtime, while the new runtime has the complete suite and
+the exact short restored continuation. Handoff/receipt:
+`STAGE_0_5_SPEED_REPAIR_HANDOFF.md`; `stage_0_5_speed_repair_validation.json`.
+Bounded independent review approved the repair with no blocking findings; final
+architecture/performance/release acceptance remains pending. No new P5/endurance, promotion, rank issue17 or Stage1 work.
+
 ## Latest checkpoint: final full suite green; correctness handoff ready (October 13 UTC)
 
 GitHub run38378944249 passed **2406tests and2subtests in4988.93s** (no failures) on immutable candidatea65d6afa08921477cbaf419695b08f0f98dea4b1/treef33fa16a1b7b5fa0dd8004bd9673e34b45176d28. The workflow-only commitcb21c4f502c4190f29b4a40728721d32b64a90ec pins this checkout and verified all106 production/script hashes match passing P5 source5bf5c0192b307d15b9ab525cee20938584506ae6. The intervening changes are the documented stale floor assertion correction and evidence/docs, not runtime edits.

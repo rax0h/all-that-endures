@@ -10970,6 +10970,7 @@ class LazyWorldSession:
         from .persistence_lazy_world_identity import EagerOwnerJournal
         self._eager_tracker._dirty=EagerOwnerJournal(bridge,self._eager_tracker._dirty)
         self._eager_tracker._deleted=EagerOwnerJournal(bridge,self._eager_tracker._deleted)
+        self._eager_tracker._mark_scalar_action_assignment=bridge.mark_scalar_action_assignment
         self._prepare_event_id_facade(self.world.event_ids)
         from .persistence_adapters import PACKED_LIST_KIND
         if self._eager_tracker._manifest['collections'][AGENCY_ACTIONS_NAMESPACE][0] == PACKED_LIST_KIND:
@@ -11068,6 +11069,11 @@ class LazyWorldSession:
                 self._identity_bridge.synchronize_packed_actions(subject)
                 self._identity_bridge.synchronize_lazy_placements()
                 self._identity_coordinator.routes_for_mutation(subject)
+                if field is not None and not (value is None or type(value) in (bool, int, float, str, bytes)):
+                    # A formerly scalar eager action can accept imported mutable
+                    # fields. Even a retained binding after a prefix trim must
+                    # force complete graph reconciliation for that assignment.
+                    self._identity_bridge._packed_scalar_projection = False
         if (
             isinstance(
                 subject,
