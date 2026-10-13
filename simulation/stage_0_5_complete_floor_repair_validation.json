@@ -1,0 +1,30 @@
+{
+  "status": "test-only floor expectation repair; green full suite pending",
+  "tested_production_commit": "5bf5c0192b307d15b9ab525cee20938584506ae6",
+  "tested_production_tree": "4abd10073b17d3effcee36c31de005f13c84f0fc",
+  "previous_run": 38335872125,
+  "previous_full_suite": {
+    "passed": 2405,
+    "failed": 3,
+    "seconds": 4876.12,
+    "failure_scope": "stale format3/4 assertions in paged ownership tests; conversion already emits5"
+  },
+  "reproduction": "both fault subtests and current-copy case fail locally at exact old format expectation",
+  "repair": "tests only; preserve bounded capability5 across edits, save faults, retry, copy and reopen; original alias/value/generation assertions retained",
+  "focused_result": {
+    "passed": 41,
+    "subtests_passed": 2,
+    "seconds": 10.29
+  },
+  "production_hashes_unchanged": true,
+  "source_hash_count": 106,
+  "p5": {
+    "passed": true,
+    "report": "stage_0_5_complete_p5_final.json",
+    "artifact_id": 11786410897,
+    "artifact_expires": "2026-10-27T02:48:24Z",
+    "archive_sha256": "2a77fbf1e6d05d89d9a76e2e2f72dc431377d78e8187ae8038e15e3e7503ab85",
+    "relocated_sqlite_sha256": "ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199"
+  },
+  "no_new_p5_or_endurance": true
+}

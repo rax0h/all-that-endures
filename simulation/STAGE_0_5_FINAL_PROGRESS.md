@@ -1,5 +1,17 @@
 # Stage 0.5 complete closeout ledger
 
+## Latest checkpoint: final acceptance results and stale floor assertion repair (October 13 UTC)
+
+Durable CI38335872125 completed against candidate public5bf5c0192b307d15b9ab525cee20938584506ae6 (local0ed4c2b). Required complete-format seed8430003+4+3 P5 **passed**: finalyear10,439events, expected finaldigest3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e and totaldigestb31c2272d220a1624ff5ee204e229ccaf95adf9a7eaff86643b350567b5e9387. Independent controls, checkpoint continuation, reopen, detach checkpoint roundtrip and relocated backup checks all passed. Exact report is retained in `stage_0_5_complete_p5_final.json`.
+
+The full suite completed in4876.12s (81m16s): **2405passed,3failed**. The three failures are two subtests in the paged ownership save-fault test and one current-copy test, all asserting stale floors3/4 on fixtures whose existing explicit conversion already requires5. Local RED reproduced the failures. `_declare_bounded_collections` and `_convert_event_id_authority` already emitted5 in the recovered pre-session baselineff81fa9; this was not a capability6 runtime regression. Existing store tests still prove transactional floor3-to5 rollback and5-to4 requested-floor non-downgrade.
+
+The repair changes tests only: assert capability5 before/after ownership edits, both fault phases, retry, copy and reopen, retaining all alias/value/generation assertions. GREEN: **41passed,2subtests passed in10.29s** (whole paged ownership repair file plus lazy store gate). All106 production/script SHA256 entries exactly match the passing P5 source. No P5 rerun is necessary for this test/documentation-only correction. A fresh complete CI suite is being submitted against the corrected tests; previous failing full suite is not represented as green certification.
+
+P5 result artifact11786410897 includes the relocated SQLite backup (SHA256ca75aa18d6b81642d8d102765dd790cd078fd6c64fe0ceac32d9fdfe24a25199), expiresOctober27. Archive SHA2562a77fbf1e6d05d89d9a76e2e2f72dc431377d78e8187ae8038e15e3e7503ab85. Full-suite logs/JUnit artifact11787785511 expiresOctober27. Run: https://github.com/rax0h/all-that-endures/actions/runs/38335872125 .
+
+Correctness P5 is not a latency acceptance claim: first4-year continuation603.007s; reopened3-year continuation1398.147s; eager final control0.152s. This observed overhead remains explicit for release review alongside the existing pressure cold-miss/latency and endurance policy decisions. No main/PR14 promotion, rank issue17 work, checkpoint-default replacement or new endurance occurred.
+
 ## Latest checkpoint: complete-format candidate, root audit and review repairs (October 13 UTC)
 
 Complete-format capability6 now selects the existing checked runtime on ordinary open. Exact feature/floor/catalog checks reject missing or competing authority without repair. Explicit `upgrade_lazy_snapshot` publishes only a private source-preserving fully normalized format5 copy through the existing transaction/publisher. Earlier formats use their established explicit conversion first; no hidden migration or default checkpoint change.
