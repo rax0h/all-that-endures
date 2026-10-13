@@ -9,6 +9,7 @@ from ate_sim.core import Household, World
 from ate_sim.incremental_store import StoreConflictError, StoreError, StoreIntegrityError
 from ate_sim.persistence_lazy import convert_cold_to_lazy, open_lazy_world_session
 from ate_sim.persistence_session import write_cold_snapshot
+from ate_sim.persistence_lazy_store import BOUNDED_AUTHORITY_FORMAT_VERSION
 
 RULES = 'paged-ownership-repair'
 
@@ -32,6 +33,15 @@ class PagedOwnershipRepair(unittest.TestCase):
 
     def open(self, path):
         return open_lazy_world_session(path, rules_id=RULES)
+
+    def assert_bounded_format(self, session):
+        # These fixtures use the current cold conversion, whose scalar/query
+        # and Event-ID authority already require capability 5. Ownership edits,
+        # retries and copies must preserve that floor, never downgrade to 3/4.
+        self.assertEqual(
+            session.store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0],
+            str(BOUNDED_AUTHORITY_FORMAT_VERSION),
+        )
 
     def test_delete_unloaded_foreign_then_reopen_and_mutate_twice(self):
         path = self.make()
@@ -90,12 +100,13 @@ class PagedOwnershipRepair(unittest.TestCase):
                 self.root.mkdir()
                 path = self.make()
                 with self.open(path) as s:
+                    self.assert_bounded_format(s)
                     held = s.world.households[1].members
                     s.world.households[2].members = held
                     del s.world.households[1]
                     held.append(901)
                     baseline = s.pin.captured_head
-                    self.assertEqual(s.store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0], '3')
+                    self.assert_bounded_format(s)
                     def fault(point):
                         if point == phase:
                             raise RuntimeError('ownership fault')
@@ -103,13 +114,14 @@ class PagedOwnershipRepair(unittest.TestCase):
                     with self.assertRaisesRegex(RuntimeError, 'ownership fault'):
                         s.save()
                     s.store._phase_hook = lambda _: None
-                    self.assertEqual(s.store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0], '4' if phase == 'after_commit' else '3')
+                    self.assert_bounded_format(s)
                     if s._state == 'recovery-required':
                         self.assertEqual(s.resolve_save(), baseline + (phase == 'after_commit'))
                     self.assertIs(held, s.world.households[2].members)
                     s.save()
-                    self.assertEqual(s.store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0], '4')
+                    self.assert_bounded_format(s)
                 with self.open(path) as s:
+                    self.assert_bounded_format(s)
                     held = s.world.currency.wallets[99]['members']
                     self.assertIs(held, s.world.households[2].members)
                     self.assertEqual(held[-2:], [260, 901])
@@ -160,8 +172,10 @@ class PagedOwnershipRepair(unittest.TestCase):
     def test_foreign_alias_eviction_reactivation_preserves_identity(self):
         path = self.make()
         with self.open(path) as s:
+            self.assert_bounded_format(s)
             del s.world.households[1]
             s.save()
+            self.assert_bounded_format(s)
         with self.open(path) as s:
             held = s.world.currency.wallets[99]['members']
             # Accessing enough unrelated buckets evicts the clean owner while
@@ -301,11 +315,12 @@ class PagedOwnershipRepair(unittest.TestCase):
             codec=WorldCodec(identity_links_recorded=True),
             expected_simulation_schema=SCHEMA, expected_rules_id=RULES)
         with self.open(copied) as s:
-            self.assertEqual(s.store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0], '4')
+            self.assert_bounded_format(s)
             self.assertEqual(s.world.currency.wallets[99]['members'][-1], 260)
             s.world.currency.wallets[99]['members'].append(901)
             s.save()
         with self.open(copied) as s:
+            self.assert_bounded_format(s)
             self.assertEqual(s.world.currency.wallets[99]['members'][-2:], [260, 901])
 
     def test_shared_initial_lists_append_reopen_and_order(self):
