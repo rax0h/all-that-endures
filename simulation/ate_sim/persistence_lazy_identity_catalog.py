@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from collections import OrderedDict
 from contextlib import closing
 import hashlib
+import sys
 from .incremental_store import Membership, StoreIntegrityError, StoreFormatError, StoreConflictError, _framed_sha, _record_checksum
 from .persistence_lazy_store import VersionChange
 from .persistence_lazy_families import IDENTITY_OWNER_FAMILIES, AUXILIARY_OWNER_FAMILIES, ParticipantDelta
@@ -225,6 +226,60 @@ class IdentityCatalog:
         self.store = store
         self.codec = store.codec
         self.occurrence_limit, self.byte_limit = occurrence_limit, byte_limit
+        # Derived certificates only: no live objects, dirty projections or
+        # spilled buffers. Operational pin/head checks still precede each hit.
+        self._owner_cache = OrderedDict()
+        self._owner_cache_epoch = None
+        self._owner_cache_bytes = self._owner_cache_occurrences = 0
+        self._owner_cache_hits = self._owner_cache_misses = 0
+
+    def _clear_owner_cache(self):
+        self._owner_cache.clear()
+        self._owner_cache_epoch = None
+        self._owner_cache_bytes = self._owner_cache_occurrences = 0
+
+    def _owner_epoch(self, pin):
+        db = self.store.db
+        return (db, self.codec, self.store.codec, pin.captured_head, db.total_changes,
+                db.execute('PRAGMA data_version').fetchone()[0],
+                db.execute('PRAGMA schema_version').fetchone()[0])
+
+    @staticmethod
+    def _immutable_owner_value(value):
+        if value is None or type(value) in (bool, int, float, str, bytes):
+            return True
+        return type(value) in (tuple, frozenset) and all(
+            IdentityCatalog._immutable_owner_value(child) for child in value)
+
+    def _remember_owner(self, key, checked):
+        values = (checked.owner, checked.occurrences, checked.payload_revision,
+                  checked.payload_commitment, checked.exists, checked.storage_kind)
+        if not self._immutable_owner_value(values):
+            return  # Includes caller-owned spill buffers and mutable imports.
+        size = (resident_bytes((key, values)) + sys.getsizeof(checked)
+                + sys.getsizeof(checked.__dict__) + 128)
+        byte_limit = min(self.byte_limit, 256 * 1024)
+        count = len(checked.occurrences)
+        if size > byte_limit or count > self.occurrence_limit:
+            return
+        self._owner_cache[key] = checked, size
+        self._owner_cache_bytes += size
+        self._owner_cache_occurrences += count
+        while (len(self._owner_cache) > min(256, self.occurrence_limit)
+               or self._owner_cache_bytes > byte_limit
+               or self._owner_cache_occurrences > self.occurrence_limit):
+            _, (old, weight) = self._owner_cache.popitem(last=False)
+            self._owner_cache_bytes -= weight
+            self._owner_cache_occurrences -= len(old.occurrences)
+
+    def owner_cache_diagnostics(self):
+        return dict(entries=len(self._owner_cache), bytes=self._owner_cache_bytes,
+                    occurrences=self._owner_cache_occurrences,
+                    entry_limit=min(256, self.occurrence_limit),
+                    byte_limit=min(self.byte_limit, 256 * 1024),
+                    occurrence_limit=self.occurrence_limit,
+                    metadata_python_bytes=sys.getsizeof(self._owner_cache),
+                    hits=self._owner_cache_hits, misses=self._owner_cache_misses)
 
     def _read(self, pin, namespace, key):
         try:
@@ -348,7 +403,26 @@ class IdentityCatalog:
         raise StoreIntegrityError('identity group disagrees with exact owner membership')
 
     def read_owner_identity(self, pin, owner):
+        self.store._ensure_open()
+        standalone = not self.store.db.in_transaction
+        if not standalone:
+            # total_changes is monotonic across rollback. Never retain or use
+            # a certificate in a borrowed transaction/savepoint, where a later
+            # rollback could restore different bytes under that same counter.
+            self._clear_owner_cache()
         with self.store.read_snapshot(pin):
+            epoch = self._owner_epoch(pin) if standalone else None
+            key = self.codec.encode(owner) if standalone else None
+            if standalone:
+                if epoch != self._owner_cache_epoch:
+                    self._clear_owner_cache()
+                    self._owner_cache_epoch = epoch
+                cached = self._owner_cache.get(key)
+                if cached is not None:
+                    self._owner_cache.move_to_end(key)
+                    self._owner_cache_hits += 1
+                    return cached[0]
+            self._owner_cache_misses += 1
             self._descriptor(pin)
             header = self._owner(pin, owner)
             actual = CheckedSpool(self.codec, entry_limit=self.occurrence_limit,
@@ -371,7 +445,10 @@ class IdentityCatalog:
                 if (len(actual) != header[7] or len(leaves) != header[7]
                     or any(a != b for a, b in zip(actual.encoded_sorted(), leaves.encoded_sorted()))):
                     raise StoreIntegrityError('identity owner occurrence completeness mismatch')
-                return CheckedOwnerIdentity(owner, actual.freeze(), header[3], header[5], header[1], header[2])
+                checked = CheckedOwnerIdentity(owner, actual.freeze(), header[3], header[5], header[1], header[2])
+                if standalone and epoch == self._owner_epoch(pin):
+                    self._remember_owner(key, checked)
+                return checked
             except BaseException:
                 actual.close()
                 raise

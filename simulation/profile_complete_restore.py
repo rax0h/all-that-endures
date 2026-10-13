@@ -26,12 +26,13 @@ class BudgetExpired(Exception):
     pass
 
 
-def run(source, output, budget):
+def run(source, output, budget, *, profiled=True):
     output.mkdir(parents=True, exist_ok=False)
     target = output / "operational.sqlite"
     shutil.copyfile(source, target)
     result = {"source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
-              "budget_seconds_per_phase": budget, "phases": {}, "passed": False}
+              "budget_seconds_per_phase": budget, "profiled": profiled,
+              "phases": {}, "passed": False}
     session = None
     sql_ticks = 0
 
@@ -48,29 +49,33 @@ def run(source, output, budget):
         sql_ticks = 0
         if session is not None:
             session.store.reset_diagnostics()
-        profiler = cProfile.Profile()
+        profiler = cProfile.Profile() if profiled else None
         started = time.perf_counter()
         status = "completed"
         signal.setitimer(signal.ITIMER_REAL, budget)
-        profiler.enable()
+        if profiler is not None:
+            profiler.enable()
         try:
             return operation()
         except BaseException as exc:
             status = f"{type(exc).__name__}: {exc}"
+            result["passed"] = False
             raise
         finally:
             signal.setitimer(signal.ITIMER_REAL, 0)
-            profiler.disable()
+            if profiler is not None:
+                profiler.disable()
             elapsed = time.perf_counter() - started
-            profiler.dump_stats(str(output / f"{name}.prof"))
-            stream = io.StringIO()
-            stats = pstats.Stats(profiler, stream=stream).strip_dirs()
-            stats.sort_stats("cumulative").print_stats(50)
-            stats.sort_stats("tottime").print_stats(30)
-            (output / f"{name}.txt").write_text(stream.getvalue())
+            if profiler is not None:
+                profiler.dump_stats(str(output / f"{name}.prof"))
+                stream = io.StringIO()
+                stats = pstats.Stats(profiler, stream=stream).strip_dirs()
+                stats.sort_stats("cumulative").print_stats(50)
+                stats.sort_stats("tottime").print_stats(30)
+                (output / f"{name}.txt").write_text(stream.getvalue())
             record = {"status": status, "seconds": elapsed,
                       "sqlite_vm_instructions_approx": (
-                          sql_ticks * 10000 if session is not None and name != "close" else None)}
+                          sql_ticks * 10000 if profiled and session is not None and name != "close" else None)}
             if session is not None:
                 record["io"] = asdict(session.store.diagnostics())
             result["phases"][name] = record
@@ -81,7 +86,8 @@ def run(source, output, budget):
     try:
         session = phase("open", lambda: open_lazy_world_session(
             target, rules_id="stage-0-5-complete-final"))
-        session.store.db.set_progress_handler(progress, 10000)
+        if profiled:
+            session.store.db.set_progress_handler(progress, 10000)
         result["start_year"] = session.world.year
         result["start_generation"] = session.pin.captured_head
         control = _run_unbound(session.world.seed, session.world.year + 1)
@@ -109,5 +115,8 @@ if __name__ == "__main__":
     parser.add_argument("source", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--budget", type=float, default=90)
+    parser.add_argument("--unprofiled", action="store_true",
+                        help="Disable cProfile and SQLite progress sampling; retain ordinary I/O counters")
     args = parser.parse_args()
-    run(args.source, args.output, args.budget)
+    result = run(args.source, args.output, args.budget, profiled=not args.unprofiled)
+    raise SystemExit(0 if result["passed"] else 1)
