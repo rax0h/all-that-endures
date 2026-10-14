@@ -209,3 +209,21 @@ def test_indexed_replay_authenticates_later_rows_before_returning_value(tmp_path
         rows=workspace.stage_versions(VersionChange('world.people',i,[i]) for i in range(3))
         workspace.db.execute("UPDATE replay_rows SET payload=x'00' WHERE stream=? AND ordinal=2",(rows.stream,))
         with pytest.raises(StoreIntegrityError):rows[0]
+
+
+@pytest.mark.parametrize('corruption',['owner-key','placement-inc','missing-owner','missing-placement'])
+def test_catalog_rejects_corrupted_indexed_inventory_before_staging_output(tmp_path,monkeypatch,corruption):
+    cat=catalog();original=cat._disk_catalog_inputs
+    def corrupt(workspace,*args,**kwargs):
+        seal=original(workspace,*args,**kwargs)
+        if corruption=='owner-key':workspace.db.execute("UPDATE conversion_owners SET typed_key=x'00'")
+        elif corruption=='placement-inc':workspace.db.execute('UPDATE conversion_placements SET inc=2')
+        elif corruption=='missing-owner':workspace.db.execute('DELETE FROM conversion_owners')
+        else:workspace.db.execute('DELETE FROM conversion_placements')
+        return seal
+    monkeypatch.setattr(cat,'_disk_catalog_inputs',corrupt)
+    codec=WorldCodec(identity_links_recorded=True)
+    with workspace_type()(codec,directory=tmp_path) as workspace:
+        with pytest.raises(StoreIntegrityError):
+            cat.stage_initial_catalog(workspace,[VersionChange('world.people',1,'v')],
+                [IdentityOccurrenceChange('world.people',1,(),1)],next_incarnation_id=3,generation=1)

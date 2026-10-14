@@ -182,8 +182,9 @@ def validate_initial_catalog_inputs(codec, owner_versions, identity_changes, *, 
     """Retain source checks when normalization will replace its catalog."""
     from .persistence_conversion_workspace import ConversionWorkspace
     with ConversionWorkspace(codec, directory=None) as workspace:
-        _disk_catalog_inputs(workspace, owner_versions, identity_changes,
+        seals = _disk_catalog_inputs(workspace, owner_versions, identity_changes,
             next_incarnation_id=next_incarnation_id, generation=generation, ordinary_changes=ordinary_changes)
+        _validate_conversion_inventory(workspace, seals)
 
 
 def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incarnation_id, generation,
@@ -227,6 +228,36 @@ def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incar
                    for ns in CATALOG_NAMESPACES if ns not in populated)
     return ParticipantDelta.freeze(codec, 'identity-catalog', version_changes=changes)
 
+def _conversion_owner_checksum(ordinal, namespace, key, kind, live, payload):
+    return _framed_sha(b'conversion-owner/v1', str(ordinal).encode(), namespace.encode(), key,
+                      kind.encode(), str(int(live)).encode(), payload)
+
+
+def _conversion_placement_checksum(namespace, key, path, hashed, inc, absolute, occurrence):
+    return _framed_sha(b'conversion-placement/v1', namespace.encode(), key, path, hashed,
+                      str(inc).encode(), absolute, occurrence)
+
+
+def _validate_conversion_inventory(workspace, seals):
+    from .persistence_conversion_workspace import _update
+    db = workspace.db
+    checked = []
+    h = hashlib.sha256(); count = 0
+    for ordinal, ns, key, kind, live, payload, checksum in db.execute('SELECT * FROM conversion_owners ORDER BY ordinal'):
+        if ordinal != count or checksum != _conversion_owner_checksum(ordinal,ns,key,kind,live,payload):
+            raise StoreIntegrityError('conversion owner inventory checksum/order mismatch')
+        _update(h,ordinal,checksum.encode()); count += 1
+    checked.append((count,h.hexdigest()))
+    h = hashlib.sha256(); count = 0
+    for ns,key,path,hashed,inc,absolute,occurrence,checksum,ordinal in db.execute('SELECT * FROM conversion_placements ORDER BY ordinal'):
+        if ordinal != count or checksum != _conversion_placement_checksum(ns,key,path,hashed,inc,absolute,occurrence):
+            raise StoreIntegrityError('conversion placement inventory checksum/order mismatch')
+        _update(h,ordinal,checksum.encode()); count += 1
+    checked.append((count,h.hexdigest()))
+    if tuple(checked) != seals:
+        raise StoreIntegrityError('conversion catalog inventory count/root mismatch')
+
+
 def _disk_catalog_inputs(workspace, owner_versions, identity_changes, *, next_incarnation_id,
                          generation, ordinary_changes=()):
     """Index captured owners and placements without resident grouping maps."""
@@ -238,12 +269,14 @@ def _disk_catalog_inputs(workspace, owner_versions, identity_changes, *, next_in
     db.execute('DROP TABLE IF EXISTS conversion_owners')
     db.execute('DROP TABLE IF EXISTS conversion_placements')
     db.execute('CREATE TABLE conversion_owners(ordinal INTEGER PRIMARY KEY,namespace TEXT,typed_key BLOB,kind TEXT,live INTEGER,payload BLOB,checksum TEXT,UNIQUE(namespace,typed_key))')
-    db.execute('CREATE TABLE conversion_placements(namespace TEXT,typed_key BLOB,path BLOB,hashed BLOB,inc INTEGER,absolute BLOB,occurrence BLOB,checksum TEXT,PRIMARY KEY(namespace,typed_key,path),UNIQUE(namespace,typed_key,hashed)) WITHOUT ROWID')
+    db.execute('CREATE TABLE conversion_placements(namespace TEXT,typed_key BLOB,path BLOB,hashed BLOB,inc INTEGER,absolute BLOB,occurrence BLOB,checksum TEXT,ordinal INTEGER UNIQUE,PRIMARY KEY(namespace,typed_key,path),UNIQUE(namespace,typed_key,hashed)) WITHOUT ROWID')
     db.execute('DROP TABLE IF EXISTS conversion_link_digests')
     db.execute('CREATE TABLE conversion_link_digests(payload BLOB)')
     db.execute('CREATE INDEX conversion_link_payload ON conversion_link_digests(payload)')
     db.execute('CREATE INDEX conversion_groups ON conversion_placements(inc,absolute)')
     db.execute('CREATE INDEX conversion_owner_hashes ON conversion_placements(namespace,typed_key,hashed)')
+    from .persistence_conversion_workspace import _update
+    owner_root, placement_root = hashlib.sha256(), hashlib.sha256()
     ordinal = 0
     for kind, changes in (('lazy', owner_versions), ('ordinary', ordinary_changes)):
         for source in changes:
@@ -255,13 +288,16 @@ def _disk_catalog_inputs(workspace, owner_versions, identity_changes, *, next_in
                 if not source.delete and source.key[0] >= next_incarnation_id:
                     raise StoreIntegrityError('physical history owner has an unallocated incarnation')
             payload = codec.encode(pack_change(source))
-            checksum = _framed_sha(b'conversion-owner/v1', kind.encode(), payload)
+            checksum = _conversion_owner_checksum(ordinal, source.namespace, codec.encode(source.key), kind, not source.delete, payload)
             try:
                 db.execute('INSERT INTO conversion_owners VALUES (?,?,?,?,?,?,?)',
                     (ordinal, source.namespace, codec.encode(source.key), kind, not source.delete, payload, checksum))
             except sqlite3.IntegrityError as exc:
                 raise ValueError('duplicate/competing identity owner source') from exc
+            _update(owner_root,ordinal,checksum.encode())
             ordinal += 1
+    owner_count = ordinal
+    ordinal = 0
     for change in identity_changes:
         if change.delete or type(change.incarnation_id) is not int or not 0 < change.incarnation_id < next_incarnation_id:
             raise ValueError('initial catalog requires live allocated occurrences')
@@ -272,17 +308,18 @@ def _disk_catalog_inputs(workspace, owner_versions, identity_changes, *, next_in
         hashed = path_hash(codec, change.occurrence_path)
         occurrence = codec.encode((namespace, change.owner_key, change.occurrence_path))
         absolute = codec.encode(absolute)
-        checksum = _framed_sha(b'conversion-placement/v1', namespace.encode(), key, path, hashed,
-                              str(change.incarnation_id).encode(), absolute, occurrence)
+        checksum = _conversion_placement_checksum(namespace, key, path, hashed, change.incarnation_id, absolute, occurrence)
         try:
-            db.execute('INSERT INTO conversion_placements VALUES (?,?,?,?,?,?,?,?)',
-                (namespace, key, path, hashed, change.incarnation_id, absolute, occurrence, checksum))
+            db.execute('INSERT INTO conversion_placements VALUES (?,?,?,?,?,?,?,?,?)',
+                (namespace, key, path, hashed, change.incarnation_id, absolute, occurrence, checksum, ordinal))
         except sqlite3.IntegrityError as exc:
             if db.execute('SELECT 1 FROM conversion_placements WHERE namespace=? AND typed_key=? AND path=?', (namespace, key, path)).fetchone():
                 raise ValueError('duplicate occurrence or missing owner source') from exc
             raise StoreIntegrityError('duplicate/colliding owner occurrence paths') from exc
-    for namespace, key, kind, payload, checksum in db.execute('SELECT namespace,typed_key,kind,payload,checksum FROM conversion_owners WHERE live=1 ORDER BY ordinal'):
-        if checksum != _framed_sha(b'conversion-owner/v1', kind.encode(), payload):
+        _update(placement_root,ordinal,checksum.encode())
+        ordinal += 1
+    for owner_ordinal, namespace, key, kind, live, payload, checksum in db.execute('SELECT * FROM conversion_owners WHERE live=1 ORDER BY ordinal'):
+        if checksum != _conversion_owner_checksum(owner_ordinal, namespace, key, kind, live, payload):
             raise StoreIntegrityError('conversion owner staging checksum mismatch')
         source = unpack_change(codec.decode(payload))
         adapter = AUXILIARY_OWNER_FAMILIES.get(namespace)
@@ -298,6 +335,7 @@ def _disk_catalog_inputs(workspace, owner_versions, identity_changes, *, next_in
             if count != expected_count:
                 raise StoreIntegrityError('physical history references disagree with identity placements')
     db.commit()
+    return ((owner_count,owner_root.hexdigest()), (ordinal,placement_root.hexdigest()))
 
 
 def _digest_encoded(domain, values):
@@ -313,13 +351,14 @@ def stage_initial_catalog(workspace, owner_versions, identity_changes, *, next_i
     """Checked replayable conversion rows; ordinary ParticipantDelta is unchanged."""
     from .persistence_conversion_workspace import unpack_change
     codec, db = workspace.codec, workspace.db
-    _disk_catalog_inputs(workspace, owner_versions, identity_changes,
+    seals = _disk_catalog_inputs(workspace, owner_versions, identity_changes,
         next_incarnation_id=next_incarnation_id, generation=generation, ordinary_changes=ordinary_changes)
+    _validate_conversion_inventory(workspace, seals)
 
     def changes():
         populated = set()
-        for namespace, key, kind, payload, checksum in db.execute('SELECT namespace,typed_key,kind,payload,checksum FROM conversion_owners WHERE live=1 ORDER BY ordinal'):
-            if checksum != _framed_sha(b'conversion-owner/v1', kind.encode(), payload):
+        for owner_ordinal, namespace, key, kind, live, payload, checksum in db.execute('SELECT * FROM conversion_owners WHERE live=1 ORDER BY ordinal'):
+            if checksum != _conversion_owner_checksum(owner_ordinal, namespace, key, kind, live, payload):
                 raise StoreIntegrityError('conversion owner staging checksum mismatch')
             version = unpack_change(codec.decode(payload))
             owner = namespace, version.key
@@ -385,7 +424,9 @@ def stage_initial_catalog(workspace, owner_versions, identity_changes, *, next_i
         for ns in CATALOG_NAMESPACES:
             if ns not in populated:
                 yield VersionChange(ns, ('empty-catalog-declaration/v1',), delete=True)
-    return workspace.stage_versions(changes())
+    result = workspace.stage_versions(changes())
+    _validate_conversion_inventory(workspace, seals)
+    return result
 
 
 @dataclass(frozen=True)

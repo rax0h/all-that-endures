@@ -271,3 +271,11 @@ the throwaway catalog build, stages final catalog/prepared rows, checks downstre
 retention, and resumes the saved lazy checkpoint with honest old/new candidate
 provenance. Runtime code remains unchanged. No new validation run was launched
 as part of the planning handoff.
+
+## Complete-upgrade memory repair candidate
+
+Implementation follows `STAGE_0_5_UPGRADE_MEMORY_REPAIR_HANDOFF.md` and its linked plan. The private converter retains source checks without the throwaway catalog, writes final catalog/prepared rows to checked disposable disk staging, and reuses the existing commit/publication/recovery authority. Ordinary saves remain on their existing path. Completed normalized outputs replay only after identity has explicit placements; source normalization still has disclosed input-sized residency.
+
+Focused implementation results and phase/RSS/virtual-memory measurements are in `STAGE_0_5_UPGRADE_MEMORY_REPAIR_PROGRESS.md`. The real small old-checkpoint/new-candidate harness lane passes with exact continuation. Explicit `--checkpoint-product-sha` validates the old receipt product while `--product-sha` names the actual executing repair; all other configuration checks remain exact. New receipts include source workflow/database/receipt hashes and bind subsequent stages to the new candidate.
+
+The acceptance workflow will rerun focused recovery, complete3+4+3 and one full suite on the pinned candidate, then resume only retained lazy artifact11870590333 under the existing8GiB guard. Successful complete publication remains partial evidence until exact1001/1002 continuation and fresh-runner downloaded restore pass. Old canonical1000 evidence is reused only as source-world/digest evidence, not a new-candidate benchmark. No main/PR14 merge, checkpoint default replacement, rank change or Stage1 work.

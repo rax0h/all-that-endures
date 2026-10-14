@@ -50,3 +50,15 @@ Fresh-process synthetic end-to-end measurements (2000 people/Events, exact resto
 Task4 phase RSS/VmSize: after source capture44360/71968; after normalization59672/88352; after catalog staging59728/88352; scrub completed59428/87212. Post-publication digest materialization raised lifetime peak to75020KiB and VmSize103596KiB; this is separate from conversion. Disk staging trades time/I/O for memory; this synthetic conversion became slower, not faster.
 
 Remaining input-sized costs: resident source/normalization graphs and their existing per-incarnation/path maps; one oversized encoded record or builder input; backing graph metadata; selected promotion values; SQLite caches. No universal fixed-memory claim. The retained mature year1000 fixture under8GiB RLIMIT_AS remains the required large acceptance gate. Independent whole-diff review precedes its launch.
+
+## Final inventory/provenance checks
+
+Four indexed-inventory corruption tests exposed missing protection for private owner/placement metadata and lost rows. The builder now seals source row counts/order and full owner/placement metadata, checks those seals before output construction and again after it, while preserving the reference catalog values. RED97-test affected inventory/preparation/catalog gate subsequently passed97 tests22.90s.
+
+Harness provenance now accepts an explicit `checkpoint_product_sha` only during resume. Every seed/rules/maturity/milestone/schema/stage/database check remains exact. The checkpoint source product matches the retained receipt; executable `product_sha` remains the repair candidate. New checkpoints bind to that executing candidate and retain the prior source product, workflow, database hash and original receipt hash. Subsequent stages carry that chain into final summaries.
+
+Harness gate:5 passed127.16s, including actual cold->lazy->repaired complete->1/2 continuation, accurate source/candidate provenance, unchanged original source receipt, configuration/stage/checksum rejection and the original complete lane. Actual CLI rejects `--checkpoint-product-sha` without explicit resume before creating output.
+
+GitHub metadata independently confirms retained artifact11870590333, run38508408370, origin124c3215468a60862b7848086f00a8e768a6ed66,1339563957 ZIP bytes, ZIP SHA256409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9, not expired. The gated complete job will stream-verify the archive and receipt/database checksum before conversion; metadata alone is not a restored-database proof.
+
+Prepared five-job acceptance workflow: fresh focused/recovery gate and full suite, repaired complete upgrade under8GiB RLIMIT_AS, exact1001/1002 continuation from its new checkpoint, and downloaded restore on a fresh runner. All checkout the pinned repair candidate, record separate workflow SHA and preserve old checkpoint provenance. No original bootstrap or canonical millennium rerun. Canonical1000 results remain old source-world evidence. Workflow shell blocks and embedded Python parse; no long job has launched yet.

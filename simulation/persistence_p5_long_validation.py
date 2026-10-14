@@ -195,7 +195,11 @@ def _control(seed, milestones, *, initialization='founders'):
 
 def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workflow_sha,
         *, complete_format=False, initialization='founders',
-        stop_after=None, resume_from=None):
+        stop_after=None, resume_from=None, checkpoint_product_sha: str | None = None):
+    if checkpoint_product_sha is not None and not resume_from:
+        raise ValueError('checkpoint product provenance requires explicit resume')
+    if checkpoint_product_sha is not None and (type(checkpoint_product_sha) is not str or not checkpoint_product_sha):
+        raise ValueError('checkpoint product provenance must be nonempty text')
     if initialization not in ('founders', 'mature'):
         raise ValueError('initialization must be founders or mature')
     milestones = tuple(sorted(set(int(value) for value in milestones)))
@@ -233,9 +237,12 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
                   complete_format=complete_format, initialization=initialization,
                   simulation_schema=SCHEMA)
     checkpoint_path = workdir / 'checkpoint.json'
+    source_checkpoint = None
     if resume_from:
-        checkpoint = json.loads(checkpoint_path.read_text())
-        if checkpoint['schema'] != 1 or checkpoint['config'] != config:
+        checkpoint_bytes = checkpoint_path.read_bytes()
+        checkpoint = json.loads(checkpoint_bytes)
+        source_config = dict(config, product_sha=checkpoint_product_sha if checkpoint_product_sha is not None else product_sha)
+        if checkpoint['schema'] != 1 or checkpoint['config'] != source_config:
             raise ValueError('checkpoint configuration does not match requested run')
         if checkpoint['stage'] != resume_from:
             raise ValueError('checkpoint stage does not match resume stage')
@@ -244,8 +251,14 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
                 or file_hash(expected_path) != checkpoint['database']['sha256']):
             raise ValueError('checkpoint database checksum mismatch')
         state = checkpoint['state']
+        source_checkpoint = dict(product_sha=checkpoint['config']['product_sha'],
+            workflow_sha=checkpoint['workflow_sha'], stage=resume_from, database=dict(checkpoint['database']),
+            receipt_sha256=hashlib.sha256(checkpoint_bytes).hexdigest(),
+            prior_source=checkpoint.get('source_checkpoint'))
         progress('checkpoint_verified', checkpoint_stage=resume_from,
-                 origin_workflow_sha=checkpoint['workflow_sha'])
+                 checkpoint_product_sha=source_checkpoint['product_sha'],
+                 origin_workflow_sha=checkpoint['workflow_sha'],
+                 source_database_sha256=checkpoint['database']['sha256'])
     else:
         # Never overwrite an earlier run or silently reuse an unverified database.
         if any(path.exists() for path in (cold, lazy, complete, restore, checkpoint_path)):
@@ -255,7 +268,9 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
     def checkpoint(stage, database):
         receipt = dict(schema=1, stage=stage, config=config, workflow_sha=workflow_sha,
                        database={'name': database.name, 'sha256': file_hash(database)},
-                       state=state)
+                       state=state, product_sha=product_sha,
+                       checkpoint_product_sha=source_checkpoint['product_sha'] if source_checkpoint else None,
+                       source_checkpoint=source_checkpoint)
         pending = checkpoint_path.with_suffix('.pending')
         pending.write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
         pending.replace(checkpoint_path)
@@ -427,6 +442,8 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
         "bootstrap_year": bootstrap_year,
         "milestones": milestones,
         "product_sha": product_sha,
+        "checkpoint_product_sha": source_checkpoint["product_sha"] if source_checkpoint else None,
+        "source_checkpoint": source_checkpoint,
         "workflow_sha": workflow_sha,
         "control_wall_seconds": control_seconds,
         "bootstrap_simulation_seconds": bootstrap_simulation_seconds,
@@ -467,6 +484,7 @@ def main():
     parser.add_argument("--workdir", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--product-sha", default="")
+    parser.add_argument("--checkpoint-product-sha", default=None)
     parser.add_argument("--workflow-sha", default=os.environ.get("GITHUB_SHA", ""))
     parser.add_argument("--complete-format", action="store_true")
     parser.add_argument("--initialization", choices=('founders', 'mature'), default='founders')
@@ -487,7 +505,7 @@ def main():
         args.workflow_sha,
         complete_format=args.complete_format,
         initialization=args.initialization,
-        stop_after=args.stop_after, resume_from=args.resume_from,
+        stop_after=args.stop_after, resume_from=args.resume_from, checkpoint_product_sha=args.checkpoint_product_sha,
     )
     rendered = json.dumps(summary, indent=2, sort_keys=True)
     Path(args.output).write_text(rendered + "\n", encoding="utf-8")

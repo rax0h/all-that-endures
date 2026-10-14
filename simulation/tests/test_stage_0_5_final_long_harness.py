@@ -43,9 +43,22 @@ def test_staged_harness_resumes_checked_artifacts_without_rebuilding(tmp_path, m
         shutil.copyfile(previous / 'checkpoint.json', target / 'checkpoint.json')
         name = f'p5-long-{before}.sqlite'
         shutil.copyfile(previous / name, target / name)
-        result = run(*args, target, **kw, resume_from=before, stop_after=after)
+        old_receipt = (previous / 'checkpoint.json').read_bytes()
+        stage_kw = dict(kw, product_sha='repaired-product') if after == 'complete' else kw
+        override = dict(checkpoint_product_sha='runtime-source') if after == 'complete' else {}
+        result = run(*args, target, **stage_kw, resume_from=before, stop_after=after, **override)
+        assert (previous / 'checkpoint.json').read_bytes() == old_receipt
+        if after == 'complete':
+            import json
+            receipt = json.loads((target / 'checkpoint.json').read_text())
+            assert receipt['config']['product_sha'] == 'repaired-product'
+            assert receipt['checkpoint_product_sha'] == 'runtime-source'
+            assert receipt['source_checkpoint']['product_sha'] == 'runtime-source'
+            assert receipt['source_checkpoint']['workflow_sha'] == 'workflow-source'
+            assert receipt['source_checkpoint']['database']['sha256'] == json.loads(old_receipt)['database']['sha256']
         assert result['checkpoint_stage'] == after and not result['passed']
         previous = target
+    kw = dict(kw, product_sha='repaired-product')
     with pytest.raises(ValueError, match='configuration'):
         run(1, [1, 2], 0, previous, **kw, resume_from='complete')
     damaged = tmp_path / 'damaged'
@@ -56,5 +69,41 @@ def test_staged_harness_resumes_checked_artifacts_without_rebuilding(tmp_path, m
         run(*args, damaged, **kw, resume_from='complete')
     result = run(*args, previous, **kw, resume_from='complete')
     assert result['passed'] and result['cold_source_preserved']
+    assert result['product_sha'] == 'repaired-product'
+    assert result['source_checkpoint']['product_sha'] == 'repaired-product'
+    assert result['source_checkpoint']['prior_source']['product_sha'] == 'runtime-source'
     assert all(result['p4'][str(y)]['matches_control'] for y in (1, 2))
     assert result['restore_artifact']['year'] == 2
+
+
+def test_source_product_override_is_rejected_without_explicit_resume(tmp_path):
+    import pytest
+    with pytest.raises(ValueError,match='resume'):
+        run(843000,[1,2],0,tmp_path,'repair-test','new-product','new-workflow',
+            complete_format=True,stop_after='cold',checkpoint_product_sha='old-product')
+
+
+def test_repair_resume_keeps_all_nonproduct_configuration_checks(tmp_path):
+    import json,hashlib,pytest
+    import persistence_p5_long_validation as harness
+    config=dict(seed=843000,milestones=[1,2],bootstrap_year=0,rules_id='repair-test',
+        product_sha='old-product',complete_format=True,initialization='founders',simulation_schema=harness.SCHEMA)
+    db=tmp_path/'p5-long-lazy.sqlite';db.write_bytes(b'not-opened-in-preflight')
+    receipt=dict(schema=1,stage='lazy',config=config,workflow_sha='old-workflow',
+        database=dict(name=db.name,sha256=hashlib.sha256(db.read_bytes()).hexdigest()),state={})
+    path=tmp_path/'checkpoint.json';path.write_text(json.dumps(receipt));before=path.read_bytes()
+    args=(843000,[1,2],0,tmp_path,'repair-test','new-product','new-workflow')
+    base=dict(complete_format=True,resume_from='lazy',stop_after='complete',checkpoint_product_sha='old-product')
+    for change in ('seed','rules','maturity','milestones','source-product','stage','checksum','no-provenance'):
+        requested=list(args);kw=dict(base)
+        if change=='seed':requested[0]=7
+        elif change=='rules':requested[4]='wrong-rules'
+        elif change=='maturity':kw['initialization']='mature'
+        elif change=='milestones':requested[1]=[1,3]
+        elif change=='source-product':kw['checkpoint_product_sha']='wrong-source'
+        elif change=='stage':kw['resume_from']='cold'
+        elif change=='no-provenance':kw.pop('checkpoint_product_sha')
+        else:db.write_bytes(b'corrupt')
+        with pytest.raises(ValueError,match='configuration|stage|checksum'):
+            run(*requested,**kw)
+        assert path.read_bytes()==before
