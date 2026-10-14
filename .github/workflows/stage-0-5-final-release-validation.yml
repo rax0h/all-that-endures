@@ -1,4 +1,4 @@
-name: Stage 0.5 recoverable late fixture
+name: Stage 0.5 resume retained cold checkpoint
 'on':
   push:
     branches:
@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: b546cf56dabe1cf2887cab0b770c2674861c83bc
+        ref: ccba8cc6eba70965271d2570043829b3368e695a
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
@@ -39,6 +39,12 @@ jobs:
         assert {j['name'] for j in rows}==expected
         assert all(j['conclusion']=='success' and j['head_sha']=='fb9505a0349e083882672e2de9e8e7735b68fd77' for j in rows)
         json.dump({'runtime_sha':'2bc3c85389760ff12578857f7d2a849bc5cf9201','prior_jobs':rows},open('evidence/prior-gates.json','w'),indent=2)
+        url='https://api.github.com/repos/rax0h/all-that-endures/actions/runs/38500678444/attempts/1/jobs'
+        req=urllib.request.Request(url, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN']})
+        with urllib.request.urlopen(req) as f: previous=json.load(f)
+        cold=next(j for j in previous['jobs'] if j['name']=='late-cold')
+        assert cold['conclusion']=='success' and cold['head_sha']=='8a6744c34c1c42ea32411fbcb723a42dcf014387'
+        json.dump(cold,open('evidence/reused-cold-job.json','w'),indent=2)
         CHECK
         python -m pytest -q -o junit_family=legacy --junitxml=evidence/harness.xml simulation/tests/test_stage_0_5_final_long_harness.py 2>&1 | tee evidence/harness.log
     - uses: actions/upload-artifact@v4
@@ -49,75 +55,14 @@ jobs:
         retention-days: 14
         compression-level: 1
         if-no-files-found: error
-  late-cold:
+  late-lazy:
     needs: harness-gate
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: b546cf56dabe1cf2887cab0b770c2674861c83bc
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-    - name: Reserve hosted-runner disk for disposable conversion databases
-      shell: bash
-      run: |
-        # Only unused preinstalled toolchains on this disposable hosted runner.
-        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        mkdir -p evidence
-        df -h . 2>&1 | tee evidence/disk-start.txt
-        python -c "import shutil; assert shutil.disk_usage('.').free > 25*1024**3, 'need 25 GiB for explicit conversion and restore copies'"
-    - name: Publish checked cold checkpoint
-      shell: bash
-      run: |
-        mkdir -p evidence
-        git rev-parse HEAD HEAD^{tree} HEAD:simulation/ate_sim | tee evidence/source.txt
-        (
-          while true; do
-            date -u
-            free -m
-            df -h .
-            ps -eo pid,ppid,rss,vsz,comm --sort=-rss | head -n 10 || true
-            for f in /sys/fs/cgroup/memory.events /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.max; do
-              if [ -r "$f" ]; then echo "$f"; cat "$f"; fi
-            done
-            sleep 60
-          done
-        ) > >(tee evidence/resources.log) 2>&1 &
-        monitor_pid=$!
-        trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
-        timeout --signal=TERM --kill-after=30s 350m python simulation/persistence_p5_long_validation.py --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' --stop-after cold 2>&1 | tee evidence/late.log
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: late-cold-diagnostics
-        path: |-
-          evidence/*.txt
-          evidence/*.json
-          evidence/*.log
-          evidence/late/progress.jsonl
-        retention-days: 14
-        compression-level: 1
-        if-no-files-found: error
-    - uses: actions/upload-artifact@v4
-      if: success()
-      with:
-        name: late-cold-checkpoint
-        path: |-
-          evidence/late/checkpoint.json
-          evidence/late/p5-long-cold.sqlite
-        retention-days: 14
-        compression-level: 1
-        if-no-files-found: error
-  late-lazy:
-    needs: late-cold
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: b546cf56dabe1cf2887cab0b770c2674861c83bc
+        ref: ccba8cc6eba70965271d2570043829b3368e695a
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
@@ -133,6 +78,17 @@ jobs:
       with:
         name: late-cold-checkpoint
         path: evidence/late
+        run-id: 38500678444
+        github-token: ${{ github.token }}
+    - name: Verify retained checkpoint provenance
+      shell: bash
+      run: |
+        python - <<'PYCODE'
+        import json
+        r=json.load(open('evidence/late/checkpoint.json'))
+        assert r['workflow_sha']=='8a6744c34c1c42ea32411fbcb723a42dcf014387'
+        assert r['stage']=='cold' and r['config']['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201'
+        PYCODE
     - name: Publish checked lazy checkpoint
       shell: bash
       run: |
@@ -153,6 +109,12 @@ jobs:
         monitor_pid=$!
         trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
         timeout --signal=TERM --kill-after=30s 350m python simulation/persistence_p5_long_validation.py --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' --stop-after lazy --resume-from cold 2>&1 | tee evidence/late.log
+    - name: Capture native failure diagnostics
+      if: failure()
+      shell: bash
+      run: |
+        mkdir -p evidence
+        { python -VV; python -c 'import sqlite3; print(sqlite3.sqlite_version)'; sudo dmesg --ctime | tail -n 80; coredumpctl info --no-pager; } > evidence/native-failure.log 2>&1 || true
     - uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -182,7 +144,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: b546cf56dabe1cf2887cab0b770c2674861c83bc
+        ref: ccba8cc6eba70965271d2570043829b3368e695a
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
@@ -218,6 +180,12 @@ jobs:
         monitor_pid=$!
         trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
         timeout --signal=TERM --kill-after=30s 350m python simulation/persistence_p5_long_validation.py --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' --stop-after complete --resume-from lazy 2>&1 | tee evidence/late.log
+    - name: Capture native failure diagnostics
+      if: failure()
+      shell: bash
+      run: |
+        mkdir -p evidence
+        { python -VV; python -c 'import sqlite3; print(sqlite3.sqlite_version)'; sudo dmesg --ctime | tail -n 80; coredumpctl info --no-pager; } > evidence/native-failure.log 2>&1 || true
     - uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -247,7 +215,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: b546cf56dabe1cf2887cab0b770c2674861c83bc
+        ref: ccba8cc6eba70965271d2570043829b3368e695a
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
@@ -301,6 +269,12 @@ jobs:
         with open(r['restore_artifact']['path'],'rb') as f:
             assert hashlib.file_digest(f,'sha256').hexdigest()==r['restore_artifact']['sha256']
         PY
+    - name: Capture native failure diagnostics
+      if: failure()
+      shell: bash
+      run: |
+        mkdir -p evidence
+        { python -VV; python -c 'import sqlite3; print(sqlite3.sqlite_version)'; sudo dmesg --ctime | tail -n 80; coredumpctl info --no-pager; } > evidence/native-failure.log 2>&1 || true
     - uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -325,7 +299,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: b546cf56dabe1cf2887cab0b770c2674861c83bc
+        ref: ccba8cc6eba70965271d2570043829b3368e695a
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
@@ -369,6 +343,12 @@ jobs:
         json.dump(result,open('evidence/downloaded-restore.json','w'),indent=2)
         print(json.dumps(result),flush=True)
         PY
+    - name: Capture native failure diagnostics
+      if: failure()
+      shell: bash
+      run: |
+        mkdir -p evidence
+        { python -VV; python -c 'import sqlite3; print(sqlite3.sqlite_version)'; sudo dmesg --ctime | tail -n 80; coredumpctl info --no-pager; } > evidence/native-failure.log 2>&1 || true
     - uses: actions/upload-artifact@v4
       if: always()
       with:
