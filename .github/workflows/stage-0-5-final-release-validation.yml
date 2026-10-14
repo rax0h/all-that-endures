@@ -1,4 +1,4 @@
-name: Stage 0.5 resume retained cold checkpoint
+name: Stage 0.5 complete upgrade memory diagnosis
 'on':
   push:
     branches:
@@ -10,55 +10,9 @@ env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
 jobs:
-  harness-gate:
+  complete-memory-probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ccba8cc6eba70965271d2570043829b3368e695a
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-    - run: python -m pip install pytest
-    - name: Verify unchanged runtime, prior gates and staged handoffs
-      shell: bash
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        set -euo pipefail
-        mkdir -p evidence
-        test "$(git rev-parse HEAD:simulation/ate_sim)" = 43c2976e97474127ec860bcb6382988660ddadb3
-        python - <<'CHECK'
-        import json, os, urllib.request
-        url='https://api.github.com/repos/rax0h/all-that-endures/actions/runs/38459262962/attempts/1/jobs'
-        req=urllib.request.Request(url, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN']})
-        with urllib.request.urlopen(req) as f: data=json.load(f)
-        expected={'recovery-gate','full-suite','canonical-millennium'}
-        rows=[j for j in data['jobs'] if j['name'] in expected]
-        assert {j['name'] for j in rows}==expected
-        assert all(j['conclusion']=='success' and j['head_sha']=='fb9505a0349e083882672e2de9e8e7735b68fd77' for j in rows)
-        json.dump({'runtime_sha':'2bc3c85389760ff12578857f7d2a849bc5cf9201','prior_jobs':rows},open('evidence/prior-gates.json','w'),indent=2)
-        url='https://api.github.com/repos/rax0h/all-that-endures/actions/runs/38500678444/attempts/1/jobs'
-        req=urllib.request.Request(url, headers={'Authorization':'Bearer '+os.environ['GH_TOKEN']})
-        with urllib.request.urlopen(req) as f: previous=json.load(f)
-        cold=next(j for j in previous['jobs'] if j['name']=='late-cold')
-        assert cold['conclusion']=='success' and cold['head_sha']=='8a6744c34c1c42ea32411fbcb723a42dcf014387'
-        json.dump(cold,open('evidence/reused-cold-job.json','w'),indent=2)
-        CHECK
-        python -m pytest -q -o junit_family=legacy --junitxml=evidence/harness.xml simulation/tests/test_stage_0_5_final_long_harness.py 2>&1 | tee evidence/harness.log
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: staged-harness-evidence
-        path: evidence
-        retention-days: 14
-        compression-level: 1
-        if-no-files-found: error
-  late-lazy:
-    needs: harness-gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 95
     steps:
     - uses: actions/checkout@v4
       with:
@@ -76,20 +30,20 @@ jobs:
         python -c "import shutil; assert shutil.disk_usage('.').free > 25*1024**3, 'need 25 GiB for explicit conversion and restore copies'"
     - uses: actions/download-artifact@v4
       with:
-        name: late-cold-checkpoint
+        name: late-lazy-checkpoint
         path: evidence/late
-        run-id: 38500678444
+        run-id: 38508408370
         github-token: ${{ github.token }}
-    - name: Verify retained checkpoint provenance
+    - name: Verify reused lazy checkpoint provenance
       shell: bash
       run: |
-        python - <<'PYCODE'
+        python - <<'CHECK'
         import json
         r=json.load(open('evidence/late/checkpoint.json'))
-        assert r['workflow_sha']=='8a6744c34c1c42ea32411fbcb723a42dcf014387'
-        assert r['stage']=='cold' and r['config']['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201'
-        PYCODE
-    - name: Publish checked lazy checkpoint
+        assert r['stage']=='lazy' and r['workflow_sha']=='124c3215468a60862b7848086f00a8e768a6ed66'
+        assert r['config']['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201'
+        CHECK
+    - name: Locate complete-upgrade memory growth from retained lazy checkpoint
       shell: bash
       run: |
         mkdir -p evidence
@@ -108,7 +62,33 @@ jobs:
         ) > >(tee evidence/resources.log) 2>&1 &
         monitor_pid=$!
         trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
-        timeout --signal=TERM --kill-after=30s 350m python simulation/persistence_p5_long_validation.py --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' --stop-after lazy --resume-from cold 2>&1 | tee evidence/late.log
+        timeout --signal=TERM --kill-after=30s 80m python - --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' --stop-after complete --resume-from lazy <<'PROBE' 2>&1 | tee evidence/late.log
+        import functools,json,resource,runpy,time
+        from ate_sim import persistence_catalog_copy as copy
+        from ate_sim import persistence_event_copy_normalization as normalization
+        # Limit only this Python process; leave room for the runner and artifact upload.
+        resource.setrlimit(resource.RLIMIT_AS,(8*1024**3,8*1024**3))
+        def observe(module,name):
+            original=getattr(module,name)
+            @functools.wraps(original)
+            def wrapped(*args,**kwargs):
+                started=time.monotonic()
+                print(json.dumps({'probe':name,'phase':'started','peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}),flush=True)
+                try:
+                    result=original(*args,**kwargs)
+                except BaseException as error:
+                    print(json.dumps({'probe':name,'phase':'failed','exception':type(error).__name__,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}),flush=True)
+                    raise
+                print(json.dumps({'probe':name,'phase':'finished','seconds':time.monotonic()-started,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}),flush=True)
+                return result
+            setattr(module,name,wrapped)
+        for name in ('_owner_sources','initial_catalog_delta','_backing_rosters','_check_reference_targets','_check_backing_graph','_empty_destination','_verify_catalog'):
+            observe(copy,name)
+        for name in ('capture_bodies','normalize_events'):
+            observe(normalization,name)
+        print('DIAGNOSTIC RUN: 8 GiB address-space cap; this is not final release acceptance',flush=True)
+        runpy.run_module('persistence_p5_long_validation',run_name='__main__')
+        PROBE
     - name: Capture native failure diagnostics
       if: failure()
       shell: bash
@@ -118,7 +98,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: late-lazy-diagnostics
+        name: memory-probe-late-complete-diagnostics
         path: |-
           evidence/*.txt
           evidence/*.json
@@ -130,228 +110,10 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: success()
       with:
-        name: late-lazy-checkpoint
-        path: |-
-          evidence/late/checkpoint.json
-          evidence/late/p5-long-lazy.sqlite
-        retention-days: 14
-        compression-level: 1
-        if-no-files-found: error
-  late-complete:
-    needs: late-lazy
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ccba8cc6eba70965271d2570043829b3368e695a
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-    - name: Reserve hosted-runner disk for disposable conversion databases
-      shell: bash
-      run: |
-        # Only unused preinstalled toolchains on this disposable hosted runner.
-        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        mkdir -p evidence
-        df -h . 2>&1 | tee evidence/disk-start.txt
-        python -c "import shutil; assert shutil.disk_usage('.').free > 25*1024**3, 'need 25 GiB for explicit conversion and restore copies'"
-    - uses: actions/download-artifact@v4
-      with:
-        name: late-lazy-checkpoint
-        path: evidence/late
-    - name: Publish checked complete checkpoint
-      shell: bash
-      run: |
-        mkdir -p evidence
-        git rev-parse HEAD HEAD^{tree} HEAD:simulation/ate_sim | tee evidence/source.txt
-        (
-          while true; do
-            date -u
-            free -m
-            df -h .
-            ps -eo pid,ppid,rss,vsz,comm --sort=-rss | head -n 10 || true
-            for f in /sys/fs/cgroup/memory.events /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.max; do
-              if [ -r "$f" ]; then echo "$f"; cat "$f"; fi
-            done
-            sleep 60
-          done
-        ) > >(tee evidence/resources.log) 2>&1 &
-        monitor_pid=$!
-        trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
-        timeout --signal=TERM --kill-after=30s 350m python simulation/persistence_p5_long_validation.py --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' --stop-after complete --resume-from lazy 2>&1 | tee evidence/late.log
-    - name: Capture native failure diagnostics
-      if: failure()
-      shell: bash
-      run: |
-        mkdir -p evidence
-        { python -VV; python -c 'import sqlite3; print(sqlite3.sqlite_version)'; sudo dmesg --ctime | tail -n 80; coredumpctl info --no-pager; } > evidence/native-failure.log 2>&1 || true
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: late-complete-diagnostics
-        path: |-
-          evidence/*.txt
-          evidence/*.json
-          evidence/*.log
-          evidence/late/progress.jsonl
-        retention-days: 14
-        compression-level: 1
-        if-no-files-found: error
-    - uses: actions/upload-artifact@v4
-      if: success()
-      with:
-        name: late-complete-checkpoint
+        name: memory-probe-late-complete-checkpoint
         path: |-
           evidence/late/checkpoint.json
           evidence/late/p5-long-complete.sqlite
         retention-days: 14
         compression-level: 1
         if-no-files-found: error
-  complete-late-fixture:
-    needs: late-complete
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ccba8cc6eba70965271d2570043829b3368e695a
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-    - name: Reserve hosted-runner disk for disposable conversion databases
-      shell: bash
-      run: |
-        # Only unused preinstalled toolchains on this disposable hosted runner.
-        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        mkdir -p evidence
-        df -h . 2>&1 | tee evidence/disk-start.txt
-        python -c "import shutil; assert shutil.disk_usage('.').free > 25*1024**3, 'need 25 GiB for explicit conversion and restore copies'"
-    - uses: actions/download-artifact@v4
-      with:
-        name: late-complete-checkpoint
-        path: evidence/late
-    - uses: actions/download-artifact@v4
-      with:
-        name: final-source-canonical-evidence
-        path: canonical-evidence
-        run-id: 38459262962
-        github-token: ${{ github.token }}
-    - name: Continue, audit, reopen and verify restore
-      shell: bash
-      run: |
-        mkdir -p evidence
-        git rev-parse HEAD HEAD^{tree} HEAD:simulation/ate_sim | tee evidence/source.txt
-        (
-          while true; do
-            date -u
-            free -m
-            df -h .
-            ps -eo pid,ppid,rss,vsz,comm --sort=-rss | head -n 10 || true
-            for f in /sys/fs/cgroup/memory.events /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.max; do
-              if [ -r "$f" ]; then echo "$f"; cat "$f"; fi
-            done
-            sleep 60
-          done
-        ) > >(tee evidence/resources.log) 2>&1 &
-        monitor_pid=$!
-        trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
-        timeout --signal=TERM --kill-after=30s 350m python simulation/persistence_p5_long_validation.py --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' --resume-from complete 2>&1 | tee evidence/late.log
-        python - <<'PY'
-        import json,hashlib
-        r=json.load(open('evidence/late.json'))
-        c=json.load(open('canonical-evidence/canonical-receipt.json'))
-        assert r['passed'] and r['complete_format'] and r['initialization']=='mature'
-        assert r['bootstrap_digest']==c['benchmark']['digest']
-        assert r['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201' and r['milestones']==[1001,1002]
-        assert all(r['p4'][str(y)]['matches_control'] for y in (1001,1002))
-        assert r['restore_artifact']['year']==1002
-        with open(r['restore_artifact']['path'],'rb') as f:
-            assert hashlib.file_digest(f,'sha256').hexdigest()==r['restore_artifact']['sha256']
-        PY
-    - name: Capture native failure diagnostics
-      if: failure()
-      shell: bash
-      run: |
-        mkdir -p evidence
-        { python -VV; python -c 'import sqlite3; print(sqlite3.sqlite_version)'; sudo dmesg --ctime | tail -n 80; coredumpctl info --no-pager; } > evidence/native-failure.log 2>&1 || true
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: final-source-late-evidence
-        path: |
-          evidence/*.txt
-          evidence/*.json
-          evidence/*.log
-          evidence/late/progress.jsonl
-        retention-days: 14
-    - uses: actions/upload-artifact@v4
-      if: success()
-      with:
-        name: final-source-year1002-restore
-        path: evidence/late/p5-long-restore.sqlite
-        retention-days: 14
-        compression-level: 1
-  downloaded-restore-proof:
-    needs: complete-late-fixture
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: ccba8cc6eba70965271d2570043829b3368e695a
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-    - name: Reserve hosted-runner space for retained and operational copies
-      run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
-    - uses: actions/download-artifact@v4
-      with:
-        name: final-source-late-evidence
-        path: downloaded-evidence
-    - uses: actions/download-artifact@v4
-      with:
-        name: final-source-year1002-restore
-        path: retained
-    - name: Verify downloaded original and reopen disposable copy
-      shell: bash
-      run: |
-        mkdir -p evidence
-        git rev-parse HEAD HEAD^{tree} 2>&1 | tee evidence/source.txt
-        python - <<'PY' 2>&1 | tee evidence/restore.log
-        import hashlib,json,pathlib,shutil,os
-        from ate_sim.persistence_lazy import open_lazy_world_session
-        from persistence_p5_long_validation import _counters
-        r=json.load(open('downloaded-evidence/late.json'))
-        source=pathlib.Path('retained/p5-long-restore.sqlite')
-        def sha(path):
-            with path.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
-        expected=r['restore_artifact']
-        assert r['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201' and r['passed'] and r['complete_format']
-        assert sha(source)==expected['sha256']
-        assert shutil.disk_usage('.').free > source.stat().st_size+1024**3
-        copy=pathlib.Path('operational.sqlite');shutil.copyfile(source,copy)
-        with open_lazy_world_session(copy,rules_id=r['rules_id']) as s:
-            assert s.world.year==expected['year']==1002
-            assert s.pin.captured_head==expected['generation']
-            assert int(s.store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])==6
-            digest=s.world.digest()
-            assert digest==expected['digest']==r['control']['1002']['digest']
-            assert _counters(s.world)==r['control']['1002']['counters']
-        assert sha(source)==expected['sha256']
-        result={'passed':True,'candidate':'2bc3c85389760ff12578857f7d2a849bc5cf9201','workflow_sha':os.environ['GITHUB_SHA'],'year':1002,'digest':digest,'downloaded_sha256':expected['sha256'],'retained_original_unchanged':True}
-        json.dump(result,open('evidence/downloaded-restore.json','w'),indent=2)
-        print(json.dumps(result),flush=True)
-        PY
-    - name: Capture native failure diagnostics
-      if: failure()
-      shell: bash
-      run: |
-        mkdir -p evidence
-        { python -VV; python -c 'import sqlite3; print(sqlite3.sqlite_version)'; sudo dmesg --ctime | tail -n 80; coredumpctl info --no-pager; } > evidence/native-failure.log 2>&1 || true
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: final-source-downloaded-restore-proof
-        path: evidence
-        retention-days: 14
