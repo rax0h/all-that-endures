@@ -20,7 +20,7 @@ from .persistence_lazy_store import (
 )
 from .persistence_lazy_families import IDENTITY_OWNER_FAMILIES, AUXILIARY_OWNER_FAMILIES
 from .persistence_lazy_identity_catalog import (
-    IdentityCatalog, initial_catalog_delta, CATALOG_NAMESPACE, OWNER_NAMESPACE,
+    IdentityCatalog, initial_catalog_delta, validate_initial_catalog_inputs, CATALOG_NAMESPACE, OWNER_NAMESPACE,
     GROUP_NAMESPACE, LINK_NAMESPACE, OWNER_TREE_NAMESPACE, CATALOG_TAG,
 )
 from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE, PAGE_NAMESPACE, ENTRY_NAMESPACE
@@ -325,7 +325,8 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                             'SELECT owner_namespace,owner_key,occurrence_path,incarnation_id '
                             'FROM lazy_identity_occurrence_versions WHERE valid_from<=? '
                             'AND (valid_to IS NULL OR ?<valid_to)', (pin.captured_head, pin.captured_head)))
-                    delta = initial_catalog_delta(codec, versions, placements,
+                    build_initial = validate_initial_catalog_inputs if normalize_graph or selected else initial_catalog_delta
+                    delta = build_initial(codec, versions, placements,
                         ordinary_changes=ordinary, next_incarnation_id=next_incarnation,
                         generation=pin.captured_head + 1)
                     dependencies = _backing_rosters(store, pin, next_incarnation)

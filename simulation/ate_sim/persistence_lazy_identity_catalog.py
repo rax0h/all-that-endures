@@ -140,9 +140,9 @@ def _owner_sources(codec, owner_versions, ordinary_changes):
     return sources
 
 
-def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incarnation_id, generation,
+def _validated_initial_catalog_inputs(codec, owner_versions, identity_changes, *, next_incarnation_id, generation,
                           ordinary_changes=()):
-    """Freeze a complete explicit conversion; this does not publish a format floor."""
+    """Check captured inputs without allocating output catalog rows."""
     if type(next_incarnation_id) is not int or next_incarnation_id < 1:
         raise ValueError('invalid incarnation allocator')
     owners = {marker: entry for marker, entry in _owner_sources(codec, owner_versions, ordinary_changes).items()
@@ -163,6 +163,32 @@ def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incar
         seen.add(marker)
         by_owner.setdefault((marker[0], marker[1]), []).append((change.occurrence_path, change.incarnation_id))
         by_group.setdefault(change.incarnation_id, []).append((change.owner_namespace, change.owner_key, change.occurrence_path))
+    for marker, (_kind, version) in owners.items():
+        placements = by_owner.get(marker, ())
+        hashes = set()
+        for path, _incarnation in placements:
+            hashed = path_hash(codec, path)
+            if hashed in hashes:
+                raise StoreIntegrityError('duplicate/colliding owner occurrence paths')
+            hashes.add(hashed)
+        adapter = AUXILIARY_OWNER_FAMILIES.get(version.namespace)
+        if adapter is not None and dict(placements) != dict(adapter.reference_placements(version.value)):
+            raise StoreIntegrityError('physical history references disagree with identity placements')
+    return owners, by_owner, by_group
+
+
+def validate_initial_catalog_inputs(codec, owner_versions, identity_changes, *, next_incarnation_id,
+                                    generation, ordinary_changes=()):
+    """Retain source checks when normalization will replace its catalog."""
+    _validated_initial_catalog_inputs(codec, owner_versions, identity_changes,
+        next_incarnation_id=next_incarnation_id, generation=generation, ordinary_changes=ordinary_changes)
+
+
+def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incarnation_id, generation,
+                          ordinary_changes=()):
+    """Freeze a complete explicit conversion; this does not publish a format floor."""
+    owners, by_owner, by_group = _validated_initial_catalog_inputs(codec, owner_versions, identity_changes,
+        next_incarnation_id=next_incarnation_id, generation=generation, ordinary_changes=ordinary_changes)
     changes = []
     for marker, (kind, version) in owners.items():
         owner = version.namespace, version.key
