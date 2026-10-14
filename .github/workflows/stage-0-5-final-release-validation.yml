@@ -1,4 +1,4 @@
-name: Stage 0.5 complete upgrade memory diagnosis
+name: Stage 0.5 repaired complete upgrade acceptance
 'on':
   push:
     branches:
@@ -9,14 +9,84 @@ permissions:
 env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
+  CANDIDATE_SHA: 98a37c64514084879ef77c04825e47e1f6a4fabe
 jobs:
-  complete-memory-probe:
+  recovery-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 95
+    timeout-minutes: 45
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: ccba8cc6eba70965271d2570043829b3368e695a
+        ref: ${{ env.CANDIDATE_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - name: Regressions and complete 3+4+3 recovery
+      shell: bash
+      run: |
+        mkdir -p evidence
+        git rev-parse HEAD HEAD^{tree} 2>&1 | tee evidence/source.txt
+        python -m pytest -q -o junit_family=legacy --junitxml=evidence/focused.xml simulation/tests/test_stage_0_5_upgrade_memory.py simulation/tests/test_stage_0_5_conversion_preparation.py simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_stage_0_5_owner_witness_cache.py simulation/tests/test_stage_0_5_final_long_harness.py simulation/tests/test_stage_0_5_final_backing_dependencies.py 2>&1 | tee evidence/focused.log
+        timeout 35m python simulation/persistence_p5_validation.py --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --complete-format --rules-id stage-0-5-final-release --workdir evidence/p5 --output evidence/p5.json 2>&1 | tee evidence/p5.log
+        python - <<'PY'
+        import json
+        r=json.load(open('evidence/p5.json'))
+        assert r['passed'] and r['complete_format'] and r['final_year']==10
+        assert r['control_final_digest']=='3301d4e4a6a2f415679cabe62754813440034cf4c190035c79ba82cc7b8e378e'
+        PY
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: final-source-recovery-evidence
+        path: |
+          evidence/*.txt
+          evidence/*.json
+          evidence/*.xml
+          evidence/*.log
+        retention-days: 14
+    - uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: final-source-short-restore
+        path: evidence/p5/p5-relocated.sqlite
+        retention-days: 14
+    - uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: final-source-recovery-failure-databases
+        path: evidence/p5
+        retention-days: 14
+  full-suite:
+    needs: recovery-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.CANDIDATE_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - shell: bash
+      run: |
+        mkdir -p evidence
+        git rev-parse HEAD HEAD^{tree} 2>&1 | tee evidence/source.txt
+        python -m pytest -q -o junit_family=legacy --durations=30 --junitxml=evidence/full.xml simulation/tests 2>&1 | tee evidence/full.log
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: final-source-full-suite
+        path: evidence
+        retention-days: 14
+  late-complete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.CANDIDATE_SHA }}
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
@@ -28,12 +98,47 @@ jobs:
         mkdir -p evidence
         df -h . 2>&1 | tee evidence/disk-start.txt
         python -c "import shutil; assert shutil.disk_usage('.').free > 25*1024**3, 'need 25 GiB for explicit conversion and restore copies'"
-    - uses: actions/download-artifact@v4
-      with:
-        name: late-lazy-checkpoint
-        path: evidence/late
-        run-id: 38508408370
-        github-token: ${{ github.token }}
+    - name: Download and verify exact retained lazy archive
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        mkdir -p evidence/late
+        python - <<'ARCHIVE'
+        import hashlib,json,os,pathlib,urllib.request,urllib.error,zipfile
+        base='https://api.github.com/repos/rax0h/all-that-endures/actions/artifacts/11870590333'
+        headers={'Authorization':'Bearer '+os.environ['GITHUB_TOKEN'],'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}
+        with urllib.request.urlopen(urllib.request.Request(base,headers=headers)) as response:metadata=json.load(response)
+        expected='409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9'
+        assert metadata['id']==11870590333 and not metadata['expired'] and metadata['name']=='late-lazy-checkpoint'
+        assert metadata['size_in_bytes']==1339563957 and metadata['digest']=='sha256:'+expected
+        assert metadata['workflow_run']['id']==38508408370 and metadata['workflow_run']['head_sha']=='124c3215468a60862b7848086f00a8e768a6ed66'
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self,*args):return None
+        opener=urllib.request.build_opener(NoRedirect)
+        try:
+            opener.open(urllib.request.Request(base+'/zip',headers=headers))
+            raise AssertionError('expected artifact redirect')
+        except urllib.error.HTTPError as error:
+            assert error.code==302
+            location=error.headers['Location']
+            assert location.startswith('https://')
+        # The signed object URL receives no GitHub credential header.
+        archive=pathlib.Path('evidence/retained-lazy.zip');h=hashlib.sha256();size=0
+        with urllib.request.urlopen(location) as response,archive.open('wb') as output:
+            while chunk:=response.read(1024*1024):
+                output.write(chunk);h.update(chunk);size+=len(chunk)
+        assert h.hexdigest()==expected and size==1339563957
+        with zipfile.ZipFile(archive) as z:
+            assert set(z.namelist())=={'checkpoint.json','p5-long-lazy.sqlite'}
+            z.extractall('evidence/late')
+        receipt=json.load(open('evidence/late/checkpoint.json'))
+        assert receipt['stage']=='lazy' and receipt['workflow_sha']=='124c3215468a60862b7848086f00a8e768a6ed66'
+        assert receipt['config']==dict(seed=843000,milestones=[1001,1002],bootstrap_year=1000,rules_id='stage-0-5-final-release',product_sha='2bc3c85389760ff12578857f7d2a849bc5cf9201',complete_format=True,initialization='mature',simulation_schema='ate-world-p2a/1')
+        with open('evidence/late/p5-long-lazy.sqlite','rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==receipt['database']['sha256']
+        json.dump(dict(artifact_id=11870590333,origin_run=38508408370,archive_sha256=expected,archive_bytes=size,source_receipt=receipt,executing_candidate=os.environ['CANDIDATE_SHA']),open('evidence/source-artifact.json','w'),indent=2)
+        archive.unlink()
+        ARCHIVE
     - name: Verify reused lazy checkpoint provenance
       shell: bash
       run: |
@@ -43,7 +148,8 @@ jobs:
         assert r['stage']=='lazy' and r['workflow_sha']=='124c3215468a60862b7848086f00a8e768a6ed66'
         assert r['config']['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201'
         CHECK
-    - name: Locate complete-upgrade memory growth from retained lazy checkpoint
+        cp evidence/late/checkpoint.json evidence/source-checkpoint.json
+    - name: Upgrade retained year1000 fixture under 8 GiB address-space guard
       shell: bash
       run: |
         mkdir -p evidence
@@ -62,8 +168,11 @@ jobs:
         ) > >(tee evidence/resources.log) 2>&1 &
         monitor_pid=$!
         trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
-        timeout --signal=TERM --kill-after=30s 80m python - --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' --stop-after complete --resume-from lazy <<'PROBE' 2>&1 | tee evidence/late.log
-        import functools,json,resource,runpy,time
+        timeout --signal=TERM --kill-after=30s 350m python - --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha "${CANDIDATE_SHA}" --checkpoint-product-sha 2bc3c85389760ff12578857f7d2a849bc5cf9201 --workflow-sha '${{ github.sha }}' --stop-after complete --resume-from lazy <<'PROBE' 2>&1 | tee evidence/late.log
+        import functools,json,resource,runpy,time,pathlib
+        def memory():
+            status=dict(line.split(':',1) for line in pathlib.Path('/proc/self/status').read_text().splitlines() if ':' in line)
+            return dict(rss=status['VmRSS'].strip(),virtual_memory=status['VmSize'].strip(),peak_rss_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
         from ate_sim import persistence_catalog_copy as copy
         from ate_sim import persistence_event_copy_normalization as normalization
         # Limit only this Python process; leave room for the runner and artifact upload.
@@ -73,22 +182,41 @@ jobs:
             @functools.wraps(original)
             def wrapped(*args,**kwargs):
                 started=time.monotonic()
-                print(json.dumps({'probe':name,'phase':'started','peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}),flush=True)
+                print(json.dumps({'probe':name,'phase':'started',**memory()}),flush=True)
                 try:
                     result=original(*args,**kwargs)
                 except BaseException as error:
-                    print(json.dumps({'probe':name,'phase':'failed','exception':type(error).__name__,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}),flush=True)
+                    print(json.dumps({'probe':name,'phase':'failed','exception':type(error).__name__,**memory()}),flush=True)
                     raise
-                print(json.dumps({'probe':name,'phase':'finished','seconds':time.monotonic()-started,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}),flush=True)
+                print(json.dumps({'probe':name,'phase':'finished','seconds':time.monotonic()-started,**memory()}),flush=True)
+                for argument in args:
+                    if type(argument).__name__=='ConversionWorkspace':
+                        print(json.dumps(dict(workspace=argument.metrics)),flush=True)
                 return result
             setattr(module,name,wrapped)
-        for name in ('_owner_sources','initial_catalog_delta','_backing_rosters','_check_reference_targets','_check_backing_graph','_empty_destination','_verify_catalog'):
+        original_phase=copy._copy_phase
+        def measured_phase(phase,path):
+            print(json.dumps(dict(copy_phase=phase,**memory())),flush=True)
+            return original_phase(phase,path)
+        copy._copy_phase=measured_phase
+        for name in ('_owner_sources','validate_initial_catalog_inputs','stage_initial_catalog','_backing_rosters','_check_reference_targets','_check_backing_graph','_empty_destination','_verify_catalog'):
             observe(copy,name)
         for name in ('capture_bodies','normalize_events'):
             observe(normalization,name)
-        print('DIAGNOSTIC RUN: 8 GiB address-space cap; this is not final release acceptance',flush=True)
+        print('REPAIR CANDIDATE: 8 GiB address-space cap; complete checkpoint remains partial evidence',flush=True)
         runpy.run_module('persistence_p5_long_validation',run_name='__main__')
         PROBE
+        python - <<'VERIFY'
+        import json,hashlib,os
+        old=json.load(open('evidence/source-checkpoint.json'))
+        r=json.load(open('evidence/late/checkpoint.json'))
+        assert r['config']['product_sha']==os.environ['CANDIDATE_SHA']
+        assert r['checkpoint_product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201'
+        assert r['source_checkpoint']['workflow_sha']=='124c3215468a60862b7848086f00a8e768a6ed66'
+        assert r['source_checkpoint']['database']==old['database']
+        with open('evidence/late/p5-long-lazy.sqlite','rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==old['database']['sha256']
+        assert r['source_checkpoint']['receipt_sha256']==hashlib.sha256(open('evidence/source-checkpoint.json','rb').read()).hexdigest()
+        VERIFY
     - name: Capture native failure diagnostics
       if: failure()
       shell: bash
@@ -98,7 +226,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: memory-probe-late-complete-diagnostics
+        name: repair-late-complete-evidence
         path: |-
           evidence/*.txt
           evidence/*.json
@@ -110,10 +238,162 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: success()
       with:
-        name: memory-probe-late-complete-checkpoint
+        name: late-complete-checkpoint
         path: |-
           evidence/late/checkpoint.json
           evidence/late/p5-long-complete.sqlite
         retention-days: 14
         compression-level: 1
         if-no-files-found: error
+    needs:
+    - recovery-gate
+    - full-suite
+  complete-late-fixture:
+    needs: late-complete
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.CANDIDATE_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Reserve hosted-runner disk for disposable conversion databases
+      shell: bash
+      run: |
+        # Only unused preinstalled toolchains on this disposable hosted runner.
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        mkdir -p evidence
+        df -h . 2>&1 | tee evidence/disk-start.txt
+        python -c "import shutil; assert shutil.disk_usage('.').free > 25*1024**3, 'need 25 GiB for explicit conversion and restore copies'"
+    - uses: actions/download-artifact@v4
+      with:
+        name: late-complete-checkpoint
+        path: evidence/late
+    - uses: actions/download-artifact@v4
+      with:
+        name: final-source-canonical-evidence
+        path: canonical-evidence
+        run-id: 38459262962
+        github-token: ${{ github.token }}
+    - name: Continue, audit, reopen and verify restore
+      shell: bash
+      run: |
+        mkdir -p evidence
+        git rev-parse HEAD HEAD^{tree} HEAD:simulation/ate_sim | tee evidence/source.txt
+        (
+          while true; do
+            date -u
+            free -m
+            df -h .
+            ps -eo pid,ppid,rss,vsz,comm --sort=-rss | head -n 10 || true
+            for f in /sys/fs/cgroup/memory.events /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.max; do
+              if [ -r "$f" ]; then echo "$f"; cat "$f"; fi
+            done
+            sleep 60
+          done
+        ) > >(tee evidence/resources.log) 2>&1 &
+        monitor_pid=$!
+        trap 'kill "$monitor_pid" 2>/dev/null || true' EXIT
+        timeout --signal=TERM --kill-after=30s 350m python simulation/persistence_p5_long_validation.py --seed 843000 --initialization mature --bootstrap-year 1000 --milestones 1001 1002 --complete-format --rules-id stage-0-5-final-release --workdir evidence/late --output evidence/late.json --product-sha "${CANDIDATE_SHA}" --workflow-sha '${{ github.sha }}' --resume-from complete 2>&1 | tee evidence/late.log
+        python - <<'PY'
+        import json,hashlib,os
+        r=json.load(open('evidence/late.json'))
+        c=json.load(open('canonical-evidence/canonical-receipt.json'))
+        assert r['passed'] and r['complete_format'] and r['initialization']=='mature'
+        assert r['bootstrap_digest']==c['benchmark']['digest']
+        assert r['product_sha']==os.environ['CANDIDATE_SHA'] and r['milestones']==[1001,1002]
+        assert r['source_checkpoint']['product_sha']==os.environ['CANDIDATE_SHA']
+        assert r['source_checkpoint']['prior_source']['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201'
+        assert all(r['p4'][str(y)]['matches_control'] for y in (1001,1002))
+        assert r['restore_artifact']['year']==1002
+        with open(r['restore_artifact']['path'],'rb') as f:
+            assert hashlib.file_digest(f,'sha256').hexdigest()==r['restore_artifact']['sha256']
+        PY
+    - name: Capture native failure diagnostics
+      if: failure()
+      shell: bash
+      run: |
+        mkdir -p evidence
+        { python -VV; python -c 'import sqlite3; print(sqlite3.sqlite_version)'; sudo dmesg --ctime | tail -n 80; coredumpctl info --no-pager; } > evidence/native-failure.log 2>&1 || true
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: final-source-late-evidence
+        path: |
+          evidence/*.txt
+          evidence/*.json
+          evidence/*.log
+          evidence/late/progress.jsonl
+        retention-days: 14
+    - uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: final-source-year1002-restore
+        path: evidence/late/p5-long-restore.sqlite
+        retention-days: 14
+        compression-level: 1
+  downloaded-restore-proof:
+    needs: complete-late-fixture
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.CANDIDATE_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Reserve hosted-runner space for retained and operational copies
+      run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+    - uses: actions/download-artifact@v4
+      with:
+        name: final-source-late-evidence
+        path: downloaded-evidence
+    - uses: actions/download-artifact@v4
+      with:
+        name: final-source-year1002-restore
+        path: retained
+    - name: Verify downloaded original and reopen disposable copy
+      shell: bash
+      run: |
+        mkdir -p evidence
+        git rev-parse HEAD HEAD^{tree} 2>&1 | tee evidence/source.txt
+        python - <<'PY' 2>&1 | tee evidence/restore.log
+        import hashlib,json,pathlib,shutil,os
+        from ate_sim.persistence_lazy import open_lazy_world_session
+        from persistence_p5_long_validation import _counters
+        r=json.load(open('downloaded-evidence/late.json'))
+        source=pathlib.Path('retained/p5-long-restore.sqlite')
+        def sha(path):
+            with path.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+        expected=r['restore_artifact']
+        assert r['product_sha']==os.environ['CANDIDATE_SHA'] and r['passed'] and r['complete_format']
+        assert sha(source)==expected['sha256']
+        assert shutil.disk_usage('.').free > source.stat().st_size+1024**3
+        copy=pathlib.Path('operational.sqlite');shutil.copyfile(source,copy)
+        with open_lazy_world_session(copy,rules_id=r['rules_id']) as s:
+            assert s.world.year==expected['year']==1002
+            assert s.pin.captured_head==expected['generation']
+            assert int(s.store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])==6
+            digest=s.world.digest()
+            assert digest==expected['digest']==r['control']['1002']['digest']
+            assert _counters(s.world)==r['control']['1002']['counters']
+        assert sha(source)==expected['sha256']
+        result={'passed':True,'candidate':os.environ['CANDIDATE_SHA'],'source_checkpoint':r['source_checkpoint'],'workflow_sha':os.environ['GITHUB_SHA'],'year':1002,'digest':digest,'downloaded_sha256':expected['sha256'],'retained_original_unchanged':True}
+        json.dump(result,open('evidence/downloaded-restore.json','w'),indent=2)
+        print(json.dumps(result),flush=True)
+        PY
+    - name: Capture native failure diagnostics
+      if: failure()
+      shell: bash
+      run: |
+        mkdir -p evidence
+        { python -VV; python -c 'import sqlite3; print(sqlite3.sqlite_version)'; sudo dmesg --ctime | tail -n 80; coredumpctl info --no-pager; } > evidence/native-failure.log 2>&1 || true
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: final-source-downloaded-restore-proof
+        path: evidence
+        retention-days: 14
