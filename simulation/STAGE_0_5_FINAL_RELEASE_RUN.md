@@ -251,3 +251,23 @@ it was published when the owner requested continuation at02:57 Central.
 Workflow commit:0e1c309dd6ffcd3c45cac1ecfaf3e705edfbd145.
 Diagnostic launch: [run38531810400](https://github.com/rax0h/all-that-endures/actions/runs/38531810400).
 Allocation diagnosis and the subsequent repair/acceptance remain pending.
+
+## Diagnostic result and SOL repair assignment
+
+Run38531810400 produced the intended bounded allocation traceback. Job115745205236
+failed with MemoryError in the first initial_catalog_delta call, specifically
+ParticipantDelta.freeze's tuple of encoded version rows (families.py:619), reached
+from catalog_copy.py:328. Peak RSS8,284,100KiB. _owner_sources completed before
+that failure. Artifact11879904649 retained the traceback/resources; ZIP SHA256
+ a63c7436bdc3b3af2e1748c916bab44acc2fc5ff74b50d3306d120e5b6f6c402.
+This diagnoses an allocation site; it does not establish that later normalization,
+commit preparation and scrub will fit after that site is repaired.
+
+Daniel requested a plan for SOL rather than implementing a substantial repair in
+this turn. The assignment is
+[STAGE_0_5_UPGRADE_MEMORY_REPAIR_HANDOFF.md](STAGE_0_5_UPGRADE_MEMORY_REPAIR_HANDOFF.md)
+and its linked implementation plan. It preserves source validation while removing
+the throwaway catalog build, stages final catalog/prepared rows, checks downstream
+retention, and resumes the saved lazy checkpoint with honest old/new candidate
+provenance. Runtime code remains unchanged. No new validation run was launched
+as part of the planning handoff.
