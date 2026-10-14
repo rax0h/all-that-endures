@@ -388,7 +388,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                     (all_versions, all_ordinary, placements, dependencies, orders, states,
                      versions, ordinary, next_incarnation) = normalize_event_graph(target, pin,
                         all_versions, all_ordinary, placements, dependencies, orders, states,
-                        next_incarnation, captured_bodies, normalize_advancement=normalize_advancement)
+                        next_incarnation, captured_bodies, normalize_advancement=normalize_advancement, workspace=workspace if not promoted else None)
                 if promoted:
                     if normalize_graph:
                         # Promotion must consume the already normalized physical
@@ -404,7 +404,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                         promoted = normalized
                     (all_versions, all_ordinary, placements, dependencies, orders, states,
                      versions, ordinary) = transform_copy(target, pin, promoted, all_versions,
-                        all_ordinary, placements, dependencies, orders, states)
+                        all_ordinary, placements, dependencies, orders, states, workspace=workspace)
                 if normalize_graph:
                     del captured_bodies
                 _copy_phase('after_normalization', private)

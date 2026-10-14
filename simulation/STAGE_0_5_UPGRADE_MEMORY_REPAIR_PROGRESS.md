@@ -66,3 +66,28 @@ Prepared five-job acceptance workflow: fresh focused/recovery gate and full suit
 ## Hosted full-suite metric failure
 
 Run38603776178 recovered correctly (95 focused tests plus complete3+4+3) and passed2484 tests/2 subtests in the full run. Its single failure was the inherited ru_maxrss comparison in the synthetic memory test; both110MiB guard outcomes were correct. The original run remains red. `STAGE_0_5_MEMORY_METRIC_REPAIR.md` records the deterministic warm-parent reproduction, corrected child-image metrics and46-test green gate. Runtime98a37c6 remains byte-identical; scoped resume checks original evidence and reruns the corrected metric cases without relabeling the failed whole run.
+
+## Retained fixture reaches final normalization reconciliation
+
+Run38625824419 passed its checked reused-runtime gate, exact lazy ZIP/receipt/database provenance and initial source validation. Complete job116064738973 then hit MemoryError under8GiB in `persistence_history_copy_promotion.reconcile_copy` at line110 constructing `source_orders`. It had passed the previously failing catalog stage. Peak RSS8230592KiB; normalization began atRSS4422796/VmSize4476648KiB. Disk83GiB free; the runner survived and retained artifact11927094324, ZIP50948 bytes/SHA2565e581fc0eb1661fe95b8e2eeca26882666f8e2d9ecc149da7bfde4051f5ca0db. No complete checkpoint was published; retained lazy11870590333 remains the source.
+
+The explicit private converter now uses opt-in disk reconciliation of completed normalized output. Live keys/source orders are checked spools; disposable SQLite indexes perform membership joins and canonical sorting. Surviving ordinals, deleted gaps, new key order, namespace counts/high-water and empty declarations remain exact. Comparison/label inventories are released after graph rewriting and before reconciliation. Output rows stage on disk, preventing another resident owner/ordering inventory. Source decoding/identity remains resident through normalization; combined normalization+explicit promotion keeps its existing resident input contract before staging, so persistent id(obj) memo keys do not cross replay.
+
+RED: disk reconciliation API missing; old100000-row reconciliation fails under90MiB RLIMIT_AS. GREEN: disk path succeeds at35828KiB peak RSS/VmPeak64968KiB in15.70s; old peak63120KiB/VmPeak92128KiB, failure0.81s. Production8GiB guard is unchanged. Two semantic/corruption tests cover exact surviving/new order, high-water, empty state, unchanged inputs and checked output replay. A bounded subprocess regression retains the old-fails/new-succeeds proof using executed-image peaks.
+
+Affected conversion gate144 passed85.04s: upgrade-memory, complete-format, legacy Event copy, copy promotion, frozen snapshot authority, legacy/nonreflexive copy, and catalog-copy files under `simulation/tests`. Final reconciliation-only memory gate is recorded below. This runtime change requires fresh candidate recovery/full-suite evidence; prior green tests are baseline only. Large conversion will still start from the retained lazy checkpoint, without rebuilding the bootstrap/control/cold stages.
+...                                                                      [100%]
+3 passed, 31 deselected in 19.43s
+
+
+## Ordering-index integrity review
+
+Independent review found one Important defect before the new candidate was published: source_position was not authenticated. A corrupted scratch index could treat a surviving key as new, change its ordinal/high-water and publish. Six RED regressions reproduced NULL/reordered positions, false old/new classification, end-to-end publication, and duplicate-order handling.
+
+The index now carries a constant-size full-row count/SHA256 XOR commitment accumulated while consuming checked live/source-order rows. It authenticates keys, live flags, ordinals and source positions before sorting and after output staging. Updating a duplicate key retains its first position and last ordinal, matching the original dictionary. No aggregate Python key map is introduced. Both end-to-end corruption tests reject before publication, preserve source bytes and clean scratch.
+
+GREEN:9 reconciliation tests passed26.09s. Independent read-only review also passed all9 and injected three additional build-time position/live/deletion faults, each rejected. No remaining Critical/Important findings. Actual large-fixture memory, fresh whole-suite/recovery and continuation/restore remain undecided.
+
+Final100000-row/90MiB fresh-process probes with index authentication: resident path fails at63248KiB RSS/VmPeak92128KiB in0.79s; disk path passes at35832KiB RSS/VmPeak64972KiB in23.00s. The production8GiB guard remains unchanged; this does not establish success for resident normalization inputs of arbitrary size.
+
+Final affected gate after integrity repair:151 passed102.24s across upgrade-memory, complete-format, legacy Event, promotion, frozen snapshot, legacy/current nonreflexive and catalog-copy tests. Independent review approved fresh candidate validation.

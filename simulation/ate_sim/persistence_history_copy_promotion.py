@@ -1,8 +1,9 @@
 """Explicit copy-only promotion, using the existing counted sequence builder."""
 from collections import Counter
+from itertools import chain
 from dataclasses import is_dataclass, replace
 
-from .incremental_store import StoreIntegrityError, StoreConflictError
+from .incremental_store import StoreIntegrityError, StoreConflictError, _framed_sha
 from .persistence_lazy_store import IdentityOccurrenceChange, VersionChange
 from .persistence_lazy_nested_history import (
     HistoryReference, reference, LazyHistoryList, DESCRIPTOR_NAMESPACE, PAGE_NAMESPACE,
@@ -73,7 +74,7 @@ def _rewrite(value, selected, memo):
     return result
 
 
-def transform_copy(target, pin, captured, versions, ordinary, placements, dependencies, orders, states):
+def transform_copy(target, pin, captured, versions, ordinary, placements, dependencies, orders, states, *, workspace=None):
     """Build only in an unpublished mutable-empty destination; never source I/O."""
     selected, memo = set(captured), {}
     added = []
@@ -96,11 +97,13 @@ def transform_copy(target, pin, captured, versions, ordinary, placements, depend
             for path, child in AUXILIARY_OWNER_FAMILIES[NODE_NAMESPACE].reference_placements(change.value):
                 placements.append(IdentityOccurrenceChange(NODE_NAMESPACE, change.key, path, child))
     dependencies = tuple(replace(v, value=dependency_value('sequence')) if v.key in selected else v for v in dependencies)
-    return reconcile_copy(target.codec, versions, ordinary, tuple(placements), dependencies, orders, states)
+    return reconcile_copy(target.codec, versions, ordinary, tuple(placements), dependencies, orders, states, workspace=workspace)
 
 
-def reconcile_copy(codec, versions, ordinary, placements, dependencies, orders, states):
+def reconcile_copy(codec, versions, ordinary, placements, dependencies, orders, states, *, workspace=None):
     """Reconcile explicit copied authority, using captured order high water."""
+    if workspace is not None:
+        return _reconcile_disk(workspace, versions, ordinary, placements, dependencies, orders, states)
     # Rebuild catalog input from actual resulting physical authority.
     owners = [v for v in versions if not v.delete and v.namespace in IDENTITY_OWNER_FAMILIES
               and not (v.namespace == NODE_NAMESPACE and v.value[0] == 'branch')]
@@ -121,3 +124,77 @@ def reconcile_copy(codec, versions, ordinary, placements, dependencies, orders, 
     versions.extend(VersionChange(ns, ('empty-copy-promotion/v1',), delete=True)
         for ns in namespaces - declared)
     return versions, ordinary, tuple(placements), dependencies, rewritten_orders, rewritten_states, owners, eager
+
+
+def _reconcile_disk(workspace, versions, ordinary, placements, dependencies, orders, states):
+    """Completed normalized rows only: no replay enters source object identity."""
+    codec, db = workspace.codec, workspace.db
+    # A checked replay sequence captures this metadata once; SQL indexes provide
+    # joins/sorting without a second Python dictionary of every source key.
+    live = workspace.stage((v.namespace, codec.encode(v.key)) for v in versions if not v.delete)
+    source_orders = workspace.stage(orders)
+    db.execute('DROP TABLE IF EXISTS conversion_order_reconcile')
+    db.execute('CREATE TABLE conversion_order_reconcile(namespace TEXT,typed_key BLOB,live INTEGER,source_ordinal INTEGER,source_position INTEGER,PRIMARY KEY(namespace,typed_key)) WITHOUT ROWID')
+    expected_live = expected_index_count = expected_index_root = 0
+    def row_hash(row):
+        return int(_framed_sha(b'conversion-order-index/v1', codec.encode(row)), 16)
+    for namespace, key in live:
+        changed = db.execute('INSERT OR IGNORE INTO conversion_order_reconcile VALUES (?,?,1,NULL,NULL)', (namespace,key)).rowcount
+        expected_live += changed
+        if changed:
+            expected_index_count += 1
+            expected_index_root ^= row_hash((namespace,key,1,None,None))
+    for position, (namespace, key, ordinal) in enumerate(source_orders):
+        previous = db.execute('SELECT namespace,typed_key,live,source_ordinal,source_position '
+            'FROM conversion_order_reconcile WHERE namespace=? AND typed_key=?',(namespace,key)).fetchone()
+        if previous is None:
+            expected_index_count += 1
+            current = (namespace,key,0,ordinal,position)
+        else:
+            expected_index_root ^= row_hash(previous)
+            current = (namespace,key,previous[2],ordinal,position if previous[4] is None else previous[4])
+        expected_index_root ^= row_hash(current)
+        db.execute('INSERT INTO conversion_order_reconcile VALUES (?,?,0,?,?) '
+            'ON CONFLICT(namespace,typed_key) DO UPDATE SET source_ordinal=excluded.source_ordinal, '
+            'source_position=coalesce(conversion_order_reconcile.source_position,excluded.source_position)',
+            (namespace,key,ordinal,position))
+    def validate_index():
+        # Seal all join/sort metadata while consuming checked input. Positions
+        # determine both survivor order and old/new classification; checking
+        # only ordinals would silently accept an existing key as a new one.
+        count = root = 0
+        for row in db.execute('SELECT namespace,typed_key,live,source_ordinal,source_position FROM conversion_order_reconcile'):
+            count += 1
+            root ^= row_hash(row)
+        if (count,root) != (expected_index_count,expected_index_root):
+            raise StoreIntegrityError('reconciled order index count/root mismatch')
+    validate_index()
+    counts = dict(db.execute('SELECT namespace,count(*) FROM conversion_order_reconcile WHERE live=1 GROUP BY namespace'))
+    highs = {ns: high for ns, _count, high in states}
+    def rewritten_orders():
+        yield from db.execute('SELECT namespace,typed_key,source_ordinal FROM conversion_order_reconcile '
+            'WHERE live=1 AND source_position IS NOT NULL ORDER BY source_position')
+        for ns,key in db.execute('SELECT namespace,typed_key FROM conversion_order_reconcile '
+                'WHERE live=1 AND source_position IS NULL ORDER BY namespace,typed_key'):
+            ordinal=highs.get(ns,0)
+            yield ns,key,ordinal
+            highs[ns]=ordinal+1
+    rewritten = workspace.stage(rewritten_orders())
+    # Authenticate against the sealed inventories, rather than trusting an
+    # unsealed scratch index. The same index is only working join/sort data.
+    validate_index()
+    expected_count=sum(counts.values())
+    if len(rewritten)!=expected_live or expected_count!=expected_live:
+        raise StoreIntegrityError('reconciled order inventory count mismatch')
+    namespaces=set(highs)|set(counts)
+    rewritten_states=tuple((ns,counts.get(ns,0),highs.get(ns,0)) for ns in sorted(namespaces))
+    declared={v.namespace for v in versions}
+    final_versions=workspace.stage_versions(chain(versions,(VersionChange(ns,('empty-copy-promotion/v1',),delete=True)
+        for ns in namespaces-declared)))
+    final_ordinary=workspace.stage_ordinary(ordinary)
+    final_placements=workspace.stage_identity(placements)
+    final_dependencies=workspace.stage_versions(dependencies)
+    owners=(v for v in final_versions if not v.delete and v.namespace in IDENTITY_OWNER_FAMILIES
+            and not(v.namespace==NODE_NAMESPACE and v.value[0]=='branch'))
+    eager=(v for v in final_ordinary if v.namespace in IDENTITY_OWNER_FAMILIES)
+    return final_versions,final_ordinary,final_placements,final_dependencies,rewritten,rewritten_states,owners,eager

@@ -239,3 +239,121 @@ def test_catalog_rejects_corrupted_indexed_inventory_before_staging_output(tmp_p
         with pytest.raises(StoreIntegrityError):
             cat.stage_initial_catalog(workspace,[VersionChange('world.people',1,'v')],
                 [IdentityOccurrenceChange('world.people',1,(),1)],next_incarnation_id=3,generation=1)
+
+
+def test_disk_reconciliation_preserves_deleted_gaps_new_order_and_empty_state(tmp_path):
+    from ate_sim.persistence_history_copy_promotion import reconcile_copy
+    from ate_sim.incremental_store import RecordChange
+    codec=WorldCodec(identity_links_recorded=True)
+    versions=[VersionChange('world.people',1,'old'),VersionChange('world.people',4,'new'),
+              VersionChange('world.people',3,delete=True),VersionChange('world.households',2,'new-household')]
+    ordinary=(RecordChange('world.currency.minted','copper',(0,7)),)
+    placements=(IdentityOccurrenceChange('world.people',1,(),1),)
+    orders=(('world.people',codec.encode(3),7),('world.people',codec.encode(1),4),('world.people',codec.encode(2),5))
+    states=(('world.people',3,15),('world.event_ids',0,9))
+    with workspace_type()(codec,directory=tmp_path,entry_limit=4,byte_limit=1024) as workspace:
+        result=reconcile_copy(codec,versions,ordinary,placements,(),orders,states,workspace=workspace)
+        assert tuple(result[4])==(('world.people',codec.encode(1),4),('world.households',codec.encode(2),0),('world.people',codec.encode(4),15))
+        assert tuple(result[5])==(('world.event_ids',0,9),('world.households',1,1),('world.people',2,16))
+        assert [(v.namespace,v.key) for v in result[6]]==[('world.people',1),('world.people',4),('world.households',2)]
+        assert tuple(result[7])==ordinary
+        assert any(v.namespace=='world.event_ids' and v.delete for v in result[0])
+        assert tuple(result[2])==placements
+        assert versions==[VersionChange('world.people',1,'old'),VersionChange('world.people',4,'new'),
+                          VersionChange('world.people',3,delete=True),VersionChange('world.households',2,'new-household')]
+
+
+def test_disk_reconciliation_replay_rejects_output_order_corruption(tmp_path):
+    from ate_sim.persistence_history_copy_promotion import reconcile_copy
+    codec=WorldCodec(identity_links_recorded=True)
+    with workspace_type()(codec,directory=tmp_path) as workspace:
+        result=reconcile_copy(codec,[VersionChange('world.people',1,'old')],(),(),(),(),(),workspace=workspace)
+        rows=result[4]
+        workspace.db.execute('DELETE FROM replay_rows WHERE stream=?',(rows.stream,))
+        with pytest.raises(StoreIntegrityError):tuple(rows)
+
+
+def test_disk_reconciliation_duplicate_orders_keep_first_position_last_ordinal(tmp_path):
+    from ate_sim.persistence_history_copy_promotion import reconcile_copy
+    codec=WorldCodec(identity_links_recorded=True)
+    versions=[VersionChange('world.people',1,'first'),VersionChange('world.people',2,'second')]
+    orders=(('world.people',codec.encode(2),3),('world.people',codec.encode(1),4),
+            ('world.people',codec.encode(2),7))
+    with workspace_type()(codec,directory=tmp_path) as workspace:
+        result=reconcile_copy(codec,versions,(),(),(),orders,(('world.people',2,10),),workspace=workspace)
+        assert tuple(result[4])==(orders[2],orders[1])
+        assert tuple(result[5])==(('world.people',2,10),)
+
+
+@pytest.mark.parametrize('corruption',['null-position','reordered-position','new-key-position'])
+def test_disk_reconciliation_authenticates_index_positions(tmp_path,monkeypatch,corruption):
+    from ate_sim.persistence_history_copy_promotion import reconcile_copy
+    codec=WorldCodec(identity_links_recorded=True)
+    with workspace_type()(codec,directory=tmp_path) as workspace:
+        original=workspace.stage
+        calls=0
+        def corrupt(values,**kwargs):
+            nonlocal calls
+            calls+=1
+            if calls==3:
+                if corruption=='null-position':
+                    workspace.db.execute('UPDATE conversion_order_reconcile SET source_position=NULL WHERE typed_key=?',(codec.encode(1),))
+                elif corruption=='reordered-position':
+                    workspace.db.execute('UPDATE conversion_order_reconcile SET source_position=100 WHERE typed_key=?',(codec.encode(1),))
+                else:
+                    workspace.db.execute('UPDATE conversion_order_reconcile SET source_position=101,source_ordinal=9 WHERE typed_key=?',(codec.encode(3),))
+            return original(values,**kwargs)
+        monkeypatch.setattr(workspace,'stage',corrupt)
+        with pytest.raises(StoreIntegrityError,match='reconciled'):
+            reconcile_copy(codec,[VersionChange('world.people',i,i) for i in (1,2,3)],(),(),(),
+                (('world.people',codec.encode(1),4),('world.people',codec.encode(2),6)),
+                (('world.people',2,15),),workspace=workspace)
+
+
+@pytest.mark.parametrize('corruption',['null-position','reordered-position'])
+def test_conversion_rejects_reconciliation_index_corruption_before_publication(tmp_path,monkeypatch,corruption):
+    from ate_sim.persistence_complete_format import upgrade_lazy_snapshot
+    source=event_source(tmp_path,share_history=True)
+    before=sha(source);destination=tmp_path/'complete.sqlite'
+    original=workspace_type().stage
+    injected=False
+    def corrupt(workspace,values,**kwargs):
+        nonlocal injected
+        if not injected and workspace.db.execute("SELECT 1 FROM sqlite_master WHERE name='conversion_order_reconcile'").fetchone():
+            position=None if corruption=='null-position' else 1000000
+            workspace.db.execute('UPDATE conversion_order_reconcile SET source_position=? WHERE namespace=? AND typed_key=(SELECT typed_key FROM conversion_order_reconcile WHERE namespace=? AND live=1 AND source_position IS NOT NULL LIMIT 1)',
+                (position,'world.skills.skills','world.skills.skills'))
+            injected=True
+        return original(workspace,values,**kwargs)
+    monkeypatch.setattr(workspace_type(),'stage',corrupt)
+    with pytest.raises(StoreIntegrityError,match='reconciled'):
+        upgrade_lazy_snapshot(source,destination,rules_id=RULES)
+    assert injected and not destination.exists() and sha(source)==before
+    assert not list(tmp_path.glob('.ate-catalog-copy-*'))
+
+
+def test_disk_reconciliation_fits_guard_that_rejects_resident_order_maps():
+    import subprocess,sys,json
+    code='''
+import resource,json,tempfile,sys
+from pathlib import Path
+from ate_sim.persistence_adapters import WorldCodec
+from ate_sim.persistence_lazy_store import VersionChange
+from ate_sim.persistence_history_copy_promotion import reconcile_copy
+from ate_sim.persistence_conversion_workspace import ConversionWorkspace
+resource.setrlimit(resource.RLIMIT_AS,(90*1024**2,90*1024**2))
+codec=WorldCodec(identity_links_recorded=True);n=100000
+try:
+ versions=[VersionChange('world.people',i,i) for i in range(n)]
+ orders=(('world.people',codec.encode(i),i*2) for i in range(n))
+ with tempfile.TemporaryDirectory() as d,ConversionWorkspace(codec,directory=d) as w:
+  result=reconcile_copy(codec,versions,(),(),(),orders,(('world.people',n,n*2+9),),workspace=w if sys.argv[1]=='disk' else None)
+  passed=sum(1 for _ in result[4])==n and tuple(result[5])==(('world.people',n,n*2+9),)
+except MemoryError:passed=False
+status=dict(l.split(':',1) for l in Path('/proc/self/status').read_text().splitlines() if ':' in l)
+print(json.dumps(dict(passed=passed,peak_rss_kib=int(status['VmHWM'].split()[0]),peak_virtual_kib=int(status['VmPeak'].split()[0]))))
+'''
+    results=[json.loads(subprocess.check_output([sys.executable,'-c',code,mode],text=True)) for mode in ('old','disk')]
+    assert results[0]['passed'] is False
+    assert results[1]['passed'] is True
+    assert results[1]['peak_rss_kib']<results[0]['peak_rss_kib']

@@ -70,7 +70,7 @@ def capture_bodies(store, pin, dependencies):
 
 
 def normalize_events(target, pin, versions, ordinary, placements, dependencies,
-                     orders, states, next_incarnation, captured, *, normalize_advancement=False):
+                     orders, states, next_incarnation, captured, *, normalize_advancement=False, workspace=None):
     codec = target.codec
     bodies, frozen = captured
     known = {d.key: d.value[1] for d in dependencies}
@@ -484,4 +484,11 @@ def normalize_events(target, pin, versions, ordinary, placements, dependencies,
                 retained.append(IdentityOccurrenceChange(change.namespace, change.key, path, child))
                 retained_markers[placement_marker] = child
     dependencies = dependencies + tuple(VersionChange(DEPENDENCIES, inc, value) for inc, value in built.items())
-    return (*reconcile_copy(codec, versions, ordinary, tuple(retained), dependencies, orders, states), next_incarnation)
+    if workspace is not None:
+        # All graph rewriting and physical placements are complete. Retire
+        # temporary comparison/label inventories before final order reconciliation.
+        del known, labels, selected, built, signatures, active, readonly_ids, atom_ids
+        del cuts, retained_markers, added, atom_rows, owner_moves, rewritten_backings
+        del rewritten, rewritten_metadata, actions, facade_rows
+    return (*reconcile_copy(codec, versions, ordinary, retained, dependencies, orders, states,
+                            workspace=workspace), next_incarnation)
