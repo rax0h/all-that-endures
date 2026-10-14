@@ -94,12 +94,14 @@ def test_invalid_source_rejects_before_normalization_and_preserves_source(tmp_pa
     assert not list(tmp_path.glob('.ate-catalog-copy-*'))
 
 
-def test_validation_only_fits_where_disposable_catalog_exhausts_address_space():
+@pytest.mark.parametrize('parent_resident_mib', [0, 220])
+def test_validation_only_fits_where_disposable_catalog_exhausts_address_space(parent_resident_mib, record_property):
     import subprocess
     import sys
     import json
     code = '''
 import json,resource,sys,time
+from pathlib import Path
 from ate_sim.persistence_adapters import WorldCodec
 from ate_sim.persistence_lazy_store import VersionChange,IdentityOccurrenceChange
 from ate_sim.persistence_lazy_identity_catalog import initial_catalog_delta,validate_initial_catalog_inputs
@@ -113,10 +115,20 @@ try:
  passed=True
 except MemoryError:
  passed=False
-print(json.dumps({'passed':passed,'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'seconds':time.perf_counter()-start}))
+# rusage can preserve pre-exec parent residency; measure this executed image.
+status=dict(line.split(':',1) for line in Path('/proc/self/status').read_text().splitlines() if ':' in line)
+print(json.dumps({'passed':passed,'peak_rss_kib':int(status['VmHWM'].split()[0]),
+ 'peak_virtual_kib':int(status['VmPeak'].split()[0]),
+ 'rusage_peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+ 'address_space_limit':resource.getrlimit(resource.RLIMIT_AS)[0],'seconds':time.perf_counter()-start}))
 '''
+    # Reproduce execution after the full suite has grown the pytest process.
+    parent_memory = bytearray(parent_resident_mib * 1024**2)
     rows = [json.loads(subprocess.check_output([sys.executable, '-c', code, mode], text=True))
             for mode in ('old', 'validate')]
+    del parent_memory
+    record_property('guarded_child_measurements', json.dumps(rows, sort_keys=True))
+    assert all(row['address_space_limit'] == 110 * 1024**2 for row in rows)
     assert rows[0]['passed'] is False
     assert rows[1]['passed'] is True
     assert rows[1]['peak_rss_kib'] < rows[0]['peak_rss_kib']
