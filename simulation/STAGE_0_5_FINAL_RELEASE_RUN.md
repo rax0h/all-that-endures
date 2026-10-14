@@ -115,3 +115,50 @@ is in progress. Exact candidate `2bc3c85389760ff12578857f7d2a849bc5cf9201`, tree
 `fb9505a0349e083882672e2de9e8e7735b68fd77`. Recovery, complete suite and
 long-horizon conclusions remain pending. No successful job from the failed
 initial run is being misattributed to this repaired source.
+
+## Hosted runner interruptions and recoverable validation
+
+Run38459262962 attempts1 and2 both ended with runner shutdown and exit143,
+without a Python traceback or correctness assertion. Attempt1 job115549208763
+ran21:28:20–23:34:44 UTC; attempt2 job115598439858 ran23:40:05–01:10:00 UTC.
+Both last reported complete_upgrade_started. Neither reached the350-minute
+process timeout. The root cause of runner termination is unknown; resource
+exhaustion is not proved or excluded. Neither attempt uploaded late evidence or
+an intermediate database because runner shutdown skipped even always() uploads.
+Recovery, full-suite and canonical millennium gates remain successful on runtime
+candidate2bc3c85389760ff12578857f7d2a849bc5cf9201.
+
+The revised validation harness stops after cold publication, native lazy
+conversion and complete upgrade, each in a separate fresh-runner job. Each
+successful job uploads a checksum-bound database and JSON receipt carrying the
+independent control, bootstrap digest, exact configuration and prior checks.
+Resume rejects wrong source/configuration, stage or database checksum before
+opening a database. Fresh runs reject occupied workdirs. Partial stages explicitly
+return passed:false; only continuation, audit, reopen and restore produce a pass.
+No incomplete/private conversion database is accepted as a checkpoint.
+
+The workflow retains runtime source2bc3c85389760ff12578857f7d2a849bc5cf9201 as
+the product identity and records the new harness source separately. It requires
+an identical simulation/ate_sim Git tree43c2976e97474127ec860bcb6382988660ddadb3
+and verifies the prior three successful jobs before reusing those gates. Only
+the validation harness, its tests and documentation change; simulation behavior,
+persistence implementation and acceptance checks do not change.
+
+Runner diagnostics stream memory, disk and largest-process usage every minute.
+The harness CLI emits stack samples every five minutes and logs existing copy
+phase seams; those samples are diagnostic, not a timeout failure. Each stage
+starts a new process, releasing all allocator state from earlier conversions.
+This bounds work lost to the active stage and may reduce carried-over memory;
+it does not prove or claim to fix the unexplained infrastructure shutdown.
+A further upgrade failure can be investigated/retried from the retained native
+lazy database without repeating the independent control, bootstrap and cold
+conversion. Final acceptance remains pending.
+
+Local staged-harness verification:3 tests passed in110.13seconds, including the
+original complete0->1->2 lane, canonical mature initialization, and an artifact
+handoff lane copying only the checkpoint receipt plus current-stage database.
+The staged test initially failed on the missing stop_after API, then passed after
+implementation. Workflow shell scripts and embedded Python parse successfully;
+git diff --check passes. Independent reviewer found no launch blocker. Resume
+compatibility is scoped to this workflow's immutable harness commit; do not reuse
+these receipts across changed harnesses without a compatibility check.
