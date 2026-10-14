@@ -213,3 +213,41 @@ It starts with a short harness gate, then resumes the retained cold artifact at
 lazy conversion. Original runtime product and all final acceptance checks remain
 unchanged. Independent review found no launch blocker. Native crash root cause
 and final completion remain unproved until further evidence.
+
+## Complete upgrade exhausts hosted memory; retained lazy checkpoint
+
+Run38508408370: harness-gate and late-lazy passed. The lazy checkpoint is artifact
+11870590333 (1,339,563,957-byte ZIP; SHA256
+409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9),
+retained until2026-10-28. Diagnostics artifact11870720152 has ZIP SHA256
+6b63ca566952dfee3076df62905d0512a056e1d7b96636a26ea742c02641cec9.
+Removal of the watchdog permitted lazy conversion to finish; this is supporting
+evidence for the diagnostic-crash hypothesis, not a native core diagnosis.
+
+Complete job115682376629 verified the lazy checkpoint, began upgrade at04:36 UTC
+and reached after_private_copy at04:53. It never reported before_catalog_commit.
+Python RSS rose from about1.1GiB to10.8GiB before the final delayed resource sample:
+15,971 of15,989MiB RAM used, only14MiB available, all3,071MiB swap consumed.
+Disk still had84GiB available. The runner then shut down at05:16:43 UTC with143.
+Memory exhaustion is observed; the exact runner shutdown mechanism is not logged.
+Both earlier completed stages remain reusable.
+
+The next run is explicitly diagnostic, not release acceptance. It reuses the
+same ccba8cc6eba70965271d2570043829b3368e695a harness and unchanged product
+2bc3c85389760ff12578857f7d2a849bc5cf9201, resumes the retained lazy checkpoint,
+and applies an8GiB address-space limit only to Python. The runner and artifact
+uploader remain outside that limit. Converter function entry/exit wrappers report
+phase and peak RSS without changing returned values or acceptance checks. The
+intent is to obtain a MemoryError allocation traceback before host exhaustion;
+a useful traceback is not guaranteed. Process bound80min, job95min. Success
+would publish only a diagnostic complete checkpoint, never final acceptance.
+No additional blind full-horizon retry or runtime change is made.
+
+The exact wrapper completed a real small lazy-to-complete upgrade locally in
+20.05seconds with a complete checkpoint and passed:false. Workflow shell and
+embedded Python syntax checks passed; independent review found no launch blocker.
+The diagnostic was prepared but not launched before the session interruption;
+it was published when the owner requested continuation at02:57 Central.
+Workflow commit:0e1c309dd6ffcd3c45cac1ecfaf3e705edfbd145.
+Diagnostic launch: [run38531810400](https://github.com/rax0h/all-that-endures/actions/runs/38531810400).
+Allocation diagnosis and the subsequent repair/acceptance remain pending.
