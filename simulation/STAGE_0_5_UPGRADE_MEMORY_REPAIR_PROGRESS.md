@@ -22,3 +22,11 @@ RED: staging API absent. GREEN: forced-budget reference equivalence for empty, m
 
 Fresh-process final-catalog scale measurements (128/512/2048 owners and occurrences; entry_limit4, byte_limit1024):
 {"n": 2048, "rows": 6148, "peak_rss_kib": 18304, "seconds": 0.7878251030001593, "buffer_entries_high_water": 0, "buffer_bytes_high_water": 0, "largest_row_bytes": 481, "largest_row_resident_bytes": 1667, "staged_rows": 6148, "staged_bytes": 2532893, "disk_bytes": 5365760, "python_index_bytes": 856}
+
+## Task3: bounded opt-in commit preparation
+
+Only the explicit private converter opts into `preparation_budget=(4096,2097152)`. Ordinary commits keep their existing preparation path. The bounded path applies the same existing per-row validators, stores immutable encoded prepared records, detects duplicates through private SQLite indexes, and streams namespace groups in their original first-occurrence order. This removes both preparer tuple retention and the writer's namespace lists; publication still uses the existing single transaction/attempt/acknowledgement state machine. Every exit closes the workspace.
+
+RED: opt-in budget keyword absent. GREEN: normal/spilled authority equality through membership publication, deletion, reinsertion and unchanged saves; duplicate version/ordinary/identity keys and malformed memberships reject before an attempt; mutable input changed after preparation cannot alter publication; staged payload corruption and injected SQLite disk-full rejection preserve the store; stale pins and five transaction/recovery fault phases close scratch and retain their existing outcomes.
+
+Affected gate127 passed20.41s: `test_stage_0_5_conversion_preparation.py`, `test_persistence_lazy_store.py`, `test_persistence_lazy_store_failures.py`, `test_stage_0_5_r3_recovery_extra.py`, `test_stage_0_5_upgrade_memory.py`, `test_stage_0_5_final_catalog_copy.py`, `test_stage_0_5_final_complete_format.py`, all under `simulation/tests` with `PYTHONPATH=.:simulation python -m pytest -q`.

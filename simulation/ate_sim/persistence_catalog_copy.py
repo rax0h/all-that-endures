@@ -411,11 +411,11 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                     floor = max(floor, FORMAT_VERSION)
                 _copy_phase('before_catalog_commit', private)
                 committed = target.commit(pin, commit_token=token,
-                    changes=all_ordinary + (RecordChange(EVENT_STORAGE,
-                        COMMIT_DESCRIPTOR_KEY, (1, pin.captured_head + 1, token)),),
+                    changes=chain(all_ordinary, (RecordChange(EVENT_STORAGE,
+                        COMMIT_DESCRIPTOR_KEY, (1, pin.captured_head + 1, token)),)),
                     version_changes=chain(all_versions, delta, dependencies),
                     identity_changes=placements, next_incarnation_id=next_incarnation, new_segments=(),
-                    required_format_version=floor, metadata=metadata)
+                    required_format_version=floor, metadata=metadata, preparation_budget=(4096, 2*1024*1024))
                 pin = committed.pin
                 _copy_phase('after_catalog_commit', private)
                 _restore_copy_ordinals(target, pin.captured_head, orders, states)

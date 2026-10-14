@@ -2123,10 +2123,14 @@ class LazyRecordStore:
         new_generation: int,
         counts: dict[str, tuple[int, int]],
     ) -> None:
-        by_namespace: dict[str, list[dict[str, Any]]] = {}
-        for item in prepared:
-            by_namespace.setdefault(item["namespace"], []).append(item)
-        for namespace, items in by_namespace.items():
+        if hasattr(prepared, 'namespace_groups'):
+            grouped = prepared.namespace_groups()
+        else:
+            by_namespace: dict[str, list[dict[str, Any]]] = {}
+            for item in prepared:
+                by_namespace.setdefault(item['namespace'], []).append(item)
+            grouped = by_namespace.items()
+        for namespace, items in grouped:
             if self.db.execute("SELECT 1 FROM records WHERE namespace=? LIMIT 1", (namespace,)).fetchone():
                 raise StoreConflictError("lazy namespace already has ordinary record authority")
             state = self._namespace_state_at(namespace, current_generation)
@@ -2605,6 +2609,7 @@ class LazyRecordStore:
         next_incarnation_id: int | None = None,
         required_format_version: int = FORMAT_VERSION,
         cleanup_budget: int = 256,
+        preparation_budget: tuple[int, int] | None = None,
     ) -> CommitResult:
         self._ensure_open()
         if type(cleanup_budget) is not int or not 0 <= cleanup_budget <= 256:
@@ -2614,162 +2619,166 @@ class LazyRecordStore:
         if pin.token in self._recovery_required:
             raise StoreConflictError("pin has unresolved commit acknowledgement")
         encoded_commit_token = self.codec.encode(commit_token)
-        version_prepared = self._prepare_version_changes(version_changes)
-        identity_prepared = self._prepare_identity_changes(identity_changes)
-        ordinary_prepared = self._prepare_ordinary_changes(changes)
-        segment_prepared = self._prepare_segments(new_segments)
-        position, seed, next_ids, namespaces_blob = _head_values(self.codec, metadata)
-        namespace_inventory = set(self.codec.decode(namespaces_blob))
-
-        current = self._checked_head_row()
-        current_generation = int(current[0])
-        if pin.store_identity != self.store_identity:
-            raise StoreConflictError("generation pin belongs to another store")
+        workspace = None
+        if preparation_budget is not None:
+            if type(preparation_budget) is not tuple or len(preparation_budget) != 2:
+                raise ValueError('preparation_budget must be an entry/byte pair')
+            from .persistence_conversion_workspace import ConversionWorkspace
+            workspace = ConversionWorkspace(self.codec, directory=self.path.parent,
+                entry_limit=preparation_budget[0], byte_limit=preparation_budget[1])
         try:
-            registered_generation = self._require_pin(pin)
-        except StoreConflictError:
-            return CommitResult("conflict", current_generation, pin, stale=True)
-        if registered_generation != current_generation:
-            return CommitResult("conflict", current_generation, pin, stale=True)
-        identity_effective = self._identity_changes_would_change(
-            identity_prepared,
-            current_generation,
-            next_incarnation_id,
-        )
-        if (
-            not version_prepared
-            and not identity_effective
-            and not ordinary_prepared
-            and not segment_prepared
-            and current[2:6]
-            == (position, seed, next_ids, namespaces_blob)
-        ):
-            return CommitResult(
-                "not_committed", current_generation, pin, stale=False
-            )
+            if workspace is None:
+                version_prepared = self._prepare_version_changes(version_changes)
+                identity_prepared = self._prepare_identity_changes(identity_changes)
+                ordinary_prepared = self._prepare_ordinary_changes(changes)
+            else:
+                from .persistence_conversion_workspace import prepare_changes
+                version_prepared = prepare_changes(workspace, self, version_changes, 'version')
+                identity_prepared = prepare_changes(workspace, self, identity_changes, 'identity')
+                ordinary_prepared = prepare_changes(workspace, self, changes, 'ordinary')
+                # Complete authentication must finish before registering an attempt.
+                for rows in (version_prepared, identity_prepared, ordinary_prepared):
+                    for _ in rows: pass
+            segment_prepared = self._prepare_segments(new_segments)
+            position, seed, next_ids, namespaces_blob = _head_values(self.codec, metadata)
+            namespace_inventory = set(self.codec.decode(namespaces_blob))
 
-        pins, _, attempts = self._checked_operational_rows(current_generation)
-        existing_attempt = next(
-            (row for row in attempts if row[0] == pin.token), None
-        )
-        if (
-            existing_attempt is not None
-            and existing_attempt[3] in {"pending", "committed"}
-        ):
-            raise StoreConflictError("pin has an unresolved commit attempt")
-        other_generations = [
-            int(row[2]) for row in pins if row[0] != pin.token
-        ]
-        if other_generations and min(other_generations) < current_generation:
-            raise GenerationPressureError(
-                current_generation, min(other_generations)
+            current = self._checked_head_row()
+            current_generation = int(current[0])
+            if pin.store_identity != self.store_identity:
+                raise StoreConflictError("generation pin belongs to another store")
+            try:
+                registered_generation = self._require_pin(pin)
+            except StoreConflictError:
+                return CommitResult("conflict", current_generation, pin, stale=True)
+            if registered_generation != current_generation:
+                return CommitResult("conflict", current_generation, pin, stale=True)
+            identity_effective = self._identity_changes_would_change(
+                identity_prepared,
+                current_generation,
+                next_incarnation_id,
             )
+            if (
+                not version_prepared
+                and not identity_effective
+                and not ordinary_prepared
+                and not segment_prepared
+                and current[2:6]
+                == (position, seed, next_ids, namespaces_blob)
+            ):
+                return CommitResult(
+                    "not_committed", current_generation, pin, stale=False
+                )
 
-        self._register_attempt(
-            pin, encoded_commit_token, current_generation
-        )
-        self._phase_hook("before_transaction")
-        self.db.execute("BEGIN IMMEDIATE")
-        committed = False
-        try:
-            locked = self._checked_head_row()
-            locked_generation = int(locked[0])
-            pins, _, attempts = self._checked_operational_rows(
-                locked_generation
-            )
-            pin_row = next(
-                (row for row in pins if row[0] == pin.token), None
-            )
-            if pin_row is None:
-                raise StoreConflictError("generation pin is not registered")
-            attempt = next(
+            pins, _, attempts = self._checked_operational_rows(current_generation)
+            existing_attempt = next(
                 (row for row in attempts if row[0] == pin.token), None
             )
             if (
-                attempt is None
-                or attempt[1] != encoded_commit_token
-                or attempt[3] != "pending"
+                existing_attempt is not None
+                and existing_attempt[3] in {"pending", "committed"}
             ):
-                raise StoreConflictError(
-                    "commit attempt is no longer pending"
-                )
-            if (
-                locked_generation != pin.captured_head
-                or int(pin_row[2]) != pin.captured_head
-            ):
-                self.db.rollback()
-                self.db.execute("BEGIN IMMEDIATE")
-                row = self._attempt_row(pin.token)
-                if (
-                    row is not None
-                    and row[0] == encoded_commit_token
-                    and row[2] == "pending"
-                ):
-                    self._write_attempt_state(
-                        pin.token,
-                        encoded_commit_token,
-                        current_generation,
-                        "conflict",
-                        None,
-                    )
-                self.db.commit()
-                return CommitResult(
-                    "conflict", locked_generation, pin, stale=True
-                )
-
+                raise StoreConflictError("pin has an unresolved commit attempt")
             other_generations = [
                 int(row[2]) for row in pins if row[0] != pin.token
             ]
-            if other_generations and min(other_generations) < locked_generation:
+            if other_generations and min(other_generations) < current_generation:
                 raise GenerationPressureError(
-                    locked_generation, min(other_generations)
+                    current_generation, min(other_generations)
                 )
 
-            counts = _namespace_counts(self.codec, locked[6])
-            new_generation = locked_generation + 1
-            self._write_lazy_changes(
-                version_prepared,
-                locked_generation,
-                new_generation,
-                counts,
+            self._register_attempt(
+                pin, encoded_commit_token, current_generation
             )
-            self._phase_hook("during_version_writes")
-            self._write_identity_changes(
-                identity_prepared,
-                locked_generation,
-                new_generation,
-                requested_next_incarnation_id=next_incarnation_id,
-            )
-            self._phase_hook("during_identity_writes")
-            self._write_ordinary_changes(
-                ordinary_prepared, new_generation, counts
-            )
-            self._phase_hook("during_ordinary_writes")
-            self._write_segments(
-                segment_prepared, new_generation, counts
-            )
-            self._phase_hook("during_segment_writes")
-
-            missing = set(counts) - namespace_inventory
-            if missing:
-                raise ValueError(
-                    f"head namespace inventory omits retained namespace: {sorted(missing)}"
+            self._phase_hook("before_transaction")
+            self.db.execute("BEGIN IMMEDIATE")
+            committed = False
+            try:
+                locked = self._checked_head_row()
+                locked_generation = int(locked[0])
+                pins, _, attempts = self._checked_operational_rows(
+                    locked_generation
                 )
-            counts_blob = _counts_blob(self.codec, counts)
-            checksum = _head_checksum(
-                new_generation,
-                locked_generation,
-                position,
-                seed,
-                next_ids,
-                namespaces_blob,
-                counts_blob,
-            )
-            self._phase_hook("before_head")
-            self.db.execute(
-                "UPDATE save_head SET generation=?,parent_generation=?,simulation_position=?,seed=?,next_ids=?,"
-                "namespace_inventory=?,namespace_counts=?,head_checksum=? WHERE singleton=1",
-                (
+                pin_row = next(
+                    (row for row in pins if row[0] == pin.token), None
+                )
+                if pin_row is None:
+                    raise StoreConflictError("generation pin is not registered")
+                attempt = next(
+                    (row for row in attempts if row[0] == pin.token), None
+                )
+                if (
+                    attempt is None
+                    or attempt[1] != encoded_commit_token
+                    or attempt[3] != "pending"
+                ):
+                    raise StoreConflictError(
+                        "commit attempt is no longer pending"
+                    )
+                if (
+                    locked_generation != pin.captured_head
+                    or int(pin_row[2]) != pin.captured_head
+                ):
+                    self.db.rollback()
+                    self.db.execute("BEGIN IMMEDIATE")
+                    row = self._attempt_row(pin.token)
+                    if (
+                        row is not None
+                        and row[0] == encoded_commit_token
+                        and row[2] == "pending"
+                    ):
+                        self._write_attempt_state(
+                            pin.token,
+                            encoded_commit_token,
+                            current_generation,
+                            "conflict",
+                            None,
+                        )
+                    self.db.commit()
+                    return CommitResult(
+                        "conflict", locked_generation, pin, stale=True
+                    )
+
+                other_generations = [
+                    int(row[2]) for row in pins if row[0] != pin.token
+                ]
+                if other_generations and min(other_generations) < locked_generation:
+                    raise GenerationPressureError(
+                        locked_generation, min(other_generations)
+                    )
+
+                counts = _namespace_counts(self.codec, locked[6])
+                new_generation = locked_generation + 1
+                self._write_lazy_changes(
+                    version_prepared,
+                    locked_generation,
+                    new_generation,
+                    counts,
+                )
+                self._phase_hook("during_version_writes")
+                self._write_identity_changes(
+                    identity_prepared,
+                    locked_generation,
+                    new_generation,
+                    requested_next_incarnation_id=next_incarnation_id,
+                )
+                self._phase_hook("during_identity_writes")
+                self._write_ordinary_changes(
+                    ordinary_prepared, new_generation, counts
+                )
+                self._phase_hook("during_ordinary_writes")
+                self._write_segments(
+                    segment_prepared, new_generation, counts
+                )
+                self._phase_hook("during_segment_writes")
+
+                missing = set(counts) - namespace_inventory
+                if missing:
+                    raise ValueError(
+                        f"head namespace inventory omits retained namespace: {sorted(missing)}"
+                    )
+                counts_blob = _counts_blob(self.codec, counts)
+                checksum = _head_checksum(
                     new_generation,
                     locked_generation,
                     position,
@@ -2777,100 +2786,117 @@ class LazyRecordStore:
                     next_ids,
                     namespaces_blob,
                     counts_blob,
-                    checksum,
-                ),
-            )
-            new_pin_checksum = _pin_checksum(
-                self.store_identity, pin.token, new_generation
-            )
-            self.db.execute(
-                "UPDATE generation_pins SET generation=?,row_checksum=? WHERE token=?",
-                (
-                    new_generation,
-                    new_pin_checksum,
-                    pin.token,
-                ),
-            )
-            receipt_checksum = _receipt_checksum(
-                pin.token,
-                encoded_commit_token,
-                new_generation,
-                locked_generation,
-                "committed",
-            )
-            self.db.execute(
-                "INSERT INTO pin_receipts(pin_token,commit_token,generation,parent_generation,outcome,row_checksum) "
-                "VALUES (?,?,?,?,?,?) ON CONFLICT(pin_token) DO UPDATE SET commit_token=excluded.commit_token,"
-                "generation=excluded.generation,parent_generation=excluded.parent_generation,outcome=excluded.outcome,"
-                "row_checksum=excluded.row_checksum",
-                (
+                )
+                self._phase_hook("before_head")
+                self.db.execute(
+                    "UPDATE save_head SET generation=?,parent_generation=?,simulation_position=?,seed=?,next_ids=?,"
+                    "namespace_inventory=?,namespace_counts=?,head_checksum=? WHERE singleton=1",
+                    (
+                        new_generation,
+                        locked_generation,
+                        position,
+                        seed,
+                        next_ids,
+                        namespaces_blob,
+                        counts_blob,
+                        checksum,
+                    ),
+                )
+                new_pin_checksum = _pin_checksum(
+                    self.store_identity, pin.token, new_generation
+                )
+                self.db.execute(
+                    "UPDATE generation_pins SET generation=?,row_checksum=? WHERE token=?",
+                    (
+                        new_generation,
+                        new_pin_checksum,
+                        pin.token,
+                    ),
+                )
+                receipt_checksum = _receipt_checksum(
                     pin.token,
                     encoded_commit_token,
                     new_generation,
                     locked_generation,
                     "committed",
-                    receipt_checksum,
-                ),
-            )
-            self._write_attempt_state(
-                pin.token,
-                encoded_commit_token,
-                locked_generation,
-                "committed",
-                new_generation,
-            )
-            self._pin_rows += 2
-            floor = self._validated_retention_floor(new_generation)
-            self._cleanup_expired(floor, row_budget=cleanup_budget)
-            format_row = self.db.execute(
-                "SELECT value FROM store_metadata WHERE key='format_version'"
-            ).fetchone()
-            if format_row is None:
-                raise StoreIntegrityError("missing persistence format requirement")
-            try:
-                current_format = int(format_row[0])
-            except (TypeError, ValueError) as exc:
-                raise StoreFormatError("invalid persistence format requirement") from exc
-            if current_format not in SUPPORTED_FORMAT_VERSIONS:
-                raise StoreFormatError("unsupported persistence format requirement")
-            published_format = max(current_format, required_format_version)
-            if published_format != current_format:
-                # Publish capability requirements atomically with their data.
-                # Later saves using older features must never downgrade them.
+                )
                 self.db.execute(
-                    "UPDATE store_metadata SET value=? WHERE key='format_version'",
-                    (str(published_format),),
+                    "INSERT INTO pin_receipts(pin_token,commit_token,generation,parent_generation,outcome,row_checksum) "
+                    "VALUES (?,?,?,?,?,?) ON CONFLICT(pin_token) DO UPDATE SET commit_token=excluded.commit_token,"
+                    "generation=excluded.generation,parent_generation=excluded.parent_generation,outcome=excluded.outcome,"
+                    "row_checksum=excluded.row_checksum",
+                    (
+                        pin.token,
+                        encoded_commit_token,
+                        new_generation,
+                        locked_generation,
+                        "committed",
+                        receipt_checksum,
+                    ),
                 )
-            self._phase_hook("before_commit")
-            try:
-                self._commit_sqlite()
-                committed = True
-            except sqlite3.Error:
-                if self.db.in_transaction:
+                self._write_attempt_state(
+                    pin.token,
+                    encoded_commit_token,
+                    locked_generation,
+                    "committed",
+                    new_generation,
+                )
+                self._pin_rows += 2
+                floor = self._validated_retention_floor(new_generation)
+                self._cleanup_expired(floor, row_budget=cleanup_budget)
+                format_row = self.db.execute(
+                    "SELECT value FROM store_metadata WHERE key='format_version'"
+                ).fetchone()
+                if format_row is None:
+                    raise StoreIntegrityError("missing persistence format requirement")
+                try:
+                    current_format = int(format_row[0])
+                except (TypeError, ValueError) as exc:
+                    raise StoreFormatError("invalid persistence format requirement") from exc
+                if current_format not in SUPPORTED_FORMAT_VERSIONS:
+                    raise StoreFormatError("unsupported persistence format requirement")
+                published_format = max(current_format, required_format_version)
+                if published_format != current_format:
+                    # Publish capability requirements atomically with their data.
+                    # Later saves using older features must never downgrade them.
+                    self.db.execute(
+                        "UPDATE store_metadata SET value=? WHERE key='format_version'",
+                        (str(published_format),),
+                    )
+                self._phase_hook("before_commit")
+                try:
+                    self._commit_sqlite()
+                    committed = True
+                except sqlite3.Error:
+                    if self.db.in_transaction:
+                        self.db.rollback()
+                    self._recovery_required[pin.token] = (
+                        encoded_commit_token
+                    )
+                    raise
+            except Exception:
+                if not committed and self.db.in_transaction:
                     self.db.rollback()
-                self._recovery_required[pin.token] = (
-                    encoded_commit_token
-                )
                 raise
-        except Exception:
-            if not committed and self.db.in_transaction:
-                self.db.rollback()
-            raise
 
-        updated = GenerationPin(
-            pin.token, self.store_identity, new_generation
-        )
-        try:
-            self._phase_hook("after_commit")
-            self._acknowledge_attempt(
-                updated, encoded_commit_token, new_generation
+            updated = GenerationPin(
+                pin.token, self.store_identity, new_generation
             )
-        except Exception:
-            self._recovery_required[pin.token] = encoded_commit_token
-            raise
-        return CommitResult(
-            "committed", new_generation, updated, stale=False
-        )
+            try:
+                self._phase_hook("after_commit")
+                self._acknowledge_attempt(
+                    updated, encoded_commit_token, new_generation
+                )
+            except Exception:
+                self._recovery_required[pin.token] = encoded_commit_token
+                raise
+            return CommitResult(
+                "committed", new_generation, updated, stale=False
+            )
+
+        finally:
+            if workspace is not None:
+                workspace.close()
 
     def resolve_commit(self, pin: GenerationPin, commit_token: Any) -> CommitResult:
         self._ensure_open()

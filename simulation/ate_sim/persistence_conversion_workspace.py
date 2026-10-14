@@ -158,3 +158,73 @@ class ConversionWorkspace:
 
     def __exit__(self, *args):
         self.close()
+
+
+class PreparedRows(ReplayRows):
+    """Writer grouping uses disk indexes while preserving first-namespace order."""
+    def namespace_groups(self):
+        workspace = self.workspace
+        # Authenticate the original complete sequence before consulting indexes.
+        for _ in self: pass
+        groups = workspace.db.execute('SELECT namespace,min(ordinal),count(*) FROM preparation_index WHERE stream=? GROUP BY namespace ORDER BY min(ordinal)', (self.stream,))
+        total = 0
+        for namespace, _first, count in groups:
+            total += count
+            def rows(namespace=namespace, count=count):
+                seen = 0
+                query = ('SELECT r.ordinal,r.payload,r.checksum FROM preparation_index i JOIN replay_rows r '
+                         'ON r.stream=i.stream AND r.ordinal=i.ordinal WHERE i.stream=? AND i.namespace=? ORDER BY i.ordinal')
+                for ordinal, payload, checksum in workspace.db.execute(query, (self.stream, namespace)):
+                    if checksum != _framed_sha(b'conversion-row/v1', payload):
+                        raise StoreIntegrityError('prepared group checksum mismatch')
+                    item = self.decode(workspace.codec.decode(payload))
+                    if item['namespace'] != namespace:
+                        raise StoreIntegrityError('prepared namespace index mismatch')
+                    seen += 1
+                    yield item
+                if seen != count:
+                    raise StoreIntegrityError('prepared namespace inventory mismatch')
+            yield namespace, rows()
+        if total != len(self):
+            raise StoreIntegrityError('prepared namespace index count mismatch')
+
+
+def prepare_changes(workspace, store, changes, kind):
+    """Reuse existing row validators/encoders with disk duplicate detection.
+
+    The original mutable change is discarded after its encoded row is captured.
+    Writers need only flags/schema/incarnation from it, never its mutable value.
+    """
+    from dataclasses import replace
+    workspace.db.execute('CREATE TABLE IF NOT EXISTS preparation_keys(kind TEXT,namespace TEXT,key BLOB,path BLOB,PRIMARY KEY(kind,namespace,key,path)) WITHOUT ROWID')
+    workspace.db.execute('CREATE TABLE IF NOT EXISTS preparation_index(stream INTEGER,ordinal INTEGER,namespace TEXT,PRIMARY KEY(stream,ordinal)) WITHOUT ROWID')
+    workspace.db.execute('CREATE INDEX IF NOT EXISTS preparation_namespaces ON preparation_index(stream,namespace,ordinal)')
+    stream = workspace._stream + 1
+    ordinal = 0
+    validate = {'version': store._prepare_version_changes, 'ordinary': store._prepare_ordinary_changes,
+                'identity': store._prepare_identity_changes}[kind]
+
+    def values():
+        nonlocal ordinal
+        for change in changes:
+            item = validate((change,))[0]
+            namespace = item.get('namespace', item.get('owner_namespace'))
+            key = item.get('typed_key', item.get('owner_key'))
+            path = item.get('occurrence_path', b'')
+            try:
+                workspace.db.execute('INSERT INTO preparation_keys VALUES (?,?,?,?)', (kind, namespace, key, path))
+            except sqlite3.IntegrityError as exc:
+                message = {'version': 'duplicate version change', 'ordinary': 'duplicate ordinary record change',
+                           'identity': 'duplicate identity occurrence change'}[kind]
+                raise ValueError(message) from exc
+            if kind == 'version':
+                workspace.db.execute('INSERT INTO preparation_index VALUES (?,?,?)', (stream, ordinal, namespace))
+            captured = dict(item)
+            captured['change'] = pack_change(change if kind == 'identity' else replace(change, value=None, memberships=()))
+            yield captured
+            ordinal += 1
+    def decode(value):
+        value['change'] = unpack_change(value['change'])
+        return value
+    rows = workspace.stage(values(), decode=decode)
+    return PreparedRows(workspace, rows.stream, rows.count, rows.seal, decode) if kind == 'version' else rows
