@@ -1,6 +1,8 @@
 """Backing protection follows a publisher token, not an older snapshot pin."""
 import gc
 import importlib
+import weakref
+from contextlib import contextmanager
 
 import pytest
 
@@ -229,3 +231,62 @@ def test_collection_during_frozen_preparation_is_deferred_and_abort_reclaims_met
         assert pool.prepare_delta() is delta and len(delta.version_bytes) == 1
         pool.abort_delta()
         assert not pool._new and not pool.prepare_delta().version_bytes
+
+
+@pytest.mark.parametrize('outcome', ['commit', 'abort'])
+def test_collection_while_preparing_keeps_captured_unpublished_status(tmp_path, monkeypatch, outcome):
+    mod = module()
+    with make_store(tmp_path / 'preparing-gc.sqlite') as store:
+        pool = mod.BackingDependencyPool(store, store.capture_pin())
+        held = [LazyHistoryList(store, pool.pin, 1, initial_values=[7])]
+        pool.acquire(held[0])
+        body = held[0].pending_changes()
+        reference = weakref.ref(held[0])
+        original = store.read_snapshot
+        @contextmanager
+        def collect_after_target_capture(pin):
+            held.clear()
+            gc.collect()
+            with original(pin):
+                yield
+        monkeypatch.setattr(store, 'read_snapshot', collect_after_target_capture)
+        delta = pool.prepare_delta()
+        assert reference() is None
+        changes = delta.decode(store.codec)[0]
+        assert len(changes) == 1 and changes[0].value == mod.dependency_value('list', (pool.token,))
+        if outcome == 'abort':
+            pool.abort_delta()
+            assert not pool._new and not pool.prepare_delta().version_bytes
+            return
+        result = store.commit(pool.pin, commit_token='captured', version_changes=body + changes,
+            changes=(), new_segments=(), metadata=metadata(1, ()))
+        pool.accept_delta(delta, result.pin)
+        release = pool.prepare_delta().decode(store.codec)[0]
+        assert len(release) == 1 and release[0].value == mod.dependency_value('list')
+
+
+def test_collection_during_capture_does_not_hide_missing_persisted_authority(tmp_path, monkeypatch):
+    mod = module()
+    with make_store(tmp_path / 'persisted-gc.sqlite') as store:
+        first = mod.BackingDependencyPool(store, store.capture_pin())
+        alias = LazyHistoryList(store, first.pin, 1, initial_values=[7])
+        first.acquire(alias)
+        pin = publish(first, changes=alias.pending_changes(), token='initial')
+        alias.accept_save(pin)
+        first.close()
+        pool = mod.BackingDependencyPool(store, store.capture_pin())
+        held = [LazyHistoryList(store, pool.pin, 1)]
+        pool.acquire(held[0])
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=?', (mod.NAMESPACE,))
+        store.db.commit()
+        original = store.read_snapshot
+        @contextmanager
+        def collect_after_target_capture(pin):
+            held.clear()
+            gc.collect()
+            with original(pin):
+                yield
+        monkeypatch.setattr(store, 'read_snapshot', collect_after_target_capture)
+        with pytest.raises(StoreIntegrityError):
+            pool.prepare_delta()
+        assert pool._prepared is None

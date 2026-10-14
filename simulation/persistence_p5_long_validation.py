@@ -194,7 +194,8 @@ def _control(seed, milestones, *, initialization='founders'):
 
 
 def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workflow_sha,
-        *, complete_format=False, initialization='founders'):
+        *, complete_format=False, initialization='founders',
+        stop_after=None, resume_from=None):
     if initialization not in ('founders', 'mature'):
         raise ValueError('initialization must be founders or mature')
     milestones = tuple(sorted(set(int(value) for value in milestones)))
@@ -218,42 +219,113 @@ def run(seed, milestones, bootstrap_year, workdir, rules_id, product_sha, workfl
     cold = workdir / "p5-long-cold.sqlite"
     lazy = workdir / "p5-long-lazy.sqlite"
     restore = workdir / "p5-long-restore.sqlite"
-    for path in (cold, lazy, restore):
-        if path.exists():
-            path.unlink()
+    complete = workdir / 'p5-long-complete.sqlite'
+    stages = ('cold', 'lazy', 'complete')
+    if stop_after not in (*stages, None) or resume_from not in (*stages, None):
+        raise ValueError('unknown checkpoint stage')
+    if (stop_after == 'complete' or resume_from == 'complete') and not complete_format:
+        raise ValueError('complete checkpoint requires complete format')
+    start = stages.index(resume_from) + 1 if resume_from else 0
+    if stop_after and stages.index(stop_after) < start:
+        raise ValueError('stop stage must follow resume stage')
+    config = dict(seed=seed, milestones=list(milestones), bootstrap_year=bootstrap_year,
+                  rules_id=rules_id, product_sha=product_sha,
+                  complete_format=complete_format, initialization=initialization,
+                  simulation_schema=SCHEMA)
+    checkpoint_path = workdir / 'checkpoint.json'
+    if resume_from:
+        checkpoint = json.loads(checkpoint_path.read_text())
+        if checkpoint['schema'] != 1 or checkpoint['config'] != config:
+            raise ValueError('checkpoint configuration does not match requested run')
+        if checkpoint['stage'] != resume_from:
+            raise ValueError('checkpoint stage does not match resume stage')
+        expected_path = {'cold': cold, 'lazy': lazy, 'complete': complete}[resume_from]
+        if (checkpoint['database']['name'] != expected_path.name
+                or file_hash(expected_path) != checkpoint['database']['sha256']):
+            raise ValueError('checkpoint database checksum mismatch')
+        state = checkpoint['state']
+        progress('checkpoint_verified', checkpoint_stage=resume_from,
+                 origin_workflow_sha=checkpoint['workflow_sha'])
+    else:
+        # Never overwrite an earlier run or silently reuse an unverified database.
+        if any(path.exists() for path in (cold, lazy, complete, restore, checkpoint_path)):
+            raise FileExistsError('fresh validation requires an unused workdir')
+        state = {}
 
-    progress('independent_control_started', milestones=milestones)
-    control_started = time.perf_counter()
-    controls = _control(seed, milestones, initialization=initialization)
-    control_seconds = time.perf_counter() - control_started
-    gc.collect()
+    def checkpoint(stage, database):
+        receipt = dict(schema=1, stage=stage, config=config, workflow_sha=workflow_sha,
+                       database={'name': database.name, 'sha256': file_hash(database)},
+                       state=state)
+        pending = checkpoint_path.with_suffix('.pending')
+        pending.write_text(json.dumps(receipt, sort_keys=True, indent=2) + '\n')
+        pending.replace(checkpoint_path)
+        progress('checkpoint_ready', checkpoint_stage=stage,
+                 database_sha256=receipt['database']['sha256'])
+        return {'passed': False, 'checkpoint_stage': stage,
+                'checkpoint': str(checkpoint_path)}
 
-    progress('bootstrap_started', bootstrap_year=bootstrap_year)
-    source = generate_world(seed, mature=initialization == 'mature')
-    started = time.perf_counter()
-    Simulation(source).run(bootstrap_year)
-    bootstrap_simulation_seconds = time.perf_counter() - started
-    source_digest, source_digest_seconds = _digest(source)
+    if start == 0:
+        progress('independent_control_started', milestones=milestones)
+        control_started = time.perf_counter()
+        state['controls'] = _control(seed, milestones, initialization=initialization)
+        state['control_seconds'] = time.perf_counter() - control_started
+        gc.collect()
+        progress('bootstrap_started', bootstrap_year=bootstrap_year)
+        source = generate_world(seed, mature=initialization == 'mature')
+        started = time.perf_counter()
+        Simulation(source).run(bootstrap_year)
+        state['bootstrap_simulation_seconds'] = time.perf_counter() - started
+        state['source_digest'], state['source_digest_seconds'] = _digest(source)
+        progress('cold_save_started')
+        state['cold_result'] = write_cold_snapshot(source, cold, rules_id=rules_id)
+        if source.digest() != state['source_digest']:
+            raise AssertionError('bootstrap persistence mutated source World')
+        del source
+        gc.collect()
+        state['cold_hash_before'] = file_hash(cold)
+        if stop_after == 'cold':
+            return checkpoint('cold', cold)
 
-    progress('cold_save_started')
-    cold_result = write_cold_snapshot(source, cold, rules_id=rules_id)
-    if source.digest() != source_digest:
-        raise AssertionError("bootstrap persistence mutated source World")
-    del source
-    gc.collect()
-    cold_hash_before = file_hash(cold)
-    progress('lazy_conversion_started')
-    conversion_result = convert_cold_to_lazy(cold, lazy, rules_id=rules_id,
-                                            native_graph_buckets=complete_format)
+    if start <= 1:
+        progress('lazy_conversion_started')
+        state['conversion_result'] = convert_cold_to_lazy(
+            cold, lazy, rules_id=rules_id, native_graph_buckets=complete_format)
+        state['cold_hash_after'] = file_hash(cold)
+        if state['cold_hash_before'] != state['cold_hash_after']:
+            raise AssertionError('cold source changed during lazy conversion')
+        if stop_after == 'lazy':
+            return checkpoint('lazy', lazy)
+
     if complete_format:
-        from ate_sim.persistence_complete_format import upgrade_lazy_snapshot
-        progress('complete_upgrade_started')
-        complete = workdir / 'p5-long-complete.sqlite'
-        conversion_result = upgrade_lazy_snapshot(lazy, complete, rules_id=rules_id)
+        if start <= 2:
+            from ate_sim.persistence_complete_format import upgrade_lazy_snapshot
+            from ate_sim import persistence_catalog_copy
+            progress('complete_upgrade_started')
+            before = file_hash(lazy)
+            original_phase = persistence_catalog_copy._copy_phase
+            def report_copy_phase(phase, path):
+                original_phase(phase, path)
+                progress('complete_upgrade_phase', phase=phase)
+            persistence_catalog_copy._copy_phase = report_copy_phase
+            try:
+                state['conversion_result'] = upgrade_lazy_snapshot(lazy, complete, rules_id=rules_id)
+            finally:
+                persistence_catalog_copy._copy_phase = original_phase
+            if before != file_hash(lazy):
+                raise AssertionError('legacy lazy source changed during complete upgrade')
+            if stop_after == 'complete':
+                return checkpoint('complete', complete)
         lazy = complete
-    cold_hash_after = file_hash(cold)
-    if cold_hash_before != cold_hash_after:
-        raise AssertionError("cold source changed during lazy conversion")
+
+    controls = state['controls']
+    control_seconds = state['control_seconds']
+    bootstrap_simulation_seconds = state['bootstrap_simulation_seconds']
+    source_digest = state['source_digest']
+    source_digest_seconds = state['source_digest_seconds']
+    cold_hash_before = state['cold_hash_before']
+    cold_hash_after = state['cold_hash_after']
+    cold_result = state['cold_result']
+    conversion_result = state['conversion_result']
 
     lazy_rows = {}
     progress('lazy_open_started')
@@ -398,7 +470,13 @@ def main():
     parser.add_argument("--workflow-sha", default=os.environ.get("GITHUB_SHA", ""))
     parser.add_argument("--complete-format", action="store_true")
     parser.add_argument("--initialization", choices=('founders', 'mature'), default='founders')
+    parser.add_argument('--stop-after', choices=('cold', 'lazy', 'complete'))
+    parser.add_argument('--resume-from', choices=('cold', 'lazy', 'complete'))
     args = parser.parse_args()
+    # Stack samples survive in the streamed job log even if the runner is lost.
+    import faulthandler
+    faulthandler.enable()
+    faulthandler.dump_traceback_later(300, repeat=True)
 
     summary = run(
         args.seed,
@@ -410,6 +488,7 @@ def main():
         args.workflow_sha,
         complete_format=args.complete_format,
         initialization=args.initialization,
+        stop_after=args.stop_after, resume_from=args.resume_from,
     )
     rendered = json.dumps(summary, indent=2, sort_keys=True)
     Path(args.output).write_text(rendered + "\n", encoding="utf-8")

@@ -160,12 +160,16 @@ class BackingDependencyPool:
             raise StoreError('backing dependency pool is closed')
         if self._prepared is not None:
             return self._prepared
-        target = {inc: row[1] for inc, row in self._aliases.items()}
+        # Weak collection can remove an unpublished alias while checked reads
+        # allocate. Capture its publication status before the target roster;
+        # callbacks may prune live metadata, but cannot reclassify this plan.
+        unpublished = self._new.copy()
+        target = {inc: row[1] for inc, row in tuple(self._aliases.items())}
         changes = []
         with self.store.read_snapshot(self.pin):
             for inc in sorted(set(target) ^ set(self._persisted)):
                 kind = target.get(inc, self._persisted.get(inc))
-                previous = _checked_value(self.store, self.pin, inc, required=inc not in self._new)
+                previous = _checked_value(self.store, self.pin, inc, required=inc not in unpublished)
                 if previous is not None and previous[1] != kind:
                     raise StoreIntegrityError('backing dependency kind disagrees with canonical proxy')
                 tokens = set(() if previous is None else _active_tokens(self.store, previous[2]))

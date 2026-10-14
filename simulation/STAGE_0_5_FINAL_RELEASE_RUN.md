@@ -69,6 +69,96 @@ Minor deferred: reusing a complete harness workdir encounters an existing
 complete destination after setup; every workflow run uses a fresh workdir and
 existing destinations remain protected. No automatic reruns are configured.
 
-Launch receipt and results will be appended after GitHub assigns the run ID.
+## Launch receipt
+
+- [Run38447779260](https://github.com/rax0h/all-that-endures/actions/runs/38447779260): failed in reopened save; downstream jobs skipped.
+- Exact candidate: `bdde5bc20c40583045fcb3562698847db460b080`.
+- Candidate tree: `9a3857db96d01de8c7aa8ed091702c2e964b5dc0`.
+- Workflow-only commit: `53ec46fd9f95098ec202cddcc043656197bef8c4`.
+- Latest local focused check including initialization regression:32 passed,
+  one previously verified long integration case deselected,1.01seconds.
+- Initialization regression observed RED before its repair; whole exact-source
+  suite and all recovery/horizon evidence are pending in this run.
+
 Final Stage0.5 release acceptance remains pending the exact-source jobs and
 explicit performance-policy assessment. No merge or promotion is performed.
+
+## Dependency capture repair
+
+The initial recovery gate passed33 focused tests (81.99s), then failed at the
+year10 reopened save: mandatory dependency authority absent for backing8031.
+No full suite, millennium or late-fixture job ran. Failed job115470568633 and
+artifact11839890191 retain the traceback and focused evidence.
+
+A deterministic small regression reproduced the same error: prepare_delta first
+captured a target containing an unpublished backing; weak collection then removed
+its live alias and _new marker; the subsequent checked read reclassified the
+captured backing as persisted and incorrectly required an existing row.
+
+The repair copies unpublished IDs before capturing the target roster and uses
+that captured status throughout preparation. This is temporary save metadata,
+not a retained live-object root or a second authority. Existing persisted rows
+remain mandatory; validation is not relaxed. Tests cover commit followed by
+lease release, abort without leaked unpublished metadata, and corruption after
+collection of an already persisted alias. Local gate:45 passed0.96s; original
+unpublished race observed RED before the repair. The complete3+4+3 rerun must
+confirm that this resolves the observed integrated failure on the new source.
+
+The revised workflow adds these dependency tests to the first gate and retains
+disposable recovery databases on failure for further diagnosis. All original
+exact-source, correctness and long-run gates remain in force. A new run will
+follow because rerunning the old pinned workflow would test the old source.
+
+Repair launch: [run38459262962](https://github.com/rax0h/all-that-endures/actions/runs/38459262962)
+is in progress. Exact candidate `2bc3c85389760ff12578857f7d2a849bc5cf9201`, tree
+`fd232ce57b7e2332c91446d0485fab9a1b2d22e4`; workflow-only commit
+`fb9505a0349e083882672e2de9e8e7735b68fd77`. Recovery, complete suite and
+long-horizon conclusions remain pending. No successful job from the failed
+initial run is being misattributed to this repaired source.
+
+## Hosted runner interruptions and recoverable validation
+
+Run38459262962 attempts1 and2 both ended with runner shutdown and exit143,
+without a Python traceback or correctness assertion. Attempt1 job115549208763
+ran21:28:20–23:34:44 UTC; attempt2 job115598439858 ran23:40:05–01:10:00 UTC.
+Both last reported complete_upgrade_started. Neither reached the350-minute
+process timeout. The root cause of runner termination is unknown; resource
+exhaustion is not proved or excluded. Neither attempt uploaded late evidence or
+an intermediate database because runner shutdown skipped even always() uploads.
+Recovery, full-suite and canonical millennium gates remain successful on runtime
+candidate2bc3c85389760ff12578857f7d2a849bc5cf9201.
+
+The revised validation harness stops after cold publication, native lazy
+conversion and complete upgrade, each in a separate fresh-runner job. Each
+successful job uploads a checksum-bound database and JSON receipt carrying the
+independent control, bootstrap digest, exact configuration and prior checks.
+Resume rejects wrong source/configuration, stage or database checksum before
+opening a database. Fresh runs reject occupied workdirs. Partial stages explicitly
+return passed:false; only continuation, audit, reopen and restore produce a pass.
+No incomplete/private conversion database is accepted as a checkpoint.
+
+The workflow retains runtime source2bc3c85389760ff12578857f7d2a849bc5cf9201 as
+the product identity and records the new harness source separately. It requires
+an identical simulation/ate_sim Git tree43c2976e97474127ec860bcb6382988660ddadb3
+and verifies the prior three successful jobs before reusing those gates. Only
+the validation harness, its tests and documentation change; simulation behavior,
+persistence implementation and acceptance checks do not change.
+
+Runner diagnostics stream memory, disk and largest-process usage every minute.
+The harness CLI emits stack samples every five minutes and logs existing copy
+phase seams; those samples are diagnostic, not a timeout failure. Each stage
+starts a new process, releasing all allocator state from earlier conversions.
+This bounds work lost to the active stage and may reduce carried-over memory;
+it does not prove or claim to fix the unexplained infrastructure shutdown.
+A further upgrade failure can be investigated/retried from the retained native
+lazy database without repeating the independent control, bootstrap and cold
+conversion. Final acceptance remains pending.
+
+Local staged-harness verification:3 tests passed in110.13seconds, including the
+original complete0->1->2 lane, canonical mature initialization, and an artifact
+handoff lane copying only the checkpoint receipt plus current-stage database.
+The staged test initially failed on the missing stop_after API, then passed after
+implementation. Workflow shell scripts and embedded Python parse successfully;
+git diff --check passes. Independent reviewer found no launch blocker. Resume
+compatibility is scoped to this workflow's immutable harness commit; do not reuse
+these receipts across changed harnesses without a compatibility check.
