@@ -204,3 +204,12 @@ Local real CLI smoke: seed843000/bootstrap0/milestone1 cold checkpoint followed
 by a separate process resuming to the lazy checkpoint both exited0 after removal;
 receipts report stages cold/lazy and passed:false as required. Revised shell and
 embedded Python syntax checks pass. Full long-fixture outcome remains pending.
+
+Retained-checkpoint retry launched:
+[run38508408370](https://github.com/rax0h/all-that-endures/actions/runs/38508408370).
+Harness source:ccba8cc6eba70965271d2570043829b3368e695a;
+workflow:124c3215468a60862b7848086f00a8e768a6ed66.
+It starts with a short harness gate, then resumes the retained cold artifact at
+lazy conversion. Original runtime product and all final acceptance checks remain
+unchanged. Independent review found no launch blocker. Native crash root cause
+and final completion remain unproved until further evidence.
