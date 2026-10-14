@@ -8,6 +8,8 @@ from pathlib import Path
 from dataclasses import is_dataclass
 import tempfile
 import uuid
+from itertools import chain
+from .persistence_conversion_workspace import ConversionWorkspace
 
 from .incremental_store import (
     Membership, RecordChange, StoreFormatError, StoreIntegrityError,
@@ -20,7 +22,7 @@ from .persistence_lazy_store import (
 )
 from .persistence_lazy_families import IDENTITY_OWNER_FAMILIES, AUXILIARY_OWNER_FAMILIES
 from .persistence_lazy_identity_catalog import (
-    IdentityCatalog, initial_catalog_delta, validate_initial_catalog_inputs, CATALOG_NAMESPACE, OWNER_NAMESPACE,
+    IdentityCatalog, initial_catalog_delta, validate_initial_catalog_inputs, stage_initial_catalog, CATALOG_NAMESPACE, OWNER_NAMESPACE,
     GROUP_NAMESPACE, LINK_NAMESPACE, OWNER_TREE_NAMESPACE, CATALOG_TAG,
 )
 from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE, PAGE_NAMESPACE, ENTRY_NAMESPACE
@@ -301,7 +303,8 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
     source, destination = _preflight_conversion_paths(source, destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     codec = WorldCodec(identity_links_recorded=True)
-    with tempfile.TemporaryDirectory(prefix='.ate-catalog-copy-', dir=destination.parent) as directory:
+    with tempfile.TemporaryDirectory(prefix='.ate-catalog-copy-', dir=destination.parent) as directory, \
+            ConversionWorkspace(codec, directory=directory) as workspace:
         captured_path = Path(directory) / 'captured.sqlite'
         private = Path(directory) / 'destination.sqlite'
         copied = LazyRecordStore.copy_current_head(source, captured_path, codec=codec,
@@ -325,7 +328,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                             'SELECT owner_namespace,owner_key,occurrence_path,incarnation_id '
                             'FROM lazy_identity_occurrence_versions WHERE valid_from<=? '
                             'AND (valid_to IS NULL OR ?<valid_to)', (pin.captured_head, pin.captured_head)))
-                    build_initial = validate_initial_catalog_inputs if normalize_graph or selected else initial_catalog_delta
+                    build_initial = validate_initial_catalog_inputs if normalize_graph or selected else lambda codec, *args, **kwargs: stage_initial_catalog(workspace, *args, **kwargs)
                     delta = build_initial(codec, versions, placements,
                         ordinary_changes=ordinary, next_incarnation_id=next_incarnation,
                         generation=pin.captured_head + 1)
@@ -397,7 +400,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                     _check_reference_targets((v.value for v in (*all_versions, *all_ordinary)), dependencies,
                         event_id_incarnations=facade_ids)
                     _check_backing_graph(codec, all_versions, dependencies)
-                    delta = initial_catalog_delta(codec, versions, placements, ordinary_changes=ordinary,
+                    delta = stage_initial_catalog(workspace, versions, placements, ordinary_changes=ordinary,
                         next_incarnation_id=next_incarnation, generation=pin.captured_head + 1)
                 if complete_format:
                     from dataclasses import replace
@@ -410,7 +413,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                 committed = target.commit(pin, commit_token=token,
                     changes=all_ordinary + (RecordChange(EVENT_STORAGE,
                         COMMIT_DESCRIPTOR_KEY, (1, pin.captured_head + 1, token)),),
-                    version_changes=tuple(all_versions) + delta.decode(codec)[0] + dependencies,
+                    version_changes=chain(all_versions, delta, dependencies),
                     identity_changes=placements, next_incarnation_id=next_incarnation, new_segments=(),
                     required_format_version=floor, metadata=metadata)
                 pin = committed.pin

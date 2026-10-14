@@ -13,3 +13,12 @@ RED: validation-only API absent. GREEN:11 new tests including eight corruption i
 Affected gate: `PYTHONPATH=.:simulation python -m pytest -q simulation/tests/test_stage_0_5_upgrade_memory.py simulation/tests/test_stage_0_5_final_catalog_copy.py simulation/tests/test_stage_0_5_final_identity_catalog.py simulation/tests/test_stage_0_5_final_legacy_event_copy.py` —70 passed22.08s. Baseline copy/Event gate35 passed7.06s.
 
 Tasks2–5 remain open: replayable final catalog, bounded commit preparation, downstream capture/normalization/scrub memory, provenance and GitHub acceptance. No large job launched and no final acceptance claimed.
+
+## Task2: checked replayable final catalog
+
+The conversion uses one private SQLite workspace for indexed owner/placement inventories, radix construction, group/link ordering and replayable VersionChange output. It constructs neither an aggregate ParticipantDelta nor its aggregate fingerprint/decode. Ordinary participants and their fingerprint formula remain unchanged. Source validation now uses disk inventories as well. The workspace writes rows directly: aggregate Python staging buffer high water is zero; each encoded row/adapter and the128KiB SQLite cache are separate costs. File cleanup is context-owned and idempotent.
+
+RED: staging API absent. GREEN: forced-budget reference equivalence for empty, many owners,257-member sharing group,257-placement owner and257 reserved/retired IDs; exact repeated ordering; mutable value capture; payload/count/order corruption and exception cleanup. Combined Task1+spill gate:88 passed24.94s.
+
+Fresh-process final-catalog scale measurements (128/512/2048 owners and occurrences; entry_limit4, byte_limit1024):
+{"n": 2048, "rows": 6148, "peak_rss_kib": 18304, "seconds": 0.7878251030001593, "buffer_entries_high_water": 0, "buffer_bytes_high_water": 0, "largest_row_bytes": 481, "largest_row_resident_bytes": 1667, "staged_rows": 6148, "staged_bytes": 2532893, "disk_bytes": 5365760, "python_index_bytes": 856}

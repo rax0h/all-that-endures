@@ -180,8 +180,10 @@ def _validated_initial_catalog_inputs(codec, owner_versions, identity_changes, *
 def validate_initial_catalog_inputs(codec, owner_versions, identity_changes, *, next_incarnation_id,
                                     generation, ordinary_changes=()):
     """Retain source checks when normalization will replace its catalog."""
-    _validated_initial_catalog_inputs(codec, owner_versions, identity_changes,
-        next_incarnation_id=next_incarnation_id, generation=generation, ordinary_changes=ordinary_changes)
+    from .persistence_conversion_workspace import ConversionWorkspace
+    with ConversionWorkspace(codec, directory=None) as workspace:
+        _disk_catalog_inputs(workspace, owner_versions, identity_changes,
+            next_incarnation_id=next_incarnation_id, generation=generation, ordinary_changes=ordinary_changes)
 
 
 def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incarnation_id, generation,
@@ -224,6 +226,166 @@ def initial_catalog_delta(codec, owner_versions, identity_changes, *, next_incar
     changes.extend(VersionChange(ns, ('empty-catalog-declaration/v1',), delete=True)
                    for ns in CATALOG_NAMESPACES if ns not in populated)
     return ParticipantDelta.freeze(codec, 'identity-catalog', version_changes=changes)
+
+def _disk_catalog_inputs(workspace, owner_versions, identity_changes, *, next_incarnation_id,
+                         generation, ordinary_changes=()):
+    """Index captured owners and placements without resident grouping maps."""
+    from .persistence_conversion_workspace import pack_change, unpack_change
+    import sqlite3
+    codec, db = workspace.codec, workspace.db
+    if type(next_incarnation_id) is not int or next_incarnation_id < 1:
+        raise ValueError('invalid incarnation allocator')
+    db.execute('DROP TABLE IF EXISTS conversion_owners')
+    db.execute('DROP TABLE IF EXISTS conversion_placements')
+    db.execute('CREATE TABLE conversion_owners(ordinal INTEGER PRIMARY KEY,namespace TEXT,typed_key BLOB,kind TEXT,live INTEGER,payload BLOB,checksum TEXT,UNIQUE(namespace,typed_key))')
+    db.execute('CREATE TABLE conversion_placements(namespace TEXT,typed_key BLOB,path BLOB,hashed BLOB,inc INTEGER,absolute BLOB,occurrence BLOB,checksum TEXT,PRIMARY KEY(namespace,typed_key,path),UNIQUE(namespace,typed_key,hashed)) WITHOUT ROWID')
+    db.execute('DROP TABLE IF EXISTS conversion_link_digests')
+    db.execute('CREATE TABLE conversion_link_digests(payload BLOB)')
+    db.execute('CREATE INDEX conversion_link_payload ON conversion_link_digests(payload)')
+    db.execute('CREATE INDEX conversion_groups ON conversion_placements(inc,absolute)')
+    db.execute('CREATE INDEX conversion_owner_hashes ON conversion_placements(namespace,typed_key,hashed)')
+    ordinal = 0
+    for kind, changes in (('lazy', owner_versions), ('ordinary', ordinary_changes)):
+        for source in changes:
+            if source.namespace not in IDENTITY_OWNER_FAMILIES:
+                raise StoreFormatError('identity source is not a declared family')
+            adapter = AUXILIARY_OWNER_FAMILIES.get(source.namespace)
+            if adapter is not None:
+                adapter.validate_source(source, kind, codec)
+                if not source.delete and source.key[0] >= next_incarnation_id:
+                    raise StoreIntegrityError('physical history owner has an unallocated incarnation')
+            payload = codec.encode(pack_change(source))
+            checksum = _framed_sha(b'conversion-owner/v1', kind.encode(), payload)
+            try:
+                db.execute('INSERT INTO conversion_owners VALUES (?,?,?,?,?,?,?)',
+                    (ordinal, source.namespace, codec.encode(source.key), kind, not source.delete, payload, checksum))
+            except sqlite3.IntegrityError as exc:
+                raise ValueError('duplicate/competing identity owner source') from exc
+            ordinal += 1
+    for change in identity_changes:
+        if change.delete or type(change.incarnation_id) is not int or not 0 < change.incarnation_id < next_incarnation_id:
+            raise ValueError('initial catalog requires live allocated occurrences')
+        absolute = placement_path(change.owner_namespace, change.owner_key, change.occurrence_path)
+        namespace, key, path = change.owner_namespace, codec.encode(change.owner_key), codec.encode(change.occurrence_path)
+        if db.execute('SELECT live FROM conversion_owners WHERE namespace=? AND typed_key=?', (namespace, key)).fetchone() != (1,):
+            raise ValueError('duplicate occurrence or missing owner source')
+        hashed = path_hash(codec, change.occurrence_path)
+        occurrence = codec.encode((namespace, change.owner_key, change.occurrence_path))
+        absolute = codec.encode(absolute)
+        checksum = _framed_sha(b'conversion-placement/v1', namespace.encode(), key, path, hashed,
+                              str(change.incarnation_id).encode(), absolute, occurrence)
+        try:
+            db.execute('INSERT INTO conversion_placements VALUES (?,?,?,?,?,?,?,?)',
+                (namespace, key, path, hashed, change.incarnation_id, absolute, occurrence, checksum))
+        except sqlite3.IntegrityError as exc:
+            if db.execute('SELECT 1 FROM conversion_placements WHERE namespace=? AND typed_key=? AND path=?', (namespace, key, path)).fetchone():
+                raise ValueError('duplicate occurrence or missing owner source') from exc
+            raise StoreIntegrityError('duplicate/colliding owner occurrence paths') from exc
+    for namespace, key, kind, payload, checksum in db.execute('SELECT namespace,typed_key,kind,payload,checksum FROM conversion_owners WHERE live=1 ORDER BY ordinal'):
+        if checksum != _framed_sha(b'conversion-owner/v1', kind.encode(), payload):
+            raise StoreIntegrityError('conversion owner staging checksum mismatch')
+        source = unpack_change(codec.decode(payload))
+        adapter = AUXILIARY_OWNER_FAMILIES.get(namespace)
+        if adapter is not None:
+            expected_count = 0
+            for path, inc in adapter.reference_placements(source.value):
+                expected_count += 1
+                found = db.execute('SELECT inc FROM conversion_placements WHERE namespace=? AND typed_key=? AND path=?',
+                    (namespace, key, codec.encode(path))).fetchone()
+                if found != (inc,):
+                    raise StoreIntegrityError('physical history references disagree with identity placements')
+            count = db.execute('SELECT count(*) FROM conversion_placements WHERE namespace=? AND typed_key=?', (namespace, key)).fetchone()[0]
+            if count != expected_count:
+                raise StoreIntegrityError('physical history references disagree with identity placements')
+    db.commit()
+
+
+def _digest_encoded(domain, values):
+    h = hashlib.sha256()
+    h.update(len(domain).to_bytes(8, 'big')); h.update(domain)
+    for part in values:
+        h.update(len(part).to_bytes(8, 'big')); h.update(part)
+    return h.hexdigest()
+
+
+def stage_initial_catalog(workspace, owner_versions, identity_changes, *, next_incarnation_id,
+                          generation, ordinary_changes=()):
+    """Checked replayable conversion rows; ordinary ParticipantDelta is unchanged."""
+    from .persistence_conversion_workspace import unpack_change
+    codec, db = workspace.codec, workspace.db
+    _disk_catalog_inputs(workspace, owner_versions, identity_changes,
+        next_incarnation_id=next_incarnation_id, generation=generation, ordinary_changes=ordinary_changes)
+
+    def changes():
+        populated = set()
+        for namespace, key, kind, payload, checksum in db.execute('SELECT namespace,typed_key,kind,payload,checksum FROM conversion_owners WHERE live=1 ORDER BY ordinal'):
+            if checksum != _framed_sha(b'conversion-owner/v1', kind.encode(), payload):
+                raise StoreIntegrityError('conversion owner staging checksum mismatch')
+            version = unpack_change(codec.decode(payload))
+            owner = namespace, version.key
+            def build(lower=b''):
+                lo, hi = lower + bytes(32-len(lower)), lower + bytes([255])*(32-len(lower))
+                params = namespace, key, lo, hi
+                query = 'SELECT hashed,path,inc FROM conversion_placements WHERE namespace=? AND typed_key=? AND hashed>=? AND hashed<=? ORDER BY hashed '
+                first = db.execute(query + 'ASC LIMIT 1', params).fetchone()
+                if first is None:
+                    return None, 0, _framed_sha(b'identity-owner-empty-v1')
+                last = db.execute(query + 'DESC LIMIT 1', params).fetchone()
+                if first[0] == last[0]:
+                    prefix = first[0]
+                    value = ('owner-leaf/v1', codec.decode(first[1]), first[2])
+                else:
+                    length = 0
+                    while first[0][length] == last[0][length]: length += 1
+                    prefix = first[0][:length]
+                    slots = db.execute('SELECT DISTINCT substr(hashed,?,1) FROM conversion_placements WHERE namespace=? AND typed_key=? AND hashed>=? AND hashed<=? ORDER BY 1', (length+1, *params))
+                    children = []
+                    for (slot,) in slots:
+                        child = yield from build(prefix + slot)
+                        children.append((slot[0], *child))
+                    value = ('owner-branch/v1', prefix, tuple(children))
+                count, commitment = node_commit(codec, value)
+                populated.add(OWNER_TREE_NAMESPACE)
+                yield VersionChange(OWNER_TREE_NAMESPACE, (*owner, prefix), value)
+                return prefix, count, commitment
+            prefix, count, commitment = yield from build()
+            value = ('identity-owner/v1', True, kind, generation, version.record_schema,
+                     _source_commitment(codec, version, kind, generation), prefix, count, commitment)
+            populated.add(OWNER_NAMESPACE)
+            yield VersionChange(OWNER_NAMESPACE, owner, value)
+        for inc in range(1, next_incarnation_id):
+            count = db.execute('SELECT count(*) FROM conversion_placements WHERE inc=?', (inc,)).fetchone()[0]
+            occurrences = (row[0] for row in db.execute('SELECT occurrence FROM conversion_placements WHERE inc=? ORDER BY occurrence', (inc,)))
+            occurrence_digest = _digest_encoded(b'identity-group-occurrences-v1', occurrences)
+            paths = db.execute('SELECT absolute FROM conversion_placements WHERE inc=? ORDER BY absolute', (inc,))
+            first = next(paths, None)
+            anchor = codec.decode(first[0]) if first else None
+            def links():
+                for ordinal, (target,) in enumerate(paths):
+                    target = codec.decode(target)
+                    populated.add(LINK_NAMESPACE)
+                    yield VersionChange(LINK_NAMESPACE, target, ('identity-link/v1', inc, anchor),
+                        memberships=(Membership('incarnation', inc, ordinal),))
+            # Links are emitted as rows while a separate SQL ordering computes
+            # the unchanged digest of encoded (target,anchor) tuples.
+            yield from links()
+            db.execute('DELETE FROM conversion_link_digests')
+            for (absolute,) in db.execute('SELECT absolute FROM conversion_placements WHERE inc=? ORDER BY absolute LIMIT -1 OFFSET 1', (inc,)):
+                db.execute('INSERT INTO conversion_link_digests VALUES (?)', (codec.encode((codec.decode(absolute), anchor)),))
+            link_digest = _digest_encoded(b'identity-group-links-v1', (r[0] for r in db.execute(
+                'SELECT payload FROM conversion_link_digests ORDER BY payload')))
+            populated.add(GROUP_NAMESPACE)
+            yield VersionChange(GROUP_NAMESPACE, inc, ('identity-group/v1', 'mutable', count,
+                occurrence_digest, max(0,count-1), link_digest, anchor),
+                memberships=() if count else (Membership('retired', True, generation),))
+        populated.update((RETIRED_NAMESPACE, CATALOG_NAMESPACE))
+        yield VersionChange(RETIRED_NAMESPACE, 0, EMPTY_HEADER)
+        yield VersionChange(CATALOG_NAMESPACE, 0, (CATALOG_TAG, FEATURES, next_incarnation_id,
+                                                 next_incarnation_id-1, EMPTY_HEADER))
+        for ns in CATALOG_NAMESPACES:
+            if ns not in populated:
+                yield VersionChange(ns, ('empty-catalog-declaration/v1',), delete=True)
+    return workspace.stage_versions(changes())
 
 
 @dataclass(frozen=True)
