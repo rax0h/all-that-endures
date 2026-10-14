@@ -185,3 +185,27 @@ def test_staging_freezes_mutable_values_and_cleans_up_exception(tmp_path):
             raise OSError('after preparation')
     workspace.close()
     assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize('phase', ['after_source_validation', 'after_source_capture', 'after_normalization', 'after_catalog_staging'])
+def test_new_retention_phase_fault_discards_scratch_and_retry_preserves_digest(tmp_path,monkeypatch,phase):
+    from ate_sim.persistence_complete_format import upgrade_lazy_snapshot
+    source=event_source(tmp_path,share_history=True);before=sha(source);destination=tmp_path/'complete.sqlite'
+    def fail(at,_path):
+        if at==phase:raise OSError('retention phase fault')
+    monkeypatch.setattr(module(),'_copy_phase',fail)
+    with pytest.raises(OSError,match='retention phase fault'):
+        upgrade_lazy_snapshot(source,destination,rules_id=RULES)
+    assert not destination.exists() and sha(source)==before
+    assert not list(tmp_path.glob('.ate-catalog-copy-*'))
+    monkeypatch.setattr(module(),'_copy_phase',lambda *args:None)
+    upgrade_lazy_snapshot(source,destination,rules_id=RULES)
+    assert destination.exists() and sha(source)==before
+
+
+def test_indexed_replay_authenticates_later_rows_before_returning_value(tmp_path):
+    codec=WorldCodec(identity_links_recorded=True)
+    with workspace_type()(codec,directory=tmp_path) as workspace:
+        rows=workspace.stage_versions(VersionChange('world.people',i,[i]) for i in range(3))
+        workspace.db.execute("UPDATE replay_rows SET payload=x'00' WHERE stream=? AND ordinal=2",(rows.stream,))
+        with pytest.raises(StoreIntegrityError):rows[0]

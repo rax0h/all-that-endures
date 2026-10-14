@@ -30,3 +30,23 @@ Only the explicit private converter opts into `preparation_budget=(4096,2097152)
 RED: opt-in budget keyword absent. GREEN: normal/spilled authority equality through membership publication, deletion, reinsertion and unchanged saves; duplicate version/ordinary/identity keys and malformed memberships reject before an attempt; mutable input changed after preparation cannot alter publication; staged payload corruption and injected SQLite disk-full rejection preserve the store; stale pins and five transaction/recovery fault phases close scratch and retain their existing outcomes.
 
 Affected gate127 passed20.41s: `test_stage_0_5_conversion_preparation.py`, `test_persistence_lazy_store.py`, `test_persistence_lazy_store_failures.py`, `test_stage_0_5_r3_recovery_extra.py`, `test_stage_0_5_upgrade_memory.py`, `test_stage_0_5_final_catalog_copy.py`, `test_stage_0_5_final_complete_format.py`, all under `simulation/tests` with `PYTHONPATH=.:simulation python -m pytest -q`.
+
+## Task4: completed-output retention and scrub
+
+The measured source-owner inventory was retained beside a second decoded capture; it is now released after validation. Immutable segments and source orders stage directly. Normalization retains its existing decoded-object identity contract; replay starts only after normalization/promotion completes and aliases have explicit incarnation placements. Completed versions, ordinary records, placements, dependencies and orders stage on disk before final catalog/preparation. Reference scrub traverses one graph at a time, resetting temporary object IDs between replayed rows. Final catalog scrub uses checked disk sets and streams source owners instead of rebuilding the complete decoded owner inventory.
+
+Two additional edge regressions first failed: indexed replay returned a value before authenticating later rows, and a scratch database initialization failure left its file behind. Indexed replay now finishes authentication and constructor failure cleans scratch. Existing before/after commit, source advancement, destination race, NaN, readonly nested graphs, Event-ID, action, advancement and promotion tests remain covered.
+
+Final affected gate152 passed49.39s: Task3/new memory tests plus `test_stage_0_5_final_complete_format.py`, `test_stage_0_5_final_legacy_event_copy.py`, `test_stage_0_5_final_copy_promotion.py`, `test_stage_0_5_final_frozen_snapshot_authority.py`, `test_stage_0_5_final_legacy_nonreflexive_copy.py`, `test_stage_0_5_final_nonreflexive_copy.py`, `test_stage_0_5_final_catalog_copy.py`.
+
+Fresh-process synthetic end-to-end measurements (2000 people/Events, exact restored World digest verified), using `PYTHONPATH=.:simulation python simulation/tests/complete_upgrade_memory_probe.py 2000`. Baseline uses git archive90a0550 as PYTHONPATH. RSS is KiB; VmSize is separately read from `/proc/self/status`.
+
+| Source | Upgrade peak RSS | Highest sampled upgrade VmSize | Publication elapsed seconds | Final digest verified |
+|---|---:|---:|---:|---|
+| Baseline90a0550 |184160|218144|39.22|yes|
+| Tasks1–3 |82992|99512|52.51|yes|
+| Task4 measured tree |69020|90284|61.19|yes|
+
+Task4 phase RSS/VmSize: after source capture44360/71968; after normalization59672/88352; after catalog staging59728/88352; scrub completed59428/87212. Post-publication digest materialization raised lifetime peak to75020KiB and VmSize103596KiB; this is separate from conversion. Disk staging trades time/I/O for memory; this synthetic conversion became slower, not faster.
+
+Remaining input-sized costs: resident source/normalization graphs and their existing per-incarnation/path maps; one oversized encoded record or builder input; backing graph metadata; selected promotion values; SQLite caches. No universal fixed-memory claim. The retained mature year1000 fixture under8GiB RLIMIT_AS remains the required large acceptance gate. Independent whole-diff review precedes its launch.

@@ -84,9 +84,10 @@ class ReplayRows(Sequence):
         if index < 0: index += self.count
         if not 0 <= index < self.count: raise IndexError('conversion row index')
         # Indexed access is explicit output; ordinary conversion streams rows.
+        selected = None
         for ordinal, row in enumerate(self):
-            if ordinal == index: return row
-        raise StoreIntegrityError('missing staged conversion row')
+            if ordinal == index: selected = row
+        return selected
 
 
 class ConversionWorkspace:
@@ -97,10 +98,19 @@ class ConversionWorkspace:
         fd, path = tempfile.mkstemp(prefix='conversion-', suffix='.sqlite', dir=directory)
         os.close(fd)
         self.path = Path(path)
-        self.db = sqlite3.connect(path)
-        self.db.execute('PRAGMA cache_size=-128')
-        self.db.execute('PRAGMA temp_store=FILE')
-        self.db.execute('CREATE TABLE replay_rows(stream INTEGER,ordinal INTEGER,payload BLOB,checksum TEXT,PRIMARY KEY(stream,ordinal)) WITHOUT ROWID')
+        self.db = None
+        try:
+            self.db = sqlite3.connect(path)
+            self.db.execute('PRAGMA cache_size=-128')
+            self.db.execute('PRAGMA temp_store=FILE')
+            self.db.execute('CREATE TABLE replay_rows(stream INTEGER,ordinal INTEGER,payload BLOB,checksum TEXT,PRIMARY KEY(stream,ordinal)) WITHOUT ROWID')
+        except BaseException:
+            if self.db is not None:
+                self.db.close()
+            for suffix in ('', '-journal', '-wal', '-shm'):
+                try: Path(str(self.path) + suffix).unlink()
+                except FileNotFoundError: pass
+            raise
         self._stream = 0
         self._closed = False
         self._metrics = dict(buffer_entries_high_water=0, buffer_bytes_high_water=0,
@@ -228,3 +238,42 @@ def prepare_changes(workspace, store, changes, kind):
         return value
     rows = workspace.stage(values(), decode=decode)
     return PreparedRows(workspace, rows.stream, rows.count, rows.seal, decode) if kind == 'version' else rows
+
+
+class DiskSet:
+    """Checksummed disposable scrub inventory; no authority outside this copy."""
+    def __init__(self, workspace):
+        self.workspace = workspace
+        workspace._stream += 1
+        self.stream = workspace._stream
+        workspace.db.execute('CREATE TABLE IF NOT EXISTS conversion_sets(stream INTEGER,key BLOB,checksum TEXT,PRIMARY KEY(stream,key)) WITHOUT ROWID')
+        self.count, self.root = 0, 0
+
+    def __contains__(self, key):
+        row = self.workspace.db.execute('SELECT checksum FROM conversion_sets WHERE stream=? AND key=?', (self.stream, key)).fetchone()
+        if row is None: return False
+        if row != (_framed_sha(b'conversion-set/v1', key),):
+            raise StoreIntegrityError('conversion scrub inventory checksum mismatch')
+        return True
+
+    def add(self, key):
+        if key in self: return
+        checksum = _framed_sha(b'conversion-set/v1', key)
+        self.workspace.db.execute('INSERT INTO conversion_sets VALUES (?,?,?)', (self.stream, key, checksum))
+        self.count += 1
+        self.root ^= int(checksum, 16)
+
+    def validate(self):
+        count, root = 0, 0
+        for key, checksum in self.workspace.db.execute('SELECT key,checksum FROM conversion_sets WHERE stream=?', (self.stream,)):
+            if checksum != _framed_sha(b'conversion-set/v1', key):
+                raise StoreIntegrityError('conversion scrub inventory checksum mismatch')
+            count += 1; root ^= int(checksum, 16)
+        if (count, root) != (self.count, self.root):
+            raise StoreIntegrityError('conversion scrub inventory count/root mismatch')
+
+    def equals(self, keys):
+        other = DiskSet(self.workspace)
+        for key in keys: other.add(key)
+        self.validate(); other.validate()
+        return self.workspace.db.execute('SELECT key FROM conversion_sets WHERE stream=? EXCEPT SELECT key FROM conversion_sets WHERE stream=? LIMIT 1', (self.stream,other.stream)).fetchone() is None and self.workspace.db.execute('SELECT key FROM conversion_sets WHERE stream=? EXCEPT SELECT key FROM conversion_sets WHERE stream=? LIMIT 1', (other.stream,self.stream)).fetchone() is None

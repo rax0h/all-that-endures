@@ -132,3 +132,20 @@ def test_disk_write_failure_during_preflight_preserves_source_and_cleans_scratch
         assert inventory(store)==before
         assert not tuple(store.db.execute('SELECT * FROM pin_attempts'))
         assert not list(tmp_path.glob('conversion-*'))
+
+
+def test_workspace_creation_failure_does_not_leave_file_or_attempt(tmp_path,monkeypatch):
+    import sqlite3
+    import simulation.ate_sim.persistence_conversion_workspace as staging
+    connect=sqlite3.connect
+    class Failure:
+        def __init__(self,db):self.db=db
+        def execute(self,sql,*args):raise sqlite3.OperationalError('scratch initialization failed')
+        def close(self):self.db.close()
+    with make_store(tmp_path/'spill.sqlite') as store:
+        pin=store.capture_pin()
+        monkeypatch.setattr(staging.sqlite3,'connect',lambda *a,**k:Failure(connect(*a,**k)))
+        with pytest.raises(sqlite3.OperationalError,match='initialization failed'):
+            save(store,pin,'init',budget=(4,1024))
+        assert not tuple(store.db.execute('SELECT * FROM pin_attempts'))
+        assert not list(tmp_path.glob('conversion-*'))

@@ -9,7 +9,7 @@ from dataclasses import is_dataclass
 import tempfile
 import uuid
 from itertools import chain
-from .persistence_conversion_workspace import ConversionWorkspace
+from .persistence_conversion_workspace import ConversionWorkspace, DiskSet
 
 from .incremental_store import (
     Membership, RecordChange, StoreFormatError, StoreIntegrityError,
@@ -51,8 +51,7 @@ def _copy_phase(_phase, _private_path):
     return None
 
 
-def _owner_sources(store, pin):
-    versions, ordinary = [], []
+def _iter_owner_sources(store, pin):
     for namespace in IDENTITY_OWNER_FAMILIES:
         if store._namespace_state_at(namespace, pin.captured_head) is not None:
             for key in store.iter_keys(pin, namespace):
@@ -67,12 +66,18 @@ def _owner_sources(store, pin):
                 if (adapter is not None and adapter.owner_kind == 'leaf'
                         and type(value) is tuple and value and value[0] == 'branch'):
                     continue
-                versions.append(VersionChange(namespace, key, value,
+                yield VersionChange(namespace, key, value,
                     record_schema=schema,
-                    memberships=tuple(Membership(*m) for m in memberships)))
+                    memberships=tuple(Membership(*m) for m in memberships))
         else:
-            ordinary.extend(RecordChange(namespace, key, value, record_schema=schema)
+            yield from (RecordChange(namespace, key, value, record_schema=schema)
                 for key, value, schema in store.read_records(namespace, expected_record_schema=1))
+
+
+def _owner_sources(store, pin):
+    versions, ordinary = [], []
+    for change in _iter_owner_sources(store, pin):
+        (versions if isinstance(change, VersionChange) else ordinary).append(change)
     return versions, ordinary
 
 
@@ -93,10 +98,13 @@ def _backing_rosters(store, pin, next_incarnation):
     return tuple(VersionChange(DEPENDENCIES, inc, dependency_value(kind)) for inc, kind in kinds.items())
 
 
-def _verify_catalog(store, pin):
+def _verify_catalog(store, pin, workspace=None):
+    if workspace is None:
+        with ConversionWorkspace(store.codec, directory=store.path.parent) as temporary:
+            return _verify_catalog(store, pin, temporary)
     catalog = IdentityCatalog(store)
     descriptor = catalog._descriptor(pin)
-    links, expected_nodes, live_owners = 0, set(), set()
+    links, expected_nodes, live_owners = 0, DiskSet(workspace), DiskSet(workspace)
     for incarnation in store.iter_keys(pin, GROUP_NAMESPACE):
         group = catalog.read_identity_group(pin, incarnation)
         links += len(group.links)
@@ -122,10 +130,9 @@ def _verify_catalog(store, pin):
                 pending.extend(child[1:] for child in node[2])
     if links != store.namespace_size(pin, LINK_NAMESPACE):
         raise StoreIntegrityError('identity link inventory is incomplete or extra')
-    versions, ordinary = _owner_sources(store, pin)
-    if live_owners != {store.codec.encode((v.namespace, v.key)) for v in (*versions, *ordinary)}:
+    if not live_owners.equals(store.codec.encode((v.namespace, v.key)) for v in _iter_owner_sources(store, pin)):
         raise StoreIntegrityError('identity owner witness inventory is incomplete or extra')
-    if expected_nodes != {store.codec.encode(key) for key in store.iter_keys(pin, OWNER_TREE_NAMESPACE)}:
+    if not expected_nodes.equals(store.codec.encode(key) for key in store.iter_keys(pin, OWNER_TREE_NAMESPACE)):
         raise StoreIntegrityError('extra/missing identity owner tree authority')
     if descriptor[0] == CATALOG_TAG:
         from .persistence_lazy_identity_retired import RetiredIdentityRanges
@@ -205,35 +212,36 @@ def _check_reference_targets(values, dependencies, *, event_id_incarnations=()):
     """Explicit conversion scrub, including compact refs inside eager headers."""
     kinds = {change.key: change.value[1] for change in dependencies}
     used_facades = set()
-    pending, seen = list(values), set()
-    while pending:
-        value = pending.pop()
-        if nonreflexive_key_reference(value):
-            if kinds.get(value.incarnation) != 'nan-key':
-                raise StoreIntegrityError('catalog copy native NaN reference has missing or wrong-kind backing')
-            continue
-        if event_id_reference(value):
-            if value.incarnation not in event_id_incarnations:
-                raise StoreIntegrityError('catalog copy Event-ID reference lacks owner-zero identity')
-            if value.incarnation in kinds:
-                raise StoreIntegrityError('Event-ID facade competes with a recursive backing incarnation')
-            used_facades.add(value.incarnation)
-            continue
-        if reference(value) or record_reference(value):
-            expected = value.kind if reference(value) else 'record'
-            if kinds.get(value.incarnation) != expected:
-                raise StoreIntegrityError('catalog copy reference has missing or wrong-kind backing')
-            continue
-        if id(value) in seen:
-            continue
-        seen.add(id(value))
-        if isinstance(value, dict):
-            pending.extend(value.keys())
-            pending.extend(value.values())
-        elif isinstance(value, (list, tuple, set, frozenset)):
-            pending.extend(value)
-        elif is_dataclass(value) and type(value) in RECORD_FIELDS:
-            pending.extend(getattr(value, field) for field in RECORD_FIELDS[type(value)])
+    for root in values:
+        pending, seen = [root], set()
+        while pending:
+            value = pending.pop()
+            if nonreflexive_key_reference(value):
+                if kinds.get(value.incarnation) != 'nan-key':
+                    raise StoreIntegrityError('catalog copy native NaN reference has missing or wrong-kind backing')
+                continue
+            if event_id_reference(value):
+                if value.incarnation not in event_id_incarnations:
+                    raise StoreIntegrityError('catalog copy Event-ID reference lacks owner-zero identity')
+                if value.incarnation in kinds:
+                    raise StoreIntegrityError('Event-ID facade competes with a recursive backing incarnation')
+                used_facades.add(value.incarnation)
+                continue
+            if reference(value) or record_reference(value):
+                expected = value.kind if reference(value) else 'record'
+                if kinds.get(value.incarnation) != expected:
+                    raise StoreIntegrityError('catalog copy reference has missing or wrong-kind backing')
+                continue
+            if id(value) in seen:
+                continue
+            seen.add(id(value))
+            if isinstance(value, dict):
+                pending.extend(value.keys())
+                pending.extend(value.values())
+            elif isinstance(value, (list, tuple, set, frozenset)):
+                pending.extend(value)
+            elif is_dataclass(value) and type(value) in RECORD_FIELDS:
+                pending.extend(getattr(value, field) for field in RECORD_FIELDS[type(value)])
     return used_facades
 
 
@@ -332,11 +340,13 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                     delta = build_initial(codec, versions, placements,
                         ordinary_changes=ordinary, next_incarnation_id=next_incarnation,
                         generation=pin.captured_head + 1)
+                    del versions, ordinary
+                    _copy_phase('after_source_validation', private)
                     dependencies = _backing_rosters(store, pin, next_incarnation)
                     promoted = capture_lists(store, pin, selected)
                     captured_bodies = capture_bodies(store, pin, dependencies) if normalize_graph else None
                     head, metadata = store._checked_head_row(), store.head_metadata()
-                    segments = tuple(store.db.execute('SELECT * FROM segments'))
+                    segments = workspace.stage(store.db.execute('SELECT * FROM segments'))
                     all_versions = []
                     states = []
                     for ns, count, high_water in store.db.execute('SELECT namespace,member_count,next_ordinal '
@@ -352,7 +362,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                                 memberships=tuple(Membership(*m) for m in members)))
                         if count == 0:
                             all_versions.append(VersionChange(ns, ('empty-catalog-copy/v1',), delete=True))
-                    orders = tuple((ns, key, ordinal) for ns, key, ordinal in store.db.execute(
+                    orders = workspace.stage((ns, key, ordinal) for ns, key, ordinal in store.db.execute(
                         'SELECT namespace,typed_key,ordinal FROM lazy_order_versions '
                         'WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',
                         (pin.captured_head, pin.captured_head)) if ns != DEPENDENCIES)
@@ -364,8 +374,9 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                         memberships=tuple(ordinary_members.get((ns, key), ())))
                         for ns, key, payload, schema in store.db.execute('SELECT namespace,typed_key,payload,record_schema FROM records')
                         if ns != LINK_NAMESPACE and (ns, codec.decode(key)) != (EVENT_STORAGE, COMMIT_DESCRIPTOR_KEY))
-                    _check_reference_targets((value.value for value in (*all_versions, *all_ordinary)), dependencies)
+                    _check_reference_targets((value.value for value in chain(all_versions, all_ordinary)), dependencies)
                     _check_backing_graph(codec, all_versions, dependencies)
+                    _copy_phase('after_source_capture', private)
             finally:
                 store.release_pin(pin)
         with LazyRecordStore.create(private, codec=codec, simulation_schema=SCHEMA, rules_id=rules_id) as target:
@@ -394,19 +405,33 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                     (all_versions, all_ordinary, placements, dependencies, orders, states,
                      versions, ordinary) = transform_copy(target, pin, promoted, all_versions,
                         all_ordinary, placements, dependencies, orders, states)
+                if normalize_graph:
+                    del captured_bodies
+                _copy_phase('after_normalization', private)
+                # Normalization keeps its decoded graph residency/identity contract.
+                # Only its completed output is replayed, after aliases are explicit.
+                all_versions = workspace.stage_versions(all_versions)
+                all_ordinary = workspace.stage_ordinary(all_ordinary)
+                placements = workspace.stage_identity(placements)
+                dependencies = workspace.stage_versions(dependencies)
+                orders = workspace.stage(orders)
                 if promoted or normalize_graph:
+                    del versions, ordinary
                     facade_ids = {p.incarnation_id for p in placements if
                         (p.owner_namespace, p.owner_key, p.occurrence_path) == ('world.event_ids', 0, ())}
-                    _check_reference_targets((v.value for v in (*all_versions, *all_ordinary)), dependencies,
+                    _check_reference_targets((v.value for v in chain(all_versions, all_ordinary)), dependencies,
                         event_id_incarnations=facade_ids)
                     _check_backing_graph(codec, all_versions, dependencies)
-                    delta = stage_initial_catalog(workspace, versions, placements, ordinary_changes=ordinary,
+                    delta = stage_initial_catalog(workspace, (v for v in all_versions if not v.delete and v.namespace in IDENTITY_OWNER_FAMILIES
+                        and not (v.namespace == NODE_NAMESPACE and v.value[0] == 'branch')), placements,
+                        ordinary_changes=(v for v in all_ordinary if v.namespace in IDENTITY_OWNER_FAMILIES),
                         next_incarnation_id=next_incarnation, generation=pin.captured_head + 1)
+                _copy_phase('after_catalog_staging', private)
                 if complete_format:
                     from dataclasses import replace
                     from .persistence_complete_format import marked_manifest, FORMAT_VERSION
                     from .persistence_adapters import META
-                    all_ordinary = tuple(replace(c, value=marked_manifest(c.value))
+                    all_ordinary = workspace.stage_ordinary(replace(c, value=marked_manifest(c.value))
                         if c.namespace == META and c.key == 'manifest' and not c.delete else c for c in all_ordinary)
                     floor = max(floor, FORMAT_VERSION)
                 _copy_phase('before_catalog_commit', private)
@@ -420,7 +445,7 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                 _copy_phase('after_catalog_commit', private)
                 _restore_copy_ordinals(target, pin.captured_head, orders, states)
                 target.verify_all()
-                _verify_catalog(target, pin)
+                _verify_catalog(target, pin, workspace)
                 if complete_format:
                     from .persistence_adapters import _read_cold_manifest
                     from .persistence_complete_format import check_open
