@@ -10,7 +10,7 @@ env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
   CANDIDATE_SHA: 98a37c64514084879ef77c04825e47e1f6a4fabe
-  TEST_METRIC_SHA: e2fea2d8172c31e618841d49916630d1326ea89c
+  TEST_METRIC_SHA: 0883e37b03d737c5a9d196274e3486f54642d711
 jobs:
   verified-runtime-gates:
     runs-on: ubuntu-latest
@@ -90,7 +90,8 @@ jobs:
         assert len(suites)==1
         suite=suites[0]
         assert {k:int(suite.attrib[k]) for k in ('tests','failures','errors','skipped')}==dict(tests=2487,failures=1,errors=0,skipped=0)
-        cases=list(suite.iter('testcase'));assert len(cases)==2487
+        # pytest's summary includes two passing subtests without separate XML rows.
+        cases=list(suite.iter('testcase'));assert len(cases)==2485
         bad=[t for t in cases if t.find('failure') is not None or t.find('error') is not None or t.find('skipped') is not None]
         assert len(bad)==1
         f=bad[0];assert f.attrib['file']=='simulation/tests/test_stage_0_5_upgrade_memory.py'
@@ -102,7 +103,7 @@ jobs:
         focused=ET.parse('evidence/recovery/focused.xml').getroot()
         assert all(int(s.attrib['failures'])==int(s.attrib['errors'])==int(s.attrib['skipped'])==0 for s in focused)
         assert sum(int(s.attrib['tests']) for s in focused)==95
-        json.dump(dict(original_run=run,original_workflow_sha=workflow,runtime_product_sha=product,original_full_suite_passed=False,unchanged_main_tests_passed=2484,subtests_passed=2,only_failure=f.attrib['name'],recovery_passed=True,recovery_final_year=10,artifact_ids=[a[0] for a in origins]),open('evidence/prior-gates.json','w'),indent=2)
+        json.dump(dict(original_run=run,original_workflow_sha=workflow,runtime_product_sha=product,original_full_suite_passed=False,original_junit_summary_tests=2487,original_junit_main_cases=2485,unchanged_main_tests_passed=2484,subtests_passed=2,only_failure=f.attrib['name'],recovery_passed=True,recovery_final_year=10,artifact_ids=[a[0] for a in origins]),open('evidence/prior-gates.json','w'),indent=2)
         EVIDENCE
     - name: Run corrected guarded cases after cold and warm pytest parents
       shell: bash
