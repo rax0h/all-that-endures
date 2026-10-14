@@ -1,6 +1,8 @@
 """Frozen pre-index market loop used for differential stabilization tests.
 
-The control flow stays intentionally unoptimized. Shared balance constants are imported from
+The control flow stays intentionally unoptimized. The coin-payment semantics
+and event fields follow the deliberate apprenticeship/access revision; selection
+is still a full-scan oracle independent of production indexes. Shared balance constants are imported from
 production so this test compares indexing against the same calibrated simulation rules.
 """
 from simulation.ate_sim.magic_resources import (
@@ -9,6 +11,7 @@ from simulation.ate_sim.magic_resources import (
  use_awakening_stone, _transfer_to_seeker, RESOURCE_DISCOVERY_RATE,
 )
 from simulation.ate_sim.core_types import layer_ref
+from simulation.ate_sim.currency import can_pay_tier
 
 def legacy_magic_ecology_step(world,rng):
  Layer,Ref=layer_ref();_recover_dead_owner_resources(world);adults_by_settlement={sid:[] for sid in world.settlements}
@@ -21,11 +24,16 @@ def legacy_magic_ecology_step(world,rng):
   if rr.random()<chance:_discover(world,rr,sid,people)
   for r in list(world.magic_resources.inventory('settlement',sid)):
    price=(7 if r.kind=='essence' else 3)
-   seekers=[p for p in people if _wants(world,p,r) and p.wealth>=price]
+   seekers=[p for p in people if _wants(world,p,r) and (p.wealth>=price or can_pay_tier(world,p.id,'iron',price))]
    if seekers:
     q=max(seekers,key=lambda p:(_aspiration(world,p).urgency,_aspiration(world,p).drive,_aspiration(world,p).preparation,p.wealth,-p.id));price=(7 if r.kind=='essence' else 3)
-    if q.wealth>=price:
-     q.wealth-=price;e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price);world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
+    institution=world.institutions.institution_by_kind('adventure_society')
+    coins={}
+    if q.wealth>=price:q.wealth-=price
+    elif institution is not None:
+     coins=world.currency.treasury_transfer(institution.id,q.id,{'iron':price},deposit=True)
+    else:continue
+    e=world.emit('magic_resource_purchased',Layer.SOCIETY,(Ref('person',q.id),),Ref('settlement',sid),((r.origin_event,) if r.origin_event else ()),resource=r.id,key=r.key,price=price,coin_deposit=coins,institution=None if institution is None else institution.id,price_domain='ranked_coin' if coins else 'ordinary_wealth');world.magic_resources.transfer(r.id,'person',q.id,e.id,sid)
  adults=[p for sid in sorted(adults_by_settlement) for p in adults_by_settlement[sid]]
  for p in adults:
   rr=rng.stream('magic_use',world.year,p.id);a=_aspiration(world,p);path=world.advancement.path(p.id);base=0 if path is None else len(path.base_essences)
