@@ -473,10 +473,9 @@ def main():
     parser.add_argument('--stop-after', choices=('cold', 'lazy', 'complete'))
     parser.add_argument('--resume-from', choices=('cold', 'lazy', 'complete'))
     args = parser.parse_args()
-    # Stack samples survive in the streamed job log even if the runner is lost.
+    # Keep fatal-crash reporting; do not walk live frames from a watchdog thread.
     import faulthandler
     faulthandler.enable()
-    faulthandler.dump_traceback_later(300, repeat=True)
 
     summary = run(
         args.seed,
