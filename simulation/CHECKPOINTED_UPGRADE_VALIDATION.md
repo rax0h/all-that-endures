@@ -61,9 +61,27 @@ upload availability issue was treated as material to retry behavior and fixed
 with a failing-then-passing workflow regression test.
 
 Runtime evidence remains run38690643226: 2522 tests plus 2 subtests and the exact
-3+4+3 recovery passed. The new harness is additionally gated by its bounded CI
-proof; that fresh-runner result is pending. The mature pipeline is deliberately
-absent from the enabled workflow. Before enabling mature construction, use its
-pinned retained source, separate measured stage budgets with upload headroom and
-source/config guards. Neither mature phase timing nor Stage0.5 acceptance is
-established by these small tests. Do not retry the old monolithic six-hour job.
+3+4+3 recovery passed. The bounded fresh-runner proof run38756130032 passed all nine jobs in10m21s,
+including68 harness tests, interrupted catalog verification, fresh-runner resume,
+exact continuation and downloaded restore. Its final restore artifact is
+11983179741 (archive SHA256
+240b92c2df78105f905c9ed018e23bbe30721d7eb68e4240a56e84dcb66b4667).
+
+The next stage uses `checkpoint_mature_capture.py` and the separate
+`stage-0-5-mature-capture.yml` workflow on
+`sol/stage-0-5-mature-checkpoint-validation`. It authenticates that green proof,
+checks the exact green helper-file hashes and runtime subtree, authenticates
+original artifact11870590333/run38508408370, and verifies every original source
+configuration field and database hash. It requires55GiB free before download and
+45GiB after extraction, keeps the8GiB process guard, and reports copy phases,
+ordinal-restoration timing and60-second resource heartbeats. Its300-minute
+command budget within a360-minute job reserves about60minutes for uploads.
+
+This construction job creates ONLY an unverified candidate and summary. It does
+not run storage/catalog verification or continuation. Inspect construction
+elapsed time, candidate size and upload time before enabling subsequent large
+stages. Existing measurements suggest construction could still take3–4hours;
+that is an estimate, not a bound. A failure within construction still requires
+construction to retry. Once capture succeeds, later stages can reuse that artifact.
+Neither mature phase timing nor Stage0.5 acceptance is established by the small
+proof. Do not retry the old monolithic six-hour job.

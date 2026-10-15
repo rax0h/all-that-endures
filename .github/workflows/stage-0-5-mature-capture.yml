@@ -1,0 +1,59 @@
+name: Stage 0.5 mature construction checkpoint
+'on':
+  push:
+    branches:
+      - sol/stage-0-5-mature-checkpoint-validation
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: 24cc39974b0762e428e2a5a0d7581f7f92216310
+  HARNESS_SHA: HARNESS_COMMIT
+jobs:
+  mature-capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Check mature wiring
+      run: |
+        python -m pip install pytest
+        python -m pytest -q simulation/tests/test_checkpoint_mature_capture.py simulation/tests/test_checkpoint_workflow.py
+    - name: Reserve disk on this disposable runner
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        mkdir -p evidence
+        df -h . | tee evidence/disk-start.txt
+    - name: Capture mature candidate with upload headroom
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        timeout --signal=TERM --kill-after=30s 300m python -m simulation.checkpoint_mature_capture 2>&1 | tee evidence/capture.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: checkpoint-mature-capture-diagnostics
+        path: |
+          evidence/capture.log
+          evidence/disk-start.txt
+          evidence/capture-summary.json
+        retention-days: 14
+    - name: Retain unverified candidate
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-mature-capture
+        path: evidence/candidate
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
