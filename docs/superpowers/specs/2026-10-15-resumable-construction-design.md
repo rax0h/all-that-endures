@@ -1,6 +1,6 @@
 # Earlier checkpoints inside complete-upgrade construction
 
-Status: proposed repair; not implemented. Stage 0.5 remains unaccepted.
+Status: approved and implemented; bounded CI validation pending. Stage 0.5 remains unaccepted.
 The large retry remains paused. This extends the previously approved
 post-construction verification split; its earlier construction boundary is new.
 
@@ -191,7 +191,11 @@ artifact provenance, measured time and headroom first.
 
 ## Current status
 
-Investigation and proposed design only. Production runtime, checkpoint
-protocol and mature workflow are unchanged by this report. The large retry
-has not started. The finished-run hourly monitor was paused. Neither this
-report nor the bounded profile establishes Stage 0.5 acceptance.
+The approved split is implemented with a no-op private converter seam and
+validation-only helpers. Local interruption, corruption, equivalence and
+fresh-process tests pass; the independent review findings were repaired.
+The converter seam changes the runtime tree, so new whole-suite and recovery
+evidence is required. The mature workflow remains unchanged and paused.
+The local pipeline uses controlled local file transfer; fresh-runner CI must
+still prove actual artifact transport and the complete staged continuation.
+No mature construction retry or Stage 0.5 acceptance is claimed.

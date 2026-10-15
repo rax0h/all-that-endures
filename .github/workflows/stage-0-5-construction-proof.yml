@@ -1,0 +1,448 @@
+name: Stage 0.5 resumable construction proof - mature paused
+'on':
+  push:
+    branches:
+    - sol/stage-0-5-construction-proof
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: construction-proof-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: SOURCE_COMMIT
+  HARNESS_SHA: SOURCE_COMMIT
+jobs:
+  harness-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - run: PYTHONPATH=.:simulation timeout 12m python -m pytest -q simulation/tests/test_construction_checkpoint.py
+        simulation/tests/test_construction_checkpoint_ci.py simulation/tests/test_checkpoint_artifacts.py
+        simulation/tests/test_checkpointed_upgrade_validation.py -k "not p5_bridge"
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - harness-tests
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded source
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        source 2>&1 | tee evidence/source.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-source-diagnostics
+        path: evidence/source.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-source
+        path: 'evidence/source/checkpoint.json
+
+          evidence/source/p5-long-lazy.sqlite
+
+          evidence/source/fixture.json'
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - source
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded prepare
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        prepare 2>&1 | tee evidence/prepare.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-prepare-diagnostics
+        path: evidence/prepare.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-prepare
+        path: evidence/prepare
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  interrupt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - prepare
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded interrupt
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        interrupt 2>&1 | tee evidence/interrupt.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-interrupt-diagnostics
+        path: evidence/interrupt.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-interrupt
+        path: evidence/interrupt
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  commit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - interrupt
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded commit
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        commit 2>&1 | tee evidence/commit.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-commit-diagnostics
+        path: evidence/commit.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-commit
+        path: evidence/commit
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  orders:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - commit
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded orders
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        orders 2>&1 | tee evidence/orders.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-orders-diagnostics
+        path: evidence/orders.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-orders
+        path: evidence/orders
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  storage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - orders
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded storage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        storage 2>&1 | tee evidence/storage.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-storage-diagnostics
+        path: evidence/storage.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-storage
+        path: evidence/storage
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - storage
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded catalog
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        catalog 2>&1 | tee evidence/catalog.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-catalog-diagnostics
+        path: evidence/catalog.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-catalog
+        path: evidence/catalog
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - catalog
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded publish
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        publish 2>&1 | tee evidence/publish.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-publish-diagnostics
+        path: evidence/publish.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-publish
+        path: evidence/publish
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  continue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - publish
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded continue
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        continue 2>&1 | tee evidence/continue.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-continue-diagnostics
+        path: evidence/continue.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-continue
+        path: evidence/continue
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - continue
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Execute bounded restore
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.construction_checkpoint_ci
+        restore 2>&1 | tee evidence/restore.log'
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-small-restore-diagnostics
+        path: evidence/restore.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-small-restore
+        path: evidence/restore
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    needs:
+    - harness-tests
+    steps:
+    - &id001
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - &id002
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - &id003
+      run: python -m pip install pytest pyyaml
+    - name: Full simulation suite
+      shell: bash
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 135m python -m pytest -q simulation/tests
+        --junitxml=evidence/full-suite.xml 2>&1 | tee evidence/full-suite.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: construction-full-suite
+        path: evidence
+        retention-days: 14
+  recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs:
+    - harness-tests
+    steps:
+    - *id001
+    - *id002
+    - *id003
+    - name: Complete recovery and conversion regressions
+      shell: bash
+      run: 'mkdir -p evidence
+
+        ulimit -v 8388608
+
+        timeout --signal=TERM --kill-after=30s 20m bash -c ''python -m simulation.measure_stage_0_5_complete_recovery
+        --output evidence/fault-recovery.json && python -m simulation.persistence_p5_validation
+        --complete-format --pre-years 3 --continuation-years 4 --reopen-years 3 --output
+        evidence/recovery-3-4-3.json'' 2>&1 | tee evidence/recovery.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: construction-recovery
+        path: evidence
+        retention-days: 14

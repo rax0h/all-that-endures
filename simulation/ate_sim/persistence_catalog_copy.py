@@ -51,6 +51,11 @@ def _copy_phase(_phase, _private_path):
     return None
 
 
+def _construction_ready(target, pin, *, workspace, streams, commit):
+    """Private validation seam; ordinary conversion always continues unchanged."""
+    return None
+
+
 def _iter_owner_sources(store, pin):
     for namespace in IDENTITY_OWNER_FAMILIES:
         if store._namespace_state_at(namespace, pin.captured_head) is not None:
@@ -479,6 +484,11 @@ def _copy_with_checked_catalog(source, destination, *, rules_id, promote_lists=(
                         if c.namespace == META and c.key == 'manifest' and not c.delete else c for c in all_ordinary)
                     floor = max(floor, FORMAT_VERSION)
                 _copy_phase('before_catalog_commit', private)
+                _construction_ready(target, pin, workspace=workspace,
+                    streams=dict(ordinary=all_ordinary, versions=all_versions, catalog=delta,
+                        dependencies=dependencies, identity=placements, orders=orders, states=states),
+                    commit=dict(commit_token=token, next_incarnation_id=next_incarnation,
+                        required_format_version=floor, metadata=metadata))
                 committed = target.commit(pin, commit_token=token,
                     changes=chain(all_ordinary, (RecordChange(EVENT_STORAGE,
                         COMMIT_DESCRIPTOR_KEY, (1, pin.captured_head + 1, token)),)),
