@@ -1,0 +1,336 @@
+name: Stage 0.5 checkpoint proof - mature retry paused
+'on':
+  push:
+    branches:
+    - sol/stage-0-5-final-release-validation
+permissions:
+  contents: read
+  actions: read
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: 24cc39974b0762e428e2a5a0d7581f7f92216310
+  HARNESS_SHA: HARNESS_COMMIT
+jobs:
+  harness-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - run: timeout --signal=TERM --kill-after=30s 12m python -m pytest -q simulation/tests/test_checkpointed_upgrade_validation.py
+        simulation/tests/test_checkpoint_artifacts.py simulation/tests/test_stage_0_5_catalog_sequence_scrub.py
+        simulation/tests/test_stage_0_5_final_long_harness.py simulation/tests/test_checkpoint_workflow.py
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - harness-tests
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - name: Execute bounded source
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.checkpoint_validation_ci
+        source 2>&1 | tee evidence/source.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: checkpoint-small-source-diagnostics
+        path: 'evidence/source.log
+
+          evidence/verification.jsonl'
+        retention-days: 14
+      continue-on-error: true
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-small-source
+        path: 'evidence/source/checkpoint.json
+
+          evidence/source/p5-long-lazy.sqlite'
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - source
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - name: Execute bounded capture
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.checkpoint_validation_ci
+        capture 2>&1 | tee evidence/capture.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: checkpoint-small-capture-diagnostics
+        path: 'evidence/capture.log
+
+          evidence/verification.jsonl'
+        retention-days: 14
+      continue-on-error: true
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-small-capture
+        path: evidence/candidate
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  storage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - capture
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - name: Execute bounded storage
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.checkpoint_validation_ci
+        storage 2>&1 | tee evidence/storage.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: checkpoint-small-storage-diagnostics
+        path: 'evidence/storage.log
+
+          evidence/verification.jsonl'
+        retention-days: 14
+      continue-on-error: true
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-small-storage
+        path: evidence/storage.json
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  interrupt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - storage
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - name: Execute bounded interrupt
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.checkpoint_validation_ci
+        interrupt 2>&1 | tee evidence/interrupt.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: checkpoint-small-interrupt-diagnostics
+        path: 'evidence/interrupt.log
+
+          evidence/verification.jsonl'
+        retention-days: 14
+      continue-on-error: true
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-small-interrupt
+        path: evidence/interrupted.json
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - interrupt
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - name: Execute bounded catalog
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.checkpoint_validation_ci
+        catalog 2>&1 | tee evidence/catalog.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: checkpoint-small-catalog-diagnostics
+        path: 'evidence/catalog.log
+
+          evidence/verification.jsonl'
+        retention-days: 14
+      continue-on-error: true
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-small-catalog
+        path: evidence/catalog.json
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - catalog
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - name: Execute bounded publish
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.checkpoint_validation_ci
+        publish 2>&1 | tee evidence/publish.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: checkpoint-small-publish-diagnostics
+        path: 'evidence/publish.log
+
+          evidence/verification.jsonl'
+        retention-days: 14
+      continue-on-error: true
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-small-publish
+        path: 'evidence/p5/checkpoint.json
+
+          evidence/p5/p5-long-complete.sqlite'
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  continue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - publish
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - name: Execute bounded continue
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.checkpoint_validation_ci
+        continue 2>&1 | tee evidence/continue.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: checkpoint-small-continue-diagnostics
+        path: 'evidence/continue.log
+
+          evidence/verification.jsonl'
+        retention-days: 14
+      continue-on-error: true
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-small-continue
+        path: evidence/continue
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+    - continue
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest
+    - name: Execute bounded restore
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: 'mkdir -p evidence
+
+        timeout --signal=TERM --kill-after=30s 12m python -m simulation.checkpoint_validation_ci
+        restore 2>&1 | tee evidence/restore.log'
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: checkpoint-small-restore-diagnostics
+        path: 'evidence/restore.log
+
+          evidence/verification.jsonl'
+        retention-days: 14
+      continue-on-error: true
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkpoint-small-restore
+        path: evidence/restore.json
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
