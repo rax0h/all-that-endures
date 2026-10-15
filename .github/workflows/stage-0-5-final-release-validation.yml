@@ -1,4 +1,4 @@
-name: Stage 0.5 repaired complete upgrade acceptance
+name: Stage 0.5 catalog repair preflight - giant retry paused
 'on':
   push:
     branches:
@@ -9,8 +9,8 @@ permissions:
 env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
-  CANDIDATE_SHA: b15f4e12730a2d542f55335f69a4a7f6e48a9346
-  CANDIDATE_TREE: e8fa00ce701eab510d87a350d809aa5095fa2b54
+  CANDIDATE_SHA: 24cc39974b0762e428e2a5a0d7581f7f92216310
+  CANDIDATE_TREE: 4b446d49ea9f4bdb23e7337124e0cd1203f0a095
 jobs:
   recovery-gate:
     runs-on: ubuntu-latest
@@ -30,7 +30,15 @@ jobs:
         git rev-parse HEAD HEAD^{tree} 2>&1 | tee evidence/source.txt
         test "$(git rev-parse HEAD)" = "${CANDIDATE_SHA}"
         test "$(git rev-parse HEAD^{tree})" = "${CANDIDATE_TREE}"
-        python -m pytest -q -o junit_family=legacy --junitxml=evidence/focused.xml simulation/tests/test_stage_0_5_upgrade_memory.py simulation/tests/test_stage_0_5_conversion_preparation.py simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_stage_0_5_owner_witness_cache.py simulation/tests/test_stage_0_5_final_long_harness.py simulation/tests/test_stage_0_5_final_backing_dependencies.py 2>&1 | tee evidence/focused.log
+        python -m pytest -q -o junit_family=legacy --junitxml=evidence/focused.xml simulation/tests/test_stage_0_5_catalog_sequence_scrub.py simulation/tests/test_stage_0_5_final_sequence.py simulation/tests/test_stage_0_5_final_catalog_copy.py simulation/tests/test_stage_0_5_upgrade_memory.py simulation/tests/test_stage_0_5_conversion_preparation.py simulation/tests/test_persistence_lazy_identity.py simulation/tests/test_stage_0_5_owner_witness_cache.py simulation/tests/test_stage_0_5_final_long_harness.py simulation/tests/test_stage_0_5_final_backing_dependencies.py 2>&1 | tee evidence/focused.log
+        python simulation/tests/catalog_sequence_scrub_probe.py --shared --counts 8 32 128 512 --output evidence/catalog-scale.json 2>&1 | tee evidence/catalog-scale.log
+        python - <<'SCALE'
+        import json
+        for row in json.load(open('evidence/catalog-scale.json')):
+            assert row['rows_fetched']==row['visible_rows']
+            assert set(row['inventory_calls'].values())=={1}
+            assert row['largest_fetchall']==0
+        SCALE
         timeout 35m python simulation/persistence_p5_validation.py --seed 843000 --pre-years 3 --continuation-years 4 --reopen-years 3 --complete-format --rules-id stage-0-5-final-release --workdir evidence/p5 --output evidence/p5.json 2>&1 | tee evidence/p5.log
         python - <<'PY'
         import json
@@ -60,6 +68,9 @@ jobs:
         name: final-source-recovery-failure-databases
         path: evidence/p5
         retention-days: 14
+    needs:
+    - retained-preflight
+    - conversion-scale
   full-suite:
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -84,6 +95,9 @@ jobs:
         name: final-source-full-suite
         path: evidence
         retention-days: 14
+    needs:
+    - retained-preflight
+    - conversion-scale
   late-complete:
     runs-on: ubuntu-latest
     timeout-minutes: 360
@@ -205,12 +219,14 @@ jobs:
             print(json.dumps(dict(copy_phase=phase,**memory())),flush=True)
             return original_phase(phase,path)
         copy._copy_phase=measured_phase
-        for name in ('_owner_sources','validate_initial_catalog_inputs','stage_initial_catalog','_backing_rosters','_check_reference_targets','_check_backing_graph','_empty_destination','_verify_catalog'):
+        for name in ('_owner_sources','validate_initial_catalog_inputs','stage_initial_catalog','_backing_rosters','_check_reference_targets','_check_backing_graph','_empty_destination'):
             observe(copy,name)
         for name in ('capture_bodies','normalize_events','reconcile_copy'):
             observe(normalization,name)
         print('REPAIR CANDIDATE: 8 GiB address-space cap; complete checkpoint remains partial evidence',flush=True)
-        runpy.run_module('persistence_p5_long_validation',run_name='__main__')
+        from simulation.tests.catalog_sequence_scrub_probe import verification_probe
+        with verification_probe('evidence/catalog-sequences.jsonl'):
+            runpy.run_module('persistence_p5_long_validation',run_name='__main__')
         PROBE
         python - <<'VERIFY'
         import json,hashlib,os
@@ -237,6 +253,7 @@ jobs:
           evidence/*.txt
           evidence/*.json
           evidence/*.log
+          evidence/*.jsonl
           evidence/late/progress.jsonl
         retention-days: 14
         compression-level: 1
@@ -254,6 +271,9 @@ jobs:
     needs:
     - recovery-gate
     - full-suite
+    - retained-preflight
+    - conversion-scale
+    if: ${{ false }}
   complete-late-fixture:
     needs: late-complete
     runs-on: ubuntu-latest
@@ -407,3 +427,260 @@ jobs:
         name: final-source-downloaded-restore-proof
         path: evidence
         retention-days: 14
+  retained-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.CANDIDATE_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Reserve hosted-runner disk for disposable conversion databases
+      shell: bash
+      run: |
+        # Only unused preinstalled toolchains on this disposable hosted runner.
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        mkdir -p evidence
+        df -h . 2>&1 | tee evidence/disk-start.txt
+        python -c "import shutil; assert shutil.disk_usage('.').free > 25*1024**3, 'need 25 GiB for explicit conversion and restore copies'"
+    - name: Download and verify exact retained lazy archive
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        mkdir -p evidence/late
+        python - <<'ARCHIVE'
+        import hashlib,json,os,pathlib,urllib.request,urllib.error,zipfile
+        base='https://api.github.com/repos/rax0h/all-that-endures/actions/artifacts/11870590333'
+        headers={'Authorization':'Bearer '+os.environ['GITHUB_TOKEN'],'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}
+        with urllib.request.urlopen(urllib.request.Request(base,headers=headers)) as response:metadata=json.load(response)
+        expected='409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9'
+        assert metadata['id']==11870590333 and not metadata['expired'] and metadata['name']=='late-lazy-checkpoint'
+        assert metadata['size_in_bytes']==1339563957 and metadata['digest']=='sha256:'+expected
+        assert metadata['workflow_run']['id']==38508408370 and metadata['workflow_run']['head_sha']=='124c3215468a60862b7848086f00a8e768a6ed66'
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self,*args):return None
+        opener=urllib.request.build_opener(NoRedirect)
+        try:
+            opener.open(urllib.request.Request(base+'/zip',headers=headers))
+            raise AssertionError('expected artifact redirect')
+        except urllib.error.HTTPError as error:
+            assert error.code==302
+            location=error.headers['Location']
+            assert location.startswith('https://')
+        # The signed object URL receives no GitHub credential header.
+        archive=pathlib.Path('evidence/retained-lazy.zip');h=hashlib.sha256();size=0
+        with urllib.request.urlopen(location) as response,archive.open('wb') as output:
+            while chunk:=response.read(1024*1024):
+                output.write(chunk);h.update(chunk);size+=len(chunk)
+        assert h.hexdigest()==expected and size==1339563957
+        with zipfile.ZipFile(archive) as z:
+            assert set(z.namelist())=={'checkpoint.json','p5-long-lazy.sqlite'}
+            z.extractall('evidence/late')
+        receipt=json.load(open('evidence/late/checkpoint.json'))
+        assert receipt['stage']=='lazy' and receipt['workflow_sha']=='124c3215468a60862b7848086f00a8e768a6ed66'
+        assert receipt['config']==dict(seed=843000,milestones=[1001,1002],bootstrap_year=1000,rules_id='stage-0-5-final-release',product_sha='2bc3c85389760ff12578857f7d2a849bc5cf9201',complete_format=True,initialization='mature',simulation_schema='ate-world-p2a/1')
+        with open('evidence/late/p5-long-lazy.sqlite','rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==receipt['database']['sha256']
+        json.dump(dict(artifact_id=11870590333,origin_run=38508408370,archive_sha256=expected,archive_bytes=size,source_receipt=receipt,executing_candidate=os.environ['CANDIDATE_SHA']),open('evidence/source-artifact.json','w'),indent=2)
+        archive.unlink()
+        ARCHIVE
+    - name: Verify reused lazy checkpoint provenance
+      shell: bash
+      run: |
+        python - <<'CHECK'
+        import json
+        r=json.load(open('evidence/late/checkpoint.json'))
+        assert r['stage']=='lazy' and r['workflow_sha']=='124c3215468a60862b7848086f00a8e768a6ed66'
+        assert r['config']['product_sha']=='2bc3c85389760ff12578857f7d2a849bc5cf9201'
+        CHECK
+        cp evidence/late/checkpoint.json evidence/source-checkpoint.json
+    - name: Bounded retained checkpoint profile - no conversion
+      shell: bash
+      run: |
+        cat > evidence/retained-profile.py <<'PROFILE'
+        """Bounded diagnostics of a disposable copy; never converts or publishes it."""
+        import hashlib
+        import json
+        import pathlib
+        import resource
+        import shutil
+        import statistics
+        import subprocess
+        import sys
+        import time
+
+        from ate_sim.persistence_adapters import WorldCodec, SCHEMA
+        from ate_sim.persistence_lazy_store import LazyRecordStore
+        from ate_sim.persistence_lazy_sequence import NAMESPACES, DESCRIPTOR_NAMESPACE
+
+        source, rules, output = pathlib.Path(sys.argv[1]), sys.argv[2], pathlib.Path(sys.argv[3])
+        resource.setrlimit(resource.RLIMIT_AS, (8 * 1024**3, 8 * 1024**3))
+        started = time.perf_counter()
+        working = output.with_suffix('.working.sqlite')
+        assert not working.exists()
+        assert shutil.disk_usage(working.parent).free > source.stat().st_size + 1024**3
+        shutil.copyfile(source, working)
+        print(json.dumps({'profile_phase': 'private_copy_ready', 'seconds': time.perf_counter() - started,
+                          'source_bytes': source.stat().st_size}), flush=True)
+
+        child = r'''
+        import json,pathlib,resource,sys,time
+        from ate_sim.persistence_adapters import WorldCodec,SCHEMA
+        from ate_sim.persistence_lazy_store import LazyRecordStore,GenerationPin
+        from ate_sim.persistence_lazy_sequence import LazyOrderedSequence
+        resource.setrlimit(resource.RLIMIT_AS,(8*1024**3,8*1024**3))
+        path,rules,token,identity,generation,incarnation=sys.argv[1:]
+        with LazyRecordStore.open(path,codec=WorldCodec(identity_links_recorded=True),expected_simulation_schema=SCHEMA,expected_rules_id=rules) as store:
+         pin=GenerationPin(token,identity,int(generation))
+         before=store.diagnostics();started=time.perf_counter()
+         seq=LazyOrderedSequence(store,pin,int(incarnation),recursive=True)
+         expected={}
+         def inventory(namespace,keys):expected[namespace]=len(keys)
+         seq.scrub(_inventory=inventory)
+         after=store.diagnostics()
+         print(json.dumps(dict(incarnation=int(incarnation),length=len(seq),seconds=time.perf_counter()-started,expected_keys=expected,payload_reads=after.payload_reads-before.payload_reads,metadata_rows=after.metadata_rows-before.metadata_rows,scope='checked tree/parent/locator/member traversal; shared inventory equality separately regression-tested')))
+        '''
+
+        result = {'candidate': '24cc39974b0762e428e2a5a0d7581f7f92216310',
+                  'source_bytes': source.stat().st_size, 'conversion_started': False,
+                  'sample_timeout_seconds': 30, 'samples': [], 'key_scan_samples': {}}
+        try:
+            with LazyRecordStore.open(working, codec=WorldCodec(identity_links_recorded=True),
+                    expected_simulation_schema=SCHEMA, expected_rules_id=rules) as store:
+                pin = store.capture_pin()
+                try:
+                    head = store.checked_head()
+                    result['head_generation'] = head.generation
+                    result['namespace_counts'] = head.namespace_counts
+                    # Bound individual SQLite diagnostics too, including a bad query plan.
+                    deadline = time.monotonic() + 120
+                    store.db.set_progress_handler(lambda: int(time.monotonic() > deadline), 10000)
+                    counts = {namespace: store.db.execute('SELECT count(*) FROM lazy_record_versions '
+                        'WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',
+                        (namespace, pin.captured_head, pin.captured_head)).fetchone()[0] for namespace in NAMESPACES}
+                    result['visible_sequence_rows'] = counts
+                    result['old_repeated_inventory_rows'] = counts[DESCRIPTOR_NAMESPACE] * sum(counts.values())
+                    print(json.dumps({'profile_phase': 'sequence_counts', 'rows': counts,
+                        'old_repeated_inventory_rows': result['old_repeated_inventory_rows']}), flush=True)
+                    for namespace in NAMESPACES:
+                        t = time.perf_counter()
+                        keys = store.db.execute('SELECT typed_key FROM lazy_record_versions WHERE namespace=? '
+                            'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) LIMIT 4096',
+                            (namespace, pin.captured_head, pin.captured_head)).fetchall()
+                        for (encoded,) in keys:
+                            store.codec.decode(encoded)
+                        result['key_scan_samples'][namespace] = {'rows': len(keys), 'seconds': time.perf_counter() - t}
+                    sizes = []
+                    cursor = store.db.execute('SELECT typed_key,valid_from,valid_to,payload,payload_checksum,'
+                        'codec_version,record_schema,memberships,row_checksum FROM lazy_record_versions '
+                        'WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',
+                        (DESCRIPTOR_NAMESPACE, pin.captured_head, pin.captured_head))
+                    for encoded, *row in cursor:
+                        value, *_ = store._check_record_row(DESCRIPTOR_NAMESPACE, encoded, tuple(row), decode=True)
+                        incarnation = store.codec.decode(encoded)
+                        assert type(value) is tuple and len(value) in (8, 9)
+                        assert type(incarnation) is int and incarnation > 0 and type(value[3]) is int
+                        sizes.append((value[3], incarnation))
+                    cursor.close()
+                    store.db.set_progress_handler(None, 0)
+                    sizes.sort()
+                    result['descriptors'] = len(sizes)
+                    if sizes:
+                        result['sequence_lengths'] = {'minimum': sizes[0][0], 'maximum': sizes[-1][0],
+                            'median': statistics.median(length for length, _ in sizes),
+                            'total': sum(length for length, _ in sizes)}
+                        positions = sorted({0, len(sizes)//4, len(sizes)//2, 3*len(sizes)//4, len(sizes)-1})
+                        result['sample_positions'] = positions
+                        for position in positions:
+                            length, incarnation = sizes[position]
+                            arguments = [sys.executable, '-c', child, str(working), rules, pin.token,
+                                         pin.store_identity, str(pin.captured_head), str(incarnation)]
+                            try:
+                                run = subprocess.run(arguments, text=True, capture_output=True, timeout=30)
+                            except subprocess.TimeoutExpired:
+                                sample = {'incarnation': incarnation, 'length': length, 'timed_out': True, 'seconds': 30}
+                            else:
+                                if run.returncode:
+                                    sample = {'incarnation': incarnation, 'length': length, 'failed': True,
+                                              'returncode': run.returncode, 'stderr': run.stderr[-4000:]}
+                                else:
+                                    sample = json.loads(run.stdout)
+                            result['samples'].append(sample)
+                            print(json.dumps({'profile_phase': 'sequence_sample', **sample}), flush=True)
+                    result['profile_completed'] = True
+                finally:
+                    store.db.set_progress_handler(None, 0)
+                    store.release_pin(pin)
+            result['seconds'] = time.perf_counter() - started
+            result['scope'] = 'Original retained lazy checkpoint, not normalized complete output. Counts and samples do not prove complete-upgrade total runtime.'
+            output.write_text(json.dumps(result, indent=2) + '\n')
+            print(json.dumps({'profile_phase': 'finished', 'seconds': result['seconds'],
+                'descriptors': result.get('descriptors'), 'conversion_started': False}), flush=True)
+        finally:
+            for suffix in ('', '-journal', '-wal', '-shm'):
+                pathlib.Path(str(working) + suffix).unlink(missing_ok=True)
+        PROFILE
+        timeout --signal=TERM --kill-after=15s 15m python evidence/retained-profile.py evidence/late/p5-long-lazy.sqlite stage-0-5-final-release evidence/retained-profile.json 2>&1 | tee evidence/retained-profile.log
+        python - <<'CHECK_PROFILE'
+        import json
+        r=json.load(open('evidence/retained-profile.json'))
+        assert r['profile_completed'] and r['conversion_started'] is False
+        assert all(not s.get('failed') and not s.get('timed_out') for s in r['samples'])
+        CHECK_PROFILE
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: catalog-retained-preflight
+        path: |-
+          evidence/*.txt
+          evidence/*.json
+          evidence/*.log
+        retention-days: 14
+        compression-level: 1
+        if-no-files-found: error
+  conversion-scale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.CANDIDATE_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Bounded complete conversion and exact restore at two sizes
+      shell: bash
+      run: |
+        mkdir -p evidence
+        for n in 2000 8000; do
+          timeout --signal=TERM --kill-after=15s 10m python - "$n" <<'SCALE_PROBE' 2>&1 | tee "evidence/conversion-scale-${n}.log"
+        import resource,runpy,sys
+        from simulation.tests.catalog_sequence_scrub_probe import verification_probe
+        n=int(sys.argv[1])
+        resource.setrlimit(resource.RLIMIT_AS,(8*1024**3,8*1024**3))
+        sys.argv=['simulation/tests/complete_upgrade_memory_probe.py',str(n)]
+        with verification_probe(f'evidence/conversion-scale-{n}.jsonl'):
+            runpy.run_path(sys.argv[0],run_name='__main__')
+        SCALE_PROBE
+        done
+        python - <<'SCALE_RESULT'
+        import json,pathlib
+        results=[]
+        for n in (2000,8000):
+            rows=[json.loads(line) for line in pathlib.Path(f'evidence/conversion-scale-{n}.log').read_text().splitlines() if line.startswith('{')]
+            phases={r['phase']:r for r in rows if r.get('phase') in ('ready','published','digest_verified')}
+            assert set(phases)=={'ready','published','digest_verified'}
+            assert phases['digest_verified']['seconds']>=phases['published']['seconds']
+            results.append({'people_and_events':n,'upgrade_seconds':phases['published']['seconds']-phases['ready']['seconds'],'total_seconds':phases['digest_verified']['seconds'],'digest_verified':True,'scope':'Synthetic conversion; not the retained mature world'})
+        pathlib.Path('evidence/conversion-scale-summary.json').write_text(json.dumps(results,indent=2)+'\n')
+        print(json.dumps(results),flush=True)
+        SCALE_RESULT
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: catalog-conversion-scale
+        path: evidence
+        retention-days: 14
+        if-no-files-found: error
