@@ -1,0 +1,152 @@
+{
+  "schema": "ate-mature-construction-timeout-diagnosis/1",
+  "run_id": 38762444566,
+  "job_id": 116516966359,
+  "workflow_sha": "38369b86e3accc6f6dc361f8b7b65dd053d39609",
+  "harness_sha": "c3b4ca6498923b31bc631d87d7407a25256a93ad",
+  "runtime_sha": "24cc39974b0762e428e2a5a0d7581f7f92216310",
+  "runtime_tree": "c3229ed9ed46bd338bf31d76e7f037d0d77b87b6",
+  "failure": {
+    "exit_code": 124,
+    "command_limit_seconds": 18000,
+    "at": "2026-10-15T20:42:28.2530013Z",
+    "active_phase": "ordinal_restoration_started",
+    "artifact_capture_completed": false,
+    "observed_exception": "timeout; no integrity assertion, MemoryError, or ENOSPC in log"
+  },
+  "phase_intervals": [
+    {
+      "phase": "capture_started",
+      "seconds": 0.0005171939999968345,
+      "end_seconds": 0.0005171939999968345,
+      "timestamp": "2026-10-15T15:44:40.4772139Z"
+    },
+    {
+      "phase": "after_private_copy",
+      "seconds": 1275.540561388,
+      "end_seconds": 1275.541078582,
+      "timestamp": "2026-10-15T16:05:56.0178093Z"
+    },
+    {
+      "phase": "after_source_validation",
+      "seconds": 1234.504451321,
+      "end_seconds": 2510.045529903,
+      "timestamp": "2026-10-15T16:26:30.5222449Z"
+    },
+    {
+      "phase": "after_source_capture",
+      "seconds": 797.8626755380001,
+      "end_seconds": 3307.908205441,
+      "timestamp": "2026-10-15T16:39:48.3848838Z"
+    },
+    {
+      "phase": "after_normalization",
+      "seconds": 1938.1730256320006,
+      "end_seconds": 5246.081231073001,
+      "timestamp": "2026-10-15T17:12:06.5579771Z"
+    },
+    {
+      "phase": "after_catalog_staging",
+      "seconds": 4316.384699816,
+      "end_seconds": 9562.465930889,
+      "timestamp": "2026-10-15T18:24:02.9425833Z"
+    },
+    {
+      "phase": "before_catalog_commit",
+      "seconds": 5.154721471999437,
+      "end_seconds": 9567.620652361,
+      "timestamp": "2026-10-15T18:24:08.0972984Z"
+    },
+    {
+      "phase": "after_catalog_commit",
+      "seconds": 8200.457169518,
+      "end_seconds": 17768.077821879,
+      "timestamp": "2026-10-15T20:40:48.5544674Z"
+    },
+    {
+      "phase": "ordinal_restoration_started",
+      "seconds": 0.0010020369991252664,
+      "end_seconds": 17768.078823916,
+      "timestamp": "2026-10-15T20:40:48.5554142Z"
+    }
+  ],
+  "prior_run": {
+    "id": 38645679329,
+    "phases": [
+      {
+        "timestamp": "2026-10-14T23:57:43.1304284Z",
+        "phase": "after_private_copy",
+        "seconds": 866.38754686
+      },
+      {
+        "timestamp": "2026-10-15T00:10:11.4305276Z",
+        "phase": "after_source_validation",
+        "seconds": 1614.6891274079999
+      },
+      {
+        "timestamp": "2026-10-15T00:18:57.7449382Z",
+        "phase": "after_source_capture",
+        "seconds": 2141.0035237350003
+      },
+      {
+        "timestamp": "2026-10-15T00:40:11.5833497Z",
+        "phase": "after_normalization",
+        "seconds": 3414.841866312
+      },
+      {
+        "timestamp": "2026-10-15T01:26:56.1742614Z",
+        "phase": "after_catalog_staging",
+        "seconds": 6219.432773629999
+      },
+      {
+        "timestamp": "2026-10-15T01:26:59.7118218Z",
+        "phase": "before_catalog_commit",
+        "seconds": 6222.970135457
+      },
+      {
+        "timestamp": "2026-10-15T02:56:12.7021642Z",
+        "phase": "after_catalog_commit",
+        "seconds": 11575.956040769
+      }
+    ],
+    "staged_row_entries": 44187048,
+    "staged_payload_bytes": 11347739819,
+    "workspace_disk_bytes": 21524033536
+  },
+  "source_artifact": {
+    "run_id": 38508408370,
+    "id": 11870590333,
+    "archive_bytes": 1339563957,
+    "sha256": "409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9",
+    "expired": false,
+    "expires_at": "2026-10-28T04:32:21Z",
+    "metadata_rechecked": true,
+    "redownloaded_this_turn": false
+  },
+  "retained_diagnostics": {
+    "id": 12005761786,
+    "size_in_bytes": 6593,
+    "sha256": "06ca628b55e2cc19f934b54410727cda14bf988ab43908e8962dbd07ce1a70e2"
+  },
+  "bounded_local_profile": {
+    "fixture": "500 synthetic people and 500 Events; existing complete_upgrade_memory_probe.py; cProfile active only around prepared commit",
+    "profile_overhead_included": true,
+    "total_prepared_commit_seconds": 14.747970745999964,
+    "prepare_version_rows": 15571,
+    "prepare_identity_rows": 2501,
+    "prepare_ordinary_rows": 533,
+    "total_function_calls": 34426254,
+    "total_primitive_function_calls": 27472539,
+    "replay_iterator_cumulative_seconds": 8.102,
+    "sqlite_execute_self_seconds": 0.762,
+    "whole_probe_seconds": 28.433844932,
+    "exact_digest_restored": true,
+    "mature_runtime_prediction": false
+  },
+  "status": {
+    "runtime_changed": false,
+    "resume_protocol_changed": false,
+    "large_retry_started": false,
+    "stage_0_5_accepted": false
+  }
+}
