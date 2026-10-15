@@ -12,8 +12,8 @@ concurrency:
 env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
-  RUNTIME_SHA: SOURCE_COMMIT
-  HARNESS_SHA: SOURCE_COMMIT
+  RUNTIME_SHA: bbc3cbf11becb58aa4b9483114559fd1296878f1
+  HARNESS_SHA: bbc3cbf11becb58aa4b9483114559fd1296878f1
 jobs:
   harness-tests:
     runs-on: ubuntu-latest
