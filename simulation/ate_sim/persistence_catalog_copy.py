@@ -98,6 +98,56 @@ def _backing_rosters(store, pin, next_incarnation):
     return tuple(VersionChange(DEPENDENCIES, inc, dependency_value(kind)) for inc, kind in kinds.items())
 
 
+def _verify_sequences(store, pin, workspace):
+    """Check every active tree, then stream shared physical inventories once.
+
+    Scratch sets retain checked count/root commitments on disk. This is only
+    explicit full-copy verification; ordinary sequence reads/edits are unchanged.
+    """
+    from .persistence_history_retirement import NAMESPACE as RETIREMENT, _job
+    active, expected, actual = (DiskSet(workspace) for _ in range(3))
+
+    def collect(namespace, keys):
+        for key in keys:
+            expected.add(store.codec.encode((namespace, key)))
+
+    with store.read_snapshot(pin):
+        for incarnation in store.iter_keys(pin, SEQUENCE_DESCRIPTOR):
+            if store.contains_lazy_key(pin, RETIREMENT, incarnation) and _job(store, pin, incarnation)[4]:
+                # Checked retirement deliberately leaves an unreadable partial tree.
+                continue
+            active.add(store.codec.encode(incarnation))
+            LazyOrderedSequence(store, pin, incarnation, value_mode='native',
+                checked_types=True, recursive=True).scrub(_inventory=collect)
+        for namespace in SEQUENCE_NAMESPACES:
+            cursor = store.db.execute('SELECT typed_key FROM lazy_record_versions WHERE namespace=? '
+                'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',
+                (namespace, pin.captured_head, pin.captured_head))
+            try:
+                for (encoded,) in cursor:
+                    store._metadata_rows += 1
+                    key = store.codec.decode(encoded)
+                    incarnation = key if namespace == SEQUENCE_DESCRIPTOR else (
+                        key[0] if type(key) is tuple and len(key) == 2 else None)
+                    if type(incarnation) is not int or incarnation < 1:
+                        raise StoreIntegrityError('invalid physical sequence projection key')
+                    if store.codec.encode(incarnation) not in active:
+                        continue
+                    marker = store.codec.encode((namespace, key))
+                    if marker in actual:
+                        raise StoreIntegrityError('overlapping sequence authority versions')
+                    actual.add(marker)
+                    if marker not in expected:
+                        raise StoreIntegrityError(f'extra/missing sequence authority in {namespace}')
+            finally:
+                cursor.close()
+        active.validate()
+        expected.validate()
+        actual.validate()
+        if actual.count != expected.count:
+            raise StoreIntegrityError('extra/missing sequence authority in shared inventory')
+
+
 def _verify_catalog(store, pin, workspace=None):
     if workspace is None:
         with ConversionWorkspace(store.codec, directory=store.path.parent) as temporary:
@@ -138,13 +188,7 @@ def _verify_catalog(store, pin, workspace=None):
         from .persistence_lazy_identity_retired import RetiredIdentityRanges
         RetiredIdentityRanges(store, pin, header=descriptor[4]).scrub()
     verify_type_witnesses(store, pin)
-    from .persistence_history_retirement import NAMESPACE as RETIREMENT, _job
-    for incarnation in store.iter_keys(pin, SEQUENCE_DESCRIPTOR):
-        if store.contains_lazy_key(pin, RETIREMENT, incarnation) and _job(store, pin, incarnation)[4]:
-            # Checked retirement deliberately leaves an unreadable partial tree.
-            continue
-        LazyOrderedSequence(store, pin, incarnation, value_mode='native',
-            checked_types=True, recursive=True).scrub()
+    _verify_sequences(store, pin, workspace)
     if store._namespace_state_at('world.event_ids',pin.captured_head) is None:
         envelope=store.read_record('world.event_ids',0,expected_record_schema=1)
         authority=envelope[1] if type(envelope) is tuple and len(envelope)==2 else None

@@ -1120,9 +1120,12 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
             self._pin = pin
             self._clear_cache()
 
-    def scrub(self):
+    def scrub(self, *, _inventory=None):
         """Explicit full-history validation, including orphan/extra projections."""
         self._ensure()
+        if _inventory is not None and (self._new or self._dirty
+                or self._store.codec.encode(self._descriptor()) != self._base_descriptor):
+            raise StoreConflictError('shared sequence scrub requires a clean persisted sequence')
         expected = {ns: set() for ns in NAMESPACES}
         expected[DESCRIPTOR_NAMESPACE].add(self._incarnation)
         occurrences, members = {}, defaultdict(list)
@@ -1187,6 +1190,12 @@ class LazyOrderedSequence(CleanCacheOwner, MutableSequence):
                 directory(self._directory)
             if dict(members) != found_members:
                 raise StoreIntegrityError('sequence scrub membership completeness disagreement')
+            if _inventory is not None:
+                # Catalog-only full scrub compares all active incarnations in
+                # one streamed pass, after their checked tree traversals.
+                for namespace, keys in expected.items():
+                    _inventory(namespace, keys)
+                return
             for namespace in NAMESPACES:
                 # Explicit scrub only. The ordinary point/edit paths never scan.
                 actual = set()
