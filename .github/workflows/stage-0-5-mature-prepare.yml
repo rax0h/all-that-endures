@@ -15,7 +15,7 @@ env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
   RUNTIME_SHA: bbc3cbf11becb58aa4b9483114559fd1296878f1
-  HARNESS_SHA: PREPARE_HARNESS_COMMIT
+  HARNESS_SHA: 2c9166dcfc60370852d6fa38820dee8ec3d2e916
 jobs:
   mature-prepare:
     runs-on: ubuntu-latest
