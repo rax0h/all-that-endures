@@ -1,0 +1,68 @@
+name: Stage 0.5 mature construction ordering
+'on':
+  push:
+    branches: [sol/stage-0-5-mature-orders]
+    paths:
+    - .github/workflows/stage-0-5-mature-orders.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stage-0-5-mature-construction-orders
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: bbc3cbf11becb58aa4b9483114559fd1296878f1
+  HARNESS_SHA: 0acb45ef35748f7eda3f8d212c5c33c5d408be8f
+jobs:
+  mature-orders:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Check mature ordering wiring
+      run: |
+        python -m pip install pytest pyyaml
+        python -m pytest -q simulation/tests/test_construction_mature_orders.py simulation/tests/test_construction_checkpoint.py simulation/tests/test_checkpoint_artifacts.py
+    - name: Reserve disk on this disposable runner
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift /usr/local/.ghcup /usr/local/share/powershell
+        sudo find /opt/hostedtoolcache -mindepth 1 -maxdepth 1 ! -name Python -exec rm -rf {} +
+        sudo docker image prune -af
+        mkdir -p evidence
+        df -h . | tee evidence/disk-start.txt
+    - name: Restore retained mature ordering
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set +e
+        timeout --signal=TERM --kill-after=30s 300m python -m simulation.construction_mature_orders 2>&1 | tee evidence/orders.log
+        orders_status=${PIPESTATUS[0]}
+        exit "$orders_status"
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-mature-orders-diagnostics
+        path: |
+          evidence/orders.log
+          evidence/disk-start.txt
+          evidence/orders-summary.json
+        retention-days: 14
+    - name: Retain ordered candidate
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-mature-ordered
+        path: evidence/candidate
+        if-no-files-found: error
+        compression-level: 1
+        retention-days: 14

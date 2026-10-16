@@ -1,0 +1,76 @@
+{
+  "commit_step_seconds": 8627,
+  "committed_artifact": {
+    "archive_bytes": 4332758248,
+    "archive_sha256": "ec5dbeb0224a7bae109771b59da2bdca6eca451ebf67f1f5102fc77b91506077",
+    "expires_at_utc": "2026-10-30T07:07:27Z",
+    "id": 12030703178,
+    "name": "construction-mature-committed",
+    "upload_finalized_at_utc": "2026-10-16T07:10:59Z"
+  },
+  "committed_artifact_upload_seconds": 212,
+  "completed_at_utc": "2026-10-16T07:11:03Z",
+  "conclusion": "success",
+  "deferred_minor": "Fine-grained mature commit phase/write accounting; no runtime optimization applied.",
+  "diagnostics_artifact": {
+    "archive_bytes": 3838,
+    "archive_sha256": "17bdbfff73c80eb9391211c11d3e150e0d1cc319eb07f4fbb72792ea691e1595",
+    "download_digest_checked": true,
+    "id": 12030598376,
+    "name": "construction-mature-commit-diagnostics"
+  },
+  "execution_harness_sha": "e32ffc7cdc87bf4bde408eb5957458fd6142736b",
+  "job": "mature-commit",
+  "job_id": 116814812559,
+  "observed_at_utc": "2026-10-16T07:18:11Z",
+  "producer_job_seconds": 8963,
+  "run_attempt": 1,
+  "run_id": 38851921152,
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/38851921152",
+  "runtime_tree": "3c7c833dbec178dc513c21ddf1ccdaa6f79d430a",
+  "stage": "committed-before-ordering",
+  "stage_0_5_accepted": false,
+  "started_at_utc": "2026-10-16T04:41:36Z",
+  "summary": {
+    "context": {
+      "harness_sha": "2c9166dcfc60370852d6fa38820dee8ec3d2e916",
+      "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+      "source_artifact": {
+        "archive_sha256": "409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9",
+        "id": 11870590333,
+        "run_id": 38508408370
+      }
+    },
+    "cpu_seconds": 8146.712779793,
+    "disk_free_bytes": 58277339136,
+    "execution_harness_sha": "e32ffc7cdc87bf4bde408eb5957458fd6142736b",
+    "files": {
+      "target.sqlite": {
+        "bytes": 29405450240,
+        "sha256": "06b18a6eb568863e8236ac270e507343cfefc9e7c7aaed4c58175619f53d28ad"
+      }
+    },
+    "pin": {
+      "captured_head": 125,
+      "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+      "token": "26242f24-ba41-49c0-ac97-12de79b0b6a9"
+    },
+    "prepared_artifact": {
+      "archive_bytes": 3631292089,
+      "archive_sha256": "01db7a227f4a50a0bab347a211c09e2409880875de685cff1e32a01724322e06",
+      "artifact_id": 12024550042,
+      "producer_job": "mature-prepare",
+      "run_id": 38833265909,
+      "seconds": 164.89578395200002,
+      "workflow_sha": "c669c29a0c04544da451a35d2631cde9cc79d253"
+    },
+    "prepared_manifest_sha256": "15954ddf26504c15f195b1915fabb337911609fbbf7ca7359181c8b59b121557",
+    "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+    "stage": "committed",
+    "wall_seconds": 8461.088594178
+  },
+  "total_run_seconds": 8967,
+  "verification_scope": "Connected GitHub run/job/artifact metadata, successful mandatory upload and exact ZIP digest in complete job log; diagnostics archive downloaded and SHA256 checked. The separate ordering job must authenticate full predecessor ZIPs, exact members, file digests, typed manifests, source configuration, stream commitments and pin before retaining any candidate.",
+  "workflow_path": ".github/workflows/stage-0-5-mature-commit.yml",
+  "workflow_sha": "0acb45ef35748f7eda3f8d212c5c33c5d408be8f"
+}

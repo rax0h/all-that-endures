@@ -79,17 +79,47 @@ simulation/tests/test_construction_mature_commit.py,
 - [x] Implement a validation-only wrapper around the unchanged commit_prepared API; preserve the preparation context and record the new executing producer separately.
 - [x] Run focused mature/construction/transport tests; verify core helpers and runtime tree remain byte-identical to the green full proof.
 - [x] Obtain independent review and resolve material findings. Review identified inadequate minimum scratch space; two boundary tests reproduced the issue, then passed with 100 GiB before download and 75 GiB after extraction. Final 75 focused checks passed; no open Critical/Important findings.
-- [x] Publish the exact reviewed wrapper, pin its SHA in the dedicated workflow, read back outgoing files, and start only one commit job. Source e32ffc7cdc87bf4bde408eb5957458fd6142736b; launch 0acb45ef35748f7eda3f8d212c5c33c5d408be8f. Four source files and the launch workflow match local content exactly.
-- [x] Record its run and update the existing hourly monitor. Active commit-only run: https://github.com/rax0h/all-that-endures/actions/runs/38851921152. Its wiring gate has passed; no committed output exists yet. Hourly monitoring follows this run and will inspect its saved artifact/timings before ordering.
-
-Deferred diagnostic minor: the new wrapper records aggregate wall/CPU timings
-and resource heartbeats. Detailed per-phase timing and write accounting remains
-a follow-up and does not weaken artifact validation. Mature duration and
-downstream acceptance are not yet established.
+- [x] Publish the exact reviewed wrapper, pin its SHA in the dedicated workflow, read back outgoing files, and start only one commit job. Launch 0acb45ef35748f7eda3f8d212c5c33c5d408be8f pins e32ffc7cdc87bf4bde408eb5957458fd6142736b; run 38851921152.
+- [x] Record its run and update the existing hourly monitor. Inspect its committed artifact and timings before ordering. The job and mandatory upload passed on October 16; total 2h29m27s, wrapper 8461.09s after authenticated preparation download (164.90s). Artifact 12030703178 is 4,332,758,248 bytes with ZIP SHA256 ec5dbeb0224a7bae109771b59da2bdca6eca451ebf67f1f5102fc77b91506077. Digest-checked diagnostics bind the original context, preparation manifest 15954ddf26504c15f195b1915fabb337911609fbbf7ca7359181c8b59b121557 and committed target 29,405,450,240 bytes, SHA256 06b18a6eb568863e8236ac270e507343cfefc9e7c7aaed4c58175619f53d28ad. Last free disk was 58,277,339,136 bytes.
 
 Ruling: reuse the existing whole-suite/recovery proof for byte-identical runtime
 and core helpers; validate the new stage wrapper with focused real-fixture
 checks and independent review. A new runtime change requires fresh runtime gates.
+
+### Task 5: Mature ordering from saved preparation and commit
+
+Daniel authorized each completed-stage brief followed by continuation. Run
+38851921152 and its committed artifact are successful; neither construction
+preparation nor commit may be repeated to advance ordering. This stage consumes
+the original context, generation 124 preparation, generation 125 commit, and
+the same store identity and pin token. Its full ZIP/member/file authentication
+on a fresh runner precedes the original restore_orders helper.
+
+**Files:** simulation/construction_mature_orders.py,
+simulation/tests/test_construction_mature_orders.py,
+.github/workflows/stage-0-5-mature-orders.yml.
+
+- [x] Write and observe failing tests for real-fixture exact values/aliases, immutable earlier inputs, foreign manifests/configuration, transport, duplicate starts, no overwrite, disk boundaries, and nonfatal post-boundary diagnostics. All 29 failed for absent wiring/workflow.
+- [x] Implement only a wrapper around unchanged restore_orders; retain the existing unverified candidate before any storage/catalog verification or publication. New ordering checks pass 29/29.
+- [x] Run affected construction, transport, verification and workflow tests; confirm runtime tree and core helper hashes still match the green proof. 124 tests passed in 76.90s; the one warning is the intentional duplicate ZIP-entry fixture.
+- [x] Obtain one independent review and resolve material findings with failing regressions. Independent review found no Critical, Important or Minor issues and independently passed 66 ordering/construction/transport tests. No material findings needed repair.
+- [ ] Publish the exact reviewed source, pin it in a separate launch commit, read back all outgoing files, inspect for earlier launches, and launch only ordering.
+- [ ] Record run and artifact evidence and update the same existing monitor to inspect ordering completion before verification.
+
+Ordering disk ruling: reserve one entire working database copy, one full SQLite
+DELETE rollback journal and 8 GiB margin after extraction (62.78 GiB); at start,
+also reserve both retained input bundles, the larger transfer ZIP and 64 MiB for
+manifests (115.07 GiB total). Clear unused tool/image caches only on the fresh
+disposable CI runner while retaining the selected Python runtime. Fail before
+ordering if these bounds are unmet. A full target journal is conservative;
+actual touched pages have not been measured for this mature ordering stage.
+
+The ordinary runtime, core helpers and simulation behavior are unchanged.
+Fine-grained mature commit phase/write accounting remains a deferred diagnostic
+minor. Ordering records wall/CPU, output blocks, peak RSS, transfer times and
+disk free bytes. Stage 0.5 acceptance is still gated by storage verification,
+catalog verification, publication, exact years 1001/1002 and downloaded restore,
+followed by the final Astra handoff.
 
 ## Execution ruling
 

@@ -210,6 +210,19 @@ e32ffc7cdc87bf4bde408eb5957458fd6142736b. Runtime and checkpoint helpers remain
 byte-identical to the green full proof. The wrapper authenticates saved
 preparation, calls the original atomic commit on a disposable copy, and saves
 closed committed output before ordering. Measured prior commit scratch usage
-motivates100GiB free before download and75GiB after extraction. No committed
-artifact or mature-world acceptance is claimed yet. Ordering, verification,
-publication, exact continuation and independent restore remain separate gates.
+motivates100GiB free before download and75GiB after extraction. Commit run38851921152 completed successfully on October16 at07:11UTC; the
+4,332,758,248-byte construction-mature-committed artifact12030703178 fully
+uploaded. The whole run took2h29m27s; the commit wrapper recorded8461.09s after
+164.90s of authenticated preparation download. Its29,405,450,240-byte target
+and original preparation lineage are bound in digest-checked diagnostics;
+see simulation/stage_0_5_mature_commit_verified.json for exact digests.
+
+Daniel's authorized continuation is the separate ordering stage consuming the
+original preparation and committed artifact. The ordering wrapper passed29 new
+checks and124 affected checks; independent review found no issues and ran66
+checks. Both full ZIPs and member/file/producer/configuration/pin/stream checks
+must authenticate on its fresh runner before the existing restore_orders can
+retain an unverified candidate. It reserves a full working database copy, full
+DELETE rollback journal and8GiB margin. No mature-world acceptance is claimed.
+Storage/catalog verification, publication, exact continuation and independent
+restore remain separate gates, followed by the final Astra handoff.
