@@ -1,0 +1,105 @@
+{
+  "accepted": false,
+  "stage": "repaired-exact-continuation-launched",
+  "run_id": 38967941113,
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/38967941113",
+  "started_at_utc": "2026-10-16T21:14:11Z",
+  "producer_job": "mature-continue",
+  "producer_job_id": 117198967587,
+  "branch": "sol/stage-0-5-mature-continue",
+  "workflow_path": ".github/workflows/stage-0-5-mature-continue.yml",
+  "workflow_sha": "f7cb57099f37e329192d7dd8b92eabf9740d553d",
+  "launch_tree": "1bb7e73d1e7c4176cb2277bfa3369e54e1908a19",
+  "reviewed_source_sha": "13d95391ef7662f778378386797a70fca0f30c2c",
+  "reviewed_source_tree": "82f8b7d8fecac6ee80ce1324f4c93cd5aa4bab27",
+  "execution_runtime_sha": "f32296ab0b93f80954acd272f5f51f990303b7d9",
+  "execution_runtime_tree": "e2142c50e54ece5495312860094052e09338497a",
+  "checkpoint_runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+  "source_file_readback_exact": true,
+  "pinned_workflow_readback_exact": true,
+  "source_then_launch_nonforce_updates": true,
+  "prior_runs_across_shas": [
+    {
+      "id": 38920910304,
+      "conclusion": "failure",
+      "retained_continued_checkpoint": false
+    }
+  ],
+  "prior_active_runs": 0,
+  "observed_launches": 1,
+  "repair_ci": {
+    "run_id": 38949779767,
+    "conclusion": "success",
+    "full_suite_passed": 2810,
+    "subtests_passed": 2,
+    "full_suite_seconds": 4721.15,
+    "focused_passed": 144,
+    "recovery": "passed",
+    "runtime_tree_unchanged_after_green": true
+  },
+  "affected_checks": {
+    "passed": 57,
+    "seconds": 133.31,
+    "warning": "intentional duplicate ZIP-member rejection"
+  },
+  "final_pin_checks": {
+    "passed": 12,
+    "deselected": 31,
+    "seconds": 14.34
+  },
+  "independent_review": {
+    "critical": 0,
+    "important": 0,
+    "new_minors": 0,
+    "verdict": "ready to launch",
+    "mature_runtime_not_certified": true
+  },
+  "limits": {
+    "address_space_bytes": 8589934592,
+    "command_minutes": 300,
+    "job_minutes": 360,
+    "start_free_bytes": 118551008632,
+    "work_free_bytes": 84972371968,
+    "output_cap_bytes": 38191218688
+  },
+  "input_published_artifact": {
+    "run_id": 38907665230,
+    "id": 12049884660,
+    "archive_bytes": 3910109453,
+    "archive_sha256": "5ea709166d2bba7f7a22d614fed604f471973ae9ff757979a4148ff197c43382",
+    "database_bytes": 29601284096,
+    "database_sha256": "0d884e52a012ab55325c7111bfc1d054fa7c27aaf0947cf9ab8de4423c213e1c",
+    "checkpoint_bytes": 134251,
+    "checkpoint_sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53",
+    "unexpired": true,
+    "metadata_rechecked": true,
+    "full_archive_authentication": "required on fresh continuation runner before simulation"
+  },
+  "expected_output_artifact": "construction-mature-continued",
+  "expected_output_members": [
+    "checkpoint.json",
+    "restore.sqlite",
+    "result.json"
+  ],
+  "expected_years": [
+    1001,
+    1002
+  ],
+  "expected_saved_generations": [
+    126,
+    127
+  ],
+  "existing_monitor_retargeted": true,
+  "monitor_id": "6ad17d810688819187e6ca0c730669f1",
+  "monitor_schedule_preserved": true,
+  "deferred_minors": [
+    "sequential local hard links can leave crash residue; success-only upload and exact producer/member authentication prevent partial external acceptance",
+    "original input checkpoint receipt hard link lacks explicit file fsync; new result and restore database are fsynced"
+  ],
+  "remaining_gates": [
+    "actual mature continuation and uploaded artifact",
+    "independent full downloaded mature restore",
+    "final Astra handoff"
+  ],
+  "mature_runtime_guarantee": false
+}

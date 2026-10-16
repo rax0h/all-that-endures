@@ -70,14 +70,29 @@ The complete continuation/transport gate then passed 57 tests in 297.76 seconds;
 its only warning is the intentional duplicate-ZIP-member rejection case.
 Independent review also cleared the wrapper and all three workflow failure paths.
 
-The repair workflow runs only focused tests, the full suite, and recovery checks.
-It does not launch mature continuation. The existing mature launch workflow has
-not been repinned or restarted. Fresh full-suite/recovery results are required
-because the runtime changed; the earlier unchanged-runtime shortcut does not apply.
+The repair workflow ran only focused tests, the full suite, and recovery checks.
+[Run 38949779767](https://github.com/rax0h/all-that-endures/actions/runs/38949779767)
+passed all three jobs on published repair
+`f32296ab0b93f80954acd272f5f51f990303b7d9`: 144 focused checks, 2,810 full-suite
+tests and two subtests, and complete recovery/exact continuation. Its runtime
+tree equals the reviewed repair above. Fresh runtime gates were required and
+passed; the earlier unchanged-runtime shortcut was not used for the repair.
 
-After those gates pass, inspect runtime/upload headroom and repin the continuation
-launcher to the reviewed repaired source and runtime. Resume from the retained
-year-1000 publication. The failed year-1001 simulation must be repeated because
-its save never committed. Both exact mature milestones, an independently
-downloaded mature restore, and the final Astra handoff remain required. No Stage
-0.5 completion or mature-runtime guarantee is claimed.
+The continuation wrapper was then repinned to that accessible published runtime,
+replacing the local-only execution identifier without changing runtime bytes.
+Source `13d95391ef7662f778378386797a70fca0f30c2c` and launch
+`f7cb57099f37e329192d7dd8b92eabf9740d553d` were read back exactly. Fresh wrapper
+and transport checks passed 57/57; final launch checks passed 12/12. One independent
+final launch review found no Critical or Important issues and no new Minor issues.
+
+The single [repaired mature continuation run](https://github.com/rax0h/all-that-endures/actions/runs/38967941113)
+started October 16 at 21:14:11 UTC. It resumes from the retained year-1000
+publication, keeps the original checkpoint/control provenance, and reruns the
+failed year-1001 simulation because its save never committed. The original
+300-minute command, 360-minute job, disk guards and mandatory upload remain.
+The full mature duration is unproven. See
+`stage_0_5_mature_continue_repair_launch.json` for exact launch evidence.
+
+Both exact mature milestones, an independently downloaded mature restore,
+and the final Astra handoff remain required. No Stage 0.5 completion or
+mature-runtime guarantee is claimed.
