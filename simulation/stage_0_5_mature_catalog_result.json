@@ -1,0 +1,105 @@
+{
+  "accepted": false,
+  "catalog_artifact": {
+    "archive_bytes": 585,
+    "archive_sha256": "854c941a708c3aa7abd8a85836369c4a209e089496d6b82906afe30f9a9b1bbd",
+    "download_digest_checked": true,
+    "exact_member": "catalog.json",
+    "expires_at_utc": "2026-10-30T11:40:28Z",
+    "id": 12043567528,
+    "member_bytes": 753,
+    "member_sha256": "f453b3f861ad868d64a5b18adcfdf6869542ede4bc3cb9b564f03e594ccef3e3",
+    "name": "construction-mature-catalog",
+    "producer_authenticated": true,
+    "receipt_matches_original_candidate_context_and_storage": true
+  },
+  "catalog_step_seconds": 5616,
+  "completed_at_utc": "2026-10-16T11:40:32Z",
+  "conclusion": "success",
+  "diagnostics_artifact": {
+    "archive_bytes": 3267,
+    "archive_sha256": "f817b68f68385b487d16709871d7191737ef644367500be3fbccdad3bcca9176",
+    "download_digest_checked": true,
+    "id": 12043383557
+  },
+  "execution_harness_sha": "e83c2f725cbe133a0401823cbeb3d351e927f292",
+  "job": "mature-catalog",
+  "job_id": 116920088588,
+  "observed_at_utc": "2026-10-16T11:50:16.927625+00:00",
+  "original_catalog_verifier_seconds": 5136.855291774,
+  "producer_job_seconds": 5710,
+  "remaining_gates": [
+    "publication",
+    "exact continuation through1001/1002",
+    "independent downloaded restore",
+    "final Astra handoff"
+  ],
+  "run_attempt": 1,
+  "run_id": 38884880079,
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/38884880079",
+  "runtime_tree": "3c7c833dbec178dc513c21ddf1ccdaa6f79d430a",
+  "stage": "catalog-verified",
+  "started_at_utc": "2026-10-16T10:05:19Z",
+  "summary": {
+    "candidate_artifact": {
+      "archive_bytes": 4342414844,
+      "archive_sha256": "b9c5ebb5f8e72dcb41d114283557a368cc08a841979defbea0ce228f825430d4",
+      "artifact_id": 12032507300,
+      "producer_job": "mature-orders",
+      "run_id": 38867766111,
+      "seconds": 402.471520196,
+      "workflow_sha": "8b8c108f032f1e6d58339cc436310402b40a10ce"
+    },
+    "context": {
+      "harness_sha": "2c9166dcfc60370852d6fa38820dee8ec3d2e916",
+      "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+      "source_artifact": {
+        "archive_sha256": "409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9",
+        "id": 11870590333,
+        "run_id": 38508408370
+      }
+    },
+    "cpu_seconds": 4797.128635865,
+    "disk_free_bytes": 80404733952,
+    "execution_harness_sha": "e83c2f725cbe133a0401823cbeb3d351e927f292",
+    "filesystem_output_blocks": 7947432,
+    "peak_rss_kib": 212224,
+    "receipt": {
+      "context": {
+        "harness_sha": "2c9166dcfc60370852d6fa38820dee8ec3d2e916",
+        "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+        "source_artifact": {
+          "archive_sha256": "409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9",
+          "id": 11870590333,
+          "run_id": 38508408370
+        }
+      },
+      "database": {
+        "bytes": 29601284096,
+        "name": "candidate.sqlite",
+        "sha256": "d96a0932ab0cb101de69e10ce4f0519de896d5cae44ee947c100b8af1429c7ee"
+      },
+      "manifest_sha256": "fd457aee712a4cfcfe69d10445e38294b21b34b5fe8496cbadb4484f6fbadf73",
+      "previous_receipt_sha256": "8e4324023fd60da647d2147eaa46d2cb171026037ecca07873080f7b086f3d65",
+      "schema": "ate-validation-unverified-upgrade/1",
+      "stage": "catalog-verified"
+    },
+    "receipt_bytes": 753,
+    "receipt_sha256": "f453b3f861ad868d64a5b18adcfdf6869542ede4bc3cb9b564f03e594ccef3e3",
+    "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+    "stage": "catalog-verified",
+    "storage_artifact": {
+      "archive_bytes": 554,
+      "archive_sha256": "7bf248f63a1b37be151f6da7c7745c056dd83e1a0ed0de320d21283f92cd6df4",
+      "artifact_id": 12037828504,
+      "producer_job": "mature-storage",
+      "run_id": 38872643738,
+      "seconds": 1.6186271749999719,
+      "workflow_sha": "4f1a7d7f0bd6c90704b5370f5e508669afe3b00f"
+    },
+    "wall_seconds": 5211.713572433
+  },
+  "total_run_seconds": 5713,
+  "workflow_path": ".github/workflows/stage-0-5-mature-catalog.yml",
+  "workflow_sha": "ee5000a156ebcf1fcec4a893da1a06958feb0ed5"
+}

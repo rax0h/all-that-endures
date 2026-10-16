@@ -277,4 +277,40 @@ e83c2f725cbe133a0401823cbeb3d351e927f292. All six source files and the final
 pinned workflow matched exact readback; zero prior catalog runs were found.
 The final pinned-workflow checks passed30/30 in26.09s. Only one launch was
 observed. See simulation/stage_0_5_mature_catalog_launch.json. Catalog completion
-and its authenticated receipt remain pending before separate publication.
+and its authenticated receipt were pending before separate publication.
+
+Catalog run38884880079 passed October16 at11:40:32UTC: total1h35m13s,
+original catalog verifier5136.86s, wrapper5211.71s and candidate transfer402.47s.
+Artifact12043567528 construction-mature-catalog fully uploaded: ZIP585 bytes
+SHA256854c941a708c3aa7abd8a85836369c4a209e089496d6b82906afe30f9a9b1bbd.
+Its sole catalog.json member is753 bytes SHA256
+f453b3f861ad868d64a5b18adcfdf6869542ede4bc3cb9b564f03e594ccef3e3.
+The downloaded ZIP/receipt and producer were authenticated; it binds the exact
+candidate and original storage receipt. Diagnostics were downloaded/hash checked.
+See simulation/stage_0_5_mature_catalog_result.json. Neither verifier is repeated
+to advance publication.
+
+The next authorized stage wraps unchanged publish_p5, consuming both successful
+receipts, the exact candidate and the original year-1000 source artifact. It
+saves only the normal complete checkpoint receipt and closed complete database,
+preserving original controls and source_checkpoint provenance. No simulation,
+construction or successful verifier may repeat. Work only on disposable space;
+retain predecessors and no-overwrite publication. Reserve118,983,179,772 bytes
+before download and67,792,502,784 bytes after extraction, including a16GiB
+source cap, full publication copy/journal-or-upload allowance and8GiB margin.
+Keep8GiB memory and300-minute command within360-minute job. Fresh real-fixture
+tests and one independent review gate launch; exact source pin/readback and
+prior-launch inspection remain mandatory. Publication duration and Stage0.5
+acceptance remain unproven. Continuation1001/1002, independent downloaded
+restore and final Astra handoff remain later required gates.
+
+The publication wrapper passed45 real-fixture/wiring checks after36 expected
+missing-wiring RED failures and a reproduced/repaired disk-cleanup regression.
+Independent review found no Critical, Important or Minor issues and passed59
+publication/transport checks in19.62s. Broader fresh-runner cache cleanup matches
+the successful ordering stage (117GiB measured free), while retaining Python
+and the Actions runtime. Runtime, core helpers and P5 runner remain byte-identical
+to the approved full proof. The final affected gate passed102/102 in324.32s,
+including the existing exact P5 continuation bridge; only the intentional
+duplicate-ZIP warning remains. Exact source pin/readback and prior-launch
+inspection still gate publication launch.

@@ -180,7 +180,63 @@ diagnostics. Check the storage receipt and candidate manifest remain unchanged
 after verification. Publication, exact continuation and downloaded restore
 remain later stages, followed by final Astra handoff. The runtime and original
 helpers remain unchanged; focused real-fixture checks plus independent review
-apply to this wrapper. Mature catalog-verification duration is unproven.
+apply to this wrapper. Catalog run 38884880079 passed October 16 at 11:40:32 UTC;
+total 5713s (1h35m13s), wrapper 5211.71s, original catalog verifier 5136.86s,
+candidate transfer 402.47s and storage transfer 1.62s. Artifact 12043567528
+construction-mature-catalog fully uploaded: ZIP 585 bytes SHA256
+854c941a708c3aa7abd8a85836369c4a209e089496d6b82906afe30f9a9b1bbd.
+Its sole catalog.json member is 753 bytes SHA256
+f453b3f861ad868d64a5b18adcfdf6869542ede4bc3cb9b564f03e594ccef3e3.
+Producer provenance, downloaded ZIP/member and original receipt authority were
+authenticated against the exact storage receipt and candidate. Diagnostics
+12043383557 (3267 bytes) were downloaded/digest-checked independently.
+
+### Task 8: Separate mature publication
+
+**Files:** Create simulation/construction_mature_publish.py,
+simulation/tests/test_construction_mature_publish.py and
+.github/workflows/stage-0-5-mature-publish.yml. Record catalog result in
+simulation/stage_0_5_mature_catalog_result.json; update this plan/spec status.
+
+**Interfaces:** run_publish(candidate, storage_receipt, catalog_receipt, source,
+bundle, *, workflow_sha) consumes ordered artifact 12032507300, storage
+12037828504, catalog 12043567528 and original year-1000 source 11870590333.
+All exact producers/ZIPs/members/files/context/configuration/pin/generation and
+original chained receipts must authenticate before unchanged publish_p5 runs.
+It produces ONLY checkpoint.json and p5-long-complete.sqlite, using the normal
+P5 complete checkpoint schema and original control state. The original context
+is retained separately from the executing producer. No successful verifier or
+construction stage, simulation, continuation or world generation may run here.
+
+- [x] Write real-fixture tests for exact published values/aliases/normal receipt, immutable inputs, refreshed-hash foreign receipt/config/pin rejection, interrupted publication, receipt failure/race/no-overwrite and nonfatal post-boundary diagnostics. Add exact transport, launch, workflow and disk-boundary tests.
+- [x] Run the new test file and observe expected absent-wiring/workflow RED failures. All 36 failed in 2.49s for the missing module/workflow. Eight later focused authority regressions also pass.
+- [x] Implement only publication wiring around unchanged publish_p5. Use a disposable P5 workspace with a hard link to the read-only source and a copied source receipt; preserve original inputs. Retain a closed, fsynced complete database and original normal complete receipt before continuation. All 44 new checks passed in 20.18s. The test's ordinary World comparisons use disposable copies; all retained inputs and published bytes remain unchanged.
+- [x] Run the new publication, construction, transport and checkpoint/P5 affected tests; check runtime/helper/P5 runner hashes against the approved proof. Before the workflow-only cleanup repair, 101 passed in 247.05s. Final affected gate passed 102/102 in 324.32s; only the existing intentional duplicate-ZIP warning. Runtime/core/P5 helper identity remained unchanged.
+- [x] Obtain ONE independent review of this stage and resolve material findings with failing regressions before publishing. The initial attempt was interrupted by a transient usage limit; the same reviewer resumed and completed the review. No Critical, Important or Minor findings; 59 independent publication/transport checks passed in 19.62s. Runtime/core/P5 equality and helper hashes were independently verified. The disk-cleanup regression passed as part of all 45 publication checks (22.52s).
+- [ ] Publish exact reviewed source, read back all outgoing files, pin it in a separate launch, inspect all prior publication launches across SHAs, run final pin tests and launch only publication once. Record actual run and retarget the same monitor.
+
+Publication disk ruling: allow one complete working copy and one full SQLite
+rollback journal OR one full-sized upload ZIP, plus 8 GiB after all extractions.
+Retained candidate bytes are 29,601,284,096. Original source extraction is capped
+at 16 GiB (enforced before publication); source-job disk logs show roughly 11 GiB
+for its retained source plus prior cold input, but do not give an exact member
+size. Before downloads also reserve the candidate, that full source cap, the
+larger transfer ZIP and 64 MiB metadata. No second full database copy is needed:
+the P5 source and retained completed output use hard links, while receipts are
+copied into disposable space. Preserve 8 GiB memory, 300-minute command inside
+360-minute job, and mandatory upload after nonfatal post-boundary diagnostics.
+Use the ordering stage's broader disposable-runner cache cleanup, which measured
+117 GiB free rather than the smaller cleanup's 103 GiB. Retain Python and the
+Actions bundled runtime. A real disposable-filesystem regression reproduces
+missing tool/image cleanup and verifies the repaired script preserves Python.
+If any size or headroom bound is unmet, fail before publication, not blindly retry.
+The original source artifact expires October 28; later construction/receipt
+artifacts expire October 30. Full large ZIP/file authentication runs on the
+fresh CI runner, as in earlier stages; local connected-app downloads are capped
+at 512 MiB and cannot download the 1.34 GB original source or 4.34 GB candidate.
+No required check is skipped: real fixture tests and the same tested CI transport
+perform them in the supported environment. Mature publication duration remains
+unproven; acceptance still requires continuation, downloaded restore and Astra.
 
 ## Execution ruling
 

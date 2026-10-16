@@ -1,0 +1,67 @@
+name: Stage 0.5 mature publication
+'on':
+  push:
+    branches: [sol/stage-0-5-mature-publish]
+    paths:
+    - .github/workflows/stage-0-5-mature-publish.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stage-0-5-mature-publication
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: bbc3cbf11becb58aa4b9483114559fd1296878f1
+  HARNESS_SHA: beb858aa7d3e4b056f1354682e50eba3586eb1d0
+jobs:
+  mature-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Check mature publication wiring
+      run: |
+        python -m pip install pytest pyyaml
+        python -m pytest -q simulation/tests/test_construction_mature_publish.py simulation/tests/test_construction_checkpoint.py simulation/tests/test_checkpoint_artifacts.py
+    - name: Reserve disk on this disposable runner
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift /usr/local/.ghcup /usr/local/share/powershell
+        sudo find /opt/hostedtoolcache -mindepth 1 -maxdepth 1 ! -name Python -exec rm -rf {} +
+        sudo docker image prune -af
+        mkdir -p evidence
+        df -h . | tee evidence/disk-start.txt
+    - name: Publish verified mature candidate
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set +e
+        timeout --signal=TERM --kill-after=30s 300m python -m simulation.construction_mature_publish 2>&1 | tee evidence/publish.log
+        publish_status=${PIPESTATUS[0]}
+        exit "$publish_status"
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-mature-publish-diagnostics
+        path: |
+          evidence/publish.log
+          evidence/disk-start.txt
+          evidence/publish-summary.json
+        retention-days: 14
+    - name: Retain published checkpoint
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-mature-published
+        path: evidence/published
+        if-no-files-found: error
+        retention-days: 14
