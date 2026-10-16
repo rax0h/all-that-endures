@@ -197,7 +197,19 @@ fresh-process tests pass; the independent review findings were repaired.
 Fresh-runner run38819525026 passed all13jobs, including2594tests and2subtests,
 complete recovery, real artifact transport, interrupted construction, exact
 continuation and downloaded restore. Its runtime tree is3c7c833dbec178dc513c21ddf1ccdaa6f79d430a.
-The next authorized large action is preparation only: retain the immutable
-target/spool/manifest before commit, then inspect its size, provenance and timing.
-Commit, ordering and acceptance remain later separate stages. No mature-world
-acceptance is claimed.
+Preparation run38833265909 succeeded in2h50m47s and fully uploaded immutable
+artifact12024550042 (3,631,292,089byte archive). Its authenticated diagnostics
+report9,822s preparation/export, a21,538,623,488byte spool and808,775,680byte
+target. Daniel's requested completion brief was delivered; he authorized
+continuation from the saved inputs.
+
+After75focused checks and independent review, commit-only run
+[38851921152](https://github.com/rax0h/all-that-endures/actions/runs/38851921152)
+started. Workflow0acb45ef35748f7eda3f8d212c5c33c5d408be8f pins reviewed wrapper
+e32ffc7cdc87bf4bde408eb5957458fd6142736b. Runtime and checkpoint helpers remain
+byte-identical to the green full proof. The wrapper authenticates saved
+preparation, calls the original atomic commit on a disposable copy, and saves
+closed committed output before ordering. Measured prior commit scratch usage
+motivates100GiB free before download and75GiB after extraction. No committed
+artifact or mature-world acceptance is claimed yet. Ordering, verification,
+publication, exact continuation and independent restore remain separate gates.
