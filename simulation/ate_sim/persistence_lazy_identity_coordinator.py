@@ -15,7 +15,7 @@ from .incremental_store import StoreIntegrityError, StoreConflictError, StoreFor
 from .persistence_lazy_identity import IncarnationId, Occurrence
 from .persistence_lazy_identity_catalog import IdentityCatalog, CheckedIdentityGroup, OWNER_NAMESPACE, placement_path
 from .persistence_lazy_store import IdentityOccurrenceChange, VersionChange, ORDINARY_QUERY_OWNER_INDEX
-from .persistence_lazy_families import ParticipantDelta, IDENTITY_OWNER_FAMILIES
+from .persistence_lazy_families import ParticipantDelta, IDENTITY_OWNER_FAMILIES, FAMILIES
 from .persistence_lazy_spill import CheckedSpool
 
 
@@ -419,7 +419,15 @@ class IdentityCoordinator:
                 selected = set(value_changed_incarnations)
                 if any(type(inc) is not int or inc not in self._value_dirty_groups for inc in selected):
                     raise StoreIntegrityError('changed backing lacks its routed identity group')
-                owners = set()
+                # A new object can have identical serialized bytes. Family
+                # value journals then suppress its header while its identity
+                # placement still changes. Publish the checked unchanged header
+                # with that placement, just as for a changed child backing.
+                # Physical child references encode incarnation IDs, so their
+                # placement edits require explicit changed payloads instead.
+                owners = {(change.owner_namespace, change.owner_key)
+                          for change in self.placement_overlay.values()
+                          if change.owner_namespace in FAMILIES}
                 for inc in selected:
                     group = self.discover_group(inc)
                     owners.update((namespace, key) for namespace, key, _path in self._current_placements(group))

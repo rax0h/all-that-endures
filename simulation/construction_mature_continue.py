@@ -19,6 +19,10 @@ ROOT = Path('evidence')
 WORKFLOW = '.github/workflows/stage-0-5-mature-continue.yml'
 BRANCH = 'sol/stage-0-5-mature-continue'
 RUNTIME_SHA, RUNTIME_TREE = publish.RUNTIME_SHA, publish.RUNTIME_TREE
+# Retained inputs keep their original producer; only continuation executes the
+# reviewed save repair. P5 already supports explicit checkpoint provenance.
+EXECUTION_RUNTIME_SHA = 'f312cc288ec5f583d34e16f63aa58d3093ca6b7c'
+EXECUTION_RUNTIME_TREE = 'e2142c50e54ece5495312860094052e09338497a'
 CONTEXT, SOURCE_CONFIG = publish.CONTEXT, publish.SOURCE_CONFIG
 CANDIDATE_PIN, SOURCE_GENERATION = publish.CANDIDATE_PIN, publish.SOURCE_GENERATION
 CANDIDATE_DATABASE, CANDIDATE_MANIFEST_SHA = publish.CANDIDATE_DATABASE, publish.CANDIDATE_MANIFEST_SHA
@@ -145,14 +149,15 @@ def run_continue(published, diagnostics, storage_receipt, catalog_receipt, bundl
         for name in PUBLISHED_FILES: shutil.copyfile(published/name,private/name)
         with redirect_stdout(publish.catalog.storage._DiagnosticOutput(sys.stdout)), publish.legacy.progress():
             result = p5.run(SOURCE_CONFIG['seed'],SOURCE_CONFIG['milestones'],SOURCE_CONFIG['bootstrap_year'],private,
-                SOURCE_CONFIG['rules_id'],RUNTIME_SHA,workflow_sha,complete_format=True,
-                initialization=SOURCE_CONFIG['initialization'],resume_from='complete')
+                SOURCE_CONFIG['rules_id'],EXECUTION_RUNTIME_SHA,workflow_sha,complete_format=True,
+                initialization=SOURCE_CONFIG['initialization'],resume_from='complete',
+                checkpoint_product_sha=RUNTIME_SHA)
         result = json.loads(json.dumps(result))
         source = dict(product_sha=RUNTIME_SHA,workflow_sha=PUBLISHED_WORKFLOW_SHA,stage='complete',
             database=receipt['database'],receipt_sha256=PUBLISHED_FILES['checkpoint.json']['sha256'],
             prior_source=receipt['source_checkpoint'])
         if (result.get('passed') is not True or result.get('schema') != 1 or result.get('workflow_sha') != workflow_sha
-                or result.get('product_sha') != RUNTIME_SHA or result.get('source_checkpoint') != source
+                or result.get('product_sha') != EXECUTION_RUNTIME_SHA or result.get('source_checkpoint') != source
                 or result.get('checkpoint_product_sha') != RUNTIME_SHA or result.get('control') != receipt['state']['controls']
                 or any(result.get(k) != SOURCE_CONFIG[k] for k in ('seed','milestones','bootstrap_year','rules_id','complete_format','initialization','simulation_schema'))
                 or set(result.get('p4',{})) != {str(y) for y in SOURCE_CONFIG['milestones']}):
@@ -197,7 +202,8 @@ def main():
     ROOT.mkdir(exist_ok=True)
     sha = subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
     tree = subprocess.check_output(['git','rev-parse','HEAD:simulation/ate_sim'],text=True).strip()
-    if sha != os.environ['HARNESS_SHA'] or os.environ['RUNTIME_SHA'] != RUNTIME_SHA or tree != RUNTIME_TREE:
+    if (sha != os.environ['HARNESS_SHA'] or os.environ['RUNTIME_SHA'] != EXECUTION_RUNTIME_SHA
+            or tree != EXECUTION_RUNTIME_TREE):
         raise ValueError('mature continuation harness/runtime differs from reviewed candidate')
     check_helpers(); unique_launch()
     if shutil.disk_usage('.').free < START_FREE_BYTES:
@@ -212,7 +218,8 @@ def main():
     try:
         usage = resource.getrusage(resource.RUSAGE_SELF)
         old._write_new(ROOT/'continue-summary.json',dict(stage='exact-continued',execution_harness_sha=sha,
-            execution_workflow_sha=os.environ['GITHUB_SHA'],runtime_sha=RUNTIME_SHA,context=CONTEXT,inputs=proofs,
+            execution_workflow_sha=os.environ['GITHUB_SHA'],runtime_sha=EXECUTION_RUNTIME_SHA,
+            checkpoint_runtime_sha=RUNTIME_SHA,context=CONTEXT,inputs=proofs,
             wall_seconds=time.monotonic()-started,cpu_seconds=time.process_time()-cpu,peak_rss_kib=usage.ru_maxrss,
             filesystem_output_blocks=usage.ru_oublock-before.ru_oublock,disk_free_bytes=shutil.disk_usage('.').free,
             files={p.name:dict(bytes=p.stat().st_size,sha256=old.file_hash(p)) for p in (ROOT/'continued').iterdir()},

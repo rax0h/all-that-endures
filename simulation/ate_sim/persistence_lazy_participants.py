@@ -496,7 +496,7 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
                            for change in (*owner_versions, *owner_records)}
         placement_owners = {(change.owner_namespace, codec.encode(change.owner_key))
                             for change in coord.placement_overlay.values()}
-        if not placement_owners <= supplied_owners:
+        if any(namespace not in FAMILIES for namespace, _key in placement_owners - supplied_owners):
             raise StoreIntegrityError('hybrid save omits a touched identity owner payload')
         if any(change.namespace == 'world_identity_links' for change in ordinary.decode(codec)[1]):
             raise StoreIntegrityError('checked catalog cannot publish legacy identity links')
@@ -523,6 +523,15 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
                                         retirement_row_budget=32 if retire_world_backings else 0,
                                         protected_incarnations=(pool.protected_incarnations()
                                             if retire_world_backings else ()))
+            # Checked header witnesses also cover identity-only replacements.
+            # Validate coverage after those suppressed headers are captured;
+            # the provider still rejects any omitted changed payload.
+            forced_versions, forced_records, _ = delta.decode(codec)
+            supplied_owners.update((change.namespace, codec.encode(change.key))
+                                   for change in (*forced_versions, *forced_records))
+            if not placement_owners <= supplied_owners:
+                coord.abort_delta(delta, plan.token)
+                raise StoreIntegrityError('hybrid save omits a touched identity owner payload')
         except BaseException:
             if dependency_participant is not None:
                 dependency_participant.abort_delta(plan.token)

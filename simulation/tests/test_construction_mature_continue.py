@@ -89,7 +89,7 @@ def test_real_continuation_proves_exact_both_milestones_and_retained_restore(tmp
     assert result==old._json(output/'result.json') and result['passed'] is True
     receipt=old._json(published/'checkpoint.json')
     assert result['control']==receipt['state']['controls']
-    assert result['workflow_sha']=='9'*40 and result['product_sha']==CONTEXT['runtime_sha']
+    assert result['workflow_sha']=='9'*40 and result['product_sha']==m.EXECUTION_RUNTIME_SHA
     assert result['source_checkpoint']['receipt_sha256']==sha(published/'checkpoint.json')
     for year in ('1','2'):
         assert result['p4'][year]['matches_control'] is True
@@ -238,11 +238,29 @@ def test_download_pins_exact_published_diagnostics_and_receipt_producers(tmp_pat
 
 
 def main_environment(m,monkeypatch):
-    monkeypatch.setenv('HARNESS_SHA','f'*40); monkeypatch.setenv('RUNTIME_SHA',m.RUNTIME_SHA)
+    monkeypatch.setenv('HARNESS_SHA','f'*40); monkeypatch.setenv('RUNTIME_SHA',m.EXECUTION_RUNTIME_SHA)
     monkeypatch.setenv('GITHUB_SHA','9'*40)
-    monkeypatch.setattr(m.subprocess,'check_output',lambda args,**kw:'f'*40 if args[-1]=='HEAD' else m.RUNTIME_TREE)
+    monkeypatch.setattr(m.subprocess,'check_output',lambda args,**kw:'f'*40 if args[-1]=='HEAD' else m.EXECUTION_RUNTIME_TREE)
     monkeypatch.setattr(m.resource,'setrlimit',lambda *a:None)
     monkeypatch.setattr(m,'check_helpers',lambda:None); monkeypatch.setattr(m,'unique_launch',lambda:None)
+
+
+def test_fixed_runtime_preserves_original_checkpoint_and_control_provenance(tmp_path,monkeypatch,template):
+    args=fixture(tmp_path,monkeypatch,template); m,p,d,s,c=args
+    monkeypatch.setattr(m,'EXECUTION_RUNTIME_SHA','8'*40,raising=False)
+    before=hashes(p),hashes(d),sha(s),sha(c)
+    original=m.p5.run
+    def checked(*a,**kw):
+        assert a[5]=='8'*40
+        assert kw.get('checkpoint_product_sha')==m.RUNTIME_SHA
+        return original(*a,**kw)
+    monkeypatch.setattr(m.p5,'run',checked)
+    result=run(args,tmp_path/'continued')
+    assert result['product_sha']=='8'*40
+    assert result['checkpoint_product_sha']==m.RUNTIME_SHA
+    assert result['source_checkpoint']['product_sha']==m.RUNTIME_SHA
+    assert result['control']==old._json(p/'checkpoint.json')['state']['controls']
+    assert (hashes(p),hashes(d),sha(s),sha(c))==before
 
 
 @pytest.mark.parametrize('where',['before','after'])
