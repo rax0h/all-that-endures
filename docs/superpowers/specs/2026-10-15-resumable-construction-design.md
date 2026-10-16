@@ -269,3 +269,12 @@ Exact reviewed-source pinning/readback and prior-launch inspection gate launch.
 Original runtime/core
 helpers remain unchanged. Publication and continuation remain later stages;
 no Stage0.5 acceptance is claimed before every gate and final Astra handoff.
+
+Catalog-only run[38884880079](https://github.com/rax0h/all-that-endures/actions/runs/38884880079)
+launched October16 at10:05:19UTC. Exact launch
+ee5000a156ebcf1fcec4a893da1a06958feb0ed5 pins reviewed source
+e83c2f725cbe133a0401823cbeb3d351e927f292. All six source files and the final
+pinned workflow matched exact readback; zero prior catalog runs were found.
+The final pinned-workflow checks passed30/30 in26.09s. Only one launch was
+observed. See simulation/stage_0_5_mature_catalog_launch.json. Catalog completion
+and its authenticated receipt remain pending before separate publication.
