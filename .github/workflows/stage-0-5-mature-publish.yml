@@ -14,7 +14,7 @@ env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
   RUNTIME_SHA: bbc3cbf11becb58aa4b9483114559fd1296878f1
-  HARNESS_SHA: beb858aa7d3e4b056f1354682e50eba3586eb1d0
+  HARNESS_SHA: 73370b253f0cb14550f6f43e8a20e4b577246c31
 jobs:
   mature-publish:
     runs-on: ubuntu-latest
