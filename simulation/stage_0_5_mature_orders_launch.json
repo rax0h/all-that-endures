@@ -1,0 +1,34 @@
+{
+  "accepted": false,
+  "ci_wiring_gate": "passed",
+  "command_limit_minutes": 300,
+  "harness_sha": "0e1986f626b66feea37be65ea1fc8291a939c004",
+  "independent_review_tests": 66,
+  "job": "mature-orders",
+  "job_id": 116864437819,
+  "job_limit_minutes": 360,
+  "launch_tree": "537ccba8394e84f134d16d90ac8cbcc77bee9778",
+  "launch_workflow_exact_readback": true,
+  "local_affected_tests": 124,
+  "next_gate": "successful ordering and mandatory candidate upload, followed by separate storage verification",
+  "observed_at_utc": "2026-10-16T07:33:04Z",
+  "ordering_free_bytes": 67400835072,
+  "predecessor_artifacts": [
+    12024550042,
+    12030703178
+  ],
+  "predecessor_runs": [
+    38833265909,
+    38851921152
+  ],
+  "review_findings": [],
+  "run_id": 38867766111,
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/38867766111",
+  "runtime_tree": "3c7c833dbec178dc513c21ddf1ccdaa6f79d430a",
+  "source_readback_files": 6,
+  "source_tree": "670070f9332f13cb12e7169d0e4d12c96354fbda",
+  "stage": "ordering-only-launched",
+  "start_free_bytes": 123553551592,
+  "workflow_path": ".github/workflows/stage-0-5-mature-orders.yml",
+  "workflow_sha": "8b8c108f032f1e6d58339cc436310402b40a10ce"
+}

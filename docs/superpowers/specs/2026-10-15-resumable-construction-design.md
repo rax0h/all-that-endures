@@ -226,3 +226,9 @@ retain an unverified candidate. It reserves a full working database copy, full
 DELETE rollback journal and8GiB margin. No mature-world acceptance is claimed.
 Storage/catalog verification, publication, exact continuation and independent
 restore remain separate gates, followed by the final Astra handoff.
+
+Ordering-only run[38867766111](https://github.com/rax0h/all-that-endures/actions/runs/38867766111)
+started on October16. Launch8b8c108f032f1e6d58339cc436310402b40a10ce pins
+reviewed source0e1986f626b66feea37be65ea1fc8291a939c004. All outgoing source
+files and the pinned workflow matched exact readback. The existing monitor
+follows ordering; no ordering artifact, verification or acceptance is claimed yet.

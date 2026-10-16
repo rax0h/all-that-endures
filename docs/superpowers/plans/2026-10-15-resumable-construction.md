@@ -103,8 +103,8 @@ simulation/tests/test_construction_mature_orders.py,
 - [x] Implement only a wrapper around unchanged restore_orders; retain the existing unverified candidate before any storage/catalog verification or publication. New ordering checks pass 29/29.
 - [x] Run affected construction, transport, verification and workflow tests; confirm runtime tree and core helper hashes still match the green proof. 124 tests passed in 76.90s; the one warning is the intentional duplicate ZIP-entry fixture.
 - [x] Obtain one independent review and resolve material findings with failing regressions. Independent review found no Critical, Important or Minor issues and independently passed 66 ordering/construction/transport tests. No material findings needed repair.
-- [ ] Publish the exact reviewed source, pin it in a separate launch commit, read back all outgoing files, inspect for earlier launches, and launch only ordering.
-- [ ] Record run and artifact evidence and update the same existing monitor to inspect ordering completion before verification.
+- [x] Publish the exact reviewed source, pin it in a separate launch commit, read back all outgoing files, inspect for earlier launches, and launch only ordering. Source 0e1986f626b66feea37be65ea1fc8291a939c004 (tree 670070f9332f13cb12e7169d0e4d12c96354fbda) and all six files read back exactly; launch 8b8c108f032f1e6d58339cc436310402b40a10ce changes only the source pin and its workflow was read back exactly. Zero earlier ordering runs were found. Final pinned-workflow checks passed 29/29.
+- [x] Record launch evidence and update the same existing monitor to inspect ordering completion before verification. Run 38867766111, job 116864437819 mature-orders: https://github.com/rax0h/all-that-endures/actions/runs/38867766111. Its CI wiring checks have passed; disk reservation was in progress at 07:33 UTC October 16. The existing monitor now follows this exact run. No ordering artifact or acceptance is claimed yet.
 
 Ordering disk ruling: reserve one entire working database copy, one full SQLite
 DELETE rollback journal and 8 GiB margin after extraction (62.78 GiB); at start,
