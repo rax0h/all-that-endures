@@ -1,0 +1,67 @@
+name: Stage 0.5 mature prepared construction inputs
+'on':
+  push:
+    branches: [sol/stage-0-5-mature-prepared-inputs]
+    paths:
+    - simulation/construction_mature_prepare.py
+    - .github/workflows/stage-0-5-mature-prepare.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stage-0-5-mature-prepared-inputs
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: bbc3cbf11becb58aa4b9483114559fd1296878f1
+  HARNESS_SHA: PREPARE_HARNESS_COMMIT
+jobs:
+  mature-prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Check mature preparation wiring
+      run: |
+        python -m pip install pytest pyyaml
+        python -m pytest -q simulation/tests/test_construction_mature_prepare.py simulation/tests/test_construction_checkpoint.py
+    - name: Reserve disk on this disposable runner
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        mkdir -p evidence
+        df -h . | tee evidence/disk-start.txt
+    - name: Prepare and save mature construction inputs
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set +e
+        timeout --signal=TERM --kill-after=30s 300m python -m simulation.construction_mature_prepare 2>&1 | tee evidence/prepare.log
+        prepare_status=${PIPESTATUS[0]}
+        exit "$prepare_status"
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-mature-prepare-diagnostics
+        path: |
+          evidence/prepare.log
+          evidence/disk-start.txt
+          evidence/prepare-summary.json
+        retention-days: 14
+    - name: Retain prepared construction
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-mature-prepared
+        path: evidence/prepared
+        if-no-files-found: error
+        compression-level: 1
+        retention-days: 14
