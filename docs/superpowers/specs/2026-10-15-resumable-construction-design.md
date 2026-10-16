@@ -246,8 +246,26 @@ exact continuation and independent restore remain gates, followed by the final
 Astra handoff. Fine-grained commit phase/write profiling remains deferred.
 
 Storage-only run[38872643738](https://github.com/rax0h/all-that-endures/actions/runs/38872643738)
-started October16. Launch4f1a7d7f0bd6c90704b5370f5e508669afe3b00f pins reviewed
-source31e1328a93b42c9fcc5c42926047c6ffcdf181c0. All six outgoing source files
-and the pinned workflow matched exact readback. Its CI wiring checks passed;
-the existing monitor follows storage before catalog verification. No completed
-storage receipt or Stage0.5 acceptance is claimed yet.
+passed October16 at09:43:52UTC. Launch4f1a7d7f0bd6c90704b5370f5e508669afe3b00f
+pins reviewed source31e1328a93b42c9fcc5c42926047c6ffcdf181c0. Source files and
+pinned workflow matched exact readback. Total1h26m57s; original storage verifier
+4428.83s, wrapper4540.59s and candidate transfer468.50s. Artifact12037828504
+construction-mature-storage fully uploaded: ZIP554 bytes SHA256
+7bf248f63a1b37be151f6da7c7745c056dd83e1a0ed0de320d21283f92cd6df4.
+Its sole storage.json is691 bytes SHA256
+8e4324023fd60da647d2147eaa46d2cb171026037ecca07873080f7b086f3d65.
+The producing run/job and full archive were authenticated, downloaded and
+checked. The receipt matches the exact original schema, candidate and context;
+diagnostics were also downloaded/hash checked. Measured peak RSS was5,794,228KiB
+under the8GiB address-space guard. See simulation/stage_0_5_mature_storage_result.json.
+
+Daniel's authorized continuation is catalog verification using only the saved
+candidate and successful storage receipt. The validation-only wrapper calls
+unchanged verify_catalog, with original storage-receipt authority checks and no
+repeated storage verification. Thirty new real-fixture/wiring checks and all87
+affected checks passed (385.82s). Independent review found no Critical,
+Important or Minor issues and passed44 catalog/transport checks in31.19s.
+Exact reviewed-source pinning/readback and prior-launch inspection gate launch.
+Original runtime/core
+helpers remain unchanged. Publication and continuation remain later stages;
+no Stage0.5 acceptance is claimed before every gate and final Astra handoff.

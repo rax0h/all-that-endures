@@ -139,7 +139,7 @@ simulation/tests/test_construction_mature_storage.py,
 - [x] Run affected checkpoint, transport and workflow tests; confirm unchanged runtime/core helper hashes. All 82 passed in 180.78s; one expected warning came from the duplicate ZIP-entry rejection fixture. Runtime tree and helper hashes match the green proof.
 - [x] Obtain one independent review and resolve material findings with failing regressions. Independent review found no Critical, Important or Minor issues, passed 39 focused checks and verified a real closed-pipe subprocess exits 0 without stderr under unbuffered Python. No material findings required repair.
 - [x] Publish and pin exact reviewed source, read back all outgoing files, inspect prior launches and start only storage verification. Source 31e1328a93b42c9fcc5c42926047c6ffcdf181c0, tree bd54fdd5cbdc4c7229a604c2ff9863c460e64f79; all six files matched exact readback. Launch 4f1a7d7f0bd6c90704b5370f5e508669afe3b00f changes only the source pin and its workflow was read back exactly. Zero prior storage runs were found; final pin tests passed 25/25 in 12.34s.
-- [x] Record launch and update the existing monitor to inspect the storage receipt before catalog verification. Run 38872643738, job 116880131564 mature-storage: https://github.com/rax0h/all-that-endures/actions/runs/38872643738. CI wiring checks passed; disk reservation was in progress at 08:18:50 UTC October 16. The same monitor now follows this exact run. No storage receipt or acceptance is claimed yet.
+- [x] Record launch and update the existing monitor to inspect the storage receipt before catalog verification. Run 38872643738, job 116880131564 mature-storage: https://github.com/rax0h/all-that-endures/actions/runs/38872643738. It passed October 16 at 09:43:52 UTC, total 1h26m57s; original storage verifier 4428.83s, wrapper 4540.59s, candidate transfer 468.50s. Artifact 12037828504 construction-mature-storage fully uploaded: ZIP 554 bytes SHA256 7bf248f63a1b37be151f6da7c7745c056dd83e1a0ed0de320d21283f92cd6df4. Its exact sole storage.json member is 691 bytes SHA256 8e4324023fd60da647d2147eaa46d2cb171026037ecca07873080f7b086f3d65. Producer provenance and full ZIP digest were authenticated; downloaded receipt matches the exact original schema, context, candidate database and manifest. Diagnostic ZIP 12037943237 was separately downloaded and hash-checked. No catalog verification or acceptance is claimed yet.
 
 Storage disk ruling: verification is read-only; retain a candidate-sized scratch
 allowance plus 8 GiB after extraction (38,191,218,688 bytes). Before download also
@@ -151,7 +151,36 @@ saved receipt; verifier exceptions and receipt-write failures still propagate.
 
 Reuse the approved full-suite/recovery proof only while runtime/core helpers
 are byte-identical; the wrapper gets fresh focused tests and independent review.
-Actual mature storage-verification duration remains unproven.
+The successful mature storage-verification duration is recorded above.
+
+### Task 7: Separate mature catalog verification
+
+The successful storage receipt is immutable and must be reused. Consume only
+ordered candidate artifact 12032507300 plus storage artifact 12037828504;
+authenticate their exact producers, ZIPs/members and files. Require the original
+candidate manifest/database/context/source configuration/generation/pin and the
+inspected 691-byte storage receipt. The unchanged verify_catalog must check the
+original storage receipt authority and run only the original catalog verifier.
+Never repeat successful storage verification to advance this stage.
+
+**Files:** simulation/construction_mature_catalog.py,
+simulation/tests/test_construction_mature_catalog.py,
+.github/workflows/stage-0-5-mature-catalog.yml.
+
+- [x] Write and observe 30 expected absent-wiring/workflow failures, including normal/rejected launch guards, refreshed-hash wrong receipt authority, interruption/write failure, changed prerequisites and broken diagnostics.
+- [x] Pass new real-fixture tests and affected checkpoint/transport checks; verify unchanged runtime/core helper hashes. All 30 new checks passed in 28.53s; all 87 affected checks passed in 385.82s. The one warning is the intentional duplicate ZIP-member rejection fixture. Runtime/core helpers match the approved green proof.
+- [x] Obtain one independent review and resolve material findings with failing regressions. Independent review found no Critical, Important or Minor issues and passed 44 catalog-wrapper/transport checks in 31.19s. Runtime tree and helper checks passed independently; no repair was required.
+- [ ] Publish/pin exact reviewed source, read back outgoing files, inspect earlier launches and start only catalog verification.
+- [ ] Record launch and update the existing monitor to inspect the catalog receipt before publication.
+
+Reuse the storage stage's read-only scratch and transfer reserves, whose 64 MiB
+metadata allowance also covers the small storage-receipt ZIP. Keep 8 GiB memory,
+300-minute command/360-minute job and mandatory receipt upload after nonfatal
+diagnostics. Check the storage receipt and candidate manifest remain unchanged
+after verification. Publication, exact continuation and downloaded restore
+remain later stages, followed by final Astra handoff. The runtime and original
+helpers remain unchanged; focused real-fixture checks plus independent review
+apply to this wrapper. Mature catalog-verification duration is unproven.
 
 ## Execution ruling
 

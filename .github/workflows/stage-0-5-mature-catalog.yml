@@ -1,0 +1,65 @@
+name: Stage 0.5 mature catalog verification
+'on':
+  push:
+    branches: [sol/stage-0-5-mature-catalog]
+    paths:
+    - .github/workflows/stage-0-5-mature-catalog.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stage-0-5-mature-catalog-verification
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: bbc3cbf11becb58aa4b9483114559fd1296878f1
+  HARNESS_SHA: aecb62b42ac2682b1d0e7d4221064d7653d427e1
+jobs:
+  mature-catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Check mature catalog wiring
+      run: |
+        python -m pip install pytest pyyaml
+        python -m pytest -q simulation/tests/test_construction_mature_catalog.py simulation/tests/test_construction_checkpoint.py simulation/tests/test_checkpoint_artifacts.py
+    - name: Reserve disk on this disposable runner
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        mkdir -p evidence
+        df -h . | tee evidence/disk-start.txt
+    - name: Verify retained mature catalog
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set +e
+        timeout --signal=TERM --kill-after=30s 300m python -m simulation.construction_mature_catalog 2>&1 | tee evidence/catalog.log
+        catalog_status=${PIPESTATUS[0]}
+        exit "$catalog_status"
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-mature-catalog-diagnostics
+        path: |
+          evidence/catalog.log
+          evidence/disk-start.txt
+          evidence/catalog-summary.json
+        retention-days: 14
+    - name: Retain catalog receipt
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-mature-catalog
+        path: evidence/catalog
+        if-no-files-found: error
+        retention-days: 14
