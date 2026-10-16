@@ -217,18 +217,30 @@ uploaded. The whole run took2h29m27s; the commit wrapper recorded8461.09s after
 and original preparation lineage are bound in digest-checked diagnostics;
 see simulation/stage_0_5_mature_commit_verified.json for exact digests.
 
-Daniel's authorized continuation is the separate ordering stage consuming the
-original preparation and committed artifact. The ordering wrapper passed29 new
-checks and124 affected checks; independent review found no issues and ran66
-checks. Both full ZIPs and member/file/producer/configuration/pin/stream checks
-must authenticate on its fresh runner before the existing restore_orders can
-retain an unverified candidate. It reserves a full working database copy, full
-DELETE rollback journal and8GiB margin. No mature-world acceptance is claimed.
-Storage/catalog verification, publication, exact continuation and independent
-restore remain separate gates, followed by the final Astra handoff.
+The separate ordering stage consumed the original preparation and committed
+artifact. Its wrapper passed29 new checks and124 affected checks; independent
+review found no issues and ran66 checks. Its fresh runner authenticated both
+full ZIPs and their member/file/producer/configuration/pin/stream checks before
+the existing restore_orders retained an unverified candidate. It reserved a
+full working database copy, full DELETE rollback journal and8GiB margin.
 
 Ordering-only run[38867766111](https://github.com/rax0h/all-that-endures/actions/runs/38867766111)
-started on October16. Launch8b8c108f032f1e6d58339cc436310402b40a10ce pins
-reviewed source0e1986f626b66feea37be65ea1fc8291a939c004. All outgoing source
-files and the pinned workflow matched exact readback. The existing monitor
-follows ordering; no ordering artifact, verification or acceptance is claimed yet.
+passed October16 at07:54UTC. Launch8b8c108f032f1e6d58339cc436310402b40a10ce
+pins reviewed source0e1986f626b66feea37be65ea1fc8291a939c004. All outgoing
+source files and the pinned workflow matched exact readback. Total22m42s;
+the wrapper took615.72s and original ordinal restoration153.15s. Immutable
+construction-mature-ordered artifact12032507300 fully uploaded, ZIP4,342,414,844
+bytes SHA256b9c5ebb5f8e72dcb41d114283557a368cc08a841979defbea0ce228f825430d4.
+Digest-checked diagnostics bind the original context/pin and candidate/manifest
+digests; see simulation/stage_0_5_mature_orders_result.json.
+
+Daniel's authorized continuation is a separate storage-verification job using
+the unchanged complete_upgrade_checkpoint.verify_storage. The new wrapper
+authenticates this saved candidate before read-only verification and retains
+only the original storage receipt. Twenty-five new real-fixture/wiring checks
+and82 affected checks passed; independent review found no issues and passed39
+focused checks plus a real closed-pipe diagnostic test. No construction,
+catalog verification, publication or continuation runs in this stage. No
+mature-world acceptance is claimed. Storage/catalog verification, publication,
+exact continuation and independent restore remain gates, followed by the final
+Astra handoff. Fine-grained commit phase/write profiling remains deferred.

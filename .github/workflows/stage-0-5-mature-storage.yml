@@ -1,0 +1,65 @@
+name: Stage 0.5 mature storage verification
+'on':
+  push:
+    branches: [sol/stage-0-5-mature-storage]
+    paths:
+    - .github/workflows/stage-0-5-mature-storage.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stage-0-5-mature-storage-verification
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: bbc3cbf11becb58aa4b9483114559fd1296878f1
+  HARNESS_SHA: 435cb61462eb47229be2927224cf5cbae000a835
+jobs:
+  mature-storage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Check mature storage wiring
+      run: |
+        python -m pip install pytest pyyaml
+        python -m pytest -q simulation/tests/test_construction_mature_storage.py simulation/tests/test_construction_checkpoint.py simulation/tests/test_checkpoint_artifacts.py
+    - name: Reserve disk on this disposable runner
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        mkdir -p evidence
+        df -h . | tee evidence/disk-start.txt
+    - name: Verify retained mature storage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set +e
+        timeout --signal=TERM --kill-after=30s 300m python -m simulation.construction_mature_storage 2>&1 | tee evidence/storage.log
+        storage_status=${PIPESTATUS[0]}
+        exit "$storage_status"
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: construction-mature-storage-diagnostics
+        path: |
+          evidence/storage.log
+          evidence/disk-start.txt
+          evidence/storage-summary.json
+        retention-days: 14
+    - name: Retain storage receipt
+      uses: actions/upload-artifact@v4
+      with:
+        name: construction-mature-storage
+        path: evidence/storage
+        if-no-files-found: error
+        retention-days: 14

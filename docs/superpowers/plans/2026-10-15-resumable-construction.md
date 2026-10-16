@@ -104,7 +104,7 @@ simulation/tests/test_construction_mature_orders.py,
 - [x] Run affected construction, transport, verification and workflow tests; confirm runtime tree and core helper hashes still match the green proof. 124 tests passed in 76.90s; the one warning is the intentional duplicate ZIP-entry fixture.
 - [x] Obtain one independent review and resolve material findings with failing regressions. Independent review found no Critical, Important or Minor issues and independently passed 66 ordering/construction/transport tests. No material findings needed repair.
 - [x] Publish the exact reviewed source, pin it in a separate launch commit, read back all outgoing files, inspect for earlier launches, and launch only ordering. Source 0e1986f626b66feea37be65ea1fc8291a939c004 (tree 670070f9332f13cb12e7169d0e4d12c96354fbda) and all six files read back exactly; launch 8b8c108f032f1e6d58339cc436310402b40a10ce changes only the source pin and its workflow was read back exactly. Zero earlier ordering runs were found. Final pinned-workflow checks passed 29/29.
-- [x] Record launch evidence and update the same existing monitor to inspect ordering completion before verification. Run 38867766111, job 116864437819 mature-orders: https://github.com/rax0h/all-that-endures/actions/runs/38867766111. Its CI wiring checks have passed; disk reservation was in progress at 07:33 UTC October 16. The existing monitor now follows this exact run. No ordering artifact or acceptance is claimed yet.
+- [x] Record launch evidence and update the same existing monitor to inspect ordering completion before verification. Run 38867766111, job 116864437819 mature-orders: https://github.com/rax0h/all-that-endures/actions/runs/38867766111. It passed October 16 at 07:54 UTC; total 22m42s, wrapper 615.72s, original ordinal restoration 153.15s. Artifact 12032507300 construction-mature-ordered fully uploaded: ZIP 4,342,414,844 bytes, SHA256 b9c5ebb5f8e72dcb41d114283557a368cc08a841979defbea0ce228f825430d4. Digest-checked diagnostics bind candidate 29,601,284,096 bytes SHA256 d96a0932ab0cb101de69e10ce4f0519de896d5cae44ee947c100b8af1429c7ee, manifest fd457aee712a4cfcfe69d10445e38294b21b34b5fe8496cbadb4484f6fbadf73, original context and generation-125 pin. The candidate remains explicitly unverified until the acceptance gates pass.
 
 Ordering disk ruling: reserve one entire working database copy, one full SQLite
 DELETE rollback journal and 8 GiB margin after extraction (62.78 GiB); at start,
@@ -120,6 +120,38 @@ minor. Ordering records wall/CPU, output blocks, peak RSS, transfer times and
 disk free bytes. Stage 0.5 acceptance is still gated by storage verification,
 catalog verification, publication, exact years 1001/1002 and downloaded restore,
 followed by the final Astra handoff.
+
+### Task 6: Separate mature storage verification
+
+The successful ordering candidate is retained and is the sole large input for
+this stage. Authenticate its exact producing run/workflow/job/artifact, ZIP and
+member inventory, manifest and database hashes/sizes, source configuration,
+original context, generation 124 source and generation 125 pin. The unchanged
+complete_upgrade_checkpoint.verify_storage performs its original read-only
+verification and emits its original storage.json receipt. No construction,
+catalog verification, publication or continuation runs here.
+
+**Files:** simulation/construction_mature_storage.py,
+simulation/tests/test_construction_mature_storage.py,
+.github/workflows/stage-0-5-mature-storage.yml.
+
+- [x] Write and observe 25 expected missing-wiring/workflow failures; implement the wrapper and pass all 25 checks. Real fixtures prove original receipt contents, unchanged candidate, corruption rejection despite refreshed hashes, interruption, receipt-write failure, broken diagnostic output, transfer provenance, duplicate starts, disk boundaries and nonfatal post-boundary summary failure.
+- [x] Run affected checkpoint, transport and workflow tests; confirm unchanged runtime/core helper hashes. All 82 passed in 180.78s; one expected warning came from the duplicate ZIP-entry rejection fixture. Runtime tree and helper hashes match the green proof.
+- [x] Obtain one independent review and resolve material findings with failing regressions. Independent review found no Critical, Important or Minor issues, passed 39 focused checks and verified a real closed-pipe subprocess exits 0 without stderr under unbuffered Python. No material findings required repair.
+- [ ] Publish and pin exact reviewed source, read back all outgoing files, inspect prior launches and start only storage verification.
+- [ ] Record launch and update the existing monitor to inspect the storage receipt before catalog verification.
+
+Storage disk ruling: verification is read-only; retain a candidate-sized scratch
+allowance plus 8 GiB after extraction (38,191,218,688 bytes). Before download also
+reserve the retained database, ZIP and 64 MiB metadata allowance
+(72,202,026,492 bytes). Keep the 8 GiB address-space guard and 300-minute command
+within the 360-minute job. Upload the completed receipt with independent,
+nonfatal diagnostics. Diagnostic stdout failures cannot suppress an already
+saved receipt; verifier exceptions and receipt-write failures still propagate.
+
+Reuse the approved full-suite/recovery proof only while runtime/core helpers
+are byte-identical; the wrapper gets fresh focused tests and independent review.
+Actual mature storage-verification duration remains unproven.
 
 ## Execution ruling
 

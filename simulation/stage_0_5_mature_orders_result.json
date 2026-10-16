@@ -1,0 +1,87 @@
+{
+  "accepted": false,
+  "candidate_artifact": {
+    "archive_bytes": 4342414844,
+    "archive_sha256": "b9c5ebb5f8e72dcb41d114283557a368cc08a841979defbea0ce228f825430d4",
+    "expires_at_utc": "2026-10-30T07:51:48Z",
+    "id": 12032507300,
+    "name": "construction-mature-ordered",
+    "upload_finalized_at_utc": "2026-10-16T07:54:11Z"
+  },
+  "candidate_upload_seconds": 144,
+  "conclusion": "success",
+  "diagnostics_artifact": {
+    "archive_bytes": 2115,
+    "archive_sha256": "328150454eb96d7c30c38f35310056ac7c3889a16f1c7c57b2ef536e50420413",
+    "download_digest_checked": true,
+    "id": 12032681432
+  },
+  "execution_harness_sha": "0e1986f626b66feea37be65ea1fc8291a939c004",
+  "job": "mature-orders",
+  "job_id": 116864437819,
+  "observed_at_utc": "2026-10-16T08:02:48Z",
+  "ordering_step_seconds": 1084,
+  "original_ordinal_restoration_seconds": 153.149682159,
+  "producer_job_seconds": 1358,
+  "run_attempt": 1,
+  "run_id": 38867766111,
+  "run_started_at_utc": "2026-10-16T07:31:32Z",
+  "run_updated_at_utc": "2026-10-16T07:54:14Z",
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/38867766111",
+  "runtime_tree": "3c7c833dbec178dc513c21ddf1ccdaa6f79d430a",
+  "stage": "ordered-unverified-candidate",
+  "summary": {
+    "committed_artifact": {
+      "archive_bytes": 4332758248,
+      "archive_sha256": "ec5dbeb0224a7bae109771b59da2bdca6eca451ebf67f1f5102fc77b91506077",
+      "artifact_id": 12030703178,
+      "producer_job": "mature-commit",
+      "run_id": 38851921152,
+      "seconds": 251.41662768199996,
+      "workflow_sha": "0acb45ef35748f7eda3f8d212c5c33c5d408be8f"
+    },
+    "committed_manifest_sha256": "db062e8f95f13a82a8c662c7ec73c2c724e078928d59e011cf7e55e7bfe11cd2",
+    "context": {
+      "harness_sha": "2c9166dcfc60370852d6fa38820dee8ec3d2e916",
+      "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+      "source_artifact": {
+        "archive_sha256": "409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9",
+        "id": 11870590333,
+        "run_id": 38508408370
+      }
+    },
+    "cpu_seconds": 163.857846869,
+    "database": {
+      "bytes": 29601284096,
+      "name": "candidate.sqlite",
+      "sha256": "d96a0932ab0cb101de69e10ce4f0519de896d5cae44ee947c100b8af1429c7ee"
+    },
+    "disk_free_bytes": 43523477504,
+    "execution_harness_sha": "0e1986f626b66feea37be65ea1fc8291a939c004",
+    "filesystem_output_blocks": 62397312,
+    "manifest_sha256": "fd457aee712a4cfcfe69d10445e38294b21b34b5fe8496cbadb4484f6fbadf73",
+    "peak_rss_kib": 47564,
+    "pin": {
+      "captured_head": 125,
+      "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+      "token": "26242f24-ba41-49c0-ac97-12de79b0b6a9"
+    },
+    "prepared_artifact": {
+      "archive_bytes": 3631292089,
+      "archive_sha256": "01db7a227f4a50a0bab347a211c09e2409880875de685cff1e32a01724322e06",
+      "artifact_id": 12024550042,
+      "producer_job": "mature-prepare",
+      "run_id": 38833265909,
+      "seconds": 215.94853948800002,
+      "workflow_sha": "c669c29a0c04544da451a35d2631cde9cc79d253"
+    },
+    "prepared_manifest_sha256": "15954ddf26504c15f195b1915fabb337911609fbbf7ca7359181c8b59b121557",
+    "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+    "stage": "unverified",
+    "wall_seconds": 615.721639752
+  },
+  "total_run_seconds": 1362,
+  "verification_scope": "Connected GitHub producer/run/job/artifact metadata, complete successful upload log and SHA256-checked diagnostics. Separate storage verification must authenticate full candidate ZIP, exact members, file and manifest hashes, original config/context/generation/pin, then run original verify_storage. No complete-format acceptance is claimed.",
+  "workflow_path": ".github/workflows/stage-0-5-mature-orders.yml",
+  "workflow_sha": "8b8c108f032f1e6d58339cc436310402b40a10ce"
+}
