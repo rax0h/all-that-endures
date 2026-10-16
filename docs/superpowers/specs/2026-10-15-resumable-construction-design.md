@@ -314,3 +314,13 @@ to the approved full proof. The final affected gate passed102/102 in324.32s,
 including the existing exact P5 continuation bridge; only the intentional
 duplicate-ZIP warning remains. Exact source pin/readback and prior-launch
 inspection still gate publication launch.
+
+Publication-only run[38907665230](https://github.com/rax0h/all-that-endures/actions/runs/38907665230)
+launched October16 at13:24:59UTC. Exact launch
+5fe99ca2faf0c0668ff73032fe9cc33fd1d6e9a9 pins reviewed source
+73370b253f0cb14550f6f43e8a20e4b577246c31. All six source files and the final
+pinned workflow matched exact readback. Final pin checks passed45/45 in20.88s.
+Zero prior publication runs were found across SHAs; exactly one launch was
+observed. See simulation/stage_0_5_mature_publish_launch.json. Actual publication,
+its authenticated saved checkpoint, continuation1001/1002, independent downloaded
+restore and final Astra handoff remain pending.
