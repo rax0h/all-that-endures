@@ -355,3 +355,12 @@ incomplete local residue, and the retained original checkpoint receipt is not
 explicitly fsynced. Completion is gated by successful command and mandatory
 upload, not atomic visibility of that local directory; exact producer/ZIP/
 member/file checks prevent partial acceptance. Runtime/core/P5 remain unchanged.
+
+Continuation-only run[38920910304](https://github.com/rax0h/all-that-endures/actions/runs/38920910304)
+launched at exact474572acf47525505e6520b11e88c2c35e0a6132, pinning reviewed
+sourcebeab83f2e96e5aee704f479d008f18a3e6b909f9. All six outgoing source
+files and final pinned workflow matched exact readback; final42 checks passed
+in125.44s. Zero prior continuation runs across SHAs were found, then exactly
+one launch/job117040272707 observed. Existing monitor retargeted and enabled;
+see simulation/stage_0_5_mature_continue_launch.json. Actual mature milestone
+results, independently downloaded restore and final Astra handoff are pending.
