@@ -244,3 +244,10 @@ catalog verification, publication or continuation runs in this stage. No
 mature-world acceptance is claimed. Storage/catalog verification, publication,
 exact continuation and independent restore remain gates, followed by the final
 Astra handoff. Fine-grained commit phase/write profiling remains deferred.
+
+Storage-only run[38872643738](https://github.com/rax0h/all-that-endures/actions/runs/38872643738)
+started October16. Launch4f1a7d7f0bd6c90704b5370f5e508669afe3b00f pins reviewed
+source31e1328a93b42c9fcc5c42926047c6ffcdf181c0. All six outgoing source files
+and the pinned workflow matched exact readback. Its CI wiring checks passed;
+the existing monitor follows storage before catalog verification. No completed
+storage receipt or Stage0.5 acceptance is claimed yet.
