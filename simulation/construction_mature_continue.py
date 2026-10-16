@@ -21,7 +21,7 @@ BRANCH = 'sol/stage-0-5-mature-continue'
 RUNTIME_SHA, RUNTIME_TREE = publish.RUNTIME_SHA, publish.RUNTIME_TREE
 # Retained inputs keep their original producer; only continuation executes the
 # reviewed save repair. P5 already supports explicit checkpoint provenance.
-EXECUTION_RUNTIME_SHA = 'f312cc288ec5f583d34e16f63aa58d3093ca6b7c'
+EXECUTION_RUNTIME_SHA = 'f32296ab0b93f80954acd272f5f51f990303b7d9'
 EXECUTION_RUNTIME_TREE = 'e2142c50e54ece5495312860094052e09338497a'
 CONTEXT, SOURCE_CONFIG = publish.CONTEXT, publish.SOURCE_CONFIG
 CANDIDATE_PIN, SOURCE_GENERATION = publish.CANDIDATE_PIN, publish.SOURCE_GENERATION
