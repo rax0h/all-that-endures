@@ -79,8 +79,13 @@ simulation/tests/test_construction_mature_commit.py,
 - [x] Implement a validation-only wrapper around the unchanged commit_prepared API; preserve the preparation context and record the new executing producer separately.
 - [x] Run focused mature/construction/transport tests; verify core helpers and runtime tree remain byte-identical to the green full proof.
 - [x] Obtain independent review and resolve material findings. Review identified inadequate minimum scratch space; two boundary tests reproduced the issue, then passed with 100 GiB before download and 75 GiB after extraction. Final 75 focused checks passed; no open Critical/Important findings.
-- [ ] Publish the exact reviewed wrapper, pin its SHA in the dedicated workflow, read back outgoing files, and start only one commit job.
-- [ ] Record its run and update the existing hourly monitor. Inspect its committed artifact and timings before ordering.
+- [x] Publish the exact reviewed wrapper, pin its SHA in the dedicated workflow, read back outgoing files, and start only one commit job. Source e32ffc7cdc87bf4bde408eb5957458fd6142736b; launch 0acb45ef35748f7eda3f8d212c5c33c5d408be8f. Four source files and the launch workflow match local content exactly.
+- [x] Record its run and update the existing hourly monitor. Active commit-only run: https://github.com/rax0h/all-that-endures/actions/runs/38851921152. Its wiring gate has passed; no committed output exists yet. Hourly monitoring follows this run and will inspect its saved artifact/timings before ordering.
+
+Deferred diagnostic minor: the new wrapper records aggregate wall/CPU timings
+and resource heartbeats. Detailed per-phase timing and write accounting remains
+a follow-up and does not weaken artifact validation. Mature duration and
+downstream acceptance are not yet established.
 
 Ruling: reuse the existing whole-suite/recovery proof for byte-identical runtime
 and core helpers; validate the new stage wrapper with focused real-fixture
