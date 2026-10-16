@@ -1,0 +1,165 @@
+{
+  "accepted": false,
+  "completed_at_utc": "2026-10-16T14:01:07Z",
+  "conclusion": "success",
+  "diagnostics_artifact": {
+    "archive_bytes": 19421,
+    "archive_sha256": "58e4d2584cdbcaffa8ee31e9173473c46d07d60b202e4d8d0e319ac2da597823",
+    "download_digest_checked": true,
+    "id": 12050152952,
+    "summary_bytes": 147292,
+    "summary_sha256": "8cd587c1e86035369b274d5f387458f9b02f3c75cb7d38f24a4e3d815667ea7a"
+  },
+  "job": "mature-publish",
+  "job_id": 116995243168,
+  "observed_at_utc": "2026-10-16T14:42:34.052615+00:00",
+  "producer_job_seconds": 2162,
+  "publication_command_seconds": 1659,
+  "published_artifact": {
+    "archive_bytes": 3910109453,
+    "archive_sha256": "5ea709166d2bba7f7a22d614fed604f471973ae9ff757979a4148ff197c43382",
+    "expires_at_utc": "2026-10-30T13:54:43Z",
+    "fully_uploaded": true,
+    "id": 12049884660,
+    "large_zip_full_authentication": "mandatory in fresh continuation runner before mutation; local connected-app limit512MiB",
+    "name": "construction-mature-published",
+    "producer_authenticated": true
+  },
+  "remaining_gates": [
+    "exact continuation through1001/1002",
+    "independent downloaded restore",
+    "final Astra handoff"
+  ],
+  "run_attempt": 1,
+  "run_id": 38907665230,
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/38907665230",
+  "stage": "complete-published",
+  "started_at_utc": "2026-10-16T13:24:59Z",
+  "summary": {
+    "context": {
+      "harness_sha": "2c9166dcfc60370852d6fa38820dee8ec3d2e916",
+      "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+      "source_artifact": {
+        "archive_sha256": "409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9",
+        "id": 11870590333,
+        "run_id": 38508408370
+      }
+    },
+    "control_digests": {
+      "1001": "57f60fdf49e221af24ffc0a1f2d5a3885dd37c07db00d153171adcb91c579eed",
+      "1002": "2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7"
+    },
+    "cpu_seconds": 257.720348274,
+    "disk_free_bytes": 56025300992,
+    "execution_harness_sha": "73370b253f0cb14550f6f43e8a20e4b577246c31",
+    "execution_workflow_sha": "5fe99ca2faf0c0668ff73032fe9cc33fd1d6e9a9",
+    "files": {
+      "checkpoint.json": {
+        "bytes": 134251,
+        "sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53"
+      },
+      "p5-long-complete.sqlite": {
+        "bytes": 29601284096,
+        "sha256": "0d884e52a012ab55325c7111bfc1d054fa7c27aaf0947cf9ab8de4423c213e1c"
+      }
+    },
+    "filesystem_output_blocks": 57815960,
+    "inputs": {
+      "candidate": {
+        "archive_bytes": 4342414844,
+        "archive_sha256": "b9c5ebb5f8e72dcb41d114283557a368cc08a841979defbea0ce228f825430d4",
+        "artifact_id": 12032507300,
+        "producer_job": "mature-orders",
+        "run_id": 38867766111,
+        "seconds": 689.6401379590001,
+        "workflow_sha": "8b8c108f032f1e6d58339cc436310402b40a10ce"
+      },
+      "catalog": {
+        "archive_bytes": 585,
+        "archive_sha256": "854c941a708c3aa7abd8a85836369c4a209e089496d6b82906afe30f9a9b1bbd",
+        "artifact_id": 12043567528,
+        "producer_job": "mature-catalog",
+        "run_id": 38884880079,
+        "seconds": 1.2566610850000188,
+        "workflow_sha": "ee5000a156ebcf1fcec4a893da1a06958feb0ed5"
+      },
+      "source": {
+        "archive_bytes": 1339563957,
+        "archive_sha256": "409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9",
+        "artifact_id": 11870590333,
+        "producer_job": "late-lazy",
+        "run_id": 38508408370,
+        "seconds": 75.37715726700003,
+        "workflow_sha": "124c3215468a60862b7848086f00a8e768a6ed66"
+      },
+      "storage": {
+        "archive_bytes": 554,
+        "archive_sha256": "7bf248f63a1b37be151f6da7c7745c056dd83e1a0ed0de320d21283f92cd6df4",
+        "artifact_id": 12037828504,
+        "producer_job": "mature-storage",
+        "run_id": 38872643738,
+        "seconds": 1.3891176450000557,
+        "workflow_sha": "4f1a7d7f0bd6c90704b5370f5e508669afe3b00f"
+      }
+    },
+    "peak_rss_kib": 41784,
+    "receipt_authority": {
+      "checkpoint_product_sha": "2bc3c85389760ff12578857f7d2a849bc5cf9201",
+      "config": {
+        "bootstrap_year": 1000,
+        "complete_format": true,
+        "initialization": "mature",
+        "milestones": [
+          1001,
+          1002
+        ],
+        "product_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+        "rules_id": "stage-0-5-final-release",
+        "seed": 843000,
+        "simulation_schema": "ate-world-p2a/1"
+      },
+      "database": {
+        "name": "p5-long-complete.sqlite",
+        "sha256": "0d884e52a012ab55325c7111bfc1d054fa7c27aaf0947cf9ab8de4423c213e1c"
+      },
+      "product_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+      "schema": 1,
+      "source_checkpoint": {
+        "database": {
+          "name": "p5-long-lazy.sqlite",
+          "sha256": "f03e1755c7e847c861502eedda11c2100bada806259698c531bf8a2a57ae3d03"
+        },
+        "prior_source": null,
+        "product_sha": "2bc3c85389760ff12578857f7d2a849bc5cf9201",
+        "receipt_sha256": "598b4875d7dad6b63990f6901e57c22708b19edf9cfa2c41c2790c9b3d345084",
+        "stage": "lazy",
+        "workflow_sha": "124c3215468a60862b7848086f00a8e768a6ed66"
+      },
+      "stage": "complete",
+      "workflow_sha": "5fe99ca2faf0c0668ff73032fe9cc33fd1d6e9a9"
+    },
+    "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+    "source_bytes": 9601409024,
+    "stage": "complete-published",
+    "state_authority": {
+      "bootstrap_simulation_seconds": 370.417090402,
+      "cold_hash_after": "972572354543fc3de15a43cba50ecd7b87bcf5823fb3706ae71510d4d56977f9",
+      "cold_hash_before": "972572354543fc3de15a43cba50ecd7b87bcf5823fb3706ae71510d4d56977f9",
+      "control_seconds": 754.3254311769999,
+      "conversion_result": {
+        "complete_format": true,
+        "generation": 125,
+        "source_generation": 124,
+        "source_preserved": true,
+        "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a"
+      },
+      "source_digest": "d2e8c476174d5497da24dfe6fa79ed6ad94fb22b3b3b2e1b15f9f5064a630584",
+      "source_digest_seconds": 77.18407195400005
+    },
+    "wall_seconds": 818.1600505779999
+  },
+  "total_run_seconds": 2168,
+  "upload_seconds": 377,
+  "workflow_path": ".github/workflows/stage-0-5-mature-publish.yml",
+  "workflow_sha": "5fe99ca2faf0c0668ff73032fe9cc33fd1d6e9a9"
+}

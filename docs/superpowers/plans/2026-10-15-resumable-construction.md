@@ -238,6 +238,75 @@ No required check is skipped: real fixture tests and the same tested CI transpor
 perform them in the supported environment. Mature publication duration remains
 unproven; acceptance still requires continuation, downloaded restore and Astra.
 
+Publication run38907665230 passed October16 at14:01:07UTC; total2168s
+(36m08s), producer job2162s, publication/download command1659s, wrapper818.16s
+and upload377s. Artifact12049884660 construction-mature-published fully uploaded:
+ZIP3910109453 bytes SHA256
+5ea709166d2bba7f7a22d614fed604f471973ae9ff757979a4148ff197c43382.
+Its normal checkpoint is134251 bytes SHA256
+082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53;
+closed complete DB29601284096 bytes SHA256
+0d884e52a012ab55325c7111bfc1d054fa7c27aaf0947cf9ab8de4423c213e1c.
+Producer metadata and downloaded19421-byte diagnostic ZIP were authenticated.
+The exact summary binds original controls, context and both verifier receipts.
+Full large ZIP/member/file authentication remains mandatory on the supported
+fresh runner before continuation; the local app's512MiB limit is not bypassed.
+See simulation/stage_0_5_mature_publish_result.json. Neither publication nor
+successful earlier work may repeat merely to advance.
+
+### Task 9: Separate exact mature continuation
+
+**Files:** Create simulation/construction_mature_continue.py,
+simulation/tests/test_construction_mature_continue.py and
+.github/workflows/stage-0-5-mature-continue.yml. Record publication result and
+update this plan/spec; runtime/core/P5 code stays unchanged.
+
+**Interfaces:** run_continue(published, diagnostics, storage_receipt,
+catalog_receipt, bundle, *, workflow_sha) consumes exact publication12049884660,
+diagnostics12050152952 and the retained original storage/catalog receipts.
+Authenticate all producers/ZIPs/members/files, the original context, normal
+complete receipt/configuration/source chain/generation125 and bound controls.
+Call unchanged P5 run with resume_from='complete', seed843000, bootstrap1000,
+milestones[1001,1002], initialization='mature' and original runtime product SHA,
+using COPIED private database/receipt. Produce only result.json, restore.sqlite
+and byte-exact original checkpoint.json after both milestone comparisons and
+the P5 local backup/reopen checks pass. A subsequent fresh downloaded restore
+is still mandatory. Never generate a World, recreate controls or repeat any
+successful construction/verifier/publication to advance.
+
+- [x] Write real-fixture tests for exact milestone digest/counters/aliases, retained-input immutability, foreign/refreshed receipt authority, wrong controls, failed/interrupted continuation, output-write/no-overwrite faults, broken diagnostics, producer transport, disk guards and bounded workflow.
+- [x] Run the new test file: all42 expected absent-module/workflow failures observed in22.81s before implementation.
+- [x] Implement only continuation wiring around unchanged P5 run; all42 checks passed in133.30s. Retain closed/fsynced backup by hard link, without a third full output copy. A real one-settlement fixture preserves shared counted histories, independently calculated controls and actual simulation/audits/save/backup/reopen; actual mature continuation remains a later CI gate.
+- [x] Run affected continuation/publication/checkpoint/transport tests and freshly compare runtime/core/P5 hashes with the approved green proof. All149 passed in203.41s; only the intentional duplicate-ZIP rejection warning. Runtime/core/P5 are byte-identical to the approved proof; no speculative optimization or whole-world regeneration.
+- [x] Obtain ONE independent final review of the whole continuation change, then fix material findings with RED-to-GREEN regressions. No Critical/Important findings; independent56 checks passed in126.53s. Two local host-crash durability minors are deferred below. No production fix or re-review was required.
+- [ ] Publish exact reviewed source on its dedicated branch, read back every outgoing file, pin source in a separate launch, inspect earlier launches across SHAs, pass final pin checks and launch only continuation ONCE. Retarget the SAME monitor, record exact run/job/producer and immutable source lineage.
+
+Continuation disk ruling: allow8GiB growth above the measured29601284096-byte
+input for EACH private database/backup (output cap38191218688 bytes). After
+extraction reserve84972371968 bytes: working copy plus full-size rollback
+journal OR final backup, and8GiB margin. Before downloads also reserve the
+retained input,3910109453-byte transfer ZIP and64MiB metadata
+(118551008632 bytes, including the exact input checkpoint). Use the proven broader disposable-runner cleanup,
+retaining Python and Actions runtime (publication measured117GiB free).
+Reject an oversized output before retention; do not infer a mature ETA from
+the fixture. Keep8GiB address guard,300-minute command/360-minute job and
+mandatory output upload after nonfatal diagnostics. Original inputs remain
+unchanged. Publication diagnostics and tiny prerequisite receipts are reused,
+not expensive verifier calls. Runtime/core/P5 remain byte-identical; reuse the
+approved full proof with new real-fixture/affected checks and one review.
+Independent downloaded restore and final Astra handoff still gate acceptance.
+
+Deferred continuation minors: final local directory creation is exclusive but
+links appear sequentially; a forced process exit after the first link leaves
+an incomplete directory, which must be inspected rather than blindly reused.
+The original input checkpoint receipt is hard-linked without an explicit file
+fsync, unlike the fsynced restore DB and newly written result. Thus completion
+is upload-gated, not an atomic/all-files-fsynced local directory promise. The
+workflow does not upload on command failure, successful producing-job checks
+and exact ZIP/member/file hashes remain mandatory, and all predecessor bytes
+survive. These caveats do not allow partial external acceptance. No ordinary
+overwrite-capable rename was substituted for the no-overwrite guard.
+
 ## Execution ruling
 
 Daniel approved the explicit request to implement and test this revised split. Execute inline as offered; this is not another request to approve routine planning. Do not launch mature construction as part of this approval. The only independent agent is the final review required by executing-plans.

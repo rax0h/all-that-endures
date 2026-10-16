@@ -324,3 +324,34 @@ Zero prior publication runs were found across SHAs; exactly one launch was
 observed. See simulation/stage_0_5_mature_publish_launch.json. Actual publication,
 its authenticated saved checkpoint, continuation1001/1002, independent downloaded
 restore and final Astra handoff remain pending.
+
+Publication completed successfully October16 at14:01:07UTC, total36m08s;
+wrapper818.16s and upload6m17s. Artifact12049884660 fully uploaded its
+3910109453-byte ZIP, SHA256
+5ea709166d2bba7f7a22d614fed604f471973ae9ff757979a4148ff197c43382.
+Authenticated producer metadata and digest-checked diagnostics bind the closed
+29601284096-byte complete database, normal134251-byte checkpoint and original
+independent controls. See simulation/stage_0_5_mature_publish_result.json.
+
+The next authorized stage authenticates that exact complete checkpoint and
+diagnostics plus both retained verification receipts, then runs unchanged P5
+resume_from='complete' through years1001/1002 on private COPIES. Retain only
+closed restore.sqlite, result.json and the exact input checkpoint.json. No
+World/control regeneration, construction, verification or publication repeats.
+Reserve118551008632 bytes before downloads,84972371968 after extraction,
+including8GiB growth per working/backup database, full journal-or-backup and
+8GiB margin; cap retained output at38191218688 bytes. Use the proven117GiB
+cleanup,8GiB address guard,300/360-minute limits and mandatory upload.
+Focused real-fixture checks and one independent review precede exact source
+pin/readback, prior-launch inspection and a single continuation launch. This
+does not substitute for actual mature continuation, independent fresh
+downloaded restore or final Astra handoff. Stage0.5 remains unaccepted.
+
+Continuation wiring passed42 real-fixture checks after42 missing-wiring RED
+failures, and149 affected checks in203.41s. One independent Astra review
+passed56 checks in126.53s and found no Critical/Important issues. Two local
+host-crash durability minors are deferred: sequential final links may leave
+incomplete local residue, and the retained original checkpoint receipt is not
+explicitly fsynced. Completion is gated by successful command and mandatory
+upload, not atomic visibility of that local directory; exact producer/ZIP/
+member/file checks prevent partial acceptance. Runtime/core/P5 remain unchanged.
