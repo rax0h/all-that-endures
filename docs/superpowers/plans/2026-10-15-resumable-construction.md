@@ -58,7 +58,33 @@
 - [x] Write failing workflow/runner tests for stage dependencies, exact artifact membership and producer checks, bounded job limits, nonfatal diagnostics before mandatory stage upload, and absent mature starts.
 - [x] Implement fresh-process stage runner and proof workflow; test locally.
 - [x] Obtain one independent whole-change review; repair material findings with failing regressions.
-- [ ] Publish exact source and pinned workflow on a dedicated branch; launch bounded proof plus applicable fresh recovery/full suite. Record links/results without waiting in the chat for long gates.
+- [x] Publish exact source and pinned workflow on a dedicated branch; launch bounded proof plus applicable fresh recovery/full suite. Record links/results without waiting in the chat for long gates. Run 38819525026 passed all 13 jobs, including 2,594 tests and two subtests.
+
+### Task 4: Mature commit from saved preparation
+
+Daniel authorized a preparation-completion brief followed by continuation. Run
+38833265909 passed in 2h50m47s and uploaded construction-mature-prepared
+artifact 12024550042 (3,631,292,089 bytes, archive SHA256
+01db7a227f4a50a0bab347a211c09e2409880875de685cff1e32a01724322e06).
+Authenticated diagnostics report 9,822 seconds for preparation/export and
+files target.sqlite (808,775,680 bytes) and spool.sqlite (21,538,623,488 bytes).
+The original atomic commit previously took 136m40s; that is a measurement,
+not a guaranteed duration on another runner.
+
+**Files:** simulation/construction_mature_commit.py,
+simulation/tests/test_construction_mature_commit.py,
+.github/workflows/stage-0-5-mature-commit.yml.
+
+- [x] Test commit-only reuse, foreign input rejection, exact transport, duplicate/rerun protection, and nonfatal post-boundary diagnostics.
+- [x] Implement a validation-only wrapper around the unchanged commit_prepared API; preserve the preparation context and record the new executing producer separately.
+- [x] Run focused mature/construction/transport tests; verify core helpers and runtime tree remain byte-identical to the green full proof.
+- [x] Obtain independent review and resolve material findings. Review identified inadequate minimum scratch space; two boundary tests reproduced the issue, then passed with 100 GiB before download and 75 GiB after extraction. Final 75 focused checks passed; no open Critical/Important findings.
+- [ ] Publish the exact reviewed wrapper, pin its SHA in the dedicated workflow, read back outgoing files, and start only one commit job.
+- [ ] Record its run and update the existing hourly monitor. Inspect its committed artifact and timings before ordering.
+
+Ruling: reuse the existing whole-suite/recovery proof for byte-identical runtime
+and core helpers; validate the new stage wrapper with focused real-fixture
+checks and independent review. A new runtime change requires fresh runtime gates.
 
 ## Execution ruling
 
