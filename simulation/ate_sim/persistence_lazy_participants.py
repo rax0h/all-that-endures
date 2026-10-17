@@ -72,6 +72,13 @@ def _check_unique_authorities(codec, deltas):
                 seen.add(marker)
 
 
+def _missing_owner_payload(missing):
+    # Diagnose the rejected captured keys without reading owners or histories.
+    sample = tuple((namespace, key[:160]) for namespace, key in sorted(missing)[:3])
+    return StoreIntegrityError('hybrid save omits a touched identity owner payload: '
+                               f'count={len(missing)}, owners={sample!r}')
+
+
 class FamilySaveParticipant:
     """One concrete namespace's immutable writes and exact acknowledgement."""
     def __init__(self, store, pin, target_generation, delta):
@@ -496,8 +503,10 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
                            for change in (*owner_versions, *owner_records)}
         placement_owners = {(change.owner_namespace, codec.encode(change.owner_key))
                             for change in coord.placement_overlay.values()}
-        if any(namespace not in FAMILIES for namespace, _key in placement_owners - supplied_owners):
-            raise StoreIntegrityError('hybrid save omits a touched identity owner payload')
+        missing_physical = {(namespace, key) for namespace, key in placement_owners - supplied_owners
+                            if namespace not in FAMILIES}
+        if missing_physical:
+            raise _missing_owner_payload(missing_physical)
         if any(change.namespace == 'world_identity_links' for change in ordinary.decode(codec)[1]):
             raise StoreIntegrityError('checked catalog cannot publish legacy identity links')
         # Catalog metadata augments the central version list. Placement writes
@@ -531,7 +540,7 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
                                    for change in (*forced_versions, *forced_records))
             if not placement_owners <= supplied_owners:
                 coord.abort_delta(delta, plan.token)
-                raise StoreIntegrityError('hybrid save omits a touched identity owner payload')
+                raise _missing_owner_payload(placement_owners - supplied_owners)
         except BaseException:
             if dependency_participant is not None:
                 dependency_participant.abort_delta(plan.token)

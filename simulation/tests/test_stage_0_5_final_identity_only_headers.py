@@ -148,8 +148,9 @@ def test_missing_recursive_page_and_child_payload_cannot_be_reconstructed(tmp_pa
             return freeze(store, pin, replace(plan, nested_history_version_changes=changes), **kwargs)
         monkeypatch.setattr(participants, 'freeze_hybrid_publication', omit_payloads)
         before = session.pin.captured_head
-        with pytest.raises(StoreIntegrityError, match='omits a touched identity owner payload'):
+        with pytest.raises(StoreIntegrityError, match='omits a touched identity owner payload') as rejected:
             session.save()
+        assert 'aux.lazy.nested.list_pages' in str(rejected.value)
         assert session.store.generation == before
         assert session._identity_coordinator._prepared is None
         assert session._backing_dependencies._prepared is None

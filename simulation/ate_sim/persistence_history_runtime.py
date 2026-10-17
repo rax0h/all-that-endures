@@ -675,6 +675,8 @@ class RecursiveHistoryRuntime:
             try:
                 if placements:
                     session._nested_dirty[incarnation.value] = proxy
+                else:
+                    self.retain_pending_children(proxy, private=True)
             finally:
                 if hasattr(placements, 'close'):
                     placements.close()
@@ -686,39 +688,54 @@ class RecursiveHistoryRuntime:
                 raise StoreError('nested history read requires save acknowledgement')
         proxy.bind(guard, changed, read_guard)
 
-    def retain_pending_children(self, proxy):
+    def retain_pending_children(self, proxy, *, private=False):
         """Private unpublished D keeps canonical descendants alive through U.
 
         These references are not placements or a second identity authority.
         Publication clears them; only unpublished dirty payload is traversed.
         """
-        if not proxy._new:
+        if not proxy._new and not private:
             return
         session = self.session()
         children = {}
         for source in self._changes(proxy):
             if source.delete:
                 continue
-            for _path, inc in AUXILIARY_OWNER_FAMILIES[source.namespace].reference_placements(source.value):
+            adapter = AUXILIARY_OWNER_FAMILIES[source.namespace]
+            for path, inc in adapter.reference_placements(source.value):
                 child = session._registry.object_for_incarnation(IncarnationId(session.store.store_identity, inc))
                 if child is None:
-                    raise StoreIntegrityError('unpublished child lost its canonical object')
+                    if proxy._new:
+                        raise StoreIntegrityError('unpublished child lost its canonical object')
+                    # A clean shared child can have left the weak cache. Load
+                    # it through the still-checked placement before cancellation.
+                    child = self.decode(adapter.resolve_path(source.value, path),
+                                        (source.namespace, source.key), path)
                 children[inc] = child
         proxy._recursive_pending_children = children
 
-    def decode(self, value, owner, path):
+    def _pending_child(self, parent_backing, value, owner, path):
+        if parent_backing is None:
+            return None
+        source = self._source_change(parent_backing, owner)
+        child = getattr(parent_backing, '_recursive_pending_children', {}).get(value.incarnation)
+        if source is None or source.delete or child is None:
+            return None
+        current = AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(source.value, path)
+        if current != value or (reference(value) and history_storage_kind(self.backing_for(child)) != value.kind):
+            raise StoreIntegrityError('private recursive reference disagrees with its pending value')
+        return child
+
+    def decode(self, value, owner, path, *, allow_private=True):
         if reference(value) or record_reference(value) or event_id_reference(value) or nonreflexive_key_reference(value):
             session = self.session()
             parent = session._registry.object_for_incarnation(
                 IncarnationId(session.store.store_identity, owner[1][0]))
             parent_backing = self.backing_for(parent) if parent is not None else None
-            if parent_backing is not None and parent_backing._new:
-                source = self._source_change(parent_backing, owner)
-                child = getattr(parent_backing, '_recursive_pending_children', {}).get(value.incarnation)
-                if source is not None and not source.delete and child is not None:
-                    current = AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(source.value, path)
-                    if current != value or (reference(value) and history_storage_kind(self.backing_for(child)) != value.kind):
-                        raise StoreIntegrityError('private recursive reference disagrees with its pending value')
+            if allow_private and parent_backing is not None and (parent_backing._new
+                    or getattr(parent_backing, '_recursive_pending_children', None)):
+                child = self._pending_child(parent_backing, value, owner, path)
+                if child is not None:
                     return child
             if owner[0] == NODE_NAMESPACE:
                 if (type(parent) is LazyOrderedSequence and parent._mutation_depth
@@ -769,13 +786,15 @@ class RecursiveHistoryRuntime:
             return session._bind_history_list(value, Occurrence(*owner, path),
                 IncarnationId(session.store.store_identity, value.incarnation), kind=value.kind)
         if type(value) is tuple:
-            return tuple(self.decode(child, owner, path + (('index', slot),)) for slot, child in enumerate(value))
+            return tuple(self.decode(child, owner, path + (('index', slot),), allow_private=allow_private)
+                         for slot, child in enumerate(value))
         from .core import Ref
         if type(value) is Ref:
-            return Ref(self.decode(value.kind, owner, path + (('field', 'kind'),)),
-                       self.decode(value.id, owner, path + (('field', 'id'),)))
+            return Ref(self.decode(value.kind, owner, path + (('field', 'kind'),), allow_private=allow_private),
+                       self.decode(value.id, owner, path + (('field', 'id'),), allow_private=allow_private))
         if type(value) is frozenset:
-            return frozenset(self.decode(child, owner, path + (('key', child),)) for child in value)
+            return frozenset(self.decode(child, owner, path + (('key', child),), allow_private=allow_private)
+                             for child in value)
         return value
 
     def validate_physical_children(self, owner, value):
@@ -791,10 +810,22 @@ class RecursiveHistoryRuntime:
         session = self.session()
         coord = session._identity_coordinator
         rows = coord._owner_changes(owner, ())
+        parent = session._registry.object_for_incarnation(
+            IncarnationId(session.store.store_identity, owner[1][0]))
+        backing = self.backing_for(parent) if parent is not None else None
         for path, inc in refs:
             marker = coord._marker(owner, path)
             if marker not in rows or rows[marker][2] != inc:
-                raise StoreIntegrityError('recursive reference lacks its checked physical placement')
+                # Held private D has no physical placement until reattachment.
+                # Validate only its retained, previously admitted child; live
+                # owners must continue to prove their checked projection.
+                if (backing is None or session._registry.occurrences_for_incarnation(
+                        IncarnationId(session.store.store_identity, owner[1][0]))
+                        or session._nested_eager_owners(parent)
+                        or self._pending_child(backing,
+                            AUXILIARY_OWNER_FAMILIES[owner[0]].resolve_path(value, path), owner, path) is None):
+                    raise StoreIntegrityError('recursive reference lacks its checked physical placement')
+                continue
             coord.discover_group(inc)
 
     def _changes(self, proxy):
@@ -868,11 +899,13 @@ class RecursiveHistoryRuntime:
                 coord.dirty_owners.discard(owner)
 
     def retire_unowned_new_routes(self):
-        """Cancel only actual unpublished D which lost its owning placement.
+        """Cancel physical placement edits for D which lost its owner.
 
         Removing one private parent's routes can orphan its new children. The
         queue visits those outgoing D edges once; published backing retirement
         remains the existing bounded retirement participant's responsibility.
+        A published unowned alias keeps its old physical source, so restore its
+        original placements instead of publishing edits without their payload.
         """
         session = self.session()
         coord = session._identity_coordinator
@@ -881,26 +914,29 @@ class RecursiveHistoryRuntime:
         while pending:
             proxy = pending.popleft()
             inc = proxy._incarnation
-            if not proxy._new or inc in retired:
+            if inc in retired:
                 continue
             if (session._registry.occurrences_for_incarnation(
                     IncarnationId(session.store.store_identity, inc))
                     or session._nested_eager_owners(canonical_for(proxy))):
                 continue
             retired.add(inc)
+            self.retain_pending_children(proxy, private=True)
             for source in self._changes(proxy):
                 owner = source.namespace, source.key
                 if owner not in coord.dirty_owners and owner not in coord._by_owner:
                     continue
-                rows = coord._owner_changes(owner, ())
-                children = {child for _path, _original, child in rows.values() if child is not None}
-                coord.retire_owner(owner)
-                coord.dirty_owners.discard(owner)
+                children = coord.discard_private_owner_changes(owner)
                 self.release_unowned_memos(children)
                 for child in children:
                     backing = session._nested_dirty.get(child)
                     if backing is not None:
                         pending.append(backing)
+            # Later shared-child routing must see the saved physical payload,
+            # rather than this alias's unpublished replacement overlay.
+            session._nested_dirty.pop(inc, None)
+            if type(proxy) is RecordBacking:
+                proxy._dirty_record = None
 
     def release_unowned_memos(self, incarnations):
         session = self.session()
@@ -1038,7 +1074,9 @@ class RecursiveHistoryRuntime:
     def resolve_path(self, physical, path):
         adapter = AUXILIARY_OWNER_FAMILIES[physical.owner[0]]
         value = adapter.resolve_path(physical.value, path)
-        return self.decode(value, physical.owner, path)
+        # Coordinator routing resolves a checked physical source. A retained
+        # alias may hold different private bytes at exactly this same path.
+        return self.decode(value, physical.owner, path, allow_private=False)
 
     def install_path(self, owner, path, obj):
         session = self.session()
@@ -1057,6 +1095,12 @@ class RecursiveHistoryRuntime:
     def unchanged_header(self, owner):
         session = self.session()
         value = self.load_owner(owner).value
+        try:
+            saved = session.store.read_version(session.pin, *owner, expected_record_schema=1).value
+        except KeyError as error:
+            raise StoreIntegrityError('unchanged physical owner lacks a checked saved source') from error
+        if session.store.codec.encode(value) != session.store.codec.encode(saved):
+            raise StoreIntegrityError('changed physical owner payload requires an explicit save change')
         adapter = AUXILIARY_OWNER_FAMILIES[owner[0]]
         members = (Membership('incarnation', owner[1][0], value[0]),) if adapter.owner_kind == 'entry' else ()
         return VersionChange(*owner, value, memberships=members)

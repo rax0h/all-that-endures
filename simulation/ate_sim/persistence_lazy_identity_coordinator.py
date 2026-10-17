@@ -410,6 +410,38 @@ class IdentityCoordinator:
         with self._mutation():
             self._replace_scope(owner, (), ())
 
+    def discard_private_owner_changes(self, owner):
+        """Restore only journaled placements when their backing is not saved.
+
+        The caller has proved this physical backing has no current owner.
+        Its private value overlay stays on the held alias; the published source
+        and its checked placements must remain together until reattachment.
+        Original identities came from checked mutation discovery, so cancelling
+        these edits needs no owner payload or child/history traversal.
+        """
+        from .persistence_history_owner_adapters import AUXILIARY_OWNER_FAMILIES
+        if owner[0] not in AUXILIARY_OWNER_FAMILIES:
+            raise ValueError('private placement cancellation requires a physical owner')
+        with self._mutation():
+            self.preflight()
+            if self._prepared is not None:
+                raise StoreConflictError('identity coordinator has an unacknowledged frozen plan')
+            removed = set()
+            for marker in tuple(self._by_owner.get(owner, ())):
+                change = self.placement_overlay[marker]
+                original = self._original[marker]
+                current = None if change.delete else change.incarnation_id
+                if current is not None:
+                    removed.add(current)
+                occurrence = Occurrence(*owner, change.occurrence_path)
+                self.registry.detach_occurrence(occurrence)
+                if original is not None:
+                    self.registry.attach_existing(IncarnationId(self.store.store_identity, original), occurrence)
+                self._record_placement_change(owner, change.occurrence_path, original, current, original)
+            self.dirty_owners.discard(owner)
+            self._trim()
+            return removed
+
     def _force_owner_headers(self, versions, ordinary, value_changed_incarnations):
         """The publisher names actual backing writes; guarded no-ops add no rows."""
         forced_versions, forced_ordinary = [], []
