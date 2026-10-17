@@ -53,7 +53,7 @@ def snapshot(world, include_digest=False):
         'users_by_occupation':dict(Counter(p.occupation for p in adults if p.id in paths)),
         'available_stock_owner_kinds':dict(Counter(r.owner_kind for r in available)),
         'coin_supply':dict(world.currency.minted),'coin_consumption':dict(world.currency.consumed),
-        'treasuries':world.currency.treasuries,
+        'treasuries':{institution:dict(coins) for institution,coins in world.currency.treasuries.items()},
         'change_exchanges':events['society_change_exchanged'],
         'paid_apprentice_jobs':events['society_apprentice_work'],
     }

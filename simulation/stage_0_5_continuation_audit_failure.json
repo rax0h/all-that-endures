@@ -1,0 +1,53 @@
+{
+  "stage": "mature-continuation-audit-failed",
+  "accepted": false,
+  "run_id": 38992881882,
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/38992881882",
+  "job_id": 117278888593,
+  "workflow_sha": "3512bf8f379934ff7b67c4832b164ea3d01e5bc8",
+  "harness_sha": "93f6d4259ce970b70af49431da287ee842dcaaaa",
+  "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "created_at_utc": "2026-10-17T01:55:38Z",
+  "exception_at_utc": "2026-10-17T05:56:50Z",
+  "completed_at_utc": "2026-10-17T05:56:59Z",
+  "exit_code": 1,
+  "timed_out": false,
+  "error": "TypeError: Object of type LazyHistoryMap is not JSON serializable",
+  "failing_report_field_reproduced": "magic_access.treasuries[1]",
+  "save_1001_returned": true,
+  "reopen_1001_started": false,
+  "year_1001_verified": false,
+  "year_1002_started": false,
+  "continued_checkpoint_uploaded": false,
+  "phase_seconds": {
+    "open_after_checkpoint_verification": 1006.649424561,
+    "simulation_1001": 4087.5994771769997,
+    "save_and_compact_diagnostics_1001": 3645.246470621,
+    "audit_until_exception_1001_approximate": 4897.525
+  },
+  "diagnostic_artifact": {
+    "id": 12091846715,
+    "name": "construction-mature-continue-diagnostics",
+    "archive_bytes": 6066,
+    "archive_sha256": "e279474e393e0e6eeeca74dfa302900a925163146fb75876abc9aa757aa2146f"
+  },
+  "retained_predecessor": {
+    "run_id": 38907665230,
+    "artifact_id": 12049884660,
+    "name": "construction-mature-published",
+    "year": 1000,
+    "unexpired_metadata_rechecked": true,
+    "archive_sha256": "5ea709166d2bba7f7a22d614fed604f471973ae9ff757979a4148ff197c43382"
+  },
+  "local_reproduction_seconds": 0.437,
+  "report_fix_red": {"passed": 1, "failed": 2},
+  "report_fix_affected_green": {
+    "passed": 65,
+    "seconds": 273.95,
+    "warning": "intentional duplicate ZIP-member rejection fixture"
+  },
+  "staged_protocol_implemented": false,
+  "new_mature_run_launched": false,
+  "monitoring_enabled": false
+}
