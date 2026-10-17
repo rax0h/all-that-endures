@@ -1,0 +1,46 @@
+name: Stop duplicate physical-owner validation
+'on':
+  push:
+    branches: [sol/stage-0-5-physical-owner-ci-cleanup]
+    paths: [.github/workflows/stage-0-5-physical-owner-ci-cleanup.yml]
+permissions:
+  contents: read
+  actions: write
+jobs:
+  stop-duplicate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+    - name: Keep original validation and cancel its queued duplicate
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: bash
+      run: |
+        python - <<'PYTHON'
+        import json, os, urllib.request
+        base = 'https://api.github.com/repos/rax0h/all-that-endures/actions/runs/'
+        headers = {'Authorization': 'Bearer ' + os.environ['GH_TOKEN'],
+                   'Accept': 'application/vnd.github+json',
+                   'X-GitHub-Api-Version': '2022-11-28'}
+        def read(run_id):
+            request = urllib.request.Request(base + str(run_id), headers=headers)
+            with urllib.request.urlopen(request, timeout=60) as response:
+                return json.load(response)
+        keep = read(38985095878)
+        duplicate = read(38985162119)
+        for row, sha in ((keep, '2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a'),
+                         (duplicate, '63e3383ed33add5e47a93ca263f42afa581cf8c5')):
+            assert row['repository']['full_name'] == 'rax0h/all-that-endures'
+            assert row['head_sha'] == sha
+            assert row['head_branch'] == 'sol/stage-0-5-physical-owner-save-repair'
+            assert row['path'] == '.github/workflows/stage-0-5-physical-owner-save-repair.yml'
+        if duplicate['status'] == 'completed':
+            print('Duplicate already stopped:', duplicate['conclusion'])
+        elif keep['status'] == 'in_progress' or keep.get('conclusion') == 'success':
+            request = urllib.request.Request(base + '38985162119/cancel', headers=headers, method='POST')
+            with urllib.request.urlopen(request, timeout=60) as response:
+                print('Cancel request accepted for duplicate 38985162119:', response.status)
+        else:
+            raise RuntimeError('Original validation is not healthy; no run cancelled')
+        print('Original validation 38985095878:', keep['status'], keep.get('conclusion'))
+        PYTHON
