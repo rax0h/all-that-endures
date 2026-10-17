@@ -1,0 +1,115 @@
+{
+  "accepted": false,
+  "stage": "physical-owner-exact-continuation-launched",
+  "run_id": 38992881882,
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/38992881882",
+  "started_at_utc": "2026-10-17T01:55:38Z",
+  "producer_job": "mature-continue",
+  "producer_job_id": 117278888593,
+  "branch": "sol/stage-0-5-mature-continue",
+  "workflow_path": ".github/workflows/stage-0-5-mature-continue.yml",
+  "workflow_sha": "3512bf8f379934ff7b67c4832b164ea3d01e5bc8",
+  "launch_tree": "e0608ed323de51d0a560b52bfb481fc1620b7041",
+  "reviewed_source_sha": "93f6d4259ce970b70af49431da287ee842dcaaaa",
+  "reviewed_source_tree": "a658a729f4b432d89a0ec7ef3ef8bb71101cc721",
+  "source_parents": [
+    "e5bcf4b76064438979d9c53cdeeebbdb5ead752e",
+    "cf4238ac3f45c6c062763d2aa1e3304c9e5f433d"
+  ],
+  "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "checkpoint_runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+  "source_file_readback_exact": true,
+  "pinned_workflow_readback_exact": true,
+  "nonforce_expected_ref_update": true,
+  "expected_previous_ref": "cf4238ac3f45c6c062763d2aa1e3304c9e5f433d",
+  "prior_runs_across_shas": [
+    {
+      "id": 38967941113,
+      "conclusion": "failure",
+      "retained_continued_checkpoint": false
+    },
+    {
+      "id": 38920910304,
+      "conclusion": "failure",
+      "retained_continued_checkpoint": false
+    }
+  ],
+  "prior_active_runs": 0,
+  "observed_launches": 1,
+  "repair_ci": {
+    "run_id": 38985095878,
+    "conclusion": "success",
+    "source_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "full_suite_passed": 2828,
+    "subtests_passed": 2,
+    "full_suite_seconds": 4868.22,
+    "focused_passed": 236,
+    "recovery": "passed",
+    "all_three_evidence_uploads": "success",
+    "runtime_tree_unchanged_after_green": true
+  },
+  "affected_checks": {
+    "passed": 57,
+    "seconds": 131.422,
+    "warning": "intentional duplicate ZIP-member rejection"
+  },
+  "final_pin_checks": {
+    "passed": 14,
+    "deselected": 29,
+    "seconds": 13.921
+  },
+  "independent_review": {
+    "critical": 0,
+    "important": 0,
+    "minor": 0,
+    "verdict": "approved for one launch after fresh active-run and expected-ref checks",
+    "mature_runtime_not_certified": true
+  },
+  "limits": {
+    "address_space_bytes": 8589934592,
+    "command_minutes": 300,
+    "job_minutes": 360,
+    "start_free_bytes": 118551008632,
+    "work_free_bytes": 84972371968,
+    "output_cap_bytes": 38191218688
+  },
+  "input_published_artifact": {
+    "run_id": 38907665230,
+    "id": 12049884660,
+    "archive_bytes": 3910109453,
+    "archive_sha256": "5ea709166d2bba7f7a22d614fed604f471973ae9ff757979a4148ff197c43382",
+    "database_bytes": 29601284096,
+    "database_sha256": "0d884e52a012ab55325c7111bfc1d054fa7c27aaf0947cf9ab8de4423c213e1c",
+    "checkpoint_bytes": 134251,
+    "checkpoint_sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53",
+    "unexpired": true,
+    "metadata_rechecked": true,
+    "full_archive_authentication": "required on fresh continuation runner before simulation"
+  },
+  "expected_output_artifact": "construction-mature-continued",
+  "expected_output_members": [
+    "checkpoint.json",
+    "restore.sqlite",
+    "result.json"
+  ],
+  "expected_years": [
+    1001,
+    1002
+  ],
+  "expected_saved_generations": [
+    126,
+    127
+  ],
+  "monitoring": {
+    "scheduled": false,
+    "automatic_continuation": false,
+    "reason": "User explicitly disabled monitoring; no automation changed during this foreground launch"
+  },
+  "remaining_gates": [
+    "actual mature continuation and uploaded artifact",
+    "independent full downloaded mature restore",
+    "final Astra handoff"
+  ],
+  "mature_runtime_guarantee": false
+}
