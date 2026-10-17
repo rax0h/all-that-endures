@@ -87,3 +87,33 @@ The actual mature year-1001 and year-1002 saves, an independent downloaded matur
 restore, and the final Astra review remain required. This repair is not Stage 0.5
 acceptance and does not guarantee that the mature continuation will pass or fit
 its hosted-runner budget.
+
+## Fresh repair CI and continuation preparation
+
+[Repair validation 38985095878](https://github.com/rax0h/all-that-endures/actions/runs/38985095878)
+passed all three jobs on published source
+`2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a`, runtime subtree
+`76dee76973928dbce72860156feb32f2d7f02f86`: 236 focused tests; 2828 full-suite
+tests and two subtests in 4868.22 seconds; complete fault recovery and exact
+continuation/reopen checks. The full run completed October 17 at 01:34:08 UTC.
+All three evidence artifacts uploaded successfully.
+
+The continuation execution pin now selects that validated runtime, retaining
+original checkpoint producer `bbc3cbf11becb58aa4b9483114559fd1296878f1` and all
+original input/control/receipt checks. Only the two execution-pin constants
+changed in the wrapper. Helpers, P5, simulation/runtime bytes, disk/address
+guards, 300-minute command and 360-minute hosted job remain unchanged. New
+focused wrapper/transport checks and an independent final launch review are
+required before the single next launch.
+
+The published year-1000 artifact was rechecked unexpired with the original
+size and digest. The two earlier continuation attempts are both finished;
+neither saved year 1001. Scheduled monitoring and automatic continuation remain
+disabled at Daniel's request; this is an explicitly requested foreground step.
+
+The repinned wrapper and artifact-transport gate passed 57/57 tests in 131.42
+seconds. Its only warning is the intentional duplicate-ZIP-member rejection
+fixture. Frozen helper checks and unchanged runtime subtree checks also passed.
+An inert source branch will retain this wrapper before a separate launch commit
+pins its exact public source SHA. The final review and active-run check still
+gate that launch.
