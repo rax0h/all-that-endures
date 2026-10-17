@@ -13,8 +13,8 @@ concurrency:
 env:
   PYTHONPATH: .:simulation
   PYTHONUNBUFFERED: '1'
-  RUNTIME_SHA: f32296ab0b93f80954acd272f5f51f990303b7d9
-  HARNESS_SHA: 13d95391ef7662f778378386797a70fca0f30c2c
+  RUNTIME_SHA: 2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a
+  HARNESS_SHA: 93f6d4259ce970b70af49431da287ee842dcaaaa
 jobs:
   mature-continue:
     runs-on: ubuntu-latest
