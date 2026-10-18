@@ -15,7 +15,22 @@ created October 18, 2026 at 04:47:29 UTC. Workflow source
 `dd795af561ca81a342fd3aa8e835db5233ef8d6b` with configuration SHA256
 `89ff9fc8221999dce7a1173a5e3a97f8d5d57a9e884f5f8fcd41c486cce9ac68`.
 Readback and immediate duplicate/active checks passed before the single launch.
-The run was in progress at launch inspection; no mature result is claimed.
+The save completed successfully October 18, 2026 at 07:29:57 UTC. Its successful
+producer uploaded artifact12129336378, ZIP4419015875 bytes, SHA256
+`67e52ba2f045f87b2a814e9d0dfe5b9ed7f24898d25a448437bd386869f46e2d`.
+It retains generation126/year1001, database29922463744 bytes, SHA256
+`4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2`.
+The diagnostic ZIP and all members were downloaded/hash-checked; its saved
+manifest and live counters match the original exact checkpoint controls. This
+is a saved-unverified result; full audit and digest remain required.
+
+`stage_0_5_save1001_result.json` binds exact producing job/source, candidate,
+diagnostics, original control, hashes and phase timings. The full4.4GB saved
+ZIP was not downloaded locally; the audit runner must authenticate the full
+ZIP, exact members and file hashes before ordinary open. The new audit
+configuration pins this exact candidate and known size, preserving the original
+checkpoint/context and green proof. `stage_0_5_audit1001_launch_preflight.json`
+records the next stage; no simulation or save is part of auditing.
 `stage_0_5_save1001_launch_result.json` and `STAGE_0_5_SAVE1001_LAUNCH_REVIEW.md`
 retain the exact record. Only this save runs; later verification must authenticate
 its successful uploaded candidate and reuse it. No automatic downstream launch.
@@ -58,7 +73,8 @@ Original producer `bbc3cbf11becb58aa4b9483114559fd1296878f1`, configuration,
 controls, context and source receipts are preserved separately from new
 executing harness/workflow producers. Do not repeat successful preparation,
 commit, ordering, verification or publication. Failed run 38992881882 uploaded
-no year-1001 database; that simulation still has to run once.
+no year-1001 database. The later successful save39098313631 now retains the
+year-1001 generation; do not simulate it again to run or retry verification.
 
 ## Implemented boundaries
 
