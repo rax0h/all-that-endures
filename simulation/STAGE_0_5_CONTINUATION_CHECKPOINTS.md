@@ -5,8 +5,20 @@ receipt composition, independent restore and runner wiring are implemented.
 Independent implementation review and all 17 fresh-runner proof jobs passed.
 Actual mature gates remain pending. The old two-year command remains paused.
 The new configuration pins the authenticated proof for the separate year-1001
-save; its workflow remains inert until the concrete launch review.
+save. Its independent concrete launch review cleared, and exactly one mature
+save stage has now launched.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
+
+The actual year-1001 save is [run 39098313631](https://github.com/rax0h/all-that-endures/actions/runs/39098313631),
+created October 18, 2026 at 04:47:29 UTC. Workflow source
+`94f7c72666d6bc2041ad3324ef1d2d65529f7810` checks out harness
+`dd795af561ca81a342fd3aa8e835db5233ef8d6b` with configuration SHA256
+`89ff9fc8221999dce7a1173a5e3a97f8d5d57a9e884f5f8fcd41c486cce9ac68`.
+Readback and immediate duplicate/active checks passed before the single launch.
+The run was in progress at launch inspection; no mature result is claimed.
+`stage_0_5_save1001_launch_result.json` and `STAGE_0_5_SAVE1001_LAUNCH_REVIEW.md`
+retain the exact record. Only this save runs; later verification must authenticate
+its successful uploaded candidate and reuse it. No automatic downstream launch.
 
 The single bounded proof/full-suite launch is [run 39090807612](https://github.com/rax0h/all-that-endures/actions/runs/39090807612),
 created October 18, 2026 at 02:38:25 UTC. Its source is

@@ -1,0 +1,140 @@
+{
+  "schema": "ate-mature-stage-launch-result/1",
+  "stage": "save",
+  "year": 1001,
+  "run": {
+    "id": 39098313631,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39098313631",
+    "status": "in_progress",
+    "conclusion": null,
+    "head_sha": "94f7c72666d6bc2041ad3324ef1d2d65529f7810",
+    "branch": "sol/stage-0-5-mature-continuation-stage",
+    "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+    "event": "push",
+    "run_attempt": 1,
+    "created_at": "2026-10-18T04:47:29Z"
+  },
+  "execution_harness_sha": "dd795af561ca81a342fd3aa8e835db5233ef8d6b",
+  "local_harness_source_sha": "9c09b545391706fda9f44adb627764f06db0d92a",
+  "harness_tree": "11255b9ad74989497ecedbb6b4748535898bc1e9",
+  "workflow_sha": "94f7c72666d6bc2041ad3324ef1d2d65529f7810",
+  "local_workflow_source_sha": "9ad86b9e9dcfbbfcc23328dc32e303a6df7fe498",
+  "launch_tree": "aeded871137efcdc73f72f256234b6908d0987cd",
+  "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "config_sha256": "89ff9fc8221999dce7a1173a5e3a97f8d5d57a9e884f5f8fcd41c486cce9ac68",
+  "original_input": {
+    "artifact_id": 12049884660,
+    "run_id": 38907665230,
+    "year": 1000,
+    "generation": 125,
+    "next_generation": 126,
+    "original_checkpoint_producer_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+    "full_archive_and_file_authentication": "mandatory on runner before simulation; not performed locally"
+  },
+  "fresh_proof": {
+    "run_id": 39090807612,
+    "source_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+    "proof_artifact_id": 12125346802,
+    "restore_artifact_id": 12123320043,
+    "jobs_passed": 17,
+    "full_suite_tests": 2938,
+    "full_suite_subtests": 2
+  },
+  "source_readback": {
+    "harness_files": [
+      {
+        "path": "simulation/STAGE_0_5_CONTINUATION_CHECKPOINTS.md",
+        "mode": "100644",
+        "type": "blob",
+        "blob_sha": "630b310d443d9dc29efaa3989f52a8b63515446c",
+        "sha256": "6d847c91650438f3c3a6a307f1b9948aa0b5f77b759b02a61fcabded35dd6c5d"
+      },
+      {
+        "path": "simulation/stage_0_5_continuation_proof_result.json",
+        "mode": "100644",
+        "type": "blob",
+        "blob_sha": "47175ca8d46f8dd466baacd10d439b346ce14ba7",
+        "sha256": "695d979df7a6709f1dc71cd0a113b4f541ada5ba3c967a8d1ced9299fe892dfd"
+      },
+      {
+        "path": "simulation/stage_0_5_continuation_stage_launch.json",
+        "mode": "100644",
+        "type": "blob",
+        "blob_sha": "11066b66328de9f420e196a5307f294a76b7cbcc",
+        "sha256": "89ff9fc8221999dce7a1173a5e3a97f8d5d57a9e884f5f8fcd41c486cce9ac68"
+      },
+      {
+        "path": "simulation/stage_0_5_save1001_launch_preflight.json",
+        "mode": "100644",
+        "type": "blob",
+        "blob_sha": "abc004c903a24b78b400c98c64d4fac5f91b8534",
+        "sha256": "afff7e367a7c817556f76c3adbd70ccfdb196f5adf7e658045dd1c64143b21a0"
+      }
+    ],
+    "unchanged_implementation_blobs": 12,
+    "workflow_blob_sha": "d0065d71afc1602f6a6fc7d151c39f7a1674de47",
+    "workflow_sha256": "3c3f595bc65caac0412c70162c069d8b4bdb350f930363c56d31411290ef68f3",
+    "byte_and_blob_exact": true
+  },
+  "immediate_inventory": {
+    "queries": [
+      {
+        "query": "queued",
+        "count": 0,
+        "conflicts": 0
+      },
+      {
+        "query": "in_progress",
+        "count": 0,
+        "conflicts": 0
+      },
+      {
+        "query": "waiting",
+        "count": 0,
+        "conflicts": 0
+      },
+      {
+        "query": "requested",
+        "count": 0,
+        "conflicts": 0
+      },
+      {
+        "query": "pending",
+        "count": 0,
+        "conflicts": 0
+      },
+      {
+        "query": "sol/stage-0-5-mature-continuation-stage",
+        "count": 0,
+        "conflicts": 0
+      },
+      {
+        "query": "sol/stage-0-5-mature-continue",
+        "count": 3,
+        "conflicts": 0
+      }
+    ],
+    "branch_absent": true
+  },
+  "review": {
+    "model": "gpt-6.1-sol",
+    "fresh_context": true,
+    "critical": 0,
+    "important": 0,
+    "new_minors": 0,
+    "previous_deferred_minor": "audit_seconds presence/type is optional; substantive audit comparisons remain mandatory",
+    "scope": "exact save1001 launch only"
+  },
+  "wrapper_transport_checks": {
+    "passed": 68,
+    "expected_warnings": 1,
+    "seconds": 0.68
+  },
+  "command_minutes": 300,
+  "job_minutes": 360,
+  "monitoring_enabled": false,
+  "downstream_auto_launch": false,
+  "stage_0_5_accepted": false,
+  "next_gate": "On user-requested continuation after success, authenticate the exact retained candidate/checkpoint/save bundle and successful producing upload. Reuse that saved generation for independent audit and digest. Do not rerun simulation because a later verifier fails."
+}
