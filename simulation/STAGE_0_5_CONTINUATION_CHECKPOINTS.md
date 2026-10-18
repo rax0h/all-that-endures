@@ -11,6 +11,15 @@ new helper bytes before an audit retry can launch. The saved generation stays
 retained, and year1001 simulation must not repeat to perform verification.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
 
+The comparison repair's fresh proof/full-suite run is [39139421134](https://github.com/rax0h/all-that-endures/actions/runs/39139421134),
+source `cdb0516b0423af24483eadcc5a18651e879bdc47`, created October18,2026 at
+15:12:23UTC. Local134 affected checks passed and Astra cleared proof-only
+publication of exact tree882a00bfaa24d0e4c5c0dcaf7ffa7405b52d7bc0. All seven
+published files read back exact. No mature retry is launched. On actual fresh
+green proof, authenticate its NEW summary/restore artifacts and all17 jobs,
+then prepare/review one audit1001 retry consuming saved candidate12129336378.
+The old proof's helper fingerprints cannot cover the repaired comparator.
+
 The current audit1001 is [run 39108569661](https://github.com/rax0h/all-that-endures/actions/runs/39108569661),
 created October 18, 2026 at 07:40:49 UTC. Workflow source
 `15a54a73df6643229aa768e37dd752b425990cac` checks out harness

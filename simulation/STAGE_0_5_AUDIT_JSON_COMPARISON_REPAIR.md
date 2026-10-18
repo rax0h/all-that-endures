@@ -56,8 +56,18 @@ The existing audit_seconds timing-metadata limitation remains deferred.
 Six regression assertions failed before implementation: two integer/string
 year-map comparisons, converted-key collision rejection, the real complete
 World audit/control comparison, and two missing diagnostic-detail cases.
-The first repaired selection passed49 tests in58.46 seconds. Broader protocol
-checks and independent review are required before publishing validation CI.
+The first repaired selection passed49 tests in58.46 seconds. The full affected
+selection then passed134 tests in385.56 seconds, with one expected duplicate-ZIP
+warning. A fresh independent Astra review found no blocking findings. Its new
+diagnostic-only signed-zero detail edge is deferred and does not weaken rejection;
+the existing audit_seconds metadata minor also remains deferred.
+
+The reviewed tree882a00bfaa24d0e4c5c0dcaf7ffa7405b52d7bc0 was published as
+`cdb0516b0423af24483eadcc5a18651e879bdc47`, all seven changed files byte/blob
+read back exact. A single fresh proof launched as [run39139421134](https://github.com/rax0h/all-that-endures/actions/runs/39139421134)
+on October18,2026 at15:12:23UTC. Its actual result remains pending. Exact source,
+review, evidence and next gates are in `stage_0_5_audit_json_repair_launch.json`
+and `STAGE_0_5_AUDIT_JSON_REPAIR_REVIEW.md`.
 
 The fresh proof must run all17 existing jobs, including the full simulation
 suite and actual downloaded bounded restore, on these new helper bytes. The

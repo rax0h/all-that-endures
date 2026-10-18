@@ -1,0 +1,147 @@
+{
+  "schema": "ate-audit-comparison-repair-launch/1",
+  "run": {
+    "id": 39139421134,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39139421134",
+    "status": "in_progress",
+    "conclusion": null,
+    "head_sha": "cdb0516b0423af24483eadcc5a18651e879bdc47",
+    "branch": "sol/stage-0-5-continuation-checkpoints",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "event": "push",
+    "run_attempt": 1,
+    "created_at": "2026-10-18T15:12:23Z"
+  },
+  "published_source_sha": "cdb0516b0423af24483eadcc5a18651e879bdc47",
+  "local_source_sha": "d6839096bfeb6c64738d00d8695fa1a510a83db8",
+  "reviewed_tree": "882a00bfaa24d0e4c5c0dcaf7ffa7405b52d7bc0",
+  "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "source_readback": [
+    {
+      "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob_sha": "9c0e70238ae14801bac5c01042cedb2ee7db952f",
+      "sha256": "e41c74d317380ec98bbb3b2bc540eb2e196dc05fc71ee581ff649c10c296d53c"
+    },
+    {
+      "path": "simulation/STAGE_0_5_AUDIT_JSON_COMPARISON_REPAIR.md",
+      "mode": "100644",
+      "type": "blob",
+      "blob_sha": "4fe00318b2f306ebbd52a0add93d9c9f81fa7e69",
+      "sha256": "31e24de42387de949ef31c467971d9e8257b2dd373ea84370490f7bfcaf509ba"
+    },
+    {
+      "path": "simulation/STAGE_0_5_CONTINUATION_CHECKPOINTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "blob_sha": "67f42d38da5f1b217961262e77021b12a4003df2",
+      "sha256": "eedf72b8b31926abcbd4a3fd17c2a020b7ca43af7b8d244b7bdb83bcf9c786e3"
+    },
+    {
+      "path": "simulation/continuation_receipts.py",
+      "mode": "100644",
+      "type": "blob",
+      "blob_sha": "8b0b012e5adb56a3003ac30b3f1b28c6fd9b091a",
+      "sha256": "b6d72debacb64289ce4c1d697cc01ce917748fa6671647cbba518d8b4e039c95"
+    },
+    {
+      "path": "simulation/stage_0_5_audit1001_failure.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob_sha": "b9e0f90ecfeb2e6c3d9d9251506ddcf3ed0c9465",
+      "sha256": "62de7b1929aa8c68d77cd4ea45492a8a6dcec477d3403cada67206a4fa4fbe26"
+    },
+    {
+      "path": "simulation/tests/test_continuation_receipts.py",
+      "mode": "100644",
+      "type": "blob",
+      "blob_sha": "eeded650b0e9f79fafbc780cbf09a0fdc00f0c36",
+      "sha256": "71d8fd8b780e8b269228700eedd528da3c7ca63dc1199363697d51c2926bb0a5"
+    },
+    {
+      "path": "simulation/tests/test_continuation_verifiers.py",
+      "mode": "100644",
+      "type": "blob",
+      "blob_sha": "35b26ac37fd311a01d8bf4ddf7a0f2ee4189c5f0",
+      "sha256": "8401252b03215d95430d7c749f4b3c390e095e8f17379de732fd97b8a17db39c"
+    }
+  ],
+  "byte_blob_exact": true,
+  "tests": {
+    "red": {
+      "failed": 6,
+      "passed": 43,
+      "seconds": 54.31
+    },
+    "targeted_green": {
+      "passed": 49,
+      "seconds": 58.46
+    },
+    "affected_final": {
+      "passed": 134,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 385.56,
+      "expected_warnings": 1
+    }
+  },
+  "review": {
+    "model": "gpt-6-astra",
+    "fresh_context": true,
+    "critical": 0,
+    "important": 0,
+    "scope": "proof-only publication; mature retry not cleared",
+    "deferred_minors": [
+      "Signed-zero mismatches reject correctly but can produce empty diagnostic details.",
+      "Existing audit_seconds presence/type validation remains deferred."
+    ]
+  },
+  "launch_inventory": {
+    "inventory": [
+      {
+        "status": "queued",
+        "count": 0
+      },
+      {
+        "status": "in_progress",
+        "count": 0
+      },
+      {
+        "status": "waiting",
+        "count": 0
+      },
+      {
+        "status": "requested",
+        "count": 0
+      },
+      {
+        "status": "pending",
+        "count": 0
+      }
+    ],
+    "prior_proof_runs": 1,
+    "previous_sha": "bfdfadbe5fbb4d6aec837fc6dad1afbdcd563e76"
+  },
+  "failed_predecessor": {
+    "audit_run_id": 39108569661,
+    "diagnostic_artifact_id": 12131849106,
+    "observed_audit_values_retained": false
+  },
+  "preserved_save": {
+    "run_id": 39098313631,
+    "artifact_id": 12129336378,
+    "year": 1001,
+    "generation": 126,
+    "archive_sha256": "67e52ba2f045f87b2a814e9d0dfe5b9ed7f24898d25a448437bd386869f46e2d",
+    "save_sha256": "72649d5bef65e4af16ed6cb269b26acde061b57966b728ddd633755ae667b827"
+  },
+  "required_jobs": 17,
+  "full_suite_result": "pending",
+  "mature_retry_launched": false,
+  "simulation_repeated": false,
+  "monitoring_enabled": false,
+  "stage_0_5_accepted": false,
+  "next_gate": "Authenticate all actual new proof jobs, full suite count, summary and downloaded bounded restore; pin its NEW proof ArtifactRef for changed helper bytes, then independently review one audit1001 retry against exact saved candidate12129336378. Never reuse the prior green proof to certify this changed helper."
+}
