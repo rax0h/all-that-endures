@@ -81,6 +81,11 @@ cannot cover them. One audit1001 retry was pinned and independently cleared by
 Astra using the same retained artifact12129336378. The single launch is
 [run39152488567](https://github.com/rax0h/all-that-endures/actions/runs/39152488567),
 created October18 at18:04:35UTC. Exact source/review/dispatch evidence is in
-`stage_0_5_audit1001_retry_launch_result.json`. Its real outcome is pending. Successful fixture proof
+`stage_0_5_audit1001_retry_launch_result.json`. The actual retry completed
+successfully at19:21:19UTC; downloaded audit12148235361 matches the full original
+control. Its physical JSON ordering exposes a separate downstream receipt
+writer/readback rejection, reproduced in the exact consumer. See
+`STAGE_0_5_AUDIT_RECEIPT_HANDOFF.md` and `stage_0_5_audit1001_result.json`.
+Successful fixture proof
 does not establish the actual mature audit outcome. No SAVE rerun, automatic downstream stage, monitoring,
 endurance, main merge or Stage0.5 acceptance is authorized by this repair.

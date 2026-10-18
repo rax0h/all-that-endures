@@ -5,9 +5,11 @@ receipt composition, independent restore and runner wiring are implemented.
 Independent implementation review and all 17 fresh-runner proof jobs passed.
 Actual mature gates remain pending. The old two-year command remains paused.
 The actual year-1001 save and upload succeeded. Its first separate audit
-completed but failed comparison with the original control. A confirmed JSON
-year-key comparison defect is repaired; all 17 fresh proof jobs passed on the
-new helper bytes. One independently reviewed audit retry has launched. The saved generation stays
+completed but failed comparison with the original control. The JSON year-key
+comparison repair passed all17 fresh proof jobs. The actual audit retry then
+passed and its downloaded receipt matches the full original control. The next
+acceptance consumer rejects that receipt's noncanonical byte ordering; the
+receipt writer/readback handoff needs a separately validated repair. The saved generation stays
 retained, and year1001 simulation must not repeat to perform verification.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
 
@@ -31,12 +33,20 @@ created October18,2026 at18:04:35UTC, push attempt1. Exact reviewed launch sourc
 `247b5dc2f6ef5b0aa6596798e6ccad3235a6c317` checks out harness
 `60eaf810fbc156e333722672627a8dc2caf20bc1`; config SHA256
 `38dbe688767f204442e9a655e1c017882954af091cb2792e6e750e1d4a73cdd9`.
-It audits saved candidate12129336378/year1001/generation126 without simulation
-or save. Actual audit outcome remains pending; no downstream stage or monitoring
-was enabled. `stage_0_5_audit1001_retry_launch_result.json` and
+It audited saved candidate12129336378/year1001/generation126 without simulation
+or save. It completed successfully October18 at19:21:19UTC. Downloaded receipt
+and diagnostics authenticate; full saved audit/counters match the original
+control and retained inputs are preserved. Artifact12148235361 retains the real
+audit. The exact next-stage reader rejects its JSON byte ordering locally,
+before any acceptance launch. `stage_0_5_audit1001_result.json` and
+`STAGE_0_5_AUDIT_RECEIPT_HANDOFF.md` record both actual audit success and the
+handoff blocker. No downstream stage or monitoring was enabled.
+`stage_0_5_audit1001_retry_launch_result.json` and
 `STAGE_0_5_AUDIT1001_RETRY_LAUNCH_REVIEW.md` bind the actual source, review,
-readbacks and single launch. Authenticate its real output before preparing the
-separate digest1001 stage for the same retained candidate.
+readbacks and single launch. Repair the receipt handoff using the exact existing
+audit evidence, then separately perform digest1001 for the same retained
+candidate. Do not repeat the successful mature audit or simulation merely to
+rewrite the receipt.
 
 The failed first audit1001 is [run 39108569661](https://github.com/rax0h/all-that-endures/actions/runs/39108569661),
 created October 18, 2026 at 07:40:49 UTC. Workflow source
