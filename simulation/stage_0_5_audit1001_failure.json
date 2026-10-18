@@ -1,0 +1,83 @@
+{
+  "schema": "ate-mature-audit-failure/1",
+  "run": {
+    "id": 39108569661,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39108569661",
+    "head_sha": "15a54a73df6643229aa768e37dd752b425990cac",
+    "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "failure",
+    "created_at": "2026-10-18T07:40:49Z",
+    "updated_at": "2026-10-18T09:26:14Z"
+  },
+  "job": {
+    "id": 117619605334,
+    "name": "mature-stage",
+    "conclusion": "failure",
+    "started_at": "2026-10-18T07:40:51Z",
+    "completed_at": "2026-10-18T09:26:13Z"
+  },
+  "error": "ValueError: full saved audit differs from original control",
+  "failure_phase": "after actual audit, close and retained-input hash recheck; receipt validation before publication",
+  "transport": {
+    "artifact_id": 12129336378,
+    "archive_bytes": 4419015875,
+    "archive_sha256": "67e52ba2f045f87b2a814e9d0dfe5b9ed7f24898d25a448437bd386869f46e2d",
+    "full_download_verified_on_failed_audit_runner": true,
+    "download_seconds": 120.72726791299999
+  },
+  "phases": {
+    "copy_seconds": 139.45849212799993,
+    "open_seconds": 1082.3051181680003,
+    "audit_wall_seconds": 4684.422454324,
+    "audit_cpu_seconds": 4553.755503063,
+    "close_seconds": 1.0270002719998956
+  },
+  "diagnostics": {
+    "artifact_id": 12131849106,
+    "name": "continuation-stage-diagnostics-audit-1001",
+    "archive_bytes": 3475,
+    "archive_sha256": "61c9cae932153fb4208f43e704e7de3c1dee2520c819cf2898d0aefefda06787",
+    "members": [
+      {
+        "name": "stage.log",
+        "bytes": 18089,
+        "sha256": "0f61474dfd67e9636dd6b4551dee4d9ebfd7aa1f796f85c61ad40b15d7c87059"
+      },
+      {
+        "name": "disk-start.txt",
+        "bytes": 89,
+        "sha256": "b7763e0f75386b81b4991d45d37e70b49a650e249ac0facd8c45675cab9b629e"
+      }
+    ],
+    "downloaded_and_hash_checked": true,
+    "forensic_only_not_successful_gate": true
+  },
+  "retained_saved_year": {
+    "artifact_id": 12129336378,
+    "run_id": 39098313631,
+    "year": 1001,
+    "generation": 126,
+    "unexpired": true,
+    "archive_digest_unchanged": true,
+    "resimulation_required": false
+  },
+  "confirmed_validator_defect": {
+    "field": "new_irons_by_year",
+    "live_keys": "integers",
+    "stored_json_keys": "strings",
+    "old_canonicalization": "sort before JSON key conversion; numeric and lexical orders differ",
+    "minimal_real_complete_fixture_years": [
+      2,
+      10
+    ],
+    "same_logical_json_rejected_before_fix": true,
+    "original_control_reproduction": true,
+    "mature_observed_values_retained": false,
+    "sole_cause_guaranteed": false
+  },
+  "stage_0_5_accepted": false,
+  "mature_retry_launched": false,
+  "monitoring_enabled": false
+}

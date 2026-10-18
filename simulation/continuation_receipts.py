@@ -34,8 +34,21 @@ def frozen(value):
     return value
 
 
+def _unique_json_pairs(items):
+    result = {}
+    for key, value in items:
+        if key in result:
+            raise ValueError('duplicate JSON member')
+        result[key] = value
+    return result
+
+
 def canonical(value):
-    return json.dumps(plain(value), sort_keys=True, allow_nan=False, separators=(',', ':'))
+    # JSON converts integer object keys to strings. Normalize that conversion
+    # before sorting, so live year counters compare with their stored JSON.
+    normalized = json.loads(json.dumps(plain(value), allow_nan=False),
+        object_pairs_hook=_unique_json_pairs)
+    return json.dumps(normalized, sort_keys=True, allow_nan=False, separators=(',', ':'))
 
 
 def same(left, right):
@@ -76,17 +89,10 @@ def load_receipt(path):
 
 
 def decode_receipt(data):
-    def pairs(items):
-        result = {}
-        for key, value in items:
-            if key in result:
-                raise ValueError('duplicate JSON member')
-            result[key] = value
-        return result
     def nonfinite(_value):
         raise ValueError('nonfinite JSON number')
     try:
-        result = json.loads(data, object_pairs_hook=pairs, parse_constant=nonfinite)
+        result = json.loads(data, object_pairs_hook=_unique_json_pairs, parse_constant=nonfinite)
     except (RecursionError, UnicodeError) as error:
         raise ValueError('invalid metadata encoding/nesting') from error
     if type(result) is not dict:
@@ -421,6 +427,38 @@ def normalized_audit(value):
     return {key:item for key,item in value.items() if key != 'audit_seconds'}
 
 
+def _audit_difference_details(expected, actual):
+    """Bounded failure evidence only; never defines audit acceptance."""
+    expected, actual = (json.loads(canonical(value)) for value in (expected,actual))
+    missing = object()
+    differences = []
+    def sample(value):
+        return '<missing>' if value is missing else json.dumps(value,sort_keys=True)[:96]
+    def add(path,left,right):
+        differences.append(f'{path[:160] or "/"} expected={sample(left)} actual={sample(right)}')
+    def visit(left,right,path):
+        if len(differences) >= 8:
+            return
+        if type(left) is not type(right):
+            add(path,left,right)
+        elif isinstance(left,dict):
+            for key in sorted(left.keys()|right.keys()):
+                visit(left.get(key,missing),right.get(key,missing),
+                    path+'/'+key.replace('~','~0').replace('/','~1'))
+                if len(differences) >= 8:
+                    break
+        elif isinstance(left,list):
+            for index in range(max(len(left),len(right))):
+                visit(left[index] if index<len(left) else missing,
+                    right[index] if index<len(right) else missing,path+'/'+str(index))
+                if len(differences) >= 8:
+                    break
+        elif left != right:
+            add(path,left,right)
+    visit(expected,actual,'')
+    return '; '.join(differences)
+
+
 def validate_verification(row, authority, *, kind, binding):
     keys = VERIFICATION_KEYS | ({'continuation'} if kind.startswith('restore-') else set())
     exact(row,keys,'verification receipt')
@@ -449,9 +487,12 @@ def validate_verification(row, authority, *, kind, binding):
             or not same(observation['counters'],control['counters'])):
         raise ValueError('observed state/counters differ from original control')
     if kind == 'audit':
-        if (observation['audited_state'] != 'saved-reopened' or type(observation['audit']) is not dict
-                or not same(normalized_audit(observation['audit']),normalized_audit(control['audit']))):
+        if observation['audited_state'] != 'saved-reopened' or type(observation['audit']) is not dict:
             raise ValueError('full saved audit differs from original control')
+        actual, expected = normalized_audit(observation['audit']), normalized_audit(control['audit'])
+        if not same(actual,expected):
+            raise ValueError('full saved audit differs from original control: '
+                +_audit_difference_details(expected,actual))
     elif kind == 'restore-values':
         if observation['restored_state'] != 'downloaded-reopened' or not same(observation['snapshot'],control['audit']['snapshot']):
             raise ValueError('actual restored values differ from original control')

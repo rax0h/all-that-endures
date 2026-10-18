@@ -152,3 +152,52 @@ def test_directory_fsync_failure_removes_only_new_receipt(tmp_path,monkeypatch):
     monkeypatch.setattr(m,'fsync_dir',failed)
     with pytest.raises(OSError,match='directory'):m.publish_receipt(path,{'passed':True})
     assert not path.exists()
+
+
+@pytest.mark.parametrize('live,stored', [
+    ({2: 1, 10: 3}, {'2': 1, '10': 3}),
+    ({0: 2, 100: 4, 1001: 6, 9: 8}, {'0': 2, '100': 4, '1001': 6, '9': 8}),
+])
+def test_json_object_year_keys_compare_after_json_key_conversion(live,stored):
+    assert module().same({'years':live},{'years':stored})
+
+
+@pytest.mark.parametrize('actual,expected', [
+    ({2: 1, 10: 4}, {'2': 1, '10': 3}),
+    ({2: True}, {'2': 1}),
+    ({2: 1.0}, {'2': 1}),
+    ({2: [1, 2]}, {'2': [2, 1]}),
+    ({2: 1}, {'2': 1, '10': 3}),
+])
+def test_json_key_normalization_keeps_value_types_order_and_fields_strict(actual,expected):
+    assert not module().same(actual,expected)
+
+
+def test_json_key_conversion_rejects_colliding_object_keys():
+    with pytest.raises(ValueError,match='duplicate'):
+        module().canonical({1:'first','1':'second'})
+
+
+def test_real_complete_audit_with_multi_digit_history_matches_stored_control(tmp_path):
+    from ate_sim.core import World,Layer
+    from ate_sim.persistence_session import write_cold_snapshot
+    from ate_sim.persistence_lazy import convert_cold_to_lazy,open_lazy_world_session
+    from ate_sim.persistence_complete_format import upgrade_lazy_snapshot
+    from persistence_p5_long_validation import _audit
+    m=module();world=World(843000)
+    for year in (2,10):
+        world.year=year
+        world.emit('rank_advanced',Layer.SOCIETY,from_rank=0,to_rank=1)
+    original=_audit(world)
+    assert original['new_irons_by_year']=={2:1,10:1}
+    control=json.loads(json.dumps(original))
+    assert control['new_irons_by_year']=={'2':1,'10':1}
+    cold,lazy,complete=(tmp_path/name for name in ('cold.sqlite','lazy.sqlite','complete.sqlite'))
+    rules='audit-json-year-keys'
+    write_cold_snapshot(world,cold,rules_id=rules)
+    convert_cold_to_lazy(cold,lazy,rules_id=rules,native_graph_buckets=True)
+    upgrade_lazy_snapshot(lazy,complete,rules_id=rules)
+    with open_lazy_world_session(complete,rules_id=rules) as session:
+        actual=_audit(session.world)
+        assert actual['new_irons_by_year']=={2:1,10:1}
+        assert m.same(m.normalized_audit(actual),m.normalized_audit(control))

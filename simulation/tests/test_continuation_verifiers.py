@@ -96,8 +96,27 @@ def test_wrong_actual_values_block_a_verification_receipt(tmp_path,saved_templat
             return result
         monkeypatch.setattr(m.p5,'_audit',wrong)
     else:monkeypatch.setattr(m.p5,'_digest',lambda world:('0'*64,0.1))
-    with pytest.raises(ValueError,match='control'):
+    with pytest.raises(ValueError,match='control') as error:
         getattr(m,stage+'_year')(saved,tmp_path/'wrong.json',authority=a,candidate=candidate,producer=producer(stage,stage+'1'))
+    if stage=='audit':
+        assert '/snapshot/magic_access/treasuries/1/iron' in str(error.value)
+        assert 'expected=' in str(error.value) and 'actual=' in str(error.value)
+    assert not (tmp_path/'wrong.json').exists()
+
+
+def test_audit_mismatch_diagnostics_bound_values_and_difference_count(tmp_path,saved_template,monkeypatch):
+    m=api();saved,a,manifest,candidate=saved_inputs(tmp_path,saved_template)
+    actual=m.p5._audit
+    def wrong(world):
+        result=actual(world)
+        result.update({f'unknown/{i}':'x'*10000 for i in range(30)})
+        return result
+    monkeypatch.setattr(m.p5,'_audit',wrong)
+    with pytest.raises(ValueError,match='control') as error:
+        m.audit_year(saved,tmp_path/'wrong.json',authority=a,candidate=candidate,producer=producer('audit','audit1'))
+    message=str(error.value)
+    assert '/unknown~10' in message and 'actual=' in message
+    assert len(message)<4096
     assert not (tmp_path/'wrong.json').exists()
 
 

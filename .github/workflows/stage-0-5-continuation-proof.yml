@@ -1,4 +1,5 @@
 name: Stage 0.5 durable continuation proof - mature paused
+# Validate JSON year-key comparison repair; retained mature save1001 is immutable.
 'on':
   push:
     branches: [sol/stage-0-5-continuation-checkpoints]
