@@ -1,0 +1,130 @@
+{
+  "schema": "ate-source-readback/1",
+  "source_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+  "local_source_sha": "fda8075624990906c910179c5cfb01db1b983337",
+  "tree": "7fc2ceaac8322e5320c5f11fd14a4ea18a1790f1",
+  "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "files": [
+    {
+      "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+      "blob_sha": "0019348b7e5c8ba16d45c227d7b8633ba584f79f",
+      "sha256": "fa33ba08998d3a4e20e9707a02bb33214e90fe40168a12e51ad666f81e40d536",
+      "size": 19777
+    },
+    {
+      "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "blob_sha": "cfe3cfd1de2788fd1536bfe7a952c0f8f3054d0f",
+      "sha256": "443134bcc0caf62783e73f26e4521b91023e922522d293d03759f73e0a627c4b",
+      "size": 2325
+    },
+    {
+      "path": "docs/superpowers/specs/2026-10-17-continuation-recovery-design.md",
+      "blob_sha": "55f801e41a032a0e3dc539f3c7ff3f6d24e8c786",
+      "sha256": "2013be97ff911fa834eb939fac23e543ae9dc300cacf3161deb583ba4c7cfc30",
+      "size": 18951
+    },
+    {
+      "path": "simulation/STAGE_0_5_CONTINUATION_CHECKPOINTS.md",
+      "blob_sha": "bf0dcc60c6718bf864ade380828b3822407c6b7b",
+      "sha256": "ef7eb7ff142fb244f67a86aaa9aa72f956d4270f9dde5092c30b59f0ff8f0f5e",
+      "size": 8772
+    },
+    {
+      "path": "simulation/STAGE_0_5_CONTINUATION_CHECKPOINT_REVIEW.md",
+      "blob_sha": "fa474eb41d7033615528d1a08868dca7bdbe5b17",
+      "sha256": "cd90177a0410bf6b87ac7d9b3ee8ef89ebe23d2d1a830bfd5215d921f185e16a",
+      "size": 4506
+    },
+    {
+      "path": "simulation/STAGE_0_5_CONTINUATION_RECOVERY_HANDOFF.md",
+      "blob_sha": "dfaf4a53e94709de74e479edb26959e8f337030c",
+      "sha256": "d808bc11af9e48854b805482ad0bd3ed473f9c8b90433d7e1f814c45fd98347d",
+      "size": 6683
+    },
+    {
+      "path": "simulation/construction_mature_continuation_stages.py",
+      "blob_sha": "ee30219e8c152175d7a41f53edc43b014cfa6217",
+      "sha256": "e4cc78a7ebb30898b67386cb158ad60d26b9dc43e67aa3d01bbdc0068b3fb2b4",
+      "size": 22783
+    },
+    {
+      "path": "simulation/continuation_checkpoint.py",
+      "blob_sha": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+      "sha256": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+      "size": 13970
+    },
+    {
+      "path": "simulation/continuation_checkpoint_ci.py",
+      "blob_sha": "1ab76e43ae6c1d6df35268d96b7139b09a7631a7",
+      "sha256": "8c27a88899b0122c8df1438af8f0fecdd98bc719c96e1eacb4e03e4d1d533fb5",
+      "size": 10599
+    },
+    {
+      "path": "simulation/continuation_receipts.py",
+      "blob_sha": "1699458d1c76b25b824c79a589a63462e0450045",
+      "sha256": "1dce91486f0f5587a6cae1d71f024ac40780cf69a2a46aeeb02b526dbbb9b453",
+      "size": 30275
+    },
+    {
+      "path": "simulation/stage_0_5_continuation_stage_launch.json",
+      "blob_sha": "90f14b8f744ba16c08ed817697d3a4adcd9492d9",
+      "sha256": "cf483a90316b110903fda00969909cab8a436ede87f23874778221db08eb0712",
+      "size": 153
+    },
+    {
+      "path": "simulation/tests/continuation_fixtures.py",
+      "blob_sha": "a7951e04301674c94e9b92059b20a815c272153c",
+      "sha256": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e",
+      "size": 3331
+    },
+    {
+      "path": "simulation/tests/continuation_transport_probe.py",
+      "blob_sha": "5ea19b5e651e92fcbc2d71df94241faa876a3f54",
+      "sha256": "7645423530c721f885e64913fe5b8b2d078f67064e22c8876c645f4a8fdc6b53",
+      "size": 3106
+    },
+    {
+      "path": "simulation/tests/test_construction_mature_continuation_stages.py",
+      "blob_sha": "dc22dea1c126d4acbc62315f278db4621f1ecffb",
+      "sha256": "7154d794c13a91e980289679b7d8c414e212f02166bc6cd2abaafb9d906ee96b",
+      "size": 7208
+    },
+    {
+      "path": "simulation/tests/test_continuation_acceptance.py",
+      "blob_sha": "f87de137b43ab66bd6e8d53b28edb09d8dafac6c",
+      "sha256": "c7343689d7b6a88a70b99d45b968346a01e6b0edf653dd18dd77d9d527f42ed1",
+      "size": 5831
+    },
+    {
+      "path": "simulation/tests/test_continuation_checkpoint.py",
+      "blob_sha": "b6b007bbf13059da9a140ccde98e3d0b9c522ad2",
+      "sha256": "e04f124b7790b7259320f1b762b88d04623d3ebccd3707fa4cb8ce013c4bfa71",
+      "size": 4530
+    },
+    {
+      "path": "simulation/tests/test_continuation_checkpoint_ci.py",
+      "blob_sha": "852ebf8cef492cbc2c33e25b92113cc2536c04a8",
+      "sha256": "0048da8ae8e3a88754bf41fa5d2d059d36fe226c39019799ca55c90cd2b7f0ee",
+      "size": 11058
+    },
+    {
+      "path": "simulation/tests/test_continuation_receipts.py",
+      "blob_sha": "2c445b7fd2a90e290cb165f8e9570ec151c23958",
+      "sha256": "0097316413c98153e8d2438f17be83654fec918815f32d32d0ba698ce8074bdc",
+      "size": 8188
+    },
+    {
+      "path": "simulation/tests/test_continuation_restore.py",
+      "blob_sha": "d9e039fdfe39ef42a61ada63e782a6fc2d4022f1",
+      "sha256": "905878e85cd9d21ef164167c5214879649d6aadf16ed216dda0ef0d24c6beb20",
+      "size": 5480
+    },
+    {
+      "path": "simulation/tests/test_continuation_verifiers.py",
+      "blob_sha": "2b01f4cced9b5de8cc3b93f1f31e6caac37d6b3f",
+      "sha256": "8e6e56eae10f4447efbb61f5b169348349481592bf72b5075fad199da738a2b3",
+      "size": 5616
+    }
+  ],
+  "matched": true
+}

@@ -1,0 +1,71 @@
+{
+  "schema": "ate-continuation-proof-launch/1",
+  "stage": "bounded-proof-running",
+  "run": {
+    "id": 39090807612,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39090807612",
+    "status": "in_progress",
+    "conclusion": null,
+    "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+    "branch": "sol/stage-0-5-continuation-checkpoints",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "event": "push",
+    "run_attempt": 1,
+    "created_at": "2026-10-18T02:38:25Z"
+  },
+  "published_source_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+  "local_source_sha": "fda8075624990906c910179c5cfb01db1b983337",
+  "source_tree": "7fc2ceaac8322e5320c5f11fd14a4ea18a1790f1",
+  "reviewed_implementation_sha": "11ef1722fda5fd7f8ae1085d2dca34d7fb849ede",
+  "reviewed_implementation_tree": "dc6a2cf5459b0c84ecae7dd978af44659523fa8a",
+  "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "source_readback": {
+    "files": 20,
+    "byte_exact": true,
+    "blob_exact": true
+  },
+  "local_tests": {
+    "tests": 124,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 197.56,
+    "expected_warnings": 1
+  },
+  "independent_review": {
+    "model": "gpt-6.1-sol",
+    "fresh_context": true,
+    "critical": 0,
+    "important": 0,
+    "deferred_minors": [
+      "audit_seconds presence/type is optional; substantive audit equality remains mandatory"
+    ],
+    "boundary_tests": 68,
+    "pipeline_processes": 15,
+    "astra_attempt": "unavailable before review due model usage limit"
+  },
+  "expected_jobs": [
+    "harness-tests",
+    "full-suite",
+    "source",
+    "save1",
+    "interrupt-audit1",
+    "audit1",
+    "digest1",
+    "accept1",
+    "save2",
+    "audit2",
+    "digest2",
+    "accept2",
+    "continued",
+    "restore-values",
+    "restore-digest",
+    "restored",
+    "proof-summary"
+  ],
+  "monitoring_enabled": false,
+  "mature_launch_performed": false,
+  "stage_0_5_accepted": false,
+  "next_gate": "Inspect actual successful proof jobs, full suite count and authenticated proof/restore receipts before preparing any separate mature launch."
+}

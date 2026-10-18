@@ -8,6 +8,16 @@ two-year mature command remains paused; the new mature launch configuration
 contains no proof pin and its workflow has inert source/configuration pins.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
 
+The single bounded proof/full-suite launch is [run 39090807612](https://github.com/rax0h/all-that-endures/actions/runs/39090807612),
+created October 18, 2026 at 02:38:25 UTC. Its source is
+`084f6a9e90614b9df6189d0501bcc38cd6a9175f`, full tree
+`7fc2ceaac8322e5320c5f11fd14a4ea18a1790f1`, byte/blob exact against local
+`fda8075624990906c910179c5cfb01db1b983337` for all 20 outgoing files.
+The run was in progress at launch inspection; no result is claimed. Exact
+launch and readback records are `stage_0_5_continuation_proof_launch.json` and
+`stage_0_5_continuation_source_readback.json`. These documentation-only records
+do not alter the workflow path and must not trigger another proof.
+
 ## Authority and previous evidence
 
 The treasury-report repair passed run 39070285697 on exact source
