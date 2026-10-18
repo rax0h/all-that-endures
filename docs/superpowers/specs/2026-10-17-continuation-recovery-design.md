@@ -1,9 +1,10 @@
 # Durable mature continuation and verification
 
-Status: Astra design decision and implementation assignment. The treasury report
-repair is implemented separately; the staged continuation protocol below is not
-implemented or validated yet. Stage 0.5 remains unaccepted. Do not relaunch the
-old two-year continuation command.
+Status: Astra design decision. The treasury report repair passed CI39070285697.
+The local staged protocol and runner wiring are implemented; fresh-runner proof,
+final implementation/launch review and actual mature gates remain pending. See
+`simulation/STAGE_0_5_CONTINUATION_CHECKPOINTS.md`. Stage 0.5 remains unaccepted.
+Do not relaunch the old two-year continuation command.
 
 ## Objective and preserved authority
 

@@ -1,0 +1,632 @@
+name: Stage 0.5 durable continuation proof - mature paused
+'on':
+  push:
+    branches: [sol/stage-0-5-continuation-checkpoints]
+    paths: [.github/workflows/stage-0-5-continuation-proof.yml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stage-0-5-continuation-proof
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: 2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a
+  HARNESS_SHA: ${{ github.sha }}
+jobs:
+  harness-tests:
+    name: harness-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Local protocol and transport tests
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 25m python -m pytest -q \
+          simulation/tests/test_continuation_receipts.py \
+          simulation/tests/test_continuation_checkpoint.py \
+          simulation/tests/test_continuation_verifiers.py \
+          simulation/tests/test_continuation_acceptance.py \
+          simulation/tests/test_continuation_restore.py \
+          simulation/tests/test_construction_mature_continuation_stages.py \
+          simulation/tests/test_continuation_checkpoint_ci.py \
+          simulation/tests/test_long_history_report_treasuries.py \
+          simulation/tests/test_checkpoint_artifacts.py \
+          --junitxml=evidence/protocol-tests.xml 2>&1 | tee evidence/protocol-tests.log
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: continuation-checkpoints-tests
+        path: evidence
+        retention-days: 14
+  full-suite:
+    name: full-suite
+    needs: [harness-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Full simulation suite
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 135m python -m pytest -q simulation/tests \
+          --junitxml=evidence/full-suite.xml 2>&1 | tee evidence/full-suite.log
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: continuation-checkpoints-full-suite
+        path: evidence
+        retention-days: 14
+  source:
+    name: source
+    needs: [harness-tests]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job source 2>&1 | tee evidence/source.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-source-diagnostics
+        path: evidence/source.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-source
+        path: evidence/source/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  save1:
+    name: save1
+    needs: [source]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job save1 2>&1 | tee evidence/save1.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-save1-diagnostics
+        path: evidence/save1.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-save1
+        path: evidence/save1/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  interrupt-audit1:
+    name: interrupt-audit1
+    needs: [save1]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job interrupt-audit1 2>&1 | tee evidence/interrupt-audit1.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-interrupt-audit1-diagnostics
+        path: evidence/interrupt-audit1.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-interrupt-audit1
+        path: evidence/interrupt-audit1/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  audit1:
+    name: audit1
+    needs: [interrupt-audit1]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job audit1 2>&1 | tee evidence/audit1.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-audit1-diagnostics
+        path: evidence/audit1.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-audit1
+        path: evidence/audit1/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  digest1:
+    name: digest1
+    needs: [save1]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job digest1 2>&1 | tee evidence/digest1.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-digest1-diagnostics
+        path: evidence/digest1.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-digest1
+        path: evidence/digest1/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  accept1:
+    name: accept1
+    needs: [audit1, digest1]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job accept1 2>&1 | tee evidence/accept1.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-accept1-diagnostics
+        path: evidence/accept1.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-accept1
+        path: evidence/accept1/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  save2:
+    name: save2
+    needs: [accept1]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job save2 2>&1 | tee evidence/save2.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-save2-diagnostics
+        path: evidence/save2.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-save2
+        path: evidence/save2/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  audit2:
+    name: audit2
+    needs: [save2]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job audit2 2>&1 | tee evidence/audit2.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-audit2-diagnostics
+        path: evidence/audit2.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-audit2
+        path: evidence/audit2/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  digest2:
+    name: digest2
+    needs: [save2]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job digest2 2>&1 | tee evidence/digest2.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-digest2-diagnostics
+        path: evidence/digest2.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-digest2
+        path: evidence/digest2/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  accept2:
+    name: accept2
+    needs: [audit2, digest2]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job accept2 2>&1 | tee evidence/accept2.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-accept2-diagnostics
+        path: evidence/accept2.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-accept2
+        path: evidence/accept2/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  continued:
+    name: continued
+    needs: [accept2]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job continued 2>&1 | tee evidence/continued.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-continued-diagnostics
+        path: evidence/continued.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-continued
+        path: evidence/continued/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  restore-values:
+    name: restore-values
+    needs: [continued]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job restore-values 2>&1 | tee evidence/restore-values.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-restore-values-diagnostics
+        path: evidence/restore-values.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-restore-values
+        path: evidence/restore-values/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  restore-digest:
+    name: restore-digest
+    needs: [continued]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job restore-digest 2>&1 | tee evidence/restore-digest.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-restore-digest-diagnostics
+        path: evidence/restore-digest.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-restore-digest
+        path: evidence/restore-digest/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  restored:
+    name: restored
+    needs: [restore-values, restore-digest]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job restored 2>&1 | tee evidence/restored.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-restored-diagnostics
+        path: evidence/restored.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-restored
+        path: evidence/restored/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1
+  proof-summary:
+    name: proof-summary
+    needs: [restored, full-suite]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Execute bounded stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        mkdir -p evidence
+        timeout --signal=TERM --kill-after=30s 20m python -m simulation.continuation_checkpoint_ci --job proof-summary 2>&1 | tee evidence/proof-summary.log
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-small-proof-summary-diagnostics
+        path: evidence/proof-summary.log
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-small-proof
+        path: evidence/proof-summary/output
+        if-no-files-found: error
+        retention-days: 14
+        compression-level: 1

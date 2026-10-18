@@ -1,0 +1,68 @@
+name: Stage 0.5 one durable mature continuation stage
+'on':
+  push:
+    branches: [sol/stage-0-5-mature-continuation-stage]
+    paths: [.github/workflows/stage-0-5-mature-continuation-stage.yml]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stage-0-5-mature-continuation
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+  RUNTIME_SHA: 2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a
+  HARNESS_SHA: not-published
+  LAUNCH_CONFIG_SHA256: not-configured
+  STAGE: save
+  YEAR: '1001'
+jobs:
+  mature-stage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ env.HARNESS_SHA }}
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - run: python -m pip install pytest pyyaml
+    - name: Reserve disk on this disposable runner
+      shell: bash
+      run: |
+        sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift /usr/local/.ghcup /usr/local/share/powershell
+        sudo find /opt/hostedtoolcache -mindepth 1 -maxdepth 1 ! -name Python -exec rm -rf {} +
+        sudo docker image prune -af
+        mkdir -p evidence
+        df -h . | tee evidence/disk-start.txt
+    - name: Execute one mature stage
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        mkdir -p evidence
+        set +e
+        timeout --signal=TERM --kill-after=30s 300m python -m simulation.construction_mature_continuation_stages --stage "$STAGE" --year "$YEAR" --config simulation/stage_0_5_continuation_stage_launch.json 2>&1 | tee evidence/stage.log
+        stage_status=${PIPESTATUS[0]}
+        exit "$stage_status"
+    - name: Retain diagnostics
+      uses: actions/upload-artifact@v4
+      if: always()
+      continue-on-error: true
+      with:
+        name: continuation-stage-diagnostics-${{ env.STAGE }}-${{ env.YEAR }}
+        path: |
+          evidence/stage.log
+          evidence/stage-summary.json
+          evidence/disk-start.txt
+        retention-days: 14
+    - name: Retain completed stage
+      uses: actions/upload-artifact@v4
+      with:
+        name: continuation-stage-${{ env.STAGE }}-${{ env.YEAR }}
+        path: evidence/output
+        retention-days: 14
+        if-no-files-found: error
+        compression-level: 1

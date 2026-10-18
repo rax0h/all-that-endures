@@ -1,9 +1,10 @@
 # Astra: finish continuation without discarding completed saves
 
-This is the next Sol assignment. The treasury reporting repair is implemented
-and passes its local affected tests. The durable continuation protocol is
-specified below but **not implemented yet**. No mature retry is authorized by a
-report-only green result. Monitoring remains disabled and main is unchanged.
+Sol has implemented the local durable continuation protocol and runner wiring.
+See [implementation status](STAGE_0_5_CONTINUATION_CHECKPOINTS.md). Fresh protocol
+CI, final implementation/launch review and the actual mature stages still gate
+advancement. The treasury-report repair passed focused and full CI39070285697
+(2831 tests plus two subtests). Monitoring remains disabled and main is unchanged.
 
 ## Verified failure
 
