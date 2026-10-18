@@ -8,12 +8,50 @@ new17-job proof/full-suite run is [39167485117](https://github.com/rax0h/all-tha
 created October18,2026 at21:21:37UTC. Source
 `e3800ed91ca27725f0b75ff0ef38b4fd940da2bd` has exact reviewed tree
 `cf20288baaa0217654471d8176189d8ab1b6cd99`; all10 changed files including the
-binary fixture read back byte/blob exact. Actual fresh proof/full-suite and
-retained-audit hosted authentication remain pending before mature continuation.
+binary fixture read back byte/blob exact. The run completed with failure
+October18 at23:15:14UTC. Fifteen jobs succeeded, including the actual retained
+audit's authenticated download/reader/full-control check and the bounded
+independent downloaded restore. The full suite had2966 passed, two passed
+subtests and one failed cost assertion; proof-summary was skipped. A new green
+proof remains mandatory before mature continuation.
 The successful mature audit and saved generation are reused unchanged.
 `stage_0_5_receipt_handoff_repair_local.json` records the exact local gates.
 `stage_0_5_receipt_handoff_repair_launch.json` and
 `STAGE_0_5_RECEIPT_HANDOFF_REPAIR_REVIEW.md` bind the review and single launch.
+
+## Observed full-suite failure and test measurement repair
+
+The sole failure was
+`test_sealed_suffix_publish_has_fixed_unrelated_history_work`: H1000 cost
+(155 reads,31 writes,1185 metadata rows) versus H10000 (158,32,1196).
+There was no archive-walk rejection or logical audit/restore failure. Exact
+failed-suite and successful harness/restore archives and members were
+downloaded/hash-checked. Failed-job diagnostics are forensic evidence only,
+not a successful producing-job proof. The original strict authentication rule
+is unchanged. See `stage_0_5_receipt_handoff_proof_failure.json`.
+
+Five standalone hash-seeded executions passed. A bounded change to cycle-GC
+thresholds reproduced unequal costs. Written-namespace traces isolated all
+variation to dependency-lease rows:7 versus9 in one reproduction; all other
+written namespace counts were identical. BackingDependencyPool tracks weak
+alias lifetimes, so automatic cycle collection changes the live lease roster.
+The benchmark compared different temporary-object lifetimes rather than a
+constant affected closure at different unrelated archive sizes.
+
+The test now explicitly collects fixture garbage before resetting diagnostics
+and disables automatic cycle collection only during the two measured saves
+and cost capture. It restores the prior GC enabled state and fixture thresholds
+in finally blocks. Ordinary refcount cleanup and all actual save/dependency
+accounting still run. Exact cost equality and all three archive/registry-walk
+rejections remain unchanged; no ceiling, tolerance or retry was added.
+Normal and aggressive fixture schedules both measured155/31/1185 at both
+sizes. The complete15-test module passed39.73s. The full module is also added
+to the early proof gate so this regression is checked before starting the
+hosted full suite. Persistence/runtime and receipt helper bytes are unchanged.
+
+The expanded early gate, final independent review and a fresh actual full-suite
+proof remain required. Successful mature save/audit evidence remains retained;
+no mature stage is repeated or advanced on this failed run.
 
 Actual audit1001 [run39152488567](https://github.com/rax0h/all-that-endures/actions/runs/39152488567)
 completed successfully October18,2026 at19:21:19UTC (14:21:19 America/Chicago).

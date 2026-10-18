@@ -1,4 +1,5 @@
 """Readonly roles and deep immutable snapshot certification are distinct."""
+import gc
 import pytest
 from ate_sim.core import Event, Layer
 from ate_sim.agency import ActionRecord
@@ -111,7 +112,17 @@ def test_full_snapshot_scrub_rejects_false_certification(tmp_path):
             verify_frozen_certification(snapshot)
 
 
-def test_sealed_suffix_publish_has_fixed_unrelated_history_work(tmp_path, record_property):
+@pytest.fixture(params=[(700,10,10),(10,1,1)],ids=['normal-gc','aggressive-gc'])
+def collection_schedule(request):
+    previous=gc.get_threshold()
+    gc.set_threshold(*request.param)
+    try:
+        yield
+    finally:
+        gc.set_threshold(*previous)
+
+
+def test_sealed_suffix_publish_has_fixed_unrelated_history_work(tmp_path, record_property, collection_schedule):
     from simulation.tests.test_stage_0_5_final_world_native_event_peers import with_native_event
     metrics = []
     for size in (1000, 10000):
@@ -126,11 +137,22 @@ def test_sealed_suffix_publish_has_fixed_unrelated_history_work(tmp_path, record
             unrelated = s.skills[2, 'craft'].provenance
             unrelated._read_page = lambda *_: pytest.fail('save walked unrelated archive')
             s._registry.live_bindings = lambda: pytest.fail('save inventoried registry')
-            s.store.reset_diagnostics()
-            s.save()
-            s.save()
-            now = s.store.diagnostics()
-            metric = now.payload_reads, now.payload_writes, now.metadata_rows
+            # Backing leases follow weak alias lifetimes. Collect fixture
+            # garbage before measuring, then keep cycle collection from
+            # changing that lifetime roster between the two fixed-work saves.
+            # Refcount cleanup and all save/lease accounting still run.
+            collection_enabled = gc.isenabled()
+            gc.disable()
+            try:
+                gc.collect()
+                s.store.reset_diagnostics()
+                s.save()
+                s.save()
+                now = s.store.diagnostics()
+                metric = now.payload_reads, now.payload_writes, now.metadata_rows
+            finally:
+                if collection_enabled:
+                    gc.enable()
             metrics.append(metric)
             for label, count in zip(('payload_reads','payload_writes','metadata_rows'), metric):
                 record_property(f'H{size}_{label}', count)

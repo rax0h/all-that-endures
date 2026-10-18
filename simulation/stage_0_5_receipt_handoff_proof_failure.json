@@ -1,0 +1,904 @@
+{
+  "schema": "ate-receipt-handoff-proof-failure/1",
+  "run": {
+    "id": 39167485117,
+    "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/39167485117",
+    "head_sha": "e3800ed91ca27725f0b75ff0ef38b4fd940da2bd",
+    "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "event": "push",
+    "run_attempt": 1,
+    "created_at": "2026-10-18T21:21:37Z",
+    "updated_at": "2026-10-18T23:15:14Z",
+    "status": "completed",
+    "conclusion": "failure"
+  },
+  "jobs": [
+    {
+      "id": 117793362500,
+      "name": "harness-tests",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:21:39Z",
+      "completed_at": "2026-10-18T21:26:49Z"
+    },
+    {
+      "id": 117794536330,
+      "name": "full-suite",
+      "status": "completed",
+      "conclusion": "failure",
+      "started_at": "2026-10-18T21:26:52Z",
+      "completed_at": "2026-10-18T23:15:14Z"
+    },
+    {
+      "id": 117794536384,
+      "name": "source",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:26:51Z",
+      "completed_at": "2026-10-18T21:27:15Z"
+    },
+    {
+      "id": 117794632757,
+      "name": "save1",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:27:17Z",
+      "completed_at": "2026-10-18T21:27:39Z"
+    },
+    {
+      "id": 117794720211,
+      "name": "digest1",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:27:41Z",
+      "completed_at": "2026-10-18T21:28:06Z"
+    },
+    {
+      "id": 117794720316,
+      "name": "interrupt-audit1",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:27:41Z",
+      "completed_at": "2026-10-18T21:28:06Z"
+    },
+    {
+      "id": 117794815586,
+      "name": "audit1",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:28:08Z",
+      "completed_at": "2026-10-18T21:28:35Z"
+    },
+    {
+      "id": 117794919281,
+      "name": "accept1",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:28:37Z",
+      "completed_at": "2026-10-18T21:29:01Z"
+    },
+    {
+      "id": 117795012951,
+      "name": "save2",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:29:03Z",
+      "completed_at": "2026-10-18T21:29:26Z"
+    },
+    {
+      "id": 117795099527,
+      "name": "audit2",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:29:28Z",
+      "completed_at": "2026-10-18T21:29:47Z"
+    },
+    {
+      "id": 117795099534,
+      "name": "digest2",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:29:28Z",
+      "completed_at": "2026-10-18T21:29:55Z"
+    },
+    {
+      "id": 117795202088,
+      "name": "accept2",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:29:58Z",
+      "completed_at": "2026-10-18T21:30:33Z"
+    },
+    {
+      "id": 117795358371,
+      "name": "continued",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:30:36Z",
+      "completed_at": "2026-10-18T21:31:09Z"
+    },
+    {
+      "id": 117795488261,
+      "name": "restore-digest",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:31:11Z",
+      "completed_at": "2026-10-18T21:31:39Z"
+    },
+    {
+      "id": 117795488284,
+      "name": "restore-values",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:31:11Z",
+      "completed_at": "2026-10-18T21:31:42Z"
+    },
+    {
+      "id": 117795614875,
+      "name": "restored",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-10-18T21:31:44Z",
+      "completed_at": "2026-10-18T21:32:17Z"
+    },
+    {
+      "id": 117817865621,
+      "name": "proof-summary",
+      "status": "completed",
+      "conclusion": "skipped",
+      "started_at": "2026-10-18T23:15:14Z",
+      "completed_at": "2026-10-18T23:15:14Z"
+    }
+  ],
+  "success_jobs": 15,
+  "download_checks": [
+    {
+      "artifact_id": 12154660260,
+      "name": "continuation-checkpoints-full-suite",
+      "archive_bytes": 65740,
+      "archive_sha256": "1e0883728931a87f1c24cb5a499cf83d1f040815ef1b76929c3e16fcde2be306",
+      "producer_job": "full-suite",
+      "producer_conclusion": "failure",
+      "forensics_only": true,
+      "members": {
+        "full-suite.log": {
+          "bytes": 18708,
+          "sha256": "c7e7cbec30ae9cbf065653aa6cb5dc2587c56c8699dba14af36ec3d4e3826760"
+        },
+        "full-suite.xml": {
+          "bytes": 508100,
+          "sha256": "d310aabd9410dfe2dd59f324e64d616bd799617e3e2281aa4a10fc57f982309b"
+        }
+      },
+      "suite": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "1",
+        "skipped": "0",
+        "tests": "2969",
+        "time": "6491.798",
+        "timestamp": "2026-10-18T21:26:58.326374+00:00",
+        "hostname": "runnervm8k3b6"
+      },
+      "failures": [
+        {
+          "name": "test_sealed_suffix_publish_has_fixed_unrelated_history_work",
+          "classname": "simulation.tests.test_stage_0_5_final_frozen_snapshot_authority",
+          "message": "assert (155, 31, 1185) == (158, 32, 1196)\n  \n  At index 0 diff: 155 != 158\n  \n  Full diff:\n    (\n  -     158,\n  ?       ^\n  +     155,\n  ?       ^\n  -     32,\n  ?      ^\n  +     31,\n  ?      ^\n  -     1196,\n  ?       ^^\n  +     1185,\n  ?       ^^\n    )",
+          "text": "tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_sealed_suffix_publish_has0')\nrecord_property = <function record_property.<locals>.append_property at 0x7f580e7b0fe0>\n\n    def test_sealed_suffix_publish_has_fixed_unrelated_history_work(tmp_path, record_property):\n        from simulation.tests.test_stage_0_5_final_world_native_event_peers import with_native_event\n        metrics = []\n        for size in (1000, 10000):\n            directory = tmp_path / str(size)\n            directory.mkdir()\n            target = with_native_event(directory, size=size, owners=24)\n            with open_bridge(target, rules_id=RULES) as s:\n                activate(s)\n                event = s.skills[1, 'craft'].provenance[0]\n                event.seal()\n                event.data.items = lambda: pytest.fail('save walked sealed data archive')\n                unrelated = s.skills[2, 'craft'].provenance\n                unrelated._read_page = lambda *_: pytest.fail('save walked unrelated archive')\n                s._registry.live_bindings = lambda: pytest.fail('save inventoried registry')\n                s.store.reset_diagnostics()\n                s.save()\n                s.save()\n                now = s.store.diagnostics()\n                metric = now.payload_reads, now.payload_writes, now.metadata_rows\n                metrics.append(metric)\n                for label, count in zip(('payload_reads','payload_writes','metadata_rows'), metric):\n                    record_property(f'H{size}_{label}', count)\n>       assert metrics[0] == metrics[1]\nE       assert (155, 31, 1185) == (158, 32, 1196)\nE         \nE         At index 0 diff: 155 != 158\nE         \nE         Full diff:\nE           (\nE         -     158,\nE         ?       ^\nE         +     155,\nE         ?       ^\nE         -     32,\nE         ?      ^\nE         +     31,\nE         ?      ^\nE         -     1196,\nE         ?       ^^\nE         +     1185,\nE         ?       ^^\nE           )\n\nsimulation/tests/test_stage_0_5_final_frozen_snapshot_authority.py:137: AssertionError",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "155"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "31"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "1185"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "158"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "32"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "1196"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "artifact_id": 12151591591,
+      "name": "continuation-checkpoints-tests",
+      "archive_bytes": 4747,
+      "archive_sha256": "461d4ec9558290dcadcd915ec03cf1798d65e24cb5438f7498022fec71fb2759",
+      "producer_job": "harness-tests",
+      "producer_conclusion": "success",
+      "forensics_only": false,
+      "members": {
+        "protocol-tests.log": {
+          "bytes": 752,
+          "sha256": "4275819355358b32358f0db87ac170336857c8172c3bc1ea3015da044a5efb57"
+        },
+        "protocol-tests.xml": {
+          "bytes": 24925,
+          "sha256": "62d4b832ccaa5ce24a147a0e0a33edf8a45ed8800829fefe170e06a17fc67743"
+        },
+        "retained-audit-check.json": {
+          "bytes": 963,
+          "sha256": "a1e67f0426881405edef0f2ab3d7fdb7e39defe9423f326218cb9dd7b63238c0"
+        },
+        "retained-audit.log": {
+          "bytes": 417,
+          "sha256": "0f1d88e4b256cd156e450a6a698d2e452d95ff3014c5022785700fffdb85d145"
+        }
+      },
+      "suite": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "153",
+        "time": "297.370",
+        "timestamp": "2026-10-18T21:21:47.878493+00:00",
+        "hostname": "runnervm8k3b6"
+      },
+      "failures": []
+    },
+    {
+      "artifact_id": 12150738792,
+      "name": "continuation-small-restored",
+      "archive_bytes": 194429,
+      "archive_sha256": "40522f762c13d58e2ce6940438e8eb9a139964a8ba9405efa8fc9999c46b7ad4",
+      "producer_job": "restored",
+      "producer_conclusion": "success",
+      "forensics_only": false,
+      "members": {
+        "restore-verified.json": {
+          "bytes": 1260764,
+          "sha256": "73f259c0b4a164fcb407baaf1bc6d9050df21ca62a4573aa46a13625f94f3757"
+        }
+      }
+    }
+  ],
+  "full_suite": {
+    "passed": 2966,
+    "failed": 1,
+    "subtests_passed": 2,
+    "errors": 0,
+    "skipped": 0,
+    "warnings": 41,
+    "seconds": 6491.91
+  },
+  "failed_test": "simulation/tests/test_stage_0_5_final_frozen_snapshot_authority.py::test_sealed_suffix_publish_has_fixed_unrelated_history_work",
+  "actual_cost": {
+    "H1000": [
+      155,
+      31,
+      1185
+    ],
+    "H10000": [
+      158,
+      32,
+      1196
+    ]
+  },
+  "failed_archive_is_forensics_only": true,
+  "retained_mature_audit_transport_and_control_passed": true,
+  "bounded_restore_receipt_recursively_validated": true,
+  "proof_summary_skipped": true,
+  "mature_progression_blocked": true,
+  "root_cause": "Uncontrolled automatic cycle collection changes weak alias liveness and the dependency lease roster between fixture sizes. Exact save-cost equality compared different live-object states.",
+  "bounded_gc_reproduction": [
+    {
+      "index": 0,
+      "threshold": [
+        700,
+        10,
+        10
+      ],
+      "passed": true,
+      "metrics": {
+        "H1000_payload_reads": 158,
+        "H1000_payload_writes": 32,
+        "H1000_metadata_rows": 1196,
+        "H10000_payload_reads": 158,
+        "H10000_payload_writes": 32,
+        "H10000_metadata_rows": 1196
+      }
+    },
+    {
+      "index": 1,
+      "threshold": [
+        1,
+        1,
+        1
+      ],
+      "passed": true,
+      "metrics": {
+        "H1000_payload_reads": 155,
+        "H1000_payload_writes": 31,
+        "H1000_metadata_rows": 1185,
+        "H10000_payload_reads": 155,
+        "H10000_payload_writes": 31,
+        "H10000_metadata_rows": 1185
+      }
+    },
+    {
+      "index": 2,
+      "threshold": [
+        10,
+        1,
+        1
+      ],
+      "passed": false,
+      "metrics": {
+        "H1000_payload_reads": 155,
+        "H1000_payload_writes": 31,
+        "H1000_metadata_rows": 1185,
+        "H10000_payload_reads": 161,
+        "H10000_payload_writes": 33,
+        "H10000_metadata_rows": 1207
+      }
+    },
+    {
+      "index": 3,
+      "threshold": [
+        1000000,
+        1000000,
+        1000000
+      ],
+      "passed": true,
+      "metrics": {
+        "H1000_payload_reads": 161,
+        "H1000_payload_writes": 33,
+        "H1000_metadata_rows": 1207,
+        "H10000_payload_reads": 161,
+        "H10000_payload_writes": 33,
+        "H10000_metadata_rows": 1207
+      }
+    },
+    {
+      "index": 4,
+      "threshold": [
+        700,
+        10,
+        10
+      ],
+      "passed": true,
+      "metrics": {
+        "H1000_payload_reads": 158,
+        "H1000_payload_writes": 32,
+        "H1000_metadata_rows": 1196,
+        "H10000_payload_reads": 158,
+        "H10000_payload_writes": 32,
+        "H10000_metadata_rows": 1196
+      }
+    },
+    {
+      "index": 5,
+      "threshold": [
+        700,
+        10,
+        10
+      ],
+      "passed": true,
+      "metrics": {
+        "H1000_payload_reads": 158,
+        "H1000_payload_writes": 32,
+        "H1000_metadata_rows": 1196,
+        "H10000_payload_reads": 158,
+        "H10000_payload_writes": 32,
+        "H10000_metadata_rows": 1196
+      }
+    }
+  ],
+  "gc_policy_and_written_namespace_trace": [
+    {
+      "policy": "threshold-10",
+      "metrics": [
+        {
+          "size": 1000,
+          "cost": [
+            155,
+            31,
+            1185
+          ],
+          "written_namespaces": [
+            [
+              "aux.lazy.history.dependencies",
+              7
+            ],
+            [
+              "aux.lazy.history.member_types",
+              2
+            ],
+            [
+              "aux.lazy.history.retirement",
+              1
+            ],
+            [
+              "aux.lazy.identity.catalog",
+              1
+            ],
+            [
+              "aux.lazy.identity.groups",
+              4
+            ],
+            [
+              "aux.lazy.identity.owner_tree",
+              3
+            ],
+            [
+              "aux.lazy.identity.owners",
+              4
+            ],
+            [
+              "aux.lazy.nested.descriptors",
+              2
+            ],
+            [
+              "aux.lazy.nested.entries",
+              1
+            ],
+            [
+              "aux.lazy.nested.list_pages",
+              1
+            ],
+            [
+              "aux.lazy.records.headers",
+              1
+            ],
+            [
+              "world_identity_links",
+              1
+            ]
+          ]
+        },
+        {
+          "size": 10000,
+          "cost": [
+            161,
+            33,
+            1207
+          ],
+          "written_namespaces": [
+            [
+              "aux.lazy.history.dependencies",
+              9
+            ],
+            [
+              "aux.lazy.history.member_types",
+              2
+            ],
+            [
+              "aux.lazy.history.retirement",
+              1
+            ],
+            [
+              "aux.lazy.identity.catalog",
+              1
+            ],
+            [
+              "aux.lazy.identity.groups",
+              4
+            ],
+            [
+              "aux.lazy.identity.owner_tree",
+              3
+            ],
+            [
+              "aux.lazy.identity.owners",
+              4
+            ],
+            [
+              "aux.lazy.nested.descriptors",
+              2
+            ],
+            [
+              "aux.lazy.nested.entries",
+              1
+            ],
+            [
+              "aux.lazy.nested.list_pages",
+              1
+            ],
+            [
+              "aux.lazy.records.headers",
+              1
+            ],
+            [
+              "world_identity_links",
+              1
+            ]
+          ]
+        }
+      ],
+      "equal": false
+    },
+    {
+      "policy": "controlled",
+      "metrics": [
+        {
+          "size": 1000,
+          "cost": [
+            155,
+            31,
+            1185
+          ],
+          "written_namespaces": [
+            [
+              "aux.lazy.history.dependencies",
+              7
+            ],
+            [
+              "aux.lazy.history.member_types",
+              2
+            ],
+            [
+              "aux.lazy.history.retirement",
+              1
+            ],
+            [
+              "aux.lazy.identity.catalog",
+              1
+            ],
+            [
+              "aux.lazy.identity.groups",
+              4
+            ],
+            [
+              "aux.lazy.identity.owner_tree",
+              3
+            ],
+            [
+              "aux.lazy.identity.owners",
+              4
+            ],
+            [
+              "aux.lazy.nested.descriptors",
+              2
+            ],
+            [
+              "aux.lazy.nested.entries",
+              1
+            ],
+            [
+              "aux.lazy.nested.list_pages",
+              1
+            ],
+            [
+              "aux.lazy.records.headers",
+              1
+            ],
+            [
+              "world_identity_links",
+              1
+            ]
+          ]
+        },
+        {
+          "size": 10000,
+          "cost": [
+            155,
+            31,
+            1185
+          ],
+          "written_namespaces": [
+            [
+              "aux.lazy.history.dependencies",
+              7
+            ],
+            [
+              "aux.lazy.history.member_types",
+              2
+            ],
+            [
+              "aux.lazy.history.retirement",
+              1
+            ],
+            [
+              "aux.lazy.identity.catalog",
+              1
+            ],
+            [
+              "aux.lazy.identity.groups",
+              4
+            ],
+            [
+              "aux.lazy.identity.owner_tree",
+              3
+            ],
+            [
+              "aux.lazy.identity.owners",
+              4
+            ],
+            [
+              "aux.lazy.nested.descriptors",
+              2
+            ],
+            [
+              "aux.lazy.nested.entries",
+              1
+            ],
+            [
+              "aux.lazy.nested.list_pages",
+              1
+            ],
+            [
+              "aux.lazy.records.headers",
+              1
+            ],
+            [
+              "world_identity_links",
+              1
+            ]
+          ]
+        }
+      ],
+      "equal": true
+    },
+    {
+      "policy": "threshold-10-repeat",
+      "metrics": [
+        {
+          "size": 1000,
+          "cost": [
+            161,
+            33,
+            1207
+          ],
+          "written_namespaces": [
+            [
+              "aux.lazy.history.dependencies",
+              9
+            ],
+            [
+              "aux.lazy.history.member_types",
+              2
+            ],
+            [
+              "aux.lazy.history.retirement",
+              1
+            ],
+            [
+              "aux.lazy.identity.catalog",
+              1
+            ],
+            [
+              "aux.lazy.identity.groups",
+              4
+            ],
+            [
+              "aux.lazy.identity.owner_tree",
+              3
+            ],
+            [
+              "aux.lazy.identity.owners",
+              4
+            ],
+            [
+              "aux.lazy.nested.descriptors",
+              2
+            ],
+            [
+              "aux.lazy.nested.entries",
+              1
+            ],
+            [
+              "aux.lazy.nested.list_pages",
+              1
+            ],
+            [
+              "aux.lazy.records.headers",
+              1
+            ],
+            [
+              "world_identity_links",
+              1
+            ]
+          ]
+        },
+        {
+          "size": 10000,
+          "cost": [
+            161,
+            33,
+            1207
+          ],
+          "written_namespaces": [
+            [
+              "aux.lazy.history.dependencies",
+              9
+            ],
+            [
+              "aux.lazy.history.member_types",
+              2
+            ],
+            [
+              "aux.lazy.history.retirement",
+              1
+            ],
+            [
+              "aux.lazy.identity.catalog",
+              1
+            ],
+            [
+              "aux.lazy.identity.groups",
+              4
+            ],
+            [
+              "aux.lazy.identity.owner_tree",
+              3
+            ],
+            [
+              "aux.lazy.identity.owners",
+              4
+            ],
+            [
+              "aux.lazy.nested.descriptors",
+              2
+            ],
+            [
+              "aux.lazy.nested.entries",
+              1
+            ],
+            [
+              "aux.lazy.nested.list_pages",
+              1
+            ],
+            [
+              "aux.lazy.records.headers",
+              1
+            ],
+            [
+              "world_identity_links",
+              1
+            ]
+          ]
+        }
+      ],
+      "equal": true
+    },
+    {
+      "policy": "controlled-repeat",
+      "metrics": [
+        {
+          "size": 1000,
+          "cost": [
+            155,
+            31,
+            1185
+          ],
+          "written_namespaces": [
+            [
+              "aux.lazy.history.dependencies",
+              7
+            ],
+            [
+              "aux.lazy.history.member_types",
+              2
+            ],
+            [
+              "aux.lazy.history.retirement",
+              1
+            ],
+            [
+              "aux.lazy.identity.catalog",
+              1
+            ],
+            [
+              "aux.lazy.identity.groups",
+              4
+            ],
+            [
+              "aux.lazy.identity.owner_tree",
+              3
+            ],
+            [
+              "aux.lazy.identity.owners",
+              4
+            ],
+            [
+              "aux.lazy.nested.descriptors",
+              2
+            ],
+            [
+              "aux.lazy.nested.entries",
+              1
+            ],
+            [
+              "aux.lazy.nested.list_pages",
+              1
+            ],
+            [
+              "aux.lazy.records.headers",
+              1
+            ],
+            [
+              "world_identity_links",
+              1
+            ]
+          ]
+        },
+        {
+          "size": 10000,
+          "cost": [
+            155,
+            31,
+            1185
+          ],
+          "written_namespaces": [
+            [
+              "aux.lazy.history.dependencies",
+              7
+            ],
+            [
+              "aux.lazy.history.member_types",
+              2
+            ],
+            [
+              "aux.lazy.history.retirement",
+              1
+            ],
+            [
+              "aux.lazy.identity.catalog",
+              1
+            ],
+            [
+              "aux.lazy.identity.groups",
+              4
+            ],
+            [
+              "aux.lazy.identity.owner_tree",
+              3
+            ],
+            [
+              "aux.lazy.identity.owners",
+              4
+            ],
+            [
+              "aux.lazy.nested.descriptors",
+              2
+            ],
+            [
+              "aux.lazy.nested.entries",
+              1
+            ],
+            [
+              "aux.lazy.nested.list_pages",
+              1
+            ],
+            [
+              "aux.lazy.records.headers",
+              1
+            ],
+            [
+              "world_identity_links",
+              1
+            ]
+          ]
+        }
+      ],
+      "equal": true
+    }
+  ],
+  "diagnostic_trace": "All varying written version counts were aux.lazy.history.dependencies; other written namespaces stayed identical. Controlled collection before measurement plus no automatic cycle collection during measured saves gave equal155/31/1185 at both sizes.",
+  "test_fix": "Collect fixture garbage before reset_diagnostics; disable automatic cycle collection only through the two measured saves and metric capture; restore prior enabled state. Keep exact equality and every archive/registry walk rejection. Exercise normal and aggressive fixture schedules.",
+  "production_runtime_changed": false,
+  "receipt_helpers_changed": false,
+  "world_format_changed": false,
+  "saved_candidate_preserved": 12129336378,
+  "successful_mature_audit_preserved": 12148235361,
+  "monitoring_enabled": false,
+  "stage_0_5_accepted": false,
+  "next_gate": "Fresh independent review of the test-only normalization and failure evidence, then one corrected17-job proof with this failing module added to the early focused gate. Require actual full-suite success; no shortcut or mature-stage launch."
+}

@@ -1,5 +1,5 @@
 name: Stage 0.5 durable continuation proof - mature paused
-# Validate receipt handoff and exact retained audit reuse; mature gates remain paused.
+# Validate receipt handoff and GC-controlled fixed-work measurement; mature paused.
 'on':
   push:
     branches: [sol/stage-0-5-continuation-checkpoints]
@@ -44,6 +44,7 @@ jobs:
           simulation/tests/test_continuation_checkpoint_ci.py \
           simulation/tests/test_long_history_report_treasuries.py \
           simulation/tests/test_checkpoint_artifacts.py \
+          simulation/tests/test_stage_0_5_final_frozen_snapshot_authority.py \
           --junitxml=evidence/protocol-tests.xml 2>&1 | tee evidence/protocol-tests.log
     - name: Authenticate retained mature audit handoff
       shell: bash
