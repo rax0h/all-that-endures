@@ -4,10 +4,22 @@ Implementation status: the local saved-year protocol, separate verification,
 receipt composition, independent restore and runner wiring are implemented.
 Independent implementation review and all 17 fresh-runner proof jobs passed.
 Actual mature gates remain pending. The old two-year command remains paused.
-The new configuration pins the authenticated proof for the separate year-1001
-save. Its independent concrete launch review cleared, and exactly one mature
-save stage has now launched.
+The actual year-1001 save and upload succeeded. The current configuration pins
+that retained generation and authenticated proof for a separate audit. A fresh
+Astra concrete launch review cleared, and exactly one audit stage has launched.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
+
+The current audit1001 is [run 39108569661](https://github.com/rax0h/all-that-endures/actions/runs/39108569661),
+created October 18, 2026 at 07:40:49 UTC. Workflow source
+`15a54a73df6643229aa768e37dd752b425990cac` checks out harness
+`db8779cd58ced3052a25c4af833193f2d6407e4b`, config SHA256
+`7ec3479beb23e4d470a909f0e5beb4e61fa2cd7ff24d1b012b84472205a669d8`.
+It consumes only saved candidate12129336378/year1001/generation126. Full archive,
+member and file authentication precedes disposable-copy audit; no simulation
+or save is repeated. The run was in progress at launch inspection. Actual audit
+success is not yet claimed. `stage_0_5_audit1001_launch_result.json` and
+`STAGE_0_5_AUDIT1001_LAUNCH_REVIEW.md` retain the actual source/review/launch.
+Digest1001 remains the next separate stage after authenticating audit success.
 
 The actual year-1001 save is [run 39098313631](https://github.com/rax0h/all-that-endures/actions/runs/39098313631),
 created October 18, 2026 at 04:47:29 UTC. Workflow source
