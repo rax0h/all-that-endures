@@ -34,7 +34,7 @@
     "sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2"
   },
   "checkpoint_sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53",
-  "concrete_review": "pending",
+  "concrete_review": "cleared for exactly one retry; see STAGE_0_5_AUDIT1001_RETRY_LAUNCH_REVIEW.md",
   "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
   "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
   "full_local_candidate_download": false,

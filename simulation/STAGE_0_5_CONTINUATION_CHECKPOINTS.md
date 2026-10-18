@@ -7,7 +7,7 @@ Actual mature gates remain pending. The old two-year command remains paused.
 The actual year-1001 save and upload succeeded. Its first separate audit
 completed but failed comparison with the original control. A confirmed JSON
 year-key comparison defect is repaired; all 17 fresh proof jobs passed on the
-new helper bytes. A single audit retry is being prepared. The saved generation stays
+new helper bytes. One independently reviewed audit retry has launched. The saved generation stays
 retained, and year1001 simulation must not repeat to perform verification.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
 
@@ -21,9 +21,22 @@ test-report ZIPs and exact members were downloaded and authenticated. The
 restored receipt validates recursively, and all12 helper bytes/blobs match local.
 `stage_0_5_audit_json_repair_result.json` retains the actual evidence. The new
 proof12143847835 now pins the audit retry configuration; the exact saved
-candidate12129336378 is unchanged. Independent concrete retry review and final
-source/duplicate checks remain required before a single launch. The old proof
-cannot cover the repaired comparator.
+candidate12129336378 is unchanged. Fresh independent Astra review cleared only
+one retry; final source readback and all five active-status/cross-SHA checks
+passed before the single leased launch. The old proof cannot cover the repaired
+comparator.
+
+The audit retry is [run39152488567](https://github.com/rax0h/all-that-endures/actions/runs/39152488567),
+created October18,2026 at18:04:35UTC, push attempt1. Exact reviewed launch source
+`247b5dc2f6ef5b0aa6596798e6ccad3235a6c317` checks out harness
+`60eaf810fbc156e333722672627a8dc2caf20bc1`; config SHA256
+`38dbe688767f204442e9a655e1c017882954af091cb2792e6e750e1d4a73cdd9`.
+It audits saved candidate12129336378/year1001/generation126 without simulation
+or save. Actual audit outcome remains pending; no downstream stage or monitoring
+was enabled. `stage_0_5_audit1001_retry_launch_result.json` and
+`STAGE_0_5_AUDIT1001_RETRY_LAUNCH_REVIEW.md` bind the actual source, review,
+readbacks and single launch. Authenticate its real output before preparing the
+separate digest1001 stage for the same retained candidate.
 
 The failed first audit1001 is [run 39108569661](https://github.com/rax0h/all-that-endures/actions/runs/39108569661),
 created October 18, 2026 at 07:40:49 UTC. Workflow source

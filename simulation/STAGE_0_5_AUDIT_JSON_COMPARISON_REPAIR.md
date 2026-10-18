@@ -77,7 +77,10 @@ review, evidence and next gates are in `stage_0_5_audit_json_repair_launch.json`
 and `STAGE_0_5_AUDIT_JSON_REPAIR_REVIEW.md`.
 
 The new proof12143847835 authorizes the repaired helper bytes; the prior proof
-cannot cover them. One audit1001 retry is being pinned and independently
-reviewed using the same retained artifact12129336378. Successful fixture proof
+cannot cover them. One audit1001 retry was pinned and independently cleared by
+Astra using the same retained artifact12129336378. The single launch is
+[run39152488567](https://github.com/rax0h/all-that-endures/actions/runs/39152488567),
+created October18 at18:04:35UTC. Exact source/review/dispatch evidence is in
+`stage_0_5_audit1001_retry_launch_result.json`. Its real outcome is pending. Successful fixture proof
 does not establish the actual mature audit outcome. No SAVE rerun, automatic downstream stage, monitoring,
 endurance, main merge or Stage0.5 acceptance is authorized by this repair.
