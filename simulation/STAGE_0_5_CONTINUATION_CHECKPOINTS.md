@@ -9,7 +9,9 @@ completed but failed comparison with the original control. The JSON year-key
 comparison repair passed all17 fresh proof jobs. The actual audit retry then
 passed and its downloaded receipt matches the full original control. The next
 acceptance consumer rejects that receipt's noncanonical byte ordering; the
-receipt writer/readback handoff needs a separately validated repair. The saved generation stays
+receipt writer/readback handoff repair is implemented locally. Fresh affected
+checks, independent review and a new proof/full-suite run must clear these
+changed helper bytes before the separate digest stage. The saved generation stays
 retained, and year1001 simulation must not repeat to perform verification.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
 

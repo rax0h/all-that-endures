@@ -1,5 +1,12 @@
 # Mature audit passed; receipt handoff blocked
 
+Repair status: implementation and19 targeted regressions pass locally after
+observing12 failures on the old code. All153 affected checks passed in166.02s,
+with one expected duplicate-ZIP warning; the final19 handoff checks passed0.73s.
+Independent review and fresh proof/full suite are required before any mature continuation.
+The successful mature audit and saved generation are reused unchanged.
+`stage_0_5_receipt_handoff_repair_local.json` records the exact local gates.
+
 Actual audit1001 [run39152488567](https://github.com/rax0h/all-that-endures/actions/runs/39152488567)
 completed successfully October18,2026 at19:21:19UTC (14:21:19 America/Chicago).
 Job117748798734 uploaded artifact12148235361, continuation-stage-audit-1001:
@@ -43,7 +50,41 @@ outside the previous comparison repair.
 The previous repair correctly fixed logical audit comparison. Its regression
 tested the real cross-digit audit/control values, but did not cover this full
 publish/reload/next-stage reader path. No runtime or format change has been
-made during this update, and no repair is claimed here.
+made during that status update. The bounded repair below is separate.
+
+## Bounded repair
+
+New receipt writing normalizes JSON key conversion before sorting, using the
+same duplicate-key rejection as logical comparison. Publication and reload
+therefore agree on bytes and hashes even across digit-width boundaries.
+Receipt fields, schema1 and persisted World formats remain unchanged.
+
+One explicit compatibility entry identifies all fields of the actual immutable
+audit ArtifactRef, its original physical member SHA4be22bcf, size223650 and
+decoded canonical content SHAd5b3f1c7. The consumer still authenticates the full
+original producing job/workflow/harness/runtime and exact ZIP before reading.
+Its reader requires the exact physical member bytes; arbitrary noncanonical
+JSON, rewritten copies and foreign artifact references do not gain this path.
+Full original-control validation remains mandatory.
+
+Acceptance's receipt_sha256 continues to mean the physical member hash. For
+this one retained artifact, composition and recursive validation bind4be22bcf,
+not the hash of a reserialization. New canonical receipts use their stable
+ordinary hash. The exact artifact/archive proof plus pinned content identity
+keep the embedded receipt and physical source bound without rewriting the
+source or rerunning the successful mature audit.
+
+The exact35KB original artifact is checked in as a regression fixture. Tests
+cover publish/reload/acceptance, physical versus canonical hashes, every
+ArtifactRef pin, whitespace/rewrite rejection, tampered values/control and
+duplicate keys. Synthetic digest metadata in unit composition is explicitly
+not an actual mature digest result.
+
+The existing17-job proof also gains a mandatory harness step that fully
+authenticates/downloads the actual retained mature audit and runs the real
+reader and full original-control validator without opening a World. All
+existing saved-year, retry, independent downloaded restore and full-suite jobs
+remain required. No new mature stage or successful predecessor repeats.
 
 ## Required continuation
 

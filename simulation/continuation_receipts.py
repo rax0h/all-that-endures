@@ -43,12 +43,15 @@ def _unique_json_pairs(items):
     return result
 
 
-def canonical(value):
+def _json_value(value):
     # JSON converts integer object keys to strings. Normalize that conversion
     # before sorting, so live year counters compare with their stored JSON.
-    normalized = json.loads(json.dumps(plain(value), allow_nan=False),
+    return json.loads(json.dumps(plain(value), allow_nan=False),
         object_pairs_hook=_unique_json_pairs)
-    return json.dumps(normalized, sort_keys=True, allow_nan=False, separators=(',', ':'))
+
+
+def canonical(value):
+    return json.dumps(_json_value(value), sort_keys=True, allow_nan=False, separators=(',', ':'))
 
 
 def same(left, right):
@@ -101,7 +104,7 @@ def decode_receipt(data):
 
 
 def receipt_bytes(value):
-    return (json.dumps(plain(value),sort_keys=True,indent=2,allow_nan=False)+'\n').encode()
+    return (json.dumps(_json_value(value),sort_keys=True,indent=2,allow_nan=False)+'\n').encode()
 
 
 def receipt_hash(value):
@@ -176,6 +179,31 @@ class ArtifactRef:
     def from_dict(cls, value):
         exact(value, (field.name for field in fields(cls)), 'artifact')
         return cls(**value)
+
+
+# One immutable successful audit predates stable JSON-key serialization. Preserve
+# its physical member proof rather than rerunning the mature audit or rewriting it.
+RETAINED_AUDIT = ArtifactRef(artifact_id=12148235361,run_id=39152488567,
+    workflow_sha='247b5dc2f6ef5b0aa6596798e6ccad3235a6c317',
+    workflow_path='.github/workflows/stage-0-5-mature-continuation-stage.yml',
+    producer_job='mature-stage',name='continuation-stage-audit-1001',
+    archive_sha256='c9b502c71e355644b26ae4b0bdb3ca3edc6dfb567335d73465da009af4cd1943',
+    archive_bytes=35605,harness_sha='60eaf810fbc156e333722672627a8dc2caf20bc1',
+    runtime_sha='2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a',
+    runtime_tree='76dee76973928dbce72860156feb32f2d7f02f86')
+RETAINED_AUDIT_BYTES = 223650
+RETAINED_AUDIT_MEMBER_SHA256 = '4be22bcfeea6dd71e588d8f65c4e63ab7538c2faca7c4a07640b26b2f1252b97'
+RETAINED_AUDIT_CONTENT_SHA256 = 'd5b3f1c750c7355c342ed3f127a660ccd2d09d36e5a4c48951902361c04c1f0d'
+
+
+def receipt_member_hash(value, artifact):
+    """Physical member digest, including the exact retained legacy audit."""
+    digest = receipt_hash(value)
+    if artifact == RETAINED_AUDIT:
+        if digest != RETAINED_AUDIT_CONTENT_SHA256:
+            raise ValueError('retained audit receipt content differs')
+        return RETAINED_AUDIT_MEMBER_SHA256
+    return digest
 
 
 @dataclass(frozen=True)
@@ -541,7 +569,7 @@ def validate_year_acceptance(row, authority):
         exact(proof,('artifact','receipt_sha256'),'verification artifact proof')
         ref = ArtifactRef.from_dict(proof['artifact'])
         match_producer(ref,row[kind]['producer'],authority)
-        if proof['receipt_sha256'] != receipt_hash(row[kind]):
+        if proof['receipt_sha256'] != receipt_member_hash(row[kind],ref):
             raise ValueError('verification receipt member digest differs')
     return row
 
@@ -550,8 +578,8 @@ def accept_year(saved,audit,digest,*,authority,candidate,audit_proof,digest_proo
     row = dict(schema=SCHEMA,stage='year-verified',stage_0_5_accepted=False,
         authority=authority.to_dict(),producer=producer,
         binding=saved_binding(saved,candidate,receipt_hash(saved)),saved=saved,audit=audit,digest=digest,
-        proofs=dict(audit=dict(artifact=audit_proof.to_dict(),receipt_sha256=receipt_hash(audit)),
-            digest=dict(artifact=digest_proof.to_dict(),receipt_sha256=receipt_hash(digest))),
+        proofs=dict(audit=dict(artifact=audit_proof.to_dict(),receipt_sha256=receipt_member_hash(audit,audit_proof)),
+            digest=dict(artifact=digest_proof.to_dict(),receipt_sha256=receipt_member_hash(digest,digest_proof))),
         previous_acceptance=previous_acceptance,original_checkpoint=audit.get('original_checkpoint'))
     validate_year_acceptance(row,authority)
     return decode_receipt(canonical(row))

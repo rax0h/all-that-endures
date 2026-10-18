@@ -245,7 +245,8 @@ def _small(inputs,label,filename,ref,authority):
     r.match_producer(ref,row.get('producer',{}),authority)
     if not r.same(row.get('authority'),authority.to_dict()):
         raise ValueError('receipt original authority differs from expected checkpoint')
-    if r.receipt_hash(row) != r.file_hash(directory/filename):
+    if (r.receipt_member_hash(row,ref) != r.file_hash(directory/filename)
+            or (ref == r.RETAINED_AUDIT and (directory/filename).stat().st_size != r.RETAINED_AUDIT_BYTES)):
         raise ValueError('noncanonical receipt member bytes')
     return row
 

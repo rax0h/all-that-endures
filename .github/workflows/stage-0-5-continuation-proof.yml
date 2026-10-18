@@ -1,5 +1,5 @@
 name: Stage 0.5 durable continuation proof - mature paused
-# Validate JSON year-key comparison repair; retained mature save1001 is immutable.
+# Validate receipt handoff and exact retained audit reuse; mature gates remain paused.
 'on':
   push:
     branches: [sol/stage-0-5-continuation-checkpoints]
@@ -35,6 +35,7 @@ jobs:
         mkdir -p evidence
         timeout --signal=TERM --kill-after=30s 25m python -m pytest -q \
           simulation/tests/test_continuation_receipts.py \
+          simulation/tests/test_continuation_receipt_handoff.py \
           simulation/tests/test_continuation_checkpoint.py \
           simulation/tests/test_continuation_verifiers.py \
           simulation/tests/test_continuation_acceptance.py \
@@ -44,11 +45,23 @@ jobs:
           simulation/tests/test_long_history_report_treasuries.py \
           simulation/tests/test_checkpoint_artifacts.py \
           --junitxml=evidence/protocol-tests.xml 2>&1 | tee evidence/protocol-tests.log
+    - name: Authenticate retained mature audit handoff
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        timeout --signal=TERM --kill-after=30s 2m python -m simulation.continuation_checkpoint_ci --job retained-audit 2>&1 | tee evidence/retained-audit.log
+        cp evidence/retained-audit/output/retained-audit-check.json evidence/retained-audit-check.json
     - uses: actions/upload-artifact@v4
       if: always()
       with:
         name: continuation-checkpoints-tests
-        path: evidence
+        path: |
+          evidence/protocol-tests.xml
+          evidence/protocol-tests.log
+          evidence/retained-audit.log
+          evidence/retained-audit-check.json
         retention-days: 14
   full-suite:
     name: full-suite
