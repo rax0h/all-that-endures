@@ -1,0 +1,338 @@
+{
+  "downloads": [
+    {
+      "archive_bytes": 1203,
+      "archive_sha256": "cbd70719295fbe24185a732f7281c43cf120fc6bbdf687d0893f79ce2be6ce9c",
+      "artifact_id": 12125346802,
+      "members": [
+        {
+          "bytes": 2382,
+          "name": "proof.json",
+          "sha256": "e9b3a009e9ce9ca94da5b56142b473a0a4bded338fd6bb35f3912f015311d842"
+        }
+      ],
+      "name": "continuation-small-proof"
+    },
+    {
+      "archive_bytes": 193445,
+      "archive_sha256": "84e7d71931bbe79b5c8df2e7e19c7f5f793bff3cf39c5dc4daa26a8bb45f8563",
+      "artifact_id": 12123320043,
+      "members": [
+        {
+          "bytes": 1260854,
+          "name": "restore-verified.json",
+          "sha256": "92408ab486291ec20aec3732874b7eb4bc100f13501b7dba32ed53915f86fc7b"
+        }
+      ],
+      "name": "continuation-small-restored"
+    },
+    {
+      "archive_bytes": 63276,
+      "archive_sha256": "7dbcd489e79d8afc0162ba9a464465052cd1cd63e0ef7b2ef3a4ef8504e5d749",
+      "artifact_id": 12124838530,
+      "log_tail": [
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "2938 passed, 41 warnings, 2 subtests passed in 6589.51s (1:49:49)"
+      ],
+      "members": [
+        {
+          "bytes": 15939,
+          "name": "full-suite.log",
+          "sha256": "360896cbf5899953b63972cfae9b74bf9da30886b9b7f3c420ae8861421b2f18"
+        },
+        {
+          "bytes": 500750,
+          "name": "full-suite.xml",
+          "sha256": "b7a18d9ec6861f6a380cc682dfea25abb638e378a0bba652b18b510710afb9c9"
+        }
+      ],
+      "name": "continuation-checkpoints-full-suite",
+      "testsuites": [
+        {
+          "errors": "0",
+          "failures": "0",
+          "hostname": "runnervm8k3b6",
+          "name": "pytest",
+          "skipped": "0",
+          "tests": "2940",
+          "time": "6589.400",
+          "timestamp": "2026-10-18T02:41:14.790529+00:00"
+        }
+      ]
+    },
+    {
+      "archive_bytes": 3048,
+      "archive_sha256": "e766dd4f40052cd0e2c12c935d8f5f7cc396d269c4f6e0fd744d3808bc4f3dc1",
+      "artifact_id": 12122582882,
+      "log_tail": [
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "124 passed, 1 warning in 149.71s (0:02:29)"
+      ],
+      "members": [
+        {
+          "bytes": 672,
+          "name": "protocol-tests.log",
+          "sha256": "160cad6e04f03e842762a3367d833379cd006b6654fffa1fd6ac140af3ca0829"
+        },
+        {
+          "bytes": 19982,
+          "name": "protocol-tests.xml",
+          "sha256": "c6d7eb3d431722e565bf44ec83f5d90befc12b8e4097423f3dc200a14f2bbdf2"
+        }
+      ],
+      "name": "continuation-checkpoints-tests",
+      "testsuites": [
+        {
+          "errors": "0",
+          "failures": "0",
+          "hostname": "runnervm8k3b6",
+          "name": "pytest",
+          "skipped": "0",
+          "tests": "124",
+          "time": "149.710",
+          "timestamp": "2026-10-18T02:38:33.607141+00:00"
+        }
+      ]
+    }
+  ],
+  "fixture_feature_line": "2026-10-18T02:45:26.7355895Z {\"counted_histories\": 8, \"phase\": \"fixture_features_verified\", \"shared_nested_identity\": true, \"year\": 2}",
+  "focused": {
+    "seconds": 149.71,
+    "tests": 124,
+    "warnings": 1
+  },
+  "full_suite": {
+    "errors": 0,
+    "failures": 0,
+    "seconds": 6589.51,
+    "skipped": 0,
+    "subtests": 2,
+    "tests": 2938,
+    "warnings": 41
+  },
+  "helpers_checked": true,
+  "implementation_hashes": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "fa33ba08998d3a4e20e9707a02bb33214e90fe40168a12e51ad666f81e40d536",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/construction_checkpoint_ci.py": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+    "simulation/construction_mature_continuation_stages.py": "e4cc78a7ebb30898b67386cb158ad60d26b9dc43e67aa3d01bbdc0068b3fb2b4",
+    "simulation/construction_mature_continue.py": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+    "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+    "simulation/continuation_checkpoint_ci.py": "8c27a88899b0122c8df1438af8f0fecdd98bc719c96e1eacb4e03e4d1d533fb5",
+    "simulation/continuation_receipts.py": "1dce91486f0f5587a6cae1d71f024ac40780cf69a2a46aeeb02b526dbbb9b453",
+    "simulation/long_history_scaling.py": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+    "simulation/persistence_p5_long_validation.py": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+    "simulation/run_long_history.py": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+    "simulation/tests/continuation_fixtures.py": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e"
+  },
+  "jobs": [
+    {
+      "completed_at": "2026-10-18T02:41:06Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117566964489,
+      "name": "harness-tests",
+      "started_at": "2026-10-18T02:38:27Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T04:31:07Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567442172,
+      "name": "full-suite",
+      "started_at": "2026-10-18T02:41:08Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:41:39Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567442984,
+      "name": "source",
+      "started_at": "2026-10-18T02:41:10Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:42:00Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567539348,
+      "name": "save1",
+      "started_at": "2026-10-18T02:41:40Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:42:28Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567602623,
+      "name": "digest1",
+      "started_at": "2026-10-18T02:42:02Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:42:26Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567602629,
+      "name": "interrupt-audit1",
+      "started_at": "2026-10-18T02:42:02Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:42:51Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567679212,
+      "name": "audit1",
+      "started_at": "2026-10-18T02:42:28Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:43:17Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567747929,
+      "name": "accept1",
+      "started_at": "2026-10-18T02:42:53Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:43:43Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567823515,
+      "name": "save2",
+      "started_at": "2026-10-18T02:43:19Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:44:11Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567897095,
+      "name": "digest2",
+      "started_at": "2026-10-18T02:43:45Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:44:04Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567897145,
+      "name": "audit2",
+      "started_at": "2026-10-18T02:43:45Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:44:37Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117567975979,
+      "name": "accept2",
+      "started_at": "2026-10-18T02:44:13Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:45:06Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117568046156,
+      "name": "continued",
+      "started_at": "2026-10-18T02:44:39Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:45:29Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117568128618,
+      "name": "restore-values",
+      "started_at": "2026-10-18T02:45:08Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:45:39Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117568128653,
+      "name": "restore-digest",
+      "started_at": "2026-10-18T02:45:08Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T02:46:22Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117568224433,
+      "name": "restored",
+      "started_at": "2026-10-18T02:45:41Z",
+      "status": "completed"
+    },
+    {
+      "completed_at": "2026-10-18T04:31:25Z",
+      "conclusion": "success",
+      "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+      "id": 117586491728,
+      "name": "proof-summary",
+      "started_at": "2026-10-18T04:31:09Z",
+      "status": "completed"
+    }
+  ],
+  "proof_artifact": {
+    "archive_bytes": 1203,
+    "archive_sha256": "cbd70719295fbe24185a732f7281c43cf120fc6bbdf687d0893f79ce2be6ce9c",
+    "artifact_id": 12125346802,
+    "harness_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+    "name": "continuation-small-proof",
+    "producer_job": "proof-summary",
+    "run_id": 39090807612,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "workflow_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f"
+  },
+  "proof_member": {
+    "bytes": 2382,
+    "name": "proof.json",
+    "sha256": "e9b3a009e9ce9ca94da5b56142b473a0a4bded338fd6bb35f3912f015311d842"
+  },
+  "restore_artifact": {
+    "archive_bytes": 193445,
+    "archive_sha256": "84e7d71931bbe79b5c8df2e7e19c7f5f793bff3cf39c5dc4daa26a8bb45f8563",
+    "artifact_id": 12123320043,
+    "harness_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+    "name": "continuation-small-restored",
+    "producer_job": "restored",
+    "run_id": 39090807612,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "workflow_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f"
+  },
+  "restore_member": {
+    "bytes": 1260854,
+    "name": "restore-verified.json",
+    "sha256": "92408ab486291ec20aec3732874b7eb4bc100f13501b7dba32ed53915f86fc7b"
+  },
+  "restore_validated": true,
+  "restored_generation": 5,
+  "restored_year": 2,
+  "run": {
+    "conclusion": "success",
+    "created_at": "2026-10-18T02:38:25Z",
+    "head_branch": "sol/stage-0-5-continuation-checkpoints",
+    "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+    "html_url": "https://github.com/rax0h/all-that-endures/actions/runs/39090807612",
+    "id": 39090807612,
+    "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "run_attempt": 1,
+    "status": "completed",
+    "updated_at": "2026-10-18T04:31:25Z"
+  },
+  "schema": "ate-continuation-proof-result/1",
+  "source_blob_identity_checked": true,
+  "stage": "authenticated-bounded-proof",
+  "stage_0_5_accepted": false
+}

@@ -1,0 +1,98 @@
+{
+  "bounds": {
+    "address_space_bytes": 8589934592,
+    "before_download_free_bytes": 114640764928,
+    "before_execution_free_bytes": 85039480832,
+    "command_minutes": 300,
+    "job_minutes": 360,
+    "output_max_bytes": 38191218688,
+    "upload_reservation": "actual saved database bytes plus 8GiB and 64MiB margin"
+  },
+  "checkpoint_bytes": 134251,
+  "checkpoint_runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+  "checkpoint_sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53",
+  "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "generation_after": 126,
+  "generation_before": 125,
+  "implementation_hashes": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "fa33ba08998d3a4e20e9707a02bb33214e90fe40168a12e51ad666f81e40d536",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/construction_checkpoint_ci.py": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+    "simulation/construction_mature_continuation_stages.py": "e4cc78a7ebb30898b67386cb158ad60d26b9dc43e67aa3d01bbdc0068b3fb2b4",
+    "simulation/construction_mature_continue.py": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+    "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+    "simulation/continuation_checkpoint_ci.py": "8c27a88899b0122c8df1438af8f0fecdd98bc719c96e1eacb4e03e4d1d533fb5",
+    "simulation/continuation_receipts.py": "1dce91486f0f5587a6cae1d71f024ac40780cf69a2a46aeeb02b526dbbb9b453",
+    "simulation/long_history_scaling.py": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+    "simulation/persistence_p5_long_validation.py": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+    "simulation/run_long_history.py": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+    "simulation/tests/continuation_fixtures.py": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e"
+  },
+  "launch_config_sha256": "89ff9fc8221999dce7a1173a5e3a97f8d5d57a9e884f5f8fcd41c486cce9ac68",
+  "mature_launch_performed": false,
+  "monitoring_enabled": false,
+  "original_context": {
+    "harness_sha": "2c9166dcfc60370852d6fa38820dee8ec3d2e916",
+    "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+    "source_artifact": {
+      "archive_sha256": "409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9",
+      "id": 11870590333,
+      "run_id": 38508408370
+    }
+  },
+  "original_publication": {
+    "archive_bytes": 3910109453,
+    "archive_sha256": "5ea709166d2bba7f7a22d614fed604f471973ae9ff757979a4148ff197c43382",
+    "artifact_id": 12049884660,
+    "harness_sha": "73370b253f0cb14550f6f43e8a20e4b577246c31",
+    "name": "construction-mature-published",
+    "producer_job": "mature-publish",
+    "run_id": 38907665230,
+    "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+    "runtime_tree": "3c7c833dbec178dc513c21ddf1ccdaa6f79d430a",
+    "workflow_path": ".github/workflows/stage-0-5-mature-publish.yml",
+    "workflow_sha": "5fe99ca2faf0c0668ff73032fe9cc33fd1d6e9a9"
+  },
+  "proof": {
+    "archive_bytes": 1203,
+    "archive_sha256": "cbd70719295fbe24185a732f7281c43cf120fc6bbdf687d0893f79ce2be6ce9c",
+    "artifact_id": 12125346802,
+    "harness_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+    "name": "continuation-small-proof",
+    "producer_job": "proof-summary",
+    "run_id": 39090807612,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "workflow_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f"
+  },
+  "publication_expires_at": "2026-10-30T13:54:43Z",
+  "publication_full_download": "mandatory on fresh mature runner before any simulation; not performed locally",
+  "publication_metadata_authenticated": true,
+  "published_database_bytes": 29601284096,
+  "published_database_sha256": "0d884e52a012ab55325c7111bfc1d054fa7c27aaf0947cf9ab8de4423c213e1c",
+  "review_status": "concrete workflow review pending after exact harness publication",
+  "schema": "ate-mature-stage-preflight/1",
+  "source_config": {
+    "bootstrap_year": 1000,
+    "complete_format": true,
+    "initialization": "mature",
+    "milestones": [
+      1001,
+      1002
+    ],
+    "product_sha": "2bc3c85389760ff12578857f7d2a849bc5cf9201",
+    "rules_id": "stage-0-5-final-release",
+    "seed": 843000,
+    "simulation_schema": "ate-world-p2a/1"
+  },
+  "stage": "save",
+  "stage_0_5_accepted": false,
+  "wrapper_transport_checks": {
+    "passed": 68,
+    "seconds": 0.51,
+    "warnings": 1
+  },
+  "year": 1001
+}

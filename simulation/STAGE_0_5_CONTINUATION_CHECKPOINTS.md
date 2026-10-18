@@ -2,10 +2,10 @@
 
 Implementation status: the local saved-year protocol, separate verification,
 receipt composition, independent restore and runner wiring are implemented.
-Independent implementation review is complete; fresh-runner protocol CI and the
-actual mature gates remain pending. The old
-two-year mature command remains paused; the new mature launch configuration
-contains no proof pin and its workflow has inert source/configuration pins.
+Independent implementation review and all 17 fresh-runner proof jobs passed.
+Actual mature gates remain pending. The old two-year command remains paused.
+The new configuration pins the authenticated proof for the separate year-1001
+save; its workflow remains inert until the concrete launch review.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
 
 The single bounded proof/full-suite launch is [run 39090807612](https://github.com/rax0h/all-that-endures/actions/runs/39090807612),
@@ -13,10 +13,21 @@ created October 18, 2026 at 02:38:25 UTC. Its source is
 `084f6a9e90614b9df6189d0501bcc38cd6a9175f`, full tree
 `7fc2ceaac8322e5320c5f11fd14a4ea18a1790f1`, byte/blob exact against local
 `fda8075624990906c910179c5cfb01db1b983337` for all 20 outgoing files.
-The run was in progress at launch inspection; no result is claimed. Exact
-launch and readback records are `stage_0_5_continuation_proof_launch.json` and
-`stage_0_5_continuation_source_readback.json`. These documentation-only records
-do not alter the workflow path and must not trigger another proof.
+The run completed successfully October 18, 2026 at 04:31:25 UTC. All 17 jobs
+passed. Full suite: 2938 tests plus two subtests, 41 warnings, 6589.51 seconds;
+focused selection: 124 tests, one expected warning, 149.71 seconds. The actual
+fresh-runner interruption/retry and independent downloaded restore passed. The
+restored bounded World also retained its shared nested identity and eight
+counted-history descriptors. Proof and restore ZIPs/members were downloaded,
+hash-checked and authenticated against successful producing jobs; recursive
+restore acceptance and every implementation/helper/source identity check passed.
+
+Original launch/readback snapshots remain in `stage_0_5_continuation_proof_launch.json`
+and `stage_0_5_continuation_source_readback.json`. Actual result, artifact pins
+and exact member hashes are in `stage_0_5_continuation_proof_result.json`.
+`stage_0_5_save1001_launch_preflight.json` records the original publication,
+separate provenance and unchanged mature guards. No small fixture constitutes
+a mature result.
 
 ## Authority and previous evidence
 
@@ -76,7 +87,7 @@ workflow graph, shell and diff checks passed. The fresh independent Sol review
 found no Critical or Important issues; its 68 boundary tests and separate
 15-process pipeline also passed. One minor timing-metadata validation issue is
 recorded in `STAGE_0_5_CONTINUATION_CHECKPOINT_REVIEW.md`. Actual fresh-runner CI
-remains pending at this checkpoint. The Astra reviewer could not start because
+has now passed on the byte-identical implementation. The Astra reviewer could not start because
 of its model usage limit; the completed review used a fresh Sol context.
 
 The implementation was built from observed failing regressions. Local gates

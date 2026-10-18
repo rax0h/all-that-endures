@@ -1,8 +1,20 @@
 {
+  "candidate_database": null,
+  "inputs": {},
+  "proof": {
+    "archive_bytes": 1203,
+    "archive_sha256": "cbd70719295fbe24185a732f7281c43cf120fc6bbdf687d0893f79ce2be6ce9c",
+    "artifact_id": 12125346802,
+    "harness_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+    "name": "continuation-small-proof",
+    "producer_job": "proof-summary",
+    "run_id": 39090807612,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "workflow_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f"
+  },
   "schema": "ate-validation-continuation-launch/1",
   "stage": "save",
-  "year": 1001,
-  "inputs": {},
-  "candidate_database": null,
-  "proof": null
+  "year": 1001
 }
