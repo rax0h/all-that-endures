@@ -13,9 +13,26 @@ acceptance consumer rejects that receipt's noncanonical byte ordering; the
 receipt writer/readback handoff repair passed153 affected checks and independent
 Astra review. Run39167485117 then passed the handoff, retained-audit and bounded
 restore checks but failed one full-suite cost assertion. A test-only GC-state
-measurement repair is being validated before a new proof. The saved generation stays
+measurement repair passed168 affected checks and independent Astra review;
+the single corrected proof39177774744 is launched. The saved generation stays
 retained, and year1001 simulation must not repeat to perform verification.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
+
+Current corrected proof: [39177774744](https://github.com/rax0h/all-that-endures/actions/runs/39177774744),
+created October18,2026 at23:44:30UTC, push attempt1, source
+`4fecd93fdcc5012a404afc07ce166cb7ff422f59`, reviewed tree
+`ea611ec99d6b11bd6c826f5f9e542de213ee1cc0`. All five outgoing files read back
+byte/blob exact; all11 production fingerprints and runtime subtree76dee769...
+are unchanged. Local module15 passed39.73s and expanded168 passed295.62s.
+One independent Astra source review has no blocking findings. Fresh active-run
+inventory found no relevant active work across SHAs; one non-force leased push
+registered exactly one new run. Its17 jobs, full-suite count, retained-audit
+check, bounded downloaded restore and proof-summary still require actual
+success and authentication. No later hosted result is claimed.
+`stage_0_5_cost_measurement_repair_launch.json` and
+`STAGE_0_5_COST_MEASUREMENT_REVIEW.md` bind this launch. Saved candidate12129336378
+and actual mature audit12148235361 remain reusable; no simulation/save/audit
+repeat or mature digest launch occurred.
 
 The handoff repair's single fresh proof is [run39167485117](https://github.com/rax0h/all-that-endures/actions/runs/39167485117),
 source`e3800ed91ca27725f0b75ff0ef38b4fd940da2bd`, created October18,2026

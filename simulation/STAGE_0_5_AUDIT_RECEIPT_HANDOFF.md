@@ -1,4 +1,19 @@
-# Mature audit passed; receipt handoff blocked
+# Mature audit passed; corrected proof pending
+
+Current proof: [39177774744](https://github.com/rax0h/all-that-endures/actions/runs/39177774744),
+created October18,2026 at23:44:30UTC, push attempt1. This is the single
+corrected proof after the cost-test failure below. The test-only GC fixture
+correction passed the complete15-test module and expanded168-check gate
+(295.62s, zero failures/errors/skips). One fresh independent Astra review found
+no blocking source findings. Published source
+`4fecd93fdcc5012a404afc07ce166cb7ff422f59`, tree
+`ea611ec99d6b11bd6c826f5f9e542de213ee1cc0`, read back exact for all five
+changed files. All11 production fingerprints and the runtime subtree remain
+unchanged. All17 jobs and the actual full suite remain pending; successful
+partial checks in the previous failed run do not satisfy this gate.
+`stage_0_5_cost_measurement_repair_launch.json` and
+`STAGE_0_5_COST_MEASUREMENT_REVIEW.md` retain the exact launch and review.
+No mature stage was launched and monitoring remains disabled.
 
 Repair status: implementation and19 targeted regressions pass locally after
 observing12 failures on the old code. All153 affected checks passed in166.02s,
@@ -49,9 +64,10 @@ sizes. The complete15-test module passed39.73s. The full module is also added
 to the early proof gate so this regression is checked before starting the
 hosted full suite. Persistence/runtime and receipt helper bytes are unchanged.
 
-The expanded early gate, final independent review and a fresh actual full-suite
-proof remain required. Successful mature save/audit evidence remains retained;
-no mature stage is repeated or advanced on this failed run.
+The expanded early gate and final independent source review now pass. The
+fresh actual full-suite proof39177774744 remains required. Successful mature
+save/audit evidence remains retained; no mature stage is repeated or advanced
+on the previous failed run.
 
 Actual audit1001 [run39152488567](https://github.com/rax0h/all-that-endures/actions/runs/39152488567)
 completed successfully October18,2026 at19:21:19UTC (14:21:19 America/Chicago).
