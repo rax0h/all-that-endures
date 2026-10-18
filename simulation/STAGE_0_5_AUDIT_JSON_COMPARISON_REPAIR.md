@@ -65,13 +65,19 @@ the existing audit_seconds metadata minor also remains deferred.
 The reviewed tree882a00bfaa24d0e4c5c0dcaf7ffa7405b52d7bc0 was published as
 `cdb0516b0423af24483eadcc5a18651e879bdc47`, all seven changed files byte/blob
 read back exact. A single fresh proof launched as [run39139421134](https://github.com/rax0h/all-that-endures/actions/runs/39139421134)
-on October18,2026 at15:12:23UTC. Its actual result remains pending. Exact source,
+on October18,2026 at15:12:23UTC. It completed successfully at17:08:05UTC. All17
+jobs passed, including2948 full-suite tests plus two subtests and134 focused
+checks. The four exact proof/restore/test-report ZIPs were downloaded, their
+producing jobs authenticated and all member sizes/hashes checked. The recursive
+restore receipt validates; its values job reports shared nested identity and
+eight counted histories. All12 helper source files read back byte/blob exact,
+and both runtime subtrees match the approved tree. Exact result evidence is
+`stage_0_5_audit_json_repair_result.json`. Exact source,
 review, evidence and next gates are in `stage_0_5_audit_json_repair_launch.json`
 and `STAGE_0_5_AUDIT_JSON_REPAIR_REVIEW.md`.
 
-The fresh proof must run all17 existing jobs, including the full simulation
-suite and actual downloaded bounded restore, on these new helper bytes. The
-old green proof cannot authorize a mature retry of changed helpers. After
-fresh proof success, independently review/pin one audit1001 retry consuming the
-same retained artifact. No SAVE rerun, automatic downstream stage, monitoring,
+The new proof12143847835 authorizes the repaired helper bytes; the prior proof
+cannot cover them. One audit1001 retry is being pinned and independently
+reviewed using the same retained artifact12129336378. Successful fixture proof
+does not establish the actual mature audit outcome. No SAVE rerun, automatic downstream stage, monitoring,
 endurance, main merge or Stage0.5 acceptance is authorized by this repair.

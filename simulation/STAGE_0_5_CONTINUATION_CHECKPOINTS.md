@@ -6,21 +6,26 @@ Independent implementation review and all 17 fresh-runner proof jobs passed.
 Actual mature gates remain pending. The old two-year command remains paused.
 The actual year-1001 save and upload succeeded. Its first separate audit
 completed but failed comparison with the original control. A confirmed JSON
-year-key comparison defect is repaired locally; fresh proof must pass on the
-new helper bytes before an audit retry can launch. The saved generation stays
+year-key comparison defect is repaired; all 17 fresh proof jobs passed on the
+new helper bytes. A single audit retry is being prepared. The saved generation stays
 retained, and year1001 simulation must not repeat to perform verification.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
 
 The comparison repair's fresh proof/full-suite run is [39139421134](https://github.com/rax0h/all-that-endures/actions/runs/39139421134),
 source `cdb0516b0423af24483eadcc5a18651e879bdc47`, created October18,2026 at
 15:12:23UTC. Local134 affected checks passed and Astra cleared proof-only
-publication of exact tree882a00bfaa24d0e4c5c0dcaf7ffa7405b52d7bc0. All seven
-published files read back exact. No mature retry is launched. On actual fresh
-green proof, authenticate its NEW summary/restore artifacts and all17 jobs,
-then prepare/review one audit1001 retry consuming saved candidate12129336378.
-The old proof's helper fingerprints cannot cover the repaired comparator.
+publication of exact tree882a00bfaa24d0e4c5c0dcaf7ffa7405b52d7bc0. The run
+completed successfully October18 at17:08:05UTC: full suite2948 tests plus two
+subtests, no failures/errors, and focused134 passed. All four proof, restore and
+test-report ZIPs and exact members were downloaded and authenticated. The
+restored receipt validates recursively, and all12 helper bytes/blobs match local.
+`stage_0_5_audit_json_repair_result.json` retains the actual evidence. The new
+proof12143847835 now pins the audit retry configuration; the exact saved
+candidate12129336378 is unchanged. Independent concrete retry review and final
+source/duplicate checks remain required before a single launch. The old proof
+cannot cover the repaired comparator.
 
-The current audit1001 is [run 39108569661](https://github.com/rax0h/all-that-endures/actions/runs/39108569661),
+The failed first audit1001 is [run 39108569661](https://github.com/rax0h/all-that-endures/actions/runs/39108569661),
 created October 18, 2026 at 07:40:49 UTC. Workflow source
 `15a54a73df6643229aa768e37dd752b425990cac` checks out harness
 `db8779cd58ced3052a25c4af833193f2d6407e4b`, config SHA256
