@@ -1,0 +1,307 @@
+{
+  "schema": "ate-receipt-handoff-repair-launch/1",
+  "run": {
+    "id": 39167485117,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39167485117",
+    "status_at_dispatch": "in_progress",
+    "conclusion_at_dispatch": null,
+    "head_sha": "e3800ed91ca27725f0b75ff0ef38b4fd940da2bd",
+    "branch": "sol/stage-0-5-continuation-checkpoints",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "event": "push",
+    "run_attempt": 1,
+    "created_at": "2026-10-18T21:21:37Z"
+  },
+  "local_source_sha": "fe2e2a56061c4136f938889a8b3248ecf0f423a8",
+  "published_source_sha": "e3800ed91ca27725f0b75ff0ef38b4fd940da2bd",
+  "reviewed_tree": "cf20288baaa0217654471d8176189d8ab1b6cd99",
+  "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "source_readback": [
+    {
+      "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+      "encoding": "utf-8",
+      "bytes": 20504,
+      "blob_sha": "bb69e059084fae8afe486ef98d4464de4c856b5a",
+      "sha256": "c2ffe6f27a6deb16dcc4e58aa6213c05b13d1342899cee501a10ca4b4abe5602"
+    },
+    {
+      "path": "simulation/STAGE_0_5_AUDIT_RECEIPT_HANDOFF.md",
+      "encoding": "utf-8",
+      "bytes": 6218,
+      "blob_sha": "cc159431b8492310978a506b43f544c693d6f3f9",
+      "sha256": "9707a9652eb618923b25843d49faca7a957c7da4f0fffe48302b90bb100417d5"
+    },
+    {
+      "path": "simulation/STAGE_0_5_CONTINUATION_CHECKPOINTS.md",
+      "encoding": "utf-8",
+      "bytes": 16283,
+      "blob_sha": "064582b179e76042d70b1b3b6cd504a5800eccac",
+      "sha256": "963a9090f054f0930d753f8b2b8c95c6f6b26cf092355b8e24cf51fa5c46461a"
+    },
+    {
+      "path": "simulation/construction_mature_continuation_stages.py",
+      "encoding": "utf-8",
+      "bytes": 22903,
+      "blob_sha": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+      "sha256": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75"
+    },
+    {
+      "path": "simulation/continuation_checkpoint_ci.py",
+      "encoding": "utf-8",
+      "bytes": 11679,
+      "blob_sha": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89",
+      "sha256": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2"
+    },
+    {
+      "path": "simulation/continuation_receipts.py",
+      "encoding": "utf-8",
+      "bytes": 33539,
+      "blob_sha": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+      "sha256": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655"
+    },
+    {
+      "path": "simulation/stage_0_5_receipt_handoff_repair_local.json",
+      "encoding": "utf-8",
+      "bytes": 3837,
+      "blob_sha": "8b1e9d65b42a574f678f9bdfc30d388c6f4abb6d",
+      "sha256": "fdae95d2f733a64edfcf7fc03aeb8e83625f1ad2aff38a1dab271a702be36798"
+    },
+    {
+      "path": "simulation/tests/fixtures/README.md",
+      "encoding": "utf-8",
+      "bytes": 823,
+      "blob_sha": "de874df61e1fd121e805d4fffccb4b17072979b0",
+      "sha256": "89b1f57244d11d25ce20cde84e4c85dce40572cb01cca043c285c4ac718c9476"
+    },
+    {
+      "path": "simulation/tests/fixtures/continuation-audit1001.zip",
+      "encoding": "base64",
+      "bytes": 35605,
+      "blob_sha": "7f460b647b58d33f12b04a31ca7a464e25ecf180",
+      "sha256": "c9b502c71e355644b26ae4b0bdb3ca3edc6dfb567335d73465da009af4cd1943"
+    },
+    {
+      "path": "simulation/tests/test_continuation_receipt_handoff.py",
+      "encoding": "utf-8",
+      "bytes": 10795,
+      "blob_sha": "fcd740321dc7e28ae07cd0d4cc4555ad9d498755",
+      "sha256": "3211255f7af0c9a06e82e73292634dabd6e535dcacd96cefca496ae2225da5ec"
+    }
+  ],
+  "all_ten_files_byte_blob_exact": true,
+  "binary_fixture_byte_blob_exact": true,
+  "tests": {
+    "red": {
+      "tests": "19",
+      "failures": "12",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.583"
+    },
+    "targeted_green": {
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.726"
+    },
+    "affected": {
+      "tests": "153",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "166.022"
+    }
+  },
+  "review": {
+    "model": "gpt-6-astra",
+    "reasoning_effort": "high",
+    "fresh_context": true,
+    "local_head": "fe2e2a56061c4136f938889a8b3248ecf0f423a8",
+    "tree": "cf20288baaa0217654471d8176189d8ab1b6cd99",
+    "critical": 0,
+    "important": 0,
+    "new_minor": 0,
+    "independent_handoff_tests": {
+      "passed": 19,
+      "seconds": 0.75
+    },
+    "scope": "ONLY one fresh proof publication; no mature launch/main/Stage0.5 acceptance",
+    "declined_to_judge": [
+      "Fresh hosted authentication/full suite/all17 proof jobs: mandatory actual pending gates.",
+      "Final remote source/binary readback/current active runs/leased publication: executor gates before single launch.",
+      "Actual digest1001/year acceptance/1002/downloaded mature restore: later mandatory gates; synthetic metadata is not mature certification.",
+      "Fresh external provenance: retained local evidence independently checked, executor performs actual remote readback."
+    ]
+  },
+  "implementation_hashes": {
+    "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+    "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+    "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+    "simulation/continuation_checkpoint_ci.py": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/persistence_p5_long_validation.py": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+    "simulation/run_long_history.py": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+    "simulation/construction_mature_continue.py": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+    "simulation/long_history_scaling.py": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+    "simulation/tests/continuation_fixtures.py": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e",
+    "simulation/construction_checkpoint_ci.py": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+    ".github/workflows/stage-0-5-continuation-proof.yml": "c2ffe6f27a6deb16dcc4e58aa6213c05b13d1342899cee501a10ca4b4abe5602"
+  },
+  "launch_inventory": {
+    "checked_at": "2026-10-18T21:21:34.734Z",
+    "statuses": [
+      {
+        "status": "queued",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "in_progress",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "waiting",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "requested",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "pending",
+        "total_count": 0,
+        "relevant_active": 0
+      }
+    ],
+    "histories": [
+      {
+        "branch": "sol/stage-0-5-continuation-checkpoints",
+        "runs": [
+          {
+            "id": 39139421134,
+            "head_sha": "cdb0516b0423af24483eadcc5a18651e879bdc47",
+            "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39090807612,
+            "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+            "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          }
+        ]
+      },
+      {
+        "branch": "sol/stage-0-5-mature-continuation-stage",
+        "runs": [
+          {
+            "id": 39152488567,
+            "head_sha": "247b5dc2f6ef5b0aa6596798e6ccad3235a6c317",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39108569661,
+            "head_sha": "15a54a73df6643229aa768e37dd752b425990cac",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 39098313631,
+            "head_sha": "94f7c72666d6bc2041ad3324ef1d2d65529f7810",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          }
+        ]
+      },
+      {
+        "branch": "sol/stage-0-5-mature-continue",
+        "runs": [
+          {
+            "id": 38992881882,
+            "head_sha": "3512bf8f379934ff7b67c4832b164ea3d01e5bc8",
+            "path": ".github/workflows/stage-0-5-mature-continue.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 38967941113,
+            "head_sha": "f7cb57099f37e329192d7dd8b92eabf9740d553d",
+            "path": ".github/workflows/stage-0-5-mature-continue.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 38920910304,
+            "head_sha": "474572acf47525505e6520b11e88c2c35e0a6132",
+            "path": ".github/workflows/stage-0-5-mature-continue.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          }
+        ]
+      }
+    ],
+    "proof_branch_expected_sha": "6926df71d533d16b933a55fac7b773326234e21e",
+    "mature_branch_sha": "6c7a66a6ab7bb33537591fa57bdebb2a2eeb63de",
+    "new_source_sha": "e3800ed91ca27725f0b75ff0ef38b4fd940da2bd"
+  },
+  "single_leased_fast_forward": true,
+  "dispatch_matches": 1,
+  "required_jobs": 17,
+  "mandatory_retained_audit_proof": {
+    "artifact": {
+      "artifact_id": 12148235361,
+      "run_id": 39152488567,
+      "workflow_sha": "247b5dc2f6ef5b0aa6596798e6ccad3235a6c317",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "producer_job": "mature-stage",
+      "name": "continuation-stage-audit-1001",
+      "archive_sha256": "c9b502c71e355644b26ae4b0bdb3ca3edc6dfb567335d73465da009af4cd1943",
+      "archive_bytes": 35605,
+      "harness_sha": "60eaf810fbc156e333722672627a8dc2caf20bc1",
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86"
+    },
+    "physical_member_sha256": "4be22bcfeea6dd71e588d8f65c4e63ab7538c2faca7c4a07640b26b2f1252b97",
+    "canonical_content_sha256": "d5b3f1c750c7355c342ed3f127a660ccd2d09d36e5a4c48951902361c04c1f0d",
+    "hosted_authentication": "pending; mandatory harness-tests step must download/authenticate original artifact and run full control validation"
+  },
+  "preserved_save": {
+    "artifact_id": 12129336378,
+    "run_id": 39098313631,
+    "year": 1001,
+    "generation": 126
+  },
+  "preserved_actual_audit": {
+    "artifact_id": 12148235361,
+    "run_id": 39152488567,
+    "full_original_control_match": true
+  },
+  "full_suite_result": "pending",
+  "fresh_proof_result": "pending; older green proof does not cover these changed helpers",
+  "simulation_repeated": false,
+  "save_repeated": false,
+  "successful_mature_audit_repeated": false,
+  "mature_digest_launched": false,
+  "monitoring_enabled": false,
+  "stage_0_5_accepted": false,
+  "next_gate": "Authenticate actual success of all17 NEW proof jobs, full suite count, four harness evidence files including retained-audit-check.json, new proof summary and recursively downloaded bounded restore. Verify exact changed-helper byte identity, then separately pin/review/launch ONLY digest1001 against saved candidate12129336378. Reuse successful audit12148235361 with exact physical SHA4be22bcf; never rerun it merely to reserialize. Year acceptance/1002/downloaded mature restore/final Astra remain mandatory."
+}

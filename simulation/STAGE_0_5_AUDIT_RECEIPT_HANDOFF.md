@@ -3,9 +3,17 @@
 Repair status: implementation and19 targeted regressions pass locally after
 observing12 failures on the old code. All153 affected checks passed in166.02s,
 with one expected duplicate-ZIP warning; the final19 handoff checks passed0.73s.
-Independent review and fresh proof/full suite are required before any mature continuation.
+Fresh independent Astra review cleared proof-only publication. The single
+new17-job proof/full-suite run is [39167485117](https://github.com/rax0h/all-that-endures/actions/runs/39167485117),
+created October18,2026 at21:21:37UTC. Source
+`e3800ed91ca27725f0b75ff0ef38b4fd940da2bd` has exact reviewed tree
+`cf20288baaa0217654471d8176189d8ab1b6cd99`; all10 changed files including the
+binary fixture read back byte/blob exact. Actual fresh proof/full-suite and
+retained-audit hosted authentication remain pending before mature continuation.
 The successful mature audit and saved generation are reused unchanged.
 `stage_0_5_receipt_handoff_repair_local.json` records the exact local gates.
+`stage_0_5_receipt_handoff_repair_launch.json` and
+`STAGE_0_5_RECEIPT_HANDOFF_REPAIR_REVIEW.md` bind the review and single launch.
 
 Actual audit1001 [run39152488567](https://github.com/rax0h/all-that-endures/actions/runs/39152488567)
 completed successfully October18,2026 at19:21:19UTC (14:21:19 America/Chicago).
