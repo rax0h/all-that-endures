@@ -1,25 +1,28 @@
 # Durable continuation implementation
 
-Current verified state: the corrected [proof39177774744](https://github.com/rax0h/all-that-endures/actions/runs/39177774744)
-completed successfully October19,2026 at01:20:29UTC. All17 jobs passed;
-full2968 tests plus two subtests (5359.67s), focused168 (342.57s), no failures
-or errors. Four exact artifacts and all members authenticate/hash-check;
-recursive actual bounded restore, actual retained mature audit/control handoff
-and all12 executing source blobs match. Both GC schedules pass strict fixed-work
-equality in the full suite. `stage_0_5_cost_measurement_repair_result.json` holds
-the result. The separate mature digest1001 is [run39198567003](https://github.com/rax0h/all-that-endures/actions/runs/39198567003),
-created October19 at04:15:33UTC, push attempt1, source
-`8ab01eed35176e5f13533bbc011b47fb6bc63335`, harness
-`12696c2ec36eba0c0a67d9b8d6351833266a1548`. It uses existing
-saved candidate12129336378/generation126 and new proof12157194329. Local46
-wrapper/transport checks passed31.41s; no executing helper or runtime changed.
-One independent Astra final review cleared only this launch, with no blocking
-findings. Exact publication/readbacks and all five active/cross-SHA/lease checks
-passed before one leased launch. `stage_0_5_digest1001_launch_result.json` and
-`STAGE_0_5_DIGEST1001_LAUNCH_REVIEW.md` bind the exact evidence. Successful
-save and audit12148235361 stay retained; simulation/save/audit will not repeat.
-Monitoring remains disabled. Actual mature digest/year acceptance/1002/separate
-fresh downloaded mature restore/final Astra remain mandatory.
+Current verified state: actual mature [digest1001 run39198567003](https://github.com/rax0h/all-that-endures/actions/runs/39198567003)
+passed October19,2026 at05:14:20UTC (00:14:20 America/Chicago). Its successful
+producer117886536957 uploaded digest12164423938 and diagnostics12165036147.
+Both exact ZIPs and all four members authenticate/hash-check. Full World digest
+57f60fdf49e221af24ffc0a1f2d5a3885dd37c07db00d153171adcb91c579eed and all25
+counters match original independent year1001 controls. Saved candidate12129336378,
+year1001/generation126, database/save/original checkpoint/runtime pins and
+retained input hashes match. Actual audit12148235361 already passed the same
+original control. Neither verification nor simulation/save must repeat.
+Exact evidence is stage_0_5_digest1001_result.json.
+
+The next separate stage is accept-year1001 using exactly those three retained
+artifacts. The actual audit and digest pass the real receipt consumer/composition
+locally, with World/simulation/save/verifiers forbidden; its synthetic local
+producer is explicitly not hosted year acceptance. Local72 affected checks
+passed27.10s with one expected ZIP warning. No runtime/helper changes exist;
+all12 execution fingerprints match green proof39177774744 (17 jobs,2968 full
+suite tests plus two subtests,168 focused). Acceptance configuration and review
+requirements are in stage_0_5_accept1001_preflight.json. One independent concrete
+launch review, final source/readback/active/lease checks and actual hosted
+acceptance still gate year1002. Monitoring remains disabled. Stage0.5 and main
+acceptance still require actual1002 verification, separate fresh downloaded
+mature restore and final Astra handoff.
 
 ## Earlier handoff and cost repair records
 

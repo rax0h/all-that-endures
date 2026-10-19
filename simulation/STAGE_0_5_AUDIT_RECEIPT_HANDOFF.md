@@ -1,31 +1,31 @@
-# Mature audit and corrected proof passed; digest1001 launched
+# Mature audit and digest passed; year1001 acceptance next
 
-Verified result: proof39177774744 completed successfully October19,2026 at
-01:20:29UTC (October18 at20:20:29 America/Chicago). All17 jobs succeeded.
-The full suite passed2968 tests plus two subtests in5359.67s,42 existing
-warnings; focused168 passed342.57s. Four ZIPs and all exact members were
-downloaded, successful producers authenticated and archive/file hashes checked.
-The restored bounded receipt validates recursively; actual retained mature audit
-12148235361 still authenticates and matches the full original control.
-All12 executing implementation blobs match the published green source and
-proof fingerprint. Both GC schedules show identical155/31/1185 cost at both
-sizes in the full suite as well as the early gate. Exact evidence is
-`stage_0_5_cost_measurement_repair_result.json`.
+Actual digest1001 run39198567003 completed successfully October19,2026 at
+05:14:20UTC. Successful producer117886536957 uploaded artifact12164423938,
+ZIP26329/SHA256b34ddc54a8462522715a697f15f0bb61bae1b456e7de1a3fa97606fcdff7dc58.
+Its exact sole digest.json is169541 bytes/SHA256
+b548f6928ba02491e92a18bfc18eaf0d058898a8aaf6a818489be4ee397620fe.
+Diagnostics12165036147 ZIP23802 and all three members authenticate/hash-check.
+Actual digest2158.247540734s, wrapper3096.651946613s. The full original digest,
+all counters, saved candidate/year1001/generation126/database/save/checkpoint/
+runtime/source chain validate and retained inputs are preserved. Actual audit
+12148235361 remains successful and immutable; no audit/simulation/save repeats.
+See stage_0_5_digest1001_result.json.
 
-Digest1001 is now [run39198567003](https://github.com/rax0h/all-that-endures/actions/runs/39198567003),
-created October19,2026 at04:15:33UTC, push attempt1. It checks retained
-candidate12129336378/year1001/generation126,
-using fresh proof12157194329. Its existing staged implementation and runtime
-are unchanged. Local46 wrapper/transport checks passed31.41s (one expected
-duplicate-ZIP warning); the real process/transport pipeline is reused from the
-actual green17-job proof. Original physical checkpoint, actual audit, complete
-original control and exact saved receipt validate. Configuration
-`stage_0_5_digest1001_preflight.json` describes the separate fresh-runner digest;
-one independent Astra concrete launch review and final exact source/readback/
-active/lease checks passed before the single launch. Records are
-`stage_0_5_digest1001_launch_result.json` and
-`STAGE_0_5_DIGEST1001_LAUNCH_REVIEW.md`. No simulation/save/successful audit repeats. Mature digest and
-downloaded mature restore are not certified by the bounded proof.
+The actual legacy audit's exact physical4be22bcf... bytes and the new canonical
+digest pass the real next-stage reader and year composition together. The local
+probe's synthetic producer is explicitly not hosted year acceptance. All72
+focused checks pass27.10s. Unchanged execution helpers and runtime match green
+17-job proof39177774744; full2968 tests plus two subtests and focused168 passed.
+Both GC schedules retain strict fixed-work equality. New acceptance pins only
+candidate12129336378/audit12148235361/digest12164423938; its runner must freshly
+authenticate the small actual receipts and candidate producer, compose the exact
+chain and successfully upload year-verified.json. It must not open/copy/download
+the mature database or repeat simulation/save/audit/digest. One independent
+concrete review and final exact source/active/lease checks precede one launch.
+Preflight is stage_0_5_accept1001_preflight.json. Monitoring remains disabled;
+actual hosted acceptance and later1002/downloaded mature restore/final Astra
+remain required before Stage0.5 acceptance.
 
 ## Previous proof launch record
 
