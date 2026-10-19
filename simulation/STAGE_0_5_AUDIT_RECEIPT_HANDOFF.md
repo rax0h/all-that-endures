@@ -1,4 +1,4 @@
-# Mature year1001 accepted; year1002 saved and retained
+# Mature year1001 accepted; year1002 saved and audited
 
 Actual acceptance run39207586140 succeeded October19,2026 at06:04:41UTC.
 Artifact12165934374 and the complete original1001 audit/digest/save/control
@@ -18,25 +18,28 @@ The small diagnostic ZIP and every member were downloaded and hash-checked;
 the4.481GB saved ZIP awaits full authentication on the next fresh runner.
 stage_0_5_save1002_result.json records the exact proof and that boundary.
 
-Only audit1002 is launched as [run39285440335](https://github.com/rax0h/all-that-endures/actions/runs/39285440335),
-created October19 at16:26:26UTC, push attempt1, exact source
-b4892fa7dac11fefc14c27c285274207be35654f, harness
-1553b2b631cfe81b11e4e3c6a4585adc02813951. Sole input12176425731 remains the
-retained saved1002/gen127 candidate. The new runner must fully authenticate the
-exact ZIP/members/files, audit a normally reopened disposable copy against the
-full original control/counters, close, preserve retained input hashes and upload
-the actual audit receipt. No simulation/save or earlier successful-stage repeat.
-65 focused checks and2final workflow checks passed; exact helper/runtime byte
-identity permits reuse of green full/protocol proof39177774744. One independent
-Astra final review found no blocking or new minor issue; final exact source,
-active/cross-SHA/input availability/ref-lease checks cleared one launch.
-300/360-minute and all existing guards remain unchanged. Exact evidence is
-stage_0_5_audit1002_launch_result.json and STAGE_0_5_AUDIT1002_LAUNCH_REVIEW.md.
-Actual audit/upload remain pending; only queued registration was inspected.
-Monitoring stays off. The next successful actual result must authenticate before
-ONLY digest1002 is separately pinned/reviewed/launched on the same saved artifact.
-1002 year/continuation acceptance, separate fresh downloaded mature restore and
-final Astra remain mandatory before Stage0.5/main.
+Actual audit run39285440335 completed successfully October19 at18:13:16UTC.
+Producer118169921065 uploaded12212295850, ZIP121101/SHA256
+6d3661d8d5114b99deba49825305e4110546632e9b7d83debab8919d273b03fc;
+sole audit.json819546/SHA256
+811c9b9f10f25084ac87d5b152bcb2583ec54b67b63f4ea94ecd1490313a090a.
+Actual receipt and diagnostics12211391143 were downloaded, ZIP/member hashes
+checked and producer/source/runtime authenticated. Full original1002 audit and
+all25 counters match, year1002/gen127/exact retained candidate12176425731;
+complete original authority/accepted1001 predecessor chain and retained input
+preservation validate. stage_0_5_audit1002_result.json records the proof.
+No successful audit, simulation, save or predecessor stage must repeat.
+
+Only digest1002 is prepared for one independent concrete launch review, on the
+SAME retained12176425731 candidate. It must authenticate/download exact full
+ZIP/members/files, normally reopen a disposable copy and compare the full digest
+and all counters with original1002 control, close normally, preserve retained
+inputs and require actual receipt upload. Runtime and12helper/proof fingerprints
+match green full/protocol proof39177774744. All existing300/360-minute and other
+guards remain unchanged. Exact source readback, focused pin/transport checks,
+one final review and immediate active/availability/ref-lease checks gate launch.
+Monitoring stays off.1002 year/continuation acceptance, separate fresh downloaded
+mature restore and final Astra remain mandatory before Stage0.5/main.
 
 ## Previous proof launch record
 

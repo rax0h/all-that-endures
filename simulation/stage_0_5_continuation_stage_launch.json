@@ -33,6 +33,6 @@
     "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59"
   },
   "schema": "ate-validation-continuation-launch/1",
-  "stage": "audit",
+  "stage": "digest",
   "year": 1002
 }
