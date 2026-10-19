@@ -1,0 +1,538 @@
+{
+  "downloaded_diagnostics": {
+    "archive_bytes": 76297,
+    "archive_sha256": "0a11f26956f86617bbe591ff3aa2142d533fe24e2c2fcf5f2ae0c19c410b57b4",
+    "id": 12176170186,
+    "members": [
+      {
+        "bytes": 89,
+        "name": "disk-start.txt",
+        "sha256": "b7763e0f75386b81b4991d45d37e70b49a650e249ac0facd8c45675cab9b629e"
+      },
+      {
+        "bytes": 612142,
+        "name": "stage-summary.json",
+        "sha256": "7bbc1f21491df430016cc8a077065be0767a405778c0d2cef8a8c449b89b343a"
+      },
+      {
+        "bytes": 21550,
+        "name": "stage.log",
+        "sha256": "52815d84dcd488e593bab7f9ca7d43f87e908ed8d60cd82597d7290fff63d595"
+      }
+    ],
+    "name": "continuation-stage-diagnostics-save-1002",
+    "producer_authenticated": true
+  },
+  "job": {
+    "completed_at": "2026-10-19T09:14:19Z",
+    "conclusion": "success",
+    "id": 117929045903,
+    "name": "mature-stage",
+    "started_at": "2026-10-19T06:53:49Z"
+  },
+  "mandatory_saved_upload": {
+    "completed_at": "2026-10-19T09:14:16Z",
+    "conclusion": "success",
+    "name": "Retain completed stage",
+    "number": 8,
+    "started_at": "2026-10-19T09:10:38Z",
+    "status": "completed"
+  },
+  "monitoring_enabled": false,
+  "next_stage": "Separate audit1002 on this exact retained saved candidate, then digest/year acceptance/continuation, separate fresh downloaded mature restore and final Astra.",
+  "original_authority": {
+    "bootstrap_generation": 125,
+    "checkpoint_bytes": 134251,
+    "checkpoint_runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+    "checkpoint_sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53",
+    "context": {
+      "harness_sha": "2c9166dcfc60370852d6fa38820dee8ec3d2e916",
+      "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+      "source_artifact": {
+        "archive_sha256": "409cf0230ff1606b7eddd587a69c22076c11447eb6497e642e584c4fd3b74ef9",
+        "id": 11870590333,
+        "run_id": 38508408370
+      }
+    },
+    "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "output_max_bytes": 38191218688,
+    "publication": {
+      "archive_bytes": 3910109453,
+      "archive_sha256": "5ea709166d2bba7f7a22d614fed604f471973ae9ff757979a4148ff197c43382",
+      "artifact_id": 12049884660,
+      "harness_sha": "73370b253f0cb14550f6f43e8a20e4b577246c31",
+      "name": "construction-mature-published",
+      "producer_job": "mature-publish",
+      "run_id": 38907665230,
+      "runtime_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+      "runtime_tree": "3c7c833dbec178dc513c21ddf1ccdaa6f79d430a",
+      "workflow_path": ".github/workflows/stage-0-5-mature-publish.yml",
+      "workflow_sha": "5fe99ca2faf0c0668ff73032fe9cc33fd1d6e9a9"
+    },
+    "published_database_bytes": 29601284096,
+    "published_database_sha256": "0d884e52a012ab55325c7111bfc1d054fa7c27aaf0947cf9ab8de4423c213e1c",
+    "source_config": {
+      "bootstrap_year": 1000,
+      "complete_format": true,
+      "initialization": "mature",
+      "milestones": [
+        1001,
+        1002
+      ],
+      "product_sha": "2bc3c85389760ff12578857f7d2a849bc5cf9201",
+      "rules_id": "stage-0-5-final-release",
+      "seed": 843000,
+      "simulation_schema": "ate-world-p2a/1"
+    },
+    "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a"
+  },
+  "retained_artifact": {
+    "archive_bytes": 4481162231,
+    "archive_sha256": "61497cbf318a51d386cac114f5e93856965a4e94768c89775e520daf99345a70",
+    "artifact_id": 12176425731,
+    "created_at": "2026-10-19T09:14:16Z",
+    "expired": false,
+    "expires_at": "2026-11-02T09:10:38Z",
+    "full_zip_downloaded_locally": false,
+    "harness_sha": "451f5f33ee3378082cb4504d9f3bbb64eaec02d6",
+    "name": "continuation-stage-save-1002",
+    "producer_authenticated": true,
+    "producer_job": "mature-stage",
+    "run_id": 39212571079,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+    "workflow_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9"
+  },
+  "run": {
+    "completed_at": "2026-10-19T09:14:20Z",
+    "conclusion": "success",
+    "created_at": "2026-10-19T06:53:47Z",
+    "head_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9",
+    "id": 39212571079,
+    "run_attempt": 1,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39212571079",
+    "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml"
+  },
+  "saved_manifest_from_authenticated_diagnostics": {
+    "bytes": 601164,
+    "checkpoint": {
+      "bytes": 134251,
+      "name": "checkpoint.json",
+      "sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53"
+    },
+    "database": {
+      "bytes": 30224322560,
+      "name": "candidate.sqlite",
+      "sha256": "02ac8fb650d0b34df47c642c8bacec3490404b6786fe39d9b0af3f02c04d1d13"
+    },
+    "generation": 127,
+    "live_after": {
+      "counters": {
+        "communities.next_community": 62,
+        "culture.next_institution": 17,
+        "culture.next_law": 16,
+        "culture.next_practice": 34,
+        "divinity.next_church": 45,
+        "economy.next_property": 8462,
+        "infrastructure.next_id": 21,
+        "institutions.next_application": 9096,
+        "institutions.next_branch": 11,
+        "institutions.next_institution": 3,
+        "institutions.next_notice": 3047,
+        "institutions.next_record": 3137,
+        "knowledge.next_claim": 11,
+        "magic_resources.next_id": 95088,
+        "materials.next_item": 33344,
+        "materials.next_lot": 104556,
+        "metaphysics.next_token": 1,
+        "next_event": 1006674,
+        "next_household": 8462,
+        "next_person": 17193,
+        "next_settlement": 6,
+        "society_accountability.next_inquiry": 2,
+        "threat_ecology.next_id": 249,
+        "transmission.next_id": 191359,
+        "warfare.next_conflict": 1
+      },
+      "year": 1002
+    },
+    "live_before": {
+      "counters": {
+        "communities.next_community": 62,
+        "culture.next_institution": 17,
+        "culture.next_law": 16,
+        "culture.next_practice": 34,
+        "divinity.next_church": 45,
+        "economy.next_property": 8462,
+        "infrastructure.next_id": 21,
+        "institutions.next_application": 9096,
+        "institutions.next_branch": 11,
+        "institutions.next_institution": 3,
+        "institutions.next_notice": 3047,
+        "institutions.next_record": 3137,
+        "knowledge.next_claim": 11,
+        "magic_resources.next_id": 95088,
+        "materials.next_item": 33344,
+        "materials.next_lot": 104556,
+        "metaphysics.next_token": 1,
+        "next_event": 1006674,
+        "next_household": 8462,
+        "next_person": 17193,
+        "next_settlement": 6,
+        "society_accountability.next_inquiry": 2,
+        "threat_ecology.next_id": 249,
+        "transmission.next_id": 191359,
+        "warfare.next_conflict": 1
+      },
+      "year": 1002
+    },
+    "matches_publication_log": true,
+    "metrics": {
+      "io": {
+        "save": {
+          "payload_read_bytes": 11489950851,
+          "payload_reads": 2235142,
+          "payload_write_bytes": 67919926,
+          "payload_writes": 219865
+        },
+        "simulation": {
+          "payload_read_bytes": 7510547757,
+          "payload_reads": 7532042,
+          "payload_write_bytes": 0,
+          "payload_writes": 0
+        }
+      },
+      "phases": {
+        "close": {
+          "cpu_seconds": 0.7444696579996162,
+          "wall_seconds": 0.753348823000124
+        },
+        "copy": {
+          "cpu_seconds": 13.994749215999988,
+          "wall_seconds": 197.92565802599995
+        },
+        "hash": {
+          "cpu_seconds": 53.22550704400055,
+          "wall_seconds": 138.27409370900023
+        },
+        "open": {
+          "cpu_seconds": 830.057988811,
+          "wall_seconds": 833.923346179
+        },
+        "save": {
+          "cpu_seconds": 2897.5440475529995,
+          "wall_seconds": 2923.6981003109995
+        },
+        "simulation": {
+          "cpu_seconds": 3358.599912357,
+          "wall_seconds": 3430.776375387
+        }
+      },
+      "working_set": {
+        "advancement_paths": {
+          "advancement_payload_loads": 8432,
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_advancement_paths": 0,
+          "logical_advancement_paths": 9470,
+          "resident_advancement_paths": 256
+        },
+        "aspirations": {
+          "aspiration_payload_loads": 4434,
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_aspirations": 0,
+          "logical_aspirations": 16157,
+          "new_aspirations": 0,
+          "reinserted_aspirations": 0,
+          "removed_aspirations": 0,
+          "resident_aspirations": 256
+        },
+        "community_memberships": {
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "community_membership_payload_loads": 450,
+          "dirty_community_memberships": 0,
+          "logical_community_memberships": 138606,
+          "resident_community_memberships": 256
+        },
+        "cross_boundary_identity_links": 0,
+        "eager_bound_objects": 60171,
+        "eager_deleted_owners": 0,
+        "eager_dirty_owners": 0,
+        "event_disk_events": 1001472,
+        "event_pending_chunks": 0,
+        "event_tail_events": 5201,
+        "genealogy_children": {
+          "bucket_payload_loads": 25,
+          "clean_cache_entries": 45,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 13654,
+          "resident_buckets": 45
+        },
+        "genealogy_parents": {
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_genealogy_parents": 0,
+          "genealogy_parent_payload_loads": 1722,
+          "logical_genealogy_parents": 17065,
+          "resident_genealogy_parents": 256
+        },
+        "identity": {
+          "live_incarnations": 100050,
+          "occurrences": 98860
+        },
+        "institution_applications": {
+          "clean_cache_entries": 111,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 9095,
+          "new_records": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 111
+        },
+        "institution_magic_records": {
+          "clean_cache_entries": 1,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 3136,
+          "new_records": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 1
+        },
+        "institution_notices": {
+          "clean_cache_entries": 15,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 3046,
+          "new_records": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 15
+        },
+        "lineage_children": {
+          "bucket_payload_loads": 34,
+          "clean_cache_entries": 63,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 22195,
+          "resident_buckets": 63
+        },
+        "lineage_nodes": {
+          "clean_cache_entries": 36,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 34313,
+          "new_records": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 36
+        },
+        "material_active_index": {
+          "bucket_payload_loads": 5,
+          "clean_cache_entries": 5,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 5,
+          "resident_buckets": 5
+        },
+        "material_items": {
+          "clean_cache_entries": 44,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 33343,
+          "new_records": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 44
+        },
+        "material_lot_index": {
+          "bucket_payload_loads": 5,
+          "clean_cache_entries": 5,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 5,
+          "resident_buckets": 5
+        },
+        "material_lots": {
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_material_lots": 0,
+          "logical_material_lots": 104555,
+          "material_lot_payload_loads": 397288,
+          "resident_material_lots": 256
+        },
+        "motives": {
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 16157,
+          "new_records": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 256
+        },
+        "owner_index": {
+          "bucket_payload_loads": 15695,
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 570,
+          "resident_buckets": 256
+        },
+        "people": {
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_people": 0,
+          "logical_people": 17192,
+          "new_people": 0,
+          "person_payload_loads": 18066,
+          "reinserted_people": 0,
+          "removed_people": 0,
+          "resident_people": 256
+        },
+        "resources": {
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_resources": 0,
+          "logical_resources": 95087,
+          "new_resources": 0,
+          "reinserted_resources": 0,
+          "removed_resources": 0,
+          "resident_resources": 256,
+          "resource_payload_loads": 38107
+        },
+        "skills": {
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_skills": 0,
+          "logical_skills": 59239,
+          "resident_skills": 256,
+          "skill_payload_loads": 6565
+        },
+        "social_adjacency": {
+          "bucket_payload_loads": 710,
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 17192,
+          "resident_buckets": 256
+        },
+        "social_edges": {
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_social_edges": 0,
+          "logical_social_edges": 120314,
+          "resident_social_edges": 256,
+          "social_edge_payload_loads": 18049
+        },
+        "social_partnerships": {
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_social_partnerships": 0,
+          "logical_social_partnerships": 13597,
+          "resident_social_partnerships": 256,
+          "social_partnership_payload_loads": 1064
+        },
+        "souls": {
+          "clean_cache_entries": 31,
+          "clean_cache_limit": 256,
+          "dirty_souls": 0,
+          "logical_souls": 17192,
+          "new_souls": 0,
+          "reinserted_souls": 0,
+          "removed_souls": 0,
+          "resident_souls": 31,
+          "soul_payload_loads": 13
+        },
+        "transmissions": {
+          "clean_cache_entries": 228,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 191358,
+          "new_records": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 228
+        },
+        "treasuries": {
+          "bucket_payload_loads": 1,
+          "clean_cache_entries": 1,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 1,
+          "resident_buckets": 1
+        },
+        "wallets": {
+          "bucket_payload_loads": 282,
+          "clean_cache_entries": 256,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 5567,
+          "resident_buckets": 256
+        }
+      }
+    },
+    "predecessor_artifact": {
+      "archive_bytes": 85723,
+      "archive_sha256": "9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a",
+      "artifact_id": 12165934374,
+      "harness_sha": "cde2920fd78ce93c026a2f5002a9b5d022307e23",
+      "name": "continuation-stage-accept-year-1001",
+      "producer_job": "mature-stage",
+      "run_id": 39207586140,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879"
+    },
+    "predecessor_receipt_sha256": "5e54ce0e4e27b6d3a17cb22ce4fda887e5f1ee9cde6c052ab2d270144367ef45",
+    "previous_generation": 126,
+    "previous_year": 1001,
+    "producer": {
+      "harness_sha": "451f5f33ee3378082cb4504d9f3bbb64eaec02d6",
+      "job": "mature-stage",
+      "run_id": 39212571079,
+      "stage": "save",
+      "workflow_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9"
+    },
+    "sha256": "9b596eb3b69d09592130e67d85acfd6bf485a40a634a8b5909c370fd3a5f0344",
+    "stage": "year-saved-unverified",
+    "year": 1002
+  },
+  "schema": "ate-mature-save1002-result/1",
+  "source_blob_readback": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "7e7bb38aceacffd1c5b2795f70d5fe9783797ab1",
+    "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+    "simulation/construction_checkpoint_ci.py": "f0b3aa9560ef07913943e5db2003ae2a5d6f3b30",
+    "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+    "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+    "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+    "simulation/continuation_checkpoint_ci.py": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89",
+    "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+    "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+    "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+    "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+    "simulation/tests/continuation_fixtures.py": "a7951e04301674c94e9b92059b20a815c272153c"
+  },
+  "stage_0_5_accepted": false,
+  "successful_stages_repeated": false,
+  "validation": {
+    "actual_output_members_authenticated_locally": false,
+    "actual_producer_runtime_and_workflow_pins_checked": true,
+    "all_counter_count": 25,
+    "complete_accepted_year1001_chain_valid": true,
+    "implementation_fingerprints_match_green_full_proof": true,
+    "live_before_after_equal_original_year1002_counters": true,
+    "next_runner_must_download_authenticate_full_exact_zip_members_and_file_hashes_before_open": true,
+    "normal_close_before_hash": true,
+    "original_checkpoint_and_config_context_control_valid": true,
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86"
+  },
+  "wrapper_seconds": 7671.673253061
+}

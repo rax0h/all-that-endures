@@ -1,32 +1,33 @@
-# Mature year1001 fully verified and accepted; save1002 launched
+# Mature year1001 accepted; year1002 saved and retained
 
 Actual acceptance run39207586140 succeeded October19,2026 at06:04:41UTC.
-Producer117913679405 uploaded12165934374, ZIP85723/SHA256
-9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a;
-sole year-verified.json570001/SHA256
-5e54ce0e4e27b6d3a17cb22ce4fda887e5f1ee9cde6c052ab2d270144367ef45.
-Output plus diagnostics12166083764 and every exact member authenticate/hash-check.
-The year1001 acceptance recursively binds the original complete checkpoint and
-controls, candidate12129336378, saved manifest72649d5b..., actual successful
-audit12148235361/physical4be22bcf... and digest12164423938/physicalb548f692...,
-original year1001/gen126/store/runtime/source identities. No successful stage
-is repeated. Complete evidence: stage_0_5_accept1001_result.json.
+Artifact12165934374 and the complete original1001 audit/digest/save/control
+chain remain immutable; stage_0_5_accept1001_result.json retains the evidence.
 
-Only save1002 is launched as run39212571079, created October19 at06:53:47UTC,
-push attempt1, from the same saved1001 candidate plus ACTUAL first-year
-acceptance12165934374. Its actual predecessor reader passes the real save1002
-dispatch boundary locally; the boundary probe stops before simulation/save and
-has no published result. The hosted stage will authenticate/copy/open the actual
-retained input, run exactly one year, save127, close/hash/preserve inputs and
-upload the closed unverified saved bundle before separate1002 audit/digest.
-Original world/config/context/control/producer/runtime pins and300/360-minute
-command/job limits remain. All62 focused save/acceptance/wrapper/transport checks
-passed297.89s with one expected ZIP warning. One independent Astra concrete review
-and exact source/readback/active/availability/lease checks cleared the single launch.
-stage_0_5_save1002_launch_result.json and STAGE_0_5_SAVE1002_LAUNCH_REVIEW.md
-bind the exact evidence. Actual1002 save/upload is pending. Monitoring stays
-off.1002 verification, actual separate fresh downloaded mature restore and final
-Astra remain required before Stage0.5 acceptance.
+Year1002 save run39212571079 completed successfully October19 at09:14:20UTC;
+its mandatory upload completed09:14:16UTC. Actual retained artifact12176425731,
+ZIP4481162231/SHA256
+61497cbf318a51d386cac114f5e93856965a4e94768c89775e520daf99345a70,
+contains the closed year1002/gen127 candidate. Authenticated diagnostics bind
+DB30224322560/SHA256
+02ac8fb650d0b34df47c642c8bacec3490404b6786fe39d9b0af3f02c04d1d13,
+exact original checkpoint and accepted1001 predecessor, saved manifest
+9b596eb3b69d09592130e67d85acfd6bf485a40a634a8b5909c370fd3a5f0344.
+All25 live counters match the original1002 control before and after save.
+The small diagnostic ZIP and every member were downloaded and hash-checked;
+the4.481GB saved ZIP awaits full authentication on the next fresh runner.
+stage_0_5_save1002_result.json records the exact proof and that boundary.
+
+Only audit1002 is prepared for final independent review, with sole input12176425731.
+It must fully authenticate/download all3exact files, copy to disposable space,
+normally reopen1002/gen127 and compare the full original audit and counters,
+then normally close, preserve input hashes and require actual receipt upload.
+No simulation/save, earlier successful-stage repeat or control regeneration.
+Runtime/helpers match green proof39177774744; focused pin/transport checks and
+one final review plus exact source/active/availability/lease checks gate launch.
+All65 focused pin/receipt/transport checks passed34.84s with one expected
+duplicate-ZIP warning. Monitoring remains off. Actual1002 audit/digest/year acceptance, continuation,
+separate fresh downloaded mature restore and final Astra still gate Stage0.5.
 
 ## Previous proof launch record
 

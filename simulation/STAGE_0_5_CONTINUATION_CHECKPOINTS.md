@@ -13,27 +13,39 @@ digest12164423938/year1001/generation126/runtime/physical receipt hash chain
 validates recursively. stage_0_5_accept1001_result.json retains exact evidence.
 No successful1001 stage must repeat.
 
-Only save1002 is launched as [run39212571079](https://github.com/rax0h/all-that-endures/actions/runs/39212571079),
-created October19 at06:53:47UTC, push attempt1, source
-661f20e1939d2efbf9d40cb2e25cc4a8131968a9, pinned harness
-451f5f33ee3378082cb4504d9f3bbb64eaec02d6. It uses the original retained1001 candidate and
-ACTUAL accepted-year receipt12165934374. The real consumer routes this precise
-predecessor into the1002 save boundary; no local mature simulation/save was run
-and the synthetic boundary probe is not hosted output. The new run must fully
-authenticate the original4.4GB saved archive and all3files, copy to disposable
-space, normally open1001/gen126, simulate exactly one year, compare live counters
-to the original1002 control, save once to127, normally close, hash/preserve all
-retained inputs and upload exactly candidate.sqlite/checkpoint.json/save.json.
-The uploaded result remains explicitly unverified until separate1002 audit and
-digest/acceptance. Original milestones[1001,1002], bootstrap1000, config/context,
-controls and producer separation remain unchanged. Runtime/helpers match green
-proof39177774744;62 focused checks passed297.89s with one expected ZIP warning.
-One independent Astra concrete review and final exact source/readback/active/
-availability/ref/lease checks passed before one launch. Exact records are
-stage_0_5_save1002_launch_result.json and STAGE_0_5_SAVE1002_LAUNCH_REVIEW.md.
-Actual1002 save/upload remains pending. No timeout or guard is relaxed.
-Monitoring remains disabled. Final1002 verification, separate actual fresh
-DOWNLOADED mature restore and final Astra are still required for Stage0.5/main.
+Year1002 save [run39212571079](https://github.com/rax0h/all-that-endures/actions/runs/39212571079)
+completed successfully October19,2026 at09:14:20UTC. The mandatory saved upload
+completed09:14:16UTC. Retained artifact12176425731 is ZIP4481162231 bytes/SHA256
+61497cbf318a51d386cac114f5e93856965a4e94768c89775e520daf99345a70,
+containing the closed year1002/gen127 candidate. Authenticated diagnostics report
+candidate.sqlite30224322560 bytes/SHA256
+02ac8fb650d0b34df47c642c8bacec3490404b6786fe39d9b0af3f02c04d1d13
+and save.json SHA256
+9b596eb3b69d09592130e67d85acfd6bf485a40a634a8b5909c370fd3a5f0344.
+Original checkpoint08208158..., accepted1001 predecessor12165934374 and every
+original config/context/control/source/runtime binding validate recursively.
+All25 live counters before and after save match the original1002 control.
+Simulation took3430.78s, save2923.70s, normal close0.75s and hash138.27s;
+wrapper7671.67s. stage_0_5_save1002_result.json records the evidence.
+The large ZIP has not been downloaded locally; the next fresh runner must
+verify the full exact ZIP, exact three members and every file hash before open.
+No successful simulation or save is repeated.
+
+Only the separate audit1002 is prepared for concrete final review. Its sole
+input is saved artifact12176425731, expected year1002/gen127. It must fully
+authenticate/download the retained archive, copy the database to disposable
+space, open it normally and compare the full audit and all counters with the
+original1002 control, close normally, preserve the input hashes and upload the
+actual audit receipt. Runtime and all12 executing helper/proof fingerprints
+match green full/protocol proof39177774744; existing300/360-minute limits and
+all disk/address/upload/extraction/source/uniqueness guards remain unchanged.
+The local dispatch probe intercepts the audit body and is not hosted evidence.
+No audit launch occurs before one independent final review, exact published
+source readback and immediate active-run/input-availability/ref-lease checks.
+All65 focused pin/receipt/transport checks passed34.84s with one expected
+duplicate-ZIP warning. Monitoring remains disabled. Actual1002 audit/digest/year acceptance,
+continuation acceptance, separate fresh DOWNLOADED mature restore and final
+Astra remain required for Stage0.5/main.
 
 ## Earlier handoff and cost repair records
 
