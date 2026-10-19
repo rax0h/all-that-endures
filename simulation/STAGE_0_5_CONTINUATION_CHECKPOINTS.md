@@ -59,21 +59,29 @@ save9b596.../year1002/gen127/complete original and accepted1001 authority chain.
 Retained inputs are preserved. Digest4390.86s, wrapper5707.89s.
 stage_0_5_digest1002_result.json retains the proof. No successful stage repeats.
 
-Only accept-year1002 is prepared for final independent review. Inputs are exact
-saved12176425731, audit12212295850, digest12217841861 and accepted1001 artifact
-12165934374. The actual three small receipt ZIPs/members/producer proofs were
-downloaded/authenticated and the real composition path locally validates their
-complete original controls/candidate/year1002gen127/accepted1001 lineage. This
-probe has a synthetic local producer and is not hosted acceptance. The actual
-stage must independently authenticate exact sources/producers/metadata/small
-receipt ZIPs and bodies, compose the year-verified receipt and require upload.
-It performs no large DB download/copy/open, simulation/save/audit/digest.
-Runtime and12executing helper/proof fingerprints match green proof39177774744;
-all existing300/360-minute and other guards remain unchanged. Focused checks,
-one final independent concrete review, exact source readback and immediate
-active/cross-SHA/input-availability/ref-lease checks gate one launch.
-Monitoring remains off. Actual1002 acceptance, continuation acceptance,
-separate fresh downloaded mature restore and final Astra still gate Stage0.5/main.
+Only accept-year1002 is launched as [run39317887835](https://github.com/rax0h/all-that-endures/actions/runs/39317887835),
+created October19 at20:16:08UTC, push attempt1, source
+3819945847f020851603ff87eba2b80e8ded1f5f, pinned harness
+9fb1a9043678b9b825a1926027c077e57e9aec4a. Inputs are exact saved12176425731,
+audit12212295850, digest12217841861 and accepted1001 artifact12165934374.
+The actual three small receipt ZIPs/members/producers were authenticated and
+the real local composition validates complete original controls/candidate/
+year1002gen127/accepted1001 lineage with a synthetic producer only. Hosted
+acceptance must independently authenticate sources/producers/exact metadata/
+receipt ZIPs/bodies, compose year-verified output and require successful upload.
+It performs no large DB download/copy/open or simulation/save/audit/digest.
+64fresh focused checks passed86.62s and2final workflow cases0.34s; runtime and12
+executing helper/proof files match green proof39177774744. One fresh independent
+Astra concrete review found no blocking/new minor issue. Exact source/readbacks,
+five-active-status/three-cross-SHA-history/zero-new-source/five-input-availability/
+ref-lease checks cleared one non-force leased launch. All300/360-minute and other
+guards remain. stage_0_5_accept1002_launch_result.json and
+STAGE_0_5_ACCEPT1002_LAUNCH_REVIEW.md retain the full record. Actual acceptance/
+upload remains pending; only queued registration was inspected. Monitoring stays
+off. After authentication, separately pin/review/launch ONLY continuation
+acceptance from immutable actual first/second year receipts and exact retained
+candidate. Separate fresh downloaded mature restore and final Astra remain
+mandatory before Stage0.5/main.
 
 ## Earlier handoff and cost repair records
 

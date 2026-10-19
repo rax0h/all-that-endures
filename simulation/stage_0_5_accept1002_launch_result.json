@@ -1,0 +1,508 @@
+{
+  "schema": "ate-mature-accept1002-launch/1",
+  "run": {
+    "id": 39317887835,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39317887835",
+    "status_at_registration": "queued",
+    "conclusion_at_registration": null,
+    "head_sha": "3819945847f020851603ff87eba2b80e8ded1f5f",
+    "branch": "sol/stage-0-5-mature-continuation-stage",
+    "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+    "event": "push",
+    "run_attempt": 1,
+    "created_at": "2026-10-19T20:16:08Z"
+  },
+  "published_harness_sha": "9fb1a9043678b9b825a1926027c077e57e9aec4a",
+  "published_launch_sha": "3819945847f020851603ff87eba2b80e8ded1f5f",
+  "local_harness_sha": "aff14c4d61508b35ac72a9fb24b9cdda836f1fed",
+  "local_launch_sha": "f0efa7a6473564b2191adc9b8845a7652a2ec822",
+  "harness_tree": "7fc96ec6baf66af62e093be8533340736b7843f5",
+  "reviewed_launch_tree": "c1b91cf00b2a5c060f14e3f0de464ee4a007c68d",
+  "stage": "accept-year",
+  "year": 1002,
+  "generation": 127,
+  "launch_config_sha256": "ad71ed2fdb7bc5eb8bef8ff62b418f4f2550ec7fec964b9edd34aee2c148dd6f",
+  "inputs": {
+    "audit": {
+      "archive_bytes": 121101,
+      "archive_sha256": "6d3661d8d5114b99deba49825305e4110546632e9b7d83debab8919d273b03fc",
+      "artifact_id": 12212295850,
+      "harness_sha": "1553b2b631cfe81b11e4e3c6a4585adc02813951",
+      "name": "continuation-stage-audit-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39285440335,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "b4892fa7dac11fefc14c27c285274207be35654f"
+    },
+    "candidate": {
+      "archive_bytes": 4481162231,
+      "archive_sha256": "61497cbf318a51d386cac114f5e93856965a4e94768c89775e520daf99345a70",
+      "artifact_id": 12176425731,
+      "harness_sha": "451f5f33ee3378082cb4504d9f3bbb64eaec02d6",
+      "name": "continuation-stage-save-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39212571079,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9"
+    },
+    "digest": {
+      "archive_bytes": 111661,
+      "archive_sha256": "7852c3cf668e07d7ab4d3317e75eccc5da24fdc46bf95a40d544cd613ae75b6d",
+      "artifact_id": 12217841861,
+      "harness_sha": "17ddfc8b14e69c581c7c8c7db17b2284ae0c111f",
+      "name": "continuation-stage-digest-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39302259054,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "f78d79b1c8ad0a7adcfe99cfc1333bb16e35bb78"
+    },
+    "previous": {
+      "archive_bytes": 85723,
+      "archive_sha256": "9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a",
+      "artifact_id": 12165934374,
+      "harness_sha": "cde2920fd78ce93c026a2f5002a9b5d022307e23",
+      "name": "continuation-stage-accept-year-1001",
+      "producer_job": "mature-stage",
+      "run_id": 39207586140,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879"
+    }
+  },
+  "candidate_database": {
+    "bytes": 30224322560,
+    "name": "candidate.sqlite",
+    "sha256": "02ac8fb650d0b34df47c642c8bacec3490404b6786fe39d9b0af3f02c04d1d13"
+  },
+  "proof": {
+    "archive_bytes": 1204,
+    "archive_sha256": "2fff03386296df1ba0e5178a966ded7ee40db5a712e3e22cc88c7da04bcefd75",
+    "artifact_id": 12157194329,
+    "harness_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "name": "continuation-small-proof",
+    "producer_job": "proof-summary",
+    "run_id": 39177774744,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59"
+  },
+  "proof_result": "stage_0_5_cost_measurement_repair_result.json",
+  "digest_result": "stage_0_5_digest1002_result.json",
+  "audit_result": "stage_0_5_audit1002_result.json",
+  "accepted_year1001_result": "stage_0_5_accept1001_result.json",
+  "actual_digest_member_sha256": "17d6b464ded02646166f5d5baae95eb6b7cd72ee2f0ed63c59c71546a576d21a",
+  "actual_digest_member_bytes": 765411,
+  "source_readback": [
+    {
+      "path": "simulation/STAGE_0_5_AUDIT_RECEIPT_HANDOFF.md",
+      "sha": "0c86edba0c77c4f7c5286186c122f544756b7135",
+      "byte_exact": true,
+      "blob_exact": true
+    },
+    {
+      "path": "simulation/STAGE_0_5_CONTINUATION_CHECKPOINTS.md",
+      "sha": "968c59587bc0d9fe3fbca7ad9071ada733891b52",
+      "byte_exact": true,
+      "blob_exact": true
+    },
+    {
+      "path": "simulation/stage_0_5_continuation_stage_launch.json",
+      "sha": "e0b26c5ba2703b99927ddb46f7fcbe106810311c",
+      "byte_exact": true,
+      "blob_exact": true
+    },
+    {
+      "path": "simulation/stage_0_5_digest1002_result.json",
+      "sha": "3d84f61ecc5e36736bce958a8126a27065a8df33",
+      "byte_exact": true,
+      "blob_exact": true
+    },
+    {
+      "path": "simulation/stage_0_5_accept1002_preflight.json",
+      "sha": "e709faa2fc0d8d2aa3cefb4e2e16877e0eb9555c",
+      "byte_exact": true,
+      "blob_exact": true
+    }
+  ],
+  "workflow_readback": {
+    "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+    "sha": "2b1de5fd499cc908b18fa94a04e86ecc18307651",
+    "byte_exact": true,
+    "blob_exact": true
+  },
+  "unchanged_execution_fingerprints": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "f4603c40fea97d9f353fb2a5369b8a43633e52a383a160057bda82d7687cddf7",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/construction_checkpoint_ci.py": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+    "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+    "simulation/construction_mature_continue.py": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+    "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+    "simulation/continuation_checkpoint_ci.py": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2",
+    "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+    "simulation/long_history_scaling.py": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+    "simulation/persistence_p5_long_validation.py": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+    "simulation/run_long_history.py": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+    "simulation/tests/continuation_fixtures.py": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e"
+  },
+  "unchanged_execution_blobs": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "7e7bb38aceacffd1c5b2795f70d5fe9783797ab1",
+    "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+    "simulation/construction_checkpoint_ci.py": "f0b3aa9560ef07913943e5db2003ae2a5d6f3b30",
+    "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+    "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+    "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+    "simulation/continuation_checkpoint_ci.py": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89",
+    "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+    "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+    "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+    "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+    "simulation/tests/continuation_fixtures.py": "a7951e04301674c94e9b92059b20a815c272153c"
+  },
+  "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "review": {
+    "reviewer": "/root/review_accept1002_concrete_launch",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "high",
+    "critical": [],
+    "important": [],
+    "new_minor": [],
+    "existing_deferred_minor": [
+      "audit_seconds metadata validation",
+      "signed-zero mismatch diagnostic details"
+    ],
+    "verdict": "Exactly one ACCEPT-YEAR1002 launch cleared subject to final hosted checks.",
+    "read_only": true,
+    "tests_rerun": false,
+    "published_launch": "3819945847f020851603ff87eba2b80e8ded1f5f",
+    "published_harness": "9fb1a9043678b9b825a1926027c077e57e9aec4a",
+    "reviewed_tree": "c1b91cf00b2a5c060f14e3f0de464ee4a007c68d",
+    "config_sha256": "ad71ed2fdb7bc5eb8bef8ff62b418f4f2550ec7fec964b9edd34aee2c148dd6f",
+    "merge_authorized": false,
+    "stage_0_5_accepted": false
+  },
+  "focused": {
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "64",
+        "time": "86.622",
+        "timestamp": "2026-10-19T15:10:54.044580-05:00",
+        "hostname": "9e5d574c8c7d"
+      }
+    ],
+    "cases": 64,
+    "sha256": "4905e96ef0a5c6ddf791f1bd4090741a51330619f914595ae44b51ba75b89ad7"
+  },
+  "final_workflow_cases": {
+    "cases": 2,
+    "seconds": 0.34,
+    "failures": 0,
+    "errors": 0
+  },
+  "local_actual_receipt_composition": {
+    "generation": 127,
+    "hosted_acceptance_or_published_output": false,
+    "original_control_candidate_lineage_and_three_actual_receipt_bodies_valid": true,
+    "passed": true,
+    "previous_year": 1001,
+    "synthetic_local_producer_only": true,
+    "world_simulation_save_audit_digest_large_download_or_copy_executed": false,
+    "year": 1002
+  },
+  "downloaded_composition_inputs": [
+    {
+      "archive_bytes": 121101,
+      "archive_sha256": "6d3661d8d5114b99deba49825305e4110546632e9b7d83debab8919d273b03fc",
+      "expires_at": "2026-11-02T18:13:12Z",
+      "id": 12212295850,
+      "member_bytes": 819546,
+      "member_name": "audit.json",
+      "member_sha256": "811c9b9f10f25084ac87d5b152bcb2583ec54b67b63f4ea94ecd1490313a090a",
+      "name": "continuation-stage-audit-1002",
+      "producer_authenticated": true,
+      "role": "audit"
+    },
+    {
+      "archive_bytes": 85723,
+      "archive_sha256": "9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a",
+      "expires_at": "2026-11-02T06:04:38Z",
+      "id": 12165934374,
+      "member_bytes": 570001,
+      "member_name": "year-verified.json",
+      "member_sha256": "5e54ce0e4e27b6d3a17cb22ce4fda887e5f1ee9cde6c052ab2d270144367ef45",
+      "name": "continuation-stage-accept-year-1001",
+      "producer_authenticated": true,
+      "role": "previous"
+    }
+  ],
+  "launch_inventory": {
+    "checked_at": "2026-10-19T20:16:04.624Z",
+    "statuses": [
+      {
+        "status": "queued",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "in_progress",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "waiting",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "requested",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "pending",
+        "total_count": 0,
+        "relevant_active": 0
+      }
+    ],
+    "histories": [
+      {
+        "branch": "sol/stage-0-5-mature-continuation-stage",
+        "runs": [
+          {
+            "id": 39302259054,
+            "head_sha": "f78d79b1c8ad0a7adcfe99cfc1333bb16e35bb78",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39285440335,
+            "head_sha": "b4892fa7dac11fefc14c27c285274207be35654f",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39212571079,
+            "head_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39207586140,
+            "head_sha": "2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39198567003,
+            "head_sha": "8ab01eed35176e5f13533bbc011b47fb6bc63335",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39152488567,
+            "head_sha": "247b5dc2f6ef5b0aa6596798e6ccad3235a6c317",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39108569661,
+            "head_sha": "15a54a73df6643229aa768e37dd752b425990cac",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 39098313631,
+            "head_sha": "94f7c72666d6bc2041ad3324ef1d2d65529f7810",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          }
+        ]
+      },
+      {
+        "branch": "sol/stage-0-5-mature-continue",
+        "runs": [
+          {
+            "id": 38992881882,
+            "head_sha": "3512bf8f379934ff7b67c4832b164ea3d01e5bc8",
+            "path": ".github/workflows/stage-0-5-mature-continue.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 38967941113,
+            "head_sha": "f7cb57099f37e329192d7dd8b92eabf9740d553d",
+            "path": ".github/workflows/stage-0-5-mature-continue.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 38920910304,
+            "head_sha": "474572acf47525505e6520b11e88c2c35e0a6132",
+            "path": ".github/workflows/stage-0-5-mature-continue.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          }
+        ]
+      },
+      {
+        "branch": "sol/stage-0-5-continuation-checkpoints",
+        "runs": [
+          {
+            "id": 39177774744,
+            "head_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+            "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39167485117,
+            "head_sha": "e3800ed91ca27725f0b75ff0ef38b4fd940da2bd",
+            "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 39139421134,
+            "head_sha": "cdb0516b0423af24483eadcc5a18651e879bdc47",
+            "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39090807612,
+            "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+            "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          }
+        ]
+      }
+    ],
+    "input_artifact_availability": [
+      {
+        "role": "audit",
+        "id": 12212295850,
+        "expired": false,
+        "archive_digest_size_and_source_match": true,
+        "expires_at": "2026-11-02T18:13:12Z"
+      },
+      {
+        "role": "candidate",
+        "id": 12176425731,
+        "expired": false,
+        "archive_digest_size_and_source_match": true,
+        "expires_at": "2026-11-02T09:10:38Z"
+      },
+      {
+        "role": "digest",
+        "id": 12217841861,
+        "expired": false,
+        "archive_digest_size_and_source_match": true,
+        "expires_at": "2026-11-02T20:04:21Z"
+      },
+      {
+        "role": "previous",
+        "id": 12165934374,
+        "expired": false,
+        "archive_digest_size_and_source_match": true,
+        "expires_at": "2026-11-02T06:04:38Z"
+      },
+      {
+        "role": "proof",
+        "id": 12157194329,
+        "expired": false,
+        "archive_digest_size_and_source_match": true,
+        "expires_at": "2026-11-02T01:20:25Z"
+      }
+    ],
+    "new_source_sha": "3819945847f020851603ff87eba2b80e8ded1f5f",
+    "new_source_runs": 0,
+    "mature_branch_sha": "36c1ed1ebc32814a55cfedbfdc8b6eeb9c0e23c6",
+    "proof_branch_sha": "0ff08b9fc85220f3d60a9d8288b6d6c129813781",
+    "final_source_tree": "c1b91cf00b2a5c060f14e3f0de464ee4a007c68d",
+    "final_workflow_readback": true
+  },
+  "single_leased_fast_forward": true,
+  "dispatch_matches": 1,
+  "guards": {
+    "command_minutes": 300,
+    "job_minutes": 360,
+    "address_guard_bytes": 8589934592,
+    "disk_before_bytes": 8657043456,
+    "disk_after_bytes": 8657043456,
+    "all_existing_disk_extraction_upload_source_and_unique_guards_unchanged": true
+  },
+  "executor_rulings": [
+    {
+      "declined": "Immediate hosted activity/history/new-source/availability/source/ref-lease state.",
+      "executor": "Verified immediately at 2026-10-19T20:16:04.624Z: five statuses empty, three cross-SHA histories completed, zero new-source runs, all4inputs plus proof available, exact source/readbacks/ancestry/tree and expected leases before one non-force update."
+    },
+    {
+      "declined": "Actual hosted ACCEPT-YEAR1002 success and uploaded receipt.",
+      "executor": "Pending run39317887835; synthetic local producer/composition establishes compatibility only. Require actual successful producing job and full output ZIP/member authentication before continuation acceptance."
+    },
+    {
+      "declined": "Large candidate download or independent reopening.",
+      "executor": "This receipt-only stage authenticates candidate producer/source/metadata and actual audit/digest bodies binding the exact candidate. No large DB download/copy/open is performed; a separate fresh downloaded mature restore remains mandatory."
+    },
+    {
+      "declined": "Continuation acceptance and fresh downloaded mature restore.",
+      "executor": "Separate later mandatory gates; no downstream stage is dispatched here and no successful predecessor is repeated."
+    },
+    {
+      "declined": "Stage0.5 acceptance or main merge.",
+      "executor": "Still withheld until complete actual mature evidence and final independent Astra review."
+    },
+    {
+      "declined": "Existing audit_seconds and signed-zero diagnostic minors.",
+      "executor": "Both remain deferred and unchanged; substantive comparisons and exact actual receipt validation remain mandatory."
+    },
+    {
+      "declined": "Monitoring or endurance execution.",
+      "executor": "Monitoring remains disabled; only exact run registration was inspected, with no subsequent run/job polling or automation enabled."
+    }
+  ],
+  "actual_hosted_accept1002_result": "pending; only registration inspected",
+  "large_candidate_downloaded_or_opened_locally": false,
+  "successful_stages_repeated": false,
+  "original_world_controls_config_context_regenerated": false,
+  "downstream_stage_launched": false,
+  "monitoring_enabled": false,
+  "stage_0_5_accepted": false,
+  "next_gate": "Authenticate actual uploaded accepted1002 producer/ZIP/member and recursive full original1001/1002 lineage, then separately pin/review/launch ONLY accept-continuation from immutable actual first/second acceptances and exact retained candidate12176425731. Separate fresh downloaded mature restore and final Astra remain mandatory."
+}
