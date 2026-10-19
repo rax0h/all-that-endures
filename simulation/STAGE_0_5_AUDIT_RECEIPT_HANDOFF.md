@@ -1,34 +1,29 @@
-# Mature audit and digest passed; year1001 acceptance launched
+# Mature year1001 fully verified and accepted; save1002 next
 
-Actual digest1001 run39198567003 completed successfully October19,2026 at
-05:14:20UTC. Successful producer117886536957 uploaded artifact12164423938,
-ZIP26329/SHA256b34ddc54a8462522715a697f15f0bb61bae1b456e7de1a3fa97606fcdff7dc58.
-Its exact sole digest.json is169541 bytes/SHA256
-b548f6928ba02491e92a18bfc18eaf0d058898a8aaf6a818489be4ee397620fe.
-Diagnostics12165036147 ZIP23802 and all three members authenticate/hash-check.
-Actual digest2158.247540734s, wrapper3096.651946613s. The full original digest,
-all counters, saved candidate/year1001/generation126/database/save/checkpoint/
-runtime/source chain validate and retained inputs are preserved. Actual audit
-12148235361 remains successful and immutable; no audit/simulation/save repeats.
-See stage_0_5_digest1001_result.json.
+Actual acceptance run39207586140 succeeded October19,2026 at06:04:41UTC.
+Producer117913679405 uploaded12165934374, ZIP85723/SHA256
+9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a;
+sole year-verified.json570001/SHA256
+5e54ce0e4e27b6d3a17cb22ce4fda887e5f1ee9cde6c052ab2d270144367ef45.
+Output plus diagnostics12166083764 and every exact member authenticate/hash-check.
+The year1001 acceptance recursively binds the original complete checkpoint and
+controls, candidate12129336378, saved manifest72649d5b..., actual successful
+audit12148235361/physical4be22bcf... and digest12164423938/physicalb548f692...,
+original year1001/gen126/store/runtime/source identities. No successful stage
+is repeated. Complete evidence: stage_0_5_accept1001_result.json.
 
-The actual legacy audit's exact physical4be22bcf... bytes and the new canonical
-digest pass the real next-stage reader and year composition together. The local
-probe's synthetic producer is explicitly not hosted year acceptance. All72
-focused checks pass27.10s. Unchanged execution helpers and runtime match green
-17-job proof39177774744; full2968 tests plus two subtests and focused168 passed.
-Both GC schedules retain strict fixed-work equality. New acceptance pins only
-candidate12129336378/audit12148235361/digest12164423938; its runner must freshly
-authenticate the small actual receipts and candidate producer, compose the exact
-chain and successfully upload year-verified.json. It must not open/copy/download
-the mature database or repeat simulation/save/audit/digest. One independent Astra
-concrete review and final exact source/active/availability/lease checks passed.
-Acceptance is run39207586140, created October19 at06:01:48UTC, push attempt1;
-stage_0_5_accept1001_launch_result.json and STAGE_0_5_ACCEPT1001_LAUNCH_REVIEW.md
-record its one exact launch. Actual hosted acceptance is still pending.
-Preflight is stage_0_5_accept1001_preflight.json. Monitoring remains disabled;
-actual hosted acceptance and later1002/downloaded mature restore/final Astra
-remain required before Stage0.5 acceptance.
+Next is only save1002 from the same saved1001 candidate plus ACTUAL first-year
+acceptance12165934374. Its actual predecessor reader passes the real save1002
+dispatch boundary locally; the boundary probe stops before simulation/save and
+has no published result. The hosted stage will authenticate/copy/open the actual
+retained input, run exactly one year, save127, close/hash/preserve inputs and
+upload the closed unverified saved bundle before separate1002 audit/digest.
+Original world/config/context/control/producer/runtime pins and300/360-minute
+command/job limits remain. All62 focused save/acceptance/wrapper/transport checks
+passed297.89s with one expected ZIP warning. One independent concrete review and exact source/
+active/availability/lease checks must clear the single launch. Monitoring stays
+off.1002 verification, actual separate fresh downloaded mature restore and final
+Astra remain required before Stage0.5 acceptance.
 
 ## Previous proof launch record
 

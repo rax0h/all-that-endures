@@ -1,33 +1,34 @@
 # Durable continuation implementation
 
-Current verified state: actual mature [digest1001 run39198567003](https://github.com/rax0h/all-that-endures/actions/runs/39198567003)
-passed October19,2026 at05:14:20UTC (00:14:20 America/Chicago). Its successful
-producer117886536957 uploaded digest12164423938 and diagnostics12165036147.
-Both exact ZIPs and all four members authenticate/hash-check. Full World digest
-57f60fdf49e221af24ffc0a1f2d5a3885dd37c07db00d153171adcb91c579eed and all25
-counters match original independent year1001 controls. Saved candidate12129336378,
-year1001/generation126, database/save/original checkpoint/runtime pins and
-retained input hashes match. Actual audit12148235361 already passed the same
-original control. Neither verification nor simulation/save must repeat.
-Exact evidence is stage_0_5_digest1001_result.json.
+Current verified state: mature year1001 is saved, fully audited, digest-verified
+and accepted. [Acceptance run39207586140](https://github.com/rax0h/all-that-endures/actions/runs/39207586140)
+completed successfully October19,2026 at06:04:41UTC. Producing job117913679405
+uploaded actual year-verified artifact12165934374: ZIP85723/SHA256
+9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a,
+sole year-verified.json570001/SHA256
+5e54ce0e4e27b6d3a17cb22ce4fda887e5f1ee9cde6c052ab2d270144367ef45.
+Exact output and diagnostics12166083764 ZIP71157/all3members authenticate.
+The complete original authority/control/candidate12129336378/save/audit12148235361/
+digest12164423938/year1001/generation126/runtime/physical receipt hash chain
+validates recursively. stage_0_5_accept1001_result.json retains exact evidence.
+No successful1001 stage must repeat.
 
-The separate accept-year1001 stage is [run39207586140](https://github.com/rax0h/all-that-endures/actions/runs/39207586140),
-created October19 at06:01:48UTC, push attempt1, source
-2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879, pinned harness
-cde2920fd78ce93c026a2f5002a9b5d022307e23. It uses exactly those three retained
-artifacts. The actual audit and digest pass the real receipt consumer/composition
-locally, with World/simulation/save/verifiers forbidden; its synthetic local
-producer is explicitly not hosted year acceptance. Local72 affected checks
-passed27.10s with one expected ZIP warning. No runtime/helper changes exist;
-all12 execution fingerprints match green proof39177774744 (17 jobs,2968 full
-suite tests plus two subtests,168 focused). Acceptance configuration and review
-requirements are in stage_0_5_accept1001_preflight.json. One independent Astra
-concrete review and final exact source/readback/active/availability/lease checks
-passed before the single launch. Actual hosted acceptance still gates year1002.
-stage_0_5_accept1001_launch_result.json and STAGE_0_5_ACCEPT1001_LAUNCH_REVIEW.md
-record the exact review and launch. Monitoring remains disabled. Stage0.5 and main
-acceptance still require actual1002 verification, separate fresh downloaded
-mature restore and final Astra handoff.
+Only save1002 is being prepared, using the original retained1001 candidate and
+ACTUAL accepted-year receipt12165934374. The real consumer routes this precise
+predecessor into the1002 save boundary; no local mature simulation/save was run
+and the synthetic boundary probe is not hosted output. The new run must fully
+authenticate the original4.4GB saved archive and all3files, copy to disposable
+space, normally open1001/gen126, simulate exactly one year, compare live counters
+to the original1002 control, save once to127, normally close, hash/preserve all
+retained inputs and upload exactly candidate.sqlite/checkpoint.json/save.json.
+The uploaded result remains explicitly unverified until separate1002 audit and
+digest/acceptance. Original milestones[1001,1002], bootstrap1000, config/context,
+controls and producer separation remain unchanged. Runtime/helpers match green
+proof39177774744;62 focused checks passed297.89s with one expected ZIP warning.
+One independent concrete review and final publication/active checks precede
+one launch. No timeout or guard is relaxed.
+Monitoring remains disabled. Final1002 verification, separate actual fresh
+DOWNLOADED mature restore and final Astra are still required for Stage0.5/main.
 
 ## Earlier handoff and cost repair records
 

@@ -1,0 +1,163 @@
+{
+  "schema": "ate-mature-save1002-preflight/1",
+  "stage": "save",
+  "year": 1002,
+  "expected_previous_year": 1001,
+  "expected_previous_generation": 126,
+  "expected_new_generation": 127,
+  "config_sha256": "cb5e88df1e35812ee9e0a0a06d681903812f661447592687e82b69aa6e351208",
+  "inputs": {
+    "candidate": {
+      "archive_bytes": 4419015875,
+      "archive_sha256": "67e52ba2f045f87b2a814e9d0dfe5b9ed7f24898d25a448437bd386869f46e2d",
+      "artifact_id": 12129336378,
+      "harness_sha": "dd795af561ca81a342fd3aa8e835db5233ef8d6b",
+      "name": "continuation-stage-save-1001",
+      "producer_job": "mature-stage",
+      "run_id": 39098313631,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "94f7c72666d6bc2041ad3324ef1d2d65529f7810"
+    },
+    "previous": {
+      "archive_bytes": 85723,
+      "archive_sha256": "9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a",
+      "artifact_id": 12165934374,
+      "harness_sha": "cde2920fd78ce93c026a2f5002a9b5d022307e23",
+      "name": "continuation-stage-accept-year-1001",
+      "producer_job": "mature-stage",
+      "run_id": 39207586140,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879"
+    }
+  },
+  "candidate_database": {
+    "bytes": 29922463744,
+    "name": "candidate.sqlite",
+    "sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2"
+  },
+  "proof": {
+    "archive_bytes": 1204,
+    "archive_sha256": "2fff03386296df1ba0e5178a966ded7ee40db5a712e3e22cc88c7da04bcefd75",
+    "artifact_id": 12157194329,
+    "harness_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "name": "continuation-small-proof",
+    "producer_job": "proof-summary",
+    "run_id": 39177774744,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59"
+  },
+  "proof_result": "stage_0_5_cost_measurement_repair_result.json",
+  "accepted_year1001_result": "stage_0_5_accept1001_result.json",
+  "actual_predecessor_member_sha256": "5e54ce0e4e27b6d3a17cb22ce4fda887e5f1ee9cde6c052ab2d270144367ef45",
+  "actual_predecessor_member_bytes": 570001,
+  "source_fingerprints": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "f4603c40fea97d9f353fb2a5369b8a43633e52a383a160057bda82d7687cddf7",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/construction_checkpoint_ci.py": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+    "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+    "simulation/construction_mature_continue.py": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+    "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+    "simulation/continuation_checkpoint_ci.py": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2",
+    "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+    "simulation/long_history_scaling.py": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+    "simulation/persistence_p5_long_validation.py": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+    "simulation/run_long_history.py": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+    "simulation/tests/continuation_fixtures.py": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e"
+  },
+  "source_blobs": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "7e7bb38aceacffd1c5b2795f70d5fe9783797ab1",
+    "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+    "simulation/construction_checkpoint_ci.py": "f0b3aa9560ef07913943e5db2003ae2a5d6f3b30",
+    "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+    "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+    "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+    "simulation/continuation_checkpoint_ci.py": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89",
+    "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+    "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+    "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+    "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+    "simulation/tests/continuation_fixtures.py": "a7951e04301674c94e9b92059b20a815c272153c"
+  },
+  "boundary_probe": {
+    "passed": true,
+    "actual_accepted_predecessor_routed_exactly": true,
+    "producer_is_synthetic_local_only": true,
+    "simulation_or_save_executed": false,
+    "published_output": false
+  },
+  "focused": {
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "62",
+        "time": "297.886",
+        "timestamp": "2026-10-19T08:41:40.593977+02:00",
+        "hostname": "2999f78485f0"
+      }
+    ],
+    "cases": 62,
+    "sha256": "ffa38971896e74b521aa1a6c03fb0fb60c1a8ddd1cc88b7f383993d6fb5ec882"
+  },
+  "focused_gate_pending": false,
+  "required_input_roles": [
+    "candidate",
+    "previous"
+  ],
+  "source_config": {
+    "milestones": [
+      1001,
+      1002
+    ],
+    "bootstrap_year": 1000,
+    "seed": 843000,
+    "rules_id": "stage-0-5-final-release",
+    "product_sha": "2bc3c85389760ff12578857f7d2a849bc5cf9201"
+  },
+  "checkpoint_producer_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+  "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "original_checkpoint_sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53",
+  "save1001_receipt_sha256": "72649d5bef65e4af16ed6cb269b26acde061b57966b728ddd633755ae667b827",
+  "output_cap_bytes": 38191218688,
+  "disk_before_bytes": 114961944576,
+  "disk_after_bytes": 85039480832,
+  "command_minutes": 300,
+  "job_minutes": 360,
+  "address_guard_bytes": 8589934592,
+  "all_existing_disk_extraction_upload_source_and_unique_guards_unchanged": true,
+  "required_hosted_actions": [
+    "Authenticate successful candidate and actual accepted-year producers, their exact source/harness/runtime pins, full ZIPs and exact member/file hashes.",
+    "Validate complete original checkpoint/config/context/control and first-year acceptance chain; require candidate exactly accepted1001/gen126.",
+    "COPY retained candidate to disposable space, normal open1001/gen126/store identity, simulate exactly one year.",
+    "Require live counters match original1002 control; save once to127 without changing live year/counters; normal close before hashing.",
+    "Preserve retained input hashes and exact original checkpoint; atomically publish closed unverified saved bundle and require full successful upload."
+  ],
+  "output_members": [
+    "candidate.sqlite",
+    "checkpoint.json",
+    "save.json"
+  ],
+  "output_status": "year-saved-unverified; no actual1002 save or verification claimed before hosted result",
+  "forbidden_actions": [
+    "1001 simulation/save/audit/digest repeat",
+    "earlier publication/world/control regeneration",
+    "full audit/digest or backup during save",
+    "automatic downstream dispatch"
+  ],
+  "independent_final_concrete_review": "required before one named-branch launch",
+  "immediate_final_source_active_availability_ref_lease_checks": "required",
+  "expected_mature_branch_sha": "8ac62e702d34464df66aa2828e86a3419ec2073d",
+  "expected_proof_branch_sha": "0ff08b9fc85220f3d60a9d8288b6d6c129813781",
+  "monitoring_enabled": false,
+  "stage_0_5_accepted": false,
+  "next_gate_after_actual_save": "Authenticate successful save1002 producer, full retained uploaded candidate identity and diagnostics/live original counters. Then separately pin/review/launch1002 audit/digest on retained new candidate, never simulate/save1002 again after successful upload. Accepted1002/final continuation/separate fresh downloaded mature restore/final Astra remain mandatory."
+}
