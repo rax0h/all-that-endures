@@ -11,16 +11,21 @@ retained input hashes match. Actual audit12148235361 already passed the same
 original control. Neither verification nor simulation/save must repeat.
 Exact evidence is stage_0_5_digest1001_result.json.
 
-The next separate stage is accept-year1001 using exactly those three retained
+The separate accept-year1001 stage is [run39207586140](https://github.com/rax0h/all-that-endures/actions/runs/39207586140),
+created October19 at06:01:48UTC, push attempt1, source
+2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879, pinned harness
+cde2920fd78ce93c026a2f5002a9b5d022307e23. It uses exactly those three retained
 artifacts. The actual audit and digest pass the real receipt consumer/composition
 locally, with World/simulation/save/verifiers forbidden; its synthetic local
 producer is explicitly not hosted year acceptance. Local72 affected checks
 passed27.10s with one expected ZIP warning. No runtime/helper changes exist;
 all12 execution fingerprints match green proof39177774744 (17 jobs,2968 full
 suite tests plus two subtests,168 focused). Acceptance configuration and review
-requirements are in stage_0_5_accept1001_preflight.json. One independent concrete
-launch review, final source/readback/active/lease checks and actual hosted
-acceptance still gate year1002. Monitoring remains disabled. Stage0.5 and main
+requirements are in stage_0_5_accept1001_preflight.json. One independent Astra
+concrete review and final exact source/readback/active/availability/lease checks
+passed before the single launch. Actual hosted acceptance still gates year1002.
+stage_0_5_accept1001_launch_result.json and STAGE_0_5_ACCEPT1001_LAUNCH_REVIEW.md
+record the exact review and launch. Monitoring remains disabled. Stage0.5 and main
 acceptance still require actual1002 verification, separate fresh downloaded
 mature restore and final Astra handoff.
 

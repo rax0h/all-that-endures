@@ -1,4 +1,4 @@
-# Mature audit and digest passed; year1001 acceptance next
+# Mature audit and digest passed; year1001 acceptance launched
 
 Actual digest1001 run39198567003 completed successfully October19,2026 at
 05:14:20UTC. Successful producer117886536957 uploaded artifact12164423938,
@@ -21,8 +21,11 @@ Both GC schedules retain strict fixed-work equality. New acceptance pins only
 candidate12129336378/audit12148235361/digest12164423938; its runner must freshly
 authenticate the small actual receipts and candidate producer, compose the exact
 chain and successfully upload year-verified.json. It must not open/copy/download
-the mature database or repeat simulation/save/audit/digest. One independent
-concrete review and final exact source/active/lease checks precede one launch.
+the mature database or repeat simulation/save/audit/digest. One independent Astra
+concrete review and final exact source/active/availability/lease checks passed.
+Acceptance is run39207586140, created October19 at06:01:48UTC, push attempt1;
+stage_0_5_accept1001_launch_result.json and STAGE_0_5_ACCEPT1001_LAUNCH_REVIEW.md
+record its one exact launch. Actual hosted acceptance is still pending.
 Preflight is stage_0_5_accept1001_preflight.json. Monitoring remains disabled;
 actual hosted acceptance and later1002/downloaded mature restore/final Astra
 remain required before Stage0.5 acceptance.
