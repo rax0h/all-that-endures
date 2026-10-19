@@ -13,7 +13,10 @@ digest12164423938/year1001/generation126/runtime/physical receipt hash chain
 validates recursively. stage_0_5_accept1001_result.json retains exact evidence.
 No successful1001 stage must repeat.
 
-Only save1002 is being prepared, using the original retained1001 candidate and
+Only save1002 is launched as [run39212571079](https://github.com/rax0h/all-that-endures/actions/runs/39212571079),
+created October19 at06:53:47UTC, push attempt1, source
+661f20e1939d2efbf9d40cb2e25cc4a8131968a9, pinned harness
+451f5f33ee3378082cb4504d9f3bbb64eaec02d6. It uses the original retained1001 candidate and
 ACTUAL accepted-year receipt12165934374. The real consumer routes this precise
 predecessor into the1002 save boundary; no local mature simulation/save was run
 and the synthetic boundary probe is not hosted output. The new run must fully
@@ -25,8 +28,10 @@ The uploaded result remains explicitly unverified until separate1002 audit and
 digest/acceptance. Original milestones[1001,1002], bootstrap1000, config/context,
 controls and producer separation remain unchanged. Runtime/helpers match green
 proof39177774744;62 focused checks passed297.89s with one expected ZIP warning.
-One independent concrete review and final publication/active checks precede
-one launch. No timeout or guard is relaxed.
+One independent Astra concrete review and final exact source/readback/active/
+availability/ref/lease checks passed before one launch. Exact records are
+stage_0_5_save1002_launch_result.json and STAGE_0_5_SAVE1002_LAUNCH_REVIEW.md.
+Actual1002 save/upload remains pending. No timeout or guard is relaxed.
 Monitoring remains disabled. Final1002 verification, separate actual fresh
 DOWNLOADED mature restore and final Astra are still required for Stage0.5/main.
 

@@ -1,4 +1,4 @@
-# Mature year1001 fully verified and accepted; save1002 next
+# Mature year1001 fully verified and accepted; save1002 launched
 
 Actual acceptance run39207586140 succeeded October19,2026 at06:04:41UTC.
 Producer117913679405 uploaded12165934374, ZIP85723/SHA256
@@ -12,7 +12,8 @@ audit12148235361/physical4be22bcf... and digest12164423938/physicalb548f692...,
 original year1001/gen126/store/runtime/source identities. No successful stage
 is repeated. Complete evidence: stage_0_5_accept1001_result.json.
 
-Next is only save1002 from the same saved1001 candidate plus ACTUAL first-year
+Only save1002 is launched as run39212571079, created October19 at06:53:47UTC,
+push attempt1, from the same saved1001 candidate plus ACTUAL first-year
 acceptance12165934374. Its actual predecessor reader passes the real save1002
 dispatch boundary locally; the boundary probe stops before simulation/save and
 has no published result. The hosted stage will authenticate/copy/open the actual
@@ -20,8 +21,10 @@ retained input, run exactly one year, save127, close/hash/preserve inputs and
 upload the closed unverified saved bundle before separate1002 audit/digest.
 Original world/config/context/control/producer/runtime pins and300/360-minute
 command/job limits remain. All62 focused save/acceptance/wrapper/transport checks
-passed297.89s with one expected ZIP warning. One independent concrete review and exact source/
-active/availability/lease checks must clear the single launch. Monitoring stays
+passed297.89s with one expected ZIP warning. One independent Astra concrete review
+and exact source/readback/active/availability/lease checks cleared the single launch.
+stage_0_5_save1002_launch_result.json and STAGE_0_5_SAVE1002_LAUNCH_REVIEW.md
+bind the exact evidence. Actual1002 save/upload is pending. Monitoring stays
 off.1002 verification, actual separate fresh downloaded mature restore and final
 Astra remain required before Stage0.5 acceptance.
 
