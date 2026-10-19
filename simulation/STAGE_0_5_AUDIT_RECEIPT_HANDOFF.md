@@ -18,16 +18,25 @@ The small diagnostic ZIP and every member were downloaded and hash-checked;
 the4.481GB saved ZIP awaits full authentication on the next fresh runner.
 stage_0_5_save1002_result.json records the exact proof and that boundary.
 
-Only audit1002 is prepared for final independent review, with sole input12176425731.
-It must fully authenticate/download all3exact files, copy to disposable space,
-normally reopen1002/gen127 and compare the full original audit and counters,
-then normally close, preserve input hashes and require actual receipt upload.
-No simulation/save, earlier successful-stage repeat or control regeneration.
-Runtime/helpers match green proof39177774744; focused pin/transport checks and
-one final review plus exact source/active/availability/lease checks gate launch.
-All65 focused pin/receipt/transport checks passed34.84s with one expected
-duplicate-ZIP warning. Monitoring remains off. Actual1002 audit/digest/year acceptance, continuation,
-separate fresh downloaded mature restore and final Astra still gate Stage0.5.
+Only audit1002 is launched as [run39285440335](https://github.com/rax0h/all-that-endures/actions/runs/39285440335),
+created October19 at16:26:26UTC, push attempt1, exact source
+b4892fa7dac11fefc14c27c285274207be35654f, harness
+1553b2b631cfe81b11e4e3c6a4585adc02813951. Sole input12176425731 remains the
+retained saved1002/gen127 candidate. The new runner must fully authenticate the
+exact ZIP/members/files, audit a normally reopened disposable copy against the
+full original control/counters, close, preserve retained input hashes and upload
+the actual audit receipt. No simulation/save or earlier successful-stage repeat.
+65 focused checks and2final workflow checks passed; exact helper/runtime byte
+identity permits reuse of green full/protocol proof39177774744. One independent
+Astra final review found no blocking or new minor issue; final exact source,
+active/cross-SHA/input availability/ref-lease checks cleared one launch.
+300/360-minute and all existing guards remain unchanged. Exact evidence is
+stage_0_5_audit1002_launch_result.json and STAGE_0_5_AUDIT1002_LAUNCH_REVIEW.md.
+Actual audit/upload remain pending; only queued registration was inspected.
+Monitoring stays off. The next successful actual result must authenticate before
+ONLY digest1002 is separately pinned/reviewed/launched on the same saved artifact.
+1002 year/continuation acceptance, separate fresh downloaded mature restore and
+final Astra remain mandatory before Stage0.5/main.
 
 ## Previous proof launch record
 

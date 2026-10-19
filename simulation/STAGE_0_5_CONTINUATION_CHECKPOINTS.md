@@ -31,21 +31,28 @@ The large ZIP has not been downloaded locally; the next fresh runner must
 verify the full exact ZIP, exact three members and every file hash before open.
 No successful simulation or save is repeated.
 
-Only the separate audit1002 is prepared for concrete final review. Its sole
-input is saved artifact12176425731, expected year1002/gen127. It must fully
-authenticate/download the retained archive, copy the database to disposable
-space, open it normally and compare the full audit and all counters with the
-original1002 control, close normally, preserve the input hashes and upload the
-actual audit receipt. Runtime and all12 executing helper/proof fingerprints
-match green full/protocol proof39177774744; existing300/360-minute limits and
-all disk/address/upload/extraction/source/uniqueness guards remain unchanged.
-The local dispatch probe intercepts the audit body and is not hosted evidence.
-No audit launch occurs before one independent final review, exact published
-source readback and immediate active-run/input-availability/ref-lease checks.
-All65 focused pin/receipt/transport checks passed34.84s with one expected
-duplicate-ZIP warning. Monitoring remains disabled. Actual1002 audit/digest/year acceptance,
-continuation acceptance, separate fresh DOWNLOADED mature restore and final
-Astra remain required for Stage0.5/main.
+Only audit1002 is launched as [run39285440335](https://github.com/rax0h/all-that-endures/actions/runs/39285440335),
+created October19 at16:26:26UTC, push attempt1, source
+b4892fa7dac11fefc14c27c285274207be35654f, harness
+1553b2b631cfe81b11e4e3c6a4585adc02813951. Its sole input is retained12176425731,
+year1002/gen127. The fresh runner must authenticate/download the full exact
+saved archive and all3files before open, copy to disposable space, normally
+reopen, compare the full original audit and all counters, normally close,
+preserve retained input hashes and require actual audit receipt upload.
+No successful simulation/save is repeated. Runtime and all12 helper/proof
+fingerprints match green full/protocol proof39177774744. All65 focused checks
+passed34.84s and final2 workflow checks passed0.22s; syntax/YAML/bash/frozen
+helpers/source/config gates pass. One fresh independent Astra review found no
+blocking or new minor issues. Final active-status/cross-SHA/source/availability/
+ref-lease checks cleared one non-force leased launch. Existing300/360-minute,
+address/disk/extraction/upload/source/uniqueness guards remain unchanged.
+Exact records: stage_0_5_audit1002_launch_result.json and
+STAGE_0_5_AUDIT1002_LAUNCH_REVIEW.md. Actual audit and upload remain pending;
+registration was queued, with no subsequent polling. Monitoring remains off.
+After authenticating actual audit output, separately pin/review/launch ONLY
+digest1002 on the SAME retained candidate. No earlier successful stage repeats.
+Actual1002 audit/digest/year acceptance, continuation, separate fresh DOWNLOADED
+mature restore and final Astra still gate Stage0.5/main.
 
 ## Earlier handoff and cost repair records
 
