@@ -5,6 +5,19 @@
     "sha256": "02ac8fb650d0b34df47c642c8bacec3490404b6786fe39d9b0af3f02c04d1d13"
   },
   "inputs": {
+    "audit": {
+      "archive_bytes": 121101,
+      "archive_sha256": "6d3661d8d5114b99deba49825305e4110546632e9b7d83debab8919d273b03fc",
+      "artifact_id": 12212295850,
+      "harness_sha": "1553b2b631cfe81b11e4e3c6a4585adc02813951",
+      "name": "continuation-stage-audit-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39285440335,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "b4892fa7dac11fefc14c27c285274207be35654f"
+    },
     "candidate": {
       "archive_bytes": 4481162231,
       "archive_sha256": "61497cbf318a51d386cac114f5e93856965a4e94768c89775e520daf99345a70",
@@ -17,6 +30,32 @@
       "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
       "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
       "workflow_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9"
+    },
+    "digest": {
+      "archive_bytes": 111661,
+      "archive_sha256": "7852c3cf668e07d7ab4d3317e75eccc5da24fdc46bf95a40d544cd613ae75b6d",
+      "artifact_id": 12217841861,
+      "harness_sha": "17ddfc8b14e69c581c7c8c7db17b2284ae0c111f",
+      "name": "continuation-stage-digest-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39302259054,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "f78d79b1c8ad0a7adcfe99cfc1333bb16e35bb78"
+    },
+    "previous": {
+      "archive_bytes": 85723,
+      "archive_sha256": "9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a",
+      "artifact_id": 12165934374,
+      "harness_sha": "cde2920fd78ce93c026a2f5002a9b5d022307e23",
+      "name": "continuation-stage-accept-year-1001",
+      "producer_job": "mature-stage",
+      "run_id": 39207586140,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879"
     }
   },
   "proof": {
@@ -33,6 +72,6 @@
     "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59"
   },
   "schema": "ate-validation-continuation-launch/1",
-  "stage": "digest",
+  "stage": "accept-year",
   "year": 1002
 }

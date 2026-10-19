@@ -1,0 +1,177 @@
+{
+  "actual_workflow_source_readback": true,
+  "downloaded_artifacts": [
+    {
+      "archive_bytes": 111661,
+      "archive_sha256": "7852c3cf668e07d7ab4d3317e75eccc5da24fdc46bf95a40d544cd613ae75b6d",
+      "expires_at": "2026-11-02T20:04:21Z",
+      "id": 12217841861,
+      "members": [
+        {
+          "bytes": 765411,
+          "name": "digest.json",
+          "sha256": "17d6b464ded02646166f5d5baae95eb6b7cd72ee2f0ed63c59c71546a576d21a"
+        }
+      ],
+      "name": "continuation-stage-digest-1002",
+      "producer_authenticated": true
+    },
+    {
+      "archive_bytes": 93767,
+      "archive_sha256": "d6421de7dbf945ed90f040d05c74dcfae60e416fc212d60d0982168650620879",
+      "expires_at": "2026-11-02T20:04:20Z",
+      "id": 12218650206,
+      "members": [
+        {
+          "bytes": 89,
+          "name": "disk-start.txt",
+          "sha256": "b7763e0f75386b81b4991d45d37e70b49a650e249ac0facd8c45675cab9b629e"
+        },
+        {
+          "bytes": 776043,
+          "name": "stage-summary.json",
+          "sha256": "1560faea70e2744ade1a13c8de27c614ba7a43a74c4f28625b9d406baf0d2d65"
+        },
+        {
+          "bytes": 15539,
+          "name": "stage.log",
+          "sha256": "666e9321b65aad55cf8ae13ccaf84a8167df9ea4723404d0aad1c41a0a885a4c"
+        }
+      ],
+      "name": "continuation-stage-diagnostics-digest-1002",
+      "producer_authenticated": true
+    }
+  ],
+  "job": {
+    "completed_at": "2026-10-19T20:04:23Z",
+    "conclusion": "success",
+    "id": 118230201721,
+    "name": "mature-stage",
+    "started_at": "2026-10-19T18:24:44Z"
+  },
+  "large_candidate_downloaded_locally": false,
+  "metrics": {
+    "io": {
+      "digest": {
+        "payload_read_bytes": 3245576960,
+        "payload_reads": 12356683,
+        "payload_write_bytes": 0,
+        "payload_writes": 0
+      }
+    },
+    "phases": {
+      "close": {
+        "cpu_seconds": 0.5754144339998675,
+        "wall_seconds": 0.616548953000347
+      },
+      "copy": {
+        "cpu_seconds": 18.102393675000002,
+        "wall_seconds": 140.81375617499998
+      },
+      "digest": {
+        "cpu_seconds": 4126.335917894,
+        "wall_seconds": 4390.860325557
+      },
+      "open": {
+        "cpu_seconds": 1024.078839627,
+        "wall_seconds": 1028.685675557
+      }
+    },
+    "working_set": {}
+  },
+  "monitoring_enabled": false,
+  "next_stage": "Only accept-year1002 from exact saved/audit/digest1002 and actual accepted1001. Continuation acceptance, independent fresh downloaded mature restore and final Astra remain mandatory.",
+  "run": {
+    "completed_at": "2026-10-19T20:04:24Z",
+    "conclusion": "success",
+    "created_at": "2026-10-19T18:24:41Z",
+    "head_sha": "f78d79b1c8ad0a7adcfe99cfc1333bb16e35bb78",
+    "id": 39302259054,
+    "run_attempt": 1,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39302259054",
+    "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml"
+  },
+  "schema": "ate-mature-digest1002-result/1",
+  "source_blob_readback": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "7e7bb38aceacffd1c5b2795f70d5fe9783797ab1",
+    "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+    "simulation/construction_checkpoint_ci.py": "f0b3aa9560ef07913943e5db2003ae2a5d6f3b30",
+    "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+    "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+    "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+    "simulation/continuation_checkpoint_ci.py": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89",
+    "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+    "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+    "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+    "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+    "simulation/tests/continuation_fixtures.py": "a7951e04301674c94e9b92059b20a815c272153c"
+  },
+  "source_fingerprints": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "f4603c40fea97d9f353fb2a5369b8a43633e52a383a160057bda82d7687cddf7",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/construction_checkpoint_ci.py": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+    "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+    "simulation/construction_mature_continue.py": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+    "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+    "simulation/continuation_checkpoint_ci.py": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2",
+    "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+    "simulation/long_history_scaling.py": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+    "simulation/persistence_p5_long_validation.py": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+    "simulation/run_long_history.py": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+    "simulation/tests/continuation_fixtures.py": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e"
+  },
+  "stage_0_5_accepted": false,
+  "successful_simulation_save_audit_digest_repeated": false,
+  "validation": {
+    "actual_digest": "2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7",
+    "all_original_digest_and_counters_match": true,
+    "binding": {
+      "candidate": {
+        "archive_bytes": 4481162231,
+        "archive_sha256": "61497cbf318a51d386cac114f5e93856965a4e94768c89775e520daf99345a70",
+        "artifact_id": 12176425731,
+        "harness_sha": "451f5f33ee3378082cb4504d9f3bbb64eaec02d6",
+        "name": "continuation-stage-save-1002",
+        "producer_job": "mature-stage",
+        "run_id": 39212571079,
+        "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+        "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+        "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "workflow_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9"
+      },
+      "checkpoint_sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53",
+      "database": {
+        "bytes": 30224322560,
+        "name": "candidate.sqlite",
+        "sha256": "02ac8fb650d0b34df47c642c8bacec3490404b6786fe39d9b0af3f02c04d1d13"
+      },
+      "generation": 127,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "save_sha256": "9b596eb3b69d09592130e67d85acfd6bf485a40a634a8b5909c370fd3a5f0344",
+      "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+      "year": 1002
+    },
+    "complete_original_and_accepted1001_chain_valid": true,
+    "counter_count": 25,
+    "digest_ref": {
+      "archive_bytes": 111661,
+      "archive_sha256": "7852c3cf668e07d7ab4d3317e75eccc5da24fdc46bf95a40d544cd613ae75b6d",
+      "artifact_id": 12217841861,
+      "harness_sha": "17ddfc8b14e69c581c7c8c7db17b2284ae0c111f",
+      "name": "continuation-stage-digest-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39302259054,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "f78d79b1c8ad0a7adcfe99cfc1333bb16e35bb78"
+    },
+    "generation": 127,
+    "input_preserved": true,
+    "member_bytes": 765411,
+    "member_sha256": "17d6b464ded02646166f5d5baae95eb6b7cd72ee2f0ed63c59c71546a576d21a",
+    "year": 1002
+  },
+  "wrapper_seconds": 5707.891544375
+}
