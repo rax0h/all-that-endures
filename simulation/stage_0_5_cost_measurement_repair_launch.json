@@ -1,0 +1,515 @@
+{
+  "schema": "ate-cost-measurement-repair-launch/1",
+  "run": {
+    "id": 39177774744,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39177774744",
+    "status_at_registration": "queued",
+    "conclusion_at_registration": null,
+    "head_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "branch": "sol/stage-0-5-continuation-checkpoints",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "event": "push",
+    "run_attempt": 1,
+    "created_at": "2026-10-18T23:44:30Z"
+  },
+  "local_source_sha": "08e70912a816e24a0e452f8281e797ee544b45ea",
+  "published_source_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+  "reviewed_tree": "ea611ec99d6b11bd6c826f5f9e542de213ee1cc0",
+  "published_parent_sha": "7eecf5db43f0386124cec28da864d197f6042d92",
+  "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "failure": {
+    "run_id": 39167485117,
+    "completed_at": "2026-10-18T23:15:14Z",
+    "successful_jobs": 15,
+    "failed_jobs": 1,
+    "skipped_jobs": 1,
+    "failed_test": "simulation/tests/test_stage_0_5_final_frozen_snapshot_authority.py::test_sealed_suffix_publish_has_fixed_unrelated_history_work",
+    "full_suite": {
+      "failed": 1,
+      "passed": 2966,
+      "passed_subtests": 2,
+      "warnings": 41,
+      "seconds": 6491.91
+    },
+    "expected_small_history_cost": [
+      155,
+      31,
+      1185
+    ],
+    "observed_large_history_cost": [
+      158,
+      32,
+      1196
+    ],
+    "diagnostic_evidence": "stage_0_5_receipt_handoff_proof_failure.json",
+    "failed_job_archive_is_forensic_only": true,
+    "retained_audit_and_bounded_downloaded_restore_passed": true
+  },
+  "correction": {
+    "production_change": false,
+    "scope": [
+      "GC fixture normalization in cost measurement test",
+      "normal and aggressive GC schedule coverage",
+      "add complete regression module to early proof selection"
+    ],
+    "exact_metric_equality_preserved": true,
+    "all_three_traversal_traps_preserved": true,
+    "tolerance_retry_or_skip_added": false,
+    "gc_state_and_threshold_restoration": true,
+    "measured_small_and_large_cost": [
+      155,
+      31,
+      1185
+    ],
+    "bounded_uncontrolled_gc_reproduction": "Only weak-alias dependency row counts varied; fixture normalization fixes the live-object closure before resetting counters.",
+    "pre_fix_parameter_selection": "Both parameters happened to pass before normalization; not reported as RED. Actual CI failure and separate GC intervention are the observed failing evidence."
+  },
+  "local_gates": {
+    "targeted": {
+      "junit": ".superpowers/sdd/2026-10-17-continuation-recovery/handoff-proof-failure/cost-green.xml",
+      "sha256": "8c8d5c2579c3eef3c2d2749cfd12da31f6f1e19a3c7f133cb8a5f23bcc0a1611",
+      "suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "15",
+          "time": "39.728",
+          "timestamp": "2026-10-19T08:36:59.981058+09:00",
+          "hostname": "b7c66ae76d97"
+        }
+      ],
+      "cases": 15,
+      "cost_measurements": [
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_frozen_snapshot_authority",
+          "name": "test_sealed_suffix_publish_has_fixed_unrelated_history_work[normal-gc]",
+          "time": "1.756",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "155"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "31"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "1185"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "155"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "31"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "1185"
+            }
+          ]
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_frozen_snapshot_authority",
+          "name": "test_sealed_suffix_publish_has_fixed_unrelated_history_work[aggressive-gc]",
+          "time": "2.146",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "155"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "31"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "1185"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "155"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "31"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "1185"
+            }
+          ]
+        }
+      ]
+    },
+    "expanded": {
+      "junit": ".superpowers/sdd/2026-10-17-continuation-recovery/handoff-proof-failure/expanded-fast-gate.xml",
+      "sha256": "36ea592cef599f9d326e81e7ea91d44c486a1ee7171f1da4dee8f38adb80ed47",
+      "suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "168",
+          "time": "295.622",
+          "timestamp": "2026-10-19T08:37:35.283391+09:00",
+          "hostname": "b7c66ae76d97"
+        }
+      ],
+      "cases": 168,
+      "cost_measurements": [
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_frozen_snapshot_authority",
+          "name": "test_sealed_suffix_publish_has_fixed_unrelated_history_work[normal-gc]",
+          "time": "1.631",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "155"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "31"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "1185"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "155"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "31"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "1185"
+            }
+          ]
+        },
+        {
+          "classname": "simulation.tests.test_stage_0_5_final_frozen_snapshot_authority",
+          "name": "test_sealed_suffix_publish_has_fixed_unrelated_history_work[aggressive-gc]",
+          "time": "2.032",
+          "properties": [
+            {
+              "name": "H1000_payload_reads",
+              "value": "155"
+            },
+            {
+              "name": "H1000_payload_writes",
+              "value": "31"
+            },
+            {
+              "name": "H1000_metadata_rows",
+              "value": "1185"
+            },
+            {
+              "name": "H10000_payload_reads",
+              "value": "155"
+            },
+            {
+              "name": "H10000_payload_writes",
+              "value": "31"
+            },
+            {
+              "name": "H10000_metadata_rows",
+              "value": "1185"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "warning_counts": {
+    "targeted": 2,
+    "expanded": 3
+  },
+  "review": {
+    "agent": "/root/review_gc_cost_fixture_final",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "high",
+    "fresh_context": true,
+    "local_head": "08e70912a816e24a0e452f8281e797ee544b45ea",
+    "tree": "ea611ec99d6b11bd6c826f5f9e542de213ee1cc0",
+    "critical": 0,
+    "important": 0,
+    "verdict": "No blocking source findings; source ready for proof-only publication conditional on expanded168 gate and executor exact-source/readback/lease checks.",
+    "executor_conditions_satisfied": true,
+    "scope": "ONE corrected proof launch only. No mature progression or Stage0.5/main acceptance.",
+    "reviewer_declined_to_certify": [
+      "Hosted state/provenance and final remote readback/lease; executor performed before launch.",
+      "Production-byte comparison to published e3800ed object absent from local Git; executor verified exact fingerprints and published tree.",
+      "Fresh hosted full suite and all17 jobs remain actual pending gates."
+    ]
+  },
+  "source_readback": [
+    {
+      "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7e7bb38aceacffd1c5b2795f70d5fe9783797ab1",
+      "bytes": 20580,
+      "sha256": "f4603c40fea97d9f353fb2a5369b8a43633e52a383a160057bda82d7687cddf7",
+      "byte_exact": true,
+      "blob_exact": true
+    },
+    {
+      "path": "simulation/STAGE_0_5_AUDIT_RECEIPT_HANDOFF.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "39fbf23ec09f4cd43b22ef40449692f6b8064d06",
+      "bytes": 9163,
+      "sha256": "91686f2f4b71dfd38e1c0eb7e0313dba2af79a3d5857da8ad45c94efbb71b317",
+      "byte_exact": true,
+      "blob_exact": true
+    },
+    {
+      "path": "simulation/STAGE_0_5_CONTINUATION_CHECKPOINTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3625df00393f27663b0dae0860585350dca9f222",
+      "bytes": 17906,
+      "sha256": "b75dbbf744de4975ad5d7758ec4c32e396fa2102c9ea0800c6956da9401dd417",
+      "byte_exact": true,
+      "blob_exact": true
+    },
+    {
+      "path": "simulation/stage_0_5_receipt_handoff_proof_failure.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ff9f554d37ec5d8abd762cf49ced6aeccc4b0c57",
+      "bytes": 24729,
+      "sha256": "0037186b3ba8c488fabdc907eb36cf6d2dcf7db2d7323d8a2c6ca7736644d944",
+      "byte_exact": true,
+      "blob_exact": true
+    },
+    {
+      "path": "simulation/tests/test_stage_0_5_final_frozen_snapshot_authority.py",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "12055b6f7a33e2631e761b966d254c2359cbc8e5",
+      "bytes": 10657,
+      "sha256": "125b6599e7a0e5ca05cf21ec55857ec060020470ed4f2fc4a4c79fb4e9293fa6",
+      "byte_exact": true,
+      "blob_exact": true
+    }
+  ],
+  "all_five_files_byte_blob_exact": true,
+  "unchanged_production": {
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "production_fingerprints": [
+      {
+        "path": "simulation/continuation_receipts.py",
+        "sha256": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+        "blob_sha": "55b169ce1c68c71a2a51e21d31d9c1713d457876"
+      },
+      {
+        "path": "simulation/continuation_checkpoint.py",
+        "sha256": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+        "blob_sha": "82b160779b6c4b93254cae7a74f394e92ca74f1b"
+      },
+      {
+        "path": "simulation/construction_mature_continuation_stages.py",
+        "sha256": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+        "blob_sha": "b1227c199d9de3bbdf04f297bda6b943f1435e5c"
+      },
+      {
+        "path": "simulation/continuation_checkpoint_ci.py",
+        "sha256": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2",
+        "blob_sha": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89"
+      },
+      {
+        "path": "simulation/checkpoint_artifacts.py",
+        "sha256": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+        "blob_sha": "c7a1a679e4929fb27931ef0204c5ff3264d1def1"
+      },
+      {
+        "path": "simulation/persistence_p5_long_validation.py",
+        "sha256": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+        "blob_sha": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191"
+      },
+      {
+        "path": "simulation/run_long_history.py",
+        "sha256": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+        "blob_sha": "14af337a4cb000269add4c6ac594fca5f78e5592"
+      },
+      {
+        "path": "simulation/construction_mature_continue.py",
+        "sha256": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+        "blob_sha": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333"
+      },
+      {
+        "path": "simulation/long_history_scaling.py",
+        "sha256": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+        "blob_sha": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8"
+      },
+      {
+        "path": "simulation/tests/continuation_fixtures.py",
+        "sha256": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e",
+        "blob_sha": "a7951e04301674c94e9b92059b20a815c272153c"
+      },
+      {
+        "path": "simulation/construction_checkpoint_ci.py",
+        "sha256": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+        "blob_sha": "f0b3aa9560ef07913943e5db2003ae2a5d6f3b30"
+      }
+    ]
+  },
+  "launch_inventory": {
+    "checked_at": "2026-10-18T23:44:24.463Z",
+    "statuses": [
+      {
+        "status": "queued",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "in_progress",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "waiting",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "requested",
+        "total_count": 0,
+        "relevant_active": 0
+      },
+      {
+        "status": "pending",
+        "total_count": 0,
+        "relevant_active": 0
+      }
+    ],
+    "histories": [
+      {
+        "branch": "sol/stage-0-5-continuation-checkpoints",
+        "runs": [
+          {
+            "id": 39167485117,
+            "head_sha": "e3800ed91ca27725f0b75ff0ef38b4fd940da2bd",
+            "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 39139421134,
+            "head_sha": "cdb0516b0423af24483eadcc5a18651e879bdc47",
+            "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39090807612,
+            "head_sha": "084f6a9e90614b9df6189d0501bcc38cd6a9175f",
+            "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          }
+        ]
+      },
+      {
+        "branch": "sol/stage-0-5-mature-continuation-stage",
+        "runs": [
+          {
+            "id": 39152488567,
+            "head_sha": "247b5dc2f6ef5b0aa6596798e6ccad3235a6c317",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          },
+          {
+            "id": 39108569661,
+            "head_sha": "15a54a73df6643229aa768e37dd752b425990cac",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 39098313631,
+            "head_sha": "94f7c72666d6bc2041ad3324ef1d2d65529f7810",
+            "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1
+          }
+        ]
+      },
+      {
+        "branch": "sol/stage-0-5-mature-continue",
+        "runs": [
+          {
+            "id": 38992881882,
+            "head_sha": "3512bf8f379934ff7b67c4832b164ea3d01e5bc8",
+            "path": ".github/workflows/stage-0-5-mature-continue.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 38967941113,
+            "head_sha": "f7cb57099f37e329192d7dd8b92eabf9740d553d",
+            "path": ".github/workflows/stage-0-5-mature-continue.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          },
+          {
+            "id": 38920910304,
+            "head_sha": "474572acf47525505e6520b11e88c2c35e0a6132",
+            "path": ".github/workflows/stage-0-5-mature-continue.yml",
+            "status": "completed",
+            "conclusion": "failure",
+            "run_attempt": 1
+          }
+        ]
+      }
+    ],
+    "new_source_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "proof_branch_sha": "7eecf5db43f0386124cec28da864d197f6042d92",
+    "mature_branch_sha": "6c7a66a6ab7bb33537591fa57bdebb2a2eeb63de",
+    "new_source_runs": 0,
+    "root_tree_readback": "ea611ec99d6b11bd6c826f5f9e542de213ee1cc0"
+  },
+  "single_leased_fast_forward": true,
+  "dispatch_matches": 1,
+  "required_jobs": 17,
+  "fresh_full_suite_result": "pending; no new result inferred from older green runs or successful partial jobs",
+  "fresh_proof_result": "pending",
+  "preserved_save": {
+    "artifact_id": 12129336378,
+    "run_id": 39098313631,
+    "year": 1001,
+    "generation": 126
+  },
+  "preserved_actual_audit": {
+    "artifact_id": 12148235361,
+    "run_id": 39152488567,
+    "physical_member_sha256": "4be22bcfeea6dd71e588d8f65c4e63ab7538c2faca7c4a07640b26b2f1252b97",
+    "canonical_content_sha256": "d5b3f1c750c7355c342ed3f127a660ccd2d09d36e5a4c48951902361c04c1f0d"
+  },
+  "simulation_repeated": false,
+  "save_repeated": false,
+  "successful_mature_audit_repeated": false,
+  "mature_digest_launched": false,
+  "monitoring_enabled": false,
+  "stage_0_5_accepted": false,
+  "next_gate": "Authenticate actual success of all17 jobs in39177774744, actual full-suite count, four harness evidence files including retained-audit-check.json, new proof-summary and recursively downloaded bounded restore. Then separately pin/review/launch ONLY digest1001 against retained candidate12129336378 with original audit12148235361. Year acceptance/1002/separate fresh downloaded mature restore/final Astra remain mandatory."
+}

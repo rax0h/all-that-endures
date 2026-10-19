@@ -1,0 +1,76 @@
+{
+  "schema": "ate-receipt-handoff-repair-local/1",
+  "base_local_sha": "7cb4101282c72263b37e75cb241d11042bc32306",
+  "base_published_sha": "6c7a66a6ab7bb33537591fa57bdebb2a2eeb63de",
+  "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "tests": {
+    "red": {
+      "tests": "19",
+      "failures": "12",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.583"
+    },
+    "targeted_green": {
+      "tests": "19",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.726"
+    },
+    "affected": {
+      "tests": "153",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "166.022"
+    }
+  },
+  "implementation_hashes": {
+    "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+    "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+    "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+    "simulation/continuation_checkpoint_ci.py": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/persistence_p5_long_validation.py": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+    "simulation/run_long_history.py": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+    "simulation/construction_mature_continue.py": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+    "simulation/long_history_scaling.py": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+    "simulation/tests/continuation_fixtures.py": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e",
+    "simulation/construction_checkpoint_ci.py": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+    ".github/workflows/stage-0-5-continuation-proof.yml": "c2ffe6f27a6deb16dcc4e58aa6213c05b13d1342899cee501a10ca4b4abe5602"
+  },
+  "retained_audit": {
+    "artifact": {
+      "artifact_id": 12148235361,
+      "run_id": 39152488567,
+      "workflow_sha": "247b5dc2f6ef5b0aa6596798e6ccad3235a6c317",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "producer_job": "mature-stage",
+      "name": "continuation-stage-audit-1001",
+      "archive_sha256": "c9b502c71e355644b26ae4b0bdb3ca3edc6dfb567335d73465da009af4cd1943",
+      "archive_bytes": 35605,
+      "harness_sha": "60eaf810fbc156e333722672627a8dc2caf20bc1",
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86"
+    },
+    "member_bytes": 223650,
+    "physical_member_sha256": "4be22bcfeea6dd71e588d8f65c4e63ab7538c2faca7c4a07640b26b2f1252b97",
+    "decoded_canonical_sha256": "d5b3f1c750c7355c342ed3f127a660ccd2d09d36e5a4c48951902361c04c1f0d",
+    "reader_passes": true,
+    "full_original_control_matches": true,
+    "input_file_unchanged": true
+  },
+  "acceptance_proofs_use_physical_sha256": true,
+  "schema_changed": false,
+  "ate_sim_changed": false,
+  "frozen_helpers_unchanged": true,
+  "actual_mature_digest_performed": false,
+  "simulation_or_audit_repeated": false,
+  "review": "pending",
+  "fresh_proof": "pending; earlier proof does not cover these changed helpers",
+  "monitoring_enabled": false,
+  "stage_0_5_accepted": false,
+  "next_gate": "Independent final implementation/proof launch review, exact publication readback and one fresh17-job proof/full-suite including actual retained audit download. Only on its actual success pin new proof and separately review/launch digest1001 for unchanged candidate12129336378."
+}

@@ -1,0 +1,205 @@
+{
+  "schema": "ate-mature-digest1001-preflight/1",
+  "stage": "digest",
+  "year": 1001,
+  "generation": 126,
+  "config_sha256": "f8625cbbdd2738bbdf39578fd2a8e6f0d0fe3385828be9aa644ae9cdf5019907",
+  "candidate": {
+    "archive_bytes": 4419015875,
+    "archive_sha256": "67e52ba2f045f87b2a814e9d0dfe5b9ed7f24898d25a448437bd386869f46e2d",
+    "artifact_id": 12129336378,
+    "harness_sha": "dd795af561ca81a342fd3aa8e835db5233ef8d6b",
+    "name": "continuation-stage-save-1001",
+    "producer_job": "mature-stage",
+    "run_id": 39098313631,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+    "workflow_sha": "94f7c72666d6bc2041ad3324ef1d2d65529f7810"
+  },
+  "candidate_database": {
+    "bytes": 29922463744,
+    "name": "candidate.sqlite",
+    "sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2"
+  },
+  "proof": {
+    "artifact_id": 12157194329,
+    "run_id": 39177774744,
+    "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "producer_job": "proof-summary",
+    "name": "continuation-small-proof",
+    "archive_sha256": "2fff03386296df1ba0e5178a966ded7ee40db5a712e3e22cc88c7da04bcefd75",
+    "archive_bytes": 1204,
+    "harness_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86"
+  },
+  "proof_result": "stage_0_5_cost_measurement_repair_result.json",
+  "proof_all17_jobs_passed": true,
+  "proof_full_suite_passed": 2968,
+  "proof_full_suite_passed_subtests": 2,
+  "proof_focused_passed": 168,
+  "implementation_fingerprints": {
+    ".github/workflows/stage-0-5-continuation-proof.yml": "f4603c40fea97d9f353fb2a5369b8a43633e52a383a160057bda82d7687cddf7",
+    "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+    "simulation/construction_checkpoint_ci.py": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+    "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+    "simulation/construction_mature_continue.py": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+    "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+    "simulation/continuation_checkpoint_ci.py": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2",
+    "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+    "simulation/long_history_scaling.py": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+    "simulation/persistence_p5_long_validation.py": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+    "simulation/run_long_history.py": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+    "simulation/tests/continuation_fixtures.py": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e"
+  },
+  "source_blob_readback": [
+    {
+      "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+      "blob_sha": "7e7bb38aceacffd1c5b2795f70d5fe9783797ab1",
+      "blob_exact": true,
+      "sha256": "f4603c40fea97d9f353fb2a5369b8a43633e52a383a160057bda82d7687cddf7"
+    },
+    {
+      "path": "simulation/checkpoint_artifacts.py",
+      "blob_sha": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+      "blob_exact": true,
+      "sha256": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6"
+    },
+    {
+      "path": "simulation/construction_checkpoint_ci.py",
+      "blob_sha": "f0b3aa9560ef07913943e5db2003ae2a5d6f3b30",
+      "blob_exact": true,
+      "sha256": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03"
+    },
+    {
+      "path": "simulation/construction_mature_continuation_stages.py",
+      "blob_sha": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+      "blob_exact": true,
+      "sha256": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75"
+    },
+    {
+      "path": "simulation/construction_mature_continue.py",
+      "blob_sha": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+      "blob_exact": true,
+      "sha256": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee"
+    },
+    {
+      "path": "simulation/continuation_checkpoint.py",
+      "blob_sha": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+      "blob_exact": true,
+      "sha256": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b"
+    },
+    {
+      "path": "simulation/continuation_checkpoint_ci.py",
+      "blob_sha": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89",
+      "blob_exact": true,
+      "sha256": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2"
+    },
+    {
+      "path": "simulation/continuation_receipts.py",
+      "blob_sha": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+      "blob_exact": true,
+      "sha256": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655"
+    },
+    {
+      "path": "simulation/long_history_scaling.py",
+      "blob_sha": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+      "blob_exact": true,
+      "sha256": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79"
+    },
+    {
+      "path": "simulation/persistence_p5_long_validation.py",
+      "blob_sha": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+      "blob_exact": true,
+      "sha256": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510"
+    },
+    {
+      "path": "simulation/run_long_history.py",
+      "blob_sha": "14af337a4cb000269add4c6ac594fca5f78e5592",
+      "blob_exact": true,
+      "sha256": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c"
+    },
+    {
+      "path": "simulation/tests/continuation_fixtures.py",
+      "blob_sha": "a7951e04301674c94e9b92059b20a815c272153c",
+      "blob_exact": true,
+      "sha256": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e"
+    }
+  ],
+  "local_validation": {
+    "focused": {
+      "suites": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "tests": "46",
+          "time": "31.411",
+          "timestamp": "2026-10-19T04:09:16.784935+00:00",
+          "hostname": "010df276addb"
+        }
+      ],
+      "sha256": "7254e03e53a72cc75e6d4122c5777097998a13864c33252dc6a738649c566da6"
+    },
+    "actual_retained_audit_full_control_match": true,
+    "original_checkpoint_valid": true,
+    "saved_receipt_sha256": "72649d5bef65e4af16ed6cb269b26acde061b57966b728ddd633755ae667b827",
+    "candidate_year": 1001,
+    "candidate_generation": 126
+  },
+  "retained_actual_audit": {
+    "archive_bytes": 35605,
+    "archive_sha256": "c9b502c71e355644b26ae4b0bdb3ca3edc6dfb567335d73465da009af4cd1943",
+    "artifact_id": 12148235361,
+    "harness_sha": "60eaf810fbc156e333722672627a8dc2caf20bc1",
+    "name": "continuation-stage-audit-1001",
+    "producer_job": "mature-stage",
+    "run_id": 39152488567,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+    "workflow_sha": "247b5dc2f6ef5b0aa6596798e6ccad3235a6c317"
+  },
+  "original_checkpoint_sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53",
+  "original_checkpoint_bytes": 134251,
+  "execution_runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "execution_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "checkpoint_producer_sha": "bbc3cbf11becb58aa4b9483114559fd1296878f1",
+  "original_source_product_sha": "2bc3c85389760ff12578857f7d2a849bc5cf9201",
+  "required_input_roles": [
+    "candidate"
+  ],
+  "output_member": "digest.json",
+  "expected_output_stage": "year-digest-verified",
+  "required_hosted_actions": [
+    "Authenticate successful saved producer, exact full4.4GB ZIP and exact three regular-file members; no local large download is claimed.",
+    "Hash/validate database, original checkpoint, save receipt, original control, year1001/generation126/store identity before normal open.",
+    "COPY retained candidate to disposable space; normally open, compute complete World digest and all counters against original bound control; normally close.",
+    "Prove retained input hashes unchanged and publish only digest.json through successful mandatory upload."
+  ],
+  "forbidden_actions": [
+    "simulation",
+    "save",
+    "full audit repeat",
+    "backup",
+    "original world/control regeneration",
+    "downstream dispatch"
+  ],
+  "command_minutes": 300,
+  "job_minutes": 360,
+  "address_guard_bytes": 8589934592,
+  "all_existing_disk_extraction_upload_unique_guards_unchanged": true,
+  "successful_save_repeated": false,
+  "successful_audit_repeated": false,
+  "actual_mature_digest_result": "not yet run; no result or mature-duration guarantee inferred from bounded fixtures",
+  "independent_concrete_launch_review": "required before named-branch publication/launch",
+  "immediate_final_active_inventory": "required across all five statuses and old/new mature/proof histories before one leased launch",
+  "expected_mature_branch_sha": "6c7a66a6ab7bb33537591fa57bdebb2a2eeb63de",
+  "expected_proof_branch_sha": "0ff08b9fc85220f3d60a9d8288b6d6c129813781",
+  "monitoring_enabled": false,
+  "stage_0_5_accepted": false,
+  "next_gate_after_actual_digest": "Authenticate actual successful digest receipt and diagnostics; then separately review/pin/launch accept-year1001 using saved12129336378 and exact successful audit12148235361. Year1002 gates, separate fresh downloaded mature restore and final Astra remain mandatory."
+}

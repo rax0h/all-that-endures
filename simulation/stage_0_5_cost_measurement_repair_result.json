@@ -1,0 +1,564 @@
+{
+  "schema": "ate-cost-measurement-repair-result/1",
+  "run": {
+    "id": 39177774744,
+    "url": "https://github.com/rax0h/all-that-endures/actions/runs/39177774744",
+    "source": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "run_attempt": 1,
+    "conclusion": "success",
+    "created_at": "2026-10-18T23:44:30Z",
+    "completed_at": "2026-10-19T01:20:29Z"
+  },
+  "jobs": [
+    {
+      "id": 117823901254,
+      "name": "harness-tests",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:44:33Z",
+      "completed_at": "2026-10-18T23:50:27Z"
+    },
+    {
+      "id": 117825088932,
+      "name": "full-suite",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:50:29Z",
+      "completed_at": "2026-10-19T01:20:04Z"
+    },
+    {
+      "id": 117825089000,
+      "name": "source",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:50:30Z",
+      "completed_at": "2026-10-18T23:50:53Z"
+    },
+    {
+      "id": 117825173598,
+      "name": "save1",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:50:55Z",
+      "completed_at": "2026-10-18T23:51:21Z"
+    },
+    {
+      "id": 117825265963,
+      "name": "interrupt-audit1",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:51:23Z",
+      "completed_at": "2026-10-18T23:51:47Z"
+    },
+    {
+      "id": 117825265971,
+      "name": "digest1",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:51:23Z",
+      "completed_at": "2026-10-18T23:51:39Z"
+    },
+    {
+      "id": 117825353647,
+      "name": "audit1",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:51:49Z",
+      "completed_at": "2026-10-18T23:52:17Z"
+    },
+    {
+      "id": 117825453880,
+      "name": "accept1",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:52:19Z",
+      "completed_at": "2026-10-18T23:52:48Z"
+    },
+    {
+      "id": 117825552000,
+      "name": "save2",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:52:49Z",
+      "completed_at": "2026-10-18T23:53:16Z"
+    },
+    {
+      "id": 117825649163,
+      "name": "digest2",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:53:19Z",
+      "completed_at": "2026-10-18T23:53:45Z"
+    },
+    {
+      "id": 117825649189,
+      "name": "audit2",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:53:19Z",
+      "completed_at": "2026-10-18T23:53:45Z"
+    },
+    {
+      "id": 117825743583,
+      "name": "accept2",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:53:47Z",
+      "completed_at": "2026-10-18T23:54:11Z"
+    },
+    {
+      "id": 117825832841,
+      "name": "continued",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:54:13Z",
+      "completed_at": "2026-10-18T23:54:43Z"
+    },
+    {
+      "id": 117825937815,
+      "name": "restore-values",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:54:45Z",
+      "completed_at": "2026-10-18T23:55:11Z"
+    },
+    {
+      "id": 117825937830,
+      "name": "restore-digest",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:54:45Z",
+      "completed_at": "2026-10-18T23:55:10Z"
+    },
+    {
+      "id": 117826030635,
+      "name": "restored",
+      "conclusion": "success",
+      "started_at": "2026-10-18T23:55:13Z",
+      "completed_at": "2026-10-18T23:55:44Z"
+    },
+    {
+      "id": 117845078455,
+      "name": "proof-summary",
+      "conclusion": "success",
+      "started_at": "2026-10-19T01:20:06Z",
+      "completed_at": "2026-10-19T01:20:28Z"
+    }
+  ],
+  "job_count": 17,
+  "all_jobs_passed": true,
+  "full_suite": {
+    "passed": 2968,
+    "passed_subtests": 2,
+    "xml_tests": 2970,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "warnings": 42,
+    "wall_seconds_from_log": 5359.67
+  },
+  "focused": {
+    "passed": 168,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "warnings": 3,
+    "wall_seconds_from_log": 342.57
+  },
+  "downloaded_artifacts": [
+    {
+      "id": 12157194329,
+      "name": "continuation-small-proof",
+      "producer_job": "proof-summary",
+      "archive_bytes": 1204,
+      "archive_sha256": "2fff03386296df1ba0e5178a966ded7ee40db5a712e3e22cc88c7da04bcefd75",
+      "expires_at": "2026-11-02T01:20:25Z",
+      "members": [
+        {
+          "name": "proof.json",
+          "bytes": 2382,
+          "sha256": "04b3a19214792b9a9bf1f6b5e7fab7204ddb4fd40ccc80a13f70779aa0458ed1"
+        }
+      ],
+      "producer_authenticated": true
+    },
+    {
+      "id": 12157073178,
+      "name": "continuation-checkpoints-full-suite",
+      "producer_job": "full-suite",
+      "archive_bytes": 64855,
+      "archive_sha256": "049da188ba4341e170df7243c598a0e4e977e5a62c4be1c3a2be47c1450f8d28",
+      "expires_at": "2026-11-02T01:20:00Z",
+      "members": [
+        {
+          "name": "full-suite.log",
+          "bytes": 16194,
+          "sha256": "8e4c624b2aaf694edf5a353bc39c6297bf69f85306a361b00334ced4e21ccddb"
+        },
+        {
+          "name": "full-suite.xml",
+          "bytes": 506211,
+          "sha256": "3b091f6fdc9ed21a42468f40ce0cff2aa7ce3d78838dab997ca125a832355311"
+        }
+      ],
+      "producer_authenticated": true
+    },
+    {
+      "id": 12155620482,
+      "name": "continuation-checkpoints-tests",
+      "producer_job": "harness-tests",
+      "archive_bytes": 5436,
+      "archive_sha256": "c8e216ebfc4572994d2956f18ddeebbfbac88a5d9a91ba340d89a98a008476bb",
+      "expires_at": "2026-11-01T23:50:25Z",
+      "members": [
+        {
+          "name": "protocol-tests.log",
+          "bytes": 1328,
+          "sha256": "c822fb8b29a7dc83c90b118d1b53d939bc8b4dcc1ebdea100f424d07e3206f83"
+        },
+        {
+          "name": "protocol-tests.xml",
+          "bytes": 28299,
+          "sha256": "14e29d1acd7b9bca20684b5f36347ede50e86cf6a413311270fde16349beba21"
+        },
+        {
+          "name": "retained-audit-check.json",
+          "bytes": 963,
+          "sha256": "a1e67f0426881405edef0f2ab3d7fdb7e39defe9423f326218cb9dd7b63238c0"
+        },
+        {
+          "name": "retained-audit.log",
+          "bytes": 417,
+          "sha256": "3158f8bdc780fedba28f5d16f2cd2f906335a8976307c370ce9d78e011929740"
+        }
+      ],
+      "producer_authenticated": true
+    },
+    {
+      "id": 12155391931,
+      "name": "continuation-small-restored",
+      "producer_job": "restored",
+      "archive_bytes": 194090,
+      "archive_sha256": "383953e494f14bafa1ce680d8f812b12ec8c796b8a05e406bc9ea04ab34ef9e7",
+      "expires_at": "2026-11-01T23:55:41Z",
+      "members": [
+        {
+          "name": "restore-verified.json",
+          "bytes": 1260719,
+          "sha256": "6f52acbcbe48043c3c36df3f8165cb5b203c2bdb60471283f9b8dedc819139b0"
+        }
+      ],
+      "producer_authenticated": true
+    }
+  ],
+  "proof": {
+    "artifact_id": 12157194329,
+    "run_id": 39177774744,
+    "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+    "producer_job": "proof-summary",
+    "name": "continuation-small-proof",
+    "archive_sha256": "2fff03386296df1ba0e5178a966ded7ee40db5a712e3e22cc88c7da04bcefd75",
+    "archive_bytes": 1204,
+    "harness_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86"
+  },
+  "proof_member_sha256": "04b3a19214792b9a9bf1f6b5e7fab7204ddb4fd40ccc80a13f70779aa0458ed1",
+  "source_blob_readback": [
+    {
+      "path": ".github/workflows/stage-0-5-continuation-proof.yml",
+      "blob_sha": "7e7bb38aceacffd1c5b2795f70d5fe9783797ab1",
+      "blob_exact": true,
+      "sha256": "f4603c40fea97d9f353fb2a5369b8a43633e52a383a160057bda82d7687cddf7"
+    },
+    {
+      "path": "simulation/checkpoint_artifacts.py",
+      "blob_sha": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+      "blob_exact": true,
+      "sha256": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6"
+    },
+    {
+      "path": "simulation/construction_checkpoint_ci.py",
+      "blob_sha": "f0b3aa9560ef07913943e5db2003ae2a5d6f3b30",
+      "blob_exact": true,
+      "sha256": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03"
+    },
+    {
+      "path": "simulation/construction_mature_continuation_stages.py",
+      "blob_sha": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+      "blob_exact": true,
+      "sha256": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75"
+    },
+    {
+      "path": "simulation/construction_mature_continue.py",
+      "blob_sha": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+      "blob_exact": true,
+      "sha256": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee"
+    },
+    {
+      "path": "simulation/continuation_checkpoint.py",
+      "blob_sha": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+      "blob_exact": true,
+      "sha256": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b"
+    },
+    {
+      "path": "simulation/continuation_checkpoint_ci.py",
+      "blob_sha": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89",
+      "blob_exact": true,
+      "sha256": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2"
+    },
+    {
+      "path": "simulation/continuation_receipts.py",
+      "blob_sha": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+      "blob_exact": true,
+      "sha256": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655"
+    },
+    {
+      "path": "simulation/long_history_scaling.py",
+      "blob_sha": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+      "blob_exact": true,
+      "sha256": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79"
+    },
+    {
+      "path": "simulation/persistence_p5_long_validation.py",
+      "blob_sha": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+      "blob_exact": true,
+      "sha256": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510"
+    },
+    {
+      "path": "simulation/run_long_history.py",
+      "blob_sha": "14af337a4cb000269add4c6ac594fca5f78e5592",
+      "blob_exact": true,
+      "sha256": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c"
+    },
+    {
+      "path": "simulation/tests/continuation_fixtures.py",
+      "blob_sha": "a7951e04301674c94e9b92059b20a815c272153c",
+      "blob_exact": true,
+      "sha256": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e"
+    }
+  ],
+  "validation": {
+    "source_fingerprints_match": true,
+    "fingerprints": {
+      ".github/workflows/stage-0-5-continuation-proof.yml": "f4603c40fea97d9f353fb2a5369b8a43633e52a383a160057bda82d7687cddf7",
+      "simulation/checkpoint_artifacts.py": "553f872c182d246c40986be36438ada91117eee009822aa92b9fd0eeed92f7a6",
+      "simulation/construction_checkpoint_ci.py": "981d32b0b066f96b89a6dcfec50cb80208c410cc03e37491eb06064a2c176f03",
+      "simulation/construction_mature_continuation_stages.py": "68e6d14c8426d97f737e13f8cf89fab05b5cebc9d8dc8e10a5d1a3d43352cd75",
+      "simulation/construction_mature_continue.py": "a0b530969656da12ee75173478980e8999b30b6000d19fe1ac695f1947c873ee",
+      "simulation/continuation_checkpoint.py": "03acb13c644d73553cd842f8c1fd7f78fd096f503d4f21660b4623537b6b514b",
+      "simulation/continuation_checkpoint_ci.py": "18df56933ed8d1327a70a20c3ff8f12b6d89f375f6d86399bba35e630f528fb2",
+      "simulation/continuation_receipts.py": "0e4ef0cb53b6b9d110bd22009a7e9d54ad83b52bf96d1f446cbf747526bb7655",
+      "simulation/long_history_scaling.py": "985612ac5207d646a39ec2c36870e65d4f16a9571b2e26219685642e76236d79",
+      "simulation/persistence_p5_long_validation.py": "7ae326f2b52362493f485fa5102f69d4b939ef4bac6880232662bff461a0b510",
+      "simulation/run_long_history.py": "9c23308c1ca47364076ffe20ee3d517ecc3cb396672d1c34232913c024c37e6c",
+      "simulation/tests/continuation_fixtures.py": "36007fbed4d0b3f3010669aae0ef952f8e3cd2123a9e8bb1f5002286f360193e"
+    },
+    "source_blobs": {
+      ".github/workflows/stage-0-5-continuation-proof.yml": "7e7bb38aceacffd1c5b2795f70d5fe9783797ab1",
+      "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+      "simulation/construction_checkpoint_ci.py": "f0b3aa9560ef07913943e5db2003ae2a5d6f3b30",
+      "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+      "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+      "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+      "simulation/continuation_checkpoint_ci.py": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89",
+      "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+      "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+      "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+      "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+      "simulation/tests/continuation_fixtures.py": "a7951e04301674c94e9b92059b20a815c272153c"
+    },
+    "recursive_bounded_restore_valid": true,
+    "restore_ref": {
+      "artifact_id": 12155391931,
+      "run_id": 39177774744,
+      "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+      "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
+      "producer_job": "restored",
+      "name": "continuation-small-restored",
+      "archive_sha256": "383953e494f14bafa1ce680d8f812b12ec8c796b8a05e406bc9ea04ab34ef9e7",
+      "archive_bytes": 194090,
+      "harness_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86"
+    },
+    "restore_member_sha256": "6f52acbcbe48043c3c36df3f8165cb5b203c2bdb60471283f9b8dedc819139b0",
+    "retained_audit": {
+      "artifact": {
+        "archive_bytes": 35605,
+        "archive_sha256": "c9b502c71e355644b26ae4b0bdb3ca3edc6dfb567335d73465da009af4cd1943",
+        "artifact_id": 12148235361,
+        "harness_sha": "60eaf810fbc156e333722672627a8dc2caf20bc1",
+        "name": "continuation-stage-audit-1001",
+        "producer_job": "mature-stage",
+        "run_id": 39152488567,
+        "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+        "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+        "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "workflow_sha": "247b5dc2f6ef5b0aa6596798e6ccad3235a6c317"
+      },
+      "canonical_sha256": "d5b3f1c750c7355c342ed3f127a660ccd2d09d36e5a4c48951902361c04c1f0d",
+      "full_original_control_match": true,
+      "generation": 126,
+      "input_preserved": true,
+      "member_bytes": 223650,
+      "member_sha256": "4be22bcfeea6dd71e588d8f65c4e63ab7538c2faca7c4a07640b26b2f1252b97",
+      "stage": "retained-audit-compatible",
+      "year": 1001
+    },
+    "test_reports": {
+      "focused": {
+        "suites": [
+          {
+            "name": "pytest",
+            "errors": "0",
+            "failures": "0",
+            "skipped": "0",
+            "tests": "168",
+            "time": "342.569",
+            "timestamp": "2026-10-18T23:44:40.288685+00:00",
+            "hostname": "runnervm8k3b6"
+          }
+        ],
+        "cases": 168,
+        "cost_measurements": [
+          {
+            "classname": "simulation.tests.test_stage_0_5_final_frozen_snapshot_authority",
+            "name": "test_sealed_suffix_publish_has_fixed_unrelated_history_work[normal-gc]",
+            "time": "1.531",
+            "properties": [
+              {
+                "name": "H1000_payload_reads",
+                "value": "155"
+              },
+              {
+                "name": "H1000_payload_writes",
+                "value": "31"
+              },
+              {
+                "name": "H1000_metadata_rows",
+                "value": "1185"
+              },
+              {
+                "name": "H10000_payload_reads",
+                "value": "155"
+              },
+              {
+                "name": "H10000_payload_writes",
+                "value": "31"
+              },
+              {
+                "name": "H10000_metadata_rows",
+                "value": "1185"
+              }
+            ]
+          },
+          {
+            "classname": "simulation.tests.test_stage_0_5_final_frozen_snapshot_authority",
+            "name": "test_sealed_suffix_publish_has_fixed_unrelated_history_work[aggressive-gc]",
+            "time": "1.811",
+            "properties": [
+              {
+                "name": "H1000_payload_reads",
+                "value": "155"
+              },
+              {
+                "name": "H1000_payload_writes",
+                "value": "31"
+              },
+              {
+                "name": "H1000_metadata_rows",
+                "value": "1185"
+              },
+              {
+                "name": "H10000_payload_reads",
+                "value": "155"
+              },
+              {
+                "name": "H10000_payload_writes",
+                "value": "31"
+              },
+              {
+                "name": "H10000_metadata_rows",
+                "value": "1185"
+              }
+            ]
+          }
+        ]
+      },
+      "full": {
+        "suites": [
+          {
+            "name": "pytest",
+            "errors": "0",
+            "failures": "0",
+            "skipped": "0",
+            "tests": "2970",
+            "time": "5359.579",
+            "timestamp": "2026-10-18T23:50:40.593699+00:00",
+            "hostname": "runnervm8k3b6"
+          }
+        ],
+        "cases": 2968,
+        "cost_measurements": [
+          {
+            "classname": "simulation.tests.test_stage_0_5_final_frozen_snapshot_authority",
+            "name": "test_sealed_suffix_publish_has_fixed_unrelated_history_work[normal-gc]",
+            "time": "1.333",
+            "properties": [
+              {
+                "name": "H1000_payload_reads",
+                "value": "155"
+              },
+              {
+                "name": "H1000_payload_writes",
+                "value": "31"
+              },
+              {
+                "name": "H1000_metadata_rows",
+                "value": "1185"
+              },
+              {
+                "name": "H10000_payload_reads",
+                "value": "155"
+              },
+              {
+                "name": "H10000_payload_writes",
+                "value": "31"
+              },
+              {
+                "name": "H10000_metadata_rows",
+                "value": "1185"
+              }
+            ]
+          },
+          {
+            "classname": "simulation.tests.test_stage_0_5_final_frozen_snapshot_authority",
+            "name": "test_sealed_suffix_publish_has_fixed_unrelated_history_work[aggressive-gc]",
+            "time": "1.762",
+            "properties": [
+              {
+                "name": "H1000_payload_reads",
+                "value": "155"
+              },
+              {
+                "name": "H1000_payload_writes",
+                "value": "31"
+              },
+              {
+                "name": "H1000_metadata_rows",
+                "value": "1185"
+              },
+              {
+                "name": "H10000_payload_reads",
+                "value": "155"
+              },
+              {
+                "name": "H10000_payload_writes",
+                "value": "31"
+              },
+              {
+                "name": "H10000_metadata_rows",
+                "value": "1185"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "actual_mature_restore_proven": false,
+  "preserved_save_artifact": 12129336378,
+  "preserved_actual_audit_artifact": 12148235361,
+  "mature_simulation_or_save_repeated": false,
+  "monitoring_enabled": false,
+  "stage_0_5_accepted": false,
+  "next_stage": "separately reviewed digest1001 on saved candidate12129336378; no audit or simulation/save repeat"
+}

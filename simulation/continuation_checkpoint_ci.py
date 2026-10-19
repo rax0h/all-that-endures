@@ -133,6 +133,25 @@ def proof_summary(root):
         restore_artifact=ref.to_dict(),restore_receipt_sha256=r.file_hash(root/'restored/restore-verified.json')))
 
 
+def retained_audit(root):
+    """Authenticate and consume the existing mature audit; no World is opened."""
+    ref = r.RETAINED_AUDIT
+    source = root/'retained'
+    runner.download_ref(ref,source,members={'audit.json'})
+    before = r.file_hash(source/'audit.json')
+    authority = runner.mature_authority()
+    row = runner._small({'audit':source},'audit','audit.json',ref,authority)
+    r.validate_verification(row,authority,kind='audit',binding=row['binding'])
+    if r.file_hash(source/'audit.json') != before:
+        raise ValueError('retained audit proof changed input')
+    r.publish_receipt(root/'output/retained-audit-check.json',dict(
+        stage='retained-audit-compatible',artifact=ref.to_dict(),
+        member_bytes=(source/'audit.json').stat().st_size,member_sha256=before,
+        canonical_sha256=r.receipt_hash(row),year=row['binding']['year'],
+        generation=row['binding']['generation'],input_preserved=True,
+        full_original_control_match=True))
+
+
 def fixture_features(root,saved,authority):
     """Point-check the bounded fixture's shared alias and real counted storage."""
     before = {p.name:r.file_hash(p) for p in saved.iterdir()}
@@ -153,7 +172,7 @@ def fixture_features(root,saved,authority):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--job',choices=sorted(set(ROLES)|{'source','interrupt-audit1','proof-summary'}),required=True)
+    parser.add_argument('--job',choices=sorted(set(ROLES)|{'source','interrupt-audit1','proof-summary','retained-audit'}),required=True)
     args = parser.parse_args(argv)
     resource.setrlimit(resource.RLIMIT_AS,(runner.MARGIN,runner.MARGIN))
     runner.check_source()
@@ -164,6 +183,9 @@ def main(argv=None):
     if root.exists():raise FileExistsError(root)
     root.mkdir()
     runner.check_space(runner.MARGIN+runner.SMALL_SPACE+4*FIXTURE_CAP)
+    if args.job=='retained-audit':
+        retained_audit(root)
+        return
     if args.job=='source':
         build_source(root/'output')
         return

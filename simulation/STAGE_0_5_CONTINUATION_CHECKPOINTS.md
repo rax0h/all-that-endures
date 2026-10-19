@@ -1,17 +1,75 @@
 # Durable continuation implementation
 
+Current verified state: the corrected [proof39177774744](https://github.com/rax0h/all-that-endures/actions/runs/39177774744)
+completed successfully October19,2026 at01:20:29UTC. All17 jobs passed;
+full2968 tests plus two subtests (5359.67s), focused168 (342.57s), no failures
+or errors. Four exact artifacts and all members authenticate/hash-check;
+recursive actual bounded restore, actual retained mature audit/control handoff
+and all12 executing source blobs match. Both GC schedules pass strict fixed-work
+equality in the full suite. `stage_0_5_cost_measurement_repair_result.json` holds
+the result. The separate mature digest1001 is now prepared against the existing
+saved candidate12129336378/generation126 and new proof12157194329. Local46
+wrapper/transport checks passed31.41s; no executing helper or runtime changed.
+The concrete launch still requires one independent review and final exact
+publication/active checks. See `stage_0_5_digest1001_preflight.json`. Successful
+save and audit12148235361 stay retained; simulation/save/audit will not repeat.
+Monitoring remains disabled. Actual mature digest/year acceptance/1002/separate
+fresh downloaded mature restore/final Astra remain mandatory.
+
+## Earlier handoff and cost repair records
+
 Implementation status: the local saved-year protocol, separate verification,
 receipt composition, independent restore and runner wiring are implemented.
-Independent implementation review and all 17 fresh-runner proof jobs passed.
+Earlier independent implementation review and17-job proofs passed. The current
+handoff repair still requires a successful full-suite proof.
 Actual mature gates remain pending. The old two-year command remains paused.
 The actual year-1001 save and upload succeeded. Its first separate audit
 completed but failed comparison with the original control. The JSON year-key
 comparison repair passed all17 fresh proof jobs. The actual audit retry then
 passed and its downloaded receipt matches the full original control. The next
 acceptance consumer rejects that receipt's noncanonical byte ordering; the
-receipt writer/readback handoff needs a separately validated repair. The saved generation stays
+receipt writer/readback handoff repair passed153 affected checks and independent
+Astra review. Run39167485117 then passed the handoff, retained-audit and bounded
+restore checks but failed one full-suite cost assertion. A test-only GC-state
+measurement repair passed168 affected checks and independent Astra review;
+the single corrected proof39177774744 is launched. The saved generation stays
 retained, and year1001 simulation must not repeat to perform verification.
 Monitoring remains disabled. Stage 0.5 is unaccepted.
+
+Current corrected proof: [39177774744](https://github.com/rax0h/all-that-endures/actions/runs/39177774744),
+created October18,2026 at23:44:30UTC, push attempt1, source
+`4fecd93fdcc5012a404afc07ce166cb7ff422f59`, reviewed tree
+`ea611ec99d6b11bd6c826f5f9e542de213ee1cc0`. All five outgoing files read back
+byte/blob exact; all11 production fingerprints and runtime subtree76dee769...
+are unchanged. Local module15 passed39.73s and expanded168 passed295.62s.
+One independent Astra source review has no blocking findings. Fresh active-run
+inventory found no relevant active work across SHAs; one non-force leased push
+registered exactly one new run. Its17 jobs, full-suite count, retained-audit
+check, bounded downloaded restore and proof-summary still require actual
+success and authentication. No later hosted result is claimed.
+`stage_0_5_cost_measurement_repair_launch.json` and
+`STAGE_0_5_COST_MEASUREMENT_REVIEW.md` bind this launch. Saved candidate12129336378
+and actual mature audit12148235361 remain reusable; no simulation/save/audit
+repeat or mature digest launch occurred.
+
+The handoff repair's single fresh proof is [run39167485117](https://github.com/rax0h/all-that-endures/actions/runs/39167485117),
+source`e3800ed91ca27725f0b75ff0ef38b4fd940da2bd`, created October18,2026
+at21:21:37UTC, push attempt1. It failed at23:15:14UTC:15 jobs passed, full suite
+2966 passed/two passed subtests/one failed, proof-summary skipped. Mandatory
+actual retained-audit authentication and full-control validation passed, as did
+the bounded downloaded restore. The sole cost-test failure was reproduced
+under varying garbage-collection schedules; all varying written rows were weak
+alias dependencies. The benchmark now normalizes fixture GC state while keeping
+strict cost equality and archive-walk guards; its15-test module passes. All10 outgoing
+files and exact reviewed treecf20288baaa0217654471d8176189d8ab1b6cd99 read back
+exact. No mature stage launched. Authenticate the NEW proof and four harness
+evidence files, including retained-audit-check.json, before separately reviewing
+digest1001 for saved candidate12129336378. Actual audit12148235361 stays reusable
+with its original physical member SHA4be22bcf; no audit/simulation repeat merely
+to rewrite evidence. `stage_0_5_receipt_handoff_repair_launch.json` and
+`STAGE_0_5_RECEIPT_HANDOFF_REPAIR_REVIEW.md` retain exact publication/review gates.
+`stage_0_5_receipt_handoff_proof_failure.json` records the exact failure and
+successful partial evidence. A new complete green proof is still required.
 
 The comparison repair's fresh proof/full-suite run is [39139421134](https://github.com/rax0h/all-that-endures/actions/runs/39139421134),
 source `cdb0516b0423af24483eadcc5a18651e879bdc47`, created October18,2026 at

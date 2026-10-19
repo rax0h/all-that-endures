@@ -20,19 +20,19 @@
     }
   },
   "proof": {
-    "archive_bytes": 1199,
-    "archive_sha256": "bfd17f990fc3ef965c0a1118985a6d2882d963320853ecdd0f417a6258c62a43",
-    "artifact_id": 12143847835,
-    "harness_sha": "cdb0516b0423af24483eadcc5a18651e879bdc47",
+    "archive_bytes": 1204,
+    "archive_sha256": "2fff03386296df1ba0e5178a966ded7ee40db5a712e3e22cc88c7da04bcefd75",
+    "artifact_id": 12157194329,
+    "harness_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
     "name": "continuation-small-proof",
     "producer_job": "proof-summary",
-    "run_id": 39139421134,
+    "run_id": 39177774744,
     "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
     "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
     "workflow_path": ".github/workflows/stage-0-5-continuation-proof.yml",
-    "workflow_sha": "cdb0516b0423af24483eadcc5a18651e879bdc47"
+    "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59"
   },
   "schema": "ate-validation-continuation-launch/1",
-  "stage": "audit",
+  "stage": "digest",
   "year": 1001
 }

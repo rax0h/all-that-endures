@@ -1,4 +1,98 @@
-# Mature audit passed; receipt handoff blocked
+# Mature audit and corrected proof passed; digest1001 next
+
+Verified result: proof39177774744 completed successfully October19,2026 at
+01:20:29UTC (October18 at20:20:29 America/Chicago). All17 jobs succeeded.
+The full suite passed2968 tests plus two subtests in5359.67s,42 existing
+warnings; focused168 passed342.57s. Four ZIPs and all exact members were
+downloaded, successful producers authenticated and archive/file hashes checked.
+The restored bounded receipt validates recursively; actual retained mature audit
+12148235361 still authenticates and matches the full original control.
+All12 executing implementation blobs match the published green source and
+proof fingerprint. Both GC schedules show identical155/31/1185 cost at both
+sizes in the full suite as well as the early gate. Exact evidence is
+`stage_0_5_cost_measurement_repair_result.json`.
+
+Next is only digest1001 on retained candidate12129336378/year1001/generation126,
+using fresh proof12157194329. Its existing staged implementation and runtime
+are unchanged. Local46 wrapper/transport checks passed31.41s (one expected
+duplicate-ZIP warning); the real process/transport pipeline is reused from the
+actual green17-job proof. Original physical checkpoint, actual audit, complete
+original control and exact saved receipt validate. Configuration
+`stage_0_5_digest1001_preflight.json` describes the separate fresh-runner digest;
+one independent concrete launch review and final publication/active checks
+remain required. No simulation/save/successful audit repeats. Mature digest and
+downloaded mature restore are not certified by the bounded proof.
+
+## Previous proof launch record
+
+Current proof: [39177774744](https://github.com/rax0h/all-that-endures/actions/runs/39177774744),
+created October18,2026 at23:44:30UTC, push attempt1. This is the single
+corrected proof after the cost-test failure below. The test-only GC fixture
+correction passed the complete15-test module and expanded168-check gate
+(295.62s, zero failures/errors/skips). One fresh independent Astra review found
+no blocking source findings. Published source
+`4fecd93fdcc5012a404afc07ce166cb7ff422f59`, tree
+`ea611ec99d6b11bd6c826f5f9e542de213ee1cc0`, read back exact for all five
+changed files. All11 production fingerprints and the runtime subtree remain
+unchanged. All17 jobs and the actual full suite remain pending; successful
+partial checks in the previous failed run do not satisfy this gate.
+`stage_0_5_cost_measurement_repair_launch.json` and
+`STAGE_0_5_COST_MEASUREMENT_REVIEW.md` retain the exact launch and review.
+No mature stage was launched and monitoring remains disabled.
+
+Repair status: implementation and19 targeted regressions pass locally after
+observing12 failures on the old code. All153 affected checks passed in166.02s,
+with one expected duplicate-ZIP warning; the final19 handoff checks passed0.73s.
+Fresh independent Astra review cleared proof-only publication. The single
+new17-job proof/full-suite run is [39167485117](https://github.com/rax0h/all-that-endures/actions/runs/39167485117),
+created October18,2026 at21:21:37UTC. Source
+`e3800ed91ca27725f0b75ff0ef38b4fd940da2bd` has exact reviewed tree
+`cf20288baaa0217654471d8176189d8ab1b6cd99`; all10 changed files including the
+binary fixture read back byte/blob exact. The run completed with failure
+October18 at23:15:14UTC. Fifteen jobs succeeded, including the actual retained
+audit's authenticated download/reader/full-control check and the bounded
+independent downloaded restore. The full suite had2966 passed, two passed
+subtests and one failed cost assertion; proof-summary was skipped. A new green
+proof remains mandatory before mature continuation.
+The successful mature audit and saved generation are reused unchanged.
+`stage_0_5_receipt_handoff_repair_local.json` records the exact local gates.
+`stage_0_5_receipt_handoff_repair_launch.json` and
+`STAGE_0_5_RECEIPT_HANDOFF_REPAIR_REVIEW.md` bind the review and single launch.
+
+## Observed full-suite failure and test measurement repair
+
+The sole failure was
+`test_sealed_suffix_publish_has_fixed_unrelated_history_work`: H1000 cost
+(155 reads,31 writes,1185 metadata rows) versus H10000 (158,32,1196).
+There was no archive-walk rejection or logical audit/restore failure. Exact
+failed-suite and successful harness/restore archives and members were
+downloaded/hash-checked. Failed-job diagnostics are forensic evidence only,
+not a successful producing-job proof. The original strict authentication rule
+is unchanged. See `stage_0_5_receipt_handoff_proof_failure.json`.
+
+Five standalone hash-seeded executions passed. A bounded change to cycle-GC
+thresholds reproduced unequal costs. Written-namespace traces isolated all
+variation to dependency-lease rows:7 versus9 in one reproduction; all other
+written namespace counts were identical. BackingDependencyPool tracks weak
+alias lifetimes, so automatic cycle collection changes the live lease roster.
+The benchmark compared different temporary-object lifetimes rather than a
+constant affected closure at different unrelated archive sizes.
+
+The test now explicitly collects fixture garbage before resetting diagnostics
+and disables automatic cycle collection only during the two measured saves
+and cost capture. It restores the prior GC enabled state and fixture thresholds
+in finally blocks. Ordinary refcount cleanup and all actual save/dependency
+accounting still run. Exact cost equality and all three archive/registry-walk
+rejections remain unchanged; no ceiling, tolerance or retry was added.
+Normal and aggressive fixture schedules both measured155/31/1185 at both
+sizes. The complete15-test module passed39.73s. The full module is also added
+to the early proof gate so this regression is checked before starting the
+hosted full suite. Persistence/runtime and receipt helper bytes are unchanged.
+
+The expanded early gate and final independent source review now pass. The
+fresh actual full-suite proof39177774744 remains required. Successful mature
+save/audit evidence remains retained; no mature stage is repeated or advanced
+on the previous failed run.
 
 Actual audit1001 [run39152488567](https://github.com/rax0h/all-that-endures/actions/runs/39152488567)
 completed successfully October18,2026 at19:21:19UTC (14:21:19 America/Chicago).
@@ -43,7 +137,41 @@ outside the previous comparison repair.
 The previous repair correctly fixed logical audit comparison. Its regression
 tested the real cross-digit audit/control values, but did not cover this full
 publish/reload/next-stage reader path. No runtime or format change has been
-made during this update, and no repair is claimed here.
+made during that status update. The bounded repair below is separate.
+
+## Bounded repair
+
+New receipt writing normalizes JSON key conversion before sorting, using the
+same duplicate-key rejection as logical comparison. Publication and reload
+therefore agree on bytes and hashes even across digit-width boundaries.
+Receipt fields, schema1 and persisted World formats remain unchanged.
+
+One explicit compatibility entry identifies all fields of the actual immutable
+audit ArtifactRef, its original physical member SHA4be22bcf, size223650 and
+decoded canonical content SHAd5b3f1c7. The consumer still authenticates the full
+original producing job/workflow/harness/runtime and exact ZIP before reading.
+Its reader requires the exact physical member bytes; arbitrary noncanonical
+JSON, rewritten copies and foreign artifact references do not gain this path.
+Full original-control validation remains mandatory.
+
+Acceptance's receipt_sha256 continues to mean the physical member hash. For
+this one retained artifact, composition and recursive validation bind4be22bcf,
+not the hash of a reserialization. New canonical receipts use their stable
+ordinary hash. The exact artifact/archive proof plus pinned content identity
+keep the embedded receipt and physical source bound without rewriting the
+source or rerunning the successful mature audit.
+
+The exact35KB original artifact is checked in as a regression fixture. Tests
+cover publish/reload/acceptance, physical versus canonical hashes, every
+ArtifactRef pin, whitespace/rewrite rejection, tampered values/control and
+duplicate keys. Synthetic digest metadata in unit composition is explicitly
+not an actual mature digest result.
+
+The existing17-job proof also gains a mandatory harness step that fully
+authenticates/downloads the actual retained mature audit and runs the real
+reader and full original-control validator without opening a World. All
+existing saved-year, retry, independent downloaded restore and full-suite jobs
+remain required. No new mature stage or successful predecessor repeats.
 
 ## Required continuation
 
