@@ -1,4 +1,4 @@
-# Mature audit and corrected proof passed; digest1001 next
+# Mature audit and corrected proof passed; digest1001 launched
 
 Verified result: proof39177774744 completed successfully October19,2026 at
 01:20:29UTC (October18 at20:20:29 America/Chicago). All17 jobs succeeded.
@@ -12,15 +12,19 @@ proof fingerprint. Both GC schedules show identical155/31/1185 cost at both
 sizes in the full suite as well as the early gate. Exact evidence is
 `stage_0_5_cost_measurement_repair_result.json`.
 
-Next is only digest1001 on retained candidate12129336378/year1001/generation126,
+Digest1001 is now [run39198567003](https://github.com/rax0h/all-that-endures/actions/runs/39198567003),
+created October19,2026 at04:15:33UTC, push attempt1. It checks retained
+candidate12129336378/year1001/generation126,
 using fresh proof12157194329. Its existing staged implementation and runtime
 are unchanged. Local46 wrapper/transport checks passed31.41s (one expected
 duplicate-ZIP warning); the real process/transport pipeline is reused from the
 actual green17-job proof. Original physical checkpoint, actual audit, complete
 original control and exact saved receipt validate. Configuration
 `stage_0_5_digest1001_preflight.json` describes the separate fresh-runner digest;
-one independent concrete launch review and final publication/active checks
-remain required. No simulation/save/successful audit repeats. Mature digest and
+one independent Astra concrete launch review and final exact source/readback/
+active/lease checks passed before the single launch. Records are
+`stage_0_5_digest1001_launch_result.json` and
+`STAGE_0_5_DIGEST1001_LAUNCH_REVIEW.md`. No simulation/save/successful audit repeats. Mature digest and
 downloaded mature restore are not certified by the bounded proof.
 
 ## Previous proof launch record

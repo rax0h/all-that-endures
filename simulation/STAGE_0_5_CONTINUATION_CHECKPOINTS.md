@@ -7,11 +7,16 @@ or errors. Four exact artifacts and all members authenticate/hash-check;
 recursive actual bounded restore, actual retained mature audit/control handoff
 and all12 executing source blobs match. Both GC schedules pass strict fixed-work
 equality in the full suite. `stage_0_5_cost_measurement_repair_result.json` holds
-the result. The separate mature digest1001 is now prepared against the existing
+the result. The separate mature digest1001 is [run39198567003](https://github.com/rax0h/all-that-endures/actions/runs/39198567003),
+created October19 at04:15:33UTC, push attempt1, source
+`8ab01eed35176e5f13533bbc011b47fb6bc63335`, harness
+`12696c2ec36eba0c0a67d9b8d6351833266a1548`. It uses existing
 saved candidate12129336378/generation126 and new proof12157194329. Local46
 wrapper/transport checks passed31.41s; no executing helper or runtime changed.
-The concrete launch still requires one independent review and final exact
-publication/active checks. See `stage_0_5_digest1001_preflight.json`. Successful
+One independent Astra final review cleared only this launch, with no blocking
+findings. Exact publication/readbacks and all five active/cross-SHA/lease checks
+passed before one leased launch. `stage_0_5_digest1001_launch_result.json` and
+`STAGE_0_5_DIGEST1001_LAUNCH_REVIEW.md` bind the exact evidence. Successful
 save and audit12148235361 stay retained; simulation/save/audit will not repeat.
 Monitoring remains disabled. Actual mature digest/year acceptance/1002/separate
 fresh downloaded mature restore/final Astra remain mandatory.
