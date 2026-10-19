@@ -30,16 +30,23 @@ complete original authority/accepted1001 predecessor chain and retained input
 preservation validate. stage_0_5_audit1002_result.json records the proof.
 No successful audit, simulation, save or predecessor stage must repeat.
 
-Only digest1002 is prepared for one independent concrete launch review, on the
-SAME retained12176425731 candidate. It must authenticate/download exact full
-ZIP/members/files, normally reopen a disposable copy and compare the full digest
-and all counters with original1002 control, close normally, preserve retained
-inputs and require actual receipt upload. Runtime and12helper/proof fingerprints
-match green full/protocol proof39177774744. All existing300/360-minute and other
-guards remain unchanged. Exact source readback, focused pin/transport checks,
-one final review and immediate active/availability/ref-lease checks gate launch.
-Monitoring stays off.1002 year/continuation acceptance, separate fresh downloaded
-mature restore and final Astra remain mandatory before Stage0.5/main.
+Only digest1002 is launched as [run39302259054](https://github.com/rax0h/all-that-endures/actions/runs/39302259054),
+created October19 at18:24:41UTC, push attempt1, source
+f78d79b1c8ad0a7adcfe99cfc1333bb16e35bb78, harness
+17ddfc8b14e69c581c7c8c7db17b2284ae0c111f, sole input12176425731.
+It must authenticate/download exact full ZIP/members/files, normally reopen a
+disposable copy and compare actual full digest/all counters with original1002
+control, normally close, preserve retained inputs and require receipt upload.
+65focused and2final workflow checks passed; executing bytes match green proof
+39177774744. One independent Astra concrete review plus final exact source,
+active/cross-SHA/input availability/ref-lease checks cleared exactly one launch.
+300/360-minute and all other guards remain unchanged. Exact records are
+stage_0_5_digest1002_launch_result.json and STAGE_0_5_DIGEST1002_LAUNCH_REVIEW.md.
+Actual digest/upload is pending; only registration was inspected. Monitoring
+stays off; no simulation/save/audit repeats. After actual digest authentication,
+only accept-year1002 is separately prepared from immutable actual receipts.
+Continuation acceptance, separate fresh downloaded mature restore and final
+Astra remain mandatory before Stage0.5/main.
 
 ## Previous proof launch record
 

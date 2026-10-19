@@ -46,19 +46,26 @@ are unchanged. Audit4647.82s, normal open1034.23s, wrapper5972.25s.
 stage_0_5_audit1002_result.json records the exact evidence. No successful audit,
 simulation or save must repeat.
 
-Only digest1002 is prepared for the final independent concrete launch review.
-Its sole input remains saved artifact12176425731/year1002/gen127. The fresh
-runner must authenticate/download the full exact saved ZIP and all3files before
-open, copy to disposable space, normally reopen and compute the full digest and
-all counters against the original1002 control, normally close, preserve retained
-input hashes and require actual digest receipt upload. Runtime and all12
-executing helper/proof fingerprints match green full/protocol proof39177774744.
-The local dispatcher probe intercepts the digest body and is not hosted proof.
-Existing300/360-minute, address/disk/extraction/upload/source/uniqueness guards
-remain unchanged. One final review, exact published source readback and immediate
-active/cross-SHA/input-availability/ref-lease checks must precede one launch.
-Monitoring remains off. Actual1002 digest/year acceptance, continuation,
-separate fresh DOWNLOADED mature restore and final Astra still gate Stage0.5/main.
+Only digest1002 is launched as [run39302259054](https://github.com/rax0h/all-that-endures/actions/runs/39302259054),
+created October19 at18:24:41UTC, push attempt1, source
+f78d79b1c8ad0a7adcfe99cfc1333bb16e35bb78, pinned harness
+17ddfc8b14e69c581c7c8c7db17b2284ae0c111f. Sole input remains saved
+artifact12176425731/year1002/gen127. The fresh runner must authenticate/download
+the exact full ZIP/members/files before open, normally reopen a disposable copy,
+compute the full digest and all counters against original1002 control, normally
+close, preserve retained hashes and require actual receipt upload. No successful
+simulation/save/audit repeats. Runtime and all12helper/proof fingerprints match
+green full/protocol proof39177774744.65fresh focused checks passed33.89s and2final
+workflow checks0.20s. One independent Astra final review found no blocking or
+new minor findings. Exact source readback and immediate five-active-status/
+three-cross-SHA-history/new-source/input-availability/ref-lease checks cleared
+one non-force leased launch. All300/360-minute and other guards remain unchanged.
+stage_0_5_digest1002_launch_result.json and STAGE_0_5_DIGEST1002_LAUNCH_REVIEW.md
+retain the exact evidence. Actual digest/upload is pending; only registration
+was inspected. Monitoring remains off. Next, authenticate the actual digest then
+separately pin/review/launch ONLY accept-year1002 using immutable saved/audit/
+digest1002 and accepted1001. Continuation acceptance, separate fresh DOWNLOADED
+mature restore and final Astra remain mandatory before Stage0.5/main.
 
 ## Earlier handoff and cost repair records
 
