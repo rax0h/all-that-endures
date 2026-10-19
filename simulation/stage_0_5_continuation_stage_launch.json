@@ -18,31 +18,18 @@
       "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
       "workflow_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9"
     },
-    "first": {
-      "archive_bytes": 85723,
-      "archive_sha256": "9267c69c271cdea10522022cb35890baf2d1ba087fe0c1d95eda12d67dcd7f9a",
-      "artifact_id": 12165934374,
-      "harness_sha": "cde2920fd78ce93c026a2f5002a9b5d022307e23",
-      "name": "continuation-stage-accept-year-1001",
+    "continuation": {
+      "archive_bytes": 535583,
+      "archive_sha256": "1398aa0a976f381cdda3ae3d9d3d266a2a3028e64a5b7e802d1ee9852c861c5a",
+      "artifact_id": 12223080997,
+      "harness_sha": "f8236c97d4f20bea962a92745648f192f75021f2",
+      "name": "continuation-stage-accept-continuation-1002",
       "producer_job": "mature-stage",
-      "run_id": 39207586140,
+      "run_id": 39327259797,
       "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
       "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
       "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
-      "workflow_sha": "2ce6b9e1a666cf32d5d9f315bcbbccf8d9a4b879"
-    },
-    "second": {
-      "archive_bytes": 427418,
-      "archive_sha256": "1a0204817d5263ff355b7e5ded020e8f9807753ad567ab7e3d0ab33349e277de",
-      "artifact_id": 12218167490,
-      "harness_sha": "9fb1a9043678b9b825a1926027c077e57e9aec4a",
-      "name": "continuation-stage-accept-year-1002",
-      "producer_job": "mature-stage",
-      "run_id": 39317887835,
-      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
-      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
-      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
-      "workflow_sha": "3819945847f020851603ff87eba2b80e8ded1f5f"
+      "workflow_sha": "c186b8fc6e6c57927427c25fa507e0f8fda24ec5"
     }
   },
   "proof": {
@@ -59,6 +46,6 @@
     "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59"
   },
   "schema": "ate-validation-continuation-launch/1",
-  "stage": "accept-continuation",
+  "stage": "restore-values",
   "year": 1002
 }

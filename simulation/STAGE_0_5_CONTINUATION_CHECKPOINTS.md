@@ -72,30 +72,38 @@ both audit/digest proofs, same saved12176425731/year1002gen127/save9b596.../
 checkpoint082081... and ordered1001gen126→1002gen127 lineage validate recursively.
 stage_0_5_accept1002_result.json retains this evidence. No successful stage repeats.
 
-Only accept-continuation is launched as [run39327259797](https://github.com/rax0h/all-that-endures/actions/runs/39327259797),
-created October19 at21:24:38UTC, push attempt1, source
-c186b8fc6e6c57927427c25fa507e0f8fda24ec5, pinned harness
-f8236c97d4f20bea962a92745648f192f75021f2. Inputs are exact first12165934374,
-second12218167490 and retained candidate12176425731/year1002/gen127. Actual
-receipts recursively validate complete original1001/1002 controls and exact
-ordered lineage; the local synthetic-producer composition is not hosted proof.
-The actual stage authenticates producers/sources/metadata and exact small receipt
-ZIPs/members, composes continuation-verified output and requires successful upload.
-No large candidate download/copy/open or successful stage repeat is performed.
-53focused+2workflow checks passed; runtime and12helper/proof bytes match green
-proof39177774744. The same independent Astra review resumed after a usage-limit
-interruption and cleared this launch with no blocking/new minor issue. Final
-five-active-status/three-cross-SHA-history/zero-new-source/source-readback/
-ancestry/ref-lease checks passed; candidate/first/second/proof and nested restored
-proof12155391931 were freshly available, exact and producer-authenticated.
-All17 proof jobs passed. Existing300/360-minute and other guards remain.
-stage_0_5_continued_launch_result.json and STAGE_0_5_CONTINUED_LAUNCH_REVIEW.md
-retain exact evidence. Actual continuation/upload remains pending; only
-registration was inspected. Monitoring remains off. After authenticating the
-actual receipt, separately pin/review/launch ONLY fresh DOWNLOADED mature
-restore-values on exact retained candidate12176425731 plus the actual continuation
-receipt. Restore-digest, restore acceptance and final Astra remain mandatory
-before Stage0.5/main. No successful predecessor must repeat.
+Actual continuation acceptance [run39327259797](https://github.com/rax0h/all-that-endures/actions/runs/39327259797)
+completed successfully October19,2026 at21:27:25UTC. Producer118316203529
+uploaded12223080997, ZIP535583/SHA256
+1398aa0a976f381cdda3ae3d9d3d266a2a3028e64a5b7e802d1ee9852c861c5a;
+sole continuation-verified.json3727927/SHA256
+45ce1d798e9383222dda615f44f0cc12b65b346765f889b837054e74728844e0.
+Output plus diagnostics12222872230 were downloaded/authenticated with exact
+inventories/ZIP/member hashes. Complete original ordered1001gen126→1002gen127
+controls/audits/digests/counters/proof hashes/actual accepted-year receipts and
+final retained candidate12176425731/save9b596.../checkpoint082081... validate.
+stage_0_5_continued_result.json retains this evidence; Stage0.5 remains unaccepted.
+
+Only fresh DOWNLOADED mature restore-values is prepared for final independent
+review. Inputs are exact final retained candidate12176425731 and actual
+continuation12223080997. The new runner must authenticate sources/producers,
+full exact4.481GB candidate ZIP and exact3members/file hashes before open,
+authenticate the actual continuation and original source/config/context/control/
+generation chain, COPY the retained30.224GB DB into disposable space and normally
+open1002/gen127. It must compare ACTUAL restored snapshot values and all counters
+with original independent1002 control, normally close, rehash retained inputs
+unchanged, atomically publish the restore-values receipt and require full upload.
+No simulation/save/new backup or successful predecessor repeat. Local metadata
+routing probe intercepts the restore body and is explicitly not mature proof.
+Existing restore code passed real-fixture Task6 checks and separate-runner proof;
+all12helper/proof/runtime bytes still match green proof39177774744. This change
+pins actual mature inputs only. All300/360-minute,8GiBaddress and disk/extraction/
+upload/source/unique guards remain; reserved disk99330011136 before download,
+69105688576 after. No mature duration/resource-fit guarantee. Focused checks,
+one independent final launch review, exact source/readbacks and immediate
+active/cross-SHA/input-availability/ref-lease checks gate one launch.
+Monitoring stays off. Actual downloaded restore-values, separate fresh downloaded
+restore-digest, restore acceptance and final Astra remain mandatory for Stage0.5/main.
 
 ## Earlier handoff and cost repair records
 
