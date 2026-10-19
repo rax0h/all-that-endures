@@ -59,29 +59,32 @@ save9b596.../year1002/gen127/complete original and accepted1001 authority chain.
 Retained inputs are preserved. Digest4390.86s, wrapper5707.89s.
 stage_0_5_digest1002_result.json retains the proof. No successful stage repeats.
 
-Only accept-year1002 is launched as [run39317887835](https://github.com/rax0h/all-that-endures/actions/runs/39317887835),
-created October19 at20:16:08UTC, push attempt1, source
-3819945847f020851603ff87eba2b80e8ded1f5f, pinned harness
-9fb1a9043678b9b825a1926027c077e57e9aec4a. Inputs are exact saved12176425731,
-audit12212295850, digest12217841861 and accepted1001 artifact12165934374.
-The actual three small receipt ZIPs/members/producers were authenticated and
-the real local composition validates complete original controls/candidate/
-year1002gen127/accepted1001 lineage with a synthetic producer only. Hosted
-acceptance must independently authenticate sources/producers/exact metadata/
-receipt ZIPs/bodies, compose year-verified output and require successful upload.
-It performs no large DB download/copy/open or simulation/save/audit/digest.
-64fresh focused checks passed86.62s and2final workflow cases0.34s; runtime and12
-executing helper/proof files match green proof39177774744. One fresh independent
-Astra concrete review found no blocking/new minor issue. Exact source/readbacks,
-five-active-status/three-cross-SHA-history/zero-new-source/five-input-availability/
-ref-lease checks cleared one non-force leased launch. All300/360-minute and other
-guards remain. stage_0_5_accept1002_launch_result.json and
-STAGE_0_5_ACCEPT1002_LAUNCH_REVIEW.md retain the full record. Actual acceptance/
-upload remains pending; only queued registration was inspected. Monitoring stays
-off. After authentication, separately pin/review/launch ONLY continuation
-acceptance from immutable actual first/second year receipts and exact retained
-candidate. Separate fresh downloaded mature restore and final Astra remain
-mandatory before Stage0.5/main.
+Actual year1002 acceptance [run39317887835](https://github.com/rax0h/all-that-endures/actions/runs/39317887835)
+completed successfully October19,2026 at20:18:02UTC. Producer118284007877
+uploaded12218167490, ZIP427418/SHA256
+1a0204817d5263ff355b7e5ded020e8f9807753ad567ab7e3d0ab33349e277de;
+sole year-verified.json2953406/SHA256
+19a12a9ba5d64e0bbb32c2e8dcd321de12c3a41a4a1582657b01bc1ce0821de4.
+Output and diagnostics12218337332 were downloaded, producer-authenticated and
+every ZIP/member hash checked. Actual first acceptance12165934374 was freshly
+downloaded and validated as the exact predecessor. Complete original controls,
+both audit/digest proofs, same saved12176425731/year1002gen127/save9b596.../
+checkpoint082081... and ordered1001gen126→1002gen127 lineage validate recursively.
+stage_0_5_accept1002_result.json retains this evidence. No successful stage repeats.
+
+Only accept-continuation is prepared for final independent concrete review.
+Inputs are exact accepted1001 artifact12165934374, accepted1002 artifact12218167490
+and final retained candidate12176425731. The real local continuation consumer
+validates both actual receipts and complete ordered original lineage; its
+synthetic producer is not hosted acceptance. The actual stage authenticates all
+sources/producers/candidate metadata and exact small acceptance ZIPs/members,
+composes continuation-verified metadata and requires successful upload. No large
+DB download/copy/open, simulation/save/audit/digest/year acceptance repeats.
+Runtime and12helper/proof fingerprints match green proof39177774744; all existing
+300/360-minute and other guards remain. Focused checks, one final Astra review,
+exact source/readbacks and immediate active/cross-SHA/input-availability/ref-lease
+checks gate one launch. Monitoring remains off. Actual continuation acceptance,
+separate fresh DOWNLOADED mature restore and final Astra still gate Stage0.5/main.
 
 ## Earlier handoff and cost repair records
 
