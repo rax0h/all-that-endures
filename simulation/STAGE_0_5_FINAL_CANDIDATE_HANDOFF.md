@@ -1,5 +1,7 @@
 # Stage 0.5 final correctness candidate: Astra handoff
 
+> Current disposition (20 October 2026): candidate architecture and correctness accepted in [the final Astra review](STAGE_0_5_FINAL_ASTRA_REVIEW_2026_10_20.md). Restore-acceptance run 39357369211 and its downloaded output are verified. Production promotion remains pending the explicit release conditions in that review. Earlier statuses below retain their historical source boundaries.
+
 The complete-format implementation has passed its final applicable correctness suite and required independent continuation. Final architecture acceptance and performance/release approval remain open. This handoff contains the tested source boundary and concrete remaining decisions; it does not authorize promotion or further endurance.
 
 ## Newer runtime boundary: bounded speed repair green

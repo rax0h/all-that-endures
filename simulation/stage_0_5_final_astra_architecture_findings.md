@@ -1,0 +1,34 @@
+# Independent Stage 0.5 architecture review
+
+Boundary: candidate `fb75f1c49edda0731287acbf0054a1151ec318c9`; locally verified `simulation/ate_sim` tree `76dee76973928dbce72860156feb32f2d7f02f86` equals runtime pin `2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a`. Read-only source review and bounded local tests; no CI, endurance, production write, or push.
+
+## Recommendation
+
+**Accept the reviewed candidate architecture, subject to the parent review's exact-source evidence validation. No new proven implementation blocker was found in this independent review. This is not production/release acceptance.** The exact-pressure exception, observed mature-world performance, endurance/release policy and promotion authorization remain explicit owner decisions. This is a source-based focused review, not an exhaustive proof of every implementation line.
+
+The old R3 BLOCKED closeout describes an earlier source and is superseded by the counted-sequence and complete-format integration. It must not be copied into a current candidate verdict.
+
+## Concrete architecture evidence
+
+- **R1 clean retention is repaired in the inspected paths.** `simulation/ate_sim/persistence_lazy.py:3645–3689` drops clean baseline payload/presence/incarnation/ordinal/identity-label sidecars on eviction and preserves the per-family cap during simulation steps. `persistence_lazy_budget.py:211–235,258–267` accounts payload plus sidecars under the shared budget and evicts their table ownership together. External aliases/dirty values remain separately chargeable. Local record-budget tests exercise multiple families, oversized point reads, retained alias rehydration, step caches, and frozen save recovery.
+- **R2 lifecycle is repaired.** `persistence_lazy.py:10249–10256` delegates public lifetime operations to the session guard. `:11004–11033` preflights the open backing store, rejects reentrancy/active step/current-people scope, and enforces operation state. `:17921–17953` applies close restrictions and guards the fallible pin release. Four original R2 adversarial tests passed locally.
+- **R3 is structurally closed for household/settlement histories.** `persistence_lazy_sequence.py:1–32` establishes the one MVCC sequence authority, authenticated member directory, leaf128/fanout32 and clean page budgets. The local `test_stage_0_5_final_household_sequences.py` cases prove lazy household headers and scalar edits without member-node reads at H1k/H10k (`:32–50`), local middle edits (`:53–70`), extinct duplicates/first-equal removal, cross-family aliases, detach, rollback, lost acknowledgement and unowned reattachment. All cases passed locally. This is substantially beyond the old append-page foundation.
+- **Capability and authority are explicit.** `persistence_complete_format.py:12–48` requires the exact capability-6 marker set, checks catalog/namespace authority, rejects competing ordinary identity links, and requires compact roots. The upgrade at `:52–61` delegates to the existing source-preserving copy publisher. `persistence_lazy.py:18056–18058` skips the legacy global link reader in complete mode; `:18136–18171` defers lazy/scalar families rather than restoring their archived payloads. Complete-format tests passed for missing/competing authority, source preservation, private-copy faults, racing destinations and normal checked reopen.
+- **One recovery/publication authority remains.** `persistence_lazy_participants.py:77–89,107–177` rejects duplicate authorities and validates immutable participant bytes at the exact successor pin; participants do not commit. `persistence_lazy.py:16474–16550` replays the captured plan, checks participant publication and the existing cold successor before acceptance. Targeted household and record-budget tests include pre/postcommit recovery and exact retained aliases.
+- **The earlier complete-review findings have concrete repairs.** Event-ID full-copy semantic scrub is called by `persistence_catalog_copy.py:197–205`; `persistence_event_id_exceptions.py:14–32,55–60` validates count, strictly ordered positive in-prefix removals and overlap with surviving prefix. `persistence_lazy_world_identity.py:115–148` consumes pending owner notifications instead of rescanning cumulative dirty ownership. The schema inventory documents mutable histories, advancement/import handling and immutable/input byte costs at `STAGE_0_5_FINAL_SCHEMA_INVENTORY.md:3–24`.
+
+## Limitations, not newly proven blockers
+
+- Exact pressure remains a documented O(H) cold miss: `persistence_pressure.py:1–5,31–58` streams one native sum, including duplicates/extinct household occurrences, and caches only the exact result under complete conservative revisions. Architecture approval must not imply authorization of this release exception or claim all ordinary operations are history-independent.
+- Mature restore-open/simulation/save timings supplied to the parent are materially slow. This review found the complete open bypass of legacy global identity discovery, but the timings alone do not identify an archived-payload scan or violate a byte/row bound. An ordinary-open I/O profile on that artifact is needed to attribute the cost. Current eager topology and packed actions retain disclosed C/input costs.
+- `persistence_lazy_store.py:2562–2600` enforces at most256 expired rows across tables per cleanup. Explicit maintenance also uses chunks capped at256. Fixed table order can delay later tables under sustained overload; existing tests demonstrate bounded deletion and quiescent draining, not a universal backlog bound under arbitrary write rates. This is a scheduling/operational limitation, not a demonstrated correctness blocker.
+- Capability6 remains an explicit upgrade lane; genuine older formats retain documented compatibility costs. Whole scrub/copy/detach/iteration and caller-held oversized immutable values have their stated nonconstant costs.
+
+## Local validation
+
+At the exact candidate, with `PYTHONPATH=simulation:.` and the review venv:
+
+1. `pytest -q simulation/tests/test_stage_0_5_final_record_budget.py simulation/tests/test_stage_0_5_final_household_sequences.py simulation/tests/test_stage_0_5_final_complete_format.py -k 'not fixed_history_work'`: **46 passed,1 deselected in38.39s**. The deselected test is the paired complete point-edit/no-op work measurement; no inference of a new run of that measurement is made.
+2. `pytest -q simulation/tests/test_stage_0_5_closeout.py -k r2`: **4 passed,5 deselected in1.09s**.
+
+Initial invocations encountered missing pytest/import-path setup; those were environment collection errors, resolved by the parent-provided venv and correct PYTHONPATH. No product test failed in the completed targeted checks. Parent independently verifies final suite and continuation receipts; this review does not reattribute older handoff receipts to newer runtime bytes.

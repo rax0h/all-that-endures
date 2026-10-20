@@ -1,5 +1,7 @@
 # Durable continuation implementation
 
+> Current disposition (20 October 2026): candidate architecture and correctness accepted in [the final Astra review](STAGE_0_5_FINAL_ASTRA_REVIEW_2026_10_20.md). Restore-acceptance run 39357369211 and its downloaded output are verified. Production promotion remains pending the explicit release conditions in that review. Earlier statuses below retain their historical source boundaries.
+
 Current verified state: mature year1001 is saved, fully audited, digest-verified
 and accepted. [Acceptance run39207586140](https://github.com/rax0h/all-that-endures/actions/runs/39207586140)
 completed successfully October19,2026 at06:04:41UTC. Producing job117913679405

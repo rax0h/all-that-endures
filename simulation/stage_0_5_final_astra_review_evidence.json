@@ -1,0 +1,298 @@
+{
+  "binding": {
+    "candidate": {
+      "archive_bytes": 4481162231,
+      "archive_sha256": "61497cbf318a51d386cac114f5e93856965a4e94768c89775e520daf99345a70",
+      "artifact_id": 12176425731,
+      "harness_sha": "451f5f33ee3378082cb4504d9f3bbb64eaec02d6",
+      "name": "continuation-stage-save-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39212571079,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9"
+    },
+    "checkpoint_sha256": "082081583f68c8e032669df7114e5a75950ed6e1a94d7000b653fe37d6f39f53",
+    "database": {
+      "bytes": 30224322560,
+      "name": "candidate.sqlite",
+      "sha256": "02ac8fb650d0b34df47c642c8bacec3490404b6786fe39d9b0af3f02c04d1d13"
+    },
+    "generation": 127,
+    "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "save_sha256": "9b596eb3b69d09592130e67d85acfd6bf485a40a634a8b5909c370fd3a5f0344",
+    "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+    "year": 1002
+  },
+  "candidate": "fb75f1c49edda0731287acbf0054a1151ec318c9",
+  "decision": {
+    "architecture": "accepted",
+    "correctness_candidate": "accepted",
+    "long_run_started": false,
+    "merge_performed": false,
+    "new_critical_findings": 0,
+    "new_important_findings": 0,
+    "production_promotion": "pending"
+  },
+  "downloaded_input_receipts": [
+    {
+      "member": "continuation-verified.json",
+      "member_bytes": 3727927,
+      "member_sha256": "45ce1d798e9383222dda615f44f0cc12b65b346765f889b837054e74728844e0",
+      "ref": {
+        "archive_bytes": 535583,
+        "archive_sha256": "1398aa0a976f381cdda3ae3d9d3d266a2a3028e64a5b7e802d1ee9852c861c5a",
+        "artifact_id": 12223080997,
+        "harness_sha": "f8236c97d4f20bea962a92745648f192f75021f2",
+        "name": "continuation-stage-accept-continuation-1002",
+        "producer_job": "mature-stage",
+        "run_id": 39327259797,
+        "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+        "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+        "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "workflow_sha": "c186b8fc6e6c57927427c25fa507e0f8fda24ec5"
+      }
+    },
+    {
+      "member": "restore-values.json",
+      "member_bytes": 803630,
+      "member_sha256": "804a0c9272ef570824ded8eb951b40611e2a9980c8c6521162d0627f547aad0a",
+      "ref": {
+        "archive_bytes": 118230,
+        "archive_sha256": "2e9725d9e2ea35cb9f2abb6f6e0c45ab551e16c547a1d5fe197a77510376f78e",
+        "artifact_id": 12226732983,
+        "harness_sha": "9e45fe09d17c62ff1657d17f4d7afe983af3b62b",
+        "name": "continuation-stage-restore-values-1002",
+        "producer_job": "mature-stage",
+        "run_id": 39330974146,
+        "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+        "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+        "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "workflow_sha": "e8dc9dbbfb235fcf9ccbd2bc7d116a7433d23dad"
+      }
+    },
+    {
+      "member": "restore-digest.json",
+      "member_bytes": 767116,
+      "member_sha256": "8a5868f61246919e2e5908625bccd5fb040e55ce5f0b672413917f60518b4e19",
+      "ref": {
+        "archive_bytes": 111932,
+        "archive_sha256": "8e60aaee9a206f11f27ad496159b70c85397e96f5fffb1fca6d678ffd1ffea8a",
+        "artifact_id": 12234412804,
+        "harness_sha": "b2ba877800baf6120f5d4df316cf14b528e8d52c",
+        "name": "continuation-stage-restore-digest-1002",
+        "producer_job": "mature-stage",
+        "run_id": 39346200620,
+        "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+        "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+        "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "workflow_sha": "e387db2309b625a9589f0c828ce7af0e880486a1"
+      }
+    }
+  ],
+  "final_protocol_gate": {
+    "command": "PYTHONPATH=simulation:. python -m pytest -q simulation/tests/test_continuation_receipts.py simulation/tests/test_continuation_receipt_handoff.py simulation/tests/test_continuation_acceptance.py simulation/tests/test_continuation_restore.py",
+    "junit_sha256": "064862fe9370bb3d2d06014871f0f34363a6107358adf2610f16838fab473b41",
+    "log_sha256": "3b8d1b52d32eadecb1ba3ecdf2efd88fe2620b92d9db797beaebbd179d1ae60a",
+    "passed": 87,
+    "seconds": 50.14
+  },
+  "full_suite": {
+    "all_17_jobs_success": true,
+    "completed_log_sha256": "a67174c700f1709faee32bfdf034d9a9bae8354bf177d2178dbadad70b9f3413",
+    "job_id": 117825088932,
+    "passed": 2968,
+    "run_id": 39177774744,
+    "seconds": 5359.67,
+    "subtests_passed": 2,
+    "warnings": 42
+  },
+  "independent_architecture_review": {
+    "findings_sha256": "66e31f34f7b221f4715cbb6f61b905dc5a1f7f29cefd7dcb7f419235cb1d0f10",
+    "tests": [
+      {
+        "command": "PYTHONPATH=simulation:. python -m pytest -q simulation/tests/test_stage_0_5_final_record_budget.py simulation/tests/test_stage_0_5_final_household_sequences.py simulation/tests/test_stage_0_5_final_complete_format.py -k \"not fixed_history_work\"",
+        "deselected": 1,
+        "passed": 46,
+        "seconds": 38.39
+      },
+      {
+        "command": "PYTHONPATH=simulation:. python -m pytest -q simulation/tests/test_stage_0_5_closeout.py -k r2",
+        "deselected": 5,
+        "passed": 4,
+        "seconds": 1.09
+      }
+    ]
+  },
+  "integration": {
+    "main_ref_observed": "1c46720c358a26d6b14b6f35121b23e77d3b27de",
+    "merge_tree_reviewed": false,
+    "pr14_draft": true,
+    "pr14_head": "c29e3d06a0c9d219235e2b3f0390271bd1245aea",
+    "pr14_merged": false
+  },
+  "limitations": [
+    "Focused source review is not exhaustive proof",
+    "No uninterrupted final-runtime millennium rerun",
+    "Mature open I/O counts were not recorded before diagnostics reset",
+    "No claimed interactive performance or arbitrary future-year guarantee"
+  ],
+  "mature_candidate_retention": {
+    "artifact_id": 12176425731,
+    "downloaded_again_in_this_review": false,
+    "expired_at_review": false,
+    "expires_at": "2026-11-02T09:10:38Z",
+    "fresh_runner_restore_proof_runs": [
+      39330974146,
+      39346200620
+    ]
+  },
+  "mature_years": [
+    {
+      "counters": {
+        "communities.next_community": 62,
+        "culture.next_institution": 17,
+        "culture.next_law": 16,
+        "culture.next_practice": 34,
+        "divinity.next_church": 45,
+        "economy.next_property": 8453,
+        "infrastructure.next_id": 21,
+        "institutions.next_application": 9090,
+        "institutions.next_branch": 11,
+        "institutions.next_institution": 3,
+        "institutions.next_notice": 3043,
+        "institutions.next_record": 3136,
+        "knowledge.next_claim": 11,
+        "magic_resources.next_id": 94972,
+        "materials.next_item": 33300,
+        "materials.next_lot": 104442,
+        "metaphysics.next_token": 1,
+        "next_event": 1005544,
+        "next_household": 8453,
+        "next_person": 17175,
+        "next_settlement": 6,
+        "society_accountability.next_inquiry": 2,
+        "threat_ecology.next_id": 249,
+        "transmission.next_id": 191131,
+        "warfare.next_conflict": 1
+      },
+      "digest": "57f60fdf49e221af24ffc0a1f2d5a3885dd37c07db00d153171adcb91c579eed",
+      "generation": 126,
+      "phase_metrics": {
+        "close": {
+          "cpu_seconds": 0.8523637620000954,
+          "wall_seconds": 0.8553656500007492
+        },
+        "copy": {
+          "cpu_seconds": 17.876784283000006,
+          "wall_seconds": 137.798639546
+        },
+        "hash": {
+          "cpu_seconds": 63.17990024000028,
+          "wall_seconds": 137.20857787600107
+        },
+        "open": {
+          "cpu_seconds": 911.528138464,
+          "wall_seconds": 916.614403552
+        },
+        "save": {
+          "cpu_seconds": 3990.747209811001,
+          "wall_seconds": 4009.166431367
+        },
+        "simulation": {
+          "cpu_seconds": 3806.5326087079998,
+          "wall_seconds": 3860.810018614
+        }
+      },
+      "year": 1001
+    },
+    {
+      "counters": {
+        "communities.next_community": 62,
+        "culture.next_institution": 17,
+        "culture.next_law": 16,
+        "culture.next_practice": 34,
+        "divinity.next_church": 45,
+        "economy.next_property": 8462,
+        "infrastructure.next_id": 21,
+        "institutions.next_application": 9096,
+        "institutions.next_branch": 11,
+        "institutions.next_institution": 3,
+        "institutions.next_notice": 3047,
+        "institutions.next_record": 3137,
+        "knowledge.next_claim": 11,
+        "magic_resources.next_id": 95088,
+        "materials.next_item": 33344,
+        "materials.next_lot": 104556,
+        "metaphysics.next_token": 1,
+        "next_event": 1006674,
+        "next_household": 8462,
+        "next_person": 17193,
+        "next_settlement": 6,
+        "society_accountability.next_inquiry": 2,
+        "threat_ecology.next_id": 249,
+        "transmission.next_id": 191359,
+        "warfare.next_conflict": 1
+      },
+      "digest": "2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7",
+      "generation": 127,
+      "phase_metrics": {
+        "close": {
+          "cpu_seconds": 0.7444696579996162,
+          "wall_seconds": 0.753348823000124
+        },
+        "copy": {
+          "cpu_seconds": 13.994749215999988,
+          "wall_seconds": 197.92565802599995
+        },
+        "hash": {
+          "cpu_seconds": 53.22550704400055,
+          "wall_seconds": 138.27409370900023
+        },
+        "open": {
+          "cpu_seconds": 830.057988811,
+          "wall_seconds": 833.923346179
+        },
+        "save": {
+          "cpu_seconds": 2897.5440475529995,
+          "wall_seconds": 2923.6981003109995
+        },
+        "simulation": {
+          "cpu_seconds": 3358.599912357,
+          "wall_seconds": 3430.776375387
+        }
+      },
+      "year": 1002
+    }
+  ],
+  "remaining_release_conditions": [
+    "Owner disposition of exact-pressure O(H) cold-miss and observed mature latency",
+    "Developmental release policy for completed mature two-year/restore endpoint; no new long run required by this review",
+    "Preserve mature artifact beyond current expiry",
+    "Prepare and validate integration against current main; no promotion/merge yet"
+  ],
+  "restore_acceptance": {
+    "archive_bytes": 788075,
+    "archive_sha256": "cd40474e7422aa77ca2520e77130feb381f639ff362ae40ab1a60dcb655f41b5",
+    "artifact_id": 12235349557,
+    "diagnostic_result_matches": true,
+    "expires_at": "2026-11-03T02:12:36Z",
+    "job_id": 118415160570,
+    "member": "restore-verified.json",
+    "member_bytes": 5529032,
+    "member_sha256": "f843e4b5870b9d7dbfe6204bf1a85a142ce2552d5e813974d509f98624ae9fe6",
+    "recursive_validation": true,
+    "run_id": 39357369211
+  },
+  "review_date": "2026-10-20",
+  "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+  "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "schema": "ate-final-architecture-review/1",
+  "source_equality": {
+    "all_python_and_tests_equal_to_full_suite_source": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+    "all_twelve_proof_fingerprints_match": true,
+    "runtime_equals_execution_pin": true
+  }
+}

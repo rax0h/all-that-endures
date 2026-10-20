@@ -1,5 +1,7 @@
 # Stage 0.5 closeout artifact manifest
 
+> Current disposition (20 October 2026): candidate architecture and correctness accepted in [the final Astra review](STAGE_0_5_FINAL_ASTRA_REVIEW_2026_10_20.md). Restore-acceptance run 39357369211 and its downloaded output are verified. Production promotion remains pending the explicit release conditions in that review. Earlier statuses below retain their historical source boundaries.
+
 Status: implementation in progress. This manifest is a checkpoint index, not
 release acceptance. PR14 remains unmodified and unmerged.
 
