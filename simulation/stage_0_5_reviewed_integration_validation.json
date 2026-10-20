@@ -1,0 +1,52 @@
+{
+  "review_ref": "f4c8ebdc068806e9cac4e7dccc3c2ed8abf45abd",
+  "main_ref": "1c46720c358a26d6b14b6f35121b23e77d3b27de",
+  "pr14_ref": "c29e3d06a0c9d219235e2b3f0390271bd1245aea",
+  "merge_base": "5cb2a9cc9832d8e23ce48dd5207cf31efd9680f2",
+  "prepared_merge_tree_before_report": "e5daa44add35b4e4ee68b34611d51e69677473c8",
+  "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "runtime_unchanged": true,
+  "all_python_source_and_test_files_match_full_suite_proof": "4fecd93fdcc5012a404afc07ce166cb7ff422f59",
+  "matching_python_files": 377,
+  "changed_paths_from_review_before_report": [
+    "docs/LIVING_DESIGN.md",
+    "docs/research/HUMAN_CIVILIZATIONAL_CAUSALITY.md"
+  ],
+  "research_document_matches_main": true,
+  "living_design_matches_three_way_merge_except_date": true,
+  "conflict_resolution": "Preserved the later cohesive-update date 2026-10-11; all other design additions merged automatically.",
+  "whitespace_check": "Passed with inherited Markdown two-space hard breaks allowed.",
+  "unmerged_index_entries": 0,
+  "source_validation": "Git tree/blob identity; historical full suite was not rerun for this documentation-only integration.",
+  "fresh_protocol_gate": {
+    "command": "PYTHONPATH=/workspace/scratch/ac2fde48c1b4/validation-deps:simulation:. python -m pytest -q simulation/tests/test_continuation_receipts.py simulation/tests/test_continuation_receipt_handoff.py simulation/tests/test_continuation_acceptance.py simulation/tests/test_continuation_restore.py --junitxml=/workspace/scratch/ac2fde48c1b4/integration-protocol.xml > /workspace/scratch/ac2fde48c1b4/integration-protocol.log 2>&1",
+    "result": "87 passed in 46.69s",
+    "python": "3.12",
+    "log_sha256": "e0bb449e4a04270e579df27052bc90c09bd14a0af121d05199ee3bfbd28f6e17",
+    "junit_sha256": "2cd975badc4dc727739dec30504af6f09464b40572fa64a19ee8d774cb51b28b"
+  },
+  "live_github_observations": {
+    "final_restore_acceptance": {
+      "run": 39357369211,
+      "status": "completed",
+      "conclusion": "success",
+      "head": "fb75f1c49edda0731287acbf0054a1151ec318c9"
+    },
+    "historical_full_suite": {
+      "run": 39177774744,
+      "status": "completed",
+      "conclusion": "success",
+      "head": "4fecd93fdcc5012a404afc07ce166cb7ff422f59"
+    }
+  },
+  "owner_release_disposition": "pending; preparation does not approve measured latency or production promotion",
+  "pr14_updated": false,
+  "main_updated": false,
+  "long_run_started": false,
+  "independent_integration_review": {
+    "critical": 0,
+    "important": 0,
+    "minor_resolved": "Recorded the exact JUnit/output capture command; no product change or test rerun required.",
+    "scope": "Prepared documentation delta, source identities, test evidence and release boundary; accepted runtime architecture was not re-reviewed."
+  }
+}

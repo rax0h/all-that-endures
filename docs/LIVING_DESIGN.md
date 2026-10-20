@@ -1,7 +1,7 @@
 # ALL THAT ENDURES — Living Design Document
 
 **Status:** Living design authority for new simulation direction.  
-**Last cohesive update:** 2026-10-06  
+**Last cohesive update:** 2026-10-11  
 **Purpose:** Preserve design decisions as they become coherent. Before replacing an existing system, inspect the repository and extend shared causal primitives where possible.
 
 > **North star:** Not simulated stories. Simulated people whose lives become stories.
@@ -18,9 +18,17 @@ ATE should not merely simulate a fantasy setting. It should simulate the process
 
 ## 2. Canonical magic progression
 
-A ranked person cannot exist without a complete magical path. All essences/confluence requirements and **all twenty abilities must be unlocked** before rank progression is valid. This applies even at Iron. An incomplete twenty-ability path is unranked, not a partial Iron character.
+**Owner-confirmed canonical Essence-rank progression (2026-10-11; supersedes the older twenty-before-Iron rule):**
 
-Recent validated PR #5 baseline: 91.55-second millennium run; 15 completed twenty-ability paths and therefore 15 ranked living paths (1 Iron, 2 Bronze, 3 Silver, 6 Gold, 3 Diamond), while 47 incomplete paths remain rank 0. Chronology/progression and wallet/treasury validation passed. The remaining concern is calibration rather than correctness: completion/access/liquidity is too low for the intended mature-world population, especially Gold.
+- **No Confluence = unranked.** A person holding zero, one, or two base Essences has not attained Iron rank, even if one or two innate abilities are awakened. They may have magic without having a complete Essence path.
+- **Confluence = Iron.** Acquiring a third base Essence automatically produces the fourth, the **Confluence Essence**. This is the transition to **Iron rank**, **without** requiring all twenty abilities first.
+- Each absorbed base Essence awakens its one innate ability; the Confluence produces one innate ability of its own. An ordinary newly confluenced Iron has **4 of 20 abilities awakened**: one under each of the four Essences. The remaining sixteen are gained through awakening stones and actual in-world access, not given automatically on reaching Iron.
+- **Bronze gate:** An overall Essence user may become **Bronze only once all twenty abilities exist and all twenty have individually advanced to the Bronze threshold**. An ability may reach Bronze individually while its owner remains Iron; newly awakened Iron abilities still block whole-person promotion until they catch up. The same all-twenty qualification applies to subsequent overall rank transitions as defined by the ranked-progression contracts.
+- Separate **person rank** from **ability rank**, **Essence completion** from **ability completion**, and **natural magical access** from **ranked magical body/ontology**. Do not infer whole-person Iron status merely because one ability is Iron.
+
+**Known discrepancy to repair later, not during Stage 0.5:** The current advancement runtime and some tests still implement the older/incorrect behavior; see [issue #17](https://github.com/rax0h/all-that-endures/issues/17) and Section 57. This document now records the **intended design**, not a claim that current code, checkpoints or test oracles already implement it.
+
+**Historical, not re-certified under the corrected rule:** The accepted PR #5 benchmark (91.55 seconds, 15 completed twenty-ability paths recorded as ranked under that source's definition: 1 Iron, 2 Bronze, 3 Silver, 6 Gold, 3 Diamond; 47 incomplete paths rank 0) must retain its original meaning and reproducibility. Do **not** silently reinterpret its counts or change deterministic baselines. Future recalibration should measure the population distribution under corrected rank semantics, including Iron users with only four or more abilities.
 
 ### Four mastery stages inside every rank
 
@@ -31,7 +39,7 @@ Do not rebalance the established time-to-rank curve merely to add visible progre
 - `Iron 3 — 0.0%` means that skill is halfway from Iron to Bronze.
 - Crossing Stage 4 at completion advances that skill to Stage 1 at 0.0% of the next rank.
 - Example: `Hand of the Reaper — Silver 3 — 45.0%`.
-- Character rank advancement remains gated by all twenty skills meeting the required threshold.
+- **Iron entry is the exception:** Confluence creates Iron with four innate abilities; **Bronze and later overall rank advancement** are gated by all twenty abilities existing and meeting the required next-rank threshold.
 
 This is a resolution/state/display refinement, not a pacing rewrite.
 
@@ -1534,3 +1542,404 @@ The path may change.
 
 The project does not.
 
+## 45. Character creation, origins, and voluntary magical identity
+
+**Design status:** Core freedoms and constraints below are adopted. Exact creation-screen flow, race catalogue, trials, starting allocation and numerical balance remain design work.
+
+ATE begins with a person entering an already living world, not a premade class or a guaranteed hero's journey. Character creation should provide considerable physical customization and a comprehensible starting situation while leaving most of the character's future to life and circumstance.
+
+### Two ways to enter the world
+
+Offer two broad origin directions:
+
+- **Isekai / outsider:** A person arrives from another world. Their arrival requires a valid in-world cosmological cause, not an unexplained menu exception. They may lack local knowledge and relationships; they are not automatically chosen, cosmically favored or destined for importance.
+- **Natural-born / native:** A person belongs to the simulated world. Their family, birthplace, upbringing, cultural understanding, socioeconomic circumstances and existing ties must be compatible with actual world history. Do not invent an isolated biography that contradicts the save.
+
+Both origins can pursue any legitimate life, magical or mundane. Neither grants automatic superiority. The precise rules by which newly created people are introduced into an established historical timeline, and by which outsiders cross worlds, still need design.
+
+### Customization and presentation boundaries
+
+Support meaningful freedom across the world's playable races, sex and physical appearance, with detailed control over face, body, height and proportions, hair, coloration, markings, scars and physiology-specific traits. Race must correspond to an actual world physiology; its physical properties can matter without reducing people to classes or fixed destinies. Provide usable presets as well as advanced customization. The final catalogue of playable physiologies is not yet fixed.
+
+The game may address adult subjects without displaying explicit nudity. Character creation and ordinary presentation should use appropriate clothing/undergarments; anatomical customization does not require nude display. No finished HUD or character-editor layout is canonized by this section.
+
+### Starting Essence: three legitimate magical beginnings (updated 2026-10-11)
+
+**Adopted player choice:** Standard character creation should permit an **unawakened** beginning, a **first-Essence** beginning, or an **Iron-rank** beginning. This replaces the older restriction that a normal player could select only one Common Essence. None is an inferior mode or an automatic guarantee of exceptional future success.
+
+1. **Unawakened / no Essence:** Start with no Essences or awakened abilities, with the freedom to remain mundane for an entire life or seek magic in-world. This leaves open the possibility of eventually discovering **Legendary** Essences or a **potential Transcendent** tier/opportunity if that upper category is formally defined and implemented; neither discovery nor successful acquisition is guaranteed. **"Transcendent Essence" is currently a design possibility, not a confirmed catalogued item or fixed rarity/progression rule.**
+2. **First-Essence beginning:** Start with one **Common** Essence and its innate ability, while remaining **unranked** until two more base Essences are acquired and the Confluence forms. Further Essences and abilities are earned in play. A possible optional in-world *trial* to qualify for rarer initial access remains open design, not a guaranteed Uncommon/Rare grant, unbounded reroll or settled fourth starting path.
+3. **Iron-rank beginning:** Select **three base Essences** from a deliberately **Common-and-Uncommon-focused starting pool**, with a **limited Rare selection** if supported by the actual catalogue and in-world acquisition/provenance. The **Confluence automatically forms** from these three; the player **does not independently pick the Confluence**. Each Essence, including Confluence, begins with **one awakened innate ability**. Therefore the character starts at **Iron rank with exactly four awakened abilities (4/20)**—not with all twenty. The other **sixteen** must be unlocked and developed during the living game.
+
+**Bronze is not a character-creation shortcut.** An Iron-start character must eventually awaken the other sixteen and progress **every one** of all twenty to Bronze. The choice of three starting Essences fixes meaningful, potentially irreversible parts of the path but leaves most ability acquisition, rank development, tactics and life history open. An Iron-start person's prior acquisition, training, relationships, origin and real magical resources require a world-causal introduction; creating six roster characters must not become infinite resource generation. Exact creation-pool members, Rare access restrictions, ability customization at creation and world-provenance mechanism remain open design.
+
+**Rarity is not a direct combat-strength rating or a quality-of-person score.** Rarer Essences may have unusual properties, availability constraints and greater or different *potential*; they do not inherently make their users better adventurers. Actual effectiveness is shaped by ability expression, rank, mastery, training, experience, creativity, equipment, physiology, strategy, matchup, environment and relationships. A deeply skilled adventurer possessing **only Common Essences** can be among the greatest in the world. Do not impose a universal rarity-damage multiplier or script a Legendary-Essence user to outperform a Common-Essence master.
+
+The Mirage Arena remains the **separate in-world experimentation sandbox**, not a route to grant all twenty real abilities at creation. A full build selected there need not be obtained, or manifest identically, in the living world.
+
+All starts remain available independently of isekai/natural-born origin where their actual world explanations are legitimate; detailed limitations are to be designed. Explain Essence commitment consequences clearly.
+
+**Mundane life is a complete life-path, not a beginner state, missing class, challenge penalty or failed magical build.** A person can remain without Essence magic until death and still be a master craftsperson, respected parent, politician, soldier, investigator, scholar, entrepreneur, farmer or historical figure. Do not award magic merely to validate a life well lived, or require it for meaningful play. Physical and magical power disparities remain real: an excellent mundane fighter is not secretly made equal to a Diamond.
+
+### Classes are emergent descriptions
+
+No conventional immutable class selector should govern ATE. The four-Essence/twenty-ability framework creates capabilities; profession, equipment, training, technique, reputation, relationships and conduct create a person's practice and social description. Terms like duelist, battlemage, healer, blacksmith or adventurer may help players understand or describe someone, but must not become invisible restrictions on what they can attempt. Two people with the same Essence combination can develop substantially different lives and effective builds.
+
+## 46. The world is the save; playable lives are inhabitants
+
+**Governing rule:** **The world is the persistent game. A character is a life inside it, not the container holding the save.**
+
+The player may spend an entire game with one person, create several people, inhabit existing simulated people where permitted, follow a family across generations, or move between unrelated lives. No protagonist is required to survive for the world to continue.
+
+### Personal creation roster versus people one can inhabit
+
+Adopt **at least six personally created lives per world as the initial roster design target**. Six is not a permanent ceiling on the number of people one may know, revisit or inhabit; capacity, slot reuse, and final UI remain to be specified. A created person is an actual member of the world, not a separate save branch or a disposable character preset.
+
+Maintain two distinct notions:
+
+1. **Created lives / roster:** People the player personally introduces through legitimate origins, initially targeting six or more.
+2. **Inhabited lives / history:** Any existing person whom the game's eventual inhabitation rules permit the player to control, whether or not originally created. Formerly inhabited people may be followed or bookmarked without consuming a created-character slot.
+
+**Do not interpret the six slots as an adventuring party.** Each person may live on another continent, maintain an unrelated career and have their own family, crew, guild or companions. Their paths may cross through causality, but the system must never force crossover because both are on the player's roster. A player can intentionally keep their lives separate by where and how they live; they cannot suspend the world's ordinary causal possibilities.
+
+An adventurer can assemble companions naturally. Those companions are autonomous people, not automatically the user's other created lives; permitted inhabitation of one of them changes viewpoint without magically making the group into six authored protagonists.
+
+### Shared time, mortality and release
+
+All characters inhabit **one world clock and one actual history**. Playing one does not freeze the others. Switching viewpoints must neither duplicate time nor silently fast-forward far beyond the player's informed choice. World-time flow, waiting and explicit long-history advances require clear controls and safeguards; no assumption is made that real-life offline time advances the world.
+
+When the player releases a person, that person returns to the same agency and simulation rules as everyone else. They may train, prosper, fail, change jobs, fall in love, have children, move, join a movement, abandon an ambition, age or die. On return, the player inherits the person's *actual intervening life*, not their earlier snapshot. Player-directed history influences them but does not permanently lock their desires or future decisions.
+
+Death is a real world event and is generally permanent under the existing one-life rule, subject only to genuine rare in-world resurrection mechanisms. It changes inheritance, property, grief, relationships, careers, organizations and history. It does **not** delete the world save or require a restart. The player may continue another existing life or introduce a new life through legitimate origins. The dead remain in memory and history, not erased to make a slot look unused.
+
+### Information and perspective separation
+
+The human player may remember information learned while inhabiting someone else; the current person does not thereby gain it. Knowledge, maps, rumors, private plans, hidden property, identities and relationships remain situated within actual observers and transmission. No shared-roster telepathy, automatic companionship or inventory pooling. Interactions between lives require real-world contact, messages, contracts, trade, inheritance, discovery or other legitimate causes.
+
+### Deliberately shaped people, unpredictable futures
+
+The player may develop someone ruthless, ambitious, cruel or unusually powerful and release them far from familiar settlements. That person might become a feared antagonist, establish an institution, live quietly, reform or die. **There is no Create Villain function and no guaranteed villain trajectory.** A former player-inhabited person is not plot-armored, preserved as a future encounter or obligated to become an adversary. This is one of the central tests of autonomous personhood.
+
+## 47. Autonomous release goals, plans and life commitments
+
+**Core decision:** When leaving an inhabited person, the player may express intentions for that person's future activity, continue existing commitments, or add no new direction. These intentions enter the **same bounded Agency system** that governs every other person; they are not remote-control orders, job-queue cheats, guaranteed outcome scripts or a separate former-player AI.
+
+### Release choices
+
+A proposed release interface should make three intentions intelligible without forcing elaborate micromanagement:
+
+1. **Continue existing life:** Keep present goals, routines, obligations and commitments.
+2. **Prioritize selected goals:** Record specific desired outcomes and priorities for the autonomous person to pursue, to the extent feasible and compatible with who they are.
+3. **No new direction / live freely:** Add no player-authored goals; the person still has memory, needs, habits, existing promises and the freedom to form new plans. This choice does not wipe their prior identity or debts.
+
+The wording and layout of the release screen are not finalized. The player can later inhabit the person again and change their own plans, but intervening consequences and commitments remain real.
+
+### Goal representation and decision model
+
+Represent a goal with enough causal structure to guide action without pretending it determines success. A useful bounded goal record may hold:
+
+- the **desired condition** and subject (e.g., host a banquet, learn a technique, recruit a student);
+- **motivation and personal importance**, distinguished from an external command;
+- a **deadline or horizon** where real, and expected effort;
+- known **prerequisites, dependencies and feasible next steps**;
+- perceived **resource requirements** (money, materials, labor, tools, transport, property, skills, knowledge, time);
+- relevant **relationships, promises, contracts, permissions and consequences**;
+- **confidence, uncertainty and information provenance** from the person's knowledge, not global truth;
+- priority, current status, previous attempts and reasons to continue, delay, renegotiate or abandon.
+
+Goals may overlap, conflict or support one another. Deadline-driven obligations can outrank distant ambitions, while illness, family emergencies, weather, violence, opportunities or changed values may rationally cause reprioritization. Failure may generate debt, reputation change, disappointment, loss of a contract, learning or a new plan. A stated goal must never skip the actual work required by downstream systems.
+
+Agency chooses among plausible efforts using the existing person/world model. Profession systems resolve the practical work; economy resolves resources and prices; social systems resolve cooperation; the world resolves whether outcomes are possible. **Instruction is intention; choice is agency; achievement is consequence.**
+
+### Chef: five simultaneous intentions as an integration test
+
+A restaurant-owning chef is released with five goals, not five completion timers:
+
+| Goal | Real work and dependencies | Possible consequences |
+|---|---|---|
+| **Study advanced cooking techniques** | Find sources or teachers, arrange time, buy or borrow tools/ingredients, practice, fail and improve | Greater competence, expenses, relationships, discoveries, limited or lost time for paid work |
+| **Prepare for the harvest banquet** | Accept/confirm an actual obligation; plan menu and portions; acquire food, staff, equipment, venue and transport before a real date | Income and prestige if successful; shortages, illness, weather or mistakes may cause renegotiation or failure |
+| **Develop a signature regional dish** | Experiment with regional produce, taste, preservation, technique, available equipment and consumer preferences | Original knowledge, regional identity, imitation, prestige, sales or an expensive unsuccessful experiment |
+| **Expand the restaurant** | Determine actual demand, secure finance, property, materials, labor, permits or local consent where applicable | More capacity, jobs and influence—or debt, vacancies, supply stress and closure |
+| **Recruit and train an apprentice** | Find a willing person, agree on terms, allocate teaching time, teach real techniques, earn trust and assess progress | Transmitted knowledge, mutual loyalty or resentment, succession, competition, departure or an institution surviving its founder |
+
+A harvest deadline may draw effort away from studying. An apprentice might make the banquet viable and later develop the signature dish further. Expansion can fail because trade collapses or succeed because new roads reopen. The chef may fall in love, become ill, have children or change careers. None of the five goals immunizes them from life.
+
+The player returning after months or years should find inspectable evidence of what happened: contracts, purchases, actual changes to the restaurant, learned techniques, recipes or their bounded knowledge representations, coworkers, apprentices, debts, reputation by observer, and events. No invented summary claiming the chef "completed banquet 100%" without real underlying state.
+
+### Scope and scalability
+
+A person should hold a **small bounded set** of active concerns and goals, with dormant longer-range ambitions where justified. Reassess them on meaningful events, deadlines and coarse cadence, not by repeatedly scanning global historical archives or deliberating in maximum detail every simulation tick. Released characters must have no more special per-tick machinery than comparable never-inhabited people.
+
+Test routine continuity, conflicting priorities, failure, an unmet prerequisite, a broken contract, discovery of new information, a changed relationship, unexpected success, and a person explicitly abandoning the player's former objective.
+
+## 48. Mirage Arena: diegetic sandbox and imperfect rehearsal of reality
+
+**Core decision:** The **Mirage Arena is the sandbox**. Do not create a second disconnected, omnipotent "sandbox universe" as the conceptual default.
+
+Mirage chambers are real magical locations/institutions governed by in-world access, capability and history, as established in Section 37. An appropriate chamber or player-facing Mirage experimentation context may permit simulated Essence selection, rank and mastery settings, twenty-ability configurations, equipment, monsters, opponents, environments and combat trials. It may permit mundane experimentation as well. The confluence still follows the legitimate Essence combination rather than becoming an independently arbitrary fourth choice.
+
+**Simulated success grants no real Essence, Awakening Stone, rank, rare possession or permanent magical capability.** The living world retains actual scarcity, access restrictions, training, risk, relationships and consequences. Projected deaths do not automatically kill the actual participant, unlike genuinely lethal astral or physical expeditions. Keep those modes distinct.
+
+### Model accuracy is conditional, not a guaranteed percentage
+
+A Mirage reflects its model of physical and magical reality, its technical or magical sophistication, and the quality of information available to it. A sophisticated arena may predict many known interactions extremely well; an older or poorly informed one may fail on rare abilities, unusual environments, unknown power expressions, individual physiology or poorly studied magical combinations.
+
+The player's illustrative idea of "90% accurate" describes meaningful **remaining uncertainty**, not a mandate to implement a fixed 10% error chance or to manufacture a surprise on every tenth event. Test whether the modeled causes are sound; **do not roll a separate narrative inaccuracy die.**
+
+A Mirage-tested ideal three-Legendary build might never be obtainable in the actual world. Even if the real Essences are eventually found, awakening stones, available ability outcomes, training, body, timing, mentors and circumstances may yield a different toolkit. It is also possible to reproduce a projected outcome when the real causes align. Neither success nor divergence is guaranteed for dramatic convenience.
+
+People can practice, learn and plan inside a Mirage where justified by in-world rules, but practice must not bypass real acquisition, material resources or irreversible consequences. The Mirage can show **what might be possible**. The living simulation determines **what actually happens**.
+
+## 49. Consequential civilization and the conditions for emergent stories
+
+**North star, restated:** **Do not write the stories in advance. Construct a world deep enough that meaningful stories and gameplay emerge from people, circumstances and history.**
+
+Every profession, magical capability, relationship, institution, possession and environmental intervention must connect to real causal state. A superb farmer should produce materially different possibilities than an unskilled farmer in otherwise comparable conditions. An ill-equipped merchant should face genuine transport, supply, financial and social risk; good preparation should help but not guarantee victory. These consequences should propagate through specific people, places, inventories, wages, food, debt, trust, jobs, health, ecology, travel, property and knowledge—not through a generic "story importance" or "town prosperity" increment.
+
+### Example: the farmer, the merchant and a drought
+
+A farmer who invested years in irrigation, breeding, reserves and local relationships may weather a drought better than neighbors. Grain scarcity changes prices and leverage. A poorly prepared merchant carrying supplies might break down or fail delivery, worsening local shortages. Those combined effects may change jobs, migration, theft, bargains, influence, family futures or political disputes. The prepared farmer can still fail through disease, bad judgment or wider catastrophe; the merchant can recover through skill, help or improvisation.
+
+The point is not to force drought drama. The point is that the systems recognize what was actually prepared, exposed, attempted, bought, saved, broken, promised or lost.
+
+### Development levers: tune causes, not endings
+
+Designers need explicit calibrated parameters and observability for the processes that make varied histories possible. Important families are:
+
+1. **Scarcity and abundance:** resources, labor, food, land, logistics and unequal access.
+2. **Opportunity and access:** learning, magic acquisition, discovery, careers, encounters, travel and institutions.
+3. **Individual agency:** temperament, values, beliefs, emotion, ability, risk appetite and goals.
+4. **Social friction and conflict response:** grievance, status, exclusion, debt, justice, retaliation and negotiation.
+5. **Interdependence:** trade, family, mentorship, employment, supply chains, services and obligations.
+6. **Environment and ecology:** climate, monsters, health, catastrophe, local habitat and changing resources.
+7. **Institutional resilience and legitimacy:** governance, succession, law, capacity, memory, corruption, reform and collapse.
+8. **Memory and information transmission:** witness knowledge, rumor, records, reputation, inheritance, education and cultural change.
+
+These are broad **causal calibration families**, not eight global "drama sliders" or a replacement for existing subsystem rules. Preserve local differences, random-seed reproducibility and the distinction between what is true and what each individual knows.
+
+### Escalation, climax and resolution without an arc director
+
+A conflict can travel from a small disagreement to a feud, a court case, sabotage, war, compromise, reconciliation or disappearance. A romance may grow, fail, endure, end in death or become a family institution. A discovery may transform a craft or remain forgotten. **Climax is a later observer's description of a decisive change, not a simulation event type that must be produced.**
+
+Do not implement commands like Force War, Start Redemption Arc, Make Epic Romance, Generate Legendary Hero or Save The Protagonist. People pursue motives; circumstances permit actions; consequences change future opportunity. Extraordinary action remains possible for people never inhabited by the player. Ordinary peace, prosperity, artistry and family life may be just as valuable as catastrophe.
+
+### Seed quality without narrative quotas
+
+Every valid seed should support substantial **opportunity for** adventure, surprise, meaningful choice, love, conflict, danger, learning, recovery, social change and historical development. Do **not** guarantee one war, one legendary romance or one cinematic climax in each century or world. An unusually peaceful and creatively productive century can be a successful history. A sterile thousand years of nearly consequence-free behavior is cause for investigation.
+
+Use reproducible multi-seed testing to assess, at minimum:
+
+- Whether goals lead to actual attempts, resource use and changed circumstances.
+- Whether effort, preparation, competence and mistakes make outcomes causally different.
+- Whether relationships, promises and observer-specific reputation influence later decisions.
+- Whether some disputes escalate, others resolve, and both paths leave comprehensible evidence.
+- Whether technologies, professions, institutions, families and cultures develop, transmit knowledge, fail or survive.
+- Whether unusual events arise from mechanisms that can be reconstructed rather than narrative quotas.
+- Whether players can **discover and act upon** consequential events through plausible information channels.
+
+Measure distributions, stagnation, extreme outcomes and causal traceability across seeds. Diagnose weak causes and thin connections rather than injecting plot to satisfy a checklist. Preserve the established millennium performance target and long-history state integrity; observing richness cannot require universal expensive deliberation.
+
+### Playability: history must be encounterable
+
+An extraordinary event on another continent may be hidden from the current character, but the world needs genuine routes by which its effects become encounterable: travelers, prices, trade networks, witnesses, letters, institutional records, apprentices, rumors, archaeology, family stories, displacement and later meetings. A farmer, merchant, scholar, chef and adventurer legitimately experience different portions of the same history.
+
+The player must have ways to investigate, participate, prepare, cooperate, refuse and bear consequences, while retaining the possibility that some events pass unnoticed. Depth without discoverability becomes an invisible database; discoverability without causality becomes a scripted amusement park.
+
+## 50. Character-facing information and interface direction
+
+**Directional, not a finished HUD specification.** The world remains primary. The interface should be clean, legible, flexible and context-sensitive rather than a perpetual dashboard of omniscient statistics.
+
+- Surface combat resources, risks and available actions when relevant without requiring a full-screen spreadsheet.
+- Organize magical progress, Essence paths and abilities through diegetic perception or legitimate soulspace/system interfaces where cosmology permits, never unrestricted hidden-world truth.
+- Show maps, knowledge, contracts, profession information and relationships according to what the currently inhabited person can know.
+- Let mundane characters have rich profession, skill, relationship, equipment, resource and life interfaces; do not permanently display twenty empty magic slots as if their lives were unfinished.
+- Provide comprehensible character selection, world-time change, return, release-goal and history interfaces without making former player characters freeze in menu space.
+- Preserve accessibility, player-configurable clarity and usable controls even where information is represented diegetically.
+
+No precise HUD layout, display style, control mapping or universal soulspace grant is decided here. These must be prototyped alongside an actual playable slice rather than locked down solely by prose.
+
+## 51. Independent completion, audience development and release strategy
+
+**Preferred strategic direction, not a signed distribution or licensing decision:** ATE should be built to a genuinely completed, polished, commercially releasable game and **self-published** where practical. Retain control of the game's intellectual property, canon, creative direction, technology choices, releases and player experience. Do not treat a publisher, investor or exclusive revenue-share agreement as mandatory merely because the team is small.
+
+- **Steam first** is the preferred primary PC storefront to evaluate when a market-ready project exists. Consider GOG and other stores on their actual terms; consoles are a later technical, compliance and business decision.
+- Avoid giving away IP, unnecessary exclusivity or major revenue participation in exchange for vague marketing promises. Distribution platforms necessarily have agreements, fees and obligations; independently review real contracts rather than pretending that publishing can occur with no terms at all.
+- Do not wait until finished development to introduce the game publicly. Once a **truthful, convincing playable vertical slice** exists, begin an audience/wishlist/community effort grounded in actual footage and credible claims.
+- Prefer a representative polished demo and complete release over selling promises. Early access is a possible deliberate future choice, **not** the default method of funding an unfinished vision.
+- Evaluate practical economics before launch: pricing, storefront fees, taxes, conversion, wishlists, marketing costs, support burden, QA, certification, localization, accessibility, infrastructure and post-release obligations.
+- Design commercial sustainability so the project does not *require* blockbuster sales to be viable. Future business models remain open until supported by evidence.
+- AI-assisted and agent-driven development can multiply implementation capacity but do not eliminate the need for independent quality judgment, security, testing, playtesting and responsible release management.
+
+The production order should not confuse long-term aspiration with validated completion. Finish Stage 0.5's persistence independently; build the living-simulation/Agency integrations and a small **playable** slice in a coordinated way after the foundation stabilizes; then expand, evaluate and test the complete RPG. Do not spend indefinitely building invisible infrastructure without validating that entering, living in and changing the world is a compelling experience.
+
+## 52. Decision register and implementation boundaries for Sections 45–51
+
+**Agreed core direction:**
+
+- World-owned persistence, real mortality and continuing history; several created lives in one world, no forced shared party.
+- Player inhabitation of existing people where the rules permit; releases return people to full autonomous life.
+- Optional goals on release, processed through ordinary Agency rather than puppet orders.
+- Isekai or natural-born beginnings; substantial customization; no explicit nudity required.
+- **Three standard magic starts:** no Essence, one Common Essence (unranked), or an **Iron start with three chosen Common/Uncommon-focused Essences, limited Rare possibilities, automatic Confluence, and 4/20 awakened abilities**. Unlock and train the other sixteen in-world; mundane play remains fully valid. Iron = Confluence; Bronze requires all 20 abilities individually at Bronze. See Section 2 and issue #17.
+- No traditional binding class selection; skills, magic, careers and status emerge from actual capabilities and behavior.
+- Mirage Arena as the in-world sandbox and rehearsal, not a guarantee of actual magic outcomes.
+- Consequential professions, relationships, history, failure and preparation; causal tuning rather than generated plot quotas.
+- Long-term independent release and retained creative/IP control as the preferred business strategy.
+
+**Provisional implementation details (do not quietly promote to canon):**
+
+- Final count above the **at-least-six created-life target**, slot replacement/history interface and restrictions/costs for inhabiting any person.
+- Starting trial access to Uncommon/Rare Essences; exact Iron-creation pool and rarity constraints, economic/provenance guardrails, permitted initial ability choices, and the potential **Transcendent** tier's actual definition and source.
+- Exact race catalogue, age/background generation, character-editor controls and HUD.
+- Mirage availability, permissions, custom-build tooling, degree of modeled uncertainty, training carryover and individual chamber capabilities.
+- Release-goal priority UI, active-goal limits, time-advance options and how free-form intentions are captured in player controls.
+- Final storefront, pricing, commercial structure and launch/release schedule.
+
+**Verification requirements before implementation acceptance:** Shared-time continuity; no roster-forced meetings; death retains historical consequences; correct character-relative knowledge; held identity and lawful release/return; autonomous goal abandonment and completion grounded in actual work; real magic rarity and irreversible commitment; genuine mundane alternatives; Mirage/live-world separation; multi-seed causal richness without scripted quotas; bounded per-person Agency and persistence; and a playable interface exposing legitimate opportunities without omniscience.
+
+**Relationship to current architecture:** Extend existing Agency, goal/memory, information, profession, event, identity, magic, economy, institutional, provenance and persistence mechanisms. Do not introduce parallel story, player-NPC, historical artifact, AI companion, loot or world-truth registries where existing primitives can be extended. This design update makes **no claim** that these proposed systems are already implemented, nor does it approve changes to the in-progress Stage 0.5 closeout branch.
+
+## 53. Product scale decision: Game 1 is one deeply lived kingdom
+
+**Adopted scope direction (2026-10-11):** Build and finish **Game 1 as one geographically coherent, deeply simulated kingdom or kingdom-scale region supporting approximately 1,500 living people at a time**. This is not a temporary fake map, a mandatory tutorial, a single-city quest hub, or an unfinished fragment of a promised continent-spanning game. It is the proposed **complete setting for the first finished, polished, independently released game**. The broader multi-kingdom/civilization ambition remains valuable, but Game 1's release must not depend on already supporting millions of simultaneous people.
+
+The same kingdom can support a development vertical slice, then a public-facing demo, then a complete Game 1:
+
+- **Development vertical slice:** Prove a genuinely playable and visually realized portion of the real kingdom, including ordinary life, travel, danger, professions, magic where available, relationships, character inhabitation/release, and persistent consequences. Scope small enough to implement and measure. It is a proof of integration, not the finished game.
+- **Public demo:** A representative, engaging segment of the actual game that demonstrates its central promise without inventing fake quests, simulated cinematic history, or systems that disappear in the release. Demo extent, starting conditions and accessibility remain to design.
+- **Finished Game 1:** The connected kingdom with sufficient geographic, social, professional, ecological, magical, historical and gameplay breadth to stand alone as a substantial RPG. Multiple lives and play styles are genuinely supported; it should not feel like a prototype waiting for a second game to become complete.
+
+The kingdom's boundaries, travel times, geographic footprint, political structure, number of settlements and starting historical age will be determined by world generation, design/testing and playable realization—not fixed by this section. A plausible mixture might include a principal market town, agricultural communities, smaller villages/hamlets, working sites, wilderness, routes and ruins; this is a **possibility**, not a prescribed generated map or settlement quota. Concentrate population and meaningful interactions enough for an inhabited society. Do not stretch roughly 1,500 people across many empty continents to claim map size.
+
+**Approximately 1,500 is an observed current scale and a practical initial performance/design target, not an immutable population law.** Birth, death, disease, migration, settlement growth and loss remain causal. Do not stop births or manufacture deaths when a population counter reaches an exact target. The actual supported operating range, seed distributions and upper acceptable performance bounds are to be established with evidence. Test whether such a society can sustain enough food, labor, trade, family continuity, specialization, ranks, defense, institutions and meaningful player opportunities without implausible occupational staffing. Do not fabricate a huge metropolis or empire inside a population that cannot maintain it.
+
+The full standard set of Game 1 design promises still applies at this smaller scope: autonomous individual lives, player-controlled and released people, six-or-more created-life design target, optional mundane and magical paths, Essence acquisition, Mirage experimentation, combat, professions, families, institutions, real deaths, long history, causal environments, and consequences. Narrower geography does **not** authorize a shallow simulation.
+
+### Small-population conflict and historical weight
+
+At this scale, small groups can matter profoundly. Conflict may consist of a feud, a robbery, threatened violence, a raid involving a handful of people, a skirmish among settlement defenders, or a prolonged series of retaliations and truces. There need not be a single pitched battle for a warlike relationship to exist.
+
+A battle with **100–200 total participants** is a conceivable **exceptional** local engagement, not a required or default size: at 1,500 total living people it involves approximately 7–13% of the entire world's current population, before accounting for children, elders, noncombatants, distance, loyalty, ability, injuries and logistical commitments. The actual scale emerges from who is available and who can be recruited, supplied, persuaded or compelled. Never conjure an army of thousands to make a cinematic scene, or treat every polity as capable of standing battalions.
+
+Consequences must propagate beyond casualty counts: fewer workers and caregivers; damaged farms and trade; widowhood, succession and inheritance; interrupted learning, teaching and professions; food shortages; refugees; trauma, injury and recovery; inter-family grievances; shifts in legitimacy; and alliances or institutions that may endure for generations. A 15-person raid may have more historical consequence than a larger battle if particular participants and dependencies make it so.
+
+Ranked magic changes military capability without removing the need for physical logistics, situated information, relationships, recruitment, organizational competence or exposure to actual countermeasures. A few powerful people might deter a war, destabilize an institution or make a coalition possible. They do not create extra population for free. Rare **cosmic or existential threats** may plausibly motivate extraordinary alliances and mobilization, but no threat is required to trigger scripted climaxes, and no emergency creates nonexistent soldiers or unsupported magical resources.
+
+### Game 2 or later: expansion, not a debt Game 1 must repay
+
+**Larger and fundamentally different population scales may belong to a later game or a future architecture generation**, particularly if better tooling or a more advanced simulation approach is necessary. Multi-kingdom politics, very large armies, continent-spanning supply systems, empires and millions of living people are **future ambitions, not Game 1 release requirements**. This is a scope boundary, not a cancellation or a promise of a particular sequel.
+
+Preserve extensible IDs, world truth, causal semantics, bounded history access and versioned persistence where reasonable; do not force today's team to build a million-person runtime before delivering the 1,500-person kingdom. Game 1 must stand alone. Later technical work can expand it or inform a successor without retroactively making the original product incomplete.
+
+## 54. Human and civilizational causality: research into why people and groups act
+
+**Active evidence record:** [Human & Civilizational Causality — Research Record](research/HUMAN_CIVILIZATIONAL_CAUSALITY.md). This separate document maintains published sources, competing explanations, explicitly provisional hypotheses and proposed counterfactual tests; research does not automatically change gameplay canon.
+
+**Research direction, not a claim of completed scientific validation.** To make unscripted love, leadership, innovation, cooperation, greatness, conflict, peace and war possible, ATE must investigate the underlying causes of those outcomes. Do **not** start from lists of compelling stories and then reverse-engineer NPC behavior to guarantee them.
+
+Study human history and relevant empirical/theoretical work across individual psychology, social psychology, anthropology, political science, economic history, ecology, institutional economics, collective action, military history and disaster studies. Separate established evidence, contested theories, useful modeling approximations and fantasy-specific rules. Historical cases should inform *mechanisms*, not become plot templates or universal claims about human nature.
+
+### Individual development: greatness is not a hidden stat
+
+Distinguish **character and ethics**, **developed competence**, **social recognition**, and **historical consequence**. Exceptional influence may arise through an interaction of temperament, goals, sustained practice, opportunity, health, knowledge, environment, upbringing, mentors, social access, institutions, timing, luck and earlier consequences. No universal innate hero/villain/greatness score. Do not assume famous equals good or ordinary equals insignificant. A well-prepared farmer may save a community; an extraordinary fighter may leave only destruction; a capable scholar may go unrecognized because access was denied.
+
+Build individual trajectories as feedback loops: experience changes memory, belief, skill, trust, resources, health, obligations and future opportunity. A person's choices must remain situated, uncertain, and changeable. Investigate the conditions that enable or block excellence, including ordinary failure, stable competence, unfair advantage, mentorship and cooperation.
+
+### Group formation and durable coordination
+
+Study how kin groups, crews, adventuring parties, households, workshops, guilds and settlements coordinate: shared purposes, complementary skills, trust, reciprocity, leadership, conflict resolution, collective knowledge, norms, institutions, training, access to resources and credible commitments. A group is not merely the sum of individual capability scores, but neither should it receive a free mystical teamwork bonus.
+
+Group effectiveness should arise from what members actually know about one another, what routines and commitments they share, and what relationships and institutions persist. A party assembled through adventures may become extremely capable, fragment, or continue after its leader dies. Ordinary communities must have the same causal access to collective competence as player-associated groups.
+
+### Conflict and war: explain causes and constraints
+
+A conflict need not be driven by innate aggression, arbitrary faction hostility or an abstract war-frequency timer. Investigate interacting causes such as conflicting claims or interests, resources, unequal political access, leadership incentives, fear, inaccurate intelligence, grievances, social bonds, breakdown of negotiation, uncertainty about opponents, credibility of agreements and changing balances of power.
+
+Also simulate the practical *capacity* for organized violence: willing or coerced participants, hierarchy, equipment, transport, food, money, communication, local support, terrain, rank asymmetry and the opportunity cost of removing people from ordinary life. Incentives and fears can produce a failed negotiation even when peace might be materially better; institutions, credible agreements, interdependence and trusted relationships can also prevent war. **The same pressure must be capable of producing cooperation, migration, adaptation or conflict depending on circumstances.**
+
+Do not hard-code any fantasy race, ancestry, religion or cultural group as inherently warlike, cowardly, peaceful or destined to rule. Peoples, institutions and beliefs have history and internal diversity. Avoid false universal rules such as "drought causes war" or "trade guarantees peace."
+
+### Environment is a pressure; vulnerability and response make the consequences
+
+Climate, flood, drought, fire, disease, ecological change, monster activity and other hazards operate through actual systems, not narrative disaster schedules. The harm from the same physical event depends on settlement placement, food stocks, health, housing, infrastructure, transport, prior preparation, warning, resources, governance, trust, magic, and people's choices.
+
+A drought can produce cooperation, altered crop choices, rationing, hardship, migration, banditry or political conflict. Every outcome should be traceable through real states and actions, not a disaster-to-plot lookup table. Investigate especially the social and economic mechanisms that make an event survivable in one community and catastrophic in another.
+
+### Research outputs and experimental method
+
+Prepare a **separate, evidence-grounded Human and Civilizational Causality research record** when the research work begins. Record for each proposed mechanism: the question, source/case, competing explanations, confidence and limitations, candidate world variables, causal process, required domain system, observable consequences, counterexamples, and expected computational cost. Promote findings into design authority only after scrutiny; this section is the research mandate, not proof all models are correct.
+
+Test competing initial conditions using reproducible seed pairs and controlled counterfactuals. Useful questions include:
+
+- Why did one talented person flourish and another lose access to training or opportunity?
+- How did a particular group become coordinated, and what happened after a trusted leader left or died?
+- Why did one water dispute end in negotiation while another escalated to raids?
+- How did real farming, business preparedness, equipment or local trust change survival under hardship?
+- What caused a kingdom to develop a school, establish a guild, lose specialist knowledge, or recover after a disaster?
+- Which meaningful histories became accessible to a chef, merchant, scholar, parent or adventurer through legitimate information routes?
+- When a seed experiences a long peaceful period, what institutions and incentives maintained it? When a seed stagnates, which causal opportunities were absent?
+
+Do not require a war, spectacular romance, legendary leader or catastrophe in each seed. Seek credible, varied causal histories and meaningful gameplay; investigate stagnation without injecting scripted drama.
+
+The results must eventually become **specific, bounded engineering hypotheses** for Agency and other existing systems: what facts are represented, when decisions occur, how resources constrain attempts, how group/institution processes resolve, how events persist, how subjective knowledge travels, and how simulation quality is measured over long timelines. Defer detailed implementations and tuning until Stage 0.5 closeout and subsequent authorized simulation development. Research does not require modifying persistence or implementing Stage 1 prematurely.
+
+## 55. Population scale and simulation fidelity are separate engineering budgets
+
+Stage 0.5 is primarily a **persistence, identity, history, retrieval, recovery and bounded-storage architecture investment**, not proof that millions of simultaneously living people can think, work, socialize and fight with full detail.
+
+Distinguish at least three workloads:
+
+1. **Historical scale:** Many distinct people, events, relationships, items and institutions recorded across centuries, most no longer actively living.
+2. **Concurrent living population:** People whose biographies and material circumstances continue to evolve during the same world-time interval.
+3. **Immediate high-resolution play:** Nearby actions, physics, combat, dialogue, animated characters, detailed spaces and precise reactions actually being experienced.
+
+Do not infer one capacity from another. Paired 1,000/10,000 archived-history or page-backing tests establish properties of the tested history operations, **not** the ability to simulate 10,000 living agents. The historical roughly 1,300–1,500 living-person millennium workload is useful evidence for existing versions, not a promise of a million living people or a certified Game 1 performance envelope.
+
+For a future larger population, explore legitimate variable-resolution and event-driven processing without granting distant people a different fictional physics. Active local people may require high-resolution interactions; regional people may update around obligations and consequential events; distant people may use coarser but still causally constrained schedules. **Less frequent computation must not mean fabricating accomplishments, learning, resources or changed relationships when the player returns.** Truth, knowledge, persistent identity, inventories, resource constraints and consequences remain authoritative at every resolution.
+
+Measure separate budgets for storage, retained history, memory, CPU per simulated year, rendered-frame cost, local active people, number of interacting relationships, event volume, family growth, professional specialization, magical-rank ecology and extreme disasters. Test high and low population seeds, demographic variation and long-horizon sustainability—not only the mean headcount. Never use artificial population deaths, frozen offscreen lives or secret resource injection to hide performance defects.
+
+**Game 1 acceptance focus:** a polished kingdom-scale 1,500-ish concurrent population with robust variation, sustainable historical change and richly playable lives on realistic target hardware. **Future scalability focus:** preserve architecture options for larger games without consuming Game 1's delivery budget to prove million-agent runtime today.
+
+## 56. Scope decision register (Sections 53–55)
+
+**Adopted:**
+- Game 1 is a **complete, satisfying single-kingdom/kingdom-scale living RPG**, not a prelude that requires another title to become whole.
+- Plan around approximately **1,500 simultaneous living people initially**, not 1,500 total people across all history; do not enforce a hard birth/death cap. Final acceptable population/performance range is evidence-dependent.
+- Build an actual integrated playable vertical slice, then a credible public demo, then finish the connected kingdom as Game 1.
+- Natural conflict at this scale is likely often personal or small-group; 100–200 total combatants is an **exceptional conceivable** event, never a forced quota. Cosmic threats may produce extraordinary mobilization but no artificial armies.
+- Research individual/group/civilizational motives, cooperation, hardship, war prevention and conflict escalation to inform **causal mechanics**, not a story generator.
+- Preserve deeper simulated personhood and meaningful consequences at the smaller geographical scale.
+- Larger civilizations, armies, continents and potentially millions of living agents may belong to a future game/architecture; they are not dependencies of Game 1 or claims made about completed Stage 0.5.
+
+**Open until tested/designed:** exact kingdom geography and settlement count; economically viable profession/rank/ecology distribution; demographic and simulated population limits; age and scope of generated prehistory; precise combat formations and recruitment; actual hardware budgets; what the public demo exposes; future sequel/expansion structure; and the evidence-supported causal rules derived from research.
+
+**Do not infer implemented status** from a design section. No change here approves new Stage 0.5 scope, PR merge, million-person optimization work, population balancing or simulation-rule changes without explicit development authorization.
+
+## 57. Essence-rank correction and future gameplay migration — Sol 6.1 / Astra handoff
+
+**Status (2026-10-11): Owner-confirmed rules updated in Sections 2, 45 and 52; current implementation is NOT aligned. [GitHub issue #17](https://github.com/rax0h/all-that-endures/issues/17) is the tracking authority for the discrepancy and its later repair.**
+
+### Exact conflict to avoid propagating
+
+The older Section 2 mistakenly said all twenty abilities must be awakened before **Iron**, and historical completion metrics used this assumption. The owner clarified that **three base Essences cause the Confluence, and that moment makes the character Iron, ordinarily with 4/20 innate abilities**. **Bronze requires all twenty unlocked and each at Bronze**.
+
+The existing \`simulation/ate_sim/advancement.py\` \`AdvancementState.rank(pid)\` instead returns the minimum rank of the **currently awakened** abilities, or zero if there are none. This reports **Iron for a one-Essence person** and can award **Bronze or higher before a Confluence or before twenty ability thresholds are satisfied**. \`simulation/tests/test_advancement.py\` explicitly asserts Iron after one Essence in \`test_absorbing_essence_intrinsically_awakens_catalog_innate\`. By contrast \`test_three_base_essences_form_person_shaped_confluence_and_innate\` already supports **automatic Confluence and four initial abilities**. \`simulation/ate_sim/institutions.py\` \`full_essence_user\` checks for Confluence/four Essences; audit its rank-adjacent consumers without conflating Society eligibility with bodily rank.
+
+**Do not silently "fix" this in Stage 0.5 persistence.** Sol 6.1 is still implementing storage/identity/history, and Astra's Stage 0.5 review must remain evidence-based against its authorized contracts. This is a **deferred gameplay/rules migration**, not a Stage 0.5 release blocker unless a concrete persistence invariant depends on the old behavior. Historical tests and seed digests are previous-version evidence, not updated proof. No instructions here authorize rewriting old stored outcomes, changing population calibration or merging the active persistence PR.
+
+### What must be addressed later
+
+- Separate canonical **overall person rank**, **Essence completion milestone**, **per-ability rank**, and **unawakened ability slots**. Prove that a one- or two-Essence person with strong individual skills remains unranked, completing the Confluence enters Iron, and progression to Bronze waits for 20/20 at Bronze.
+- Evaluate rank-body ontology, physiology/aging, rank ecology, institution eligibility, monster difficulty, economy, NPC advancement, rewards, save/restore, event causality and benchmark diagnostics for assumptions about \`AdvancementState.rank\` and any replicated rank fields.
+- Introduce an explicit **rules version** and carefully designed save/benchmark migration or compatibility path if corrected ranks change observable old outcomes. Preserve deterministic source-specific historical artifacts; no retroactive in-place reinterpretation.
+- Add focused regressions for zero to three Essences, Confluence, four innate skills, stone-unlocked remaining sixteen, partially elevated/missing skills, and all-twenty Bronze gate. Run an affected integration suite and Astra's independent review before adoption.
+- Design character creation to preserve world scarcity and provenance: no freely spawned rare material, no self-selected Confluence, no unearned twenty-skill unlock and no automatic rarity-derived superiority.
+- Treat **Transcendent** Essence access as **aspirational/unresolved rarity ontology** until the actual catalog, world rules and interactions distinguish it from transcendent/divine *powers beyond the normal twenty-ability framework*.
+
+### Source boundaries
+
+The locally supplied rank-ecology design note supports qualitative rank expressions, twenty abilities as a capability ecology, and separation between normal Essence abilities and exceptional external powers. The supplied Jason Asano sheet illustrates 4/4 Essences, 5/5 abilities per Essence and other exceptional powers, **but does not itself establish the Iron-onset or Bronze-gate rule**. The **owner's explicit 2026-10-11 design decision** is authoritative for those thresholds; do not misattribute them to the sheet. See issue #17 for exact source paths/test names.
+
+**Priority:** Document now; **implement only after explicit gameplay authorization outside Stage 0.5**. Sol and Astra may acknowledge the item in their future architecture reviews without interrupting the currently authorized persistence effort.
