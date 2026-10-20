@@ -1,0 +1,17 @@
+# Independent mature restore-digest launch review
+
+One independent Astra reviewer, /root/review_restore_digest_concrete_launch, cleared exactly one fresh downloaded restore-digest for year1002/gen127. No Critical, Important or new unresolved Minor findings. Exact source e387db2309b625a9589f0c828ce7af0e880486a1, harness b2ba877800baf6120f5d4df316cf14b528e8d52c, launch tree5b535db47c0bbf140180b8a96a85a360bef4d69f, config SHA256 3aecb7b32d6d10264d3f063748527918365f5db291201c98fa7277aa276431e3.
+
+Astra independently checked the six-file scope, twelve unchanged proof-covered helpers/runtime, actual restore-values and diagnostic archives/members, producer and mandatory upload, original lineage and all25 counters, authenticated actual continuation and exact reference, green seventeen-job proof and nested accepted restore, focused54checks and two final workflow cases. A summary-only numeric serialization difference was corrected during the same review: committed restore-values result now byte-matches the authenticated Python-generated verified-result.json, preserving numeric types. No runtime/input/config behavior changed. The superseded unreferenced sources44af41.../13e692... were never launched. Existing deferred audit_seconds metadata and signed-zero diagnostic minors remain unchanged.
+
+Executor rulings on declined review boundaries:
+
+- Final hosted source/readback/blob/parent/tree/runtime checks passed. At 2026-10-20T00:11:39.026Z, all five relevant active inventories and cross-SHA histories were clear, this source had zero runs, branch lease matched77673cf..., candidate/continuation/proof/nested restored artifacts were unexpired and exact with uniquely successful producing jobs, and all seventeen proof jobs were successful. Exactly one non-force leased update launched this stage.
+- The full4.481GB candidate was not downloaded locally. The new runner must fully authenticate its ZIP, exact three members and every file hash, complete original authority/config/context/control/generation chain and actual continuation before World open.
+- Actual mature restore-digest is pending run39346200620. It must COPY the retained30.224GB database to disposable space, normally open1002/gen127, compute the ACTUAL full digest and all25 counters against original1002 control, normally close, rehash retained inputs unchanged, atomically publish restore-digest.json and successfully upload it.
+- Existing300-minute command,360-minute job,8GiB address and disk/extraction/upload/source/unique guards stay unchanged. Calculated disk reserve99330011136 bytes before download and69105688576 after. No duration or resource-fit guarantee is claimed.
+- Intercepted dispatcher checks and bounded fixture/proof restore do not substitute for the actual mature digest. No broad tests were repeated for this pin-only unchanged implementation.
+- No successful simulation/save/audit/digest/year/continuation/restore-values repeats; monitoring and automatic successor dispatch remain OFF.
+- After authenticating this actual output, separate accept-restore and final independent Astra remain mandatory. This launch gives no Stage0.5 acceptance or main integration authorization.
+
+[Run39346200620](https://github.com/rax0h/all-that-endures/actions/runs/39346200620) registered once, created 2026-10-20T00:11:54Z, push attempt1, in_progress at registration. Initial registration-list visibility lag required one additional read; the branch update was not repeated. No subsequent run/job polling.

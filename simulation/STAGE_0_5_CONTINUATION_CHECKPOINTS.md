@@ -100,22 +100,37 @@ Copy203.62s, normal open627.96s, restored-values1317.77s, wrapper2298.51s.
 stage_0_5_restore_values_result.json retains exact evidence. No successful
 simulation/save/audit/digest/acceptance/restore-values stage repeats.
 
-Only separate fresh DOWNLOADED restore-digest is prepared for one independent
-final concrete launch review. It uses SAME retained candidate12176425731 and
-actual continuation12223080997; it must repeat authenticated full transport on
-its fresh runner, COPY to disposable space, normally open1002/gen127, compute
-the ACTUAL full digest and all counters against original1002 control, normally
-close, rehash retained inputs unchanged and atomically publish/upload its receipt.
-This is the separate digest observation, not another values verification.
-All twelve helper/proof fingerprints and runtime bytes remain identical to green
-proof39177774744. Focused54checks pass55.006s with one expected duplicateZIPwarning;
-two exit/upload checks pass. Local dispatcher probe intercepts the digest body
-and supplies no actual mature digest proof. Existing300/360-minute,8GiBaddress
-and disk/extraction/upload/source/unique guards stay unchanged; no duration or
-resource-fit guarantee. MonitoringOFF. Fresh source/readbacks/ancestry, input
-availability/producers/proof, active/cross-SHA history and reflease checks precede
-one launch. Actual restore-digest, restore acceptance and final independent Astra
-remain mandatory before Stage0.5 acceptance or main integration.
+Only separate fresh DOWNLOADED restore-digest was launched once as
+[run39346200620](https://github.com/rax0h/all-that-endures/actions/runs/39346200620), created
+October20,2026 at00:11:54UTC, push attempt1, in_progress at registration.
+Source e387db2309b625a9589f0c828ce7af0e880486a1, harness
+b2ba877800baf6120f5d4df316cf14b528e8d52c, tree
+5b535db47c0bbf140180b8a96a85a360bef4d69f; configuration SHA256
+3aecb7b32d6d10264d3f063748527918365f5db291201c98fa7277aa276431e3.
+Inputs remain SAME candidate12176425731 and actual continuation12223080997.
+Actual successful restore-values12226732983 remains preserved and is not repeated.
+One independent Astra review cleared the corrected exact source with no blocking
+findings; summary numeric types were restored byte-exact to authenticated evidence.
+All twelve helper/proof/runtime bytes are unchanged. Focused54checks passed55.006s,
+plus two final workflow checks. Final live source/readbacks/ancestry/input/producers/
+proof/activity/cross-SHA/reflease checks passed, followed by one non-force leased
+launch update and unique registration. Superseded unreferenced launch13e692...
+was never launched. Exact launch/review evidence is in
+stage_0_5_restore_digest_launch_result.json and STAGE_0_5_RESTORE_DIGEST_LAUNCH_REVIEW.md.
+
+The fresh runner must authenticate and download the entire exact candidate ZIP,
+all members/file hashes/original authority and actual continuation, COPY the
+retained DB to disposable space, normally open1002/gen127, compute ACTUAL full
+digest and all counters against original1002 control, close normally, rehash
+retained inputs unchanged and atomically publish/upload restore-digest.json.
+Local intercepted routing/bounded proof is not actual mature digest evidence.
+Existing300/360-minute,8GiB address and all disk/extraction/upload/source/unique
+guards are unchanged; no duration/resource-fit guarantee. MonitoringOFF, no
+run/job polling after registration, no automatic successor dispatch. On explicit
+completion authenticate this actual output; only then separately prepare/review/
+launch accept-restore using actual values12226732983 plus actual digest receipt
+and SAME candidate/continuation. Final independent Astra remains mandatory before
+Stage0.5 acceptance or main integration. No successful predecessor stage repeats.
 
 
 ## Earlier handoff and cost repair records

@@ -1,0 +1,164 @@
+{
+  "schema": "ate-stage-0-5-restore-digest-launch/1",
+  "stage": "restore-digest",
+  "year": 1002,
+  "generation": 127,
+  "run_id": 39346200620,
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/39346200620",
+  "created_at": "2026-10-20T00:11:54Z",
+  "registration_status": "in_progress",
+  "event": "push",
+  "run_attempt": 1,
+  "registration_count": 1,
+  "single_nonforce_leased_ref_update": true,
+  "source_map": {
+    "base_sha": "77673cf0754e37c265e7662e925ffe09e62dcee8",
+    "local_harness_sha": "81aaaa79140903225be20a49d4d99138ece89fe8",
+    "published_harness_sha": "b2ba877800baf6120f5d4df316cf14b528e8d52c",
+    "harness_tree": "ceb61a05660db5ff47da512fd330905e8370d595",
+    "local_launch_sha": "799c4cc2de953a26df8bbcdfb3b07c5de32d143a",
+    "published_launch_sha": "e387db2309b625a9589f0c828ce7af0e880486a1",
+    "launch_tree": "5b535db47c0bbf140180b8a96a85a360bef4d69f",
+    "config_sha256": "3aecb7b32d6d10264d3f063748527918365f5db291201c98fa7277aa276431e3",
+    "source_readback": [
+      {
+        "path": "simulation/stage_0_5_continuation_stage_launch.json",
+        "sha": "e561c86ca14d95461e6d4802fb2f102cbf8f1489",
+        "byte_exact": true,
+        "blob_exact": true
+      },
+      {
+        "path": "simulation/stage_0_5_restore_values_result.json",
+        "sha": "4a216420b7fcf24d1f2fd1883c095b570155cd62",
+        "byte_exact": true,
+        "blob_exact": true
+      },
+      {
+        "path": "simulation/stage_0_5_restore_digest_preflight.json",
+        "sha": "4c690c6cc477f5b479c10808c8c2ca71c9d69e84",
+        "byte_exact": true,
+        "blob_exact": true
+      },
+      {
+        "path": "simulation/STAGE_0_5_CONTINUATION_CHECKPOINTS.md",
+        "sha": "a660a54b3f94db489de9eb46cd933e2b433dc619",
+        "byte_exact": true,
+        "blob_exact": true
+      },
+      {
+        "path": "simulation/STAGE_0_5_AUDIT_RECEIPT_HANDOFF.md",
+        "sha": "4e4f79b8dceefacdf98da4d3cf8c3cbe7968965e",
+        "byte_exact": true,
+        "blob_exact": true
+      },
+      {
+        "path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+        "sha": "307227707b5d0ff2fd207d3bc3557811d6f7afac",
+        "byte_exact": true,
+        "blob_exact": true
+      }
+    ],
+    "implementation_blobs": {
+      ".github/workflows/stage-0-5-continuation-proof.yml": "7e7bb38aceacffd1c5b2795f70d5fe9783797ab1",
+      "simulation/checkpoint_artifacts.py": "c7a1a679e4929fb27931ef0204c5ff3264d1def1",
+      "simulation/construction_checkpoint_ci.py": "f0b3aa9560ef07913943e5db2003ae2a5d6f3b30",
+      "simulation/construction_mature_continuation_stages.py": "b1227c199d9de3bbdf04f297bda6b943f1435e5c",
+      "simulation/construction_mature_continue.py": "561593ea03c1c4ec3b14ad9a3792a660ed0bb333",
+      "simulation/continuation_checkpoint.py": "82b160779b6c4b93254cae7a74f394e92ca74f1b",
+      "simulation/continuation_checkpoint_ci.py": "ab2418d2246d3f3a6473d306bc17f9134ef0ba89",
+      "simulation/continuation_receipts.py": "55b169ce1c68c71a2a51e21d31d9c1713d457876",
+      "simulation/long_history_scaling.py": "c98c0f74a087759af071e5eb7c3fc8dbe54fffd8",
+      "simulation/persistence_p5_long_validation.py": "e5d2e69b5e26d6fcaab9ad2789d5c3a88fe0f191",
+      "simulation/run_long_history.py": "14af337a4cb000269add4c6ac594fca5f78e5592",
+      "simulation/tests/continuation_fixtures.py": "a7951e04301674c94e9b92059b20a815c272153c"
+    },
+    "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "all_published_implementation_blobs_exact": true,
+    "named_branch_moved": false,
+    "summary_numeric_fidelity_corrected": true,
+    "superseded_unreferenced_sources_not_launched": [
+      "44af41c1ed60015a10baf97be7a456da328252f4",
+      "13e692f5e670bd82a601ec49e268f5c8ffe928af"
+    ]
+  },
+  "config_sha256": "3aecb7b32d6d10264d3f063748527918365f5db291201c98fa7277aa276431e3",
+  "inputs": {
+    "candidate": {
+      "archive_bytes": 4481162231,
+      "archive_sha256": "61497cbf318a51d386cac114f5e93856965a4e94768c89775e520daf99345a70",
+      "artifact_id": 12176425731,
+      "harness_sha": "451f5f33ee3378082cb4504d9f3bbb64eaec02d6",
+      "name": "continuation-stage-save-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39212571079,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "661f20e1939d2efbf9d40cb2e25cc4a8131968a9"
+    },
+    "continuation": {
+      "archive_bytes": 535583,
+      "archive_sha256": "1398aa0a976f381cdda3ae3d9d3d266a2a3028e64a5b7e802d1ee9852c861c5a",
+      "artifact_id": 12223080997,
+      "harness_sha": "f8236c97d4f20bea962a92745648f192f75021f2",
+      "name": "continuation-stage-accept-continuation-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39327259797,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "c186b8fc6e6c57927427c25fa507e0f8fda24ec5"
+    }
+  },
+  "preserved_restore_values": {
+    "run_id": 39330974146,
+    "artifact_id": 12226732983,
+    "receipt_sha256": "804a0c9272ef570824ded8eb951b40611e2a9980c8c6521162d0627f547aad0a",
+    "actual_snapshot_and_25_counters_verified": true
+  },
+  "review": {
+    "reviewer": "/root/review_restore_digest_concrete_launch",
+    "model": "gpt-6-astra",
+    "verdict": "Exactly one fresh downloaded restore-digest cleared conditional on final live gates; executor gates passed.",
+    "critical": [],
+    "important": [],
+    "new_unresolved_minor": [],
+    "corrected_minor": "Evidence-summary numeric types now byte-exact to verified-result.json.",
+    "existing_deferred_minor": [
+      "audit_seconds metadata validation",
+      "signed-zero diagnostic details"
+    ],
+    "published_launch": "e387db2309b625a9589f0c828ce7af0e880486a1",
+    "published_harness": "b2ba877800baf6120f5d4df316cf14b528e8d52c",
+    "read_only": true,
+    "tests_rerun": false,
+    "stage_0_5_accepted": false,
+    "merge_authorized": false
+  },
+  "focused_checks": {
+    "cases": 54,
+    "seconds": 55.006,
+    "sha256": "71dc1a8eef27dc857b558dbfa4f4f899715de897355f8a171b001c649df2ea82"
+  },
+  "final_workflow_checks": {
+    "cases": 2,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 0.19
+  },
+  "final_live_checks": {
+    "checked_at": "2026-10-20T00:11:39.026Z",
+    "no_relevant_active_runs": true,
+    "new_source_prior_runs": 0,
+    "unchanged_mature_branch_lease": true,
+    "all_four_inputs_unexpired_available": true,
+    "all_producing_jobs_successful": true,
+    "all_17_proof_jobs_successful": true,
+    "source_blobs_readback_parents_trees_runtime_exact": true
+  },
+  "actual_mature_restore_digest_proven": false,
+  "stage_0_5_accepted": false,
+  "monitoring_enabled": false,
+  "automatic_successor_dispatch": false,
+  "next": "On explicit completion authenticate this actual restore-digest producer/upload/exact archive/member/digest/all counters/original control/retained hashes. Then separately review and launch accept-restore with actual values and digest receipts plus same candidate and continuation; final independent Astra mandatory."
+}
