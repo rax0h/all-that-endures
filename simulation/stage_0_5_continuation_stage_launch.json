@@ -30,6 +30,32 @@
       "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
       "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
       "workflow_sha": "c186b8fc6e6c57927427c25fa507e0f8fda24ec5"
+    },
+    "digest": {
+      "archive_bytes": 111932,
+      "archive_sha256": "8e60aaee9a206f11f27ad496159b70c85397e96f5fffb1fca6d678ffd1ffea8a",
+      "artifact_id": 12234412804,
+      "harness_sha": "b2ba877800baf6120f5d4df316cf14b528e8d52c",
+      "name": "continuation-stage-restore-digest-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39346200620,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "e387db2309b625a9589f0c828ce7af0e880486a1"
+    },
+    "values": {
+      "archive_bytes": 118230,
+      "archive_sha256": "2e9725d9e2ea35cb9f2abb6f6e0c45ab551e16c547a1d5fe197a77510376f78e",
+      "artifact_id": 12226732983,
+      "harness_sha": "9e45fe09d17c62ff1657d17f4d7afe983af3b62b",
+      "name": "continuation-stage-restore-values-1002",
+      "producer_job": "mature-stage",
+      "run_id": 39330974146,
+      "runtime_sha": "2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a",
+      "runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+      "workflow_path": ".github/workflows/stage-0-5-mature-continuation-stage.yml",
+      "workflow_sha": "e8dc9dbbfb235fcf9ccbd2bc7d116a7433d23dad"
     }
   },
   "proof": {
@@ -46,6 +72,6 @@
     "workflow_sha": "4fecd93fdcc5012a404afc07ce166cb7ff422f59"
   },
   "schema": "ate-validation-continuation-launch/1",
-  "stage": "restore-digest",
+  "stage": "accept-restore",
   "year": 1002
 }

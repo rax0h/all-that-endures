@@ -100,37 +100,42 @@ Copy203.62s, normal open627.96s, restored-values1317.77s, wrapper2298.51s.
 stage_0_5_restore_values_result.json retains exact evidence. No successful
 simulation/save/audit/digest/acceptance/restore-values stage repeats.
 
-Only separate fresh DOWNLOADED restore-digest was launched once as
-[run39346200620](https://github.com/rax0h/all-that-endures/actions/runs/39346200620), created
-October20,2026 at00:11:54UTC, push attempt1, in_progress at registration.
-Source e387db2309b625a9589f0c828ce7af0e880486a1, harness
-b2ba877800baf6120f5d4df316cf14b528e8d52c, tree
-5b535db47c0bbf140180b8a96a85a360bef4d69f; configuration SHA256
-3aecb7b32d6d10264d3f063748527918365f5db291201c98fa7277aa276431e3.
-Inputs remain SAME candidate12176425731 and actual continuation12223080997.
-Actual successful restore-values12226732983 remains preserved and is not repeated.
-One independent Astra review cleared the corrected exact source with no blocking
-findings; summary numeric types were restored byte-exact to authenticated evidence.
-All twelve helper/proof/runtime bytes are unchanged. Focused54checks passed55.006s,
-plus two final workflow checks. Final live source/readbacks/ancestry/input/producers/
-proof/activity/cross-SHA/reflease checks passed, followed by one non-force leased
-launch update and unique registration. Superseded unreferenced launch13e692...
-was never launched. Exact launch/review evidence is in
-stage_0_5_restore_digest_launch_result.json and STAGE_0_5_RESTORE_DIGEST_LAUNCH_REVIEW.md.
+Actual fresh DOWNLOADED mature restore-digest
+[run39346200620](https://github.com/rax0h/all-that-endures/actions/runs/39346200620)
+completed successfully October20,2026 at01:41:49UTC. Producer118379284708
+uploaded12234412804, ZIP111932/SHA256
+8e60aaee9a206f11f27ad496159b70c85397e96f5fffb1fca6d678ffd1ffea8a;
+sole restore-digest.json767116/SHA256
+8a5868f61246919e2e5908625bccd5fb040e55ce5f0b672413917f60518b4e19.
+Exact output and diagnostics12234597595 were downloaded/authenticated with
+ZIP/member hashes, producer/source/harness/runtime and original authority chain.
+The fresh runner fully authenticated/downloaded SAME retained candidate12176425731
+and actual continuation12223080997, copied to disposable space, normally opened
+year1002/gen127 and computed ACTUAL full restored digest
+2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7
+and all25counters matching original1002 control. Normal close and retained input
+hash preservation passed. Digest3699.36s, open1039.53s, wrapper5027.84s.
+stage_0_5_restore_digest_result.json preserves exact numeric types and evidence.
+Actual successful restore-values artifact12226732983 remains immutable.
 
-The fresh runner must authenticate and download the entire exact candidate ZIP,
-all members/file hashes/original authority and actual continuation, COPY the
-retained DB to disposable space, normally open1002/gen127, compute ACTUAL full
-digest and all counters against original1002 control, close normally, rehash
-retained inputs unchanged and atomically publish/upload restore-digest.json.
-Local intercepted routing/bounded proof is not actual mature digest evidence.
-Existing300/360-minute,8GiB address and all disk/extraction/upload/source/unique
-guards are unchanged; no duration/resource-fit guarantee. MonitoringOFF, no
-run/job polling after registration, no automatic successor dispatch. On explicit
-completion authenticate this actual output; only then separately prepare/review/
-launch accept-restore using actual values12226732983 plus actual digest receipt
-and SAME candidate/continuation. Final independent Astra remains mandatory before
-Stage0.5 acceptance or main integration. No successful predecessor stage repeats.
+Only separate accept-restore is prepared for one independent final launch review.
+Inputs are exact retained candidate12176425731 metadata, actual continuation
+12223080997, actual values12226732983 and actual digest12234412804. The new runner
+must authenticate candidate availability/producer/archive metadata, fully download
+and authenticate the exact THREE small receipt archives/members, recursively
+validate complete original controls/lineage/common candidate1002gen127 and exact
+physical proof hashes, then atomically publish/upload restore-verified.json.
+This stage composes already proven independent observations; it does not reopen
+the mature DB or repeat any successful stage. Large candidate download is not
+required for receipt composition. The local real dispatcher/validator probe used
+actual receipts with a synthetic producer and intercepted publication; it is not
+actual hosted acceptance proof. All twelve helper/proof/runtime bytes remain
+exact against green17jobproof39177774744. Existing300/360-minute,8GiBaddress,
+disk/extraction/upload/source/unique guards remain unchanged. MonitoringOFF.
+Fresh source/readback/ancestry/input/producers/proof/activity/cross-SHA/reflease
+checks and one independent final concrete review precede ONE launch.
+Actual restore acceptance authentication and FINAL independent Astra remain
+mandatory before Stage0.5 acceptance or main integration.
 
 
 ## Earlier handoff and cost repair records
