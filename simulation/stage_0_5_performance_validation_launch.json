@@ -1,0 +1,23 @@
+{
+  "schema": "ate-performance-validation-launch/1",
+  "date": "2026-10-21",
+  "branch": "sol/stage-0-5-performance-repair",
+  "candidate_commit": "5521c094981c9a5f28f1d076453264291b534ff5",
+  "candidate_root_tree": "de75bc9455985c625b6abe133f937b33a5555d55",
+  "candidate_runtime_tree": "48e3e21b3b8d4ccb57eab74e11412a1ec4e74b6a",
+  "preserved_local_history_branch": "sol/stage-0-5-performance-recovery-local",
+  "preserved_local_history_head": "c001f19fbe3e7273514055d0069779999f6d4aab",
+  "run_id": 39605825742,
+  "run_url": "https://github.com/rax0h/all-that-endures/actions/runs/39605825742",
+  "observed_submission_status": "queued",
+  "workflow": ".github/workflows/stage-0-5-performance-validation.yml",
+  "jobs": {
+    "full-suite": {"job_limit_minutes": 150, "command_limit_minutes": 135},
+    "mature-open": {"job_limit_minutes": 100, "each_open_budget_seconds": 1800, "each_command_limit_minutes": 40}
+  },
+  "fresh_local_evidence": {"final_runtime_affected_tests_passed": 205, "fresh_process_transport_tests_passed": 13},
+  "next_step": "Inspect this run's complete suite log and matched mature-open receipts before deciding the next bounded continuation measurement. Do not treat queued jobs, a timeout, or local tests as mature acceptance.",
+  "independent_workflow_review": "incomplete-reviewer-usage-limit",
+  "interactive_performance": "unverified",
+  "merged_or_promoted": false
+}
