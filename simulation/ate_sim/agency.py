@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
 from .core_types import layer_ref
+from .magic_progression import practice_ability,record_body_transition
 from .rank_ecology import rank_ecology_step
 @dataclass
 class MotiveState:hunger:float=0.;safety:float=0.;belonging:float=0.;wealth:float=0.;curiosity:float=0.;legacy:float=0.;obligation:float=0.;status:float=0.
@@ -23,9 +24,9 @@ def _practice_path(world,p,rr,action,strength):
  relevant={'secure_food':{'creation','control','support','detection','recovery'},'prepare':{'enhancement','control','movement','detection','recovery'},'work':{'creation','enhancement','control','support','exchange'},'socialize':{'influence','support','detection','exchange'},'learn':{'detection','control','transformation','support'},'teach':{'influence','support','control','exchange'},'build':{'creation','enhancement','control','transformation'}}.get(action,set())
  candidates=[(i,a) for i,a in enumerate(path.abilities) if a.function in relevant] or list(enumerate(path.abilities));rr.shuffle(candidates);uses=max(1,min(len(candidates),2+int(3*strength)));before=world.advancement.rank(p.id)
  for i,a in candidates[:uses]:
-  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;world.advancement.practice(p.id,i,meaningful,reflection)
+  meaningful=(.10+.22*strength)*(.75+.5*p.curiosity);reflection=(.25+.75*p.curiosity) if action in ('learn','teach','socialize') else .08*p.curiosity;practice_ability(world,p,i,meaningful,reflection,context=action)
  after=world.advancement.rank(p.id)
- if after>before:p.rank=after;Layer,Ref=layer_ref();world.emit('rank_advanced',Layer.REALITY,(Ref('person',p.id),),Ref('settlement',p.settlement),from_rank=before,to_rank=after,practice_context=action)
+ record_body_transition(world,p,before,context=action)
 
 def agency_step(world,rng):
  dependents={}
