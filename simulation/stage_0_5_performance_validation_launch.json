@@ -21,6 +21,10 @@
   "interactive_performance": "unverified",
   "merged_or_promoted": false,
   "follow_on_measurement": {
+    "launch_revision": 2,
+    "previous_failed_run_id": 39640324933,
+    "previous_failure": "Launcher only: baseline could not import the newer common helper; candidate output directory was pre-created. Neither lane opened or simulated the mature checkpoint.",
+    "launch_regression": ".github/tests/check_mature_step_save_launch.py",
     "workflow": ".github/workflows/stage-0-5-mature-step-save.yml",
     "candidate_runtime_tree": "48e3e21b3b8d4ccb57eab74e11412a1ec4e74b6a",
     "baseline_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",

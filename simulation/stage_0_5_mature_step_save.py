@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import asdict
+import importlib.util
 import json
 import math
 import os
@@ -23,7 +24,14 @@ import time
 from ate_sim.engine import Simulation
 from ate_sim.persistence_lazy import open_lazy_world_session
 from simulation import continuation_receipts as r
-from simulation import profile_stage_0_5_performance as base
+
+# Load the common measurement helper beside this harness. In the baseline lane,
+# simulation imports intentionally resolve to the older runtime checkout, which
+# predates this helper. Loading its file must not alter that runtime search path.
+_common_path = Path(__file__).resolve().with_name('profile_stage_0_5_performance.py')
+_common_spec = importlib.util.spec_from_file_location('ate_mature_common_harness', _common_path)
+base = importlib.util.module_from_spec(_common_spec)
+_common_spec.loader.exec_module(base)
 
 
 PHASES = ('open', 'first_step', 'save', 'warm_step')
@@ -42,6 +50,7 @@ def run(source, output, *, seconds, expected_sha256, authority):
     output.mkdir(parents=True, exist_ok=False)
     result = {'schema': 'ate-mature-step-save/1', 'status': 'error',
               'source': r.plain(authority), 'harness_sha256': r.file_hash(__file__),
+              'common_harness_sha256': r.file_hash(_common_path),
               'runtime': base._runtime_identity(),
               'machine': {'platform': platform.platform(), 'processor': platform.processor(),
                           'python': platform.python_version(), 'sqlite': sqlite3.sqlite_version,
@@ -221,6 +230,8 @@ def compare_receipts(baseline, candidate):
         raise ValueError('comparison source/configuration differs')
     if baseline['harness_sha256'] != candidate['harness_sha256']:
         raise ValueError('comparison harness differs')
+    if baseline['common_harness_sha256'] != candidate['common_harness_sha256']:
+        raise ValueError('comparison common helper differs')
     if baseline['machine'] != candidate['machine']:
         raise ValueError('comparison machine/runtime instrumentation differs')
     for label in ('initial', 'saved', 'final'):

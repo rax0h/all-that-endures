@@ -35,6 +35,12 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pyyaml
+      - name: Smoke the exact launcher before downloading the mature checkpoint
+        working-directory: candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python .github/tests/check_mature_step_save_launch.py --workspace "$GITHUB_WORKSPACE" --lane "${{ matrix.lane }}"
       - name: Reserve disk on this disposable hosted runner
         shell: bash
         run: |
@@ -99,7 +105,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$GITHUB_WORKSPACE/evidence/$LANE"
           if [ "$LANE" = baseline ]; then
             timeout --signal=TERM --kill-after=30s 250m python -c 'import os,runpy,sys; p=os.environ["GITHUB_WORKSPACE"]+"/candidate/simulation/stage_0_5_mature_step_save.py"; sys.argv=[p,"run",os.environ["GITHUB_WORKSPACE"]+"/source/candidate.sqlite",os.environ["GITHUB_WORKSPACE"]+"/evidence/baseline","--seconds","14400","--expected-sha256","4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2","--authority",os.environ["GITHUB_WORKSPACE"]+"/evidence/source-authority.json"]; runpy.run_path(p,run_name="__main__")'
           else
