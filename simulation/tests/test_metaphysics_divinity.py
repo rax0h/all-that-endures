@@ -41,15 +41,21 @@ def test_transcendence_requires_causes_not_random_rank_roll():
  assert transformed is not None and transformed.ontology=='astral_king' and 'transcendent' in transformed.marks
 
 
-def test_society_membership_barrier_is_four_essences_not_partial_magic():
- w=generate_world(910005);ensure_core_societies(w);p=_adult(w)
+def test_society_membership_barrier_is_four_essences_for_magic_society_and_iron_for_adventure_society():
+ w=generate_world(910005);ensure_core_societies(w)
+ p=next(p for p in w.people.values() if p.alive and p.age>=18 and w.advancement.path(p.id) is None)
  w.advancement.absorb_essence(p.id,'fire',w.year,('test',))
  assert not society_eligible(w,p.id,'adventure_society')
  rejected=apply_for_society(w,p.id,'adventure_society')
  assert rejected.stage=='rejected_ineligible' and rejected.passed is False
  for essence in ('water','wind'):w.advancement.absorb_essence(p.id,essence,w.year,('test',))
- assert len(w.advancement.path(p.id).essences)==4
- assert society_eligible(w,p.id,'adventure_society') and society_eligible(w,p.id,'magic_society')
+ path=w.advancement.path(p.id)
+ assert len(path.essences)==4
+ assert society_eligible(w,p.id,'magic_society')
+ assert not society_eligible(w,p.id,'adventure_society')
+ while len(path.abilities)<20:w.advancement.awaken_skill(p.id,'eyes',w.year,('test',))
+ assert w.advancement.rank(p.id)==1
+ assert society_eligible(w,p.id,'adventure_society')
 
 
 def test_churches_can_emerge_but_are_not_guaranteed_at_world_birth():

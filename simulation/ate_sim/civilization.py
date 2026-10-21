@@ -43,7 +43,12 @@ def migration_step(world,rng):
     ids=sorted(world.settlements);pop={sid:0 for sid in ids};caps={sid:_capacity(world,sid) for sid in ids}
     for p in world.current_people():
         if p.alive:pop[p.settlement]+=1
-    for hid,h in list(world.households.items()):
+    # Historical households remain archived forever, but only households
+    # with living members can migrate. Iterate that bounded live set instead of
+    # rescanning millennia of empty household records every year.
+    active_hids=sorted({p.household for p in world.current_people() if p.alive})
+    for hid in active_hids:
+        h=world.households[hid]
         if not h.alive:continue
         living=_household_living(world,hid)
         if not living:continue

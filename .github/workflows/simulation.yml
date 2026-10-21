@@ -10,7 +10,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: diagnostic 300-year late profile
+        env:
+          ATE_PROFILE_TAIL: '40'
+        run: python simulation/run_long_history.py 843000 300
+
+  millennium:
+    needs: profile
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: .:simulation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: unprofiled 1000-year performance and calibration gate
+        run: python simulation/run_long_history.py 843000 1000 --max-cpu-seconds 120
+
   test:
+    needs: profile
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -27,3 +57,33 @@ jobs:
         run: python simulation/specific_test.py --seed 843000 --years 10 --section all
       - name: deterministic 100-year smoke history
         run: python simulation/run_long_history.py 843000 100
+      - name: canonical 1000-year progression validation
+        run: |
+          set -o pipefail
+          python simulation/run_long_history.py 843000 1000 --archive /tmp/ate-canonical.sqlite | tee /tmp/canonical-millennium.log
+          python simulation/validate_magic_progression.py /tmp/ate-canonical.sqlite | tee /tmp/canonical-validation.log
+
+
+  longevity:
+    if: github.head_ref == 'research/stage-0.5-causal-rebuild'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      PYTHONPATH: .:simulation
+      PYTHONHASHSEED: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 'pypy3.10'
+      - name: fresh-seed 10000-year pure simulation
+        run: |
+          set -o pipefail
+          python simulation/run_longevity_observation.py --seed 917263 --years 10000 --checkpoints 1000 5000 7500 10000 | tee /tmp/longevity-report.jsonl
+      - name: upload longevity report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: longevity-report
+          path: /tmp/longevity-report.jsonl
+          if-no-files-found: warn
