@@ -16,8 +16,23 @@
     "mature-open": {"job_limit_minutes": 100, "each_open_budget_seconds": 1800, "each_command_limit_minutes": 40}
   },
   "fresh_local_evidence": {"final_runtime_affected_tests_passed": 205, "fresh_process_transport_tests_passed": 13},
-  "next_step": "Inspect this run's complete suite log and matched mature-open receipts before deciding the next bounded continuation measurement. Do not treat queued jobs, a timeout, or local tests as mature acceptance.",
+  "next_step": "Run the bounded matched mature first-step/save/warm-step comparison on the exact accepted year-1001 source, then independently reopen each saved year-1002 checkpoint and require the accepted digest.",
   "independent_workflow_review": "incomplete-reviewer-usage-limit",
   "interactive_performance": "unverified",
-  "merged_or_promoted": false
+  "merged_or_promoted": false,
+  "follow_on_measurement": {
+    "workflow": ".github/workflows/stage-0-5-mature-step-save.yml",
+    "candidate_runtime_tree": "48e3e21b3b8d4ccb57eab74e11412a1ec4e74b6a",
+    "baseline_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+    "source_artifact_id": 12129336378,
+    "accepted_year1001_artifact_id": 12165934374,
+    "source_sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2",
+    "source_bytes": 29922463744,
+    "expected_saved_year": 1002,
+    "expected_saved_generation": 127,
+    "expected_year1002_digest": "2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7",
+    "lane_timeout_minutes": 350,
+    "measurement_budget_minutes": 240,
+    "parallel_lanes": true
+  }
 }
