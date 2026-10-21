@@ -1,0 +1,183 @@
+name: Stage 0.5 performance repair validation
+'on':
+  push:
+    branches: [sol/stage-0-5-performance-repair]
+    paths:
+      - simulation/ate_sim/**
+      - simulation/tests/**
+      - simulation/profile_stage_0_5_performance.py
+      - .github/workflows/stage-0-5-performance-validation.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: stage-0-5-performance-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+jobs:
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest pyyaml
+      - name: Record exact execution source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python - <<'PY'
+          import platform, sqlite3, subprocess
+          from pathlib import Path
+          from simulation import continuation_receipts as r
+          def git(*args): return subprocess.check_output(['git', *args], text=True).strip()
+          r.publish_receipt(Path('evidence/source.json'), dict(head=git('rev-parse', 'HEAD'),
+              runtime_tree=git('rev-parse', 'HEAD:simulation/ate_sim'),
+              tracked_dirty=git('status', '--porcelain', '--untracked-files=no'),
+              python=platform.python_version(), sqlite=sqlite3.sqlite_version, platform=platform.platform()))
+          PY
+          df -h . > evidence/disk-start.txt
+      - name: Run clean complete simulation suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=30s 135m python -m pytest -q simulation/tests --durations=30 -o junit_family=legacy --junitxml=evidence/full-suite.xml 2>&1 | tee evidence/full-suite.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-0-5-performance-full-suite-${{ github.sha }}
+          path: evidence
+          retention-days: 14
+          if-no-files-found: error
+
+  mature-open:
+    runs-on: ubuntu-latest
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          # Same accepted runtime as the local measurement baseline. The later
+          # 5a667f5 commit only added its harness; use this durable remote ancestor.
+          ref: fb75f1c49edda0731287acbf0054a1151ec318c9
+          path: baseline
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pyyaml
+      - name: Reserve disk on this disposable hosted runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/share/swift /usr/local/.ghcup /usr/local/share/powershell
+          sudo find /opt/hostedtoolcache -mindepth 1 -maxdepth 1 ! -name Python -exec rm -rf {} +
+          sudo docker image prune -af
+          mkdir -p evidence
+          df -h . > evidence/disk-start.txt
+      - name: Authenticate exact accepted year-1001 source
+        id: prepare
+        working-directory: candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, shutil, subprocess
+          from pathlib import Path
+          from simulation import continuation_receipts as r, continuation_checkpoint as checkpoint
+          from simulation import construction_mature_continuation_stages as stages
+          root = Path(os.environ['GITHUB_WORKSPACE'])
+          expected_tree = '76dee76973928dbce72860156feb32f2d7f02f86'
+          actual_tree = subprocess.check_output(['git', '-C', str(root/'baseline'), 'rev-parse', 'HEAD:simulation/ate_sim'], text=True).strip()
+          if actual_tree != expected_tree: raise ValueError('baseline runtime differs from accepted authority')
+          launch = r.load_receipt('simulation/stage_0_5_save1002_preflight.json')
+          source = r.ArtifactRef.from_dict(launch['inputs']['candidate'])
+          accepted = r.ArtifactRef.from_dict(launch['inputs']['previous'])
+          database = launch['candidate_database']
+          required = 2*database['bytes'] + source.archive_bytes + 8*1024**3
+          if shutil.disk_usage(root).free < required: raise ValueError('insufficient source/copy/archive headroom')
+          transport = stages.download_ref(source, root/'source', members=r.SAVED_MEMBERS, database_cap=database['bytes'])
+          acceptance_transport = stages.download_ref(accepted, root/'accepted', members={'year-verified.json'})
+          authority = stages.mature_authority()
+          saved, retained = checkpoint._read_saved(root/'source', authority, source)
+          receipt = r.load_receipt(root/'accepted/year-verified.json')
+          r.validate_year_acceptance(receipt, authority)
+          r.match_producer(accepted, receipt['producer'], authority)
+          if (not r.same(database, saved['database']) or saved['year'] != 1001
+                  or not r.same(receipt['binding'], r.saved_binding(saved, source, retained['save.json']))):
+              raise ValueError('source is not the exact accepted year-1001 checkpoint')
+          performance_authority = dict(schema='ate-performance-source/1',
+              database={key: database[key] for key in ('sha256', 'bytes')},
+              rules_id=authority.source_config['rules_id'],
+              pin=dict(token=None, store_identity=saved['store_identity'], captured_head=saved['generation']),
+              world=dict(seed=authority.source_config['seed'], year=saved['year']),
+              provenance=dict(kind='authenticated-accepted-saved-artifact', artifact=source.to_dict(),
+                  acceptance=accepted.to_dict(), save_sha256=retained['save.json'],
+                  source_lease='Closed artifact has no live source lease; measured sessions record their complete actual pins'))
+          r.publish_receipt(root/'evidence/source-authority.json', performance_authority)
+          r.publish_receipt(root/'evidence/source-transport.json', dict(source=transport,
+              acceptance=acceptance_transport, saved_manifest=saved, accepted_binding=receipt['binding']))
+          PY
+      - name: Measure accepted baseline open with the common candidate harness
+        id: baseline
+        continue-on-error: true
+        working-directory: baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=30s 40m python -c 'import os,runpy;runpy.run_path(os.environ["GITHUB_WORKSPACE"]+"/candidate/simulation/profile_stage_0_5_performance.py",run_name="__main__")' "$GITHUB_WORKSPACE/source/candidate.sqlite" "$GITHUB_WORKSPACE/evidence/baseline" --phase open --seconds 1800 --expected-sha256 4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2 --authority "$GITHUB_WORKSPACE/evidence/source-authority.json"
+      - name: Release only the disposable baseline measurement copy
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['GITHUB_WORKSPACE'])/'evidence/baseline'
+          for name in ('operational.sqlite', 'operational.sqlite-journal', 'operational.sqlite-wal', 'operational.sqlite-shm'):
+              (root/name).unlink(missing_ok=True)
+          PY
+      - name: Measure candidate open
+        id: candidate
+        continue-on-error: true
+        working-directory: candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=30s 40m python -m simulation.profile_stage_0_5_performance "$GITHUB_WORKSPACE/source/candidate.sqlite" "$GITHUB_WORKSPACE/evidence/candidate" --phase open --seconds 1800 --expected-sha256 4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2 --authority "$GITHUB_WORKSPACE/evidence/source-authority.json"
+      - name: Require a complete matched-source comparison
+        if: always() && steps.prepare.outcome == 'success'
+        working-directory: candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from simulation import continuation_receipts as r
+          from simulation.profile_stage_0_5_performance import compare_receipts
+          root = Path(os.environ['GITHUB_WORKSPACE'])/'evidence'
+          baseline = r.load_receipt(root/'baseline/result.json')
+          candidate = r.load_receipt(root/'candidate/result.json')
+          r.publish_receipt(root/'comparison.json', compare_receipts(baseline, candidate))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-0-5-performance-mature-open-${{ github.sha }}
+          path: |
+            evidence/**/*.json
+            evidence/disk-start.txt
+          retention-days: 14
+          if-no-files-found: error

@@ -11,6 +11,8 @@ def living_household_members(world, household_id):
     from .persistence_lazy_sequence import LazyOrderedSequence
     if type(members) is LazyOrderedSequence:
         live = {person.id: person for person in world.current_people()}
+        if len(members) <= len(live):
+            return [live[member_id] for member_id in members if member_id in live]
         return [live[members[rank]] for rank in members.candidate_positions(live)]
     if getattr(members, "_ate_household_page_sequence", False):
         # The current people index is a current-state query. Do not enumerate

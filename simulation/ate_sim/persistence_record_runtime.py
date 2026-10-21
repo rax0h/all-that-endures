@@ -5,12 +5,59 @@ Only actual dirty record bodies are retained strongly; clean native records are
 weakly held by the existing assignment-binding table and incarnation registry.
 """
 import weakref
+from dataclasses import dataclass
+import math
 
 from .incremental_store import StoreError, StoreIntegrityError
 from .persistence_lazy_store import VersionChange
 from .persistence_record_headers import (
     RecordReference, NAMESPACE, record_header, checked_record_header,
 )
+
+
+def _identity_free_scalar(value):
+    return (value is None or type(value) in (bool, int, str, bytes)
+            or type(value) is float and math.isfinite(value))
+
+
+def _assignment_epoch(session):
+    store = session.store
+    db = store.db
+    bridge, coordinator = session._identity_bridge, session._identity_coordinator
+    return (store, db, store.codec, session.pin, db.total_changes,
+            db.execute('PRAGMA data_version').fetchone()[0],
+            db.execute('PRAGMA schema_version').fetchone()[0],
+            bridge, coordinator,
+            None if coordinator is None else coordinator.placement_revision,
+            None if bridge is None else bridge.placement_revision)
+
+
+@dataclass(frozen=True)
+class AssignmentRouteTicket:
+    obj: object
+    field: str
+    revision: int
+    epoch: tuple
+    routes: tuple
+
+    def matches(self, binding, obj, field, session):
+        return (self.obj is obj and self.field == field
+                and self.revision == binding._assignment_revision
+                and self.epoch == _assignment_epoch(session))
+
+
+@dataclass(frozen=True)
+class IndexedAssignmentRouteTicket(AssignmentRouteTicket):
+    table: object
+    assigned: object
+
+    def matches(self, table, obj, field, session):
+        # The caller first reconciles all pending placements. Only the final
+        # bridge notification counter may differ; all topology/DB authority stays exact.
+        return (self.table is table and self.obj is obj and self.field == field
+                and self.revision == table._indexed_assignment_revision
+                and getattr(obj, field) is self.assigned
+                and self.epoch[:-1] == _assignment_epoch(session)[:-1])
 
 
 def mutable_record(value):
@@ -105,6 +152,7 @@ class RecordBinding:
             raise StoreError('cross-session native record')
         self._tracker_ref = weakref.ref(tracker)
         self._record_backing = backing
+        self._assignment_revision = 0
         self.owners = set(() if previous is None else previous.owners)
         self.root_fields = None if previous is None else previous.root_fields
         self._closed = False
@@ -143,6 +191,7 @@ class RecordBinding:
         tracker = self.session
         if tracker._suspended:
             return None
+        self._assignment_revision += 1
         _check_record(obj)
         if type(obj) is Event and vars(obj).get('_sealed', False):
             raise TypeError('sealed historical events are immutable; append a new cause')
@@ -162,10 +211,15 @@ class RecordBinding:
         runtime = backing._runtime
         runtime.validate_native(value)
         runtime.check_assignment_cycle(obj, value)
-        runtime.session()._shared_object_routes(obj)
+        session = runtime.session()
+        old = getattr(obj, name)
+        routes = session._shared_object_routes(obj)
         stored = runtime._admit_validated(value)
         assigned = runtime.admitted_value(stored)
-        return 'owned', name, stored, assigned
+        ticket = (AssignmentRouteTicket(obj, name, self._assignment_revision,
+                    _assignment_epoch(session), routes)
+                  if _identity_free_scalar(old) and _identity_free_scalar(assigned) else None)
+        return 'owned', name, stored, ticket, assigned
 
     def after_assignment(self, obj, name, value, token):
         if token is None or self.session._suspended:
@@ -179,7 +233,10 @@ class RecordBinding:
         backing.changed()
         backing._runtime.invalidate_advancement_ancestors(obj)
         session = backing._runtime.session()
-        for table, key in session._shared_object_routes(obj):
+        ticket = token[3] if token[0] == 'owned' else None
+        routes = (ticket.routes if ticket is not None and ticket.matches(self, obj, name, session)
+                  else session._shared_object_routes(obj))
+        for table, key in routes:
             table.changed(key)
         self.session._mark_many(session._nested_eager_owners(obj))
 

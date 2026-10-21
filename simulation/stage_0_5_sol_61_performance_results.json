@@ -1,0 +1,39 @@
+{
+  "schema": "ate-performance-recovery-handoff/1",
+  "date": "2026-10-21",
+  "status": "candidate-awaiting-clean-ci-and-mature-measurement",
+  "recovered_checkout": "fca8f16d800754434f5a2aa9d05f822aa655bdbe",
+  "baseline_commit": "fb75f1c49edda0731287acbf0054a1151ec318c9",
+  "baseline_runtime_tree": "76dee76973928dbce72860156feb32f2d7f02f86",
+  "local_validation": {
+    "review_regressions_red": {"failed": 20, "passed": 22},
+    "review_regressions_green": {"passed": 42, "seconds": 14.67},
+    "indexed_routes_red": {"failed": 4, "passed": 12},
+    "indexed_routes_green": {"passed": 23, "seconds": 15.84},
+    "fresh_process_transport": {"passed": 13, "seconds": 60.28},
+    "broad_affected": {"passed": 204, "seconds": 133.96, "before_final_rank_exception_atomicity_fix": true},
+    "final_material_rerun": {"passed": 32, "seconds": 26.60},
+    "postcommit_broad_final_runtime": {"passed": 205, "seconds": 126.99},
+    "material_projection_memory": {"active_lots": 400, "recursive_bytes_including_scalars": 84220, "incremental_process_rss": null},
+    "workflow_static": {"yaml": "valid", "shell_blocks": 10, "python_blocks": 4},
+    "common_harness_cli_smoke": "both-complete-import-roots-verified-comparison-accepted"
+  },
+  "mature_source": {
+    "year": 1001,
+    "generation": 126,
+    "bytes": 29922463744,
+    "sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2",
+    "save_artifact": 12129336378,
+    "acceptance_artifact": 12165934374,
+    "artifacts_checked_unexpired": true
+  },
+  "gaps": [
+    "clean-full-suite",
+    "fresh-mature-open-comparison",
+    "matched-mature-first-warm-step-save",
+    "exact-year-1002-digest-and-independent-audit-restore",
+    "independent-workflow-review-ended-at-reviewer-usage-limit"
+  ],
+  "interactive_performance": "unverified",
+  "promoted": false
+}

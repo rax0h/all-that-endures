@@ -1,5 +1,6 @@
 """World wiring for the checked catalog; no bootstrap or format migration here."""
 import weakref
+from itertools import islice
 
 from .incremental_store import StoreIntegrityError
 from .persistence_lazy_identity_coordinator import IdentityCoordinator
@@ -7,6 +8,13 @@ from .persistence_lazy_families import FAMILIES
 from .persistence_lazy_identity import IncarnationId, Occurrence
 from .persistence_lazy_nested_history import HISTORY_TYPES
 from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY, PACKED_LIST_KIND
+from .persistence_validation_scope import checked_read_operation
+
+
+def _batches(values):
+    source = iter(values)
+    while batch := tuple(islice(source, 64)):
+        yield batch
 
 
 class OwnerKeyJournal(set):
@@ -60,6 +68,7 @@ class WorldIdentityBridge:
     def __init__(self, session):
         self._session_ref = weakref.ref(session)
         self._pending_owners=set()
+        self.placement_revision=0
         self._synchronizing=False
         self._marking_packed_payload=False
         self._packed_action_epoch=None
@@ -76,6 +85,7 @@ class WorldIdentityBridge:
         if owner == (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY) and self._marking_packed_payload:
             return  # The coordinator already reconciled this physical owner.
         self._pending_owners.add(owner)
+        self.placement_revision+=1
 
     def mark_scalar_action_assignment(self, obj, old, new, owners):
         from .agency import ActionRecord
@@ -254,26 +264,29 @@ class WorldIdentityBridge:
                 coord.discover_group(original[1])
                 registry.bind(subject, incarnation=IncarnationId(session.store.store_identity, original[1]))
         placements = []
-        for _ident, _obj, path in rows:
-            child = session._family_bindings.resolve_path(value, path)
-            inc = registry.incarnation_for_object(child)
-            original = originals.get(id(child))
-            if inc is None and original is not None and original[0] is child:
-                inc = IncarnationId(session.store.store_identity, original[1])
-                coord.discover_group(inc)
-                canonical = registry.object_for_incarnation(inc)
-                if canonical is None:
-                    registry.bind(child, incarnation=inc)
-                else:
-                    adapter = FAMILIES[owner[0]]
-                    if adapter.identity_payload_bytes(session.store, session.pin, child) != adapter.identity_payload_bytes(
-                            session.store, session.pin, canonical):
-                        raise StoreIntegrityError('checked action payload copies disagree')
-                    session._family_bindings.install_path(owner, path, canonical)
-                    child = canonical
-            if registry.incarnation_for_object(child) is None:
-                registry.bind(child)
-            placements.append((path, child))
+        for batch in _batches(rows):
+            with checked_read_operation(session.store, session.pin,
+                    byte_limit=min(256*1024, coord.catalog.byte_limit//6)):
+                for _ident, _obj, path in batch:
+                    child = session._family_bindings.resolve_path(value, path)
+                    inc = registry.incarnation_for_object(child)
+                    original = originals.get(id(child))
+                    if inc is None and original is not None and original[0] is child:
+                        inc = IncarnationId(session.store.store_identity, original[1])
+                        coord.discover_group(inc)
+                        canonical = registry.object_for_incarnation(inc)
+                        if canonical is None:
+                            registry.bind(child, incarnation=inc)
+                        else:
+                            adapter = FAMILIES[owner[0]]
+                            if adapter.identity_payload_bytes(session.store, session.pin, child) != adapter.identity_payload_bytes(
+                                    session.store, session.pin, canonical):
+                                raise StoreIntegrityError('checked action payload copies disagree')
+                            session._family_bindings.install_path(owner, path, canonical)
+                            child = canonical
+                    if registry.incarnation_for_object(child) is None:
+                        registry.bind(child)
+                    placements.append((path, child))
         current = {path: registry.incarnation_for_object(child).value for path, child in placements}
         if before != current:
             coord.replace_owner(owner, placements)
@@ -296,29 +309,32 @@ class WorldIdentityBridge:
         session = self._session_ref()
         registry, coord = session._registry, self.coordinator
         seen = set()
-        for action in session.world.agency.actions:
-            inc = registry.incarnation_for_object(action)
-            if inc is None or inc.value in seen:
-                continue
-            seen.add(inc.value)
-            placements = coord._current_placements(coord.discover_group(inc))
-            try:
-                for namespace, key, path in placements:
-                    if namespace in session._family_bindings.tables:
+        for batch in _batches(session.world.agency.actions):
+            with checked_read_operation(session.store, session.pin,
+                    byte_limit=min(256*1024, coord.catalog.byte_limit//6)):
+                for action in batch:
+                    inc = registry.incarnation_for_object(action)
+                    if inc is None or inc.value in seen:
                         continue
-                    owner = (namespace, key)
-                    value = session._family_bindings.load_owner(owner)
-                    current = session._family_bindings.resolve_path(value, path)
-                    if current is not action:
-                        adapter = FAMILIES[namespace]
-                        if adapter.identity_payload_bytes(session.store, session.pin, current, path) != adapter.identity_payload_bytes(
-                                session.store, session.pin, action, path):
-                            raise StoreIntegrityError('checked action payload copies disagree')
-                        session._family_bindings.install_path(owner, path, action)
-                    registry.attach_occurrence(action, Occurrence(namespace, key, path))
-            finally:
-                if hasattr(placements, 'close'):
-                    placements.close()
+                    seen.add(inc.value)
+                    placements = coord._current_placements(coord.discover_group(inc))
+                    try:
+                        for namespace, key, path in placements:
+                            if namespace in session._family_bindings.tables:
+                                continue
+                            owner = (namespace, key)
+                            value = session._family_bindings.load_owner(owner)
+                            current = session._family_bindings.resolve_path(value, path)
+                            if current is not action:
+                                adapter = FAMILIES[namespace]
+                                if adapter.identity_payload_bytes(session.store, session.pin, current, path) != adapter.identity_payload_bytes(
+                                        session.store, session.pin, action, path):
+                                    raise StoreIntegrityError('checked action payload copies disagree')
+                                session._family_bindings.install_path(owner, path, action)
+                            registry.attach_occurrence(action, Occurrence(namespace, key, path))
+                    finally:
+                        if hasattr(placements, 'close'):
+                            placements.close()
 
     def _synchronize_owner(self, owner, exists):
         session = self._session_ref()

@@ -50,7 +50,7 @@ CACHES = {
     social.SocialGraph: {'_relationships', '_partnership_index', '_partnership_count'},
     communities.CommunityState: {'_membership_index'},
     magic_resources.MagicResourceState: {'_query_inventory', '_query_selection', '_query_offer_books'},
-    materials.MaterialEconomy: {'_selection_index', '_rank_heaps', '_selection_ids', '_whole_units'},
+    materials.MaterialEconomy: {'_selection_index', '_rank_heaps', '_selection_ids', '_whole_units', '_derived_lots'},
     advancement.AdvancementState: {'_rank_cache'},
 }
 

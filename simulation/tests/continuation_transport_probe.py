@@ -15,7 +15,11 @@ def main():
     role,root = sys.argv[2],Path(sys.argv[3])
     from simulation import continuation_checkpoint_ci as ci
     ci.ROOT = root
-    runtime_tree = ci.runner.original.EXECUTION_RUNTIME_TREE
+    # Test-local fake API authority follows the checkout being exercised. The
+    # production mature harness retains its frozen, independently reviewed pins.
+    ci.runner.original.EXECUTION_RUNTIME_SHA = state['head']
+    ci.runner.original.EXECUTION_RUNTIME_TREE = state['runtime_tree']
+    runtime_tree = state['runtime_tree']
     def api(path):
         parsed = urllib.parse.urlsplit(path)
         path = parsed.path

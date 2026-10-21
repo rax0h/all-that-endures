@@ -209,6 +209,7 @@ class CoordinatorSaveParticipant:
         self.target_generation = target_generation
         self._validated_pin = self._row_proved_pin = None
         self.accepted = False
+        self._publication_proof = None
 
     def prepare_delta(self, context):
         if context is not None:
@@ -223,6 +224,9 @@ class CoordinatorSaveParticipant:
     def validate_publication(self, delta, successor_pin):
         self._check(delta, successor_pin)
         self._validated_pin = self._row_proved_pin = None
+        self._publication_proof = None
+        from .persistence_publication_proof import publication_epoch
+        entry = publication_epoch(self.store) if not self.store.db.in_transaction else None
         with self.store.read_snapshot(successor_pin):
             if self.store.checked_head().generation != self.target_generation:
                 raise StoreConflictError('coordinator publication successor was replaced')
@@ -231,7 +235,9 @@ class CoordinatorSaveParticipant:
                 # coordinator acknowledgement still checks its registered lease.
                 self.coordinator.accept_delta(delta, successor_pin)
             else:
-                self.coordinator.validate_publication(delta, successor_pin)
+                self._publication_proof = self.coordinator.validate_publication(delta, successor_pin)
+        if self._publication_proof is not None:
+            self._publication_proof = self._publication_proof.finish_owned_read(entry)
         self._row_proved_pin = successor_pin
 
     def confirm_cold_publication(self, delta, successor_pin, cold_plan, head):
@@ -245,10 +251,12 @@ class CoordinatorSaveParticipant:
         self._check(delta, successor_pin)
         if self._validated_pin != successor_pin:
             raise StoreIntegrityError('coordinator lacks checked publication acknowledgement')
-        self.coordinator.accept_delta(delta, successor_pin)
+        self.coordinator.accept_delta(delta, successor_pin, proof=self._publication_proof)
+        self._publication_proof = None
         self.accepted = True
 
     def abort_delta(self, commit_token):
+        self._publication_proof = None
         self.coordinator.abort_delta(self.delta, commit_token)
 
 

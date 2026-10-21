@@ -1243,6 +1243,10 @@ class LazyRecordStore:
 
     def _read_snapshot_start(self, pin: GenerationPin) -> int:
         nested = getattr(self, "_checked_snapshot_depth", 0)
+        scope = getattr(self, '_validation_scope', None)
+        if nested and scope is not None and scope.can_reuse(self, pin):
+            self._checked_snapshot_depth = nested + 1
+            return pin.captured_head
         owns_transaction = not getattr(self, '_active_read_transaction', False)
         if not nested:
             if owns_transaction:

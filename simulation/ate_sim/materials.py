@@ -20,6 +20,7 @@ class MaterialEconomy:
  lots:dict[int,MaterialLot]=field(default_factory=dict);items:dict[int,CraftedItem]=field(default_factory=dict);lot_index:dict[int,list[int]]=field(default_factory=dict);active_lot_index:dict[int,set[int]]=field(default_factory=dict);next_lot:int=1;next_item:int=1
  def create_lot(self,kind,quantity,quality,sid,producer,year,event,properties=(),material_rank=0):
   i=self.next_lot;self.next_lot+=1;l=MaterialLot(i,kind,quantity,quality,sid,producer,year,event,'person',producer,tuple(properties),0,[],material_rank);self.lots[i]=l;self.lot_index.setdefault(sid,[]).append(i);self.active_lot_index.setdefault(sid,set()).add(i)
+  if hasattr(self,'_derived_lots'):self._derived_lots[i]=self._cacheable_projection(l)
   if hasattr(self,'_selection_index'):
    heaps,counts=self._selection_index;heappush(heaps.setdefault(sid,[]),self._selection_key(l));counts[sid]=counts.get(sid,0)+bool(l.magical_properties)
   if hasattr(self,'_rank_heaps'):heappush(self._rank_heaps.setdefault((sid,material_rank),[]),self._selection_key(l))
@@ -40,12 +41,16 @@ class MaterialEconomy:
     if hasattr(self,'_selection_index'):
      _,counts=self._selection_index;counts[lot.settlement]=counts.get(lot.settlement,0)-bool(lot.magical_properties)
   if hasattr(self,'_whole_units'):self._whole_units[lot.settlement]=self._whole_units.get(lot.settlement,0)+int(max(0.,lot.quantity-lot.consumed))-old_whole
+  if hasattr(self,'_derived_lots'):
+   if lot.id in self.active_lot_index.get(lot.settlement,()):self._derived_lots[lot.id]=self._cacheable_projection(lot)
+   else:self._derived_lots.pop(lot.id,None)
   return used
  def rebuild_active_index(self):
   self.__dict__.pop('_rank_heaps',None)
   self.__dict__.pop('_selection_index',None)
   self.__dict__.pop('_whole_units',None)
   self.__dict__.pop('_selection_ids',None)
+  self.__dict__.pop('_derived_lots',None)
   # Preserve a persistence-aware mapping facade when an explicit rebuild is
   # requested; eager dictionaries retain identical clear-and-repopulate behavior.
   self.active_lot_index.clear()
@@ -54,15 +59,37 @@ class MaterialEconomy:
    if active:self.active_lot_index[sid]=active
  def _selection_key(self,lot):
   return (-(lot.quality+(.2 if lot.magical_properties else 0.)),lot.id)
+ def _rebuild_derived_indexes(self):
+  # Share only active scalar projections. Each consumer retains its original
+  # lazy allocation, arithmetic and heap construction order; no bodies survive.
+  self._derived_lots={i:self._cacheable_projection(self.lots[i])
+                      for ids in self.active_lot_index.values() for i in ids}
+ def _lot_projection(self,lot):
+  return (lot.id,lot.quality,bool(lot.magical_properties),lot.material_rank,lot.quantity,lot.consumed)
+ def _cacheable_projection(self,lot):
+  row=self._lot_projection(lot)
+  return row if (type(row[0]) is int and type(row[1]) in (int,float)
+                and type(row[3]) is int and type(row[4]) in (int,float)
+                and type(row[5]) in (int,float)) else None
+ def _projected_lot(self,i):
+  if not hasattr(self,'_derived_lots'):self._rebuild_derived_indexes()
+  row=self._derived_lots[i]
+  return self._lot_projection(self.lots[i]) if row is None else row
+ def _projection_key(self,row):
+  return (-(row[1]+(.2 if row[2] else 0.)),row[0])
+ def _build_selection_index(self):
+  heaps={};counts={}
+  for sid,ids in self.active_lot_index.items():
+   heap=[];count=0
+   for i in ids:
+    row=self._projected_lot(i);heap.append(self._projection_key(row));count+=row[2]
+   heapify(heap);heaps[sid]=heap;counts[sid]=count
+  self._selection_index=(heaps,counts)
  def _ensure_selection_index(self):
   # Derived runtime state: excluded from canonical history, rebuilt for old checkpoints.
   # Quality/properties are fixed after creation. Rebuild after explicit data repair.
   if not hasattr(self,'_selection_index'):
-   heaps={};counts={}
-   for sid,ids in self.active_lot_index.items():
-    heaps[sid]=[self._selection_key(self.lots[i]) for i in ids];heapify(heaps[sid])
-    counts[sid]=sum(bool(self.lots[i].magical_properties) for i in ids)
-   self._selection_index=(heaps,counts)
+   self._build_selection_index()
   return self._selection_index
  def has_available(self,sid):
   return bool(self.active_lot_index.get(sid))
@@ -72,10 +99,12 @@ class MaterialEconomy:
   return self.lots[heap[0][1]] if heap else None
  def best_at_rank(self,sid,rank):
   if not hasattr(self,'_rank_heaps'):
-   self._rank_heaps={}
-   for place,ids in self.active_lot_index.items():
+   ranks={}
+   for settlement,ids in self.active_lot_index.items():
     for i in ids:
-     lot=self.lots[i];heappush(self._rank_heaps.setdefault((place,lot.material_rank),[]),self._selection_key(lot))
+     row=self._projected_lot(i)
+     heappush(ranks.setdefault((settlement,row[3]),[]),self._projection_key(row))
+   self._rank_heaps=ranks
   heap=self._rank_heaps.get((sid,rank),[]);active=self.active_lot_index.get(sid,())
   while heap and heap[0][1] not in active:heappop(heap)
   return self.lots[heap[0][1]] if heap else None
@@ -91,7 +120,13 @@ class MaterialEconomy:
   # Integer lower bound proves saturation without summing the growing stockpile.
   # Near a decision boundary, retain the original ordered floating-point sum.
   if not hasattr(self,'_whole_units'):
-   self._whole_units={place:sum(int(max(0.,self.lots[i].quantity-self.lots[i].consumed)) for i in ids) for place,ids in self.active_lot_index.items()}
+   whole={}
+   for settlement,ids in self.active_lot_index.items():
+    units=0
+    for i in ids:
+     row=self._projected_lot(i);units+=int(max(0.,row[4]-row[5]))
+    whole[settlement]=units
+   self._whole_units=whole
   if self._whole_units.get(sid,0)>limit*8:return limit
   available_units=sum(max(0.,l.quantity-l.consumed) for l in self.available(sid))
   return min(limit,max(0,int(available_units//8)))

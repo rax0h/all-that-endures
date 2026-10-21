@@ -17,6 +17,7 @@ from .persistence_lazy_identity_catalog import IdentityCatalog, CheckedIdentityG
 from .persistence_lazy_store import IdentityOccurrenceChange, VersionChange, ORDINARY_QUERY_OWNER_INDEX
 from .persistence_lazy_families import ParticipantDelta, IDENTITY_OWNER_FAMILIES, FAMILIES
 from .persistence_lazy_spill import CheckedSpool
+from .persistence_publication_proof import overlay_fingerprint
 
 
 @dataclass(frozen=True)
@@ -68,6 +69,7 @@ class IdentityCoordinator:
         self._cache_occurrences = self._cache_bytes = 0
         self._weights = {}
         self.placement_overlay = {}
+        self.placement_revision = 0
         self._original = {}
         self._by_owner = {}
         self._by_incarnation = {}
@@ -258,6 +260,7 @@ class IdentityCoordinator:
 
     def _record_placement_change(self, owner, path, original, old, chosen):
         """Apply a prevalidated placement edit; no loading or user callbacks."""
+        self.placement_revision += 1
         marker = self._marker(owner, path)
         affected = {i for i in (original, old, chosen) if i is not None}
         for inc in affected:
@@ -515,11 +518,14 @@ class IdentityCoordinator:
             version_changes=forced_versions + versions, ordinary_changes=forced_ordinary + ordinary,
             identity_changes=placements)
         self._prepared = PreparedCoordinatorState(delta, catalog_delta, self.pin.captured_head,
-            self.registry.next_incarnation, tuple(sorted(self.placement_overlay)))
+            self.registry.next_incarnation, overlay_fingerprint(self))
         return delta
 
     def validate_publication(self, delta, successor_pin):
         self.store._ensure_open()
+        from .persistence_publication_proof import PublicationProof, publication_epoch
+        standalone = not self.store.db.in_transaction
+        entry_epoch = publication_epoch(self.store)
         prepared = self._prepared
         if prepared is None or delta != prepared.delta:
             raise StoreConflictError('identity publication does not match the prepared plan')
@@ -580,19 +586,30 @@ class IdentityCoordinator:
                     raise StoreIntegrityError('missing acknowledged identity placement') from None
                 if change.delete or actual.incarnation_id != change.incarnation_id:
                     raise StoreIntegrityError('acknowledged identity placement mismatch')
+        return PublicationProof.after_validation(self, delta, successor_pin, entry_epoch, standalone)
 
-    def accept_delta(self, delta, successor_pin):
+    def accept_delta(self, delta, successor_pin, *, proof=None):
         self.store._ensure_open()
         if self._accepted == (delta.fingerprint, successor_pin):
             self.store._require_pin(successor_pin)
             return
-        self.validate_publication(delta, successor_pin)
+        from .persistence_publication_proof import PublicationProof
         prepared = self._prepared
-        if tuple(sorted(self.placement_overlay)) != prepared.overlay_fingerprint:
+        if prepared is None or delta != prepared.delta:
+            raise StoreConflictError('identity publication does not match the prepared plan')
+        if overlay_fingerprint(self) != prepared.overlay_fingerprint:
+            raise StoreConflictError('identity overlay changed after preparation')
+        if type(proof) is PublicationProof and proof.matches(self, delta, successor_pin):
+            self.store._require_pin(successor_pin)
+        else:
+            self.validate_publication(delta, successor_pin)
+        prepared = self._prepared
+        if overlay_fingerprint(self) != prepared.overlay_fingerprint:
             raise StoreConflictError('identity overlay changed after preparation')
         self.pin = successor_pin
         self._baseline_allocator = prepared.next_incarnation
         self.placement_overlay.clear()
+        self.placement_revision += 1
         self._original.clear()
         self._by_owner.clear()
         self._by_incarnation.clear()

@@ -3476,10 +3476,44 @@ class LazyRecordTable(RecordTable):
         self._session._ensure_people_mutation_allowed()
 
     def preflight_shared_record(self, record):
-        self._session._shared_object_routes(record)
+        return self._session._shared_object_routes(record)
+
+    def _before_indexed_assignment(self, record, field, value):
+        from .persistence_record_runtime import IndexedAssignmentRouteTicket, _assignment_epoch, _identity_free_scalar
+        from .persistence_schema import RECORD_FIELDS
+        self._indexed_assignment_revision = getattr(self, '_indexed_assignment_revision', 0) + 1
+        preflight = self.preflight_shared_record
+        routes = preflight(record)
+        if (self._session._identity_coordinator is not None
+                and field in RECORD_FIELDS.get(type(record), ()) and type(routes) is tuple
+                and getattr(preflight, '__func__', None) is LazyRecordTable.preflight_shared_record
+                and getattr(self.shared_record_changed, '__func__', None) is LazyRecordTable.shared_record_changed
+                and _identity_free_scalar(getattr(record, field, None)) and _identity_free_scalar(value)):
+            return IndexedAssignmentRouteTicket(record, field, self._indexed_assignment_revision,
+                _assignment_epoch(self._session), routes, self, value)
+        return None
+
+    def _after_indexed_assignment(self, record, field, ticket):
+        if ticket is None:
+            self.shared_record_changed(record)
+            return
+        session = self._session
+        bridge, recursive = session._identity_bridge, session._recursive_histories
+        if not bridge._synchronizing and not recursive._synchronizing:
+            self._ensure_mutation()
+            bridge.synchronize_lazy_placements()
+            if (not bridge._pending_owners and not recursive._pending_backings
+                    and getattr(self.shared_record_changed, '__func__', None) is LazyRecordTable.shared_record_changed
+                    and ticket.matches(self, record, field, session)):
+                self._mark_shared_record_routes(record, ticket.routes)
+                return
+        self.shared_record_changed(record)
 
     def shared_record_changed(self, record):
-        for table, key in self._session._shared_object_routes(record):
+        self._mark_shared_record_routes(record, self._session._shared_object_routes(record))
+
+    def _mark_shared_record_routes(self, record, routes):
+        for table, key in routes:
             # IndexedRecord already delivered its exact field notification to
             # this owner. Repeating it with field=None would turn a scalar
             # advancement write into a full identity-graph reconciliation.
@@ -17985,6 +18019,8 @@ def _begin_matching_snapshot(store, pin):
         store._active_read_transaction = False
         store.db.rollback()
         return None
+    from .persistence_validation_scope import OwnedOpenRead
+    store._owned_open_read = OwnedOpenRead(store, pin)
     return head
 
 
@@ -18258,6 +18294,7 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
             pin = None
             return session
         finally:
+            store._owned_open_read = None
             store._active_read_transaction = False
             if store.db.in_transaction:
                 store.db.rollback()

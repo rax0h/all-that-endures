@@ -9,6 +9,8 @@ import weakref
 class IndexedRecord:
     def __setattr__(self, name, value):
         table = None
+        assignment_preflight = None
+        assignment_token = None
         if not name.startswith('_index_'):
             ref = self.__dict__.get('_index_table')
             table = None if ref is None else ref()
@@ -19,15 +21,22 @@ class IndexedRecord:
                 preflight = getattr(table, "preflight_change", None)
                 if preflight is not None:
                     preflight(self._index_key, name)
-                shared_preflight = getattr(table, "preflight_shared_record", None)
-                if shared_preflight is not None:
-                    shared_preflight(self)
+                assignment_preflight = getattr(table, '_before_indexed_assignment', None)
+                if assignment_preflight is not None:
+                    assignment_token = assignment_preflight(self, name, value)
+                else:
+                    shared_preflight = getattr(table, "preflight_shared_record", None)
+                    if shared_preflight is not None:
+                        shared_preflight(self)
         object.__setattr__(self, name, value)
         if table is not None:
             table.changed(self._index_key, name)
-            shared_changed = getattr(table, "shared_record_changed", None)
-            if shared_changed is not None:
-                shared_changed(self)
+            if assignment_preflight is not None:
+                table._after_indexed_assignment(self, name, assignment_token)
+            else:
+                shared_changed = getattr(table, "shared_record_changed", None)
+                if shared_changed is not None:
+                    shared_changed(self)
 
     def __getstate__(self):
         return {k:v for k,v in self.__dict__.items() if not k.startswith('_index_')}

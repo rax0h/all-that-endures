@@ -546,6 +546,12 @@ class IdentityCatalog:
 
     def _owner(self, pin, owner):
         placement_path(*owner, ())
+        scope = getattr(self.store, '_validation_scope', None)
+        marker = (owner[0], self.codec.encode(owner[1]))
+        reusable = scope is not None and self.codec is self.store.codec and scope.can_reuse(self.store, pin)
+        cached = scope.lookup('owner', marker) if reusable else None
+        if cached is not None:
+            return cached
         header = self._read(pin, OWNER_NAMESPACE, owner)
         if (type(header) is not tuple or len(header) != 9 or header[0] != 'identity-owner/v1'
             or type(header[1]) is not bool or header[2] not in ('lazy', 'ordinary') or type(header[3]) is not int
@@ -578,6 +584,8 @@ class IdentityCatalog:
             raise StoreIntegrityError('identity owner root/count mismatch')
         if header[6] is None and header[8] != _framed_sha(b'identity-owner-empty-v1'):
             raise StoreIntegrityError('identity owner empty commitment mismatch')
+        if reusable:
+            scope.remember('owner', marker, header)
         return header
 
     def _has_source(self, pin, owner):
@@ -601,6 +609,12 @@ class IdentityCatalog:
         return bool(placed)
 
     def _node(self, pin, owner, prefix, expected_count, expected_digest):
+        scope = getattr(self.store, '_validation_scope', None)
+        marker = (owner[0], self.codec.encode(owner[1]), prefix, expected_count, expected_digest)
+        reusable = scope is not None and self.codec is self.store.codec and scope.can_reuse(self.store, pin)
+        cached = scope.lookup('node', marker) if reusable else None
+        if cached is not None:
+            return cached
         node = self._read(pin, OWNER_TREE_NAMESPACE, (*owner, prefix))
         count, checksum = node_commit(self.codec, node)
         if count != expected_count or checksum != expected_digest:
@@ -610,6 +624,8 @@ class IdentityCatalog:
                 raise StoreIntegrityError('identity owner leaf locator mismatch')
         elif node[1] != prefix:
             raise StoreIntegrityError('identity owner branch locator mismatch')
+        if reusable:
+            scope.remember('node', marker, node)
         return node
 
     def _point(self, pin, owner, path, incarnation, header):
@@ -724,7 +740,8 @@ class IdentityCatalog:
     def read_identity_group(self, pin, incarnation_id):
         if type(incarnation_id) is not int or incarnation_id < 1:
             raise ValueError('incarnation_id must be a positive int')
-        with self.store.read_snapshot(pin):
+        from .persistence_validation_scope import checked_read_operation
+        with checked_read_operation(self.store, pin, byte_limit=min(256*1024, self.byte_limit//6)) as scope:
             descriptor = self._descriptor(pin)
             if incarnation_id >= descriptor[2]:
                 raise StoreIntegrityError('identity incarnation exceeds catalog allocator')
@@ -751,7 +768,7 @@ class IdentityCatalog:
             # Four private buffers plus one bounded owner-header LRU share the
             # transient Python budget. Large groups never bypass it by becoming
             # an archive-sized Python tuple, dict or sorted list.
-            portion = max(1, self.byte_limit // 5)
+            portion = max(1, (self.byte_limit - scope.byte_limit) // 5)
             buffers = []
             def buffer(order):
                 result = CheckedSpool(self.codec, entry_limit=self.occurrence_limit,

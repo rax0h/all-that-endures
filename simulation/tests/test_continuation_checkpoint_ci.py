@@ -152,12 +152,15 @@ def test_real_zip_transport_two_year_pipeline_uses_fresh_processes(tmp_path):
     assert probe.exists(),'fresh-process transport probe missing'
     repo=Path(__file__).resolve().parents[2]
     head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip()
-    workflow=(repo/module().PROOF_WORKFLOW).read_text()
-    state=dict(head=head,workflow=workflow,artifacts=[],jobs=[],archives={})
+    runtime_tree=subprocess.check_output(['git','rev-parse','HEAD:simulation/ate_sim'],cwd=repo,text=True).strip()
+    workflow_data=yaml.safe_load((repo/module().PROOF_WORKFLOW).read_text())
+    workflow_data['env']['RUNTIME_SHA']=head
+    workflow=yaml.safe_dump(workflow_data)
+    state=dict(head=head,runtime_tree=runtime_tree,workflow=workflow,artifacts=[],jobs=[],archives={})
     roles=['source','save1','interrupt-audit1','audit1','digest1','accept1','save2',
         'audit2','digest2','accept2','continued','restore-values','restore-digest','restored','proof-summary']
     env=dict(os.environ,PYTHONPATH='simulation:.',GH_TOKEN='bounded-test-token',HARNESS_SHA=head,
-        GITHUB_SHA=head,RUNTIME_SHA='2cbf3510ef1f0ad8ddd712a1c4174ccfa518291a',GITHUB_RUN_ID='500',GITHUB_RUN_ATTEMPT='1')
+        GITHUB_SHA=head,RUNTIME_SHA=head,GITHUB_RUN_ID='500',GITHUB_RUN_ATTEMPT='1')
     for index,role in enumerate(roles):
         path=tmp_path/'network.json';path.write_text(json.dumps(state))
         result=subprocess.run([sys.executable,str(probe),str(path),role,str(tmp_path/role)],
@@ -180,3 +183,14 @@ def test_real_zip_transport_two_year_pipeline_uses_fresh_processes(tmp_path):
     assert final['values']['observation']['snapshot']['magic_access']['treasuries']
     features=r.load_receipt(tmp_path/'restore-values/restore-values/fixture-check.json')
     assert features['year']==2 and features['shared_nested_identity'] is True and features['counted_histories']>0
+
+
+def test_frozen_mature_harness_still_rejects_unreviewed_runtime(monkeypatch):
+    m=module()
+    repo=Path(__file__).resolve().parents[2]
+    head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip()
+    tree=subprocess.check_output(['git','rev-parse','HEAD:simulation/ate_sim'],cwd=repo,text=True).strip()
+    assert tree != m.original.EXECUTION_RUNTIME_TREE
+    monkeypatch.setenv('HARNESS_SHA',head)
+    monkeypatch.setenv('RUNTIME_SHA',m.original.EXECUTION_RUNTIME_SHA)
+    with pytest.raises(ValueError,match='reviewed pin'): m.check_source()
