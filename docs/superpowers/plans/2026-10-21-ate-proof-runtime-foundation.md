@@ -50,14 +50,14 @@
 - [x] Run new tests to establish expected redundant-work failures before changing production code.
 - [x] Implement narrowly proven scalar admission and value-only notification; retain existing structural journals and immediate reconciliation.
 - [x] Run the new cases and existing indexed/native assignment, owner-witness, publication, corruption and recovery regressions. Fix every new failure before measuring speed.
-- [ ] Run a bounded populated first/warm/save profile. Compare actual work and exact output with the unchanged checked path; no extrapolated mature speed claim.
-- [ ] Commit the implementation and measured evidence.
+- [x] Run a bounded populated first/warm/save profile. Compare actual work and exact output with the unchanged checked path; no extrapolated mature speed claim.
+- [x] Commit the implementation and measured evidence.
 
 ## Task 3: Whole-package verification and durable-proof handoff
 
 **Files:** Update this checklist and `docs/performance/proof-runtime-foundation-results.md`; add a bounded CI workflow only if local full-suite runtime cannot complete in-session.
 
-- [ ] Run the full simulation suite on the final runtime, retaining JUnit/log evidence. Do not repeat the 30-GB comparison before the attributed work warrants it.
+- [x] Run the full simulation suite on the final runtime, retaining JUnit/log evidence. Do not repeat the 30-GB comparison before the attributed work warrants it.
 - [x] Obtain a fresh-context final code review as required by executing-plans; fix important findings with red/green checks.
 - [x] Publish only task-owned changes over the current remote head using a nonforced lease; leave unrelated handoffs intact.
 - [x] Continue to a separate durable-transition-proof plan: exact immutable node/manifest format, copy upgrade, atomic data/root publication, complete index/absence proofs, old-pin retention and recovery. This foundation must not be called the durable proof system or target completion.
@@ -71,3 +71,5 @@
 - Ruling: execute inline after writing/self-reviewing this plan because the user's current instruction explicitly authorizes Sol to implement Astra's outline efficiently; do not ask them to reauthorize routine preparation.
 
 Published candidate `848ebf4bb14bd14ace00ba604f23a61acd967ea4`; full suite/populated validation [39728517108](https://github.com/rax0h/all-that-endures/actions/runs/39728517108) is pending. Next: [durable proof map foundation](2026-10-22-ate-durable-proof-map-foundation.md).
+
+Final checkpoint: run 39810513221 green, 3094 tests + 2 subtests; populated fresh restores passed. See acceptance receipt in docs/performance/run-39810513221/.

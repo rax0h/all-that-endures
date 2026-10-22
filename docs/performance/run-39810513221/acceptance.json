@@ -1,0 +1,28 @@
+{
+  "schema": "ate-proof-runtime-acceptance/1",
+  "run": 39810513221,
+  "source": "3b2af964f42b6197fe596554fdce97d459798c82",
+  "runtime_tree": "6f00a6d68bafba1a371e470bfd70024237d8f79a",
+  "full_suite": {
+    "passed": 3094,
+    "subtests_passed": 2,
+    "warnings": 1,
+    "seconds": 6409.98
+  },
+  "populated": "complete; both saved successors match eager canonical digest",
+  "previous_failed_cases_retest": {
+    "passed": 189,
+    "seconds": 591.57
+  },
+  "interactive_targets_met": false,
+  "artifacts": [
+    {
+      "id": 12445723725,
+      "sha256": "29a43e4bc3020a10175469daba189f0aa7590d87d20b8adc9add04e567cc5bbd"
+    },
+    {
+      "id": 12440267263,
+      "sha256": "b1e3c66ecdd8afbfa32c66238c663b03952e510a2e980855706eabb75fd6c66c"
+    }
+  ]
+}

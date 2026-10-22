@@ -1,0 +1,3999 @@
+{
+  "attribution_helper_sha256": "bff79f26022b68310676299559dc82b1024659a487616efea0eb75d14cb90c13",
+  "budget_seconds": 600.0,
+  "common_harness_sha256": "79e9e3abc5c8cfe342b0114157d8fa7b3578461a8d3d3868d45b286f92fcaf95",
+  "final": {
+    "actions": 155,
+    "pin": {
+      "captured_head": 4,
+      "store_identity": "e56a1bda-a3fa-49f0-8dca-18ec315318d8",
+      "token": "5de41b53-c62c-43df-932d-0e93d2cdb7fc"
+    },
+    "seed": 843000,
+    "year": 2
+  },
+  "harness_sha256": "81bccd7806fe48fbbbcad60bf9ce0b2ef187dcea80d94cec7a99e04483f24787",
+  "initial": {
+    "actions": 0,
+    "pin": {
+      "captured_head": 3,
+      "store_identity": "e56a1bda-a3fa-49f0-8dca-18ec315318d8",
+      "token": "5de41b53-c62c-43df-932d-0e93d2cdb7fc"
+    },
+    "seed": 843000,
+    "year": 0
+  },
+  "instrumentation": "attribution-v1",
+  "machine": {
+    "cpu_count": 4,
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "python": "3.12.15",
+    "sqlite": "3.45.1"
+  },
+  "phases": {
+    "first_step": {
+      "attribution": {
+        "cpu_seconds": 67.420830148,
+        "key_sample": {
+          "entries": 2048,
+          "limit": 2048,
+          "meaning": "bounded recent-key LRU; hits are observed reuse, not exact cardinality"
+        },
+        "physical_io": {
+          "available": true,
+          "rchar": 674452325,
+          "read_bytes": 0,
+          "wchar": 6140,
+          "write_bytes": 8192
+        },
+        "reads": {
+          "aux.lazy.adoption.buckets": {
+            "reasons": {
+              "engine.civilization_step": 6,
+              "engine.cultural_step": 10
+            },
+            "requests": 16,
+            "sample_hits": 0,
+            "sample_misses": 16
+          },
+          "aux.lazy.adoption.settlements": {
+            "reasons": {
+              "engine.civilization_step": 5,
+              "engine.cultural_step": 10
+            },
+            "requests": 15,
+            "sample_hits": 10,
+            "sample_misses": 5
+          },
+          "aux.lazy.history.member_types": {
+            "reasons": {
+              "engine.agency_step": 1753,
+              "engine.cultural_step": 25,
+              "engine.development_step": 149,
+              "engine.divine_step": 34,
+              "engine.household_step": 109,
+              "engine.institution_step": 32,
+              "engine.magic_ecology_step": 137,
+              "engine.production": 144,
+              "engine.threat_ecology_step": 1100
+            },
+            "requests": 3483,
+            "sample_hits": 0,
+            "sample_misses": 3483
+          },
+          "aux.lazy.identity.catalog": {
+            "reasons": {
+              "engine.agency_step": 18143,
+              "engine.civilization_step": 94,
+              "engine.cultural_step": 105,
+              "engine.demography": 489,
+              "engine.development_step": 160,
+              "engine.divine_step": 17,
+              "engine.household_step": 4417,
+              "engine.institution_step": 11,
+              "engine.magic_ecology_step": 898,
+              "engine.magical_civilization_step": 1631,
+              "engine.material_economy_step": 620,
+              "engine.people": 139,
+              "engine.production": 199,
+              "engine.threat_ecology_step": 3256,
+              "engine.weather": 36
+            },
+            "requests": 30215,
+            "sample_hits": 30214,
+            "sample_misses": 1
+          },
+          "aux.lazy.identity.groups": {
+            "reasons": {
+              "engine.agency_step": 13764,
+              "engine.cultural_step": 25,
+              "engine.demography": 1,
+              "engine.development_step": 17,
+              "engine.household_step": 105,
+              "engine.magic_ecology_step": 66,
+              "engine.magical_civilization_step": 202,
+              "engine.people": 127,
+              "engine.threat_ecology_step": 2585,
+              "engine.weather": 1
+            },
+            "requests": 16893,
+            "sample_hits": 12671,
+            "sample_misses": 4222
+          },
+          "aux.lazy.identity.owner_tree": {
+            "reasons": {
+              "engine.agency_step": 38265,
+              "engine.civilization_step": 16,
+              "engine.cultural_step": 125,
+              "engine.demography": 2,
+              "engine.development_step": 337,
+              "engine.divine_step": 68,
+              "engine.household_step": 299,
+              "engine.institution_step": 54,
+              "engine.magic_ecology_step": 324,
+              "engine.magical_civilization_step": 494,
+              "engine.material_economy_step": 1,
+              "engine.people": 152,
+              "engine.production": 415,
+              "engine.threat_ecology_step": 7601,
+              "engine.weather": 6
+            },
+            "requests": 48159,
+            "sample_hits": 32475,
+            "sample_misses": 15684
+          },
+          "aux.lazy.identity.owners": {
+            "reasons": {
+              "engine.agency_step": 18143,
+              "engine.civilization_step": 94,
+              "engine.cultural_step": 105,
+              "engine.demography": 489,
+              "engine.development_step": 160,
+              "engine.divine_step": 17,
+              "engine.household_step": 4417,
+              "engine.institution_step": 11,
+              "engine.magic_ecology_step": 898,
+              "engine.magical_civilization_step": 1631,
+              "engine.material_economy_step": 620,
+              "engine.people": 139,
+              "engine.production": 199,
+              "engine.threat_ecology_step": 3256,
+              "engine.weather": 36
+            },
+            "requests": 30215,
+            "sample_hits": 24272,
+            "sample_misses": 5943
+          },
+          "aux.lazy.identity.retired": {
+            "reasons": {
+              "engine.agency_step": 18143,
+              "engine.civilization_step": 94,
+              "engine.cultural_step": 105,
+              "engine.demography": 489,
+              "engine.development_step": 160,
+              "engine.divine_step": 17,
+              "engine.household_step": 4417,
+              "engine.institution_step": 11,
+              "engine.magic_ecology_step": 898,
+              "engine.magical_civilization_step": 1631,
+              "engine.material_economy_step": 620,
+              "engine.people": 139,
+              "engine.production": 199,
+              "engine.threat_ecology_step": 3256,
+              "engine.weather": 36
+            },
+            "requests": 30215,
+            "sample_hits": 30214,
+            "sample_misses": 1
+          },
+          "aux.lazy.nested.descriptors": {
+            "reasons": {
+              "engine.agency_step": 1753,
+              "engine.cultural_step": 25,
+              "engine.development_step": 149,
+              "engine.divine_step": 34,
+              "engine.household_step": 76,
+              "engine.institution_step": 32,
+              "engine.magic_ecology_step": 137,
+              "engine.production": 144,
+              "engine.threat_ecology_step": 1100
+            },
+            "requests": 3450,
+            "sample_hits": 0,
+            "sample_misses": 3450
+          },
+          "aux.lazy.nested.list_pages": {
+            "reasons": {
+              "engine.agency_step": 460,
+              "engine.institution_step": 15,
+              "engine.magic_ecology_step": 57,
+              "engine.magical_civilization_step": 48,
+              "engine.material_economy_step": 5,
+              "engine.threat_ecology_step": 20
+            },
+            "requests": 605,
+            "sample_hits": 356,
+            "sample_misses": 249
+          },
+          "aux.lazy.records.headers": {
+            "reasons": {
+              "engine.agency_step": 5649,
+              "engine.magic_ecology_step": 57,
+              "engine.magical_civilization_step": 60,
+              "engine.threat_ecology_step": 1287
+            },
+            "requests": 7053,
+            "sample_hits": 3494,
+            "sample_misses": 3559
+          },
+          "aux.lazy.sequence.descriptors": {
+            "reasons": {
+              "engine.household_step": 38
+            },
+            "requests": 38,
+            "sample_hits": 0,
+            "sample_misses": 38
+          },
+          "aux.lazy.sequence.member_directory": {
+            "reasons": {
+              "engine.demography": 4,
+              "engine.household_step": 47
+            },
+            "requests": 51,
+            "sample_hits": 22,
+            "sample_misses": 29
+          },
+          "aux.lazy.sequence.members": {
+            "reasons": {
+              "engine.demography": 2,
+              "engine.household_step": 25
+            },
+            "requests": 27,
+            "sample_hits": 10,
+            "sample_misses": 17
+          },
+          "aux.lazy.sequence.nodes": {
+            "reasons": {
+              "engine.civilization_step": 24,
+              "engine.demography": 26,
+              "engine.household_step": 22
+            },
+            "requests": 72,
+            "sample_hits": 12,
+            "sample_misses": 60
+          },
+          "aux.lazy.sequence.occurrences": {
+            "reasons": {
+              "engine.demography": 4,
+              "engine.household_step": 81
+            },
+            "requests": 85,
+            "sample_hits": 17,
+            "sample_misses": 68
+          },
+          "aux.lazy.sequence.parents": {
+            "reasons": {
+              "engine.civilization_step": 33,
+              "engine.demography": 37,
+              "engine.household_step": 33
+            },
+            "requests": 103,
+            "sample_hits": 34,
+            "sample_misses": 69
+          },
+          "world.advancement.paths": {
+            "reasons": {
+              "engine.magic_ecology_step": 114
+            },
+            "requests": 114,
+            "sample_hits": 57,
+            "sample_misses": 57
+          },
+          "world.communities.memberships": {
+            "reasons": {
+              "engine.demography": 6
+            },
+            "requests": 6,
+            "sample_hits": 0,
+            "sample_misses": 6
+          },
+          "world.culture.adoption": {
+            "reasons": {
+              "engine.cultural_step": 25
+            },
+            "requests": 25,
+            "sample_hits": 0,
+            "sample_misses": 25
+          },
+          "world.culture.practices": {
+            "reasons": {
+              "engine.cultural_step": 25
+            },
+            "requests": 25,
+            "sample_hits": 0,
+            "sample_misses": 25
+          },
+          "world.divinity.gods": {
+            "reasons": {
+              "engine.divine_step": 17
+            },
+            "requests": 17,
+            "sample_hits": 0,
+            "sample_misses": 17
+          },
+          "world.households": {
+            "reasons": {
+              "engine.household_step": 33
+            },
+            "requests": 33,
+            "sample_hits": 0,
+            "sample_misses": 33
+          },
+          "world.infrastructure.assets": {
+            "reasons": {
+              "engine.development_step": 5
+            },
+            "requests": 5,
+            "sample_hits": 0,
+            "sample_misses": 5
+          },
+          "world.institutions.branches": {
+            "reasons": {
+              "engine.institution_step": 10
+            },
+            "requests": 10,
+            "sample_hits": 0,
+            "sample_misses": 10
+          },
+          "world.institutions.institutions": {
+            "reasons": {
+              "engine.agency_step": 1,
+              "engine.institution_step": 1
+            },
+            "requests": 2,
+            "sample_hits": 0,
+            "sample_misses": 2
+          },
+          "world.lineage.children": {
+            "reasons": {
+              "engine.household_step": 8
+            },
+            "requests": 8,
+            "sample_hits": 0,
+            "sample_misses": 8
+          },
+          "world.magic_resources.owner_index": {
+            "reasons": {
+              "engine.magic_ecology_step": 7
+            },
+            "requests": 7,
+            "sample_hits": 0,
+            "sample_misses": 7
+          },
+          "world.magic_resources.resources": {
+            "reasons": {
+              "engine.magic_ecology_step": 8
+            },
+            "requests": 8,
+            "sample_hits": 0,
+            "sample_misses": 8
+          },
+          "world.people": {
+            "reasons": {
+              "engine.production": 127
+            },
+            "requests": 127,
+            "sample_hits": 0,
+            "sample_misses": 127
+          },
+          "world.skills.skills": {
+            "reasons": {
+              "engine.development_step": 72,
+              "engine.production": 72
+            },
+            "requests": 144,
+            "sample_hits": 0,
+            "sample_misses": 144
+          },
+          "world.social.adjacency": {
+            "reasons": {
+              "engine.household_step": 68,
+              "engine.magic_ecology_step": 8
+            },
+            "requests": 76,
+            "sample_hits": 0,
+            "sample_misses": 76
+          },
+          "world.social.edges": {
+            "reasons": {
+              "engine.agency_step": 76
+            },
+            "requests": 76,
+            "sample_hits": 0,
+            "sample_misses": 76
+          }
+        },
+        "schema": "ate-performance-attribution/1",
+        "spans": {
+          "codec.decode": {
+            "calls": 429977,
+            "exclusive_cpu_seconds": 5.156076849999277,
+            "exclusive_wall_seconds": 5.148278258993173,
+            "inclusive_cpu_seconds": 5.156076849999277,
+            "inclusive_wall_seconds": 5.148278258993173
+          },
+          "codec.encode": {
+            "calls": 1034827,
+            "exclusive_cpu_seconds": 15.422993002999313,
+            "exclusive_wall_seconds": 15.388046261026943,
+            "inclusive_cpu_seconds": 15.422993002999313,
+            "inclusive_wall_seconds": 15.388046261026943
+          },
+          "engine.accountability_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.0002012289999981931,
+            "exclusive_wall_seconds": 0.0002012570000147207,
+            "inclusive_cpu_seconds": 0.0002305430000006936,
+            "inclusive_wall_seconds": 0.00023050000004332105
+          },
+          "engine.agency_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 6.600134467000238,
+            "exclusive_wall_seconds": 6.605009580991691,
+            "inclusive_cpu_seconds": 46.655449968,
+            "inclusive_wall_seconds": 46.65975093899999
+          },
+          "engine.ambient_magic_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.009229462999996052,
+            "exclusive_wall_seconds": 0.009242696999876898,
+            "inclusive_cpu_seconds": 0.011902292000000259,
+            "inclusive_wall_seconds": 0.011901992999980848
+          },
+          "engine.civilization_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.023656982999938236,
+            "exclusive_wall_seconds": 0.023656853001114087,
+            "inclusive_cpu_seconds": 0.13393682899999249,
+            "inclusive_wall_seconds": 0.13394730099997787
+          },
+          "engine.craft_career_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.0005189019999960465,
+            "exclusive_wall_seconds": 0.0005187360000036279,
+            "inclusive_cpu_seconds": 0.0005189019999960465,
+            "inclusive_wall_seconds": 0.0005187360000036279
+          },
+          "engine.cultural_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.038946221999935915,
+            "exclusive_wall_seconds": 0.03891931000055138,
+            "inclusive_cpu_seconds": 0.25993744699999866,
+            "inclusive_wall_seconds": 0.25994805900000983
+          },
+          "engine.demography": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.054262148000002064,
+            "exclusive_wall_seconds": 0.05431007000021282,
+            "inclusive_cpu_seconds": 0.5242818809999994,
+            "inclusive_wall_seconds": 0.5243460140000025
+          },
+          "engine.development_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.08111603300010017,
+            "exclusive_wall_seconds": 0.08114665699935131,
+            "inclusive_cpu_seconds": 0.4319591990000049,
+            "inclusive_wall_seconds": 0.43198871399999916
+          },
+          "engine.divine_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.025583837000000997,
+            "exclusive_wall_seconds": 0.025579722999395926,
+            "inclusive_cpu_seconds": 0.08130393700000038,
+            "inclusive_wall_seconds": 0.0813030560000243
+          },
+          "engine.household_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.27463973200006553,
+            "exclusive_wall_seconds": 0.27481853500211173,
+            "inclusive_cpu_seconds": 4.586180029,
+            "inclusive_wall_seconds": 4.586724833000005
+          },
+          "engine.institution_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.037515824000053044,
+            "exclusive_wall_seconds": 0.0374995159989453,
+            "inclusive_cpu_seconds": 0.08738725900001043,
+            "inclusive_wall_seconds": 0.08741454599999088
+          },
+          "engine.magic_ecology_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.26308837400002183,
+            "exclusive_wall_seconds": 0.2632753509973327,
+            "inclusive_cpu_seconds": 1.3671257889999993,
+            "inclusive_wall_seconds": 1.3673559910000108
+          },
+          "engine.magical_civilization_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.4261398550006277,
+            "exclusive_wall_seconds": 0.4261756750015593,
+            "inclusive_cpu_seconds": 2.3336182949999937,
+            "inclusive_wall_seconds": 2.333789866000018
+          },
+          "engine.material_economy_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.04124135800002193,
+            "exclusive_wall_seconds": 0.0412343810000948,
+            "inclusive_cpu_seconds": 0.6442116860000056,
+            "inclusive_wall_seconds": 0.6442449450000254
+          },
+          "engine.memory": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.0005364619999852493,
+            "exclusive_wall_seconds": 0.0005374220000931018,
+            "inclusive_cpu_seconds": 0.0007005930000048011,
+            "inclusive_wall_seconds": 0.000700685000026624
+          },
+          "engine.people": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.1305768539999932,
+            "exclusive_wall_seconds": 0.13057103299888695,
+            "inclusive_cpu_seconds": 0.37521673099999986,
+            "inclusive_wall_seconds": 0.37527226599996766
+          },
+          "engine.pressure": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.00033300600000085723,
+            "exclusive_wall_seconds": 0.0003328610000039589,
+            "inclusive_cpu_seconds": 0.00033300600000085723,
+            "inclusive_wall_seconds": 0.0003328610000039589
+          },
+          "engine.production": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.09099968600000086,
+            "exclusive_wall_seconds": 0.09098783299981505,
+            "inclusive_cpu_seconds": 0.5144122250000001,
+            "inclusive_wall_seconds": 0.5144486930000198
+          },
+          "engine.society_career_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.09496195299998078,
+            "exclusive_wall_seconds": 0.09500321299975667,
+            "inclusive_cpu_seconds": 0.11772178999999028,
+            "inclusive_wall_seconds": 0.11776949399995829
+          },
+          "engine.threat_ecology_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 1.2410644699999978,
+            "exclusive_wall_seconds": 1.2421430460040597,
+            "inclusive_cpu_seconds": 9.013475738,
+            "inclusive_wall_seconds": 9.014358007999988
+          },
+          "engine.warfare_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.002925888999996573,
+            "exclusive_wall_seconds": 0.0029266929998357227,
+            "inclusive_cpu_seconds": 0.0037995339999952193,
+            "inclusive_wall_seconds": 0.003799459999981991
+          },
+          "engine.weather": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.0019803379999998594,
+            "exclusive_wall_seconds": 0.0019813770003338504,
+            "inclusive_cpu_seconds": 0.04105003600000012,
+            "inclusive_wall_seconds": 0.041049670999996124
+          },
+          "identity.group": {
+            "calls": 16893,
+            "exclusive_cpu_seconds": 13.10483967700067,
+            "exclusive_wall_seconds": 13.114972351999995,
+            "inclusive_cpu_seconds": 31.1031819049999,
+            "inclusive_wall_seconds": 31.10505535800303
+          },
+          "identity.owner": {
+            "calls": 27037,
+            "exclusive_cpu_seconds": 5.4721850949999675,
+            "exclusive_wall_seconds": 5.479365322003048,
+            "inclusive_cpu_seconds": 13.956965498000466,
+            "inclusive_wall_seconds": 13.958432882999489
+          },
+          "identity.owner_projection": {
+            "calls": 2142,
+            "exclusive_cpu_seconds": 1.5978636910007822,
+            "exclusive_wall_seconds": 1.5985514410047585,
+            "inclusive_cpu_seconds": 4.795703458000059,
+            "inclusive_wall_seconds": 4.795903671000474
+          },
+          "identity.routes": {
+            "calls": 1835,
+            "exclusive_cpu_seconds": 0.4685305339994281,
+            "exclusive_wall_seconds": 0.4689254090006898,
+            "inclusive_cpu_seconds": 8.856288380999757,
+            "inclusive_wall_seconds": 8.85704267900013
+          },
+          "identity.synchronize": {
+            "calls": 2916,
+            "exclusive_cpu_seconds": 0.9383567120004066,
+            "exclusive_wall_seconds": 0.9390864519988895,
+            "inclusive_cpu_seconds": 8.002393078000058,
+            "inclusive_wall_seconds": 8.003239147999125
+          },
+          "phase.unattributed": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.23607643900000141,
+            "exclusive_wall_seconds": 0.23607347499995512,
+            "inclusive_cpu_seconds": 67.420830148,
+            "inclusive_wall_seconds": 67.42727010599998
+          },
+          "store.check_record_row": {
+            "calls": 164261,
+            "exclusive_cpu_seconds": 3.1614447439993834,
+            "exclusive_wall_seconds": 3.1731978630043045,
+            "inclusive_cpu_seconds": 7.202922882000841,
+            "inclusive_wall_seconds": 7.206004058003884
+          },
+          "store.operational_check": {
+            "calls": 150807,
+            "exclusive_cpu_seconds": 2.185020001999357,
+            "exclusive_wall_seconds": 2.179422512986946,
+            "inclusive_cpu_seconds": 2.185020001999357,
+            "inclusive_wall_seconds": 2.179422512986946
+          },
+          "store.read_version": {
+            "calls": 171378,
+            "exclusive_cpu_seconds": 10.237790316000455,
+            "exclusive_wall_seconds": 10.255278938986237,
+            "inclusive_cpu_seconds": 22.17755340100089,
+            "inclusive_wall_seconds": 22.179407133995255
+          }
+        },
+        "status": "complete",
+        "timing": "instrumented; exclusive spans partition phase, inclusive spans overlap",
+        "wall_seconds": 67.42727010599998
+      },
+      "cpu_seconds": 67.421246277,
+      "io": {
+        "maintenance_removed_rows": 0,
+        "maintenance_rows": 0,
+        "metadata_rows": 819680,
+        "payload_check_bytes": 52522967,
+        "payload_check_reads": 164261,
+        "payload_read_bytes": 52172598,
+        "payload_reads": 162914,
+        "payload_write_bytes": 0,
+        "payload_writes": 0,
+        "pin_rows": 345953,
+        "query_rows": 1322,
+        "temporary_keys_peak": 17
+      },
+      "process_peak_rss_bytes": 104144896,
+      "rss_end_bytes": 104321024,
+      "rss_start_bytes": 52387840,
+      "status": "complete",
+      "wall_seconds": 67.427690466,
+      "working_set": {
+        "advancement_paths": {
+          "advancement_payload_loads": 57,
+          "clean_cache_entries": 55,
+          "clean_cache_limit": 256,
+          "dirty_advancement_paths": 4,
+          "logical_advancement_paths": 59,
+          "resident_advancement_paths": 59
+        },
+        "aspirations": {
+          "aspiration_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_aspirations": 76,
+          "logical_aspirations": 76,
+          "new_aspirations": 76,
+          "reinserted_aspirations": 0,
+          "removed_aspirations": 0,
+          "resident_aspirations": 76
+        },
+        "backing_dependencies": {
+          "dependencies": 4351,
+          "metadata_python_bytes": 1041897,
+          "published_dependencies": 0
+        },
+        "community_memberships": {
+          "clean_cache_entries": 6,
+          "clean_cache_limit": 256,
+          "community_membership_payload_loads": 6,
+          "dirty_community_memberships": 3,
+          "logical_community_memberships": 130,
+          "resident_community_memberships": 9
+        },
+        "cross_boundary_identity_links": 0,
+        "eager_bound_objects": 3839,
+        "eager_deleted_owners": 0,
+        "eager_dirty_owners": 198,
+        "event_disk_events": 0,
+        "event_pending_chunks": 0,
+        "event_tail_events": 1284,
+        "frozen_save": null,
+        "genealogy_children": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 6,
+          "logical_buckets": 6,
+          "resident_buckets": 6
+        },
+        "genealogy_parents": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_genealogy_parents": 3,
+          "genealogy_parent_payload_loads": 0,
+          "logical_genealogy_parents": 3,
+          "resident_genealogy_parents": 3
+        },
+        "history_cache": {
+          "bytes": 13244,
+          "entries": 64,
+          "evictions": 916,
+          "metadata_python_bytes": 40968,
+          "owners": 23
+        },
+        "identity": {
+          "incarnations_with_occurrences": 5487,
+          "live_incarnations": 5511,
+          "max_owner_group_size": 1,
+          "metadata_container_bytes": 2655400,
+          "next_incarnation": 11937,
+          "nonreflexive_key_checks": 0,
+          "nonreflexive_key_queue": 0,
+          "occurrences": 5487,
+          "owner_groups": 3221,
+          "owners_with_occurrences": 3221,
+          "strong_object_roots": 0,
+          "weak_forward_entries": 5511,
+          "weak_reverse_entries": 5511
+        },
+        "identity_coordinator": {
+          "clean_occurrences": 0,
+          "clean_python_bytes": 65480,
+          "dirty_group_occurrences": 531,
+          "dirty_group_python_bytes": 559050,
+          "dirty_groups": 1744,
+          "dirty_owners": 1597,
+          "discovered_groups": 831,
+          "discovered_occurrences": 531,
+          "group_discoveries": 18318,
+          "identity_cache_python_bytes": 624530,
+          "overlay_placements": 1213,
+          "spill_sqlite_cache_limit_bytes": 0,
+          "spilled_group_bytes": 0,
+          "value_routes": {
+            "byte_limit": 65536,
+            "bytes": 65480,
+            "entries": 33,
+            "entry_limit": 128,
+            "hits": 518,
+            "misses": 477
+          }
+        },
+        "institution_applications": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 9,
+          "logical_records": 9,
+          "new_records": 9,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 9,
+          "touched_membership_buckets": 25
+        },
+        "institution_magic_records": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "institution_notices": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "lineage_children": {
+          "bucket_payload_loads": 8,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 19,
+          "logical_buckets": 56,
+          "resident_buckets": 19
+        },
+        "lineage_nodes": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 13,
+          "logical_records": 258,
+          "new_records": 13,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 13,
+          "touched_membership_buckets": 0
+        },
+        "material_active_index": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 5,
+          "logical_buckets": 5,
+          "resident_buckets": 5
+        },
+        "material_items": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0
+        },
+        "material_lot_index": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 5,
+          "logical_buckets": 5,
+          "resident_buckets": 5
+        },
+        "material_lots": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_material_lots": 10,
+          "logical_material_lots": 10,
+          "material_lot_payload_loads": 0,
+          "resident_material_lots": 10
+        },
+        "motives": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 76,
+          "logical_records": 76,
+          "new_records": 76,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 76,
+          "touched_membership_buckets": 0
+        },
+        "owner_index": {
+          "bucket_payload_loads": 7,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "people": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_people": 130,
+          "logical_people": 130,
+          "new_people": 3,
+          "person_payload_loads": 127,
+          "reinserted_people": 0,
+          "removed_people": 0,
+          "resident_people": 130
+        },
+        "pressure_cache": {
+          "byte_limit": 65536,
+          "cold_miss_time_bound": "O(all household occurrences)",
+          "entries": 0,
+          "entry_limit": 64,
+          "hits": 0,
+          "misses": 0,
+          "occurrence_visits": 0,
+          "python_bytes": 128
+        },
+        "record_cache": {
+          "bytes": 656955,
+          "entries": 534,
+          "evictions": 0,
+          "metadata_python_bytes": 237859,
+          "owners": 12
+        },
+        "resources": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_resources": 8,
+          "logical_resources": 550,
+          "new_resources": 0,
+          "reinserted_resources": 0,
+          "removed_resources": 0,
+          "resident_resources": 8,
+          "resource_payload_loads": 8
+        },
+        "scalar_records": {
+          "world.communities.communities": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 5,
+            "minimum_aux_cache_entries": 0,
+            "minimum_aux_cache_limit": 256,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.culture.adoption": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 25,
+            "logical_records": 25,
+            "payload_loads": 25,
+            "resident_records": 25
+          },
+          "world.culture.practices": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 25,
+            "logical_records": 25,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 25,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 25,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.churches": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.gods": {
+            "clean_cache_entries": 17,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 17,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 17,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 17,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.great_astral_beings": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 3,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.economy.property": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 5,
+            "logical_records": 38,
+            "new_records": 5,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 5,
+            "touched_membership_buckets": 5
+          },
+          "world.households": {
+            "clean_cache_entries": 24,
+            "clean_cache_limit": 256,
+            "dirty_records": 14,
+            "logical_records": 38,
+            "new_records": 5,
+            "overlay_query_checks": 28,
+            "payload_loads": 33,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 38,
+            "touched_membership_buckets": 9
+          },
+          "world.infrastructure.assets": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 5,
+            "logical_records": 5,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 5,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 5,
+            "touched_membership_buckets": 0
+          },
+          "world.institutions.branches": {
+            "clean_cache_entries": 10,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 10,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 10,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 10,
+            "touched_membership_buckets": 0
+          },
+          "world.institutions.institutions": {
+            "clean_cache_entries": 2,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 2,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 2,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 2,
+            "touched_membership_buckets": 0
+          },
+          "world.knowledge.beliefs": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 24,
+            "logical_records": 24,
+            "payload_loads": 0,
+            "resident_records": 24
+          },
+          "world.knowledge.claim_index": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 2,
+            "logical_records": 2,
+            "payload_loads": 0,
+            "resident_records": 2
+          },
+          "world.knowledge.claims": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 2,
+            "logical_records": 2,
+            "new_records": 2,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 2,
+            "touched_membership_buckets": 0
+          },
+          "world.metaphysics.resurrection_tokens": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "minimum_aux_cache_entries": 0,
+            "minimum_aux_cache_limit": 256,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.society_accountability.inquiries": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.threat_ecology.resolutions": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "payload_loads": 0,
+            "resident_records": 0
+          },
+          "world.threat_ecology.threats": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.warfare.conflicts": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          }
+        },
+        "skills": {
+          "clean_cache_entries": 132,
+          "clean_cache_limit": 256,
+          "dirty_skills": 118,
+          "logical_skills": 250,
+          "resident_skills": 250,
+          "skill_payload_loads": 144
+        },
+        "social_adjacency": {
+          "bucket_payload_loads": 76,
+          "clean_cache_entries": 8,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 71,
+          "logical_buckets": 130,
+          "resident_buckets": 79
+        },
+        "social_edges": {
+          "clean_cache_entries": 76,
+          "clean_cache_limit": 256,
+          "dirty_social_edges": 140,
+          "logical_social_edges": 234,
+          "resident_social_edges": 216,
+          "social_edge_payload_loads": 76
+        },
+        "social_partnerships": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_social_partnerships": 11,
+          "logical_social_partnerships": 11,
+          "resident_social_partnerships": 11,
+          "social_partnership_payload_loads": 0
+        },
+        "souls": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_souls": 3,
+          "logical_souls": 130,
+          "new_souls": 3,
+          "reinserted_souls": 0,
+          "removed_souls": 0,
+          "resident_souls": 3,
+          "soul_payload_loads": 0
+        },
+        "state": "active",
+        "store": {
+          "maintenance_removed_rows": 0,
+          "maintenance_rows": 0,
+          "metadata_rows": 819680,
+          "payload_check_bytes": 52522967,
+          "payload_check_reads": 164261,
+          "payload_read_bytes": 52172598,
+          "payload_reads": 162914,
+          "payload_write_bytes": 0,
+          "payload_writes": 0,
+          "pin_rows": 345953,
+          "query_rows": 1322,
+          "temporary_keys_peak": 17
+        },
+        "transmissions": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 3,
+          "logical_records": 3,
+          "new_records": 3,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 3,
+          "touched_membership_buckets": 2
+        },
+        "treasuries": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "wallets": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        }
+      }
+    },
+    "open": {
+      "attribution": {
+        "cpu_seconds": 0.6783353369999999,
+        "key_sample": {
+          "entries": 1226,
+          "limit": 2048,
+          "meaning": "bounded recent-key LRU; hits are observed reuse, not exact cardinality"
+        },
+        "physical_io": {
+          "available": true,
+          "rchar": 7853620,
+          "read_bytes": 0,
+          "wchar": 120311,
+          "write_bytes": 114688
+        },
+        "reads": {
+          "aux.lazy.history.member_types": {
+            "reasons": {
+              "unattributed": 1218
+            },
+            "requests": 1218,
+            "sample_hits": 0,
+            "sample_misses": 1218
+          },
+          "aux.lazy.identity.catalog": {
+            "reasons": {
+              "identity.owner": 1,
+              "unattributed": 2
+            },
+            "requests": 3,
+            "sample_hits": 2,
+            "sample_misses": 1
+          },
+          "aux.lazy.identity.owners": {
+            "reasons": {
+              "identity.owner": 1
+            },
+            "requests": 1,
+            "sample_hits": 0,
+            "sample_misses": 1
+          },
+          "aux.lazy.identity.retired": {
+            "reasons": {
+              "identity.owner": 1,
+              "unattributed": 2
+            },
+            "requests": 3,
+            "sample_hits": 2,
+            "sample_misses": 1
+          },
+          "aux.lazy.sequence.descriptors": {
+            "reasons": {
+              "unattributed": 5
+            },
+            "requests": 5,
+            "sample_hits": 0,
+            "sample_misses": 5
+          }
+        },
+        "schema": "ate-performance-attribution/1",
+        "spans": {
+          "codec.decode": {
+            "calls": 9150,
+            "exclusive_cpu_seconds": 0.10937386200000365,
+            "exclusive_wall_seconds": 0.10911213500185113,
+            "inclusive_cpu_seconds": 0.10937386200000365,
+            "inclusive_wall_seconds": 0.10911213500185113
+          },
+          "codec.encode": {
+            "calls": 6128,
+            "exclusive_cpu_seconds": 0.05567015700000355,
+            "exclusive_wall_seconds": 0.05554961700011063,
+            "inclusive_cpu_seconds": 0.05567015700000355,
+            "inclusive_wall_seconds": 0.05554961700011063
+          },
+          "identity.owner": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.0005551180000002987,
+            "exclusive_wall_seconds": 0.000556500000016058,
+            "inclusive_cpu_seconds": 0.0012362500000000498,
+            "inclusive_wall_seconds": 0.0012373870000033094
+          },
+          "phase.unattributed": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.35668615199999254,
+            "exclusive_wall_seconds": 0.37875827999869216,
+            "inclusive_cpu_seconds": 0.6783353369999999,
+            "inclusive_wall_seconds": 0.7003067109999961
+          },
+          "store.check_record_row": {
+            "calls": 2443,
+            "exclusive_cpu_seconds": 0.04155532100000048,
+            "exclusive_wall_seconds": 0.041690551997589864,
+            "inclusive_cpu_seconds": 0.07858105800000126,
+            "inclusive_wall_seconds": 0.07863097200032598
+          },
+          "store.operational_check": {
+            "calls": 1243,
+            "exclusive_cpu_seconds": 0.018347751999999606,
+            "exclusive_wall_seconds": 0.018343818000346346,
+            "inclusive_cpu_seconds": 0.018347751999999606,
+            "inclusive_wall_seconds": 0.018343818000346346
+          },
+          "store.read_version": {
+            "calls": 1230,
+            "exclusive_cpu_seconds": 0.0961469749999998,
+            "exclusive_wall_seconds": 0.0962958090013899,
+            "inclusive_cpu_seconds": 0.1771001809999989,
+            "inclusive_wall_seconds": 0.17720413700124027
+          }
+        },
+        "status": "complete",
+        "timing": "instrumented; exclusive spans partition phase, inclusive spans overlap",
+        "wall_seconds": 0.7003067109999961
+      },
+      "cpu_seconds": 0.6787541709999999,
+      "io": {
+        "maintenance_removed_rows": 0,
+        "maintenance_rows": 0,
+        "metadata_rows": 6295,
+        "payload_check_bytes": 1052908,
+        "payload_check_reads": 4570,
+        "payload_read_bytes": 1052908,
+        "payload_reads": 4570,
+        "payload_write_bytes": 0,
+        "payload_writes": 0,
+        "pin_rows": 4922,
+        "query_rows": 0,
+        "temporary_keys_peak": 0
+      },
+      "process_peak_rss_bytes": 100376576,
+      "rss_end_bytes": 51736576,
+      "rss_start_bytes": 37412864,
+      "status": "complete",
+      "wall_seconds": 0.7007284540000001,
+      "working_set": {
+        "advancement_paths": {
+          "advancement_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_advancement_paths": 0,
+          "logical_advancement_paths": 57,
+          "resident_advancement_paths": 0
+        },
+        "aspirations": {
+          "aspiration_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_aspirations": 0,
+          "logical_aspirations": 0,
+          "new_aspirations": 0,
+          "reinserted_aspirations": 0,
+          "removed_aspirations": 0,
+          "resident_aspirations": 0
+        },
+        "backing_dependencies": {
+          "dependencies": 1218,
+          "metadata_python_bytes": 237141,
+          "published_dependencies": 0
+        },
+        "community_memberships": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "community_membership_payload_loads": 0,
+          "dirty_community_memberships": 0,
+          "logical_community_memberships": 127,
+          "resident_community_memberships": 0
+        },
+        "cross_boundary_identity_links": 0,
+        "eager_bound_objects": 2887,
+        "eager_deleted_owners": 0,
+        "eager_dirty_owners": 0,
+        "event_disk_events": 0,
+        "event_pending_chunks": 0,
+        "event_tail_events": 1208,
+        "frozen_save": null,
+        "genealogy_children": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "genealogy_parents": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_genealogy_parents": 0,
+          "genealogy_parent_payload_loads": 0,
+          "logical_genealogy_parents": 0,
+          "resident_genealogy_parents": 0
+        },
+        "history_cache": {
+          "bytes": 5020,
+          "entries": 5,
+          "evictions": 0,
+          "metadata_python_bytes": 4282,
+          "owners": 5
+        },
+        "identity": {
+          "incarnations_with_occurrences": 1218,
+          "live_incarnations": 1218,
+          "max_owner_group_size": 1,
+          "metadata_container_bytes": 185520,
+          "next_incarnation": 10723,
+          "nonreflexive_key_checks": 0,
+          "nonreflexive_key_queue": 0,
+          "occurrences": 1218,
+          "owner_groups": 1213,
+          "owners_with_occurrences": 1213,
+          "strong_object_roots": 0,
+          "weak_forward_entries": 1218,
+          "weak_reverse_entries": 1218
+        },
+        "identity_coordinator": {
+          "clean_occurrences": 0,
+          "clean_python_bytes": 0,
+          "dirty_group_occurrences": 0,
+          "dirty_group_python_bytes": 0,
+          "dirty_groups": 0,
+          "dirty_owners": 0,
+          "discovered_groups": 0,
+          "discovered_occurrences": 0,
+          "group_discoveries": 0,
+          "identity_cache_python_bytes": 0,
+          "overlay_placements": 0,
+          "spill_sqlite_cache_limit_bytes": 0,
+          "spilled_group_bytes": 0,
+          "value_routes": {
+            "byte_limit": 65536,
+            "bytes": 0,
+            "entries": 0,
+            "entry_limit": 128,
+            "hits": 0,
+            "misses": 0
+          }
+        },
+        "institution_applications": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "institution_magic_records": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "institution_notices": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "lineage_children": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 45,
+          "resident_buckets": 0
+        },
+        "lineage_nodes": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 245,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "material_active_index": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "material_items": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0
+        },
+        "material_lot_index": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "material_lots": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_material_lots": 0,
+          "logical_material_lots": 0,
+          "material_lot_payload_loads": 0,
+          "resident_material_lots": 0
+        },
+        "motives": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "owner_index": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 7,
+          "resident_buckets": 0
+        },
+        "people": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_people": 0,
+          "logical_people": 127,
+          "new_people": 0,
+          "person_payload_loads": 0,
+          "reinserted_people": 0,
+          "removed_people": 0,
+          "resident_people": 0
+        },
+        "pressure_cache": {
+          "byte_limit": 65536,
+          "cold_miss_time_bound": "O(all household occurrences)",
+          "entries": 0,
+          "entry_limit": 64,
+          "hits": 0,
+          "misses": 0,
+          "occurrence_visits": 0,
+          "python_bytes": 128
+        },
+        "record_cache": {
+          "bytes": 0,
+          "entries": 0,
+          "evictions": 0,
+          "metadata_python_bytes": 248,
+          "owners": 0
+        },
+        "resources": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_resources": 0,
+          "logical_resources": 550,
+          "new_resources": 0,
+          "reinserted_resources": 0,
+          "removed_resources": 0,
+          "resident_resources": 0,
+          "resource_payload_loads": 0
+        },
+        "scalar_records": {
+          "world.communities.communities": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 5,
+            "minimum_aux_cache_entries": 0,
+            "minimum_aux_cache_limit": 256,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.culture.adoption": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 25,
+            "payload_loads": 0,
+            "resident_records": 0
+          },
+          "world.culture.practices": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 25,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.churches": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.gods": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 17,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.great_astral_beings": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 3,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.economy.property": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 33,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.households": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 33,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.infrastructure.assets": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 5,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.institutions.branches": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 10,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.institutions.institutions": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 2,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.knowledge.beliefs": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "payload_loads": 0,
+            "resident_records": 0
+          },
+          "world.knowledge.claim_index": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "payload_loads": 0,
+            "resident_records": 0
+          },
+          "world.knowledge.claims": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.metaphysics.resurrection_tokens": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "minimum_aux_cache_entries": 0,
+            "minimum_aux_cache_limit": 256,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.society_accountability.inquiries": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.threat_ecology.resolutions": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "payload_loads": 0,
+            "resident_records": 0
+          },
+          "world.threat_ecology.threats": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.warfare.conflicts": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          }
+        },
+        "skills": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_skills": 0,
+          "logical_skills": 144,
+          "resident_skills": 0,
+          "skill_payload_loads": 0
+        },
+        "social_adjacency": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 127,
+          "resident_buckets": 0
+        },
+        "social_edges": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_social_edges": 0,
+          "logical_social_edges": 94,
+          "resident_social_edges": 0,
+          "social_edge_payload_loads": 0
+        },
+        "social_partnerships": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_social_partnerships": 0,
+          "logical_social_partnerships": 0,
+          "resident_social_partnerships": 0,
+          "social_partnership_payload_loads": 0
+        },
+        "souls": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_souls": 0,
+          "logical_souls": 127,
+          "new_souls": 0,
+          "reinserted_souls": 0,
+          "removed_souls": 0,
+          "resident_souls": 0,
+          "soul_payload_loads": 0
+        },
+        "state": "active",
+        "store": {
+          "maintenance_removed_rows": 0,
+          "maintenance_rows": 0,
+          "metadata_rows": 6295,
+          "payload_check_bytes": 1052908,
+          "payload_check_reads": 4570,
+          "payload_read_bytes": 1052908,
+          "payload_reads": 4570,
+          "payload_write_bytes": 0,
+          "payload_writes": 0,
+          "pin_rows": 4922,
+          "query_rows": 0,
+          "temporary_keys_peak": 0
+        },
+        "transmissions": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "treasuries": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "wallets": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        }
+      }
+    },
+    "save": {
+      "attribution": {
+        "cpu_seconds": 15.078029498999996,
+        "key_sample": {
+          "entries": 2048,
+          "limit": 2048,
+          "meaning": "bounded recent-key LRU; hits are observed reuse, not exact cardinality"
+        },
+        "physical_io": {
+          "available": true,
+          "rchar": 351601675,
+          "read_bytes": 0,
+          "wchar": 74953401,
+          "write_bytes": 97755136
+        },
+        "reads": {
+          "aux.lazy.adoption.settlements": {
+            "reasons": {
+              "save.prepare": 25
+            },
+            "requests": 25,
+            "sample_hits": 20,
+            "sample_misses": 5
+          },
+          "aux.lazy.history.dependencies": {
+            "reasons": {
+              "save.prepare": 4346,
+              "save.publish": 8678
+            },
+            "requests": 13024,
+            "sample_hits": 0,
+            "sample_misses": 13024
+          },
+          "aux.lazy.history.member_types": {
+            "reasons": {
+              "save.publish": 16
+            },
+            "requests": 16,
+            "sample_hits": 0,
+            "sample_misses": 16
+          },
+          "aux.lazy.identity.catalog": {
+            "reasons": {
+              "save.prepare": 1095,
+              "save.publish": 1223
+            },
+            "requests": 2318,
+            "sample_hits": 2314,
+            "sample_misses": 4
+          },
+          "aux.lazy.identity.groups": {
+            "reasons": {
+              "save.prepare": 7,
+              "save.publish": 2442
+            },
+            "requests": 2449,
+            "sample_hits": 1221,
+            "sample_misses": 1228
+          },
+          "aux.lazy.identity.owner_tree": {
+            "reasons": {
+              "save.prepare": 1544,
+              "save.publish": 3799
+            },
+            "requests": 5343,
+            "sample_hits": 782,
+            "sample_misses": 4561
+          },
+          "aux.lazy.identity.owners": {
+            "reasons": {
+              "save.prepare": 2702,
+              "save.publish": 4423
+            },
+            "requests": 7125,
+            "sample_hits": 2784,
+            "sample_misses": 4341
+          },
+          "aux.lazy.identity.retired": {
+            "reasons": {
+              "save.prepare": 1095,
+              "save.publish": 1222
+            },
+            "requests": 2317,
+            "sample_hits": 2313,
+            "sample_misses": 4
+          },
+          "aux.lazy.keys.nan_atoms": {
+            "reasons": {
+              "save.prepare": 7
+            },
+            "requests": 7,
+            "sample_hits": 0,
+            "sample_misses": 7
+          },
+          "aux.lazy.nested.descriptors": {
+            "reasons": {
+              "save.prepare": 7
+            },
+            "requests": 7,
+            "sample_hits": 0,
+            "sample_misses": 7
+          },
+          "aux.lazy.nested.list_pages": {
+            "reasons": {
+              "save.prepare": 212
+            },
+            "requests": 212,
+            "sample_hits": 159,
+            "sample_misses": 53
+          },
+          "aux.lazy.records.headers": {
+            "reasons": {
+              "save.prepare": 15
+            },
+            "requests": 15,
+            "sample_hits": 4,
+            "sample_misses": 11
+          },
+          "aux.lazy.sequence.descriptors": {
+            "reasons": {
+              "save.prepare": 7,
+              "save.publish": 17
+            },
+            "requests": 24,
+            "sample_hits": 0,
+            "sample_misses": 24
+          },
+          "aux.lazy.sequence.member_directory": {
+            "reasons": {
+              "save.publish": 45
+            },
+            "requests": 45,
+            "sample_hits": 0,
+            "sample_misses": 45
+          },
+          "aux.lazy.sequence.members": {
+            "reasons": {
+              "save.publish": 28
+            },
+            "requests": 28,
+            "sample_hits": 0,
+            "sample_misses": 28
+          },
+          "aux.lazy.sequence.nodes": {
+            "reasons": {
+              "save.publish": 17
+            },
+            "requests": 17,
+            "sample_hits": 0,
+            "sample_misses": 17
+          },
+          "aux.lazy.sequence.occurrences": {
+            "reasons": {
+              "save.publish": 47
+            },
+            "requests": 47,
+            "sample_hits": 0,
+            "sample_misses": 47
+          },
+          "aux.lazy.sequence.parents": {
+            "reasons": {
+              "save.publish": 5
+            },
+            "requests": 5,
+            "sample_hits": 0,
+            "sample_misses": 5
+          }
+        },
+        "schema": "ate-performance-attribution/1",
+        "spans": {
+          "codec.decode": {
+            "calls": 179212,
+            "exclusive_cpu_seconds": 2.703749021001144,
+            "exclusive_wall_seconds": 2.699417839004127,
+            "inclusive_cpu_seconds": 2.703749021001144,
+            "inclusive_wall_seconds": 2.699417839004127
+          },
+          "codec.encode": {
+            "calls": 274521,
+            "exclusive_cpu_seconds": 3.7195842450093295,
+            "exclusive_wall_seconds": 3.7094382980103546,
+            "inclusive_cpu_seconds": 3.7195842450093295,
+            "inclusive_wall_seconds": 3.7094382980103546
+          },
+          "identity.group": {
+            "calls": 1228,
+            "exclusive_cpu_seconds": 0.8884321059984757,
+            "exclusive_wall_seconds": 0.8894041950023279,
+            "inclusive_cpu_seconds": 2.571199614999756,
+            "inclusive_wall_seconds": 2.57134239100003
+          },
+          "identity.owner": {
+            "calls": 848,
+            "exclusive_cpu_seconds": 0.27275391900033696,
+            "exclusive_wall_seconds": 0.2733788770008232,
+            "inclusive_cpu_seconds": 0.7820175600001988,
+            "inclusive_wall_seconds": 0.7830493709998905
+          },
+          "identity.owner_projection": {
+            "calls": 430,
+            "exclusive_cpu_seconds": 0.1357316279995615,
+            "exclusive_wall_seconds": 0.13607451300094908,
+            "inclusive_cpu_seconds": 0.6863321549998744,
+            "inclusive_wall_seconds": 0.6879056789999254
+          },
+          "identity.publication": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.28483716900016987,
+            "exclusive_wall_seconds": 0.2860398949969749,
+            "inclusive_cpu_seconds": 4.409037444999996,
+            "inclusive_wall_seconds": 4.4094753800000035
+          },
+          "identity.routes": {
+            "calls": 864,
+            "exclusive_cpu_seconds": 0.1952765809992627,
+            "exclusive_wall_seconds": 0.19538636199939674,
+            "inclusive_cpu_seconds": 0.6918151299998954,
+            "inclusive_wall_seconds": 0.6917972459999646
+          },
+          "identity.synchronize": {
+            "calls": 2,
+            "exclusive_cpu_seconds": 0.037559181000276,
+            "exclusive_wall_seconds": 0.03773634399982484,
+            "inclusive_cpu_seconds": 0.8206323069999968,
+            "inclusive_wall_seconds": 0.8222745780000196
+          },
+          "phase.unattributed": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.10150323799983596,
+            "exclusive_wall_seconds": 0.10188688899916087,
+            "inclusive_cpu_seconds": 15.078029498999996,
+            "inclusive_wall_seconds": 15.179579458999967
+          },
+          "save.commit": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 1.0401647820002182,
+            "exclusive_wall_seconds": 1.1397463040043476,
+            "inclusive_cpu_seconds": 1.5631909470000096,
+            "inclusive_wall_seconds": 1.6618663529999935
+          },
+          "save.prepare": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 1.1993898249969277,
+            "exclusive_wall_seconds": 1.2043710459839758,
+            "inclusive_cpu_seconds": 6.019848901999993,
+            "inclusive_wall_seconds": 6.021951341999966
+          },
+          "save.publish": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.6673794399974895,
+            "exclusive_wall_seconds": 0.6695683170023017,
+            "inclusive_cpu_seconds": 7.143578824000002,
+            "inclusive_wall_seconds": 7.144329794000043
+          },
+          "store.check_record_row": {
+            "calls": 43552,
+            "exclusive_cpu_seconds": 0.6921242809985984,
+            "exclusive_wall_seconds": 0.6946021530025632,
+            "inclusive_cpu_seconds": 1.3343981029996428,
+            "inclusive_wall_seconds": 1.3350283929979128
+          },
+          "store.operational_check": {
+            "calls": 47124,
+            "exclusive_cpu_seconds": 0.8767528819984136,
+            "exclusive_wall_seconds": 0.8754396969938512,
+            "inclusive_cpu_seconds": 0.8767528819984136,
+            "inclusive_wall_seconds": 0.8754396969938512
+          },
+          "store.read_version": {
+            "calls": 33024,
+            "exclusive_cpu_seconds": 2.2627912009999562,
+            "exclusive_wall_seconds": 2.2670887299989886,
+            "inclusive_cpu_seconds": 4.561675758999215,
+            "inclusive_wall_seconds": 4.562109313996245
+          }
+        },
+        "status": "complete",
+        "timing": "instrumented; exclusive spans partition phase, inclusive spans overlap",
+        "wall_seconds": 15.179579458999967
+      },
+      "cpu_seconds": 15.078603832999988,
+      "io": {
+        "maintenance_removed_rows": 128,
+        "maintenance_rows": 256,
+        "metadata_rows": 158320,
+        "payload_check_bytes": 8730728,
+        "payload_check_reads": 43686,
+        "payload_read_bytes": 6835506,
+        "payload_reads": 31007,
+        "payload_write_bytes": 2395258,
+        "payload_writes": 11632,
+        "pin_rows": 158160,
+        "query_rows": 2205,
+        "temporary_keys_peak": 0
+      },
+      "process_peak_rss_bytes": 129458176,
+      "rss_end_bytes": 121712640,
+      "rss_start_bytes": 104333312,
+      "status": "complete",
+      "wall_seconds": 15.180155399,
+      "working_set": {
+        "advancement_paths": {
+          "advancement_payload_loads": 57,
+          "clean_cache_entries": 59,
+          "clean_cache_limit": 256,
+          "dirty_advancement_paths": 0,
+          "logical_advancement_paths": 59,
+          "resident_advancement_paths": 59
+        },
+        "aspirations": {
+          "aspiration_payload_loads": 0,
+          "clean_cache_entries": 76,
+          "clean_cache_limit": 256,
+          "dirty_aspirations": 0,
+          "logical_aspirations": 76,
+          "new_aspirations": 0,
+          "reinserted_aspirations": 0,
+          "removed_aspirations": 0,
+          "resident_aspirations": 76
+        },
+        "backing_dependencies": {
+          "dependencies": 3591,
+          "metadata_python_bytes": 1052913,
+          "published_dependencies": 4339
+        },
+        "community_memberships": {
+          "clean_cache_entries": 9,
+          "clean_cache_limit": 256,
+          "community_membership_payload_loads": 6,
+          "dirty_community_memberships": 0,
+          "logical_community_memberships": 130,
+          "resident_community_memberships": 9
+        },
+        "cross_boundary_identity_links": 0,
+        "eager_bound_objects": 3113,
+        "eager_deleted_owners": 0,
+        "eager_dirty_owners": 0,
+        "event_disk_events": 0,
+        "event_pending_chunks": 0,
+        "event_tail_events": 1284,
+        "frozen_save": null,
+        "genealogy_children": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 6,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 6,
+          "resident_buckets": 6
+        },
+        "genealogy_parents": {
+          "clean_cache_entries": 3,
+          "clean_cache_limit": 256,
+          "dirty_genealogy_parents": 0,
+          "genealogy_parent_payload_loads": 0,
+          "logical_genealogy_parents": 3,
+          "resident_genealogy_parents": 3
+        },
+        "history_cache": {
+          "bytes": 0,
+          "entries": 0,
+          "evictions": 977,
+          "metadata_python_bytes": 9120,
+          "owners": 0
+        },
+        "identity": {
+          "incarnations_with_occurrences": 4741,
+          "live_incarnations": 4751,
+          "max_owner_group_size": 1,
+          "metadata_container_bytes": 2655400,
+          "next_incarnation": 11937,
+          "nonreflexive_key_checks": 0,
+          "nonreflexive_key_queue": 0,
+          "occurrences": 4741,
+          "owner_groups": 2912,
+          "owners_with_occurrences": 2912,
+          "strong_object_roots": 0,
+          "weak_forward_entries": 4751,
+          "weak_reverse_entries": 4751
+        },
+        "identity_coordinator": {
+          "clean_occurrences": 0,
+          "clean_python_bytes": 0,
+          "dirty_group_occurrences": 0,
+          "dirty_group_python_bytes": 0,
+          "dirty_groups": 0,
+          "dirty_owners": 0,
+          "discovered_groups": 0,
+          "discovered_occurrences": 0,
+          "group_discoveries": 18723,
+          "identity_cache_python_bytes": 0,
+          "overlay_placements": 0,
+          "spill_sqlite_cache_limit_bytes": 0,
+          "spilled_group_bytes": 0,
+          "value_routes": {
+            "byte_limit": 65536,
+            "bytes": 0,
+            "entries": 0,
+            "entry_limit": 128,
+            "hits": 518,
+            "misses": 477
+          }
+        },
+        "institution_applications": {
+          "clean_cache_entries": 9,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 9,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 9,
+          "touched_membership_buckets": 0
+        },
+        "institution_magic_records": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "institution_notices": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "lineage_children": {
+          "bucket_payload_loads": 8,
+          "clean_cache_entries": 19,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 56,
+          "resident_buckets": 19
+        },
+        "lineage_nodes": {
+          "clean_cache_entries": 13,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 258,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 13,
+          "touched_membership_buckets": 0
+        },
+        "material_active_index": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 5,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 5,
+          "resident_buckets": 5
+        },
+        "material_items": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0
+        },
+        "material_lot_index": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 5,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 5,
+          "resident_buckets": 5
+        },
+        "material_lots": {
+          "clean_cache_entries": 10,
+          "clean_cache_limit": 256,
+          "dirty_material_lots": 0,
+          "logical_material_lots": 10,
+          "material_lot_payload_loads": 0,
+          "resident_material_lots": 10
+        },
+        "motives": {
+          "clean_cache_entries": 76,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 76,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 76,
+          "touched_membership_buckets": 0
+        },
+        "owner_index": {
+          "bucket_payload_loads": 7,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "people": {
+          "clean_cache_entries": 130,
+          "clean_cache_limit": 256,
+          "dirty_people": 0,
+          "logical_people": 130,
+          "new_people": 0,
+          "person_payload_loads": 127,
+          "reinserted_people": 0,
+          "removed_people": 0,
+          "resident_people": 130
+        },
+        "pressure_cache": {
+          "byte_limit": 65536,
+          "cold_miss_time_bound": "O(all household occurrences)",
+          "entries": 0,
+          "entry_limit": 64,
+          "hits": 0,
+          "misses": 0,
+          "occurrence_visits": 0,
+          "python_bytes": 128
+        },
+        "record_cache": {
+          "bytes": 1769377,
+          "entries": 1349,
+          "evictions": 0,
+          "metadata_python_bytes": 533822,
+          "owners": 34
+        },
+        "resources": {
+          "clean_cache_entries": 8,
+          "clean_cache_limit": 256,
+          "dirty_resources": 0,
+          "logical_resources": 550,
+          "new_resources": 0,
+          "reinserted_resources": 0,
+          "removed_resources": 0,
+          "resident_resources": 8,
+          "resource_payload_loads": 8
+        },
+        "scalar_records": {
+          "world.communities.communities": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 5,
+            "minimum_aux_cache_entries": 0,
+            "minimum_aux_cache_limit": 256,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.culture.adoption": {
+            "clean_cache_entries": 25,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 25,
+            "payload_loads": 25,
+            "resident_records": 25
+          },
+          "world.culture.practices": {
+            "clean_cache_entries": 25,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 25,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 25,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 25,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.churches": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.gods": {
+            "clean_cache_entries": 17,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 17,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 17,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 17,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.great_astral_beings": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 3,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.economy.property": {
+            "clean_cache_entries": 5,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 38,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 5,
+            "touched_membership_buckets": 0
+          },
+          "world.households": {
+            "clean_cache_entries": 38,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 38,
+            "new_records": 0,
+            "overlay_query_checks": 28,
+            "payload_loads": 33,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 38,
+            "touched_membership_buckets": 0
+          },
+          "world.infrastructure.assets": {
+            "clean_cache_entries": 5,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 5,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 5,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 5,
+            "touched_membership_buckets": 0
+          },
+          "world.institutions.branches": {
+            "clean_cache_entries": 10,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 10,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 10,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 10,
+            "touched_membership_buckets": 0
+          },
+          "world.institutions.institutions": {
+            "clean_cache_entries": 2,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 2,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 2,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 2,
+            "touched_membership_buckets": 0
+          },
+          "world.knowledge.beliefs": {
+            "clean_cache_entries": 24,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 24,
+            "payload_loads": 0,
+            "resident_records": 24
+          },
+          "world.knowledge.claim_index": {
+            "clean_cache_entries": 2,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 2,
+            "payload_loads": 0,
+            "resident_records": 2
+          },
+          "world.knowledge.claims": {
+            "clean_cache_entries": 2,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 2,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 2,
+            "touched_membership_buckets": 0
+          },
+          "world.metaphysics.resurrection_tokens": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "minimum_aux_cache_entries": 0,
+            "minimum_aux_cache_limit": 256,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.society_accountability.inquiries": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.threat_ecology.resolutions": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "payload_loads": 0,
+            "resident_records": 0
+          },
+          "world.threat_ecology.threats": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.warfare.conflicts": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          }
+        },
+        "skills": {
+          "clean_cache_entries": 250,
+          "clean_cache_limit": 256,
+          "dirty_skills": 0,
+          "logical_skills": 250,
+          "resident_skills": 250,
+          "skill_payload_loads": 144
+        },
+        "social_adjacency": {
+          "bucket_payload_loads": 76,
+          "clean_cache_entries": 79,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 130,
+          "resident_buckets": 79
+        },
+        "social_edges": {
+          "clean_cache_entries": 216,
+          "clean_cache_limit": 256,
+          "dirty_social_edges": 0,
+          "logical_social_edges": 234,
+          "resident_social_edges": 216,
+          "social_edge_payload_loads": 76
+        },
+        "social_partnerships": {
+          "clean_cache_entries": 11,
+          "clean_cache_limit": 256,
+          "dirty_social_partnerships": 0,
+          "logical_social_partnerships": 11,
+          "resident_social_partnerships": 11,
+          "social_partnership_payload_loads": 0
+        },
+        "souls": {
+          "clean_cache_entries": 3,
+          "clean_cache_limit": 256,
+          "dirty_souls": 0,
+          "logical_souls": 130,
+          "new_souls": 0,
+          "reinserted_souls": 0,
+          "removed_souls": 0,
+          "resident_souls": 3,
+          "soul_payload_loads": 0
+        },
+        "state": "active",
+        "store": {
+          "maintenance_removed_rows": 128,
+          "maintenance_rows": 256,
+          "metadata_rows": 158320,
+          "payload_check_bytes": 8730728,
+          "payload_check_reads": 43686,
+          "payload_read_bytes": 6835506,
+          "payload_reads": 31007,
+          "payload_write_bytes": 2395258,
+          "payload_writes": 11632,
+          "pin_rows": 158160,
+          "query_rows": 2205,
+          "temporary_keys_peak": 0
+        },
+        "transmissions": {
+          "clean_cache_entries": 3,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 3,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 3,
+          "touched_membership_buckets": 0
+        },
+        "treasuries": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "wallets": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        }
+      }
+    },
+    "warm_step": {
+      "attribution": {
+        "cpu_seconds": 60.812055317,
+        "key_sample": {
+          "entries": 2048,
+          "limit": 2048,
+          "meaning": "bounded recent-key LRU; hits are observed reuse, not exact cardinality"
+        },
+        "physical_io": {
+          "available": true,
+          "rchar": 779485723,
+          "read_bytes": 0,
+          "wchar": 0,
+          "write_bytes": 0
+        },
+        "reads": {
+          "aux.lazy.adoption.buckets": {
+            "reasons": {
+              "engine.civilization_step": 6,
+              "engine.cultural_step": 10
+            },
+            "requests": 16,
+            "sample_hits": 0,
+            "sample_misses": 16
+          },
+          "aux.lazy.adoption.settlements": {
+            "reasons": {
+              "engine.civilization_step": 5,
+              "engine.cultural_step": 10
+            },
+            "requests": 15,
+            "sample_hits": 10,
+            "sample_misses": 5
+          },
+          "aux.lazy.history.member_types": {
+            "reasons": {
+              "engine.agency_step": 829,
+              "engine.household_step": 3,
+              "engine.magic_ecology_step": 3,
+              "engine.threat_ecology_step": 810
+            },
+            "requests": 1645,
+            "sample_hits": 0,
+            "sample_misses": 1645
+          },
+          "aux.lazy.identity.catalog": {
+            "reasons": {
+              "engine.agency_step": 17199,
+              "engine.cultural_step": 103,
+              "engine.demography": 422,
+              "engine.development_step": 56,
+              "engine.household_step": 1658,
+              "engine.institution_step": 11,
+              "engine.magic_ecology_step": 88,
+              "engine.magical_civilization_step": 41,
+              "engine.material_economy_step": 270,
+              "engine.people": 137,
+              "engine.threat_ecology_step": 3256,
+              "engine.weather": 21
+            },
+            "requests": 23262,
+            "sample_hits": 23261,
+            "sample_misses": 1
+          },
+          "aux.lazy.identity.groups": {
+            "reasons": {
+              "engine.agency_step": 13774,
+              "engine.cultural_step": 25,
+              "engine.demography": 11,
+              "engine.development_step": 17,
+              "engine.household_step": 57,
+              "engine.institution_step": 9,
+              "engine.magic_ecology_step": 58,
+              "engine.material_economy_step": 10,
+              "engine.people": 130,
+              "engine.threat_ecology_step": 2585,
+              "engine.weather": 1
+            },
+            "requests": 16677,
+            "sample_hits": 12301,
+            "sample_misses": 4376
+          },
+          "aux.lazy.identity.owner_tree": {
+            "reasons": {
+              "engine.agency_step": 38607,
+              "engine.cultural_step": 125,
+              "engine.demography": 31,
+              "engine.development_step": 75,
+              "engine.household_step": 123,
+              "engine.institution_step": 13,
+              "engine.magic_ecology_step": 63,
+              "engine.material_economy_step": 21,
+              "engine.people": 150,
+              "engine.threat_ecology_step": 7601,
+              "engine.weather": 7
+            },
+            "requests": 46816,
+            "sample_hits": 31869,
+            "sample_misses": 14947
+          },
+          "aux.lazy.identity.owners": {
+            "reasons": {
+              "engine.agency_step": 17199,
+              "engine.cultural_step": 103,
+              "engine.demography": 422,
+              "engine.development_step": 56,
+              "engine.household_step": 1658,
+              "engine.institution_step": 11,
+              "engine.magic_ecology_step": 88,
+              "engine.magical_civilization_step": 41,
+              "engine.material_economy_step": 270,
+              "engine.people": 137,
+              "engine.threat_ecology_step": 3256,
+              "engine.weather": 21
+            },
+            "requests": 23262,
+            "sample_hits": 18196,
+            "sample_misses": 5066
+          },
+          "aux.lazy.identity.retired": {
+            "reasons": {
+              "engine.agency_step": 17199,
+              "engine.cultural_step": 103,
+              "engine.demography": 422,
+              "engine.development_step": 56,
+              "engine.household_step": 1658,
+              "engine.institution_step": 11,
+              "engine.magic_ecology_step": 88,
+              "engine.magical_civilization_step": 41,
+              "engine.material_economy_step": 270,
+              "engine.people": 137,
+              "engine.threat_ecology_step": 3256,
+              "engine.weather": 21
+            },
+            "requests": 23262,
+            "sample_hits": 23261,
+            "sample_misses": 1
+          },
+          "aux.lazy.nested.descriptors": {
+            "reasons": {
+              "engine.agency_step": 829,
+              "engine.household_step": 3,
+              "engine.magic_ecology_step": 3,
+              "engine.threat_ecology_step": 810
+            },
+            "requests": 1645,
+            "sample_hits": 0,
+            "sample_misses": 1645
+          },
+          "aux.lazy.nested.list_pages": {
+            "reasons": {
+              "engine.agency_step": 456,
+              "engine.demography": 2,
+              "engine.institution_step": 17,
+              "engine.magic_ecology_step": 59,
+              "engine.magical_civilization_step": 17,
+              "engine.material_economy_step": 11,
+              "engine.threat_ecology_step": 11
+            },
+            "requests": 573,
+            "sample_hits": 346,
+            "sample_misses": 227
+          },
+          "aux.lazy.records.headers": {
+            "reasons": {
+              "engine.agency_step": 5613,
+              "engine.threat_ecology_step": 1287
+            },
+            "requests": 6900,
+            "sample_hits": 3339,
+            "sample_misses": 3561
+          },
+          "aux.lazy.sequence.descriptors": {
+            "reasons": {
+              "engine.household_step": 3
+            },
+            "requests": 3,
+            "sample_hits": 0,
+            "sample_misses": 3
+          },
+          "aux.lazy.sequence.member_directory": {
+            "reasons": {
+              "engine.demography": 9,
+              "engine.household_step": 31
+            },
+            "requests": 40,
+            "sample_hits": 17,
+            "sample_misses": 23
+          },
+          "aux.lazy.sequence.members": {
+            "reasons": {
+              "engine.demography": 3,
+              "engine.household_step": 15
+            },
+            "requests": 18,
+            "sample_hits": 6,
+            "sample_misses": 12
+          },
+          "aux.lazy.sequence.nodes": {
+            "reasons": {
+              "engine.civilization_step": 30,
+              "engine.demography": 36,
+              "engine.household_step": 14
+            },
+            "requests": 80,
+            "sample_hits": 10,
+            "sample_misses": 70
+          },
+          "aux.lazy.sequence.occurrences": {
+            "reasons": {
+              "engine.demography": 10,
+              "engine.household_step": 44
+            },
+            "requests": 54,
+            "sample_hits": 9,
+            "sample_misses": 45
+          },
+          "aux.lazy.sequence.parents": {
+            "reasons": {
+              "engine.civilization_step": 38,
+              "engine.demography": 44,
+              "engine.household_step": 20
+            },
+            "requests": 102,
+            "sample_hits": 24,
+            "sample_misses": 78
+          },
+          "world.communities.memberships": {
+            "reasons": {
+              "engine.demography": 4
+            },
+            "requests": 4,
+            "sample_hits": 0,
+            "sample_misses": 4
+          },
+          "world.lineage.children": {
+            "reasons": {
+              "engine.household_step": 3
+            },
+            "requests": 3,
+            "sample_hits": 0,
+            "sample_misses": 3
+          },
+          "world.social.adjacency": {
+            "reasons": {
+              "engine.magic_ecology_step": 3
+            },
+            "requests": 3,
+            "sample_hits": 0,
+            "sample_misses": 3
+          },
+          "world.social.edges": {
+            "reasons": {
+              "engine.agency_step": 4
+            },
+            "requests": 4,
+            "sample_hits": 0,
+            "sample_misses": 4
+          }
+        },
+        "schema": "ate-performance-attribution/1",
+        "spans": {
+          "codec.decode": {
+            "calls": 384308,
+            "exclusive_cpu_seconds": 4.860330482000336,
+            "exclusive_wall_seconds": 4.851797101005502,
+            "inclusive_cpu_seconds": 4.860330482000336,
+            "inclusive_wall_seconds": 4.851797101005502
+          },
+          "codec.encode": {
+            "calls": 918623,
+            "exclusive_cpu_seconds": 14.233619433998683,
+            "exclusive_wall_seconds": 14.200130801034163,
+            "inclusive_cpu_seconds": 14.233619433998683,
+            "inclusive_wall_seconds": 14.200130801034163
+          },
+          "engine.accountability_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.00017698400000654146,
+            "exclusive_wall_seconds": 0.00017691100003958127,
+            "inclusive_cpu_seconds": 0.00021592100000589198,
+            "inclusive_wall_seconds": 0.0002158570000005966
+          },
+          "engine.agency_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 6.427342125002127,
+            "exclusive_wall_seconds": 6.433355309985984,
+            "inclusive_cpu_seconds": 46.963570884000006,
+            "inclusive_wall_seconds": 46.96730008199995
+          },
+          "engine.ambient_magic_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.005243175999936511,
+            "exclusive_wall_seconds": 0.00525039999973842,
+            "inclusive_cpu_seconds": 0.007362365999995291,
+            "inclusive_wall_seconds": 0.007362349000004542
+          },
+          "engine.civilization_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.021299753000079136,
+            "exclusive_wall_seconds": 0.02132094199959056,
+            "inclusive_cpu_seconds": 0.04225197499999922,
+            "inclusive_wall_seconds": 0.04226744100003543
+          },
+          "engine.craft_career_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.0037722829999893293,
+            "exclusive_wall_seconds": 0.0037718079999535803,
+            "inclusive_cpu_seconds": 0.0037722829999893293,
+            "inclusive_wall_seconds": 0.0037718079999535803
+          },
+          "engine.cultural_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.03375048699984973,
+            "exclusive_wall_seconds": 0.03378107900152827,
+            "inclusive_cpu_seconds": 0.2779723749999903,
+            "inclusive_wall_seconds": 0.27797644399998944
+          },
+          "engine.demography": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.05793730099961181,
+            "exclusive_wall_seconds": 0.057982749998700456,
+            "inclusive_cpu_seconds": 0.5281071149999974,
+            "inclusive_wall_seconds": 0.5281676550000043
+          },
+          "engine.development_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.03150830399977167,
+            "exclusive_wall_seconds": 0.03149267299932035,
+            "inclusive_cpu_seconds": 0.13793367600001716,
+            "inclusive_wall_seconds": 0.13794373299998597
+          },
+          "engine.divine_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.017243121999996447,
+            "exclusive_wall_seconds": 0.017238232999204683,
+            "inclusive_cpu_seconds": 0.021564529000002608,
+            "inclusive_wall_seconds": 0.021564225000020087
+          },
+          "engine.household_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.14261723600024823,
+            "exclusive_wall_seconds": 0.14265257699889844,
+            "inclusive_cpu_seconds": 2.035371566000009,
+            "inclusive_wall_seconds": 2.035581843999978
+          },
+          "engine.institution_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.0440632620003214,
+            "exclusive_wall_seconds": 0.04409605400047667,
+            "inclusive_cpu_seconds": 0.0808359199999984,
+            "inclusive_wall_seconds": 0.08084642699998312
+          },
+          "engine.magic_ecology_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.08877702999996018,
+            "exclusive_wall_seconds": 0.08882430599948066,
+            "inclusive_cpu_seconds": 0.2554028889999955,
+            "inclusive_wall_seconds": 0.25541458899999725
+          },
+          "engine.magical_civilization_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.07419256100001803,
+            "exclusive_wall_seconds": 0.07417270699966139,
+            "inclusive_cpu_seconds": 0.13973221200001262,
+            "inclusive_wall_seconds": 0.13973984999995537
+          },
+          "engine.material_economy_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.0319940010000721,
+            "exclusive_wall_seconds": 0.03201016700040782,
+            "inclusive_cpu_seconds": 0.3464044469999976,
+            "inclusive_wall_seconds": 0.34643773600004124
+          },
+          "engine.memory": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.0005590739999377092,
+            "exclusive_wall_seconds": 0.0005593430000772059,
+            "inclusive_cpu_seconds": 0.0007907969999791931,
+            "inclusive_wall_seconds": 0.0007908009999937349
+          },
+          "engine.people": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.1352558699998383,
+            "exclusive_wall_seconds": 0.13524865400080444,
+            "inclusive_cpu_seconds": 0.38761233900000036,
+            "inclusive_wall_seconds": 0.3876536849999752
+          },
+          "engine.pressure": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 8.933300000535382e-05,
+            "exclusive_wall_seconds": 8.93220000079964e-05,
+            "inclusive_cpu_seconds": 8.933300000535382e-05,
+            "inclusive_wall_seconds": 8.93220000079964e-05
+          },
+          "engine.production": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.01619082299991703,
+            "exclusive_wall_seconds": 0.01618801100011069,
+            "inclusive_cpu_seconds": 0.020871607999993103,
+            "inclusive_wall_seconds": 0.0208702240000207
+          },
+          "engine.society_career_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.10439733099923387,
+            "exclusive_wall_seconds": 0.10441948299859405,
+            "inclusive_cpu_seconds": 0.13665785800000663,
+            "inclusive_wall_seconds": 0.13666925200004698
+          },
+          "engine.threat_ecology_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 1.2059455930002798,
+            "exclusive_wall_seconds": 1.2071065699916517,
+            "inclusive_cpu_seconds": 9.134623414999993,
+            "inclusive_wall_seconds": 9.135540081999977
+          },
+          "engine.warfare_step": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.003008691000275121,
+            "exclusive_wall_seconds": 0.003011137999976654,
+            "inclusive_cpu_seconds": 0.004099779999990005,
+            "inclusive_wall_seconds": 0.0040996399999926325
+          },
+          "engine.weather": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.00112297199997613,
+            "exclusive_wall_seconds": 0.0011236770001232799,
+            "inclusive_cpu_seconds": 0.02611445999998807,
+            "inclusive_wall_seconds": 0.026114326000026722
+          },
+          "identity.group": {
+            "calls": 16677,
+            "exclusive_cpu_seconds": 13.130636558001072,
+            "exclusive_wall_seconds": 13.14227224597363,
+            "inclusive_cpu_seconds": 31.27467762399995,
+            "inclusive_wall_seconds": 31.275854126997388
+          },
+          "identity.owner": {
+            "calls": 22944,
+            "exclusive_cpu_seconds": 4.65348144799357,
+            "exclusive_wall_seconds": 4.659724067996137,
+            "inclusive_cpu_seconds": 12.160586961999073,
+            "inclusive_wall_seconds": 12.161420906001354
+          },
+          "identity.owner_projection": {
+            "calls": 981,
+            "exclusive_cpu_seconds": 0.5362443520000681,
+            "exclusive_wall_seconds": 0.5366574830050581,
+            "inclusive_cpu_seconds": 1.9436335690002124,
+            "inclusive_wall_seconds": 1.9438790969999218
+          },
+          "identity.routes": {
+            "calls": 1214,
+            "exclusive_cpu_seconds": 0.4230825759992882,
+            "exclusive_wall_seconds": 0.4235469570007808,
+            "inclusive_cpu_seconds": 5.443111078999621,
+            "inclusive_wall_seconds": 5.4435969050000494
+          },
+          "identity.synchronize": {
+            "calls": 2172,
+            "exclusive_cpu_seconds": 0.4374502450010169,
+            "exclusive_wall_seconds": 0.4379781199992294,
+            "inclusive_cpu_seconds": 3.5252770240007294,
+            "inclusive_wall_seconds": 3.5257379099994637
+          },
+          "phase.unattributed": {
+            "calls": 1,
+            "exclusive_cpu_seconds": 0.2606975690000297,
+            "exclusive_wall_seconds": 0.26069434000010006,
+            "inclusive_cpu_seconds": 60.812055317,
+            "inclusive_wall_seconds": 60.81711171200004
+          },
+          "store.check_record_row": {
+            "calls": 143460,
+            "exclusive_cpu_seconds": 2.7930490060063278,
+            "exclusive_wall_seconds": 2.8033522299884908,
+            "inclusive_cpu_seconds": 6.558820194000305,
+            "inclusive_wall_seconds": 6.560235487985835
+          },
+          "store.operational_check": {
+            "calls": 104732,
+            "exclusive_cpu_seconds": 2.5896258929977307,
+            "exclusive_wall_seconds": 2.584272034991443,
+            "inclusive_cpu_seconds": 2.5896258929977307,
+            "inclusive_wall_seconds": 2.584272034991443
+          },
+          "store.read_version": {
+            "calls": 144384,
+            "exclusive_cpu_seconds": 8.447350442000428,
+            "exclusive_wall_seconds": 8.462814216031177,
+            "inclusive_cpu_seconds": 19.34575079500172,
+            "inclusive_wall_seconds": 19.347010283013276
+          }
+        },
+        "status": "complete",
+        "timing": "instrumented; exclusive spans partition phase, inclusive spans overlap",
+        "wall_seconds": 60.81711171200004
+      },
+      "cpu_seconds": 60.812586046999996,
+      "io": {
+        "maintenance_removed_rows": 0,
+        "maintenance_rows": 0,
+        "metadata_rows": 683380,
+        "payload_check_bytes": 50929293,
+        "payload_check_reads": 143460,
+        "payload_read_bytes": 50455320,
+        "payload_reads": 142102,
+        "payload_write_bytes": 0,
+        "payload_writes": 0,
+        "pin_rows": 458426,
+        "query_rows": 1333,
+        "temporary_keys_peak": 17
+      },
+      "process_peak_rss_bytes": 129458176,
+      "rss_end_bytes": 122777600,
+      "rss_start_bytes": 122105856,
+      "status": "complete",
+      "wall_seconds": 60.817645809,
+      "working_set": {
+        "advancement_paths": {
+          "advancement_payload_loads": 57,
+          "clean_cache_entries": 59,
+          "clean_cache_limit": 256,
+          "dirty_advancement_paths": 0,
+          "logical_advancement_paths": 59,
+          "resident_advancement_paths": 59
+        },
+        "aspirations": {
+          "aspiration_payload_loads": 0,
+          "clean_cache_entries": 18,
+          "clean_cache_limit": 256,
+          "dirty_aspirations": 61,
+          "logical_aspirations": 79,
+          "new_aspirations": 3,
+          "reinserted_aspirations": 0,
+          "removed_aspirations": 0,
+          "resident_aspirations": 79
+        },
+        "backing_dependencies": {
+          "dependencies": 4247,
+          "metadata_python_bytes": 1471561,
+          "published_dependencies": 4339
+        },
+        "community_memberships": {
+          "clean_cache_entries": 13,
+          "clean_cache_limit": 256,
+          "community_membership_payload_loads": 10,
+          "dirty_community_memberships": 3,
+          "logical_community_memberships": 133,
+          "resident_community_memberships": 16
+        },
+        "cross_boundary_identity_links": 0,
+        "eager_bound_objects": 3861,
+        "eager_deleted_owners": 0,
+        "eager_dirty_owners": 151,
+        "event_disk_events": 0,
+        "event_pending_chunks": 0,
+        "event_tail_events": 1311,
+        "frozen_save": null,
+        "genealogy_children": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 4,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 6,
+          "logical_buckets": 10,
+          "resident_buckets": 10
+        },
+        "genealogy_parents": {
+          "clean_cache_entries": 3,
+          "clean_cache_limit": 256,
+          "dirty_genealogy_parents": 3,
+          "genealogy_parent_payload_loads": 0,
+          "logical_genealogy_parents": 6,
+          "resident_genealogy_parents": 6
+        },
+        "history_cache": {
+          "bytes": 13140,
+          "entries": 64,
+          "evictions": 1739,
+          "metadata_python_bytes": 36988,
+          "owners": 16
+        },
+        "identity": {
+          "incarnations_with_occurrences": 5645,
+          "live_incarnations": 5655,
+          "max_owner_group_size": 1,
+          "metadata_container_bytes": 2655400,
+          "next_incarnation": 12381,
+          "nonreflexive_key_checks": 0,
+          "nonreflexive_key_queue": 0,
+          "occurrences": 5645,
+          "owner_groups": 3299,
+          "owners_with_occurrences": 3299,
+          "strong_object_roots": 0,
+          "weak_forward_entries": 5655,
+          "weak_reverse_entries": 5655
+        },
+        "identity_coordinator": {
+          "clean_occurrences": 0,
+          "clean_python_bytes": 64512,
+          "dirty_group_occurrences": 587,
+          "dirty_group_python_bytes": 575974,
+          "dirty_groups": 1107,
+          "dirty_owners": 1081,
+          "discovered_groups": 718,
+          "discovered_occurrences": 587,
+          "group_discoveries": 35884,
+          "identity_cache_python_bytes": 640486,
+          "overlay_placements": 444,
+          "spill_sqlite_cache_limit_bytes": 0,
+          "spilled_group_bytes": 0,
+          "value_routes": {
+            "byte_limit": 65536,
+            "bytes": 64512,
+            "entries": 32,
+            "entry_limit": 128,
+            "hits": 1017,
+            "misses": 899
+          }
+        },
+        "institution_applications": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 10,
+          "logical_records": 10,
+          "new_records": 1,
+          "overlay_query_checks": 18,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 10,
+          "touched_membership_buckets": 27
+        },
+        "institution_magic_records": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "institution_notices": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0,
+          "touched_membership_buckets": 0
+        },
+        "lineage_children": {
+          "bucket_payload_loads": 11,
+          "clean_cache_entries": 15,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 14,
+          "logical_buckets": 63,
+          "resident_buckets": 29
+        },
+        "lineage_nodes": {
+          "clean_cache_entries": 13,
+          "clean_cache_limit": 256,
+          "dirty_records": 9,
+          "logical_records": 267,
+          "new_records": 9,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 22,
+          "touched_membership_buckets": 0
+        },
+        "material_active_index": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 5,
+          "logical_buckets": 5,
+          "resident_buckets": 5
+        },
+        "material_items": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 0,
+          "logical_records": 0,
+          "new_records": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 0
+        },
+        "material_lot_index": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 5,
+          "logical_buckets": 5,
+          "resident_buckets": 5
+        },
+        "material_lots": {
+          "clean_cache_entries": 10,
+          "clean_cache_limit": 256,
+          "dirty_material_lots": 12,
+          "logical_material_lots": 22,
+          "material_lot_payload_loads": 0,
+          "resident_material_lots": 22
+        },
+        "motives": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_records": 79,
+          "logical_records": 79,
+          "new_records": 3,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 79,
+          "touched_membership_buckets": 0
+        },
+        "owner_index": {
+          "bucket_payload_loads": 7,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "people": {
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_people": 133,
+          "logical_people": 133,
+          "new_people": 3,
+          "person_payload_loads": 127,
+          "reinserted_people": 0,
+          "removed_people": 0,
+          "resident_people": 133
+        },
+        "pressure_cache": {
+          "byte_limit": 65536,
+          "cold_miss_time_bound": "O(all household occurrences)",
+          "entries": 0,
+          "entry_limit": 64,
+          "hits": 0,
+          "misses": 0,
+          "occurrence_visits": 0,
+          "python_bytes": 128
+        },
+        "record_cache": {
+          "bytes": 1275477,
+          "entries": 1106,
+          "evictions": 0,
+          "metadata_python_bytes": 487005,
+          "owners": 26
+        },
+        "resources": {
+          "clean_cache_entries": 8,
+          "clean_cache_limit": 256,
+          "dirty_resources": 0,
+          "logical_resources": 550,
+          "new_resources": 0,
+          "reinserted_resources": 0,
+          "removed_resources": 0,
+          "resident_resources": 8,
+          "resource_payload_loads": 8
+        },
+        "scalar_records": {
+          "world.communities.communities": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 5,
+            "minimum_aux_cache_entries": 0,
+            "minimum_aux_cache_limit": 256,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.culture.adoption": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 25,
+            "logical_records": 25,
+            "payload_loads": 25,
+            "resident_records": 25
+          },
+          "world.culture.practices": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 25,
+            "logical_records": 25,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 25,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 25,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.churches": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.gods": {
+            "clean_cache_entries": 17,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 17,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 17,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 17,
+            "touched_membership_buckets": 0
+          },
+          "world.divinity.great_astral_beings": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 3,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.economy.property": {
+            "clean_cache_entries": 5,
+            "clean_cache_limit": 256,
+            "dirty_records": 3,
+            "logical_records": 41,
+            "new_records": 3,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 8,
+            "touched_membership_buckets": 3
+          },
+          "world.households": {
+            "clean_cache_entries": 30,
+            "clean_cache_limit": 256,
+            "dirty_records": 11,
+            "logical_records": 41,
+            "new_records": 3,
+            "overlay_query_checks": 50,
+            "payload_loads": 33,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 41,
+            "touched_membership_buckets": 7
+          },
+          "world.infrastructure.assets": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 5,
+            "logical_records": 5,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 5,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 5,
+            "touched_membership_buckets": 0
+          },
+          "world.institutions.branches": {
+            "clean_cache_entries": 10,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 10,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 10,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 10,
+            "touched_membership_buckets": 0
+          },
+          "world.institutions.institutions": {
+            "clean_cache_entries": 2,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 2,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 2,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 2,
+            "touched_membership_buckets": 0
+          },
+          "world.knowledge.beliefs": {
+            "clean_cache_entries": 24,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 24,
+            "payload_loads": 0,
+            "resident_records": 24
+          },
+          "world.knowledge.claim_index": {
+            "clean_cache_entries": 2,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 2,
+            "payload_loads": 0,
+            "resident_records": 2
+          },
+          "world.knowledge.claims": {
+            "clean_cache_entries": 2,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 2,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 2,
+            "touched_membership_buckets": 0
+          },
+          "world.metaphysics.resurrection_tokens": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "minimum_aux_cache_entries": 0,
+            "minimum_aux_cache_limit": 256,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.society_accountability.inquiries": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.threat_ecology.resolutions": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "payload_loads": 0,
+            "resident_records": 0
+          },
+          "world.threat_ecology.threats": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          },
+          "world.warfare.conflicts": {
+            "clean_cache_entries": 0,
+            "clean_cache_limit": 256,
+            "dirty_records": 0,
+            "logical_records": 0,
+            "new_records": 0,
+            "overlay_query_checks": 0,
+            "payload_loads": 0,
+            "reinserted_records": 0,
+            "removed_records": 0,
+            "resident_records": 0,
+            "touched_membership_buckets": 0
+          }
+        },
+        "skills": {
+          "clean_cache_entries": 177,
+          "clean_cache_limit": 256,
+          "dirty_skills": 82,
+          "logical_skills": 259,
+          "resident_skills": 259,
+          "skill_payload_loads": 144
+        },
+        "social_adjacency": {
+          "bucket_payload_loads": 79,
+          "clean_cache_entries": 44,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 41,
+          "logical_buckets": 133,
+          "resident_buckets": 85
+        },
+        "social_edges": {
+          "clean_cache_entries": 220,
+          "clean_cache_limit": 256,
+          "dirty_social_edges": 59,
+          "logical_social_edges": 293,
+          "resident_social_edges": 279,
+          "social_edge_payload_loads": 80
+        },
+        "social_partnerships": {
+          "clean_cache_entries": 11,
+          "clean_cache_limit": 256,
+          "dirty_social_partnerships": 6,
+          "logical_social_partnerships": 17,
+          "resident_social_partnerships": 17,
+          "social_partnership_payload_loads": 0
+        },
+        "souls": {
+          "clean_cache_entries": 3,
+          "clean_cache_limit": 256,
+          "dirty_souls": 3,
+          "logical_souls": 133,
+          "new_souls": 3,
+          "reinserted_souls": 0,
+          "removed_souls": 0,
+          "resident_souls": 6,
+          "soul_payload_loads": 0
+        },
+        "state": "active",
+        "store": {
+          "maintenance_removed_rows": 0,
+          "maintenance_rows": 0,
+          "metadata_rows": 683380,
+          "payload_check_bytes": 50929293,
+          "payload_check_reads": 143460,
+          "payload_read_bytes": 50455320,
+          "payload_reads": 142102,
+          "payload_write_bytes": 0,
+          "payload_writes": 0,
+          "pin_rows": 458426,
+          "query_rows": 1333,
+          "temporary_keys_peak": 17
+        },
+        "transmissions": {
+          "clean_cache_entries": 3,
+          "clean_cache_limit": 256,
+          "dirty_records": 3,
+          "logical_records": 6,
+          "new_records": 3,
+          "overlay_query_checks": 0,
+          "payload_loads": 0,
+          "reinserted_records": 0,
+          "removed_records": 0,
+          "resident_records": 6,
+          "touched_membership_buckets": 2
+        },
+        "treasuries": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        },
+        "wallets": {
+          "bucket_payload_loads": 0,
+          "clean_cache_entries": 0,
+          "clean_cache_limit": 256,
+          "dirty_buckets": 0,
+          "logical_buckets": 0,
+          "resident_buckets": 0
+        }
+      }
+    }
+  },
+  "runtime": {
+    "committed_tree": "6f00a6d68bafba1a371e470bfd70024237d8f79a",
+    "engine_path": "/home/runner/work/all-that-endures/all-that-endures/candidate/simulation/ate_sim/engine.py",
+    "head": "3b2af964f42b6197fe596554fdce97d459798c82",
+    "persistence_path": "/home/runner/work/all-that-endures/all-that-endures/candidate/simulation/ate_sim/persistence_lazy.py",
+    "root": "/home/runner/work/all-that-endures/all-that-endures/candidate",
+    "source_sha256": "50a018595433b344e50212ce621a14c8d101e749eb62d2e166de04e0b1588fc7"
+  },
+  "saved": {
+    "actions": 76,
+    "pin": {
+      "captured_head": 4,
+      "store_identity": "e56a1bda-a3fa-49f0-8dca-18ec315318d8",
+      "token": "5de41b53-c62c-43df-932d-0e93d2cdb7fc"
+    },
+    "seed": 843000,
+    "year": 1
+  },
+  "saved_database": {
+    "bytes": 151306240,
+    "sha256": "0997b8c554350785d71d98265025d53ca2e66e627d8ffdd2dbacb199d1fcd680"
+  },
+  "schema": "ate-mature-step-save/1",
+  "source": {
+    "database": {
+      "bytes": 134057984,
+      "sha256": "6768d9e5dae45b5e3fb17b86d2a70d534c2b700759a74b09d6498ab3024bc12c"
+    },
+    "pin": {
+      "captured_head": 3,
+      "store_identity": "e56a1bda-a3fa-49f0-8dca-18ec315318d8",
+      "token": null
+    },
+    "provenance": {
+      "config": {
+        "mature": true,
+        "seed": 843000
+      },
+      "initial_digest": "acf5e00bc6eb6e5ade53b606635ba0ac5dd7f5909cd7741b1f6b9da9ffe7861f",
+      "kind": "generated-populated-diagnostic",
+      "successor_digest": "6c4b0344ec250e32f812d252a3b0163f36a93c259905a1f7ef1ba8de06d2bec3"
+    },
+    "rules_id": "proof-runtime-populated-diagnostic/1",
+    "schema": "ate-performance-source/1",
+    "world": {
+      "seed": 843000,
+      "year": 0
+    }
+  },
+  "source_unchanged": true,
+  "status": "complete",
+  "unavailable": [
+    "phase_peak_rss"
+  ]
+}

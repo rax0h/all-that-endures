@@ -1,3 +1,5 @@
+Current checkpoint: [run 39810513221](https://github.com/rax0h/all-that-endures/actions/runs/39810513221) is green: 3,094 tests plus 2 subtests, and the populated comparison with both fresh restores. Runtime foundation correctness is verified on that source; interactive targets remain unmet. Earlier failed-run sections below are retained history, superseded by the final acceptance receipt.
+
 # Proof runtime foundation — 2026-10-22
 
 This candidate implements the first runtime package of the [approved architecture](../superpowers/specs/2026-10-21-ate-incremental-proof-design.md). It does **not** implement durable cross-generation proofs, a new persistent format, authenticated lazy action admission or background scrub. Interactive targets remain unproven: warm year <=1 s, incremental save <=2 s, open <=10 s.
@@ -96,3 +98,14 @@ The [repair verification receipt](run-39728517108/repair-validation.json) explic
 Latest repair source: remote `3b2af964f42b6197fe596554fdce97d459798c82`, exact root tree `18737205a1a36d17683b0a6c628d337eb8e3775c` of local `cacfca66bf82f1efff4f0f38ca63d68a948a7ca0`. The exact workflow-driver tiny-world smoke passed after both runtime repairs and diagnostic counter capture, including both fresh restores. Its digest remains `0af8c8866d9f6c92f4222c74b5f1591719a09a0589083678410ab4045c403486`; this is launcher validation only.
 
 Repair validation: [run 39810513221](https://github.com/rax0h/all-that-endures/actions/runs/39810513221), executing source `3b2af964f42b6197fe596554fdce97d459798c82`. Full suite and populated workload both launched; results pending.
+
+## Final runtime foundation checkpoint
+
+[Acceptance receipt](run-39810513221/acceptance.json), complete JUnit/log, common source authority, phase receipts and fresh restores are retained in `run-39810513221/`. Downloaded ZIPs matched the GitHub artifact digests. The separate rerun of the previous 189 failed cases completed successfully in 591.57 s. Full suite: 3094 passed, 2 subtests passed, one warning, 6409.98 s. No merge or main promotion was performed.
+
+- Final attributed first_step: 68.471 s baseline, 67.428 s candidate (1.015x).
+- Final attributed open: 0.704 s baseline, 0.701 s candidate (1.004x).
+- Final attributed save: 15.290 s baseline, 15.180 s candidate (1.007x).
+- Final attributed warm_step: 61.063 s baseline, 60.818 s candidate (1.004x).
+
+These remain a bounded populated workload, not mature-year timing acceptance. New immutable-map work starts from this repaired runtime and cannot bypass existing save/open checks until the remaining format and recovery contracts are implemented.
