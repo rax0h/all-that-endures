@@ -1,0 +1,29 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_nul_prefixed_text_cannot_bypass_node_transfer_budget ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_nul_prefixed_text_cannot_0')
+
+    def test_nul_prefixed_text_cannot_bypass_node_transfer_budget(tmp_path):
+        import gc
+        import tracemalloc
+        with sqlite3.connect(tmp_path/'nodes.sqlite') as db:
+            s = store(db);s.create_schema()
+            text = '\0' + 'x'*(2*1024*1024)
+            db.execute('INSERT INTO ate_proof_nodes VALUES(?,?,?)',(DOMAIN,b'x'*32,text))
+            db.commit();del text;gc.collect()
+            assert db.execute('SELECT typeof(node_bytes),length(node_bytes) FROM ate_proof_nodes').fetchone() == ('text',0)
+            tracemalloc.start()
+            try:
+                with pytest.raises(StoreIntegrityError):s.read(DOMAIN,b'x'*32)
+                _,peak = tracemalloc.get_traced_memory()
+            finally:
+                tracemalloc.stop()
+>           assert peak < 128*1024, f'corrupt non-BLOB body transferred {peak} Python bytes'
+E           AssertionError: corrupt non-BLOB body transferred 2099402 Python bytes
+E           assert 2099402 < (128 * 1024)
+
+simulation/tests/test_stage_0_5_proof_store.py:122: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_store.py::test_nul_prefixed_text_cannot_bypass_node_transfer_budget
+1 failed in 0.17s

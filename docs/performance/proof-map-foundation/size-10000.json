@@ -1,0 +1,59 @@
+{
+  "construction": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 16700886,
+      "read_nodes": 33706,
+      "read_requests": 33706,
+      "write_requests": 42706,
+      "written_bytes": 17630166,
+      "written_nodes": 42706
+    },
+    "wall_seconds": 2.8379816830000664
+  },
+  "database_bytes": 28094464,
+  "keys": 10000,
+  "limitations": [
+    "No World payload tables, saves, migration or root publication exercised.",
+    "RSS is process-lifetime peak including construction, not a phase peak.",
+    "Obsolete immutable nodes are retained; root-aware collection is future work."
+  ],
+  "point": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 2308,
+      "read_nodes": 6,
+      "read_requests": 6,
+      "write_requests": 5,
+      "written_bytes": 2168,
+      "written_nodes": 4
+    },
+    "process_peak_rss_bytes": 25157632,
+    "python_peak_bytes": 18611,
+    "sql_selects": {
+      "other": 0,
+      "proof": 6
+    },
+    "wall_seconds": 0.005930442000021685
+  },
+  "retained_nodes": 46541,
+  "root_after": {
+    "count": 10000,
+    "digest": "a761d874f145346da8f4d884201bbb8b0a3a81da0a71e014d7401390b6c349a5"
+  },
+  "root_before": {
+    "count": 10000,
+    "digest": "4bf277394b4cc09a1906b3f2c9e681ff4e2914f63836c12bf011ba4020b0057d"
+  },
+  "schema": "ate-proof-map-scaling/1",
+  "scope": "proof-map point replacement only; no World/save integration",
+  "source": {
+    "driver_sha256": "fdb0dbee4e682f185737c86a97fe6cce98f38ff7002c0ab06a8c2163345a47d3",
+    "head": "a4fb680cef2bf8fa2a7121dfc41aafb5cc5f3c2c",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "runtime_tree": "c16f31094b248f67dab2f951a4e9abbba27ee276",
+    "sqlite": "3.53.1"
+  },
+  "status": "complete"
+}

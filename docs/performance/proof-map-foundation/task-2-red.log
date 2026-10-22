@@ -1,0 +1,364 @@
+FFFFFFFFFFFF                                                             [100%]
+=================================== FAILURES ===================================
+__________ test_point_updates_keep_old_roots_and_noops_write_nothing ___________
+
+    def test_point_updates_keep_old_roots_and_noops_write_nothing():
+>       storage = MemoryNodes(); m = proof_map(storage)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_prefix_splits_and_insertion_order_produce_one_canonical_root _______
+
+    def test_prefix_splits_and_insertion_order_produce_one_canonical_root():
+        keys = [f'key:{i}'.encode() for i in range(80)]
+        roots = []
+        for ordering in (keys, list(reversed(keys)), keys[::2]+keys[1::2]):
+>           storage = MemoryNodes(); m = proof_map(storage); root = empty_root(DOMAIN)
+                                         ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_seeded_transitions_match_reference_map_and_retained_snapshots ______
+
+    def test_seeded_transitions_match_reference_map_and_retained_snapshots():
+>       storage = MemoryNodes(); m = proof_map(storage); root = empty_root(DOMAIN)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:86: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_malformed_or_missing_proof_path_is_rejected[child-count] _________
+
+corruption = 'child-count'
+
+    @pytest.mark.parametrize('corruption', ['child-count','child-path','missing','bytes','root-count','empty-root','domain'])
+    def test_malformed_or_missing_proof_path_is_rejected(corruption):
+>       storage = MemoryNodes(); m = proof_map(storage)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_malformed_or_missing_proof_path_is_rejected[child-path] _________
+
+corruption = 'child-path'
+
+    @pytest.mark.parametrize('corruption', ['child-count','child-path','missing','bytes','root-count','empty-root','domain'])
+    def test_malformed_or_missing_proof_path_is_rejected(corruption):
+>       storage = MemoryNodes(); m = proof_map(storage)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_malformed_or_missing_proof_path_is_rejected[missing] ___________
+
+corruption = 'missing'
+
+    @pytest.mark.parametrize('corruption', ['child-count','child-path','missing','bytes','root-count','empty-root','domain'])
+    def test_malformed_or_missing_proof_path_is_rejected(corruption):
+>       storage = MemoryNodes(); m = proof_map(storage)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_malformed_or_missing_proof_path_is_rejected[bytes] ____________
+
+corruption = 'bytes'
+
+    @pytest.mark.parametrize('corruption', ['child-count','child-path','missing','bytes','root-count','empty-root','domain'])
+    def test_malformed_or_missing_proof_path_is_rejected(corruption):
+>       storage = MemoryNodes(); m = proof_map(storage)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_malformed_or_missing_proof_path_is_rejected[root-count] _________
+
+corruption = 'root-count'
+
+    @pytest.mark.parametrize('corruption', ['child-count','child-path','missing','bytes','root-count','empty-root','domain'])
+    def test_malformed_or_missing_proof_path_is_rejected(corruption):
+>       storage = MemoryNodes(); m = proof_map(storage)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_malformed_or_missing_proof_path_is_rejected[empty-root] _________
+
+corruption = 'empty-root'
+
+    @pytest.mark.parametrize('corruption', ['child-count','child-path','missing','bytes','root-count','empty-root','domain'])
+    def test_malformed_or_missing_proof_path_is_rejected(corruption):
+>       storage = MemoryNodes(); m = proof_map(storage)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_malformed_or_missing_proof_path_is_rejected[domain] ___________
+
+corruption = 'domain'
+
+    @pytest.mark.parametrize('corruption', ['child-count','child-path','missing','bytes','root-count','empty-root','domain'])
+    def test_malformed_or_missing_proof_path_is_rejected(corruption):
+>       storage = MemoryNodes(); m = proof_map(storage)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____ test_point_admission_leaves_unrelated_corruption_for_full_traversal ______
+
+    def test_point_admission_leaves_unrelated_corruption_for_full_traversal():
+>       storage = MemoryNodes(); m = proof_map(storage); root = empty_root(DOMAIN)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_failed_write_cannot_change_the_accepted_old_mapping ___________
+
+    def test_failed_write_cannot_change_the_accepted_old_mapping():
+>       storage = MemoryNodes(); m = proof_map(storage)
+                                     ^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_map.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_map.py:47: in proof_map
+    module = importlib.import_module('ate_sim.persistence_proof_map')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_map'
+import_ = <function _gcd_import at 0x7f2ebb70c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_map'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_point_updates_keep_old_roots_and_noops_write_nothing
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_prefix_splits_and_insertion_order_produce_one_canonical_root
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_seeded_transitions_match_reference_map_and_retained_snapshots
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_malformed_or_missing_proof_path_is_rejected[child-count]
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_malformed_or_missing_proof_path_is_rejected[child-path]
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_malformed_or_missing_proof_path_is_rejected[missing]
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_malformed_or_missing_proof_path_is_rejected[bytes]
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_malformed_or_missing_proof_path_is_rejected[root-count]
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_malformed_or_missing_proof_path_is_rejected[empty-root]
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_malformed_or_missing_proof_path_is_rejected[domain]
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_point_admission_leaves_unrelated_corruption_for_full_traversal
+FAILED simulation/tests/test_stage_0_5_proof_map.py::test_failed_write_cannot_change_the_accepted_old_mapping
+12 failed in 0.21s

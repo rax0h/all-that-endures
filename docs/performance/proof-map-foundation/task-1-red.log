@@ -1,0 +1,847 @@
+FFFFFFFFFFFFFFFFFFFFF                                                    [100%]
+=================================== FAILURES ===================================
+_______________ test_known_canonical_bytes_and_domain_separation _______________
+
+    def test_known_canonical_bytes_and_domain_separation():
+>       n = nodes()
+            ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________________ test_reject_noncanonical_nodes[] _______________________
+
+raw = b''
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x02Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x02Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B\x01\x11\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01B\x01\x11\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B@\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01B@\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x...00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_reject_noncanonical_nodes[ATEP\x01B\x00\x00] _______________
+
+raw = b'ATEP\x01B\x00\x00'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01B\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B\x00\x11\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01B\x00\x11\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x0...00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01B\x00\x02\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\xff\xff\xff\xff\xff\xff\xff\xffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01B\x00\x02\x00\xff\xff\xff\xff\xff\xff\xff\xffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x10\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+
+raw = b'ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x10\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxextra] _
+
+raw = b'ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxextra'
+
+    @pytest.mark.parametrize('raw', [
+        b'', b'ATEP\x02L'+b'x'*64, b'ATEP\x01L'+b'x'*63,
+        b'ATEP\x01L'+b'x'*65,
+        b'ATEP\x01B\x01\x11\x02'+child(0)+child(1), # nonzero padding
+        b'ATEP\x01B\x40'+b'\x00'*32+b'\x02'+child(0)+child(1), # exhausted locator
+        b'ATEP\x01B\x00\x00', b'ATEP\x01B\x00\x01'+child(0),
+        b'ATEP\x01B\x00\x11'+child(0)*17,
+        b'ATEP\x01B\x00\x02'+child(0)+child(0),
+        b'ATEP\x01B\x00\x02'+child(1)+child(0),
+        b'ATEP\x01B\x00\x02'+child(0,0)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0,2**64-1)+child(1),
+        b'ATEP\x01B\x00\x02'+child(0)+child(16),
+        b'ATEP\x01B\x00\x02'+child(0)+child(1)+b'extra',
+    ])
+    def test_reject_noncanonical_nodes(raw):
+>       with pytest.raises(StoreIntegrityError): nodes().decode_node(raw)
+                                                 ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_encoder_rejects_noncanonical_objects[short-leaf] _____________
+
+kind = 'short-leaf'
+
+    @pytest.mark.parametrize('kind', ['short-leaf', 'short-digest', 'bad-slot', 'bool-count', 'negative-prefix'])
+    def test_encoder_rejects_noncanonical_objects(kind):
+>       n = nodes()
+            ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_encoder_rejects_noncanonical_objects[short-digest] ____________
+
+kind = 'short-digest'
+
+    @pytest.mark.parametrize('kind', ['short-leaf', 'short-digest', 'bad-slot', 'bool-count', 'negative-prefix'])
+    def test_encoder_rejects_noncanonical_objects(kind):
+>       n = nodes()
+            ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_encoder_rejects_noncanonical_objects[bad-slot] ______________
+
+kind = 'bad-slot'
+
+    @pytest.mark.parametrize('kind', ['short-leaf', 'short-digest', 'bad-slot', 'bool-count', 'negative-prefix'])
+    def test_encoder_rejects_noncanonical_objects(kind):
+>       n = nodes()
+            ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_encoder_rejects_noncanonical_objects[bool-count] _____________
+
+kind = 'bool-count'
+
+    @pytest.mark.parametrize('kind', ['short-leaf', 'short-digest', 'bad-slot', 'bool-count', 'negative-prefix'])
+    def test_encoder_rejects_noncanonical_objects(kind):
+>       n = nodes()
+            ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_encoder_rejects_noncanonical_objects[negative-prefix] __________
+
+kind = 'negative-prefix'
+
+    @pytest.mark.parametrize('kind', ['short-leaf', 'short-digest', 'bad-slot', 'bool-count', 'negative-prefix'])
+    def test_encoder_rejects_noncanonical_objects(kind):
+>       n = nodes()
+            ^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_nodes.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_nodes.py:10: in nodes
+    return importlib.import_module('ate_sim.persistence_proof_nodes')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_nodes'
+import_ = <function _gcd_import at 0x7fb3d66c00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_nodes'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_known_canonical_bytes_and_domain_separation
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x02Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01Lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x01\x11\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B@\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x00\x00]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x00\x11\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x00xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\xff\xff\xff\xff\xff\xff\xff\xffxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x10\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_reject_noncanonical_nodes[ATEP\x01B\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\x01\x00\x00\x00\x00\x00\x00\x00\x01xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxextra]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_encoder_rejects_noncanonical_objects[short-leaf]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_encoder_rejects_noncanonical_objects[short-digest]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_encoder_rejects_noncanonical_objects[bad-slot]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_encoder_rejects_noncanonical_objects[bool-count]
+FAILED simulation/tests/test_stage_0_5_proof_nodes.py::test_encoder_rejects_noncanonical_objects[negative-prefix]
+21 failed in 0.35s

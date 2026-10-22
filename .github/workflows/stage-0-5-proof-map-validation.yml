@@ -1,0 +1,78 @@
+name: Stage 0.5 durable proof map validation
+'on':
+  push:
+    branches: [sol/durable-proof-map]
+    paths:
+      - simulation/ate_sim/**
+      - simulation/tests/**
+      - .github/tests/run_proof_map_scaling.py
+      - .github/workflows/stage-0-5-proof-map-validation.yml
+permissions:
+  contents: read
+concurrency:
+  group: stage-0-5-proof-map-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+jobs:
+  proof-map:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest pyyaml
+      - name: Verify proof primitives and bounded 1k/10k/100k work
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python -m pytest -q simulation/tests/test_stage_0_5_proof_nodes.py simulation/tests/test_stage_0_5_proof_map.py simulation/tests/test_stage_0_5_proof_store.py --junitxml=evidence/proof-tests.xml 2>&1 | tee evidence/proof-tests.log
+          timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_map_scaling.py --output evidence/scaling 2>&1 | tee evidence/scaling.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-0-5-proof-map-${{ github.sha }}
+          path: |
+            evidence/**/*.json
+            evidence/**/*.xml
+            evidence/*.log
+          retention-days: 14
+          if-no-files-found: error
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest pyyaml
+      - name: Record source and run all simulation tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python - <<'PY'
+          import platform, sqlite3, subprocess
+          from pathlib import Path
+          from simulation import continuation_receipts as r
+          def git(*args):return subprocess.check_output(['git',*args],text=True).strip()
+          if git('status','--porcelain','--untracked-files=no'):raise ValueError('tracked execution source is dirty')
+          r.publish_receipt(Path('evidence/source.json'),dict(head=git('rev-parse','HEAD'),runtime_tree=git('rev-parse','HEAD:simulation/ate_sim'),python=platform.python_version(),sqlite=sqlite3.sqlite_version))
+          PY
+          timeout --signal=TERM --kill-after=30s 135m python -m pytest -q simulation/tests --durations=30 -o junit_family=legacy --junitxml=evidence/full-suite.xml 2>&1 | tee evidence/full-suite.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-0-5-proof-map-suite-${{ github.sha }}
+          path: evidence
+          retention-days: 14
+          if-no-files-found: error
