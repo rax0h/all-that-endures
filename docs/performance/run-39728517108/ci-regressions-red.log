@@ -1,0 +1,77 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_________ test_evicted_external_alias_rehydrates_same_object_and_saves _________
+simulation/tests/test_stage_0_5_final_record_budget.py:58: in test_evicted_external_alias_rehydrates_same_object_and_saves
+    retained.wealth = 99.0
+    ^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_tracking.py:149: in hooked
+    _original(self, name, assigned)
+simulation/ate_sim/record_index.py:26: in __setattr__
+    assignment_token = assignment_preflight(self, name, value)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:3487: in _before_indexed_assignment
+    value_only = eligible(self, record, field, value)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_value_routes.py:52: in eligible
+    bridge, recursive = session._identity_bridge, session._recursive_histories
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'
+__ test_native_event_peer_reopens_and_first_edit_publishes_one_body[history] ___
+simulation/tests/test_stage_0_5_final_world_native_event_peers.py:32: in test_native_event_peer_reopens_and_first_edit_publishes_one_body
+    event = session.skills[1, 'craft'].provenance[0]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_nested_history.py:1140: in call
+    return original(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_nested_history.py:310: in __getitem__
+    value = self._recursive_runtime.decode(value,
+simulation/ate_sim/persistence_history_runtime.py:788: in decode
+    result = self.load_record(value)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_history_runtime.py:622: in load_record
+    object.__setattr__(result, field, self.decode(child, owner, (('field', field),)))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_history_runtime.py:773: in decode
+    rows = coord._owner_changes(owner, ())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:672: in read_owner_identity
+    header = self._owner(pin, owner)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:580: in _owner
+    raise StoreIntegrityError('identity owner/header commitment disagreement')
+E   ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement
+_ test_native_event_peer_reopens_and_first_edit_publishes_one_body[world-log] __
+simulation/tests/test_stage_0_5_final_world_native_event_peers.py:32: in test_native_event_peer_reopens_and_first_edit_publishes_one_body
+    event = session.skills[1, 'craft'].provenance[0]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_nested_history.py:1140: in call
+    return original(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_nested_history.py:310: in __getitem__
+    value = self._recursive_runtime.decode(value,
+simulation/ate_sim/persistence_history_runtime.py:788: in decode
+    result = self.load_record(value)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_history_runtime.py:622: in load_record
+    object.__setattr__(result, field, self.decode(child, owner, (('field', field),)))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_history_runtime.py:773: in decode
+    rows = coord._owner_changes(owner, ())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes
+    checked = self.catalog.read_owner_identity(self.pin, owner)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:672: in read_owner_identity
+    header = self._owner(pin, owner)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:580: in _owner
+    raise StoreIntegrityError('identity owner/header commitment disagreement')
+E   ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_final_record_budget.py::test_evicted_external_alias_rehydrates_same_object_and_saves
+FAILED simulation/tests/test_stage_0_5_final_world_native_event_peers.py::test_native_event_peer_reopens_and_first_edit_publishes_one_body[history]
+FAILED simulation/tests/test_stage_0_5_final_world_native_event_peers.py::test_native_event_peer_reopens_and_first_edit_publishes_one_body[world-log]
+3 failed in 15.35s

@@ -1,0 +1,15 @@
+{
+  "run_id": 39728517108,
+  "artifacts": [
+    {
+      "id": 12404132982,
+      "sha256": "300071bd4c29e4e795bcef066dce5b83f6e3f015720dceb2b243ca426a2c0d73",
+      "bytes": 109530
+    },
+    {
+      "id": 12408030276,
+      "sha256": "3dadfd9b6ae01e00d704d060d8625ba8d2b91138f8eac036943ed1aed36877d4",
+      "bytes": 155260
+    }
+  ]
+}

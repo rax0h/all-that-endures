@@ -1,0 +1,781 @@
+{
+  "run_id": 39728517108,
+  "source_sha": "848ebf4bb14bd14ace00ba604f23a61acd967ea4",
+  "failures": [
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_inquiry_close_uses_five_checked_candidates_no_application_payloads[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_inquiry_close_uses_five_checked_candidates_no_application_payloads[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_threshold_uses_current_overlays_and_excludes_changed_baseline_keys",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_eager_and_lazy_inquiry_findings_match_at_threshold[4]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_eager_and_lazy_inquiry_findings_match_at_threshold[5]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_eager_and_lazy_inquiry_findings_match_at_threshold[6]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_threshold_membership_save_failure_resolves_current_predicate[before_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_threshold_membership_save_failure_resolves_current_predicate[after_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_legacy_index_absence_uses_checked_fallback_without_open_upgrade",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_passed_query_preserves_native_bool_numeric_equality_on_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_query_capability_kind_preserves_cross_owner_application_paths",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_advancement.py::test_scalar_advancement_writes_skip_identity_graph_reconcile",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_advancement.py::test_advancement_nested_mutations_save_and_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_advancement.py::test_shared_advancement_nested_identity_survives_save_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_advancement.py::test_advancement_lost_ack_resolves_exactly_once",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_advancement.py::test_advancement_stale_writer_rejects_future_nested_mutation",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_advancement.py::test_advancement_materializing_detach_preserves_sharing_and_checkpoint",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_aspirations.py::test_aspiration_edit_noop_save_and_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_aspirations.py::test_retained_aspiration_survives_cache_pressure_and_mutates",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_aspirations.py::test_cross_boundary_aspiration_alias_mutates_without_payload_load",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_aspirations.py::test_lazy_detach_materializes_complete_aspiration_mapping",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_cold_scalar_families.py::test_direct_edits_memberships_and_single_family_save",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_cold_scalar_families.py::test_scalar_save_failure_resolves_with_frozen_evidence[before_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_cold_scalar_families.py::test_scalar_save_failure_resolves_with_frozen_evidence[after_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_cold_scalar_families.py::test_shared_wallet_mutation_reopen_and_portable_detach",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_cold_scalar_families.py::test_scalar_predicate_preserves_native_numeric_equality",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_cold_scalar_families.py::test_scalar_residency_sidecars_remain_bounded_and_retained_object_mutates",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_cold_scalar_families.py::test_failed_detach_retains_scalar_mutation_authority",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_institutions.py::test_one_dirty_record_does_not_retain_obsolete_membership_buckets[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_institutions.py::test_one_dirty_record_does_not_retain_obsolete_membership_buckets[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_institutions.py::test_pruning_one_record_preserves_other_current_candidates",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_institutions.py::test_failed_save_keeps_current_membership_overlay_for_retry",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_institutions.py::test_institution_membership_overlay_save_and_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_institutions.py::test_institution_application_overlay_query_checks_only_matching_candidates",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_lineage.py::test_lineage_direct_edit_save_reopen_and_noop",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_materials.py::test_material_direct_mutation_save_reopen_and_noop",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_materials.py::test_create_consume_and_membership_publish_together",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_materials.py::test_material_save_precommit_failure_resolves_old_and_retries",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_one_token_consumption_writes_bounded_metadata[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_one_token_consumption_writes_bounded_metadata[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_old_pin_retains_prior_minimum_and_node_links",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_id_ties_reinsertion_and_direct_edits_preserve_native_selection",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_minimum_metadata_and_records_recover_together[before_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_minimum_metadata_and_records_recover_together[after_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_normal_ack_rejects_missing_minimum_query_witness",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_noop_direct_field_edits_do_not_retain_dirty_history",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_shared_records_route_minimum_edits_reopen_and_detach[wallet]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_shared_records_route_minimum_edits_reopen_and_detach[record]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_numeric_id_representatives_and_stable_equal_ties_survive_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_mixed_minimum_operations_match_native_stable_sort",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_minimum_selection.py::test_failed_detach_keeps_retained_minimum_record_callback",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_people_scalar_edit_save_reopen_and_true_noop",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_evicted_external_current_person_mutation_rehydrates_owner_and_saves",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_evicted_inactive_person_reactivation_invalidates_alive_query_and_reopens",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_one_people_edit_write_work_does_not_follow_historical_population[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_one_people_edit_write_work_does_not_follow_historical_population[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_people_save_precommit_failure_resolves_old_and_retries",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_people_lost_ack_resolves_committed_successor_exactly_once",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_competing_people_writer_marks_loser_stale_and_preflights_future_mutation",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_hybrid_lazy_session_runs_one_real_step_and_reopens_equal_to_eager_control",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_hybrid_lazy_session_continues_two_real_steps_across_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_lazy_materializing_detach_preserves_all_people_edits_alias_and_portability",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_lazy_detach_staging_failure_leaves_session_usable",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_lazy_stale_detach_materializes_local_people_branch_without_touching_winner",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_cross_boundary_person_alias_mutates_before_people_payload_load",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_people.py::test_cross_boundary_person_field_edit_and_owner_replacement_publish_atomically",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_resources.py::test_resource_transfer_consume_membership_and_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_resources.py::test_retained_owner_bucket_rehydrates_during_real_transfer",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_scalar_archives.py::test_scalar_archive_direct_edits_save_and_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_skills.py::test_skill_practice_and_teach_save_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_skills.py::test_skill_direct_scalar_and_nested_replacement_persist",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_social.py::test_simulation_run_reuses_pinned_social_memberships_and_overlays_unsaved_changes",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_social.py::test_social_mutation_save_and_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_social.py::test_social_get_record_creates_edge_and_adjacency_lazily",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_souls.py::test_scalar_and_all_nested_soul_mutations_save_and_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_souls.py::test_real_death_resurrection_mark_and_transform_paths_persist",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_souls.py::test_soul_history_scaling_is_bounded_by_requested_access[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_souls.py::test_soul_history_scaling_is_bounded_by_requested_access[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_institution_divinity.py::test_real_nested_histories_use_bounded_points_and_header_reads[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_institution_divinity.py::test_real_nested_histories_use_bounded_points_and_header_reads[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_institution_divinity.py::test_typed_set_map_aliases_save_replace_and_materialize_once[wallet]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_institution_divinity.py::test_typed_set_map_aliases_save_replace_and_materialize_once[church]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_property_transfer_has_bounded_history_pages_and_bytes[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_property_transfer_has_bounded_history_pages_and_bytes[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_infrastructure_condition_edit_does_not_read_history[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_infrastructure_condition_edit_does_not_read_history[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_typed_history_save_failure_keeps_frozen_plan_and_resolves[before_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_typed_history_save_failure_keeps_frozen_plan_and_resolves[after_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_history_replacement_splits_alias_and_old_child_cannot_dirty_replacement",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_typed_history_eager_alias_survives_removal_of_all_lazy_placements",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_eager_only_history_missing_occurrence_fails_closed",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_shared_property_record_routes_header_and_child_edits_from_either_owner[wallet]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_persistence_lazy_typed_property_histories.py::test_shared_property_record_routes_header_and_child_edits_from_either_owner[property]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_closeout.py::test_r1_retained_history_sidecars_and_reactivation_across_boundaries[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_closeout.py::test_r1_retained_history_sidecars_and_reactivation_across_boundaries[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_checked_current_copy.py::test_checked_copy_captures_committed_head_while_source_acknowledgement_is_unresolved[after_commit-0.9]",
+      "message": "ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_event_histories.py::test_scalar_save_reads_no_event_history_pages[resources-transfers-location-2-1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_event_histories.py::test_scalar_save_reads_no_event_history_pages[resources-transfers-location-2-10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_event_histories.py::test_scalar_save_reads_no_event_history_pages[material_lots-transfers-quantity-12.0-1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_event_histories.py::test_scalar_save_reads_no_event_history_pages[material_lots-transfers-quantity-12.0-10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_event_histories.py::test_scalar_save_reads_no_event_history_pages[social_edges-shared_history-trust-0.75-1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_event_histories.py::test_scalar_save_reads_no_event_history_pages[social_edges-shared_history-trust-0.75-10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_graph_buckets.py::test_counted_history_shared_across_graph_record_and_eager_fields",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[native-True-list]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[native-True-set]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[native-True-map]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[eager-True-list]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[eager-True-set]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[eager-True-map]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[eager_existing-True-list]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[eager_existing-True-set]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[eager_existing-True-map]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[wallet-True-list]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[wallet-True-set]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[wallet-True-map]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[wallet_existing-True-list]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[wallet_existing-True-set]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_retained_private_history_publishes_on_reattachment[wallet_existing-True-map]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_new_unpublished_private_history_survives_reattachment[list]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_new_unpublished_private_history_survives_reattachment[set]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_new_unpublished_private_history_survives_reattachment[map]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_unrelated_lost_ack_keeps_private_overlay_for_reattachment[list]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_unrelated_lost_ack_keeps_private_overlay_for_reattachment[set]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_history_reattachment.py::test_unrelated_lost_ack_keeps_private_overlay_for_reattachment[map]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_household_sequences.py::test_scalar_household_edit_loads_no_member_nodes[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_household_sequences.py::test_scalar_household_edit_loads_no_member_nodes[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_household_sequences.py::test_replacement_new_owner_and_unowned_sequence_reattachment",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_knowledge_authorities.py::test_new_claim_reuses_exact_semantic_key_and_mutation_survives_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_knowledge_authorities.py::test_loaded_claim_scalar_edit_is_saved_and_detached_record_remains_mutable",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_knowledge_authorities.py::test_knowledge_point_edit_and_insert_have_fixed_archive_cost",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_owner_header_witnesses.py::test_changed_header_cannot_be_replaced_by_a_baseline_witness",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_pressure.py::test_pressure_exact_float_hex_duplicate_extinct_order_and_cache_writers",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_pressure_arithmetic.py::test_forced_pressure_matches_eager_native_hex_and_rng_after_edit_and_reopen[True-values0-None]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_pressure_arithmetic.py::test_forced_pressure_matches_eager_native_hex_and_rng_after_edit_and_reopen[True-values1-occurrences1]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_pressure_arithmetic.py::test_forced_pressure_matches_eager_native_hex_and_rng_after_edit_and_reopen[True-values2-None]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_pressure_arithmetic.py::test_shared_occurrence_list_duplicates_and_replacement_keep_native_order[True]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_record_budget.py::test_evicted_external_alias_rehydrates_same_object_and_saves",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_record_budget.py::test_oversize_point_read_returns_record_without_retaining_cache",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_record_budget.py::test_tiny_cache_budget_preserves_frozen_save_and_exact_recovery[before_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_record_budget.py::test_tiny_cache_budget_preserves_frozen_save_and_exact_recovery[after_commit]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_record_budget.py::test_oversized_record_mutation_pins_dirty_owner_before_rehydration[skills-False]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_record_budget.py::test_oversized_record_mutation_pins_dirty_owner_before_rehydration[souls-False]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_record_budget.py::test_oversized_record_mutation_pins_dirty_owner_before_rehydration[social_edges-False]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_record_budget.py::test_oversized_record_mutation_pins_dirty_owner_before_rehydration[property-False]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_runtime_families.py::test_cold_indexed_alias_gets_its_authority_callback_before_mutation[skill]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_runtime_families.py::test_cold_indexed_alias_gets_its_authority_callback_before_mutation[lineage]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_runtime_families.py::test_eager_settlement_record_alias_reuses_concrete_lazy_authority[skill-False]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_runtime_families.py::test_eager_settlement_record_alias_reuses_concrete_lazy_authority[lineage-False]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_skill_histories.py::test_skill_scalar_save_does_not_read_history_pages[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_skill_histories.py::test_skill_scalar_save_does_not_read_history_pages[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_skill_histories.py::test_replacement_keeps_retained_shared_history_without_resurrecting_path",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_soul_collections.py::test_soul_scalar_save_reads_no_collection_pages[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_soul_collections.py::test_soul_scalar_save_reads_no_collection_pages[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_soul_collections.py::test_cold_shared_alias_mutation_replacement_and_reopen",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_soul_transformations.py::test_soul_scalar_edit_preserves_compact_history_without_page_reads[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_soul_transformations.py::test_soul_scalar_edit_preserves_compact_history_without_page_reads[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_soul_transformations.py::test_soul_skill_and_eager_alias_share_append_and_replacement",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_step_cache_caps.py::test_step_record_cap_drops_sidecars_without_losing_external_alias[people]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_step_cache_caps.py::test_step_record_cap_drops_sidecars_without_losing_external_alias[skills]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_step_cache_caps.py::test_step_record_cap_drops_sidecars_without_losing_external_alias[lineage_nodes]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_catalog_bridge.py::test_catalog_activation_rejects_existing_unsaved_family_edits",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_native_event_peers.py::test_native_event_peer_reopens_and_first_edit_publishes_one_body[history]",
+      "message": "ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_native_event_peers.py::test_native_event_peer_reopens_and_first_edit_publishes_one_body[world-log]",
+      "message": "ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_native_event_peers.py::test_first_world_event_edit_has_exact_backing_recovery[before_commit]",
+      "message": "ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_native_event_peers.py::test_first_world_event_edit_has_exact_backing_recovery[after_commit]",
+      "message": "ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_participants.py::test_world_preparation_uses_family_participants_and_detached_replay",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_participants.py::test_frozen_publication_replays_original_token_and_generation",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_participants.py::test_corrupt_failed_attempt_cannot_discard_world_pending_plan",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_participants.py::test_lost_ack_replays_exact_participant_plan_and_accepts_once",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_participants.py::test_publication_rejects_wrong_delta_and_wrong_pin_before_acceptance",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_participants.py::test_new_save_source_field_cannot_be_silently_excluded",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_participants.py::test_superseded_successor_is_stale_before_any_participant_acceptance",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_participants.py::test_postcommit_failure_type_cannot_discard_acknowledged_plan[conflict]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_participants.py::test_postcommit_failure_type_cannot_discard_acknowledged_plan[pressure]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_household_selection_cost.py::test_numeric_duplicates_and_fresh_liveness",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_living_consumer_closeout.py::test_mortality_survivors_and_inheritance_match_eager_without_dead_loads[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_living_consumer_closeout.py::test_mortality_survivors_and_inheritance_match_eager_without_dead_loads[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_living_consumer_closeout.py::test_engine_death_matches_eager_without_dead_member_reads[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_living_consumer_closeout.py::test_engine_death_matches_eager_without_dead_member_reads[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_living_consumer_closeout.py::test_demography_deactivates_households_without_scanning_dead_members[1000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_living_consumer_closeout.py::test_demography_deactivates_households_without_scanning_dead_members[10000]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_living_consumer_closeout.py::test_duplicate_live_member_occurrences_keep_order_and_effects",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_material_rebuild_cost.py::test_selection_only_reads_once_and_mutations_rebuild_exactly",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_unloaded_alias_routing.py::test_person_edit_publishes_every_containing_payload_owner[people-people]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_unloaded_alias_routing.py::test_person_edit_publishes_every_containing_payload_owner[people-wallet]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_unloaded_alias_routing.py::test_person_edit_publishes_every_containing_payload_owner[wallet-people]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_unloaded_alias_routing.py::test_person_edit_publishes_every_containing_payload_owner[wallet-wallet]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_unloaded_alias_routing.py::test_retained_person_after_wallet_replacement_does_not_mutate_replacement[assign]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    },
+    {
+      "nodeid": "simulation/tests/test_stage_0_5_unloaded_alias_routing.py::test_retained_person_after_wallet_replacement_does_not_mutate_replacement[update]",
+      "message": "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'"
+    }
+  ],
+  "groups": {
+    "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'": 184,
+    "ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session": 1,
+    "ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement": 4
+  },
+  "representative_traces": {
+    "AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'": {
+      "nodeid": "simulation/tests/test_persistence_application_threshold.py::test_inquiry_close_uses_five_checked_candidates_no_application_payloads[1000]",
+      "trace": "tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_inquiry_close_uses_five_c0')\nhistory = 1000\n\n    @pytest.mark.parametrize('history', [1000, 10000])\n    def test_inquiry_close_uses_five_checked_candidates_no_application_payloads(tmp_path, history):\n        path = converted(tmp_path, history)\n        with open_lazy_world_session(path, rules_id=RULES) as session:\n            applications = session.institution_applications\n            before = session.store.diagnostics()\n>           _close(session.world, session.world.society_accountability.inquiries[1])\n\nsimulation/tests/test_persistence_application_threshold.py:34: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsimulation/ate_sim/society_accountability.py:27: in _close\n    q.findings=tuple(findings);q.status='closed';q.closed_year=world.year\n    ^^^^^^^^^^\nsimulation/ate_sim/persistence_tracking.py:149: in hooked\n    _original(self, name, assigned)\nsimulation/ate_sim/record_index.py:26: in __setattr__\n    assignment_token = assignment_preflight(self, name, value)\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsimulation/ate_sim/persistence_lazy.py:3487: in _before_indexed_assignment\n    value_only = eligible(self, record, field, value)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\ntable = {}\nobj = Inquiry(id=1, branch=1, opened_year=0, trigger_kind='probe', trigger_event=1, severity=0.2, status='open', findings=(), closed_year=None, origin_event=None, resolved_event=None)\nfield = 'findings', value = ('training_or_selection_failure',)\n\n    def eligible(table, obj, field, value):\n        from .persistence_record_runtime import _identity_free_scalar\n        from .persistence_schema import RECORD_FIELDS\n        session = table._session\n>       bridge, recursive = session._identity_bridge, session._recursive_histories\n                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nE       AttributeError: 'LazyWorldSession' object has no attribute '_recursive_histories'\n\nsimulation/ate_sim/persistence_value_routes.py:52: AttributeError"
+    },
+    "ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session": {
+      "nodeid": "simulation/tests/test_stage_0_5_final_checked_current_copy.py::test_checked_copy_captures_committed_head_while_source_acknowledgement_is_unresolved[after_commit-0.9]",
+      "trace": "tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_checked_copy_captures_com1')\nphase = 'after_commit', expected = 0.9\n\n    @pytest.mark.parametrize('phase,expected', [('before_commit', .5), ('after_commit', .9)])\n    def test_checked_copy_captures_committed_head_while_source_acknowledgement_is_unresolved(tmp_path, phase, expected):\n        source = backed_source(tmp_path)\n        target = tmp_path / 'copy.sqlite'\n        with open_bridge(source, rules_id=RULES) as original:\n            activate(original)\n            action = original.skills[1, 'craft'].provenance[1]\n            action.strength = .9\n            def fail(at):\n                if at == phase: raise OSError('source acknowledgement fault')\n            original.store._phase_hook = fail\n            with pytest.raises(OSError, match='source acknowledgement fault'): original.save()\n            pin, pending, before = original.pin, original._pending_save, sha(source)\n>           module()._copy_current_checked_catalog(source, target, rules_id=RULES)\n\nsimulation/tests/test_stage_0_5_final_checked_current_copy.py:286: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsimulation/ate_sim/persistence_catalog_copy.py:552: in _copy_current_checked_catalog\n    _verify_catalog(target, pin)\nsimulation/ate_sim/persistence_catalog_copy.py:159: in _verify_catalog\n    return _verify_catalog(store, pin, temporary)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsimulation/ate_sim/persistence_catalog_copy.py:170: in _verify_catalog\n    checked = catalog.read_owner_identity(pin, owner)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsimulation/ate_sim/persistence_lazy_identity_catalog.py:672: in read_owner_identity\n    header = self._owner(pin, owner)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <ate_sim.persistence_lazy_identity_catalog.IdentityCatalog object at 0x7fb8506156d0>\npin = GenerationPin(token='ee38cf3c-c938-4a2a-beb0-d4a65d6360f4', store_identity='11b7f323-36af-4883-98ee-715d3fcc099a', captured_head=5)\nowner = ('aux.lazy.records.headers', (8, 0))\n\n    def _owner(self, pin, owner):\n        placement_path(*owner, ())\n        scope = getattr(self.store, '_validation_scope', None)\n        marker = (owner[0], self.codec.encode(owner[1]))\n        reusable = scope is not None and self.codec is self.store.codec and scope.can_reuse(self.store, pin)\n        cached = scope.lookup('owner', marker) if reusable else None\n        if cached is not None:\n            return cached\n        header = self._read(pin, OWNER_NAMESPACE, owner)\n        if (type(header) is not tuple or len(header) != 9 or header[0] != 'identity-owner/v1'\n            or type(header[1]) is not bool or header[2] not in ('lazy', 'ordinary') or type(header[3]) is not int\n            or not 0 <= header[3] <= pin.captured_head or type(header[4]) is not int or header[4] < 1\n            or type(header[5]) is not str or len(header[5]) != 64 or type(header[7]) is not int or header[7] < 0\n            or type(header[8]) is not str or len(header[8]) != 64\n            or (header[6] is not None and (type(header[6]) is not bytes or len(header[6]) > 32))):\n            raise StoreIntegrityError('invalid identity owner witness')\n        adapter = AUXILIARY_OWNER_FAMILIES.get(owner[0])\n        if adapter is not None and (header[2] != 'lazy' or header[4] != adapter.record_schema):\n            raise StoreIntegrityError('physical history owner witness has a different schema')\n        # Metadata-only source agreement. A historical ordinary witness is MVCC\n        # metadata, never permission to decode today's overwritten ordinary body.\n        # Old ordinary payload authority remains unavailable through this API.\n        rows = None\n        if header[2] == 'lazy':\n            rows = self.store._interval_rows('lazy_record_versions', 'valid_from,record_schema,payload_checksum',\n                ('namespace', 'typed_key'), (owner[0], self.codec.encode(owner[1])), pin.captured_head,\n                'lazy_record_interval', limit=2)\n        elif pin.captured_head == int(self.store._checked_head_row()[0]):\n            rows = self.store.db.execute('SELECT last_changed_generation,record_schema,payload_checksum FROM records '\n                'WHERE namespace=? AND typed_key=?', (owner[0], self.codec.encode(owner[1]))).fetchall()\n        if rows is not None:\n            self.store._metadata_rows += len(rows)\n            if (header[1] and (len(rows) != 1 or rows[0] != (header[3], header[4], header[5]))) or (not header[1] and rows):\n>               raise StoreIntegrityError('identity owner/header commitment disagreement')\nE               ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement\n\nsimulation/ate_sim/persistence_lazy_identity_catalog.py:580: StoreIntegrityError\n\nDuring handling of the above exception, another exception occurred:\n\ntmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_checked_copy_captures_com1')\nphase = 'after_commit', expected = 0.9\n\n    @pytest.mark.parametrize('phase,expected', [('before_commit', .5), ('after_commit', .9)])\n    def test_checked_copy_captures_committed_head_while_source_acknowledgement_is_unresolved(tmp_path, phase, expected):\n        source = backed_source(tmp_path)\n        target = tmp_path / 'copy.sqlite'\n>       with open_bridge(source, rules_id=RULES) as original:\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nsimulation/tests/test_stage_0_5_final_checked_current_copy.py:277: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/contextlib.py:158: in __exit__\n    self.gen.throw(value)\nsimulation/tests/test_stage_0_5_final_world_catalog_bridge.py:113: in open_bridge\n    with session:\n         ^^^^^^^\nsimulation/ate_sim/persistence_lazy.py:18037: in __exit__\n    self.close()\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7fb84972c680>\n\n    def close(self):\n        if not self._active:\n            return\n        if self._lifecycle_operation is not None:\n            raise StoreError(\n                \"lazy close is blocked during \"\n                f\"{self._lifecycle_operation}\"\n            )\n        if self._eager_tracker._cold_step_depth:\n            raise StoreError(\"lazy close requires a completed simulation step\")\n        if self.world.__dict__.get(\"_index_current_people\"):\n            raise StoreError(\n                \"lazy close cannot run inside current_people_scope\"\n            )\n        if self._state == \"recovery-required\":\n>           raise StoreError(\n                \"resolve uncertain lazy save before closing the session\"\n            )\nE           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session\n\nsimulation/ate_sim/persistence_lazy.py:17995: StoreError"
+    },
+    "ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement": {
+      "nodeid": "simulation/tests/test_stage_0_5_final_world_native_event_peers.py::test_native_event_peer_reopens_and_first_edit_publishes_one_body[history]",
+      "trace": "tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_native_event_peer_reopens0')\nfirst = 'history'\n\n    @pytest.mark.parametrize('first', ['history', 'world-log'])\n    def test_native_event_peer_reopens_and_first_edit_publishes_one_body(tmp_path, first):\n        target = with_native_event(tmp_path)\n        with open_bridge(target, rules_id=RULES) as session:\n            activate(session)\n            event = (session.skills[1, 'craft'].provenance[0] if first == 'history' else session.world.events[0])\n            event.kind = 'updated'\n            assert session.skills[1, 'craft'].provenance[0] is session.world.events[0] is event\n            session.save()\n        with open_bridge(target, rules_id=RULES) as session:\n            activate(session)\n>           event = session.skills[1, 'craft'].provenance[0]\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\nsimulation/tests/test_stage_0_5_final_world_native_event_peers.py:32: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nsimulation/ate_sim/persistence_lazy_nested_history.py:1140: in call\n    return original(self, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsimulation/ate_sim/persistence_lazy_nested_history.py:310: in __getitem__\n    value = self._recursive_runtime.decode(value,\nsimulation/ate_sim/persistence_history_runtime.py:788: in decode\n    result = self.load_record(value)\n             ^^^^^^^^^^^^^^^^^^^^^^^\nsimulation/ate_sim/persistence_history_runtime.py:622: in load_record\n    object.__setattr__(result, field, self.decode(child, owner, (('field', field),)))\n                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsimulation/ate_sim/persistence_history_runtime.py:773: in decode\n    rows = coord._owner_changes(owner, ())\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsimulation/ate_sim/persistence_lazy_identity_coordinator.py:297: in _owner_changes\n    checked = self.catalog.read_owner_identity(self.pin, owner)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsimulation/ate_sim/persistence_lazy_identity_catalog.py:672: in read_owner_identity\n    header = self._owner(pin, owner)\n             ^^^^^^^^^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = <ate_sim.persistence_lazy_identity_catalog.IdentityCatalog object at 0x7fb847a4fb90>\npin = GenerationPin(token='a1c13a66-9231-414a-9ba1-4cd40eca20a6', store_identity='2e89c4f9-d65a-4e11-aa66-db0724a02ecb', captured_head=6)\nowner = ('aux.lazy.records.headers', (10, 0))\n\n    def _owner(self, pin, owner):\n        placement_path(*owner, ())\n        scope = getattr(self.store, '_validation_scope', None)\n        marker = (owner[0], self.codec.encode(owner[1]))\n        reusable = scope is not None and self.codec is self.store.codec and scope.can_reuse(self.store, pin)\n        cached = scope.lookup('owner', marker) if reusable else None\n        if cached is not None:\n            return cached\n        header = self._read(pin, OWNER_NAMESPACE, owner)\n        if (type(header) is not tuple or len(header) != 9 or header[0] != 'identity-owner/v1'\n            or type(header[1]) is not bool or header[2] not in ('lazy', 'ordinary') or type(header[3]) is not int\n            or not 0 <= header[3] <= pin.captured_head or type(header[4]) is not int or header[4] < 1\n            or type(header[5]) is not str or len(header[5]) != 64 or type(header[7]) is not int or header[7] < 0\n            or type(header[8]) is not str or len(header[8]) != 64\n            or (header[6] is not None and (type(header[6]) is not bytes or len(header[6]) > 32))):\n            raise StoreIntegrityError('invalid identity owner witness')\n        adapter = AUXILIARY_OWNER_FAMILIES.get(owner[0])\n        if adapter is not None and (header[2] != 'lazy' or header[4] != adapter.record_schema):\n            raise StoreIntegrityError('physical history owner witness has a different schema')\n        # Metadata-only source agreement. A historical ordinary witness is MVCC\n        # metadata, never permission to decode today's overwritten ordinary body.\n        # Old ordinary payload authority remains unavailable through this API.\n        rows = None\n        if header[2] == 'lazy':\n            rows = self.store._interval_rows('lazy_record_versions', 'valid_from,record_schema,payload_checksum',\n                ('namespace', 'typed_key'), (owner[0], self.codec.encode(owner[1])), pin.captured_head,\n                'lazy_record_interval', limit=2)\n        elif pin.captured_head == int(self.store._checked_head_row()[0]):\n            rows = self.store.db.execute('SELECT last_changed_generation,record_schema,payload_checksum FROM records '\n                'WHERE namespace=? AND typed_key=?', (owner[0], self.codec.encode(owner[1]))).fetchall()\n        if rows is not None:\n            self.store._metadata_rows += len(rows)\n            if (header[1] and (len(rows) != 1 or rows[0] != (header[3], header[4], header[5]))) or (not header[1] and rows):\n>               raise StoreIntegrityError('identity owner/header commitment disagreement')\nE               ate_sim.incremental_store.StoreIntegrityError: identity owner/header commitment disagreement\n\nsimulation/ate_sim/persistence_lazy_identity_catalog.py:580: StoreIntegrityError"
+    }
+  }
+}

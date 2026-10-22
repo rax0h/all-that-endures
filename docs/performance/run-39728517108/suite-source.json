@@ -1,0 +1,7 @@
+{
+  "head": "848ebf4bb14bd14ace00ba604f23a61acd967ea4",
+  "platform": "Linux-7.0.0-1017-azure-x86_64-with-glibc2.39",
+  "python": "3.12.15",
+  "runtime_tree": "05262053faf0ed546290753b607a463725e48821",
+  "sqlite": "3.45.1"
+}

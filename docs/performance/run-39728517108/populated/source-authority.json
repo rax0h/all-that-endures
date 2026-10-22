@@ -1,0 +1,26 @@
+{
+  "database": {
+    "bytes": 134066176,
+    "sha256": "5a8f65efab263ddad486c3329d6e3cee1af57760d9e39c28f21ab2db06f438ba"
+  },
+  "pin": {
+    "captured_head": 3,
+    "store_identity": "0749f743-4cff-47c9-b678-85e7446f166f",
+    "token": null
+  },
+  "provenance": {
+    "config": {
+      "mature": true,
+      "seed": 843000
+    },
+    "initial_digest": "acf5e00bc6eb6e5ade53b606635ba0ac5dd7f5909cd7741b1f6b9da9ffe7861f",
+    "kind": "generated-populated-diagnostic",
+    "successor_digest": "6c4b0344ec250e32f812d252a3b0163f36a93c259905a1f7ef1ba8de06d2bec3"
+  },
+  "rules_id": "proof-runtime-populated-diagnostic/1",
+  "schema": "ate-performance-source/1",
+  "world": {
+    "seed": 843000,
+    "year": 0
+  }
+}

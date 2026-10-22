@@ -500,6 +500,20 @@ def freeze_hybrid_publication(store, pin, plan, *, next_incarnation, required_fo
         physical_owners.update((change.owner_namespace, codec.encode(change.owner_key))
                               for change in coord.placement_overlay.values()
                               if change.owner_namespace in AUXILIARY_OWNER_FAMILIES)
+        # A scalar native-record edit preserves placements but changes its
+        # physical header's content commitment. Select that frozen source even
+        # when no structural notification was needed. Earlier scalar-only
+        # headers without a catalog witness must remain unbootstrapped.
+        from .persistence_record_headers import NAMESPACE as RECORD_HEADERS
+        from .persistence_lazy_identity_catalog import OWNER_NAMESPACE
+        for change in all_versions:
+            if change.namespace != RECORD_HEADERS or change.delete:
+                continue
+            marker = change.namespace, codec.encode(change.key)
+            if marker not in physical_owners and (
+                    AUXILIARY_OWNER_FAMILIES[RECORD_HEADERS].reference_placements(change.value)
+                    or store.contains_lazy_key(pin, OWNER_NAMESPACE, (change.namespace, change.key))):
+                physical_owners.add(marker)
         owner_versions = tuple(change for change in all_versions if change.namespace in FAMILIES
                                or (change.namespace, codec.encode(change.key)) in physical_owners)
         if retire_world_backings:

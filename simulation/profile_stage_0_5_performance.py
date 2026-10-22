@@ -254,7 +254,11 @@ def _diagnostics(session):
         if isinstance(value, dict): return {str(k): plain(v) for k,v in value.items()}
         if isinstance(value, (tuple, list)): return [plain(v) for v in value]
         return value
-    return plain(session.diagnostics())
+    snapshot = plain(session.diagnostics())
+    coordinator = getattr(session, '_identity_coordinator', None)
+    if coordinator is not None:
+        snapshot['identity_coordinator'] = plain(coordinator.diagnostics())
+    return snapshot
 
 
 def compare_receipts(baseline, candidate):

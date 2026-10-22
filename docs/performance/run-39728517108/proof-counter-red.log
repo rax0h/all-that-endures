@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________ test_phase_snapshot_retains_route_proof_work_and_residency __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-5/test_phase_snapshot_retains_ro0')
+
+    def test_phase_snapshot_retains_route_proof_work_and_residency(tmp_path):
+        from simulation.profile_stage_0_5_performance import _diagnostics
+        path = complete(tmp_path)
+        with open_lazy_world_session(path, rules_id=RULES) as session:
+            person = session.people[1]
+            person.wealth = .25
+            person.wealth = .5
+>           row = _diagnostics(session)['identity_coordinator']
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'identity_coordinator'
+
+simulation/tests/test_stage_0_5_performance_attribution.py:157: KeyError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_performance_attribution.py::test_phase_snapshot_retains_route_proof_work_and_residency
+1 failed in 1.25s

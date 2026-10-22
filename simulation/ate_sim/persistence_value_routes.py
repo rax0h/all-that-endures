@@ -49,6 +49,8 @@ def eligible(table, obj, field, value):
     from .persistence_record_runtime import _identity_free_scalar
     from .persistence_schema import RECORD_FIELDS
     session = table._session
+    if session._identity_coordinator is None:
+        return False  # Earlier checked formats have no recursive runtime.
     bridge, recursive = session._identity_bridge, session._recursive_histories
     return (bridge is not None and not bridge._synchronizing and not recursive._synchronizing
             and field in RECORD_FIELDS.get(type(obj), ())

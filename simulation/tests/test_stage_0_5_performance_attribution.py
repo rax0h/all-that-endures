@@ -145,3 +145,17 @@ def test_attributed_receipts_bind_the_instrumentation_helper(tmp_path, runner_na
     del changed['attribution_helper_sha256']
     with pytest.raises(ValueError, match='attribution helper'):
         runner.compare_receipts(changed, changed)
+
+
+def test_phase_snapshot_retains_route_proof_work_and_residency(tmp_path):
+    from simulation.profile_stage_0_5_performance import _diagnostics
+    path = complete(tmp_path)
+    with open_lazy_world_session(path, rules_id=RULES) as session:
+        person = session.people[1]
+        person.wealth = .25
+        person.wealth = .5
+        row = _diagnostics(session)['identity_coordinator']
+        assert row['value_routes']['hits'] >= 1
+        assert row['value_routes']['entries'] > 0
+        assert row['value_routes']['bytes'] <= row['value_routes']['byte_limit']
+        assert row['dirty_owners'] > 0

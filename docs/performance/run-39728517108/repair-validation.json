@@ -1,0 +1,26 @@
+{
+  "schema": "ate-proof-runtime-repair/1",
+  "failed_source": "848ebf4bb14bd14ace00ba604f23a61acd967ea4",
+  "runtime_tree": "6f00a6d68bafba1a371e470bfd70024237d8f79a",
+  "verification": {
+    "legacy_record_budget": {
+      "passed": 16,
+      "seconds": 8.64
+    },
+    "native_events_copy_and_value_routes": {
+      "passed": 43,
+      "seconds": 69.2
+    },
+    "publication_abort_proofs_and_harness": {
+      "passed": 72,
+      "seconds": 71.52
+    },
+    "final_harness": {
+      "passed": 23,
+      "seconds": 38.87
+    }
+  },
+  "complete_failed_case_rerun": "incomplete; large-fixture cases delegated to full CI",
+  "full_simulation_suite": "pending new remote run",
+  "accepted": false
+}
