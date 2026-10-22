@@ -56,6 +56,11 @@ class DirtyBackingJournal(dict):
         runtime=getattr(session,'_recursive_histories',None) if session is not None else None
         if runtime is not None:runtime._pending_backings.add(incarnation)
 
+    def value_changed(self, incarnation, backing):
+        # Only a scalar assignment with checked unchanged references uses this
+        # path. Existing structural work for the same ID stays pending.
+        dict.__setitem__(self, incarnation, backing)
+
 
 class RecursiveHistoryRuntime:
     def __init__(self, session):

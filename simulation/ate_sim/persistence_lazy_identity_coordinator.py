@@ -45,7 +45,7 @@ def _heap_size(value, seen=None):
 class IdentityCoordinator:
     def __init__(self, store, pin, registry, *, load_owner, resolve_path, install_path,
                  mark_dirty, preflight, encode_placement=None,
-                 prepare_owner_header=None,
+                 prepare_owner_header=None, mark_value_dirty=None,
                  occurrence_limit=4096, byte_limit=2 * 1024 * 1024):
         if registry.store_identity != store.store_identity:
             raise StoreConflictError('identity coordinator registry belongs to another store')
@@ -58,6 +58,7 @@ class IdentityCoordinator:
         registry.allocator.next_value = max(registry.next_incarnation, self._baseline_allocator)
         self.load_owner, self.resolve_path, self.install_path = load_owner, resolve_path, install_path
         self.mark_dirty, self.preflight = mark_dirty, preflight
+        self.mark_value_dirty = mark_dirty if mark_value_dirty is None else mark_value_dirty
         # Concrete World family adapters compare compact headers. Standalone
         # scalar fixtures retain their checked store codec; no history codec
         # or owner namespace is inferred by the coordinator.
@@ -65,6 +66,8 @@ class IdentityCoordinator:
         self.prepare_owner_header = prepare_owner_header
         self._preparing_headers = False
         self.occurrence_limit, self.byte_limit = occurrence_limit, byte_limit
+        from .persistence_value_routes import ValueRouteCache
+        self.value_routes = ValueRouteCache(self)
         self.discovered_groups = OrderedDict()
         self._cache_occurrences = self._cache_bytes = 0
         self._weights = {}
@@ -91,7 +94,7 @@ class IdentityCoordinator:
         self._cache_bytes -= size
 
     def _trim(self):
-        while (self._cache_occurrences > self.occurrence_limit or self._cache_bytes > self.byte_limit
+        while (self._cache_occurrences > self.occurrence_limit or self._cache_bytes > self.byte_limit-self.value_routes.byte_limit
                or len(self.discovered_groups) > 256):
             key = next((k for k in self.discovered_groups if k[1] not in self.dirty_incarnations), None)
             if key is None:
@@ -162,16 +165,16 @@ class IdentityCoordinator:
         finally:
             self._mutation_depth -= 1
 
-    def routes_for_mutation(self, obj):
+    def routes_for_mutation(self, obj, *, value_only=False):
         with self._mutation():
-            return self._routes_for_mutation(obj)
+            return self._routes_for_mutation(obj, value_only=value_only)
 
     def stitch_for_read(self, obj):
         """Check and canonicalize current peers without granting mutation dirt."""
         with self._mutation():
             return self._routes_for_mutation(obj, mark_dirty=False)
 
-    def _routes_for_mutation(self, obj, *, mark_dirty=True):
+    def _routes_for_mutation(self, obj, *, mark_dirty=True, value_only=False):
         self.preflight()
         if self._prepared is not None:
             raise StoreConflictError('identity coordinator has an unacknowledged frozen plan')
@@ -180,7 +183,7 @@ class IdentityCoordinator:
             return ()
         if incarnation.value in self._routing:
             raise StoreConflictError('reentrant shared mutation routing')
-        group = self.discover_group(incarnation)
+        group = self.discover_group(incarnation, recheck=value_only)
         placements = self._current_placements(group)
         if not placements:
             return ()  # Retained, unowned alias: never resurrect its old owners.
@@ -212,7 +215,7 @@ class IdentityCoordinator:
                 return tuple(owners)
             for owner in owners:
                 self.dirty_owners.add(owner)
-                self.mark_dirty(owner)
+                (self.mark_value_dirty if value_only else self.mark_dirty)(owner)
             self.dirty_incarnations.add(incarnation.value)
             self._value_dirty_groups.add(incarnation.value)
             # Keep actual unsaved source-group witnesses after clean trimming.
@@ -617,6 +620,7 @@ class IdentityCoordinator:
         self.dirty_incarnations.clear()
         self._value_dirty_groups.clear()
         self.discovered_groups.clear()  # bounded clean entries plus actual D/G
+        self.value_routes.clear()
         self._weights.clear()
         self._cache_occurrences = self._cache_bytes = 0
         self._prepared = None
@@ -644,9 +648,10 @@ class IdentityCoordinator:
                 'spill_sqlite_cache_limit_bytes': len(spilled) * 128 * 1024,
                 'discovered_groups': len(self.discovered_groups),
                 'discovered_occurrences': self._cache_occurrences,
-                'identity_cache_python_bytes': self._cache_bytes,
+                'identity_cache_python_bytes': self._cache_bytes+self.value_routes.bytes,
                 'clean_occurrences': self._cache_occurrences - dirty_n,
-                'clean_python_bytes': self._cache_bytes - dirty_bytes,
+                'clean_python_bytes': self._cache_bytes - dirty_bytes+self.value_routes.bytes,
                 'dirty_group_occurrences': dirty_n, 'dirty_group_python_bytes': dirty_bytes,
                 'dirty_owners': len(self.dirty_owners), 'dirty_groups': len(self.dirty_incarnations),
-                'overlay_placements': len(self.placement_overlay), 'group_discoveries': self._discoveries}
+                'overlay_placements': len(self.placement_overlay), 'group_discoveries': self._discoveries,
+                'value_routes': self.value_routes.diagnostics()}

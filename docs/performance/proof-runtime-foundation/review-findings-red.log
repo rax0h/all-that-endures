@@ -1,0 +1,178 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_custom_assignment_preflight_cannot_reuse_scalar_proof[instance-preflight_value] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_custom_assignment_preflig0')
+name = 'preflight_value', placement = 'instance'
+
+    @pytest.mark.parametrize('name', ['preflight_value', 'preflight_change'])
+    @pytest.mark.parametrize('placement', ['instance', 'class'])
+    def test_custom_assignment_preflight_cannot_reuse_scalar_proof(tmp_path, name, placement):
+        path = complete(tmp_path)
+        with open_lazy_world_session(path, rules_id=RULES) as session:
+            table = session.people
+            record = table[1]
+            record.wealth = .4
+            original = getattr(table, name)
+            notified = []
+            def callback(*args):
+                notified.append(args)
+                return original(*(args[1:] if placement == 'class' else args))
+            target = type(table) if placement == 'class' else table
+            with patch.object(target, name, callback):
+                with patch.object(session, '_shared_object_routes', wraps=session._shared_object_routes) as routes:
+                    record.wealth = .75
+>                   assert routes.call_count >= 1
+E                   AssertionError: assert 0 >= 1
+E                    +  where 0 = <MagicMock name='_shared_object_routes' id='140369893076640'>.call_count
+
+simulation/tests/test_stage_0_5_value_topology_reuse.py:193: AssertionError
+_ test_custom_assignment_preflight_cannot_reuse_scalar_proof[instance-preflight_change] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_custom_assignment_preflig1')
+name = 'preflight_change', placement = 'instance'
+
+    @pytest.mark.parametrize('name', ['preflight_value', 'preflight_change'])
+    @pytest.mark.parametrize('placement', ['instance', 'class'])
+    def test_custom_assignment_preflight_cannot_reuse_scalar_proof(tmp_path, name, placement):
+        path = complete(tmp_path)
+        with open_lazy_world_session(path, rules_id=RULES) as session:
+            table = session.people
+            record = table[1]
+            record.wealth = .4
+            original = getattr(table, name)
+            notified = []
+            def callback(*args):
+                notified.append(args)
+                return original(*(args[1:] if placement == 'class' else args))
+            target = type(table) if placement == 'class' else table
+            with patch.object(target, name, callback):
+                with patch.object(session, '_shared_object_routes', wraps=session._shared_object_routes) as routes:
+                    record.wealth = .75
+>                   assert routes.call_count >= 1
+E                   AssertionError: assert 0 >= 1
+E                    +  where 0 = <MagicMock name='_shared_object_routes' id='140369881883920'>.call_count
+
+simulation/tests/test_stage_0_5_value_topology_reuse.py:193: AssertionError
+_ test_custom_assignment_preflight_cannot_reuse_scalar_proof[class-preflight_value] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_custom_assignment_preflig2')
+name = 'preflight_value', placement = 'class'
+
+    @pytest.mark.parametrize('name', ['preflight_value', 'preflight_change'])
+    @pytest.mark.parametrize('placement', ['instance', 'class'])
+    def test_custom_assignment_preflight_cannot_reuse_scalar_proof(tmp_path, name, placement):
+        path = complete(tmp_path)
+        with open_lazy_world_session(path, rules_id=RULES) as session:
+            table = session.people
+            record = table[1]
+            record.wealth = .4
+            original = getattr(table, name)
+            notified = []
+            def callback(*args):
+                notified.append(args)
+                return original(*(args[1:] if placement == 'class' else args))
+            target = type(table) if placement == 'class' else table
+            with patch.object(target, name, callback):
+                with patch.object(session, '_shared_object_routes', wraps=session._shared_object_routes) as routes:
+                    record.wealth = .75
+>                   assert routes.call_count >= 1
+E                   AssertionError: assert 0 >= 1
+E                    +  where 0 = <MagicMock name='_shared_object_routes' id='140369881839760'>.call_count
+
+simulation/tests/test_stage_0_5_value_topology_reuse.py:193: AssertionError
+_ test_custom_assignment_preflight_cannot_reuse_scalar_proof[class-preflight_change] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_custom_assignment_preflig3')
+name = 'preflight_change', placement = 'class'
+
+    @pytest.mark.parametrize('name', ['preflight_value', 'preflight_change'])
+    @pytest.mark.parametrize('placement', ['instance', 'class'])
+    def test_custom_assignment_preflight_cannot_reuse_scalar_proof(tmp_path, name, placement):
+        path = complete(tmp_path)
+        with open_lazy_world_session(path, rules_id=RULES) as session:
+            table = session.people
+            record = table[1]
+            record.wealth = .4
+            original = getattr(table, name)
+            notified = []
+            def callback(*args):
+                notified.append(args)
+                return original(*(args[1:] if placement == 'class' else args))
+            target = type(table) if placement == 'class' else table
+            with patch.object(target, name, callback):
+                with patch.object(session, '_shared_object_routes', wraps=session._shared_object_routes) as routes:
+                    record.wealth = .75
+>                   assert routes.call_count >= 1
+E                   AssertionError: assert 0 >= 1
+E                    +  where 0 = <MagicMock name='_shared_object_routes' id='140369882310576'>.call_count
+
+simulation/tests/test_stage_0_5_value_topology_reuse.py:193: AssertionError
+_ test_attributed_receipts_bind_the_instrumentation_helper[stage_0_5_mature_step_save] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_attributed_receipts_bind_0')
+runner_name = 'stage_0_5_mature_step_save'
+
+    @pytest.mark.parametrize('runner_name', ['stage_0_5_mature_step_save', 'profile_stage_0_5_performance'])
+    def test_attributed_receipts_bind_the_instrumentation_helper(tmp_path, runner_name):
+        import copy
+        import importlib
+        from pathlib import Path
+        from simulation import continuation_receipts as receipts
+        runner = importlib.import_module('simulation.' + runner_name)
+        path = fixture(tmp_path, 16)
+        authority = source_authority(path)
+        kwargs = dict(seconds=30, expected_sha256=authority['database']['sha256'],
+                      authority=authority, attributed=True)
+        if hasattr(runner, 'run_phase'):
+            result = runner.run_phase(path, tmp_path/'result', phase='open', **kwargs)
+        else:
+            result = runner.run(path, tmp_path/'result', **kwargs)
+        assert result['status'] == 'complete', result
+        helper = Path(runner.__file__).with_name('performance_attribution.py')
+>       assert result.get('attribution_helper_sha256') == receipts.file_hash(helper)
+E       AssertionError: assert None == 'bff79f26022b68310676299559dc82b1024659a487616efea0eb75d14cb90c13'
+E        +  where None = <built-in method get of dict object at 0x7faa68ddcbc0>('attribution_helper_sha256')
+E        +    where <built-in method get of dict object at 0x7faa68ddcbc0> = {'schema': 'ate-mature-step-save/1', 'status': 'complete', 'source': {'schema': 'ate-performance-source/1', 'database'..., 'captured_head': 3}, ...}, 'harness_sha256': '3cbae2458714388a622ebe5c979e3e9d9a0bda2d7f24f4de1b72bfd36908a4e6', ...}.get
+E        +  and   'bff79f26022b68310676299559dc82b1024659a487616efea0eb75d14cb90c13' = <function file_hash at 0x7faa691a3420>(PosixPath('/workspace/scratch/7905b656a1e1/ate-proof-implementation/simulation/performance_attribution.py'))
+E        +    where <function file_hash at 0x7faa691a3420> = <module 'simulation.continuation_receipts' from '/workspace/scratch/7905b656a1e1/ate-proof-implementation/simulation/continuation_receipts.py'>.file_hash
+
+simulation/tests/test_stage_0_5_performance_attribution.py:139: AssertionError
+_ test_attributed_receipts_bind_the_instrumentation_helper[profile_stage_0_5_performance] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_attributed_receipts_bind_1')
+runner_name = 'profile_stage_0_5_performance'
+
+    @pytest.mark.parametrize('runner_name', ['stage_0_5_mature_step_save', 'profile_stage_0_5_performance'])
+    def test_attributed_receipts_bind_the_instrumentation_helper(tmp_path, runner_name):
+        import copy
+        import importlib
+        from pathlib import Path
+        from simulation import continuation_receipts as receipts
+        runner = importlib.import_module('simulation.' + runner_name)
+        path = fixture(tmp_path, 16)
+        authority = source_authority(path)
+        kwargs = dict(seconds=30, expected_sha256=authority['database']['sha256'],
+                      authority=authority, attributed=True)
+        if hasattr(runner, 'run_phase'):
+            result = runner.run_phase(path, tmp_path/'result', phase='open', **kwargs)
+        else:
+            result = runner.run(path, tmp_path/'result', **kwargs)
+        assert result['status'] == 'complete', result
+        helper = Path(runner.__file__).with_name('performance_attribution.py')
+>       assert result.get('attribution_helper_sha256') == receipts.file_hash(helper)
+E       AssertionError: assert None == 'bff79f26022b68310676299559dc82b1024659a487616efea0eb75d14cb90c13'
+E        +  where None = <built-in method get of dict object at 0x7faa6900ca00>('attribution_helper_sha256')
+E        +    where <built-in method get of dict object at 0x7faa6900ca00> = {'schema': 'ate-performance-phase/1', 'status': 'complete', 'source': {'schema': 'ate-performance-source/1', 'database...80c51adc', 'store_identity': '79b779c2-29d8-48d1-9de1-c4ab726a0dbd', 'captured_head': 3}, ...}, 'profiled': False, ...}.get
+E        +  and   'bff79f26022b68310676299559dc82b1024659a487616efea0eb75d14cb90c13' = <function file_hash at 0x7faa691a3420>(PosixPath('/workspace/scratch/7905b656a1e1/ate-proof-implementation/simulation/performance_attribution.py'))
+E        +    where <function file_hash at 0x7faa691a3420> = <module 'simulation.continuation_receipts' from '/workspace/scratch/7905b656a1e1/ate-proof-implementation/simulation/continuation_receipts.py'>.file_hash
+
+simulation/tests/test_stage_0_5_performance_attribution.py:139: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_value_topology_reuse.py::test_custom_assignment_preflight_cannot_reuse_scalar_proof[instance-preflight_value]
+FAILED simulation/tests/test_stage_0_5_value_topology_reuse.py::test_custom_assignment_preflight_cannot_reuse_scalar_proof[instance-preflight_change]
+FAILED simulation/tests/test_stage_0_5_value_topology_reuse.py::test_custom_assignment_preflight_cannot_reuse_scalar_proof[class-preflight_value]
+FAILED simulation/tests/test_stage_0_5_value_topology_reuse.py::test_custom_assignment_preflight_cannot_reuse_scalar_proof[class-preflight_change]
+FAILED simulation/tests/test_stage_0_5_performance_attribution.py::test_attributed_receipts_bind_the_instrumentation_helper[stage_0_5_mature_step_save]
+FAILED simulation/tests/test_stage_0_5_performance_attribution.py::test_attributed_receipts_bind_the_instrumentation_helper[profile_stage_0_5_performance]
+6 failed in 3.83s

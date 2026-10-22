@@ -1,0 +1,88 @@
+FFFF.....                                                                [100%]
+=================================== FAILURES ===================================
+_ test_repeated_scalar_edits_reuse_checked_topology_and_publish_exact_value[people-1-wealth] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_repeated_scalar_edits_reu0')
+family = 'people', key = 1, field = 'wealth'
+
+    @pytest.mark.parametrize('family,key,field', [
+        ('people',1,'wealth'), ('motives',1,'safety'), ('skills',(1,'craft'),'level'),
+    ])
+    def test_repeated_scalar_edits_reuse_checked_topology_and_publish_exact_value(tmp_path, family, key, field):
+        path=complete(tmp_path)
+        with open_lazy_world_session(path,rules_id=RULES) as session:
+            table=getattr(session,family);record=table[key]
+            bridge=session._identity_bridge
+            with patch.object(session,'_shared_object_routes',wraps=session._shared_object_routes) as routes:
+                with patch.object(bridge,'_synchronize_owner',wraps=bridge._synchronize_owner) as projections:
+                    for value in (.25,.5,.75):setattr(record,field,value)
+>           assert routes.call_count == 1
+E           AssertionError: assert 3 == 1
+E            +  where 3 = <MagicMock name='_shared_object_routes' id='139726203388848'>.call_count
+
+simulation/tests/test_stage_0_5_value_topology_reuse.py:23: AssertionError
+_ test_repeated_scalar_edits_reuse_checked_topology_and_publish_exact_value[motives-1-safety] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_repeated_scalar_edits_reu1')
+family = 'motives', key = 1, field = 'safety'
+
+    @pytest.mark.parametrize('family,key,field', [
+        ('people',1,'wealth'), ('motives',1,'safety'), ('skills',(1,'craft'),'level'),
+    ])
+    def test_repeated_scalar_edits_reuse_checked_topology_and_publish_exact_value(tmp_path, family, key, field):
+        path=complete(tmp_path)
+        with open_lazy_world_session(path,rules_id=RULES) as session:
+            table=getattr(session,family);record=table[key]
+            bridge=session._identity_bridge
+            with patch.object(session,'_shared_object_routes',wraps=session._shared_object_routes) as routes:
+                with patch.object(bridge,'_synchronize_owner',wraps=bridge._synchronize_owner) as projections:
+                    for value in (.25,.5,.75):setattr(record,field,value)
+>           assert routes.call_count == 1
+E           AssertionError: assert 3 == 1
+E            +  where 3 = <MagicMock name='_shared_object_routes' id='139726202495072'>.call_count
+
+simulation/tests/test_stage_0_5_value_topology_reuse.py:23: AssertionError
+_ test_repeated_scalar_edits_reuse_checked_topology_and_publish_exact_value[skills-key2-level] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_repeated_scalar_edits_reu2')
+family = 'skills', key = (1, 'craft'), field = 'level'
+
+    @pytest.mark.parametrize('family,key,field', [
+        ('people',1,'wealth'), ('motives',1,'safety'), ('skills',(1,'craft'),'level'),
+    ])
+    def test_repeated_scalar_edits_reuse_checked_topology_and_publish_exact_value(tmp_path, family, key, field):
+        path=complete(tmp_path)
+        with open_lazy_world_session(path,rules_id=RULES) as session:
+            table=getattr(session,family);record=table[key]
+            bridge=session._identity_bridge
+            with patch.object(session,'_shared_object_routes',wraps=session._shared_object_routes) as routes:
+                with patch.object(bridge,'_synchronize_owner',wraps=bridge._synchronize_owner) as projections:
+                    for value in (.25,.5,.75):setattr(record,field,value)
+>           assert routes.call_count == 1
+E           AssertionError: assert 3 == 1
+E            +  where 3 = <MagicMock name='_shared_object_routes' id='139726202542880'>.call_count
+
+simulation/tests/test_stage_0_5_value_topology_reuse.py:23: AssertionError
+___ test_scalar_edits_keep_unloaded_alias_and_do_not_recreate_deleted_owner ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_scalar_edits_keep_unloade0')
+
+    def test_scalar_edits_keep_unloaded_alias_and_do_not_recreate_deleted_owner(tmp_path):
+        path=shared_motives(tmp_path)
+        with open_lazy_world_session(path,rules_id=RULES) as session:
+            record=session.motives[1]
+            record.safety=.4
+            assert session.motives[2] is record
+            with patch.object(session,'_shared_object_routes',wraps=session._shared_object_routes) as routes:
+                record.safety=.5
+>               assert routes.call_count == 0
+E               AssertionError: assert 1 == 0
+E                +  where 1 = <MagicMock name='_shared_object_routes' id='139726211964832'>.call_count
+
+simulation/tests/test_stage_0_5_value_topology_reuse.py:39: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_value_topology_reuse.py::test_repeated_scalar_edits_reuse_checked_topology_and_publish_exact_value[people-1-wealth]
+FAILED simulation/tests/test_stage_0_5_value_topology_reuse.py::test_repeated_scalar_edits_reuse_checked_topology_and_publish_exact_value[motives-1-safety]
+FAILED simulation/tests/test_stage_0_5_value_topology_reuse.py::test_repeated_scalar_edits_reuse_checked_topology_and_publish_exact_value[skills-key2-level]
+FAILED simulation/tests/test_stage_0_5_value_topology_reuse.py::test_scalar_edits_keep_unloaded_alias_and_do_not_recreate_deleted_owner
+4 failed, 5 passed in 4.94s

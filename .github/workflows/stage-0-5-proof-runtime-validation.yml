@@ -1,0 +1,87 @@
+name: Stage 0.5 proof runtime validation
+'on':
+  push:
+    branches: [sol/incremental-state-proofs]
+    paths:
+      - simulation/ate_sim/**
+      - simulation/tests/**
+      - simulation/performance_attribution.py
+      - simulation/profile_stage_0_5_performance.py
+      - simulation/stage_0_5_mature_step_save.py
+      - .github/tests/run_proof_runtime_workload.py
+      - .github/workflows/stage-0-5-proof-runtime-validation.yml
+permissions:
+  contents: read
+concurrency:
+  group: stage-0-5-proof-runtime-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  PYTHONPATH: .:simulation
+  PYTHONUNBUFFERED: '1'
+jobs:
+  full-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest pyyaml
+      - name: Record execution source and run the complete simulation suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python - <<'PY'
+          import platform, sqlite3, subprocess
+          from pathlib import Path
+          from simulation import continuation_receipts as r
+          def git(*args): return subprocess.check_output(['git', *args], text=True).strip()
+          dirty=git('status','--porcelain','--untracked-files=no')
+          if dirty: raise ValueError('tracked execution source is dirty')
+          r.publish_receipt(Path('evidence/source.json'),dict(head=git('rev-parse','HEAD'),
+              runtime_tree=git('rev-parse','HEAD:simulation/ate_sim'),
+              python=platform.python_version(),sqlite=sqlite3.sqlite_version,platform=platform.platform()))
+          PY
+          timeout --signal=TERM --kill-after=30s 135m python -m pytest -q simulation/tests --durations=30 -o junit_family=legacy --junitxml=evidence/full-suite.xml 2>&1 | tee evidence/full-suite.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-0-5-proof-runtime-suite-${{ github.sha }}
+          path: evidence
+          retention-days: 14
+          if-no-files-found: error
+  populated-workload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          ref: 5521c094981c9a5f28f1d076453264291b534ff5
+          path: baseline
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest pyyaml
+      - name: Compare a bounded populated workload and verify both saved successors
+        working-directory: candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout --signal=TERM --kill-after=30s 35m python .github/tests/run_proof_runtime_workload.py --workspace "$GITHUB_WORKSPACE" --output "$GITHUB_WORKSPACE/evidence"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stage-0-5-proof-runtime-populated-${{ github.sha }}
+          path: |
+            evidence/**/*.json
+            evidence/*.log
+          retention-days: 14
+          if-no-files-found: error

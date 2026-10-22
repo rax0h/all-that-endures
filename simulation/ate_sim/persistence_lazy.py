@@ -3483,15 +3483,32 @@ class LazyRecordTable(RecordTable):
         from .persistence_schema import RECORD_FIELDS
         self._indexed_assignment_revision = getattr(self, '_indexed_assignment_revision', 0) + 1
         preflight = self.preflight_shared_record
-        routes = preflight(record)
+        from .persistence_value_routes import eligible, ordinary_route_hooks
+        value_only = eligible(self, record, field, value)
+        if value_only:
+            session = self._session
+            routes = session._identity_coordinator.value_routes.get(session, record)
+            if routes is None:
+                routes = session._shared_object_routes(record, value_only=True)
+        else:
+            routes = preflight(record)
         if (self._session._identity_coordinator is not None
                 and field in RECORD_FIELDS.get(type(record), ()) and type(routes) is tuple
-                and getattr(preflight, '__func__', None) is LazyRecordTable.preflight_shared_record
-                and getattr(self.shared_record_changed, '__func__', None) is LazyRecordTable.shared_record_changed
+                and ordinary_route_hooks(self)
                 and _identity_free_scalar(getattr(record, field, None)) and _identity_free_scalar(value)):
             return IndexedAssignmentRouteTicket(record, field, self._indexed_assignment_revision,
-                _assignment_epoch(self._session), routes, self, value)
+                _assignment_epoch(self._session), routes, self, value, value_only)
         return None
+
+    def _changed_after_indexed_assignment(self, record, field, ticket):
+        from .persistence_value_routes import eligible, value_notification
+        if (ticket is not None and ticket.value_only
+                and eligible(self, record, field, getattr(record, field))
+                and ticket.matches(self, record, field, self._session)):
+            with value_notification(self._session, (self._namespace, record._index_key)):
+                self.changed(record._index_key, field)
+        else:
+            self.changed(record._index_key, field)
 
     def _after_indexed_assignment(self, record, field, ticket):
         if ticket is None:
@@ -3499,26 +3516,34 @@ class LazyRecordTable(RecordTable):
             return
         session = self._session
         bridge, recursive = session._identity_bridge, session._recursive_histories
+        from .persistence_value_routes import ordinary_route_hooks
         if not bridge._synchronizing and not recursive._synchronizing:
             self._ensure_mutation()
             bridge.synchronize_lazy_placements()
             if (not bridge._pending_owners and not recursive._pending_backings
-                    and getattr(self.shared_record_changed, '__func__', None) is LazyRecordTable.shared_record_changed
+                    and ordinary_route_hooks(self)
                     and ticket.matches(self, record, field, session)):
-                self._mark_shared_record_routes(record, ticket.routes)
+                self._mark_shared_record_routes(record, ticket.routes, value_only=ticket.value_only)
+                if ticket.value_only:
+                    session._identity_coordinator.value_routes.remember(session, record, ticket.routes)
                 return
         self.shared_record_changed(record)
 
     def shared_record_changed(self, record):
         self._mark_shared_record_routes(record, self._session._shared_object_routes(record))
 
-    def _mark_shared_record_routes(self, record, routes):
+    def _mark_shared_record_routes(self, record, routes, *, value_only=False):
         for table, key in routes:
             # IndexedRecord already delivered its exact field notification to
             # this owner. Repeating it with field=None would turn a scalar
             # advancement write into a full identity-graph reconciliation.
             if table is not self or key != record.__dict__.get('_index_key'):
-                table.changed(key)
+                from .persistence_value_routes import ordinary_table, value_notification
+                if value_only and ordinary_table(table):
+                    with value_notification(self._session, (table._namespace, key)):
+                        table.changed(key)
+                else:
+                    table.changed(key)
 
     def _retain_dirty_owner(self, key):
         # Called after a mutation notification. Dirty residency is an actual
@@ -10929,7 +10954,7 @@ class LazyWorldSession:
         if not self._active:
             raise StoreError("lazy World session is closed")
 
-    def _shared_object_routes(self, obj, *, placements_synchronized=False):
+    def _shared_object_routes(self, obj, *, placements_synchronized=False, value_only=False):
         """Check and load only current owners of one live incarnation.
 
         Loading a peer binds its mutable paths to the existing object, before
@@ -10942,7 +10967,7 @@ class LazyWorldSession:
         if self._identity_coordinator is not None:
             if not placements_synchronized:
                 self._identity_bridge.synchronize_lazy_placements()
-            owners = self._identity_coordinator.routes_for_mutation(obj)
+            owners = self._identity_coordinator.routes_for_mutation(obj, value_only=value_only)
             return tuple((self._family_bindings.tables[namespace], key)
                          for namespace, key in owners if namespace in self._family_bindings.tables)
         incarnation = self._registry.incarnation_for_object(obj)
@@ -18309,3 +18334,8 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
         store.close()
         raise
 
+
+# Pin the implementation callbacks, not whatever class methods a later caller
+# installs. Class-level and instance-level custom hooks use checked fallbacks.
+from .persistence_value_routes import register_callbacks as _register_value_callbacks
+_register_value_callbacks(globals())

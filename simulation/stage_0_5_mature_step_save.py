@@ -8,6 +8,7 @@ the exact persisted year-1002 state.
 from __future__ import annotations
 
 import argparse
+from contextlib import nullcontext
 from dataclasses import asdict
 import importlib.util
 import json
@@ -41,7 +42,7 @@ def _world(session):
     return base._world(session)
 
 
-def run(source, output, *, seconds, expected_sha256, authority):
+def run(source, output, *, seconds, expected_sha256, authority, attributed=False):
     if type(seconds) not in (int, float) or not math.isfinite(seconds) or seconds <= 0:
         raise ValueError('seconds must be finite and positive')
     source, output = Path(source).resolve(), Path(output).resolve()
@@ -51,12 +52,15 @@ def run(source, output, *, seconds, expected_sha256, authority):
     result = {'schema': 'ate-mature-step-save/1', 'status': 'error',
               'source': r.plain(authority), 'harness_sha256': r.file_hash(__file__),
               'common_harness_sha256': r.file_hash(_common_path),
+              'instrumentation': 'attribution-v1' if attributed else 'none',
+              'attribution_helper_sha256': base._attribution_helper_sha256() if attributed else None,
               'runtime': base._runtime_identity(),
               'machine': {'platform': platform.platform(), 'processor': platform.processor(),
                           'python': platform.python_version(), 'sqlite': sqlite3.sqlite_version,
                           'cpu_count': os.cpu_count()},
               'budget_seconds': seconds, 'phases': {}, 'unavailable': ['phase_peak_rss']}
     session = None
+    trace = base._attribution() if attributed else None
     old_handler = signal.getsignal(signal.SIGALRM)
     old_timer = signal.getitimer(signal.ITIMER_REAL)
     if old_timer[0]:
@@ -66,13 +70,16 @@ def run(source, output, *, seconds, expected_sha256, authority):
         raise base.BudgetExpired('mature step/save run budget exhausted')
 
     def measure(name, operation):
+        nonlocal session
         if session is not None:
             session.store.reset_diagnostics()
         started, cpu, rss = time.perf_counter(), time.process_time(), base._rss()
         row = {'status': 'error', 'rss_start_bytes': rss}
         result['phases'][name] = row
         try:
-            value = operation()
+            with trace.phase(name) if trace is not None else nullcontext():
+                value = operation()
+                if name == 'open': session = value
             row['status'] = 'complete'
             return value
         except base.BudgetExpired:
@@ -85,8 +92,15 @@ def run(source, output, *, seconds, expected_sha256, authority):
             if session is not None:
                 row['io'] = asdict(session.store.diagnostics())
                 row['working_set'] = r.plain(base._diagnostics(session))
+            if trace is not None:
+                row['attribution'] = trace.snapshot()
+            # A later hard exit must not discard already measured phases. This
+            # progress record is deliberately distinct from an accepted result.
+            r.publish_receipt(output / f'phase-progress-{name}.json', {
+                'schema': 'ate-performance-progress/1', 'measurement': r.plain(result)})
 
     try:
+        if trace is not None: trace.__enter__()
         signal.signal(signal.SIGALRM, expired)
         signal.setitimer(signal.ITIMER_REAL, seconds)
         base._verify_authority(source, expected_sha256, authority)
@@ -133,6 +147,8 @@ def run(source, output, *, seconds, expected_sha256, authority):
                 session.close()
         except Exception as exc:
             result.update(status='error', close_error=f'{type(exc).__name__}: {exc}')
+        finally:
+            if trace is not None: trace.__exit__(None, None, None)
         try:
             result['source_unchanged'] = r.file_hash(source) == expected_sha256
             if not result['source_unchanged']:
@@ -232,6 +248,9 @@ def compare_receipts(baseline, candidate):
         raise ValueError('comparison harness differs')
     if baseline['common_harness_sha256'] != candidate['common_harness_sha256']:
         raise ValueError('comparison common helper differs')
+    if baseline.get('instrumentation', 'none') != candidate.get('instrumentation', 'none'):
+        raise ValueError('comparison instrumentation differs')
+    base._compare_attribution_helpers(baseline, candidate)
     if baseline['machine'] != candidate['machine']:
         raise ValueError('comparison machine/runtime instrumentation differs')
     for label in ('initial', 'saved', 'final'):
@@ -269,6 +288,7 @@ def main():
     run_parser.add_argument('--seconds', type=float, required=True)
     run_parser.add_argument('--expected-sha256', required=True)
     run_parser.add_argument('--authority', type=Path, required=True)
+    run_parser.add_argument('--attributed', action='store_true')
     verify_parser = sub.add_parser('verify')
     verify_parser.add_argument('database', type=Path)
     verify_parser.add_argument('output', type=Path)
@@ -288,7 +308,7 @@ def main():
     if args.command == 'run':
         result = run(args.source, args.output, seconds=args.seconds,
                      expected_sha256=args.expected_sha256,
-                     authority=r.load_receipt(args.authority))
+                     authority=r.load_receipt(args.authority), attributed=args.attributed)
         receipt_path = args.output / 'result.json'
     elif args.command == 'verify':
         result = verify_checkpoint(args.database, args.output,

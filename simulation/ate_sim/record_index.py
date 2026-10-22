@@ -30,7 +30,11 @@ class IndexedRecord:
                         shared_preflight(self)
         object.__setattr__(self, name, value)
         if table is not None:
-            table.changed(self._index_key, name)
+            changed_after_assignment = getattr(table, '_changed_after_indexed_assignment', None)
+            if changed_after_assignment is None:
+                table.changed(self._index_key, name)
+            else:
+                changed_after_assignment(self, name, assignment_token)
             if assignment_preflight is not None:
                 table._after_indexed_assignment(self, name, assignment_token)
             else:

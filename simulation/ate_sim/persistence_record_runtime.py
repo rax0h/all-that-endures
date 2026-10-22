@@ -47,9 +47,15 @@ class AssignmentRouteTicket:
 
 
 @dataclass(frozen=True)
+class ValueAssignmentRouteTicket(AssignmentRouteTicket):
+    """Scalar-only native assignment; its checked routes can be retained."""
+
+
+@dataclass(frozen=True)
 class IndexedAssignmentRouteTicket(AssignmentRouteTicket):
     table: object
     assigned: object
+    value_only: bool = False
 
     def matches(self, table, obj, field, session):
         # The caller first reconciles all pending placements. Only the final
@@ -135,13 +141,16 @@ class RecordBacking:
         self._base_bytes = self._store.codec.encode(self._header)
         self._dirty_record = None
 
-    def changed(self):
+    def changed(self, *, value_only=False):
         session = self._runtime.session()
         self._dirty_record = self.canonical()
         self._runtime.retain_pending_children(self)
         # Register actual D, including a private unowned alias. Preparation
         # selects owning payloads; private edits never resurrect an old owner.
-        session._nested_dirty[self._incarnation] = self
+        if value_only:
+            session._nested_dirty.value_changed(self._incarnation, self)
+        else:
+            session._nested_dirty[self._incarnation] = self
 
 
 class RecordBinding:
@@ -213,10 +222,19 @@ class RecordBinding:
         runtime.check_assignment_cycle(obj, value)
         session = runtime.session()
         old = getattr(obj, name)
-        routes = session._shared_object_routes(obj)
+        from .record_index import IndexedRecord
+        value_only = (not isinstance(obj, IndexedRecord) and session._identity_coordinator is not None
+                      and type(self) is RecordBinding
+                      and getattr(self.before_assignment, '__func__', None) is _NATIVE_BEFORE_ASSIGNMENT
+                      and getattr(self.after_assignment, '__func__', None) is _NATIVE_AFTER_ASSIGNMENT
+                      and _identity_free_scalar(old) and _identity_free_scalar(value))
+        routes = session._identity_coordinator.value_routes.get(session, obj) if value_only else None
+        if routes is None:
+            routes = session._shared_object_routes(obj, value_only=True) if value_only else session._shared_object_routes(obj)
         stored = runtime._admit_validated(value)
         assigned = runtime.admitted_value(stored)
-        ticket = (AssignmentRouteTicket(obj, name, self._assignment_revision,
+        ticket_type = ValueAssignmentRouteTicket if value_only else AssignmentRouteTicket
+        ticket = (ticket_type(obj, name, self._assignment_revision,
                     _assignment_epoch(session), routes)
                   if _identity_free_scalar(old) and _identity_free_scalar(assigned) else None)
         return 'owned', name, stored, ticket, assigned
@@ -230,18 +248,32 @@ class RecordBinding:
         if token[0] != 'event-state':
             fields[RECORD_FIELDS[type(obj)].index(name)] = token[2]
         backing._header = record_header(obj, values=tuple(fields))
-        backing.changed()
+        ticket = token[3] if token[0] == 'owned' else None
+        session = backing._runtime.session()
+        value_only = type(ticket) is ValueAssignmentRouteTicket and ticket.matches(self, obj, name, session)
+        backing.changed(value_only=value_only)
         backing._runtime.invalidate_advancement_ancestors(obj)
         session = backing._runtime.session()
-        ticket = token[3] if token[0] == 'owned' else None
         routes = (ticket.routes if ticket is not None and ticket.matches(self, obj, name, session)
                   else session._shared_object_routes(obj))
+        from .persistence_value_routes import ordinary_table, value_notification
+        value_only = type(ticket) is ValueAssignmentRouteTicket and ticket.matches(self, obj, name, session)
         for table, key in routes:
-            table.changed(key)
+            if value_only and ordinary_table(table):
+                with value_notification(session, (table._namespace, key)):
+                    table.changed(key)
+            else:
+                table.changed(key)
         self.session._mark_many(session._nested_eager_owners(obj))
+        if value_only:
+            session._identity_coordinator.value_routes.remember(session, obj, routes)
 
     def event_sealed(self, event):
         self.session._event_sealed(event)
+
+
+_NATIVE_BEFORE_ASSIGNMENT = RecordBinding.before_assignment
+_NATIVE_AFTER_ASSIGNMENT = RecordBinding.after_assignment
 
 
 def bind_record(runtime, record, incarnation, header, *, new):

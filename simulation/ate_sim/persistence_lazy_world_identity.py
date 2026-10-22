@@ -79,13 +79,25 @@ class WorldIdentityBridge:
             install_path=bindings.install_path, mark_dirty=self._mark_dirty,
             preflight=session._ensure_people_mutation_allowed,
             encode_placement=bindings.encode_placement,
-            prepare_owner_header=bindings.unchanged_owner_header)
+            prepare_owner_header=bindings.unchanged_owner_header,
+            mark_value_dirty=self._mark_value_dirty)
 
     def note_owner(self,owner):
+        if owner == getattr(self, '_value_owner_notification', None):
+            return  # Proven scalar value dirt cannot alter this placement graph.
         if owner == (AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KEY) and self._marking_packed_payload:
             return  # The coordinator already reconciled this physical owner.
         self._pending_owners.add(owner)
         self.placement_revision+=1
+
+    def _mark_value_dirty(self, owner):
+        from .persistence_value_routes import ordinary_table, value_notification
+        session = self._session_ref()
+        table = session._family_bindings.tables.get(owner[0])
+        if table is None or not ordinary_table(table):
+            return self._mark_dirty(owner)
+        with value_notification(session, owner):
+            return self._mark_dirty(owner)
 
     def mark_scalar_action_assignment(self, obj, old, new, owners):
         from .agency import ActionRecord
