@@ -59,8 +59,8 @@
 
 - [ ] Run the full simulation suite on the final runtime, retaining JUnit/log evidence. Do not repeat the 30-GB comparison before the attributed work warrants it.
 - [x] Obtain a fresh-context final code review as required by executing-plans; fix important findings with red/green checks.
-- [ ] Publish only task-owned changes over the current remote head using a nonforced lease; leave unrelated handoffs intact.
-- [ ] Continue to a separate durable-transition-proof plan: exact immutable node/manifest format, copy upgrade, atomic data/root publication, complete index/absence proofs, old-pin retention and recovery. This foundation must not be called the durable proof system or target completion.
+- [x] Publish only task-owned changes over the current remote head using a nonforced lease; leave unrelated handoffs intact.
+- [x] Continue to a separate durable-transition-proof plan: exact immutable node/manifest format, copy upgrade, atomic data/root publication, complete index/absence proofs, old-pin retention and recovery. This foundation must not be called the durable proof system or target completion.
 
 ## Initial baseline and decisions
 
@@ -69,3 +69,5 @@
 - Baseline targeted assignment/owner-witness suites: 41 passed in 17.71 seconds.
 - Test command prefix: `PYTHONPATH=/workspace/scratch/7905b656a1e1/review-venv/lib/python3.12/site-packages:.:simulation python -m pytest` (existing environment packages; no dependency installation).
 - Ruling: execute inline after writing/self-reviewing this plan because the user's current instruction explicitly authorizes Sol to implement Astra's outline efficiently; do not ask them to reauthorize routine preparation.
+
+Published candidate `848ebf4bb14bd14ace00ba604f23a61acd967ea4`; full suite/populated validation [39728517108](https://github.com/rax0h/all-that-endures/actions/runs/39728517108) is pending. Next: [durable proof map foundation](2026-10-22-ate-durable-proof-map-foundation.md).
