@@ -40,3 +40,7 @@ The diagnostic intentionally retains obsolete/intermediate immutable nodes. At 1
 The primitive does not yet provide immutable content-leaf bindings for existing versioned rows, complete topology/query/order roots, generation manifests, verified copy upgrade, atomic root/head/recovery publication, action admission or resumable scrubbing. Those are the remaining architecture requirements. Preserve canonical digest and exact identity/RNG/order semantics while integrating them.
 
 See the [integration handoff](proof-map-foundation/NEXT_INTEGRATION.md). Interactive targets remain open <=10 s, incremental save <=2 s and warm year <=1 s; none are claimed met by this primitive.
+
+## Published validation source
+
+Candidate `77ac5d2278c65021ac9c10ed04d4ad4ecff7760e` has root tree `8db1b70782ed11f7b6f43ae52459d89e25786106`, exactly local `925a8a55b90a0bfb195035132b9f1dc91758198a`; runtime tree `c16f31094b248f67dab2f951a4e9abbba27ee276` matches the final measured implementation. [Run 39830820929](https://github.com/rax0h/all-that-endures/actions/runs/39830820929) runs primitive tests/scaling plus the full simulation suite. Results are pending. No main merge or World activation was performed.

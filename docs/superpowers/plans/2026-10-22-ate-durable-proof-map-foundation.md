@@ -68,10 +68,12 @@
 - [x] Obtain one fresh whole-branch review through the executing-plans workflow. Fix Important findings with reproducing RED/GREEN cases; retain final verification logs.
 - [x] Document measured path work, maximum node bytes, cache/scratch/dirty residency and explicit limitations. Do not call root production alone a speed fix.
 - [ ] Define the next integration plan for content-leaf binding, complete topology/query/order proofs, root-bearing generation manifests, verified copy upgrade and atomic recovery publication. Resolve the five integration boundaries in the node contract before enabling any persistent capability or bypass.
-- [ ] Publish only task-owned changes with a nonforced exact-parent lease. Leave the current runtime validation source identifiable; no main merge.
+- [x] Publish only task-owned changes with a nonforced exact-parent lease. Leave the current runtime validation source identifiable; no main merge.
 
 ## Plan self-review
 
 This plan covers only the immutable map portion of Astra's package C. It deliberately cannot pass the full generation/query/open acceptance gates yet. Input/output types agree across tasks, strict decode checks cover the five review risks, and the existing World codec and generation publisher remain outside the primitive. Later integration must supply complete ordered query authority rather than treating unordered membership as a range proof.
 
 Measured and reviewed primitive results: docs/performance/proof-map-foundation-results.md. Full CI is pending. Integration handoff is written; the full follow-on integration plan is still required before capability selection.
+
+Published source77ac5d2278c65021ac9c10ed04d4ad4ecff7760e, validation run39830820929. Fullsuite and next full integration plan remain pending.
