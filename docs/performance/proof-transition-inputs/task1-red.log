@@ -1,0 +1,631 @@
+FFFFFFFFFFFFFFFF                                                         [100%]
+=================================== FAILURES ===================================
+_____ test_batch_matches_independent_mapping_and_canonical_sequential_root _____
+
+    def test_batch_matches_independent_mapping_and_canonical_sequential_root():
+        storage = MemoryNodes(); m = proof_map(storage); root = empty_root(DOMAIN)
+        expected = {}; snapshots = []; rng = random.Random(883)
+        keys = [f'key:{i}'.encode() for i in range(75)]
+        for step in range(30):
+            chosen = rng.sample(keys, 20)
+            delta = [(key, None if rng.randrange(3) == 0 else value(f'{step}:{key}')) for key in chosen]
+            previous = root
+            sequential = root
+            for key, commitment in delta:
+                sequential = m.set(sequential, key, commitment)
+                if commitment is None:
+                    expected.pop(key, None)
+                else:
+                    expected[key] = commitment
+>           root = update(m, root, iter(ordered(delta)))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_batch.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________________ test_only_final_nodes_are_written_once ____________________
+
+    def test_only_final_nodes_are_written_once():
+        storage = MemoryNodes(); m = proof_map(storage)
+>       root = update(m, empty_root(DOMAIN), iter(ordered((str(i).encode(), value(str(i))) for i in range(500))))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_batch.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_empty_and_noop_batches_keep_root_identity ________________
+
+    def test_empty_and_noop_batches_keep_root_identity():
+        storage = MemoryNodes(); m = proof_map(storage)
+        root = m.set(empty_root(DOMAIN), b'present', value('old'))
+        storage.writes.clear(); storage.reads.clear()
+>       assert update(m, root, iter(())) is root
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_batch.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes0] ____
+
+changes = [(b'a', b'short')]
+
+    @pytest.mark.parametrize('changes', [
+        [(b'a', b'short')], [(bytearray(b'a'), value('x'))], [(b'a', True)],
+        [(b'a',)], [b'ab'], [(b'a', value('x')), (b'a', value('y'))],
+    ])
+    def test_stream_rejects_duplicate_unsorted_and_malformed_changes(changes):
+        storage = MemoryNodes(); m = proof_map(storage)
+        with pytest.raises(StoreIntegrityError):
+>           update(m, empty_root(DOMAIN), iter(changes))
+
+simulation/tests/test_stage_0_5_proof_batch.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes1] ____
+
+changes = [(bytearray(b'a'), b'-q\x16B\xb7&\xb0D\x01b|\xa9\xfb\xac2\xf5\xc8S\x0f\xb1\x90<\xc4\xdb\x02%\x87\x17\x92\x1aH\x81')]
+
+    @pytest.mark.parametrize('changes', [
+        [(b'a', b'short')], [(bytearray(b'a'), value('x'))], [(b'a', True)],
+        [(b'a',)], [b'ab'], [(b'a', value('x')), (b'a', value('y'))],
+    ])
+    def test_stream_rejects_duplicate_unsorted_and_malformed_changes(changes):
+        storage = MemoryNodes(); m = proof_map(storage)
+        with pytest.raises(StoreIntegrityError):
+>           update(m, empty_root(DOMAIN), iter(changes))
+
+simulation/tests/test_stage_0_5_proof_batch.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes2] ____
+
+changes = [(b'a', True)]
+
+    @pytest.mark.parametrize('changes', [
+        [(b'a', b'short')], [(bytearray(b'a'), value('x'))], [(b'a', True)],
+        [(b'a',)], [b'ab'], [(b'a', value('x')), (b'a', value('y'))],
+    ])
+    def test_stream_rejects_duplicate_unsorted_and_malformed_changes(changes):
+        storage = MemoryNodes(); m = proof_map(storage)
+        with pytest.raises(StoreIntegrityError):
+>           update(m, empty_root(DOMAIN), iter(changes))
+
+simulation/tests/test_stage_0_5_proof_batch.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes3] ____
+
+changes = [(b'a',)]
+
+    @pytest.mark.parametrize('changes', [
+        [(b'a', b'short')], [(bytearray(b'a'), value('x'))], [(b'a', True)],
+        [(b'a',)], [b'ab'], [(b'a', value('x')), (b'a', value('y'))],
+    ])
+    def test_stream_rejects_duplicate_unsorted_and_malformed_changes(changes):
+        storage = MemoryNodes(); m = proof_map(storage)
+        with pytest.raises(StoreIntegrityError):
+>           update(m, empty_root(DOMAIN), iter(changes))
+
+simulation/tests/test_stage_0_5_proof_batch.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes4] ____
+
+changes = [b'ab']
+
+    @pytest.mark.parametrize('changes', [
+        [(b'a', b'short')], [(bytearray(b'a'), value('x'))], [(b'a', True)],
+        [(b'a',)], [b'ab'], [(b'a', value('x')), (b'a', value('y'))],
+    ])
+    def test_stream_rejects_duplicate_unsorted_and_malformed_changes(changes):
+        storage = MemoryNodes(); m = proof_map(storage)
+        with pytest.raises(StoreIntegrityError):
+>           update(m, empty_root(DOMAIN), iter(changes))
+
+simulation/tests/test_stage_0_5_proof_batch.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes5] ____
+
+changes = [(b'a', b'-q\x16B\xb7&\xb0D\x01b|\xa9\xfb\xac2\xf5\xc8S\x0f\xb1\x90<\xc4\xdb\x02%\x87\x17\x92\x1aH\x81'), (b'a', b'\xa1\xfc\xe468T\xff\x88\x8c\xffK\x8exu\xd6\x00\xc2h#\x90A*\x8c\xf7\x9b7\xd0\xb1\x11H\xb0\xfa')]
+
+    @pytest.mark.parametrize('changes', [
+        [(b'a', b'short')], [(bytearray(b'a'), value('x'))], [(b'a', True)],
+        [(b'a',)], [b'ab'], [(b'a', value('x')), (b'a', value('y'))],
+    ])
+    def test_stream_rejects_duplicate_unsorted_and_malformed_changes(changes):
+        storage = MemoryNodes(); m = proof_map(storage)
+        with pytest.raises(StoreIntegrityError):
+>           update(m, empty_root(DOMAIN), iter(changes))
+
+simulation/tests/test_stage_0_5_proof_batch.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____ test_affected_corruption_and_promoted_sibling_are_rejected[missing] ______
+
+fault = 'missing'
+
+    @pytest.mark.parametrize('fault', ['missing', 'bytes', 'count', 'path', 'promoted'])
+    def test_affected_corruption_and_promoted_sibling_are_rejected(fault):
+        storage = MemoryNodes(); m = proof_map(storage)
+        keys = [b'a', b'b']; root = empty_root(DOMAIN)
+        for key in keys:
+            root = m.set(root, key, value(key.decode()))
+        node = decode_node(storage.data[root.digest])
+        if fault == 'count':
+            root = Root(root.digest, root.count + 1)
+        elif fault == 'path':
+            slots = [slot for slot, _ in node.children]
+            root = storage.store(Branch(node.prefix, tuple(zip(slots, [ref for _, ref in reversed(node.children)]))))
+        else:
+            target = b'b' if fault == 'promoted' else b'a'
+            digest = next(d for d, raw in storage.data.items() if raw[:6] == b'ATEP\x01L' and raw[6:38] == locator(target))
+            if fault in ('missing', 'promoted'):
+                del storage.data[digest]
+            else:
+                storage.data[digest] = storage.data[digest][:-1] + b'!'
+        with pytest.raises(StoreIntegrityError):
+>           update(m, root, iter([(b'a', None if fault == 'promoted' else value('new'))]))
+
+simulation/tests/test_stage_0_5_proof_batch.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_affected_corruption_and_promoted_sibling_are_rejected[bytes] _______
+
+fault = 'bytes'
+
+    @pytest.mark.parametrize('fault', ['missing', 'bytes', 'count', 'path', 'promoted'])
+    def test_affected_corruption_and_promoted_sibling_are_rejected(fault):
+        storage = MemoryNodes(); m = proof_map(storage)
+        keys = [b'a', b'b']; root = empty_root(DOMAIN)
+        for key in keys:
+            root = m.set(root, key, value(key.decode()))
+        node = decode_node(storage.data[root.digest])
+        if fault == 'count':
+            root = Root(root.digest, root.count + 1)
+        elif fault == 'path':
+            slots = [slot for slot, _ in node.children]
+            root = storage.store(Branch(node.prefix, tuple(zip(slots, [ref for _, ref in reversed(node.children)]))))
+        else:
+            target = b'b' if fault == 'promoted' else b'a'
+            digest = next(d for d, raw in storage.data.items() if raw[:6] == b'ATEP\x01L' and raw[6:38] == locator(target))
+            if fault in ('missing', 'promoted'):
+                del storage.data[digest]
+            else:
+                storage.data[digest] = storage.data[digest][:-1] + b'!'
+        with pytest.raises(StoreIntegrityError):
+>           update(m, root, iter([(b'a', None if fault == 'promoted' else value('new'))]))
+
+simulation/tests/test_stage_0_5_proof_batch.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_affected_corruption_and_promoted_sibling_are_rejected[count] _______
+
+fault = 'count'
+
+    @pytest.mark.parametrize('fault', ['missing', 'bytes', 'count', 'path', 'promoted'])
+    def test_affected_corruption_and_promoted_sibling_are_rejected(fault):
+        storage = MemoryNodes(); m = proof_map(storage)
+        keys = [b'a', b'b']; root = empty_root(DOMAIN)
+        for key in keys:
+            root = m.set(root, key, value(key.decode()))
+        node = decode_node(storage.data[root.digest])
+        if fault == 'count':
+            root = Root(root.digest, root.count + 1)
+        elif fault == 'path':
+            slots = [slot for slot, _ in node.children]
+            root = storage.store(Branch(node.prefix, tuple(zip(slots, [ref for _, ref in reversed(node.children)]))))
+        else:
+            target = b'b' if fault == 'promoted' else b'a'
+            digest = next(d for d, raw in storage.data.items() if raw[:6] == b'ATEP\x01L' and raw[6:38] == locator(target))
+            if fault in ('missing', 'promoted'):
+                del storage.data[digest]
+            else:
+                storage.data[digest] = storage.data[digest][:-1] + b'!'
+        with pytest.raises(StoreIntegrityError):
+>           update(m, root, iter([(b'a', None if fault == 'promoted' else value('new'))]))
+
+simulation/tests/test_stage_0_5_proof_batch.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_affected_corruption_and_promoted_sibling_are_rejected[path] _______
+
+fault = 'path'
+
+    @pytest.mark.parametrize('fault', ['missing', 'bytes', 'count', 'path', 'promoted'])
+    def test_affected_corruption_and_promoted_sibling_are_rejected(fault):
+        storage = MemoryNodes(); m = proof_map(storage)
+        keys = [b'a', b'b']; root = empty_root(DOMAIN)
+        for key in keys:
+            root = m.set(root, key, value(key.decode()))
+        node = decode_node(storage.data[root.digest])
+        if fault == 'count':
+            root = Root(root.digest, root.count + 1)
+        elif fault == 'path':
+            slots = [slot for slot, _ in node.children]
+            root = storage.store(Branch(node.prefix, tuple(zip(slots, [ref for _, ref in reversed(node.children)]))))
+        else:
+            target = b'b' if fault == 'promoted' else b'a'
+            digest = next(d for d, raw in storage.data.items() if raw[:6] == b'ATEP\x01L' and raw[6:38] == locator(target))
+            if fault in ('missing', 'promoted'):
+                del storage.data[digest]
+            else:
+                storage.data[digest] = storage.data[digest][:-1] + b'!'
+        with pytest.raises(StoreIntegrityError):
+>           update(m, root, iter([(b'a', None if fault == 'promoted' else value('new'))]))
+
+simulation/tests/test_stage_0_5_proof_batch.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____ test_affected_corruption_and_promoted_sibling_are_rejected[promoted] _____
+
+fault = 'promoted'
+
+    @pytest.mark.parametrize('fault', ['missing', 'bytes', 'count', 'path', 'promoted'])
+    def test_affected_corruption_and_promoted_sibling_are_rejected(fault):
+        storage = MemoryNodes(); m = proof_map(storage)
+        keys = [b'a', b'b']; root = empty_root(DOMAIN)
+        for key in keys:
+            root = m.set(root, key, value(key.decode()))
+        node = decode_node(storage.data[root.digest])
+        if fault == 'count':
+            root = Root(root.digest, root.count + 1)
+        elif fault == 'path':
+            slots = [slot for slot, _ in node.children]
+            root = storage.store(Branch(node.prefix, tuple(zip(slots, [ref for _, ref in reversed(node.children)]))))
+        else:
+            target = b'b' if fault == 'promoted' else b'a'
+            digest = next(d for d, raw in storage.data.items() if raw[:6] == b'ATEP\x01L' and raw[6:38] == locator(target))
+            if fault in ('missing', 'promoted'):
+                del storage.data[digest]
+            else:
+                storage.data[digest] = storage.data[digest][:-1] + b'!'
+        with pytest.raises(StoreIntegrityError):
+>           update(m, root, iter([(b'a', None if fault == 'promoted' else value('new'))]))
+
+simulation/tests/test_stage_0_5_proof_batch.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________________ test_maximum_depth_batch_is_bounded ______________________
+
+    def test_maximum_depth_batch_is_bounded():
+        storage = MemoryNodes(); m = proof_map(storage)
+        key = b'deep'; raw_locator = locator(key)
+        nibbles = tuple(n for byte in raw_locator for n in (byte >> 4, byte & 15))
+        root = storage.store(Leaf(raw_locator, value('old')))
+        for depth in reversed(range(64)):
+            sibling_slot = (nibbles[depth] + 1) % 16
+            sibling_prefix = nibbles[:depth] + (sibling_slot,) + (0,) * (63-depth)
+            sibling_bytes = bytes((sibling_prefix[i] << 4) | sibling_prefix[i+1] for i in range(0, 64, 2))
+            sibling = storage.store(Leaf(sibling_bytes, value(str(depth))))
+            root = storage.store(Branch(nibbles[:depth], tuple(sorted(((nibbles[depth], root), (sibling_slot, sibling))))))
+        storage.reads.clear(); storage.writes.clear()
+>       changed = update(m, root, iter([(key, value('new'))]))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_batch.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_sqlite_batch_rollback_and_generator_fault_keep_old_roots _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_sqlite_batch_rollback_and0')
+
+    def test_sqlite_batch_rollback_and_generator_fault_keep_old_roots(tmp_path):
+        db = sqlite3.connect(tmp_path/'nodes.sqlite')
+        store = ProofNodeStore(db); store.create_schema()
+        from ate_sim.persistence_proof_map import ProofMap
+        m = ProofMap(DOMAIN, lambda digest: store.read(DOMAIN, digest),
+                     lambda digest, raw: store.write(DOMAIN, digest, raw))
+        db.execute('BEGIN')
+>       old = update(m, empty_root(DOMAIN), iter(ordered((str(i).encode(), value('old')) for i in range(1024))))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_batch.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_batch.py:17: in update
+    return importlib.import_module('ate_sim.persistence_proof_batch').update_sorted(m, root, changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_batch'
+import_ = <function _gcd_import at 0x7fe115d800e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_batch'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_batch_matches_independent_mapping_and_canonical_sequential_root
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_only_final_nodes_are_written_once
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_empty_and_noop_batches_keep_root_identity
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes0]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes1]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes2]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes3]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes4]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_stream_rejects_duplicate_unsorted_and_malformed_changes[changes5]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_affected_corruption_and_promoted_sibling_are_rejected[missing]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_affected_corruption_and_promoted_sibling_are_rejected[bytes]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_affected_corruption_and_promoted_sibling_are_rejected[count]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_affected_corruption_and_promoted_sibling_are_rejected[path]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_affected_corruption_and_promoted_sibling_are_rejected[promoted]
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_maximum_depth_batch_is_bounded
+FAILED simulation/tests/test_stage_0_5_proof_batch.py::test_sqlite_batch_rollback_and_generator_fault_keep_old_roots
+16 failed in 0.29s

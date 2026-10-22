@@ -1,0 +1,47 @@
+{
+  "schema": "ate-proof-map-ci-acceptance/1",
+  "run_id": 39830820929,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/39830820929",
+  "source": {
+    "head": "77ac5d2278c65021ac9c10ed04d4ad4ecff7760e",
+    "python": "3.12.15",
+    "runtime_tree": "c16f31094b248f67dab2f951a4e9abbba27ee276",
+    "sqlite": "3.45.1"
+  },
+  "full_suite": {
+    "conclusion": "success",
+    "pytest_summary": "3134 passed, 1 warning, 2 subtests passed in 4106.90s (1:08:26)",
+    "junit": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "3136",
+      "time": "4106.805",
+      "timestamp": "2026-10-22T18:22:55.596357+00:00",
+      "hostname": "runnervmxehtw"
+    }
+  },
+  "proof_map": {
+    "conclusion": "success",
+    "scaling_keys": [
+      1000,
+      10000,
+      100000
+    ]
+  },
+  "downloaded_artifacts": [
+    {
+      "id": 12452253303,
+      "sha256": "a1d8b9a7243a7bbe69c888278b1af137a5f6d7b32e938bc504f25ddc15097976"
+    },
+    {
+      "id": 12449046269,
+      "sha256": "32ac4a3d93a6275312ff36dbdc73fc864347506f56e7b22bcab518ecf39620b2"
+    }
+  ],
+  "limits": [
+    "No World proof authority activated.",
+    "No mature simulation speed acceptance."
+  ]
+}

@@ -17,7 +17,7 @@ Tests were written and observed RED before each implementation: 21 canonical nod
 
 The final source passed **95 focused tests in 4.74 s**, including all 40 new primitive tests and existing incremental-store/failure regressions ([log](proof-map-foundation/final-focused.log)). These counts overlap the earlier task runs. The reviewer also checked valid maximum-depth maps: a replacement uses 65 search reads/65 node writes; deletion uses 66 search/boundary reads/63 writes. Duplicate-write verification may add reads beyond search-path counts, so the workload's <=66 **total** read gate is not a universal total-IO promise. No further concrete findings or deferred minors were reported; no second review was requested after the tested fix.
 
-The full simulation suite on the new branch remains a separate CI gate before merge. The full green parent suite is not represented as a run on these new modules.
+The new branch passed its own full simulation suite: **3134 tests plus two subtests**, one warning, in **4106.90 seconds**. Both jobs in [run 39830820929](https://github.com/rax0h/all-that-endures/actions/runs/39830820929) succeeded. The downloaded ZIP digests were checked against GitHub artifact digests before extraction; [acceptance and source receipts](run-39830820929/acceptance.json), raw JUnit/logs and CI scaling receipts are retained. This is correctness acceptance for the primitive, not World integration or mature speed acceptance.
 
 ## Exact final-source scaling
 
@@ -43,4 +43,4 @@ See the [integration handoff](proof-map-foundation/NEXT_INTEGRATION.md). Interac
 
 ## Published validation source
 
-Candidate `77ac5d2278c65021ac9c10ed04d4ad4ecff7760e` has root tree `8db1b70782ed11f7b6f43ae52459d89e25786106`, exactly local `925a8a55b90a0bfb195035132b9f1dc91758198a`; runtime tree `c16f31094b248f67dab2f951a4e9abbba27ee276` matches the final measured implementation. [Run 39830820929](https://github.com/rax0h/all-that-endures/actions/runs/39830820929) runs primitive tests/scaling plus the full simulation suite. Results are pending. No main merge or World activation was performed.
+Candidate `77ac5d2278c65021ac9c10ed04d4ad4ecff7760e` has root tree `8db1b70782ed11f7b6f43ae52459d89e25786106`, exactly local `925a8a55b90a0bfb195035132b9f1dc91758198a`; runtime tree `c16f31094b248f67dab2f951a4e9abbba27ee276` matches the final measured implementation. [Run 39830820929](https://github.com/rax0h/all-that-endures/actions/runs/39830820929) runs primitive tests/scaling plus the full simulation suite. Both jobs passed; see the retained acceptance above. No main merge or World activation was performed.

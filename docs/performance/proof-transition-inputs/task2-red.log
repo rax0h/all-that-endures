@@ -1,0 +1,429 @@
+FFFFFFFFFFFFFF                                                           [100%]
+=================================== FAILURES ===================================
+__________ test_key_and_content_vectors_use_independent_exact_framing __________
+
+    def test_key_and_content_vectors_use_independent_exact_framing():
+>       c = content(); ns = 'mémoire'; encoded = ns.encode('utf-8'); key = b'key\x00\xff'
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_every_source_field_and_namespace_key_affects_commitment[version-version_fields] _
+
+kind = 'version', fields = <function version_fields at 0x7f98a6339080>
+
+    @pytest.mark.parametrize('kind,fields', [('version', version_fields), ('record', record_fields), ('segment', segment_fields)])
+    def test_every_source_field_and_namespace_key_affects_commitment(kind, fields):
+>       c = content(); function = getattr(c, kind + '_commitment'); base = fields()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_every_source_field_and_namespace_key_affects_commitment[record-record_fields] _
+
+kind = 'record', fields = <function record_fields at 0x7f98a6339120>
+
+    @pytest.mark.parametrize('kind,fields', [('version', version_fields), ('record', record_fields), ('segment', segment_fields)])
+    def test_every_source_field_and_namespace_key_affects_commitment(kind, fields):
+>       c = content(); function = getattr(c, kind + '_commitment'); base = fields()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_every_source_field_and_namespace_key_affects_commitment[segment-segment_fields] _
+
+kind = 'segment', fields = <function segment_fields at 0x7f98a5fdf380>
+
+    @pytest.mark.parametrize('kind,fields', [('version', version_fields), ('record', record_fields), ('segment', segment_fields)])
+    def test_every_source_field_and_namespace_key_affects_commitment(kind, fields):
+>       c = content(); function = getattr(c, kind + '_commitment'); base = fields()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________________ test_invalid_namespace_is_rejected[] _____________________
+
+namespace = ''
+
+    @pytest.mark.parametrize('namespace', ['', 'bad\x00name', b'bytes', True, '\ud800'])
+    def test_invalid_namespace_is_rejected(namespace):
+>       c = content()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_invalid_namespace_is_rejected[bad\x00name] ________________
+
+namespace = 'bad\x00name'
+
+    @pytest.mark.parametrize('namespace', ['', 'bad\x00name', b'bytes', True, '\ud800'])
+    def test_invalid_namespace_is_rejected(namespace):
+>       c = content()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_invalid_namespace_is_rejected[bytes] ___________________
+
+namespace = b'bytes'
+
+    @pytest.mark.parametrize('namespace', ['', 'bad\x00name', b'bytes', True, '\ud800'])
+    def test_invalid_namespace_is_rejected(namespace):
+>       c = content()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________________ test_invalid_namespace_is_rejected[True] ___________________
+
+namespace = True
+
+    @pytest.mark.parametrize('namespace', ['', 'bad\x00name', b'bytes', True, '\ud800'])
+    def test_invalid_namespace_is_rejected(namespace):
+>       c = content()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_invalid_namespace_is_rejected[\ud800] __________________
+
+namespace = '\ud800'
+
+    @pytest.mark.parametrize('namespace', ['', 'bad\x00name', b'bytes', True, '\ud800'])
+    def test_invalid_namespace_is_rejected(namespace):
+>       c = content()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_invalid_types_and_negative_counters_are_rejected[version-version_fields] _
+
+kind = 'version', fields = <function version_fields at 0x7f98a6339080>
+
+    @pytest.mark.parametrize('kind,fields', [('version', version_fields), ('record', record_fields), ('segment', segment_fields)])
+    def test_invalid_types_and_negative_counters_are_rejected(kind, fields):
+>       c = content(); function = getattr(c, kind + '_commitment'); base = fields()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_invalid_types_and_negative_counters_are_rejected[record-record_fields] __
+
+kind = 'record', fields = <function record_fields at 0x7f98a6339120>
+
+    @pytest.mark.parametrize('kind,fields', [('version', version_fields), ('record', record_fields), ('segment', segment_fields)])
+    def test_invalid_types_and_negative_counters_are_rejected(kind, fields):
+>       c = content(); function = getattr(c, kind + '_commitment'); base = fields()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_invalid_types_and_negative_counters_are_rejected[segment-segment_fields] _
+
+kind = 'segment', fields = <function segment_fields at 0x7f98a5fdf380>
+
+    @pytest.mark.parametrize('kind,fields', [('version', version_fields), ('record', record_fields), ('segment', segment_fields)])
+    def test_invalid_types_and_negative_counters_are_rejected(kind, fields):
+>       c = content(); function = getattr(c, kind + '_commitment'); base = fields()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_interval_close_preserves_immutable_content_but_is_not_a_selection_proof _
+
+    def test_interval_close_preserves_immutable_content_but_is_not_a_selection_proof():
+>       c = content()
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_large_payload_hash_does_not_copy_the_full_frame _____________
+
+    def test_large_payload_hash_does_not_copy_the_full_frame():
+>       c = content(); payload = b'x' * (2 * 1024 * 1024)
+            ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_content.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_content.py:12: in content
+    return importlib.import_module('ate_sim.persistence_proof_content')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_content'
+import_ = <function _gcd_import at 0x7f98a71280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_content'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_key_and_content_vectors_use_independent_exact_framing
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_every_source_field_and_namespace_key_affects_commitment[version-version_fields]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_every_source_field_and_namespace_key_affects_commitment[record-record_fields]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_every_source_field_and_namespace_key_affects_commitment[segment-segment_fields]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_invalid_namespace_is_rejected[]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_invalid_namespace_is_rejected[bad\x00name]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_invalid_namespace_is_rejected[bytes]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_invalid_namespace_is_rejected[True]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_invalid_namespace_is_rejected[\ud800]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_invalid_types_and_negative_counters_are_rejected[version-version_fields]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_invalid_types_and_negative_counters_are_rejected[record-record_fields]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_invalid_types_and_negative_counters_are_rejected[segment-segment_fields]
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_interval_close_preserves_immutable_content_but_is_not_a_selection_proof
+FAILED simulation/tests/test_stage_0_5_proof_content.py::test_large_payload_hash_does_not_copy_the_full_frame
+14 failed in 0.19s
