@@ -6,7 +6,7 @@ This candidate implements the first runtime package of the [approved architectur
 
 Remote parent: `c2242b67afdf102228c7b067c376cabe3c8df193`, root tree `9d4340e9e81eccd99b7f02f28f5ea0eab862d503`. Local equivalent baseline: `b731d6d` with the same complete tree. The existing dirty checkout was preserved in a separate worktree.
 
-Runtime commits: `9129916`, then hook hardening in `9c816c2`. Runtime tree before the final review fixes: `398ed4b750461db383395fdd626322b53af24a52`. Final reviewed/fixed runtime tree: `05262053faf0ed546290753b607a463725e48821`. Runtime baseline for the new comparison: `5521c094981c9a5f28f1d076453264291b534ff5`, runtime tree `48e3e21b3b8d4ccb57eab74e11412a1ec4e74b6a`, the candidate from the previous mature measurements.
+Runtime commits: `9129916`, then hook hardening in `9c816c2`. Runtime tree before the final review fixes: `398ed4b750461db383395fdd626322b53af24a52`. Runtime tree after the initial review, before the later CI repairs: `05262053faf0ed546290753b607a463725e48821`. Runtime baseline for the new comparison: `5521c094981c9a5f28f1d076453264291b534ff5`, runtime tree `48e3e21b3b8d4ccb57eab74e11412a1ec4e74b6a`, the candidate from the previous mature measurements.
 
 Eligible scalar edits now reuse a checked ownership route and mark value dirt without repeatedly queuing structural reconciliation. Structural changes retain immediate reconciliation. Certificates bind the existing store/pin/codec/database/topology authority; raw SQL writes, external changes, save/pin changes and custom hooks force the conservative path. Canonical identity remains in the existing registry. Certificates use weak subject references and reserve at most 128 entries/64 KiB inside the existing coordinator budget. Retained metadata is charged; dirty-state memory is still separate.
 
@@ -92,3 +92,7 @@ The complete failed-node local rerun passed 77 cases before reaching expensive 1
 The first performance artifact omitted coordinator diagnostics from the phase working-set snapshot, even though the coordinator already exposed them. A new reproducing regression failed on the missing snapshot key. The common harness now retains route-cache hits/misses, residency and group-work counters after a phase, including correct fallback for older runtimes. All 23 final harness checks passed (38.87 s), [log](run-39728517108/ci-harness-green.log). This diagnostic-only change does not run in ordinary simulation.
 
 The [repair verification receipt](run-39728517108/repair-validation.json) explicitly leaves full-suite acceptance pending. The new CI run will measure the repaired runtime and freshly verify both saved successors again.
+
+Latest repair source: remote `3b2af964f42b6197fe596554fdce97d459798c82`, exact root tree `18737205a1a36d17683b0a6c628d337eb8e3775c` of local `cacfca66bf82f1efff4f0f38ca63d68a948a7ca0`. The exact workflow-driver tiny-world smoke passed after both runtime repairs and diagnostic counter capture, including both fresh restores. Its digest remains `0af8c8866d9f6c92f4222c74b5f1591719a09a0589083678410ab4045c403486`; this is launcher validation only.
+
+Repair validation: [run 39810513221](https://github.com/rax0h/all-that-endures/actions/runs/39810513221), executing source `3b2af964f42b6197fe596554fdce97d459798c82`. Full suite and populated workload both launched; results pending.
