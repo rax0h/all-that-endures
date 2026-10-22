@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "<stdin>", line 5, in <module>
+  File "/workspace/scratch/7905b656a1e1/ate-review/simulation/ate_sim/persistence_complete_format.py", line 60, in upgrade_lazy_snapshot
+    return _copy_with_checked_catalog(source,destination,rules_id=rules_id,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7905b656a1e1/ate-review/simulation/ate_sim/persistence_catalog_copy.py", line 483, in _copy_with_checked_catalog
+    all_ordinary = workspace.stage_ordinary(replace(c, value=marked_manifest(c.value))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7905b656a1e1/ate-review/simulation/ate_sim/persistence_conversion_workspace.py", line 152, in stage_ordinary
+    return self.stage(changes, encode=pack_change, decode=unpack_change)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7905b656a1e1/ate-review/simulation/ate_sim/persistence_conversion_workspace.py", line 136, in stage
+    self.db.execute('INSERT INTO replay_rows VALUES (?,?,?,?)',
+sqlite3.OperationalError: attempt to write a readonly database

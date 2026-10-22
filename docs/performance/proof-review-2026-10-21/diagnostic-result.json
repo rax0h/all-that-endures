@@ -1,0 +1,24 @@
+{
+  "schema": "ate-architecture-diagnostic/1",
+  "runtime": {
+    "head": "579c06c4f922777363adfee0657f06c90b2bfce2",
+    "committed_tree": "48e3e21b3b8d4ccb57eab74e11412a1ec4e74b6a",
+    "source_sha256": "95687fd763b7ebffff1fe651d10634a8308f96d16511a2bf8b7123e4e6a95fc9",
+    "root": "/workspace/scratch/7905b656a1e1/ate-review",
+    "engine_path": "/workspace/scratch/7905b656a1e1/ate-review/simulation/ate_sim/engine.py",
+    "persistence_path": "/workspace/scratch/7905b656a1e1/ate-review/simulation/ate_sim/persistence_lazy.py"
+  },
+  "fixture": {
+    "seed": 843000,
+    "mature_initialization": true,
+    "source_year": 0,
+    "people": 127,
+    "events": 1208,
+    "actions": 0
+  },
+  "phases": {},
+  "profiled": true,
+  "budget_seconds": 180,
+  "status": "incomplete",
+  "error": "DatabaseError('database disk image is malformed')"
+}

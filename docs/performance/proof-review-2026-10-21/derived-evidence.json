@@ -1,0 +1,255 @@
+{
+  "source_run_id": 39647739463,
+  "runtime_tree": "48e3e21b3b8d4ccb57eab74e11412a1ec4e74b6a",
+  "targets_seconds": {
+    "open": 10,
+    "save": 2,
+    "warm_step": 1
+  },
+  "phases": {
+    "open": {
+      "baseline_seconds": 802.1384580939999,
+      "candidate_seconds": 313.26986518900003,
+      "time_reduction_percent": 60.94566193305633,
+      "target_multiple": 31.326986518900004
+    },
+    "first_step": {
+      "baseline_seconds": 2964.8509845220005,
+      "candidate_seconds": 2446.7961637589997,
+      "time_reduction_percent": 17.473216140288507
+    },
+    "save": {
+      "baseline_seconds": 2624.301818715,
+      "candidate_seconds": 2190.653148761,
+      "time_reduction_percent": 16.524344374624476,
+      "target_multiple": 1095.3265743805
+    },
+    "warm_step": {
+      "baseline_seconds": 2288.04842106,
+      "candidate_seconds": 2158.4484311140004,
+      "time_reduction_percent": 5.664215352835877,
+      "target_multiple": 2158.4484311140004
+    }
+  },
+  "cumulative_counter_differences": {
+    "baseline": {
+      "material_lots": {
+        "metric": "material_lot_payload_loads",
+        "snapshots": {
+          "first_step": 397288,
+          "save": 397288,
+          "warm_step": 397292
+        },
+        "save_delta": 0,
+        "warm_step_delta": 4
+      },
+      "resources": {
+        "metric": "resource_payload_loads",
+        "snapshots": {
+          "first_step": 38107,
+          "save": 38107,
+          "warm_step": 69869
+        },
+        "save_delta": 0,
+        "warm_step_delta": 31762
+      },
+      "people": {
+        "metric": "person_payload_loads",
+        "snapshots": {
+          "first_step": 18066,
+          "save": 18066,
+          "warm_step": 44772
+        },
+        "save_delta": 0,
+        "warm_step_delta": 26706
+      },
+      "owner_index": {
+        "metric": "bucket_payload_loads",
+        "snapshots": {
+          "first_step": 15695,
+          "save": 15695,
+          "warm_step": 30735
+        },
+        "save_delta": 0,
+        "warm_step_delta": 15040
+      },
+      "social_edges": {
+        "metric": "social_edge_payload_loads",
+        "snapshots": {
+          "first_step": 18049,
+          "save": 18049,
+          "warm_step": 35973
+        },
+        "save_delta": 0,
+        "warm_step_delta": 17924
+      },
+      "advancement_paths": {
+        "metric": "advancement_payload_loads",
+        "snapshots": {
+          "first_step": 8432,
+          "save": 8432,
+          "warm_step": 16785
+        },
+        "save_delta": 0,
+        "warm_step_delta": 8353
+      },
+      "history_cache": {
+        "metric": "evictions",
+        "snapshots": {
+          "first_step": 488229,
+          "save": 488259,
+          "warm_step": 580890
+        },
+        "save_delta": 30,
+        "warm_step_delta": 92631
+      }
+    },
+    "candidate": {
+      "material_lots": {
+        "metric": "material_lot_payload_loads",
+        "snapshots": {
+          "first_step": 99346,
+          "save": 99346,
+          "warm_step": 99349
+        },
+        "save_delta": 0,
+        "warm_step_delta": 3
+      },
+      "resources": {
+        "metric": "resource_payload_loads",
+        "snapshots": {
+          "first_step": 38107,
+          "save": 38107,
+          "warm_step": 69869
+        },
+        "save_delta": 0,
+        "warm_step_delta": 31762
+      },
+      "people": {
+        "metric": "person_payload_loads",
+        "snapshots": {
+          "first_step": 18066,
+          "save": 18066,
+          "warm_step": 44772
+        },
+        "save_delta": 0,
+        "warm_step_delta": 26706
+      },
+      "owner_index": {
+        "metric": "bucket_payload_loads",
+        "snapshots": {
+          "first_step": 15695,
+          "save": 15695,
+          "warm_step": 30735
+        },
+        "save_delta": 0,
+        "warm_step_delta": 15040
+      },
+      "social_edges": {
+        "metric": "social_edge_payload_loads",
+        "snapshots": {
+          "first_step": 18049,
+          "save": 18049,
+          "warm_step": 35973
+        },
+        "save_delta": 0,
+        "warm_step_delta": 17924
+      },
+      "advancement_paths": {
+        "metric": "advancement_payload_loads",
+        "snapshots": {
+          "first_step": 8432,
+          "save": 8432,
+          "warm_step": 16785
+        },
+        "save_delta": 0,
+        "warm_step_delta": 8353
+      },
+      "history_cache": {
+        "metric": "evictions",
+        "snapshots": {
+          "first_step": 477126,
+          "save": 477156,
+          "warm_step": 558478
+        },
+        "save_delta": 30,
+        "warm_step_delta": 81322
+      }
+    }
+  },
+  "pressure_snapshots": {
+    "baseline": {
+      "first_step": {
+        "byte_limit": 65536,
+        "cold_miss_time_bound": "O(all household occurrences)",
+        "entries": 0,
+        "entry_limit": 64,
+        "hits": 0,
+        "misses": 0,
+        "occurrence_visits": 0,
+        "python_bytes": 128
+      },
+      "save": {
+        "byte_limit": 65536,
+        "cold_miss_time_bound": "O(all household occurrences)",
+        "entries": 0,
+        "entry_limit": 64,
+        "hits": 0,
+        "misses": 0,
+        "occurrence_visits": 0,
+        "python_bytes": 128
+      },
+      "warm_step": {
+        "byte_limit": 65536,
+        "cold_miss_time_bound": "O(all household occurrences)",
+        "entries": 0,
+        "entry_limit": 64,
+        "hits": 0,
+        "misses": 0,
+        "occurrence_visits": 0,
+        "python_bytes": 128
+      }
+    },
+    "candidate": {
+      "first_step": {
+        "byte_limit": 65536,
+        "cold_miss_time_bound": "O(all household occurrences)",
+        "entries": 0,
+        "entry_limit": 64,
+        "hits": 0,
+        "misses": 0,
+        "occurrence_visits": 0,
+        "python_bytes": 128
+      },
+      "save": {
+        "byte_limit": 65536,
+        "cold_miss_time_bound": "O(all household occurrences)",
+        "entries": 0,
+        "entry_limit": 64,
+        "hits": 0,
+        "misses": 0,
+        "occurrence_visits": 0,
+        "python_bytes": 128
+      },
+      "warm_step": {
+        "byte_limit": 65536,
+        "cold_miss_time_bound": "O(all household occurrences)",
+        "entries": 0,
+        "entry_limit": 64,
+        "hits": 0,
+        "misses": 0,
+        "occurrence_visits": 0,
+        "python_bytes": 128
+      }
+    }
+  },
+  "save_payload_read_write_ratio": 126.64725565219256,
+  "warm_step_payload_read_count_reduction_percent": 0.5383011030954066,
+  "warm_step_pin_row_reduction_percent": 65.2356091400888,
+  "limitations": [
+    "Working-set load/eviction counters are cumulative; the differences above subtract adjacent snapshots.",
+    "No mature subsystem timings, distinct payload-key counts, or physical IO attribution are available.",
+    "First-step load snapshots include open; the dedicated open receipt reports zero domain-family payload loads.",
+    "History evictions do not establish rereads of the same pages."
+  ]
+}

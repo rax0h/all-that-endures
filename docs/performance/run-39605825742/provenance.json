@@ -1,0 +1,12 @@
+{
+  "run_id": 39605825742,
+  "commit": "5521c094981c9a5f28f1d076453264291b534ff5",
+  "artifact_id": 12351885115,
+  "archive_sha256": "ff242ea7e53bd67461a1a5e489afe098867ec14185bd0f16ad8e64232ef9a3e3",
+  "archive_sha256_verified": "ff242ea7e53bd67461a1a5e489afe098867ec14185bd0f16ad8e64232ef9a3e3",
+  "reviewed_files": {
+    "candidate-result.json": "bdca1d6241dcfa80b0c77a6265069cddd1e9aaf31e17ddb033c35284bd95275f",
+    "baseline-result.json": "63ec37ff197e7e612e74fd991a37d581357d8a3a7be17e007037d2f6c802009e",
+    "comparison.json": "79f8c6bae99095f9afba0c5a0235de42e411b5a815a4fa693b1aceac16176a69"
+  }
+}
