@@ -1,0 +1,37 @@
+{
+  "phases": {
+    "first_step": {
+      "baseline_seconds": 2964.8509845220005,
+      "candidate_seconds": 2446.7961637589997,
+      "speedup": 1.2117278212366966
+    },
+    "open": {
+      "baseline_seconds": 802.1384580939999,
+      "candidate_seconds": 313.26986518900003,
+      "speedup": 2.5605350122331707
+    },
+    "save": {
+      "baseline_seconds": 2624.301818715,
+      "candidate_seconds": 2190.653148761,
+      "speedup": 1.1979540532006472
+    },
+    "warm_step": {
+      "baseline_seconds": 2288.04842106,
+      "candidate_seconds": 2158.4484311140004,
+      "speedup": 1.0600431254589258
+    }
+  },
+  "saved_database": {
+    "baseline": {
+      "bytes": 30224322560,
+      "sha256": "c65b62cbfa5fe028f697a68bf611a5a3ab211d12893d8278ff1943e8fb773334"
+    },
+    "byte_identical": false,
+    "candidate": {
+      "bytes": 30224322560,
+      "sha256": "78e6e69b25e1d8d8be9d2167c3d23f448a62e2588a3c9b28fadf9025a9418f90"
+    }
+  },
+  "schema": "ate-mature-step-save-comparison/1",
+  "source_sha256": "4a39288b3af497e51dadf82f41cc371b714905380adfc75408c510e8ab2009e2"
+}

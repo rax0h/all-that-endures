@@ -1,0 +1,27 @@
+{
+  "actual_digest": "2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7",
+  "database_bytes_after_restore_close": 30224322560,
+  "database_bytes_changed_by_restore_open": true,
+  "database_sha256_after_restore_close": "2da32b619dd32460e372def4f9925519aa0f8f48c86fa887fbb2bd83a705259d",
+  "expected": {
+    "bytes": 30224322560,
+    "digest": "2a9b53ed70f47b49ca60711b6a5608ba694efaab9c4f125a923b0af97e07e4f7",
+    "generation": 127,
+    "rules_id": "stage-0-5-final-release",
+    "seed": 843000,
+    "sha256": "78e6e69b25e1d8d8be9d2167c3d23f448a62e2588a3c9b28fadf9025a9418f90",
+    "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+    "year": 1002
+  },
+  "pin": {
+    "captured_head": 127,
+    "store_identity": "06d24556-2bb1-4086-93f7-448f23b7eb5a",
+    "token": "752a80f9-ba37-4f6c-bf73-0eec3ac17dc2"
+  },
+  "schema": "ate-mature-fresh-restore/1",
+  "status": "complete",
+  "world": {
+    "seed": 843000,
+    "year": 1002
+  }
+}
