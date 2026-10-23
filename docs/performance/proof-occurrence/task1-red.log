@@ -1,0 +1,676 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                         [100%]
+=================================== FAILURES ===================================
+_________________ test_independent_framing_and_sql_tuple_order _________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:27: in test_independent_framing_and_sql_tuple_order
+    o, store, pin, certs = setup_source(tmp_path)
+                           ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+______________ test_exact_owner_group_pages_and_no_owner_payloads ______________
+simulation/tests/test_stage_0_5_proof_occurrence.py:51: in test_exact_owner_group_pages_and_no_owner_payloads
+    o, store, pin, certs = setup_source(tmp_path)
+                           ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_____________ test_empty_owner_group_and_end_cursor_prove_absence ______________
+simulation/tests/test_stage_0_5_proof_occurrence.py:72: in test_empty_owner_group_and_end_cursor_prove_absence
+    o, store, pin, certs = setup_source(tmp_path)
+                           ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_______________ test_previous_pin_after_reassignment_and_delete ________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:80: in test_previous_pin_after_reassignment_and_delete
+    o, store, pin, certs = setup_source(tmp_path)
+                           ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_______________ test_wrong_context_and_allocator_rejected[store] _______________
+simulation/tests/test_stage_0_5_proof_occurrence.py:99: in test_wrong_context_and_allocator_rejected
+    o,store,pin,certs = setup_source(tmp_path); cert,expected = certs[0]
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+____________ test_wrong_context_and_allocator_rejected[generation] _____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:99: in test_wrong_context_and_allocator_rejected
+    o,store,pin,certs = setup_source(tmp_path); cert,expected = certs[0]
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_______________ test_wrong_context_and_allocator_rejected[codec] _______________
+simulation/tests/test_stage_0_5_proof_occurrence.py:99: in test_wrong_context_and_allocator_rejected
+    o,store,pin,certs = setup_source(tmp_path); cert,expected = certs[0]
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_______________ test_wrong_context_and_allocator_rejected[scope] _______________
+simulation/tests/test_stage_0_5_proof_occurrence.py:99: in test_wrong_context_and_allocator_rejected
+    o,store,pin,certs = setup_source(tmp_path); cert,expected = certs[0]
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_____________ test_wrong_context_and_allocator_rejected[allocator] _____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:99: in test_wrong_context_and_allocator_rejected
+    o,store,pin,certs = setup_source(tmp_path); cert,expected = certs[0]
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_____________ test_wrong_context_and_allocator_rejected[expected] ______________
+simulation/tests/test_stage_0_5_proof_occurrence.py:99: in test_wrong_context_and_allocator_rejected
+    o,store,pin,certs = setup_source(tmp_path); cert,expected = certs[0]
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_____________ test_corruption_and_hidden_overlap_rejected[missing] _____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:112: in test_corruption_and_hidden_overlap_rejected
+    o,store,pin,certs = setup_source(tmp_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+______________ test_corruption_and_hidden_overlap_rejected[empty] ______________
+simulation/tests/test_stage_0_5_proof_occurrence.py:112: in test_corruption_and_hidden_overlap_rejected
+    o,store,pin,certs = setup_source(tmp_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_____________ test_corruption_and_hidden_overlap_rejected[surplus] _____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:112: in test_corruption_and_hidden_overlap_rejected
+    o,store,pin,certs = setup_source(tmp_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+____________ test_corruption_and_hidden_overlap_rejected[coherent] _____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:112: in test_corruption_and_hidden_overlap_rejected
+    o,store,pin,certs = setup_source(tmp_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_____________ test_corruption_and_hidden_overlap_rejected[overlap] _____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:112: in test_corruption_and_hidden_overlap_rejected
+    o,store,pin,certs = setup_source(tmp_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_______ test_corruption_and_hidden_overlap_rejected[other_group_overlap] _______
+simulation/tests/test_stage_0_5_proof_occurrence.py:112: in test_corruption_and_hidden_overlap_rejected
+    o,store,pin,certs = setup_source(tmp_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+____________ test_corruption_and_hidden_overlap_rejected[checksum] _____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:112: in test_corruption_and_hidden_overlap_rejected
+    o,store,pin,certs = setup_source(tmp_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+____________ test_corruption_and_hidden_overlap_rejected[lookahead] ____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:112: in test_corruption_and_hidden_overlap_rejected
+    o,store,pin,certs = setup_source(tmp_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+____________ test_corruption_and_hidden_overlap_rejected[false_end] ____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:112: in test_corruption_and_hidden_overlap_rejected
+    o,store,pin,certs = setup_source(tmp_path)
+                        ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+________________ test_large_metadata_guard_before_transfer[key] ________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:136: in test_large_metadata_guard_before_transfer
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_______________ test_large_metadata_guard_before_transfer[path] ________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:136: in test_large_metadata_guard_before_transfer
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_____________ test_large_metadata_guard_before_transfer[namespace] _____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:136: in test_large_metadata_guard_before_transfer
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+___________ test_large_metadata_guard_before_transfer[nul-checksum] ____________
+simulation/tests/test_stage_0_5_proof_occurrence.py:136: in test_large_metadata_guard_before_transfer
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+________ test_invalid_namespace_utf8_and_allocator_metadata_fail_closed ________
+simulation/tests/test_stage_0_5_proof_occurrence.py:149: in test_invalid_namespace_utf8_and_allocator_metadata_fail_closed
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+___________ test_indexes_are_explicit_transaction_owned_and_required ___________
+simulation/tests/test_stage_0_5_proof_occurrence.py:165: in test_indexes_are_explicit_transaction_owned_and_required
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+___________ test_owned_nested_arbitrary_transactions_and_foreign_pin ___________
+simulation/tests/test_stage_0_5_proof_occurrence.py:175: in test_owned_nested_arbitrary_transactions_and_foreign_pin
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+__________________ test_invalid_limit_or_owner_cursor[0-None] __________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:189: in test_invalid_limit_or_owner_cursor
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_________________ test_invalid_limit_or_owner_cursor[129-None] _________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:189: in test_invalid_limit_or_owner_cursor
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+________________ test_invalid_limit_or_owner_cursor[True-None] _________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:189: in test_invalid_limit_or_owner_cursor
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_________________ test_invalid_limit_or_owner_cursor[1-after3] _________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:189: in test_invalid_limit_or_owner_cursor
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_________________ test_invalid_limit_or_owner_cursor[1-after4] _________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:189: in test_invalid_limit_or_owner_cursor
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+_________________ test_invalid_limit_or_owner_cursor[1-after5] _________________
+simulation/tests/test_stage_0_5_proof_occurrence.py:189: in test_invalid_limit_or_owner_cursor
+    o,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:15: in setup_source
+    o = occurrence_module()
+        ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_fixtures.py:12: in occurrence_module
+    return importlib.import_module('ate_sim.persistence_proof_occurrence')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence'
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_independent_framing_and_sql_tuple_order
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_exact_owner_group_pages_and_no_owner_payloads
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_empty_owner_group_and_end_cursor_prove_absence
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_previous_pin_after_reassignment_and_delete
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_wrong_context_and_allocator_rejected[store]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_wrong_context_and_allocator_rejected[generation]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_wrong_context_and_allocator_rejected[codec]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_wrong_context_and_allocator_rejected[scope]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_wrong_context_and_allocator_rejected[allocator]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_wrong_context_and_allocator_rejected[expected]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_corruption_and_hidden_overlap_rejected[missing]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_corruption_and_hidden_overlap_rejected[empty]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_corruption_and_hidden_overlap_rejected[surplus]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_corruption_and_hidden_overlap_rejected[coherent]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_corruption_and_hidden_overlap_rejected[overlap]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_corruption_and_hidden_overlap_rejected[other_group_overlap]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_corruption_and_hidden_overlap_rejected[checksum]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_corruption_and_hidden_overlap_rejected[lookahead]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_corruption_and_hidden_overlap_rejected[false_end]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_large_metadata_guard_before_transfer[key]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_large_metadata_guard_before_transfer[path]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_large_metadata_guard_before_transfer[namespace]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_large_metadata_guard_before_transfer[nul-checksum]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_invalid_namespace_utf8_and_allocator_metadata_fail_closed
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_indexes_are_explicit_transaction_owned_and_required
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_owned_nested_arbitrary_transactions_and_foreign_pin
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_invalid_limit_or_owner_cursor[0-None]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_invalid_limit_or_owner_cursor[129-None]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_invalid_limit_or_owner_cursor[True-None]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_invalid_limit_or_owner_cursor[1-after3]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_invalid_limit_or_owner_cursor[1-after4]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_invalid_limit_or_owner_cursor[1-after5]
+32 failed in 0.71s

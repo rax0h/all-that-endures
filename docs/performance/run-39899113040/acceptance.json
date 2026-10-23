@@ -1,0 +1,28 @@
+{
+  "schema": "ate-proof-version-ci-acceptance/1",
+  "run_id": 39899113040,
+  "status": "completed",
+  "conclusion": "success",
+  "candidate": "cd50a80aefeeedef2466ffb45c5a21e8100e9b8c",
+  "runtime_tree": "12ab428b38cadbffb7f568ce84f7e1e6e1db8b2e",
+  "pytest_passed": 3310,
+  "subtests_passed": 2,
+  "warnings": 1,
+  "seconds": 5148.67,
+  "proof_cases": 216,
+  "diagnostics": [
+    "map",
+    "batch",
+    "order",
+    "query",
+    "version"
+  ],
+  "artifact_sha256": {
+    "12481222530": "a6dda5f52476cb50c13e2f68a8b72f48b9cff8bc113ae108cabd12c1c607fc52",
+    "12477928897": "b218b35221b35bfbaf9f06b0a64a1cd5a2d73a141744ce4181d335eddfdf71ec"
+  },
+  "limits": [
+    "No World activation",
+    "No mature speed acceptance"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "canonical_rebuild": {
+    "equal": true,
+    "wall_seconds": 6.981828921000016
+  },
+  "construction": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 0,
+      "read_nodes": 0,
+      "read_requests": 0,
+      "write_requests": 137208,
+      "written_bytes": 13001729,
+      "written_nodes": 137208
+    },
+    "python_peak_bytes": 779032,
+    "wall_seconds": 20.35144880599998
+  },
+  "database_bytes": 37617664,
+  "keys": 100000,
+  "limits": [
+    "Primitive relation metadata only, not World save/open/identity integration.",
+    "Historical payload table is synthetic; no mature workload result.",
+    "Source-row fixture setup and full rebuild are outside transition timer.",
+    "RSS is lifetime peak, including prior cases and construction."
+  ],
+  "point": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 14529,
+      "read_nodes": 33,
+      "read_requests": 33,
+      "write_requests": 6,
+      "written_bytes": 2658,
+      "written_nodes": 6
+    },
+    "python_peak_bytes": 103248,
+    "sql_selects": {
+      "historical_payloads": 0,
+      "other": 0,
+      "proof": 33,
+      "relation": 9,
+      "staging": 7
+    },
+    "wall_seconds": 0.037485994999997274
+  },
+  "process_peak_rss_bytes": 35459072,
+  "root_after": {
+    "count": 100000,
+    "digest": "7a317f4a1d0cb0f88a54efeb64d5530aeb9d5b880eb0d2cfa38ddde7134d24e0"
+  },
+  "root_before": {
+    "count": 100000,
+    "digest": "f6c30226b4b7b3fd57eb4b48479366a87ee9c287ccaa7b9ee603f52033c9bdcd"
+  },
+  "schema": "ate-proof-order-scaling/1",
+  "setup": {
+    "wall_seconds": 0.3842906659999983
+  },
+  "source": {
+    "driver_sha256": "51f3f7091edee67f6f6513f4d8aa5f77fd7e98ca8ab05ed3043c3a6b25b92aab",
+    "head": "cd50a80aefeeedef2466ffb45c5a21e8100e9b8c",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "12ab428b38cadbffb7f568ce84f7e1e6e1db8b2e",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete",
+  "verified_page_rows": 16
+}

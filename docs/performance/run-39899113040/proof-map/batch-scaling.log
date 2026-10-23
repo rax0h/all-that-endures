@@ -1,0 +1,3 @@
+1000: final nodes=1350, batch=0.148s, heap=77312B, point reads=4
+10000: final nodes=13850, batch=1.552s, heap=341242B, point reads=5
+100000: final nodes=137297, batch=16.467s, heap=783050B, point reads=6

@@ -1,0 +1,33 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_wrong_reserved_index_definition_rejected_before_query[incarnation_id,owner_namespace,owner_key,occurrence_path) WHERE valid_to IS NOT NULL] _
+simulation/tests/test_stage_0_5_proof_occurrence.py:202: in test_wrong_reserved_index_definition_rejected_before_query
+    with pytest.raises(StoreError):read(o,store,pin,certs[0])
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence.py:23: in read
+    return o.read_occurrence_page(store, pin, *pair, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_occurrence.py:235: in read_occurrence_page
+    fetched=source(boundary=after,limit=limit+1);page=fetched[:limit];entries=[];boundary_entry=None
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_occurrence.py:234: in source
+    def source(**kwargs):return _rows(store,generation,head,scope,certificate.next_incarnation_id,**kwargs)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_occurrence.py:176: in _rows
+    streams = [store.db.execute(f'SELECT {columns} FROM lazy_identity_occurrence_versions INDEXED BY {current} '
+E   sqlite3.OperationalError: no query solution
+_ test_wrong_reserved_index_definition_rejected_before_query[incarnation_id,owner_namespace COLLATE NOCASE,owner_key,occurrence_path) WHERE valid_to IS NULL] _
+simulation/tests/test_stage_0_5_proof_occurrence.py:202: in test_wrong_reserved_index_definition_rejected_before_query
+    with pytest.raises(StoreError):read(o,store,pin,certs[0])
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_wrong_reserved_index_definition_rejected_before_query[incarnation_id,owner_namespace DESC,owner_key,occurrence_path) WHERE valid_to IS NULL] _
+simulation/tests/test_stage_0_5_proof_occurrence.py:202: in test_wrong_reserved_index_definition_rejected_before_query
+    with pytest.raises(StoreError):read(o,store,pin,certs[0])
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_wrong_reserved_index_definition_rejected_before_query[incarnation_id,owner_namespace,owner_key,occurrence_path) WHERE valid_to IS NOT NULL]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_wrong_reserved_index_definition_rejected_before_query[incarnation_id,owner_namespace COLLATE NOCASE,owner_key,occurrence_path) WHERE valid_to IS NULL]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_wrong_reserved_index_definition_rejected_before_query[incarnation_id,owner_namespace DESC,owner_key,occurrence_path) WHERE valid_to IS NULL]
+3 failed, 34 deselected in 0.61s

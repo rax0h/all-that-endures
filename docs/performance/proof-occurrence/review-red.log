@@ -1,0 +1,40 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_required_interval_indexes_and_capability_cannot_take_legacy_fallback[True-lazy_identity_occurrence_interval] _
+simulation/tests/test_stage_0_5_proof_occurrence.py:236: in test_required_interval_indexes_and_capability_cannot_take_legacy_fallback
+    with pytest.raises(StoreError):read(o,store,pin,certs[0])
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_required_interval_indexes_and_capability_cannot_take_legacy_fallback[True-lazy_identity_state_interval] _
+simulation/tests/test_stage_0_5_proof_occurrence.py:236: in test_required_interval_indexes_and_capability_cannot_take_legacy_fallback
+    with pytest.raises(StoreError):read(o,store,pin,certs[0])
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_required_interval_indexes_and_capability_cannot_take_legacy_fallback[False-lazy_identity_occurrence_interval] _
+simulation/tests/test_stage_0_5_proof_occurrence.py:236: in test_required_interval_indexes_and_capability_cannot_take_legacy_fallback
+    with pytest.raises(StoreError):read(o,store,pin,certs[0])
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+_ test_required_interval_indexes_and_capability_cannot_take_legacy_fallback[False-lazy_identity_state_interval] _
+simulation/tests/test_stage_0_5_proof_occurrence.py:236: in test_required_interval_indexes_and_capability_cannot_take_legacy_fallback
+    with pytest.raises(StoreError):read(o,store,pin,certs[0])
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE StoreError
+__ test_old_empty_scope_rejects_newer_candidates_with_bounded_sql_work[1000] ___
+simulation/tests/test_stage_0_5_proof_occurrence.py:255: in test_old_empty_scope_rejects_newer_candidates_with_bounded_sql_work
+    with pytest.raises(o.OccurrenceProofBudgetError):read(o,store,old,empty,limit=4)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE OccurrenceProofBudgetError
+__ test_old_empty_scope_rejects_newer_candidates_with_bounded_sql_work[10000] __
+simulation/tests/test_stage_0_5_proof_occurrence.py:255: in test_old_empty_scope_rejects_newer_candidates_with_bounded_sql_work
+    with pytest.raises(o.OccurrenceProofBudgetError):read(o,store,old,empty,limit=4)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE OccurrenceProofBudgetError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_required_interval_indexes_and_capability_cannot_take_legacy_fallback[True-lazy_identity_occurrence_interval]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_required_interval_indexes_and_capability_cannot_take_legacy_fallback[True-lazy_identity_state_interval]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_required_interval_indexes_and_capability_cannot_take_legacy_fallback[False-lazy_identity_occurrence_interval]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_required_interval_indexes_and_capability_cannot_take_legacy_fallback[False-lazy_identity_state_interval]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_old_empty_scope_rejects_newer_candidates_with_bounded_sql_work[1000]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence.py::test_old_empty_scope_rejects_newer_candidates_with_bounded_sql_work[10000]
+6 failed, 37 deselected in 1.49s

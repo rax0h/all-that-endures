@@ -37,3 +37,7 @@ Review exclusions remain mandatory integration gates, never implicit acceptance:
 ## Published successor
 
 Exact-tree candidate cd50a80aefeeedef2466ffb45c5a21e8100e9b8c matches local82bca210 root64dd54b64c42c70a7de5c1d5951c32ffe07b248d and measured runtime12ab428b38cadbffb7f568ce84f7e1e6e1db8b2e. Only sol/durable-proof-map advanced with the exact expected parent lease. [Run39899113040](https://github.com/rax0h/all-that-endures/actions/runs/39899113040) was queued for all proof tests, five bounded diagnostics and the separate full simulation suite. Acceptance is pending; do not substitute parent green. [Launch receipt](proof-version/ci-launch.json). On green, verify downloaded artifact digests/source, retain acceptance, then continue owner/group/link/namespace proof integration. On failure, inspect this run before further code. No long-run polling.
+
+## Successor accepted
+
+Run39899113040 completed green:3310 pytest cases plus2 subtests,1 warning,5148.67s;216 proof cases and all five diagnostics. Downloaded artifacts match GitHub SHA256 metadata and all source/runtime receipts match the exact candidate. [Acceptance and raw evidence](run-39899113040/acceptance.json). This supersedes the pending status above. World authority and mature timing remain pending.

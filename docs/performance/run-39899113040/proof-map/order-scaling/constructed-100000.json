@@ -1,0 +1,27 @@
+{
+  "construction": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 0,
+      "read_nodes": 0,
+      "read_requests": 0,
+      "write_requests": 137208,
+      "written_bytes": 13001729,
+      "written_nodes": 137208
+    },
+    "python_peak_bytes": 779032,
+    "wall_seconds": 20.35144880599998
+  },
+  "keys": 100000,
+  "setup": {
+    "wall_seconds": 0.3842906659999983
+  },
+  "source": {
+    "driver_sha256": "51f3f7091edee67f6f6513f4d8aa5f77fd7e98ca8ab05ed3043c3a6b25b92aab",
+    "head": "cd50a80aefeeedef2466ffb45c5a21e8100e9b8c",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "12ab428b38cadbffb7f568ce84f7e1e6e1db8b2e",
+    "sqlite": "3.45.1"
+  }
+}

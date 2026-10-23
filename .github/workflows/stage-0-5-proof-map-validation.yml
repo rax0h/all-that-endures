@@ -10,6 +10,7 @@ name: Stage 0.5 durable proof map validation
       - .github/tests/run_proof_order_scaling.py
       - .github/tests/run_proof_query_scaling.py
       - .github/tests/run_proof_version_scaling.py
+      - .github/tests/run_proof_occurrence_scaling.py
       - .github/workflows/stage-0-5-proof-map-validation.yml
 permissions:
   contents: read
@@ -36,12 +37,13 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p evidence
-          python -m pytest -q simulation/tests/test_stage_0_5_proof_nodes.py simulation/tests/test_stage_0_5_proof_map.py simulation/tests/test_stage_0_5_proof_store.py simulation/tests/test_stage_0_5_proof_batch.py simulation/tests/test_stage_0_5_proof_content.py simulation/tests/test_stage_0_5_proof_order.py simulation/tests/test_stage_0_5_proof_order_edit.py simulation/tests/test_stage_0_5_proof_query.py simulation/tests/test_stage_0_5_proof_version.py --junitxml=evidence/proof-tests.xml 2>&1 | tee evidence/proof-tests.log
+          python -m pytest -q simulation/tests/test_stage_0_5_proof_nodes.py simulation/tests/test_stage_0_5_proof_map.py simulation/tests/test_stage_0_5_proof_store.py simulation/tests/test_stage_0_5_proof_batch.py simulation/tests/test_stage_0_5_proof_content.py simulation/tests/test_stage_0_5_proof_order.py simulation/tests/test_stage_0_5_proof_order_edit.py simulation/tests/test_stage_0_5_proof_query.py simulation/tests/test_stage_0_5_proof_version.py simulation/tests/test_stage_0_5_proof_occurrence.py --junitxml=evidence/proof-tests.xml 2>&1 | tee evidence/proof-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_map_scaling.py --output evidence/scaling 2>&1 | tee evidence/scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_batch_scaling.py --output evidence/batch-scaling 2>&1 | tee evidence/batch-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_order_scaling.py --output evidence/order-scaling 2>&1 | tee evidence/order-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_query_scaling.py --output evidence/query-scaling 2>&1 | tee evidence/query-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_version_scaling.py --output evidence/version-scaling 2>&1 | tee evidence/version-scaling.log
+          timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_occurrence_scaling.py --output evidence/occurrence-scaling 2>&1 | tee evidence/occurrence-scaling.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
