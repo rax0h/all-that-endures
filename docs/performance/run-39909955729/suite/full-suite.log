@@ -1,0 +1,85 @@
+........................................................................ [  2%]
+........................................................................ [  4%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 12%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 19%]
+........................................................................ [ 21%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 36%]
+........................................................................ [ 38%]
+........................................................................ [ 40%]
+........................................................................ [ 42%]
+........................................................................ [ 45%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 55%]
+........................................................................ [ 57%]
+........................................................................ [ 60%]
+........................................................................ [ 62%]
+........................................................................ [ 64%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 72%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 79%]
+........................................................................ [ 81%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+...................................................................... [ 87%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+........................................................................ [ 96%]
+........................................................................ [ 98%]
+............................................                             [100%]
+=============================== warnings summary ===============================
+simulation/tests/test_checkpoint_artifacts.py::test_extract_rejects_unexpected_duplicate_or_traversing_members[members3]
+  /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/zipfile/__init__.py:1650: UserWarning: Duplicate name: 'candidate.sqlite'
+    return self._open_to_write(zinfo, force_zip64=force_zip64)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 30 durations =============================
+678.87s call     simulation/tests/test_persistence_history_operations.py::test_streaming_history_bounds_and_detach_cost_are_measured[400]
+229.98s call     simulation/tests/test_stage_0_5_final_advancement_graph.py::test_scalar_edit_does_not_read_or_write_imported_sample_history
+191.52s call     simulation/tests/test_persistence_cold_bootstrap.py::test_bootstrap_transfer_read_and_retention_bounds
+109.56s call     simulation/tests/test_stage_0_5_final_aged_save_continuation.py::test_year_60_world_continues_exactly_through_two_saved_years
+64.77s call     simulation/tests/test_stage_0_5_final_identity_headers.py::test_identity_header_comparison_never_reads_sequence_history[10000]
+62.01s call     simulation/tests/test_persistence_history_operations.py::test_streaming_history_bounds_and_detach_cost_are_measured[40]
+54.13s call     simulation/tests/test_stage_0_5_final_long_harness.py::test_long_harness_complete_lane_restores_exact_two_milestones
+54.07s call     simulation/tests/test_stage_0_5_final_history_type_admission.py::test_valid_paged_admission_reads_no_member_payload[10000-sequence]
+52.42s call     simulation/tests/test_checkpointed_upgrade_validation.py::test_p5_bridge_emits_normal_receipt_and_exact_continuation
+52.21s call     simulation/tests/test_persistence_cold_save_bounds.py::test_cold_save_allocation_bounds_exclude_fixture_and_reader_cache
+50.29s call     simulation/tests/test_stage_0_5_final_long_harness.py::test_staged_harness_resumes_checked_artifacts_without_rebuilding
+42.40s call     simulation/tests/test_stage_0_5_final_event_id_exceptions.py::test_pop_skips_large_removed_suffix_and_clear_replaces_authority
+37.92s call     simulation/tests/test_persistence_lazy_souls.py::test_soul_history_scaling_is_bounded_by_requested_access[10000]
+36.72s call     simulation/tests/test_stage_0_5_final_maintenance.py::test_point_and_reverse_reads_do_not_scan_expired_backlog[10000]
+34.32s call     simulation/tests/test_stage_0_5_final_sequence.py::test_delete_to_empty_root_and_failed_mutation_rollback
+33.23s call     simulation/tests/test_persistence_cold_capture.py::test_capture_bounds_are_enforced_across_4_40_400_segments
+32.65s call     simulation/tests/test_persistence_cold_save_bounds.py::test_cold_save_history_bounds_are_independent_of_old_prefix[400]
+30.10s call     simulation/tests/test_stage_0_5_final_sequence.py::test_repeated_same_gap_splits_then_merges_and_stable_occurrences
+30.04s call     simulation/tests/test_stage_0_5_r3_cross_family_extra.py::test_three_owner_shared_members_are_bounded_and_portable[10000]
+29.74s call     simulation/tests/test_persistence_session_open.py::test_review_append_seal_close_never_reads_cold_segments[400]
+29.42s call     simulation/tests/test_cultural_reconstruction.py::test_culture_reconstructs_without_label_entity
+28.56s call     simulation/tests/test_history_networks.py::test_migration_can_found_traceable_diaspora
+28.46s call     simulation/tests/test_persistence_session_open.py::test_open_close_event_history_bookkeeping_is_constant[400]
+28.33s call     simulation/tests/test_development_systems.py::test_infrastructure_has_lineage_and_decay_maintenance_history
+26.33s call     simulation/tests/test_continuation_checkpoint_ci.py::test_real_zip_transport_two_year_pipeline_uses_fresh_processes
+22.24s call     simulation/tests/test_stage_0_5_paged_household_world.py::test_r3_world_open_digest_append_atomic_save_reopen[10000]
+22.15s call     simulation/tests/test_rank_loadout_invariant.py::test_ranked_living_people_have_complete_loadouts[843002]
+21.67s call     simulation/tests/test_rank_loadout_invariant.py::test_ranked_living_people_have_complete_loadouts[843001]
+21.66s call     simulation/tests/test_stage_0_5_closeout.py::test_r1_retained_history_sidecars_and_reactivation_across_boundaries[10000]
+21.64s call     simulation/tests/test_stage_0_5_final_currency_root_copy.py::test_currency_root_point_save_does_not_walk_map_history
+3354 passed, 1 warning, 2 subtests passed in 3713.58s (1:01:53)

@@ -1,0 +1,58 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier[1000] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_old_empty_and_nonempty_pa0')
+count = 1000
+
+    @pytest.mark.parametrize('count',[1000,10000])
+    def test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier(tmp_path,count):
+        s,store,pin,certs=setup_source(tmp_path);old=store.capture_pin()
+        original=read(s,store,old,certs[0]).rows
+        def changes():
+            yield IdentityOccurrenceChange('people',0,(('field','other'),),2)
+            yield IdentityOccurrenceChange('people',1,(('field','shared'),),delete=True)
+            for i in range(count):yield IdentityOccurrenceChange('archive',i+10,(),2)
+        writer=store.commit(pin,commit_token='frontier',version_changes=(VersionChange('archive',i+10,i) for i in range(count)),
+            identity_changes=changes(),next_incarnation_id=6,changes=(),new_segments=(),metadata=metadata(2)).pin
+>       assert store.db.execute(
+            "SELECT incarnation_id,count(*) FROM lazy_identity_occurrence_versions "
+            "WHERE owner_namespace='archive' AND valid_from=2 GROUP BY incarnation_id ORDER BY incarnation_id"
+        ).fetchall()==[(1,count),(2,count)]
+E       assert [(2, 1000)] == [(1, 1000), (2, 1000)]
+E         
+E         At index 0 diff: (2, 1000) != (1, 1000)
+E         Right contains one more item: (2, 1000)
+E         Use -v to get more diff
+
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:65: AssertionError
+_ test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier[10000] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_old_empty_and_nonempty_pa1')
+count = 10000
+
+    @pytest.mark.parametrize('count',[1000,10000])
+    def test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier(tmp_path,count):
+        s,store,pin,certs=setup_source(tmp_path);old=store.capture_pin()
+        original=read(s,store,old,certs[0]).rows
+        def changes():
+            yield IdentityOccurrenceChange('people',0,(('field','other'),),2)
+            yield IdentityOccurrenceChange('people',1,(('field','shared'),),delete=True)
+            for i in range(count):yield IdentityOccurrenceChange('archive',i+10,(),2)
+        writer=store.commit(pin,commit_token='frontier',version_changes=(VersionChange('archive',i+10,i) for i in range(count)),
+            identity_changes=changes(),next_incarnation_id=6,changes=(),new_segments=(),metadata=metadata(2)).pin
+>       assert store.db.execute(
+            "SELECT incarnation_id,count(*) FROM lazy_identity_occurrence_versions "
+            "WHERE owner_namespace='archive' AND valid_from=2 GROUP BY incarnation_id ORDER BY incarnation_id"
+        ).fetchall()==[(1,count),(2,count)]
+E       assert [(2, 10000)] == [(1, 10000), (2, 10000)]
+E         
+E         At index 0 diff: (2, 10000) != (1, 10000)
+E         Right contains one more item: (2, 10000)
+E         Use -v to get more diff
+
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:65: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier[1000]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier[10000]
+2 failed, 14 deselected in 1.09s

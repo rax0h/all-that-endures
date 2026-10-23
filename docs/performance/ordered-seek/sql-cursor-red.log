@@ -1,0 +1,16 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_build_streams_active_sql_cursor_without_schema_lock ___________
+simulation/tests/test_stage_0_5_proof_seek.py:173: in test_build_streams_active_sql_cursor_without_schema_lock
+    try:root=m.build(cursor)
+             ^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_seek.py:193: in build
+    previous=key;root=self.set(root,key,value)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_seek.py:182: in set
+    finally:self.db.execute(f'DROP TABLE IF EXISTS {table}')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   sqlite3.OperationalError: database table is locked
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_seek.py::test_build_streams_active_sql_cursor_without_schema_lock
+1 failed in 0.19s

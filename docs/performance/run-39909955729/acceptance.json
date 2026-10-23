@@ -1,0 +1,22 @@
+{
+  "schema": "ate-occurrence-ci-acceptance/1",
+  "run_id": 39909955729,
+  "status": "completed",
+  "conclusion": "success",
+  "candidate": "3f57dfe48ccfa68478b2fbd37deb151e907b24ef",
+  "runtime_tree": "8bce1bd8ffca3ede10e729d8ab0ca375ecbb747f",
+  "pytest_passed": 3354,
+  "subtests_passed": 2,
+  "warnings": 1,
+  "seconds": 3713.58,
+  "proof_cases": 260,
+  "diagnostics": 6,
+  "artifact_sha256": {
+    "12484936999": "0221c04daf091834f6bd2235a578c15bc0ceaa8853d2184f6503beec5d4fadf2",
+    "12482870610": "4e7af12a4356022b84bd8b647dd5e339373ef9c2cea830bb1e62e1ce27571a48"
+  },
+  "limits": [
+    "No World activation",
+    "No mature speed acceptance"
+  ]
+}

@@ -74,8 +74,8 @@ def create_occurrence_indexes(db):
     _require_indexes(db)
 
 
-def _require_indexes(db):
-    requirements=INDEXES+tuple((name,INTERVAL_INDEXES[name],False) for name in REQUIRED_INTERVALS)
+def _require_indexes(db,*,include_order=True):
+    requirements=(INDEXES if include_order else ())+tuple((name,INTERVAL_INDEXES[name],False) for name in REQUIRED_INTERVALS)
     for name, fields, partial in requirements:
         row = db.execute("SELECT CASE WHEN typeof(sql)='text' AND length(CAST(sql AS BLOB))<=8192 THEN sql END "
                          "FROM sqlite_schema WHERE type='index' AND name=?", (name,)).fetchone()

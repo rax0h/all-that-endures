@@ -1,0 +1,33 @@
+{
+  "archive_placements": "2*size",
+  "instrumentation": "tracemalloc,SQL trace,SQLite VM progress100",
+  "limits": [
+    "Inactive root authority, not World open/save/year timing.",
+    "Root defines committed membership; unselected physical surplus remains full-audit work."
+  ],
+  "newer_placements_per_measured_group": "size",
+  "old_empty_size": 0,
+  "old_group_fanout": 8,
+  "old_owner_paths": 2,
+  "point_key": 500,
+  "python_clean_node_cache_bytes": 0,
+  "read_page": 4,
+  "schema": "ate-root-ordered-selection-source/1",
+  "sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "source": {
+    "driver_sha256": "75167720b3b55c5d9f7d2e895f673bbfbc7127a6e7b92ba38aa316486d6ce2fa",
+    "fixture_sha256": "bb41d1cde1de22c4ff7ad1adc8a31715461b9ea4d2e87b3dd4acefc90707a0a3",
+    "head": "2746c5b0261a4299377fef5ab01437a4aa3c34a4",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "runtime_tree": "dcea4f0686b6ceb7bc4eaacc3441236c4ad08327",
+    "sqlite": "3.53.1"
+  },
+  "sqlite_main_cache_kib": 2048,
+  "sqlite_temp_cache_kib": 2048,
+  "temp_store": "FILE"
+}

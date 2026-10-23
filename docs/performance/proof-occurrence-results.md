@@ -37,3 +37,11 @@ Owner/group payload-reference projections, existing owner radix/header agreement
 ## Published successor
 
 Exact-tree candidate3f57dfe48ccfa68478b2fbd37deb151e907b24ef matches local432fe6d579 rootbf1bdef3e867c7ea6445f4f647744ae0fc5667ee and measured runtime8bce1bd8ffca3ede10e729d8ab0ca375ecbb747f. Only sol/durable-proof-map advanced using the exact expected-parent lease. [Run39909955729](https://github.com/rax0h/all-that-endures/actions/runs/39909955729) is in progress with the separate full simulation suite and all six diagnostics. Candidate acceptance is pending. [Launch/resume receipt](proof-occurrence/ci-launch.json). First authenticate this run on green; on failure inspect its artifacts before edits. Next resolve general bounded old-pin selection before World adoption, then complete topology/manifests/publication gates. No long-test polling or parent-success substitution.
+
+## Successor accepted
+
+Run39909955729 completed green:3354 tests plus2 subtests,1 warning,3713.58s;260 proof cases and all six diagnostics. Downloaded SHA256 and all runtime/source receipts match the candidate. [Acceptance and raw evidence](run-39909955729/acceptance.json). This supersedes pending status above.
+
+## Root-selected successor
+
+The separately reviewed inactive adapter in `persistence_proof_occurrence_seek.py` resolves the newer-frontier rejection for supported field sizes by selecting exact positions from a retained immutable ordered root. It checks each selected physical occurrence through exact interval indexes. The root defines committed logical membership; unselected physical surplus is never returned and requires full inventory audit. See [corrected measurements and remaining gates](ordered-seek-results.md). The original adapter and all World paths retain their existing behavior.

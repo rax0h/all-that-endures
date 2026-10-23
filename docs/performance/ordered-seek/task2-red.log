@@ -1,0 +1,340 @@
+FFFFFFFFFFFFFFFF                                                         [100%]
+=================================== FAILURES ===================================
+_______________ test_exact_framing_and_arbitrary_middle_cursors ________________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:25: in test_exact_framing_and_arbitrary_middle_cursors
+    s,store,pin,certs=setup_source(tmp_path);cert,expected=certs[0]
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+__________ test_current_pages_owner_agreement_and_zero_payload_reads ___________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:40: in test_current_pages_owner_agreement_and_zero_payload_reads
+    s,store,pin,certs=setup_source(tmp_path);sql=[];store.reset_diagnostics();store.db.set_trace_callback(sql.append)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+_ test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier[1000] __
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:57: in test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier
+    s,store,pin,certs=setup_source(tmp_path);old=store.capture_pin()
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+_ test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier[10000] _
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:57: in test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier
+    s,store,pin,certs=setup_source(tmp_path);old=store.capture_pin()
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+_____ test_selected_physical_or_proof_corruption_is_rejected[payload-row] ______
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:83: in test_selected_physical_or_proof_corruption_is_rejected
+    s,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+_______ test_selected_physical_or_proof_corruption_is_rejected[missing] ________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:83: in test_selected_physical_or_proof_corruption_is_rejected
+    s,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+_______ test_selected_physical_or_proof_corruption_is_rejected[overlap] ________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:83: in test_selected_physical_or_proof_corruption_is_rejected
+    s,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+_________ test_selected_physical_or_proof_corruption_is_rejected[node] _________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:83: in test_selected_physical_or_proof_corruption_is_rejected
+    s,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+____ test_unselected_surplus_never_enters_root_results_not_claimed_scrubbed ____
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:99: in test_unselected_surplus_never_enters_root_results_not_claimed_scrubbed
+    s,store,pin,certs=setup_source(tmp_path);original=read(s,store,pin,certs[0]).rows
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+___________________ test_wrong_authority_and_context[store] ____________________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:112: in test_wrong_authority_and_context
+    s,store,pin,certs=setup_source(tmp_path);cert,expected=certs[0]
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+_________________ test_wrong_authority_and_context[generation] _________________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:112: in test_wrong_authority_and_context
+    s,store,pin,certs=setup_source(tmp_path);cert,expected=certs[0]
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+___________________ test_wrong_authority_and_context[codec] ____________________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:112: in test_wrong_authority_and_context
+    s,store,pin,certs=setup_source(tmp_path);cert,expected=certs[0]
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+___________________ test_wrong_authority_and_context[scope] ____________________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:112: in test_wrong_authority_and_context
+    s,store,pin,certs=setup_source(tmp_path);cert,expected=certs[0]
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+_________________ test_wrong_authority_and_context[allocator] __________________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:112: in test_wrong_authority_and_context
+    s,store,pin,certs=setup_source(tmp_path);cert,expected=certs[0]
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+__________________ test_wrong_authority_and_context[expected] __________________
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:112: in test_wrong_authority_and_context
+    s,store,pin,certs=setup_source(tmp_path);cert,expected=certs[0]
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+_______ test_owned_nested_transactions_missing_interval_and_released_pin _______
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:124: in test_owned_nested_transactions_missing_interval_and_released_pin
+    s,store,pin,certs=setup_source(tmp_path)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_occurrence_seek.py:16: in setup_source
+    s=seek_module();store,pin=make_occurrence_store(tmp_path/'seek-source.sqlite',3)
+      ^^^^^^^^^^^^^
+simulation/tests/proof_occurrence_seek_fixtures.py:8: in seek_module
+    def seek_module():return importlib.import_module('ate_sim.persistence_proof_occurrence_seek')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_occurrence_seek'
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_exact_framing_and_arbitrary_middle_cursors
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_current_pages_owner_agreement_and_zero_payload_reads
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier[1000]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_old_empty_and_nonempty_pages_return_exact_despite_newer_frontier[10000]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_selected_physical_or_proof_corruption_is_rejected[payload-row]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_selected_physical_or_proof_corruption_is_rejected[missing]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_selected_physical_or_proof_corruption_is_rejected[overlap]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_selected_physical_or_proof_corruption_is_rejected[node]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_unselected_surplus_never_enters_root_results_not_claimed_scrubbed
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_wrong_authority_and_context[store]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_wrong_authority_and_context[generation]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_wrong_authority_and_context[codec]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_wrong_authority_and_context[scope]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_wrong_authority_and_context[allocator]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_wrong_authority_and_context[expected]
+FAILED simulation/tests/test_stage_0_5_proof_occurrence_seek.py::test_owned_nested_transactions_missing_interval_and_released_pin
+16 failed in 0.30s

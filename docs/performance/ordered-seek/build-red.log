@@ -1,0 +1,10 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_sorted_construction_writes_only_final_radix_nodes ____________
+simulation/tests/test_stage_0_5_proof_seek.py:183: in test_sorted_construction_writes_only_final_radix_nodes
+    assert root.count==200 and m.diagnostics()['written_nodes']<=399
+E   AssertionError: assert (200 == 200 and 571 <= 399)
+E    +  where 200 = Root(digest=b'{\x0cR\xc6,2\xa4\x08\xc1js\xe8\x17\x85\xd7i\x9e\xdd\x19p\x1aZH\xa8X\xea\x8a\xaf1}$\xfe', count=200).count
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_seek.py::test_sorted_construction_writes_only_final_radix_nodes
+1 failed in 0.20s
