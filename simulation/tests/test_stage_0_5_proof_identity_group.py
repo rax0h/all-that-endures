@@ -155,3 +155,73 @@ def test_selected_retirement_range_checked(tmp_path,fault):
         pairs=group_authorities(store,writer,3)
     with pytest.raises(StoreIntegrityError):read_group(store,writer,pairs)
     store.close()
+
+
+@pytest.mark.parametrize('fault',['link-inc-bool','anchor-bool','leaf-path-bool'])
+def test_typed_identity_aliases_are_not_python_equality(tmp_path,fault):
+    def mutate(changes,codec):
+        for c in changes:
+            v=c.value
+            if fault=='link-inc-bool' and c.namespace==catalog.LINK_NAMESPACE and not c.delete:v=(v[0],True,v[2])
+            if fault=='anchor-bool' and c.namespace==catalog.GROUP_NAMESPACE and c.key==1:
+                v=(*v[:6],(('field','people'),('key',True)))
+            yield replace(c,value=v)
+    if fault=='leaf-path-bool':
+        # Build a simpler one-leaf owner in a real catalog for a coherent header.
+        from ate_sim.persistence_lazy_store import VersionChange
+        def simple(changes,codec):
+            wrong=(('key',False),);prefix=catalog.path_hash(codec,wrong);node=('owner-leaf/v1',wrong,1)
+            for c in changes:
+                if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                    c=replace(c,key=(NS,1,prefix),value=node)
+                elif c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    c=replace(c,value=(*c.value[:6],prefix,1,catalog.node_commit(codec,node)[1]))
+                yield c
+        from ate_sim.persistence_lazy_store import IdentityOccurrenceChange,LazyRecordStore
+        from ate_sim.persistence_adapters import WorldCodec
+        from simulation.tests.proof_identity_group_fixtures import metadata
+        store=LazyRecordStore.create(tmp_path/'alias.sqlite',codec=WorldCodec(),simulation_schema='8',rules_id='alias')
+        pin=store.capture_pin();versions=(VersionChange(NS,1,{}),);placements=(IdentityOccurrenceChange(NS,1,(('key',0),),1),)
+        delta=catalog.initial_catalog_delta(store.codec,versions,placements,next_incarnation_id=2,generation=1)
+        witness=tuple(simple(delta.decode(store.codec)[0],store.codec))
+        pin=store.commit(pin,commit_token='alias',version_changes=versions+witness,identity_changes=placements,
+            next_incarnation_id=2,changes=(),new_segments=(),metadata=metadata()).pin
+        pairs=group_authorities(store,pin)
+    else:store,pin,pairs=make_group_store(tmp_path/'alias.sqlite',catalog_mutator=mutate)
+    with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+    store.close()
+
+
+def test_nested_snapshot_and_native_head_metadata_rejected_before_restore(tmp_path):
+    store,pin,pairs=make_group_store(tmp_path/'closed.sqlite')
+    with store.read_transaction():
+        with store.read_snapshot(pin):assert len(read_group(store,pin,pairs).occurrences)==2
+    from ate_sim.core import Event,Layer
+    from ate_sim.incremental_store import _head_checksum
+    store.db.execute('UPDATE save_head SET simulation_position=?',(store.codec.encode(Event(1,0,'body',Layer.REALITY)),))
+    row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+    store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),));store.db.commit()
+    with pytest.raises(StoreError):read_group(store,pin,pairs)
+    store.close()
+
+
+def test_ordinary_source_metadata_current_and_retained_without_body_admission(tmp_path):
+    from ate_sim.incremental_store import RecordChange
+    from ate_sim.persistence_lazy_store import LazyRecordStore,IdentityOccurrenceChange
+    from ate_sim.persistence_adapters import WorldCodec
+    from simulation.tests.proof_identity_group_fixtures import metadata
+    store=LazyRecordStore.create(tmp_path/'ordinary.sqlite',codec=WorldCodec(),simulation_schema='8',rules_id='ordinary')
+    pin=store.capture_pin();ordinary=(RecordChange(NS,1,'shared'),RecordChange(NS,2,'shared'))
+    placements=(IdentityOccurrenceChange(NS,1,(),1),IdentityOccurrenceChange(NS,2,(),1))
+    delta=catalog.initial_catalog_delta(store.codec,(),placements,next_incarnation_id=2,generation=1,ordinary_changes=ordinary)
+    pin=store.commit(pin,commit_token='initial',changes=ordinary,version_changes=delta.decode(store.codec)[0],identity_changes=placements,
+        next_incarnation_id=2,new_segments=(),metadata=metadata()).pin
+    pairs=group_authorities(store,pin);old=store.capture_pin()
+    assert len(read_group(store,pin,pairs).occurrences)==2
+    changed=(RecordChange(NS,1,'new'),);placement=(IdentityOccurrenceChange(NS,1,(),2),)
+    delta=catalog.IdentityCatalog(store).prepare_delta(pin,(),placement,ordinary_changes=changed,next_incarnation_id=3)
+    writer=store.commit(pin,commit_token='overwrite',changes=changed,version_changes=delta.decode(store.codec)[0],identity_changes=placement,
+        next_incarnation_id=3,new_segments=(),metadata=metadata(2)).pin
+    assert len(read_group(store,old,pairs).occurrences)==2
+    assert len(read_group(store,writer,group_authorities(store,writer)).occurrences)==1
+    store.close()

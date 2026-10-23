@@ -101,3 +101,13 @@ def test_owned_nested_snapshots_and_surplus_not_admitted(tmp_path):
     assert len(q.read_query_seek_page(store,pin,*pair).positions)==16
     assert store.db.execute('SELECT count(*) FROM lazy_query_versions').fetchone()[0]==17
     store.close()
+
+
+@pytest.mark.parametrize('limit',[1,128])
+def test_selected_and_lookahead_large_key_have_explicit_budget(tmp_path,limit):
+    q,store,pin,pair=setup(tmp_path)
+    writer=store.commit(pin,commit_token='large-key',version_changes=(VersionChange('people','x'*4200,{},
+        memberships=(Membership('cohort','active',0),)),),changes=(),new_segments=(),metadata=metadata(2)).pin
+    current=construct_query_seek(store,writer,pair[0].scope)
+    with pytest.raises(q.QuerySeekBudgetError):q.read_query_seek_page(store,writer,*current,limit=limit)
+    store.close()

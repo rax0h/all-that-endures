@@ -1,0 +1,30 @@
+{
+  "run_id": 39981711210,
+  "head": "5da550512eb21bad44ea902612f0b1235fe0ad8b",
+  "runtime_tree": "c7c87217e0fb7ec67a93a49003767ef0d785480a",
+  "status": "accepted",
+  "xml": {
+    "suite/full-suite.xml": {
+      "testcase_elements": 3450,
+      "declared_tests": 3452
+    },
+    "proof-map/proof-tests.xml": {
+      "testcase_elements": 260,
+      "declared_tests": 260
+    },
+    "proof-map/projection-tests.xml": {
+      "testcase_elements": 43,
+      "declared_tests": 43
+    },
+    "proof-map/seek-tests.xml": {
+      "testcase_elements": 53,
+      "declared_tests": 53
+    }
+  },
+  "full_suite_pytest_passed": 3450,
+  "subtests_passed": 2,
+  "artifact_sha256": {
+    "suite": "aa0faf0cd8f606f18d84209e862747663076a16a4cf8b5036d0aac4a78a8b54f",
+    "proof": "d05ab145bfe8cb2fd2c8f1953b154b27187c0faeb12ef8ef9ee9035727fa55c1"
+  }
+}

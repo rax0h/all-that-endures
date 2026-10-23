@@ -1,0 +1,29 @@
+{
+  "instrumentation": "tracemalloc/SQL trace/SQLite VM100 ticks",
+  "limits": [
+    "Selected storage body privately decoded; store World decode counter excludes this parser.",
+    "Test-only full row construction is not complete production topology authority.",
+    "No World open/save/year timing."
+  ],
+  "owner_references": 4,
+  "python_clean_proof_cache_bytes": 0,
+  "schema": "ate-owner-projection-source/1",
+  "sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "source": {
+    "driver_sha256": "8e959dc620e10a409307b85b3d06c36ba6c3cc96fecabc8854c3f64375506a73",
+    "fixture_sha256": "1740764c6ddc935e67f0ae4d54bfb5357c9dc97da5cf3381d5320edd9d4c20a6",
+    "head": "5da550512eb21bad44ea902612f0b1235fe0ad8b",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "c7c87217e0fb7ec67a93a49003767ef0d785480a",
+    "sqlite": "3.45.1"
+  },
+  "sqlite_main_cache_kib": 2048,
+  "sqlite_temp_cache_kib": 2048,
+  "successor_references": 1,
+  "temp_store": "FILE"
+}

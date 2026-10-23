@@ -125,7 +125,7 @@ def _owner_point(sources,owner,path,inc,header):
         node=sources.metadata(catalog.OWNER_TREE_NAMESPACE,(*owner,prefix))
         if catalog.node_commit(sources.codec,node)!=(count,checksum):raise StoreIntegrityError('group owner radix count/digest disagreement')
         if node[0]=='owner-leaf/v1':
-            if catalog.path_hash(sources.codec,node[1])!=prefix or node[1:]!=(path,inc):
+            if catalog.path_hash(sources.codec,node[1])!=prefix or prefix!=wanted or node[2]!=inc:
                 raise StoreIntegrityError('group owner radix exact placement disagreement')
             return
         if node[1]!=prefix or not wanted.startswith(prefix):raise StoreIntegrityError('group owner radix branch locator disagreement')
@@ -211,7 +211,7 @@ def _read(store,pin,version_certificate,expected_version,group_certificate,expec
         paths.sort(key=lambda p:p[0])
         if any(a[0]==b[0] for a,b in zip(paths,paths[1:])):raise StoreIntegrityError('duplicate canonical group placement')
         anchor=paths[0][1] if paths else None;links=tuple((p[1],anchor) for p in paths[1:])
-        if (header[3]!=catalog.digest(codec,b'identity-group-occurrences-v1',occurrences) or header[6]!=anchor
+        if (header[3]!=catalog.digest(codec,b'identity-group-occurrences-v1',occurrences) or codec.encode(header[6])!=codec.encode(anchor)
                 or header[5]!=catalog.digest(codec,b'identity-group-links-v1',links) or link_certificate.root.count!=len(links)):
             raise StoreIntegrityError('group occurrence/link count/digest/anchor disagreement')
         offset=0;after=None
@@ -220,7 +220,9 @@ def _read(store,pin,version_certificate,expected_version,group_certificate,expec
             for key,ordinal in page.positions:
                 if offset>=len(links) or ordinal!=offset or key!=codec.encode(links[offset][0]):raise StoreIntegrityError('group canonical link projection disagreement')
                 value,member=sources.value(catalog.LINK_NAMESPACE,links[offset][0])
-                if value!=('identity-link/v1',inc,anchor) or member!=(('incarnation',inc,ordinal),):raise StoreIntegrityError('group link source/membership disagreement')
+                if (codec.encode(value)!=codec.encode(('identity-link/v1',inc,anchor))
+                        or codec.encode(member)!=codec.encode((('incarnation',inc,ordinal),))):
+                    raise StoreIntegrityError('group link source/membership disagreement')
                 offset+=1
             if page.next_after is None:break
             after=page.next_after

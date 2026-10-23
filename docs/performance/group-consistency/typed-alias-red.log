@@ -1,0 +1,184 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+______ test_typed_identity_aliases_are_not_python_equality[link-inc-bool] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_typed_identity_aliases_ar0')
+fault = 'link-inc-bool'
+
+    @pytest.mark.parametrize('fault',['link-inc-bool','anchor-bool','leaf-path-bool'])
+    def test_typed_identity_aliases_are_not_python_equality(tmp_path,fault):
+        def mutate(changes,codec):
+            wrong_path=(('key',False),)
+            replacement=None
+            if fault=='leaf-path-bool':
+                # Owner1 has both () and key0. Rewrite its key0 leaf and root
+                # coherently, while the accepted occurrence root still says int0.
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1) and c.value[0]=='owner-leaf/v1' and c.value[1]==(('key',0),):
+                        replacement=(c.key[2],catalog.path_hash(codec,wrong_path),catalog.node_commit(codec,('owner-leaf/v1',wrong_path,2))[1])
+            for c in changes:
+                v=c.value;key=c.key
+                if fault=='link-inc-bool' and c.namespace==catalog.LINK_NAMESPACE and not c.delete:v=(v[0],True,v[2])
+                if fault=='anchor-bool' and c.namespace==catalog.GROUP_NAMESPACE and c.key==1:
+                    v=(*v[:6],(('field','people'),('key',True)))
+                if replacement and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                    old,new,digest=replacement
+                    if c.key[2]==old:key=(*c.key[:2],new);v=('owner-leaf/v1',wrong_path,2)
+                    elif v[0]=='owner-branch/v1':
+                        children=tuple(sorted(((new[len(v[1])],new,1,digest) if ch[1]==old else ch) for ch in v[2]))
+                        v=(v[0],v[1],children)
+                        root_digest=catalog.node_commit(codec,v)[1]
+                yield replace(c,key=key,value=v)
+        # Group2 selects key0, exercising the owner-radix path for the typed alias.
+        if fault=='leaf-path-bool':
+            # Build a simpler one-leaf owner in a real catalog for a coherent header.
+            from ate_sim.persistence_lazy_store import VersionChange
+            def simple(changes,codec):
+                wrong=(('key',False),);prefix=catalog.path_hash(codec,wrong);node=('owner-leaf/v1',wrong,1)
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        c=replace(c,key=(NS,1,prefix),value=node)
+                    elif c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                        c=replace(c,value=(*c.value[:6],prefix,1,catalog.node_commit(codec,node)[1]))
+                    yield c
+            # Existing owner1 uses (); replacing () with keyFalse is not an alias.
+            # Use the fixture's key0 placement and keep the companion () path out.
+            from ate_sim.persistence_lazy_store import IdentityOccurrenceChange,LazyRecordStore
+            from ate_sim.persistence_adapters import WorldCodec
+            from simulation.tests.proof_identity_group_fixtures import metadata
+            store=LazyRecordStore.create(tmp_path/'alias.sqlite',codec=WorldCodec(),simulation_schema='8',rules_id='alias')
+            pin=store.capture_pin();versions=(VersionChange(NS,1,{}),);placements=(IdentityOccurrenceChange(NS,1,(('key',0),),1),)
+            delta=catalog.initial_catalog_delta(store.codec,versions,placements,next_incarnation_id=2,generation=1)
+            witness=tuple(simple(delta.decode(store.codec)[0],store.codec))
+            pin=store.commit(pin,commit_token='alias',version_changes=versions+witness,identity_changes=placements,
+                next_incarnation_id=2,changes=(),new_segments=(),metadata=metadata()).pin
+            pairs=group_authorities(store,pin)
+        else:store,pin,pairs=make_group_store(tmp_path/'alias.sqlite',catalog_mutator=mutate)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:209: Failed
+_______ test_typed_identity_aliases_are_not_python_equality[anchor-bool] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_typed_identity_aliases_ar1')
+fault = 'anchor-bool'
+
+    @pytest.mark.parametrize('fault',['link-inc-bool','anchor-bool','leaf-path-bool'])
+    def test_typed_identity_aliases_are_not_python_equality(tmp_path,fault):
+        def mutate(changes,codec):
+            wrong_path=(('key',False),)
+            replacement=None
+            if fault=='leaf-path-bool':
+                # Owner1 has both () and key0. Rewrite its key0 leaf and root
+                # coherently, while the accepted occurrence root still says int0.
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1) and c.value[0]=='owner-leaf/v1' and c.value[1]==(('key',0),):
+                        replacement=(c.key[2],catalog.path_hash(codec,wrong_path),catalog.node_commit(codec,('owner-leaf/v1',wrong_path,2))[1])
+            for c in changes:
+                v=c.value;key=c.key
+                if fault=='link-inc-bool' and c.namespace==catalog.LINK_NAMESPACE and not c.delete:v=(v[0],True,v[2])
+                if fault=='anchor-bool' and c.namespace==catalog.GROUP_NAMESPACE and c.key==1:
+                    v=(*v[:6],(('field','people'),('key',True)))
+                if replacement and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                    old,new,digest=replacement
+                    if c.key[2]==old:key=(*c.key[:2],new);v=('owner-leaf/v1',wrong_path,2)
+                    elif v[0]=='owner-branch/v1':
+                        children=tuple(sorted(((new[len(v[1])],new,1,digest) if ch[1]==old else ch) for ch in v[2]))
+                        v=(v[0],v[1],children)
+                        root_digest=catalog.node_commit(codec,v)[1]
+                yield replace(c,key=key,value=v)
+        # Group2 selects key0, exercising the owner-radix path for the typed alias.
+        if fault=='leaf-path-bool':
+            # Build a simpler one-leaf owner in a real catalog for a coherent header.
+            from ate_sim.persistence_lazy_store import VersionChange
+            def simple(changes,codec):
+                wrong=(('key',False),);prefix=catalog.path_hash(codec,wrong);node=('owner-leaf/v1',wrong,1)
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        c=replace(c,key=(NS,1,prefix),value=node)
+                    elif c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                        c=replace(c,value=(*c.value[:6],prefix,1,catalog.node_commit(codec,node)[1]))
+                    yield c
+            # Existing owner1 uses (); replacing () with keyFalse is not an alias.
+            # Use the fixture's key0 placement and keep the companion () path out.
+            from ate_sim.persistence_lazy_store import IdentityOccurrenceChange,LazyRecordStore
+            from ate_sim.persistence_adapters import WorldCodec
+            from simulation.tests.proof_identity_group_fixtures import metadata
+            store=LazyRecordStore.create(tmp_path/'alias.sqlite',codec=WorldCodec(),simulation_schema='8',rules_id='alias')
+            pin=store.capture_pin();versions=(VersionChange(NS,1,{}),);placements=(IdentityOccurrenceChange(NS,1,(('key',0),),1),)
+            delta=catalog.initial_catalog_delta(store.codec,versions,placements,next_incarnation_id=2,generation=1)
+            witness=tuple(simple(delta.decode(store.codec)[0],store.codec))
+            pin=store.commit(pin,commit_token='alias',version_changes=versions+witness,identity_changes=placements,
+                next_incarnation_id=2,changes=(),new_segments=(),metadata=metadata()).pin
+            pairs=group_authorities(store,pin)
+        else:store,pin,pairs=make_group_store(tmp_path/'alias.sqlite',catalog_mutator=mutate)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:209: Failed
+_____ test_typed_identity_aliases_are_not_python_equality[leaf-path-bool] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_typed_identity_aliases_ar2')
+fault = 'leaf-path-bool'
+
+    @pytest.mark.parametrize('fault',['link-inc-bool','anchor-bool','leaf-path-bool'])
+    def test_typed_identity_aliases_are_not_python_equality(tmp_path,fault):
+        def mutate(changes,codec):
+            wrong_path=(('key',False),)
+            replacement=None
+            if fault=='leaf-path-bool':
+                # Owner1 has both () and key0. Rewrite its key0 leaf and root
+                # coherently, while the accepted occurrence root still says int0.
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1) and c.value[0]=='owner-leaf/v1' and c.value[1]==(('key',0),):
+                        replacement=(c.key[2],catalog.path_hash(codec,wrong_path),catalog.node_commit(codec,('owner-leaf/v1',wrong_path,2))[1])
+            for c in changes:
+                v=c.value;key=c.key
+                if fault=='link-inc-bool' and c.namespace==catalog.LINK_NAMESPACE and not c.delete:v=(v[0],True,v[2])
+                if fault=='anchor-bool' and c.namespace==catalog.GROUP_NAMESPACE and c.key==1:
+                    v=(*v[:6],(('field','people'),('key',True)))
+                if replacement and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                    old,new,digest=replacement
+                    if c.key[2]==old:key=(*c.key[:2],new);v=('owner-leaf/v1',wrong_path,2)
+                    elif v[0]=='owner-branch/v1':
+                        children=tuple(sorted(((new[len(v[1])],new,1,digest) if ch[1]==old else ch) for ch in v[2]))
+                        v=(v[0],v[1],children)
+                        root_digest=catalog.node_commit(codec,v)[1]
+                yield replace(c,key=key,value=v)
+        # Group2 selects key0, exercising the owner-radix path for the typed alias.
+        if fault=='leaf-path-bool':
+            # Build a simpler one-leaf owner in a real catalog for a coherent header.
+            from ate_sim.persistence_lazy_store import VersionChange
+            def simple(changes,codec):
+                wrong=(('key',False),);prefix=catalog.path_hash(codec,wrong);node=('owner-leaf/v1',wrong,1)
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        c=replace(c,key=(NS,1,prefix),value=node)
+                    elif c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                        c=replace(c,value=(*c.value[:6],prefix,1,catalog.node_commit(codec,node)[1]))
+                    yield c
+            # Existing owner1 uses (); replacing () with keyFalse is not an alias.
+            # Use the fixture's key0 placement and keep the companion () path out.
+            from ate_sim.persistence_lazy_store import IdentityOccurrenceChange,LazyRecordStore
+            from ate_sim.persistence_adapters import WorldCodec
+            from simulation.tests.proof_identity_group_fixtures import metadata
+            store=LazyRecordStore.create(tmp_path/'alias.sqlite',codec=WorldCodec(),simulation_schema='8',rules_id='alias')
+            pin=store.capture_pin();versions=(VersionChange(NS,1,{}),);placements=(IdentityOccurrenceChange(NS,1,(('key',0),),1),)
+            delta=catalog.initial_catalog_delta(store.codec,versions,placements,next_incarnation_id=2,generation=1)
+            witness=tuple(simple(delta.decode(store.codec)[0],store.codec))
+            pin=store.commit(pin,commit_token='alias',version_changes=versions+witness,identity_changes=placements,
+                next_incarnation_id=2,changes=(),new_segments=(),metadata=metadata()).pin
+            pairs=group_authorities(store,pin)
+        else:store,pin,pairs=make_group_store(tmp_path/'alias.sqlite',catalog_mutator=mutate)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:209: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_typed_identity_aliases_are_not_python_equality[link-inc-bool]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_typed_identity_aliases_are_not_python_equality[anchor-bool]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_typed_identity_aliases_are_not_python_equality[leaf-path-bool]
+3 failed, 41 deselected in 0.48s
