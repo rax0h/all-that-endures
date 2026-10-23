@@ -1,0 +1,32 @@
+{
+  "schema": "ate-proof-query-ci-acceptance/1",
+  "run_id": 39890667390,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/39890667390",
+  "status": "completed",
+  "conclusion": "success",
+  "source": {
+    "head": "a46df393e297b65a9451baa9e71a333578c5eec5",
+    "runtime_tree": "de69bd0717240beb09b8d25bafda150cb8228497",
+    "local_equivalent_head": "41962d27c46e659ade733f4515df8049ab65cf1c",
+    "local_equivalent_tree": "1474af84a10e82de6d5c8195c08add74f6e73b5a"
+  },
+  "full_suite": {
+    "tests": 3258,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 3628.626
+  },
+  "proof_tests": {
+    "tests": 162,
+    "failures": 0,
+    "errors": 0
+  },
+  "artifact_sha256": {
+    "12474756316": "656180ced351d716e28833c8193641014694c38c5506cc134c01d5a87cb12e28",
+    "12476653410": "7944861c9871cd7a01ee48fb916e184d18cad9ce8a38a7c313d3e906d0a39247"
+  },
+  "limits": [
+    "No World activation",
+    "No mature speed acceptance"
+  ]
+}

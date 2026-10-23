@@ -1241,10 +1241,12 @@ class LazyRecordStore:
                 self.db.rollback()
             raise
 
-    def _read_snapshot_start(self, pin: GenerationPin) -> int:
+    def _read_snapshot_start(self, pin: GenerationPin, *, _preflight=None) -> int:
         nested = getattr(self, "_checked_snapshot_depth", 0)
         scope = getattr(self, '_validation_scope', None)
         if nested and scope is not None and scope.can_reuse(self, pin):
+            if _preflight is not None:
+                _preflight()
             self._checked_snapshot_depth = nested + 1
             return pin.captured_head
         owns_transaction = not getattr(self, '_active_read_transaction', False)
@@ -1253,6 +1255,8 @@ class LazyRecordStore:
                 self.db.execute("BEGIN")
             self._checked_snapshot_owns_transaction = owns_transaction
         try:
+            if _preflight is not None:
+                _preflight()
             generation = self._require_pin(pin)
             head = int(self._checked_head_row()[0])
             floor = self._validated_retention_floor(head)
@@ -1273,10 +1277,10 @@ class LazyRecordStore:
             self.db.rollback()
 
     @contextmanager
-    def read_snapshot(self, pin: GenerationPin):
+    def read_snapshot(self, pin: GenerationPin, *, _preflight=None):
         """Compose checked reads in one bounded, generation-matched snapshot."""
         self._ensure_open()
-        generation = self._read_snapshot_start(pin)
+        generation = self._read_snapshot_start(pin, _preflight=_preflight)
         try:
             yield generation
         finally:

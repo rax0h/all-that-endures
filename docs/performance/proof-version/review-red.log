@@ -1,0 +1,98 @@
+FFFFFFFF.                                                                [100%]
+=================================== FAILURES ===================================
+_ test_operational_metadata_guard_precedes_materialization[save_head-head_checksum-False] _
+simulation/tests/test_stage_0_5_proof_version.py:237: in test_operational_metadata_guard_precedes_materialization
+    assert peak < 128*1024
+E   assert 2101849 < (128 * 1024)
+_ test_operational_metadata_guard_precedes_materialization[generation_pins-row_checksum-False] _
+simulation/tests/test_stage_0_5_proof_version.py:237: in test_operational_metadata_guard_precedes_materialization
+    assert peak < 128*1024
+E   assert 2101725 < (128 * 1024)
+_ test_operational_metadata_guard_precedes_materialization[pin_receipts-row_checksum-False] _
+simulation/tests/test_stage_0_5_proof_version.py:237: in test_operational_metadata_guard_precedes_materialization
+    assert peak < 128*1024
+E   assert 2102305 < (128 * 1024)
+_ test_operational_metadata_guard_precedes_materialization[pin_attempts-row_checksum-False] _
+simulation/tests/test_stage_0_5_proof_version.py:237: in test_operational_metadata_guard_precedes_materialization
+    assert peak < 128*1024
+E   assert 2102595 < (128 * 1024)
+_ test_operational_metadata_guard_precedes_materialization[save_head-next_ids-True] _
+simulation/tests/test_stage_0_5_proof_version.py:234: in test_operational_metadata_guard_precedes_materialization
+    read(v, store, pin, cert, expected)
+simulation/tests/test_stage_0_5_proof_version.py:23: in read
+    return v.read_version_bytes(store, pin, cert, expected, 'people', store.codec.encode(key),
+simulation/ate_sim/persistence_proof_version.py:73: in read_version_bytes
+    with store.read_snapshot(pin) as generation:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1279: in read_snapshot
+    generation = self._read_snapshot_start(pin)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1257: in _read_snapshot_start
+    head = int(self._checked_head_row()[0])
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:715: in _checked_head_row
+    raise StoreIntegrityError("save head checksum mismatch")
+E   ate_sim.incremental_store.StoreIntegrityError: save head checksum mismatch
+_ test_operational_metadata_guard_precedes_materialization[pin_receipts-commit_token-True] _
+simulation/tests/test_stage_0_5_proof_version.py:234: in test_operational_metadata_guard_precedes_materialization
+    read(v, store, pin, cert, expected)
+simulation/tests/test_stage_0_5_proof_version.py:23: in read
+    return v.read_version_bytes(store, pin, cert, expected, 'people', store.codec.encode(key),
+simulation/ate_sim/persistence_proof_version.py:73: in read_version_bytes
+    with store.read_snapshot(pin) as generation:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1279: in read_snapshot
+    generation = self._read_snapshot_start(pin)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1258: in _read_snapshot_start
+    floor = self._validated_retention_floor(head)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:854: in _validated_retention_floor
+    pins, _, _ = self._checked_operational_rows(head_generation)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:821: in _checked_operational_rows
+    raise StoreIntegrityError("pin receipt checksum mismatch")
+E   ate_sim.incremental_store.StoreIntegrityError: pin receipt checksum mismatch
+_ test_operational_metadata_guard_precedes_materialization[pin_attempts-commit_token-True] _
+simulation/tests/test_stage_0_5_proof_version.py:234: in test_operational_metadata_guard_precedes_materialization
+    read(v, store, pin, cert, expected)
+simulation/tests/test_stage_0_5_proof_version.py:23: in read
+    return v.read_version_bytes(store, pin, cert, expected, 'people', store.codec.encode(key),
+simulation/ate_sim/persistence_proof_version.py:73: in read_version_bytes
+    with store.read_snapshot(pin) as generation:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1279: in read_snapshot
+    generation = self._read_snapshot_start(pin)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1258: in _read_snapshot_start
+    floor = self._validated_retention_floor(head)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:854: in _validated_retention_floor
+    pins, _, _ = self._checked_operational_rows(head_generation)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:840: in _checked_operational_rows
+    raise StoreIntegrityError("pin attempt checksum mismatch")
+E   ate_sim.incremental_store.StoreIntegrityError: pin attempt checksum mismatch
+__________ test_oversized_metadata_guard_also_runs_in_nested_snapshot __________
+simulation/tests/test_stage_0_5_proof_version.py:251: in test_oversized_metadata_guard_also_runs_in_nested_snapshot
+    assert peak < 128*1024 and store.db.in_transaction
+E   assert (2101364 < (128 * 1024))
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_operational_metadata_guard_precedes_materialization[save_head-head_checksum-False]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_operational_metadata_guard_precedes_materialization[generation_pins-row_checksum-False]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_operational_metadata_guard_precedes_materialization[pin_receipts-row_checksum-False]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_operational_metadata_guard_precedes_materialization[pin_attempts-row_checksum-False]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_operational_metadata_guard_precedes_materialization[save_head-next_ids-True]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_operational_metadata_guard_precedes_materialization[pin_receipts-commit_token-True]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_operational_metadata_guard_precedes_materialization[pin_attempts-commit_token-True]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_oversized_metadata_guard_also_runs_in_nested_snapshot
+8 failed, 1 passed, 39 deselected in 1.29s

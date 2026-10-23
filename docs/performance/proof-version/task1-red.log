@@ -1,0 +1,868 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                     [100%]
+=================================== FAILURES ===================================
+_________________ test_independent_content_certificate_framing _________________
+simulation/tests/test_stage_0_5_proof_version.py:28: in test_independent_content_certificate_framing
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_____________ test_exact_raw_bytes_no_decoding_or_unrelated_tables _____________
+simulation/tests/test_stage_0_5_proof_version.py:37: in test_exact_raw_bytes_no_decoding_or_unrelated_tables
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_________ test_old_and_current_pin_bytes_after_change_or_delete[False] _________
+simulation/tests/test_stage_0_5_proof_version.py:58: in test_old_and_current_pin_bytes_after_change_or_delete
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_________ test_old_and_current_pin_bytes_after_change_or_delete[True] __________
+simulation/tests/test_stage_0_5_proof_version.py:58: in test_old_and_current_pin_bytes_after_change_or_delete
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_________________ test_wrong_context_or_authority_fails[store] _________________
+simulation/tests/test_stage_0_5_proof_version.py:82: in test_wrong_context_or_authority_fails
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+______________ test_wrong_context_or_authority_fails[generation] _______________
+simulation/tests/test_stage_0_5_proof_version.py:82: in test_wrong_context_or_authority_fails
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_________________ test_wrong_context_or_authority_fails[codec] _________________
+simulation/tests/test_stage_0_5_proof_version.py:82: in test_wrong_context_or_authority_fails
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_________________ test_wrong_context_or_authority_fails[root] __________________
+simulation/tests/test_stage_0_5_proof_version.py:82: in test_wrong_context_or_authority_fails
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_______________ test_wrong_context_or_authority_fails[expected] ________________
+simulation/tests/test_stage_0_5_proof_version.py:82: in test_wrong_context_or_authority_fails
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+________________ test_wrong_context_or_authority_fails[schema] _________________
+simulation/tests/test_stage_0_5_proof_version.py:82: in test_wrong_context_or_authority_fails
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+___ test_physical_corruption_omission_surplus_and_overlap_rejected[payload] ____
+simulation/tests/test_stage_0_5_proof_version.py:100: in test_physical_corruption_omission_surplus_and_overlap_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_ test_physical_corruption_omission_surplus_and_overlap_rejected[memberships] __
+simulation/tests/test_stage_0_5_proof_version.py:100: in test_physical_corruption_omission_surplus_and_overlap_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_ test_physical_corruption_omission_surplus_and_overlap_rejected[row_checksum] _
+simulation/tests/test_stage_0_5_proof_version.py:100: in test_physical_corruption_omission_surplus_and_overlap_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_ test_physical_corruption_omission_surplus_and_overlap_rejected[payload_checksum] _
+simulation/tests/test_stage_0_5_proof_version.py:100: in test_physical_corruption_omission_surplus_and_overlap_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+___ test_physical_corruption_omission_surplus_and_overlap_rejected[missing] ____
+simulation/tests/test_stage_0_5_proof_version.py:100: in test_physical_corruption_omission_surplus_and_overlap_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+___ test_physical_corruption_omission_surplus_and_overlap_rejected[surplus] ____
+simulation/tests/test_stage_0_5_proof_version.py:100: in test_physical_corruption_omission_surplus_and_overlap_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+___ test_physical_corruption_omission_surplus_and_overlap_rejected[coherent] ___
+simulation/tests/test_stage_0_5_proof_version.py:100: in test_physical_corruption_omission_surplus_and_overlap_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+___ test_physical_corruption_omission_surplus_and_overlap_rejected[overlap] ____
+simulation/tests/test_stage_0_5_proof_version.py:100: in test_physical_corruption_omission_surplus_and_overlap_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+____ test_physical_corruption_omission_surplus_and_overlap_rejected[proof] _____
+simulation/tests/test_stage_0_5_proof_version.py:100: in test_physical_corruption_omission_surplus_and_overlap_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+___________ test_malformed_storage_types_are_rejected[payload-text] ____________
+simulation/tests/test_stage_0_5_proof_version.py:129: in test_malformed_storage_types_are_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_________ test_malformed_storage_types_are_rejected[memberships-text] __________
+simulation/tests/test_stage_0_5_proof_version.py:129: in test_malformed_storage_types_are_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_ test_malformed_storage_types_are_rejected[row_checksum-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx] _
+simulation/tests/test_stage_0_5_proof_version.py:129: in test_malformed_storage_types_are_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+______ test_malformed_storage_types_are_rejected[payload_checksum-short] _______
+simulation/tests/test_stage_0_5_proof_version.py:129: in test_malformed_storage_types_are_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_________ test_malformed_storage_types_are_rejected[codec_version-bad] _________
+simulation/tests/test_stage_0_5_proof_version.py:129: in test_malformed_storage_types_are_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_________ test_malformed_storage_types_are_rejected[record_schema-bad] _________
+simulation/tests/test_stage_0_5_proof_version.py:129: in test_malformed_storage_types_are_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_____ test_large_malformed_bodies_rejected_before_transfer[large-payload] ______
+simulation/tests/test_stage_0_5_proof_version.py:141: in test_large_malformed_bodies_rejected_before_transfer
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+___ test_large_malformed_bodies_rejected_before_transfer[large-memberships] ____
+simulation/tests/test_stage_0_5_proof_version.py:141: in test_large_malformed_bodies_rejected_before_transfer
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+___ test_large_malformed_bodies_rejected_before_transfer[large-text-payload] ___
+simulation/tests/test_stage_0_5_proof_version.py:141: in test_large_malformed_bodies_rejected_before_transfer
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+______ test_large_malformed_bodies_rejected_before_transfer[nul-checksum] ______
+simulation/tests/test_stage_0_5_proof_version.py:141: in test_large_malformed_bodies_rejected_before_transfer
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_________________ test_owned_nested_and_arbitrary_transactions _________________
+simulation/tests/test_stage_0_5_proof_version.py:155: in test_owned_nested_and_arbitrary_transactions
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_______________________ test_invalid_budget_rejected[0] ________________________
+simulation/tests/test_stage_0_5_proof_version.py:171: in test_invalid_budget_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+_______________________ test_invalid_budget_rejected[-1] _______________________
+simulation/tests/test_stage_0_5_proof_version.py:171: in test_invalid_budget_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+______________________ test_invalid_budget_rejected[True] ______________________
+simulation/tests/test_stage_0_5_proof_version.py:171: in test_invalid_budget_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+______________________ test_invalid_budget_rejected[1.0] _______________________
+simulation/tests/test_stage_0_5_proof_version.py:171: in test_invalid_budget_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+____________________ test_invalid_budget_rejected[67108865] ____________________
+simulation/tests/test_stage_0_5_proof_version.py:171: in test_invalid_budget_rejected
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+______________ test_unread_corruption_is_not_claimed_as_scrubbed _______________
+simulation/tests/test_stage_0_5_proof_version.py:177: in test_unread_corruption_is_not_claimed_as_scrubbed
+    v, store, pin, cert, expected = setup_source(tmp_path)
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/test_stage_0_5_proof_version.py:18: in setup_source
+    certificate, expected = construct_version_certificate(store, pin)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:16: in construct_version_certificate
+    v = version_module()
+        ^^^^^^^^^^^^^^^^
+simulation/tests/proof_version_fixtures.py:12: in version_module
+    return importlib.import_module('ate_sim.persistence_proof_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:1324: in _find_and_load_unlocked
+    ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_version'
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_independent_content_certificate_framing
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_exact_raw_bytes_no_decoding_or_unrelated_tables
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_old_and_current_pin_bytes_after_change_or_delete[False]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_old_and_current_pin_bytes_after_change_or_delete[True]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_wrong_context_or_authority_fails[store]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_wrong_context_or_authority_fails[generation]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_wrong_context_or_authority_fails[codec]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_wrong_context_or_authority_fails[root]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_wrong_context_or_authority_fails[expected]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_wrong_context_or_authority_fails[schema]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_physical_corruption_omission_surplus_and_overlap_rejected[payload]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_physical_corruption_omission_surplus_and_overlap_rejected[memberships]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_physical_corruption_omission_surplus_and_overlap_rejected[row_checksum]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_physical_corruption_omission_surplus_and_overlap_rejected[payload_checksum]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_physical_corruption_omission_surplus_and_overlap_rejected[missing]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_physical_corruption_omission_surplus_and_overlap_rejected[surplus]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_physical_corruption_omission_surplus_and_overlap_rejected[coherent]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_physical_corruption_omission_surplus_and_overlap_rejected[overlap]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_physical_corruption_omission_surplus_and_overlap_rejected[proof]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_malformed_storage_types_are_rejected[payload-text]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_malformed_storage_types_are_rejected[memberships-text]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_malformed_storage_types_are_rejected[row_checksum-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_malformed_storage_types_are_rejected[payload_checksum-short]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_malformed_storage_types_are_rejected[codec_version-bad]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_malformed_storage_types_are_rejected[record_schema-bad]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_large_malformed_bodies_rejected_before_transfer[large-payload]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_large_malformed_bodies_rejected_before_transfer[large-memberships]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_large_malformed_bodies_rejected_before_transfer[large-text-payload]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_large_malformed_bodies_rejected_before_transfer[nul-checksum]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_owned_nested_and_arbitrary_transactions
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_invalid_budget_rejected[0]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_invalid_budget_rejected[-1]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_invalid_budget_rejected[True]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_invalid_budget_rejected[1.0]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_invalid_budget_rejected[67108865]
+FAILED simulation/tests/test_stage_0_5_proof_version.py::test_unread_corruption_is_not_claimed_as_scrubbed
+36 failed in 3.27s
