@@ -1,0 +1,25 @@
+{
+  "schema": "ate-proof-version-ci-launch/1",
+  "run_id": 39899113040,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/39899113040",
+  "observed_status": "queued",
+  "conclusion": null,
+  "source": {
+    "head": "cd50a80aefeeedef2466ffb45c5a21e8100e9b8c",
+    "root_tree": "64dd54b64c42c70a7de5c1d5951c32ffe07b248d",
+    "runtime_tree": "12ab428b38cadbffb7f568ce84f7e1e6e1db8b2e",
+    "local_equivalent_head": "82bca2101ae1fb09a434629fc676967fb0e48e82"
+  },
+  "local_checks": {
+    "affected": "306 passed in22.50s",
+    "source_cases": 54,
+    "diagnostic": "exact1k/10k/100k, requested payload checks1/absence0, zero unrelated source reads, bounded metadata/heap",
+    "review": "one Important fixed RED/GREEN; no Critical/Minor"
+  },
+  "limits": [
+    "No World activation",
+    "No mature speed acceptance",
+    "Prior CI39890667390 separate from this candidate"
+  ],
+  "next_on_green": "Authenticate candidate source and downloadable artifacts, then specify owner/group/link source proofs and cross-consistency; no World bypass before complete manifests/retention/publication."
+}

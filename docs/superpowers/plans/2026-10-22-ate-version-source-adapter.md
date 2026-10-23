@@ -62,3 +62,5 @@ Review fix: eight cases independently reproduced RED (one capacity case already 
 Final review exclusions ruled: no World activation/canonical admission/manifests/writer fencing; ordinary/segment retention unresolved; no mature speed claim; prior CI separate; unread corruption remains full-scrub/fetched-data responsibility. Publishing only an inactive raw-source adapter preserves each gate; cost if wrong is additional required integration, no release/format acceptance.
 
 Final affected306/306 GREEN22.50s; source54cases included. Post-repair clean9f26548 diagnostic exact1k/10k/100k, presence node4/5/6, absence3/4/5, payload checks1/0; all bounds passed. AST/YAML/bash and diff checks verified. Publication/CI launch to be recorded below; checked boxes describe the concrete deliverables and must not imply candidate CI passed.
+
+Task2: complete (exact-tree published cd50a80a, expected-parent branch lease, run39899113040 queued; raw launch receipt retained). Candidate full-suite/scaling CI acceptance pending; resume by inspecting this run/artifacts. No World activation or speed acceptance.
