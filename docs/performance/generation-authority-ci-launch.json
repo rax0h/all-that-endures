@@ -1,0 +1,15 @@
+{
+  "schema": "ate-generation-authority-ci-launch/1",
+  "run_id": 40028259840,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/40028259840",
+  "status_at_launch": "queued",
+  "candidate": "6d8f2193fd67fe94adde409c39525384115ca57d",
+  "candidate_tree": "441176a6f11ae2c2d5476713b057bd2a6841b182",
+  "runtime_tree": "79a9ad08c0b77e09c24c23aef0573661af9353cf",
+  "equivalent_local_candidate": "38af85d39f959f9203cff6212b7954eef537814e",
+  "affected_tests": 581,
+  "generation_tests": 60,
+  "parent_accepted_run": 40013683423,
+  "full_suite_acceptance": "pending",
+  "world_performance": "unmeasured"
+}

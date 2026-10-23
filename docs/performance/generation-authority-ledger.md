@@ -21,3 +21,5 @@ Final: Ruling: full-suite/scaling/World performance require separate exact-sourc
 Task2 complete / final fix pass:581 affected tests GREEN in57.09s, includes60generation cases and all prior521affected cases. XML zero errors/failures verified. Production parser restored byte-identically after the6-case mutation RED; no functional parser change required. Syntax, YAML, all workflow shell blocks and scoped whitespace checks passed (raw logs excluded).
 
 Task3 local completion: independent review and test-coverage fix complete. Existing proof CI now includes60generation cases; full simulation suite and all9prior diagnostics retained. Candidate/launch receipt below; full-suite acceptance pending.
+
+Task3 publication complete: candidate 6d8f2193fd67fe94adde409c39525384115ca57d tree 441176a6f11ae2c2d5476713b057bd2a6841b182 runtime 79a9ad08c0b77e09c24c23aef0573661af9353cf published with exact local tree match. CI 40028259840 queued at launch; full-suite acceptance pending. No main merge, endurance or long polling. All code/evidence checkpointed on GitHub.

@@ -13,3 +13,5 @@ The source fixture contains1000unrelated archive bodies. Checked source reads is
 Next: complete verified component-root directory/target/inventory construction and retained ordinary content availability; then atomic generation proof publication through the existing store commit/frozen participant protocol, compatibility/fencing and canonical World admission. Changed-row/root bindings and recovery failure phases must pass before enabling the format. Protected root inventory is not garbage collection or proof of body availability.
 
 All scope rulings and review limits: generation-authority-ledger.md and generation-authority-review.md.
+
+Final affected suite:581 passed in57.09s, including60generation tests. Candidate [40028259840](https://github.com/rax0h/all-that-endures/actions/runs/40028259840), head`6d8f2193fd67fe94adde409c39525384115ca57d`, runtime`79a9ad08c0b77e09c24c23aef0573661af9353cf`. Queued at launch; full-suite acceptance pending.
