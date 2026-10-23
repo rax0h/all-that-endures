@@ -54,3 +54,5 @@ Ruling: use bounded candidate fetch and explicit old-pin work-budget rejection w
 Review fixes in one pass: four missing-capability/index cases and two old-new frontier cases reproduced RED.43 source cases GREEN before added owner-frontier boundary coverage. Driver now measures old/current pages and newer frontier VM work; supporting diagnostic finding is addressed in this same pass. No second review.
 
 Task1: complete.44 source cases GREEN;353 affected GREEN30.76s. Task2 diagnostic: clean7c922158, exact current/mixed-open-closed previous pages at1k/10k/100k, zero payload work, old-new frontier rejection2599VM upper bound each. Final review Important fixes complete; AST/YAML/bash and diff verified. Publication/CI launch to be recorded below; no candidate CI acceptance claim.
+
+Task2: complete (exact-tree candidate3f57dfe4 published with expected-parent lease; successor39909955729 in progress; launch receipt retained). Candidate full-suite/scaling acceptance pending. General bounded old-pin selection remains a next mandatory implementation gate, alongside complete topology/manifests/publication; no World activation.

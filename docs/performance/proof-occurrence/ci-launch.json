@@ -1,0 +1,27 @@
+{
+  "schema": "ate-proof-occurrence-ci-launch/1",
+  "run_id": 39909955729,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/39909955729",
+  "observed_status": "in_progress",
+  "conclusion": null,
+  "source": {
+    "head": "3f57dfe48ccfa68478b2fbd37deb151e907b24ef",
+    "root_tree": "bf1bdef3e867c7ea6445f4f647744ae0fc5667ee",
+    "runtime_tree": "8bce1bd8ffca3ede10e729d8ab0ca375ecbb747f",
+    "local_equivalent_head": "432fe6d5790da90cc891418f8674f816f77c93f4"
+  },
+  "local_checks": {
+    "affected": "353 passed in30.76s",
+    "source_cases": 44,
+    "scaling": "Exact current/mixed-open-closed previous pages at1k/10k/100k; zero payload reads/checks/decodes; old-new frontier rejects at2599VM upper bound each",
+    "review": "Two Important fixes RED/GREEN; supporting diagnostic finding addressed"
+  },
+  "limits": [
+    "No World activation",
+    "No mature speed acceptance",
+    "General old-pin selection when newer candidates intervene remains required",
+    "Large fields above4096bytes require a separate budgeted proof path",
+    "Parent CI39899113040 is separate from this candidate"
+  ],
+  "next_on_green": "Authenticate candidate artifacts/source, then implement general bounded certificate-checked old-pin selection before World adoption; continue complete payload/owner/group/link/retirement cross-consistency, manifests/retention and atomic existing publication. Do not silently use a scan fallback."
+}
