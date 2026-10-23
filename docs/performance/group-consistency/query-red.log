@@ -1,0 +1,700 @@
+FFFFFFFFFFFFFFFFFFFF                                                     [100%]
+=================================== FAILURES ===================================
+_________________ test_pages_literal_order_framing_no_payload __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_pages_literal_order_frami0')
+
+    def test_pages_literal_order_framing_no_payload(tmp_path):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_old_nonempty_and_empty_roots_ignore_real_newer_rows[1000] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_old_nonempty_and_empty_ro0')
+count = 1000
+
+    @pytest.mark.parametrize('count',[1000,10000])
+    def test_old_nonempty_and_empty_roots_ignore_real_newer_rows(tmp_path,count):
+>       q,store,pin,pair=setup(tmp_path);old=store.capture_pin()
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_old_nonempty_and_empty_roots_ignore_real_newer_rows[10000] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_old_nonempty_and_empty_ro1')
+count = 10000
+
+    @pytest.mark.parametrize('count',[1000,10000])
+    def test_old_nonempty_and_empty_roots_ignore_real_newer_rows(tmp_path,count):
+>       q,store,pin,pair=setup(tmp_path);old=store.capture_pin()
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________________ test_selected_corruption[missing] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_corruption_missi0')
+fault = 'missing'
+
+    @pytest.mark.parametrize('fault',['missing','checksum','overlap','end-text','node'])
+    def test_selected_corruption(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);key=store.codec.encode(0)
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________________ test_selected_corruption[checksum] ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_corruption_check0')
+fault = 'checksum'
+
+    @pytest.mark.parametrize('fault',['missing','checksum','overlap','end-text','node'])
+    def test_selected_corruption(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);key=store.codec.encode(0)
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________________ test_selected_corruption[overlap] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_corruption_overl0')
+fault = 'overlap'
+
+    @pytest.mark.parametrize('fault',['missing','checksum','overlap','end-text','node'])
+    def test_selected_corruption(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);key=store.codec.encode(0)
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________________ test_selected_corruption[end-text] ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_corruption_end_t0')
+fault = 'end-text'
+
+    @pytest.mark.parametrize('fault',['missing','checksum','overlap','end-text','node'])
+    def test_selected_corruption(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);key=store.codec.encode(0)
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________________ test_selected_corruption[node] ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_corruption_node_0')
+fault = 'node'
+
+    @pytest.mark.parametrize('fault',['missing','checksum','overlap','end-text','node'])
+    def test_selected_corruption(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);key=store.codec.encode(0)
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_authority_capability_and_budget[expected] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_0')
+fault = 'expected'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_authority_capability_and_budget[generation] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_1')
+fault = 'generation'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_authority_capability_and_budget[scope] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_2')
+fault = 'scope'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_authority_capability_and_budget[codec] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_3')
+fault = 'codec'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_authority_capability_and_budget[released] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_4')
+fault = 'released'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_authority_capability_and_budget[cached-index] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_5')
+fault = 'cached-index'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_authority_capability_and_budget[physical-index] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_6')
+fault = 'physical-index'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_authority_capability_and_budget[transaction] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_7')
+fault = 'transaction'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_authority_capability_and_budget[hook] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_8')
+fault = 'hook'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_authority_capability_and_budget[extended-codec] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_9')
+fault = 'extended-codec'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_authority_capability_and_budget[budget] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_capability_and_10')
+fault = 'budget'
+
+    @pytest.mark.parametrize('fault',['expected','generation','scope','codec','released','cached-index','physical-index','transaction','hook','extended-codec','budget'])
+    def test_authority_capability_and_budget(tmp_path,fault):
+>       q,store,pin,pair=setup(tmp_path);cert,expected=pair;kwargs={}
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_owned_nested_snapshots_and_surplus_not_admitted _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_owned_nested_snapshots_an0')
+
+    def test_owned_nested_snapshots_and_surplus_not_admitted(tmp_path):
+>       q,store,pin,pair=setup(tmp_path)
+                         ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query_seek.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_query_seek.py:14: in setup
+    q=query_seek_module();store,pin=make_store(tmp_path/'query.sqlite')
+      ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_query_seek_fixtures.py:8: in query_seek_module
+    def query_seek_module():return importlib.import_module('ate_sim.persistence_proof_query_seek')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query_seek'
+import_ = <function _gcd_import at 0x7f14b75280e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query_seek'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_pages_literal_order_framing_no_payload
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_old_nonempty_and_empty_roots_ignore_real_newer_rows[1000]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_old_nonempty_and_empty_roots_ignore_real_newer_rows[10000]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_selected_corruption[missing]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_selected_corruption[checksum]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_selected_corruption[overlap]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_selected_corruption[end-text]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_selected_corruption[node]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[expected]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[generation]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[scope]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[codec]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[released]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[cached-index]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[physical-index]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[transaction]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[hook]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[extended-codec]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_authority_capability_and_budget[budget]
+FAILED simulation/tests/test_stage_0_5_proof_query_seek.py::test_owned_nested_snapshots_and_surplus_not_admitted
+20 failed in 0.56s

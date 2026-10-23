@@ -67,6 +67,32 @@ def _authority(certificate,expected,commitment):
         raise StoreIntegrityError('owner projection authority commitment disagreement')
 
 
+def _require_closed_codec(store,*,allow_typed=False):
+    world=type(store.codec) is WorldCodec
+    plain=allow_typed and type(store.codec) is TypedCodec
+    if not (world or plain) or any(
+            getattr(getattr(store.codec,name,None),'__func__',None) is not method for name,method in (
+                ('encode',TypedCodec.encode),('decode',TypedCodec.decode),
+                ('_encode_value',WorldCodec._encode_value if world else TypedCodec._encode_value),
+                ('_decode_value',WorldCodec._decode_value if world else TypedCodec._decode_value))):
+        raise StoreError('proof source requires a closed codec without caller hooks')
+    if plain and (store.codec._record_by_name or store.codec._enum_by_name):
+        raise StoreError('generic proof source cannot use caller codec registries')
+    if world:
+        from .core import Ref,Layer
+        if (store.codec._record_by_name.get('core.Ref/v1') is not Ref
+                or store.codec._enum_by_name.get('core.Layer/v1') is not Layer):
+            raise StoreError('proof source requires built-in immutable metadata types')
+
+
+def _closed_snapshot_preflight(store,max_metadata_bytes):
+    _guard_operational_metadata(store,max_metadata_bytes)
+    blobs=store.db.execute('SELECT simulation_position,next_ids,namespace_inventory,namespace_counts '
+        'FROM save_head WHERE singleton=1').fetchone()
+    closed=_ProjectionCodec(metadata=True)
+    for blob in blobs:closed.decode(blob)
+
+
 def _read_owner_projection(store,pin,version_certificate,expected_version,occurrence_certificate,expected_occurrence,
                           *,max_bytes=1048576,max_references=4096,max_metadata_bytes=1048576):
     _authority(version_certificate,expected_version,version_commitment)
@@ -78,11 +104,7 @@ def _read_owner_projection(store,pin,version_certificate,expected_version,occurr
     scope=occurrence_certificate.scope
     if type(scope) is not OwnerScope or scope.namespace not in AUXILIARY_OWNER_FAMILIES:
         raise StoreError('projection requires a registered physical owner scope')
-    if type(store.codec) is not WorldCodec or any(
-            getattr(getattr(store.codec,name,None),'__func__',None) is not method for name,method in (
-                ('encode',TypedCodec.encode),('decode',TypedCodec.decode),
-                ('_encode_value',WorldCodec._encode_value),('_decode_value',WorldCodec._decode_value))):
-        raise StoreError('projection requires the closed World codec without caller hooks')
+    _require_closed_codec(store)
     if len(scope.typed_key)>MAX_FIELD_BYTES:raise ProjectionProofBudgetError('projection owner key exceeds field budget')
     if occurrence_certificate.root.count>max_references:raise ProjectionProofBudgetError('projection references exceed budget')
     if store.db.in_transaction and not store._active_read_transaction and not getattr(store,'_checked_snapshot_depth',0):
@@ -91,14 +113,7 @@ def _read_owner_projection(store,pin,version_certificate,expected_version,occurr
     codec=_ProjectionCodec()
     if codec.version!=store.codec.version:raise StoreError('unsupported projection codec version')
     def preflight():
-        _guard_operational_metadata(store,max_metadata_bytes)
-        # Inherited snapshot validation decodes these fields through WorldCodec.
-        # Guard their exact bytes FIRST, even when the head cache is warm. The
-        # size/type guard above precedes all transfers in this same snapshot.
-        blobs=store.db.execute('SELECT simulation_position,next_ids,namespace_inventory,namespace_counts '
-            'FROM save_head WHERE singleton=1').fetchone()
-        closed=_ProjectionCodec(metadata=True)
-        for blob in blobs:closed.decode(blob)
+        _closed_snapshot_preflight(store,max_metadata_bytes)
     with store.read_snapshot(pin,_preflight=preflight):
         required=REQUIRED_INTERVALS+('lazy_record_interval',)
         if any(name not in store._interval_indexes for name in required):
