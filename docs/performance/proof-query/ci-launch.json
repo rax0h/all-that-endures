@@ -1,0 +1,23 @@
+{
+  "schema": "ate-proof-query-ci-launch/1",
+  "run_id": 39890667390,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/39890667390",
+  "observed_status": "queued",
+  "conclusion": null,
+  "source": {
+    "head": "a46df393e297b65a9451baa9e71a333578c5eec5",
+    "root_tree": "56dde863d37efd475696357bfdecae12498c5421",
+    "runtime_tree": "de69bd0717240beb09b8d25bafda150cb8228497",
+    "local_equivalent_head": "1e2819867318c8c9eae9b49ee43a24f44b25ee52"
+  },
+  "checks": {
+    "local_affected": "240 passed in 16.22s",
+    "local_diagnostics": "exact1k/10k/100k,zero payload reads, bounded metadata/heap",
+    "ci": "pending; full suite plus map/batch/order/query diagnostics"
+  },
+  "limits": [
+    "No World activation",
+    "No mature speed acceptance",
+    "Parent green is separate evidence"
+  ]
+}

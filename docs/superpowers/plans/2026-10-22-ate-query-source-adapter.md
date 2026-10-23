@@ -1,6 +1,6 @@
 # Query Source Adapter Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Read authenticated ordered pages from real pinned SQLite query rows without rereading owner/history payloads.
 
@@ -33,10 +33,10 @@
 
 **Interfaces:** Frozen QueryScope/QueryCertificate/QueryPage and exact `query_domain`, `member_commitment`, `certificate_commitment`, `read_query_page` signatures/encodings from Spec. Consumes ProofNodeStore/ProofMap/OrderRoot/OrderEntry/verify_page. A single closed reader operation owns or joins the existing explicitly owned read snapshot; arbitrary borrowed transactions fail.
 
-- [ ] Write independent binding vectors and real-store tests for exact pages/cursors/duplicates, zero payload SELECT/check counters, previous/current pin separation, released/foreign/stale pins, wrong certificate/context/root, metadata checksum/type/interval corruption, missing/surplus rows, visible overlaps, false empty boundaries and invalid limits/cursors. Fixtures build only after full verification; no test-only production methods.
-- [ ] Run `python -m pytest -q simulation/tests/test_stage_0_5_proof_query.py`; Expected missing-module failures before implementation.
-- [ ] Implement exact physical scope and page binding, bounded ordered SQL seeks/merge with existing current/open/closed indexes, all-fetched-row checks and ordered verifier. Return raw key/ordinal metadata and authenticated continuation only; no source payload reads or object exposure.
-- [ ] Run new tests plus all existing proof tests; Expected all pass. Commit `feat: verify pinned query pages against real source rows`.
+- [x] Write independent binding vectors and real-store tests for exact pages/cursors/duplicates, zero payload SELECT/check counters, previous/current pin separation, released/foreign/stale pins, wrong certificate/context/root, metadata checksum/type/interval corruption, missing/surplus rows, visible overlaps, false empty boundaries and invalid limits/cursors. Fixtures build only after full verification; no test-only production methods.
+- [x] Run `python -m pytest -q simulation/tests/test_stage_0_5_proof_query.py`; Expected missing-module failures before implementation.
+- [x] Implement exact physical scope and page binding, bounded ordered SQL seeks/merge with existing current/open/closed indexes, all-fetched-row checks and ordered verifier. Return raw key/ordinal metadata and authenticated continuation only; no source payload reads or object exposure.
+- [x] Run new tests plus all existing proof tests; Expected all pass. Commit `feat: verify pinned query pages against real source rows`.
 
 ### Task 2: Actual-store scaling evidence and successor CI
 
@@ -44,11 +44,15 @@
 
 **Interfaces:** Driver `--output PATH`, immutable source/partial/per-case receipts on clean committed source. Use actual LazyRecordStore commit API for fixed8 query owners with two distinct membership ordinals each and1k/10k/100k unrelated ordinary archive records. Build fixture proofs after one full verify per case, outside timing. Compare old checked limited query and new proof page exactly; record payload-check counts and SQL reads separately. New reader gate: zero source payload SELECT/checks, <=512 proof node reads, <2MiB traced heap, exact results and continuation. Record construction/RSS separately; source/driver hashes mandatory.
 
-- [ ] Commit driver/workflow, validate Python AST/YAML/bash syntax, then run bounded15-minute diagnostic on clean source. Expected all sizes pass with exact results and zero new-reader payload work; preserve partial receipts before later phases.
-- [ ] Run all proof tests plus incremental-store, store-failure and actual pinned-store regressions; Expected all pass. One fresh whole-package review, fix Critical/Important RED->GREEN once and retain findings/rulings.
-- [ ] Publish exact-tree leased update, launch separate full suite plus scaling CI and retain link. Expected new full suite pending until observed green; no parent-result substitution or waiting for long CI.
-- [ ] Commit evidence/handoff. Source adapters do not activate World; next mandatory integration gates remain explicit.
+- [x] Commit driver/workflow, validate Python AST/YAML/bash syntax, then run bounded15-minute diagnostic on clean source. Expected all sizes pass with exact results and zero new-reader payload work; preserve partial receipts before later phases.
+- [x] Run all proof tests plus incremental-store, store-failure and actual pinned-store regressions; Expected all pass. One fresh whole-package review, fix Critical/Important RED->GREEN once and retain findings/rulings.
+- [x] Publish exact-tree leased update, launch separate full suite plus scaling CI and retain link. Expected new full suite pending until observed green; no parent-result substitution or waiting for long CI.
+- [x] Commit evidence/handoff. Source adapters do not activate World; next mandatory integration gates remain explicit.
 
 ## Self-review
 
 Task2 consumes Task1's exact raw metadata interfaces and test-only verified fixture utility. Each Review Focus has owning tests. This package closes query row/page consumption only; it does not represent a completed global manifest, source constructor, topology checker or World adoption path.
+
+## Completion evidence
+
+Local affected suite:240 passed in16.22s. Source adapter:36 cases. Fresh whole-package review identified one Important overlap issue, repaired in one RED/GREEN pass; no Critical/Minor findings. Post-repair actual-store diagnostic exact at1k/10k/100k with zero payload reads and bounded heap. Evidence and review: `docs/performance/proof-query-results.md`. Exact-tree candidate a46df393e297b65a9451baa9e71a333578c5eec5, CI run39890667390 queued. Task completion means implementation/review/publication and CI launch; candidate CI acceptance remains pending.
