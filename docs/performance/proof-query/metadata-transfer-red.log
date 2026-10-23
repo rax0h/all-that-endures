@@ -1,0 +1,70 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_oversized_physical_metadata_is_rejected_before_python_transfer[key-text] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_oversized_physical_metada0')
+field = 'key-text'
+
+    @pytest.mark.parametrize('field',['key-text','checksum-text','key-blob'])
+    def test_oversized_physical_metadata_is_rejected_before_python_transfer(tmp_path,field):
+        q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+        huge='\x00'+'x'*(2*1024*1024)
+        if field=='key-text':store.db.execute('UPDATE lazy_query_versions SET record_key=? WHERE ordinal=0',(huge,))
+        elif field=='checksum-text':store.db.execute('UPDATE lazy_query_versions SET row_checksum=? WHERE ordinal=0',(huge,))
+        else:store.db.execute('UPDATE lazy_query_versions SET record_key=? WHERE ordinal=0',(huge.encode(),))
+        store.db.commit();tracemalloc.start()
+        try:
+            with pytest.raises(StoreError):q.read_query_page(store,pin,cert,expected)
+            _,peak=tracemalloc.get_traced_memory()
+        finally:tracemalloc.stop()
+>       assert peak<128*1024
+E       assert 2106040 < (128 * 1024)
+
+simulation/tests/test_stage_0_5_proof_query.py:149: AssertionError
+_ test_oversized_physical_metadata_is_rejected_before_python_transfer[checksum-text] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_oversized_physical_metada1')
+field = 'checksum-text'
+
+    @pytest.mark.parametrize('field',['key-text','checksum-text','key-blob'])
+    def test_oversized_physical_metadata_is_rejected_before_python_transfer(tmp_path,field):
+        q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+        huge='\x00'+'x'*(2*1024*1024)
+        if field=='key-text':store.db.execute('UPDATE lazy_query_versions SET record_key=? WHERE ordinal=0',(huge,))
+        elif field=='checksum-text':store.db.execute('UPDATE lazy_query_versions SET row_checksum=? WHERE ordinal=0',(huge,))
+        else:store.db.execute('UPDATE lazy_query_versions SET record_key=? WHERE ordinal=0',(huge.encode(),))
+        store.db.commit();tracemalloc.start()
+        try:
+            with pytest.raises(StoreError):q.read_query_page(store,pin,cert,expected)
+            _,peak=tracemalloc.get_traced_memory()
+        finally:tracemalloc.stop()
+>       assert peak<128*1024
+E       assert 2104883 < (128 * 1024)
+
+simulation/tests/test_stage_0_5_proof_query.py:149: AssertionError
+_ test_oversized_physical_metadata_is_rejected_before_python_transfer[key-blob] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_oversized_physical_metada2')
+field = 'key-blob'
+
+    @pytest.mark.parametrize('field',['key-text','checksum-text','key-blob'])
+    def test_oversized_physical_metadata_is_rejected_before_python_transfer(tmp_path,field):
+        q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+        huge='\x00'+'x'*(2*1024*1024)
+        if field=='key-text':store.db.execute('UPDATE lazy_query_versions SET record_key=? WHERE ordinal=0',(huge,))
+        elif field=='checksum-text':store.db.execute('UPDATE lazy_query_versions SET row_checksum=? WHERE ordinal=0',(huge,))
+        else:store.db.execute('UPDATE lazy_query_versions SET record_key=? WHERE ordinal=0',(huge.encode(),))
+        store.db.commit();tracemalloc.start()
+        try:
+            with pytest.raises(StoreError):q.read_query_page(store,pin,cert,expected)
+            _,peak=tracemalloc.get_traced_memory()
+        finally:tracemalloc.stop()
+>       assert peak<128*1024
+E       assert 4200507 < (128 * 1024)
+
+simulation/tests/test_stage_0_5_proof_query.py:149: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_oversized_physical_metadata_is_rejected_before_python_transfer[key-text]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_oversized_physical_metadata_is_rejected_before_python_transfer[checksum-text]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_oversized_physical_metadata_is_rejected_before_python_transfer[key-blob]
+3 failed, 28 deselected in 0.43s

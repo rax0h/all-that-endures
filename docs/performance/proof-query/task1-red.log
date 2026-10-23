@@ -1,0 +1,888 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFF                                             [100%]
+=================================== FAILURES ===================================
+_______ test_scope_member_certificate_bindings_match_independent_frames ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_scope_member_certificate_0')
+
+    def test_scope_member_certificate_bindings_match_independent_frames(tmp_path):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');certificate,_=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_exact_pagination_cursors_repeated_keys_and_zero_payload_work _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_exact_pagination_cursors_0')
+
+    def test_exact_pagination_cursors_repeated_keys_and_zero_payload_work(tmp_path):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite',30);cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_previous_pin_and_current_proofs_select_distinct_exact_sources ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_previous_pin_and_current_0')
+
+    def test_previous_pin_and_current_proofs_select_distinct_exact_sources(tmp_path):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');old_pin=store.capture_pin()
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_wrong_certificate_context_is_rejected[store] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_certificate_context0')
+field = 'store'
+
+    @pytest.mark.parametrize('field',['store','generation','codec','scope','root','expected'])
+    def test_wrong_certificate_context_is_rejected(tmp_path,field):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_wrong_certificate_context_is_rejected[generation] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_certificate_context1')
+field = 'generation'
+
+    @pytest.mark.parametrize('field',['store','generation','codec','scope','root','expected'])
+    def test_wrong_certificate_context_is_rejected(tmp_path,field):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_wrong_certificate_context_is_rejected[codec] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_certificate_context2')
+field = 'codec'
+
+    @pytest.mark.parametrize('field',['store','generation','codec','scope','root','expected'])
+    def test_wrong_certificate_context_is_rejected(tmp_path,field):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_wrong_certificate_context_is_rejected[scope] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_certificate_context3')
+field = 'scope'
+
+    @pytest.mark.parametrize('field',['store','generation','codec','scope','root','expected'])
+    def test_wrong_certificate_context_is_rejected(tmp_path,field):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_wrong_certificate_context_is_rejected[root] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_certificate_context4')
+field = 'root'
+
+    @pytest.mark.parametrize('field',['store','generation','codec','scope','root','expected'])
+    def test_wrong_certificate_context_is_rejected(tmp_path,field):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_wrong_certificate_context_is_rejected[expected] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_certificate_context5')
+field = 'expected'
+
+    @pytest.mark.parametrize('field',['store','generation','codec','scope','root','expected'])
+    def test_wrong_certificate_context_is_rejected(tmp_path,field):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_physical_metadata_corruption_omission_and_overlap_fail_closed[checksum] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_metadata_corrupt0')
+fault = 'checksum'
+
+    @pytest.mark.parametrize('fault',['checksum','type','interval','missing','surplus','overlap','empty','predecessor','lookahead'])
+    def test_physical_metadata_corruption_omission_and_overlap_fail_closed(tmp_path,fault):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_physical_metadata_corruption_omission_and_overlap_fail_closed[type] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_metadata_corrupt1')
+fault = 'type'
+
+    @pytest.mark.parametrize('fault',['checksum','type','interval','missing','surplus','overlap','empty','predecessor','lookahead'])
+    def test_physical_metadata_corruption_omission_and_overlap_fail_closed(tmp_path,fault):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_physical_metadata_corruption_omission_and_overlap_fail_closed[interval] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_metadata_corrupt2')
+fault = 'interval'
+
+    @pytest.mark.parametrize('fault',['checksum','type','interval','missing','surplus','overlap','empty','predecessor','lookahead'])
+    def test_physical_metadata_corruption_omission_and_overlap_fail_closed(tmp_path,fault):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_physical_metadata_corruption_omission_and_overlap_fail_closed[missing] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_metadata_corrupt3')
+fault = 'missing'
+
+    @pytest.mark.parametrize('fault',['checksum','type','interval','missing','surplus','overlap','empty','predecessor','lookahead'])
+    def test_physical_metadata_corruption_omission_and_overlap_fail_closed(tmp_path,fault):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_physical_metadata_corruption_omission_and_overlap_fail_closed[surplus] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_metadata_corrupt4')
+fault = 'surplus'
+
+    @pytest.mark.parametrize('fault',['checksum','type','interval','missing','surplus','overlap','empty','predecessor','lookahead'])
+    def test_physical_metadata_corruption_omission_and_overlap_fail_closed(tmp_path,fault):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_physical_metadata_corruption_omission_and_overlap_fail_closed[overlap] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_metadata_corrupt5')
+fault = 'overlap'
+
+    @pytest.mark.parametrize('fault',['checksum','type','interval','missing','surplus','overlap','empty','predecessor','lookahead'])
+    def test_physical_metadata_corruption_omission_and_overlap_fail_closed(tmp_path,fault):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__ test_physical_metadata_corruption_omission_and_overlap_fail_closed[empty] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_metadata_corrupt6')
+fault = 'empty'
+
+    @pytest.mark.parametrize('fault',['checksum','type','interval','missing','surplus','overlap','empty','predecessor','lookahead'])
+    def test_physical_metadata_corruption_omission_and_overlap_fail_closed(tmp_path,fault):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_physical_metadata_corruption_omission_and_overlap_fail_closed[predecessor] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_metadata_corrupt7')
+fault = 'predecessor'
+
+    @pytest.mark.parametrize('fault',['checksum','type','interval','missing','surplus','overlap','empty','predecessor','lookahead'])
+    def test_physical_metadata_corruption_omission_and_overlap_fail_closed(tmp_path,fault):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_physical_metadata_corruption_omission_and_overlap_fail_closed[lookahead] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_metadata_corrupt8')
+fault = 'lookahead'
+
+    @pytest.mark.parametrize('fault',['checksum','type','interval','missing','surplus','overlap','empty','predecessor','lookahead'])
+    def test_physical_metadata_corruption_omission_and_overlap_fail_closed(tmp_path,fault):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_real_empty_query_and_end_cursor_have_authenticated_absence ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_real_empty_query_and_end_0')
+
+    def test_real_empty_query_and_end_cursor_have_authenticated_absence(tmp_path):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin,'empty')
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_invalid_limits_and_raw_cursors_are_rejected[0-None] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_limits_and_raw_cu0')
+limit = 0, after = None
+
+    @pytest.mark.parametrize('limit,after',[(0,None),(129,None),(True,None),(1.0,None),(1,('bad',b'')),(1,(0,'bad')),(1,[0,b''])])
+    def test_invalid_limits_and_raw_cursors_are_rejected(tmp_path,limit,after):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_invalid_limits_and_raw_cursors_are_rejected[129-None] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_limits_and_raw_cu1')
+limit = 129, after = None
+
+    @pytest.mark.parametrize('limit,after',[(0,None),(129,None),(True,None),(1.0,None),(1,('bad',b'')),(1,(0,'bad')),(1,[0,b''])])
+    def test_invalid_limits_and_raw_cursors_are_rejected(tmp_path,limit,after):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_invalid_limits_and_raw_cursors_are_rejected[True-None] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_limits_and_raw_cu2')
+limit = True, after = None
+
+    @pytest.mark.parametrize('limit,after',[(0,None),(129,None),(True,None),(1.0,None),(1,('bad',b'')),(1,(0,'bad')),(1,[0,b''])])
+    def test_invalid_limits_and_raw_cursors_are_rejected(tmp_path,limit,after):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_invalid_limits_and_raw_cursors_are_rejected[1.0-None] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_limits_and_raw_cu3')
+limit = 1.0, after = None
+
+    @pytest.mark.parametrize('limit,after',[(0,None),(129,None),(True,None),(1.0,None),(1,('bad',b'')),(1,(0,'bad')),(1,[0,b''])])
+    def test_invalid_limits_and_raw_cursors_are_rejected(tmp_path,limit,after):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_invalid_limits_and_raw_cursors_are_rejected[1-after4] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_limits_and_raw_cu4')
+limit = 1, after = ('bad', b'')
+
+    @pytest.mark.parametrize('limit,after',[(0,None),(129,None),(True,None),(1.0,None),(1,('bad',b'')),(1,(0,'bad')),(1,[0,b''])])
+    def test_invalid_limits_and_raw_cursors_are_rejected(tmp_path,limit,after):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_invalid_limits_and_raw_cursors_are_rejected[1-after5] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_limits_and_raw_cu5')
+limit = 1, after = (0, 'bad')
+
+    @pytest.mark.parametrize('limit,after',[(0,None),(129,None),(True,None),(1.0,None),(1,('bad',b'')),(1,(0,'bad')),(1,[0,b''])])
+    def test_invalid_limits_and_raw_cursors_are_rejected(tmp_path,limit,after):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_invalid_limits_and_raw_cursors_are_rejected[1-after6] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_limits_and_raw_cu6')
+limit = 1, after = [0, b'']
+
+    @pytest.mark.parametrize('limit,after',[(0,None),(129,None),(True,None),(1.0,None),(1,('bad',b'')),(1,(0,'bad')),(1,[0,b''])])
+    def test_invalid_limits_and_raw_cursors_are_rejected(tmp_path,limit,after):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_foreign_pin_and_arbitrary_borrowed_transaction_are_rejected _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_foreign_pin_and_arbitrary0')
+
+    def test_foreign_pin_and_arbitrary_borrowed_transaction_are_rejected(tmp_path):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_metadata_does_not_admit_or_validate_owner_objects ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_metadata_does_not_admit_o0')
+
+    def test_metadata_does_not_admit_or_validate_owner_objects(tmp_path):
+>       q=query_module();store,pin=make_store(tmp_path/'source.sqlite');cert,expected=construct_certificate(store,pin)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_query.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_query_fixtures.py:13: in query_module
+    return importlib.import_module('ate_sim.persistence_proof_query')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_query'
+import_ = <function _gcd_import at 0x7fad523000e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_query'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_scope_member_certificate_bindings_match_independent_frames
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_exact_pagination_cursors_repeated_keys_and_zero_payload_work
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_previous_pin_and_current_proofs_select_distinct_exact_sources
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_wrong_certificate_context_is_rejected[store]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_wrong_certificate_context_is_rejected[generation]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_wrong_certificate_context_is_rejected[codec]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_wrong_certificate_context_is_rejected[scope]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_wrong_certificate_context_is_rejected[root]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_wrong_certificate_context_is_rejected[expected]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_physical_metadata_corruption_omission_and_overlap_fail_closed[checksum]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_physical_metadata_corruption_omission_and_overlap_fail_closed[type]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_physical_metadata_corruption_omission_and_overlap_fail_closed[interval]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_physical_metadata_corruption_omission_and_overlap_fail_closed[missing]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_physical_metadata_corruption_omission_and_overlap_fail_closed[surplus]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_physical_metadata_corruption_omission_and_overlap_fail_closed[overlap]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_physical_metadata_corruption_omission_and_overlap_fail_closed[empty]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_physical_metadata_corruption_omission_and_overlap_fail_closed[predecessor]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_physical_metadata_corruption_omission_and_overlap_fail_closed[lookahead]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_real_empty_query_and_end_cursor_have_authenticated_absence
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_invalid_limits_and_raw_cursors_are_rejected[0-None]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_invalid_limits_and_raw_cursors_are_rejected[129-None]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_invalid_limits_and_raw_cursors_are_rejected[True-None]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_invalid_limits_and_raw_cursors_are_rejected[1.0-None]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_invalid_limits_and_raw_cursors_are_rejected[1-after4]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_invalid_limits_and_raw_cursors_are_rejected[1-after5]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_invalid_limits_and_raw_cursors_are_rejected[1-after6]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_foreign_pin_and_arbitrary_borrowed_transaction_are_rejected
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_metadata_does_not_admit_or_validate_owner_objects
+28 failed in 0.37s

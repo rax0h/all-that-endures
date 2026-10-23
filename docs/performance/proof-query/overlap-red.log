@@ -1,0 +1,112 @@
+FFFF.                                                                    [100%]
+=================================== FAILURES ===================================
+____ test_each_fetched_position_rejects_hidden_visible_intervals[lookahead] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_each_fetched_position_rej0')
+case = 'lookahead'
+
+    @pytest.mark.parametrize('case', ['lookahead', 'predecessor', 'end-boundary', 'hidden-closed', 'previous-closed'])
+    def test_each_fetched_position_rejects_hidden_visible_intervals(tmp_path,case):
+        q=query_module();store,pin=make_store(tmp_path/'source.sqlite')
+        cert,expected=construct_certificate(store,pin)
+        if case=='previous-closed':
+            old_pin=store.capture_pin()
+            store.commit(pin,commit_token='advance',version_changes=(),changes=(),new_segments=(),metadata=metadata(2))
+            pin=old_pin
+        ordinal={'lookahead':4,'predecessor':1,'end-boundary':15}.get(case,2)
+        row=store.db.execute('SELECT namespace,index_name,index_value,record_key,ordinal FROM lazy_query_versions '
+            'WHERE ordinal=?',(ordinal,)).fetchone()
+        end=pin.captured_head+1 if case in ('hidden-closed','previous-closed') else None
+        checksum=_query_checksum(*row,0,end)
+        store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',(*row,0,end,checksum))
+        store.db.commit()
+        kwargs={'limit':4} if case=='lookahead' else {'after':(1,store.codec.encode(0)),'limit':4} if case=='predecessor' else {'after':(99,b'')} if case=='end-boundary' else {}
+>       with pytest.raises(StoreIntegrityError):q.read_query_page(store,pin,cert,expected,**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_query.py:169: Failed
+___ test_each_fetched_position_rejects_hidden_visible_intervals[predecessor] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_each_fetched_position_rej1')
+case = 'predecessor'
+
+    @pytest.mark.parametrize('case', ['lookahead', 'predecessor', 'end-boundary', 'hidden-closed', 'previous-closed'])
+    def test_each_fetched_position_rejects_hidden_visible_intervals(tmp_path,case):
+        q=query_module();store,pin=make_store(tmp_path/'source.sqlite')
+        cert,expected=construct_certificate(store,pin)
+        if case=='previous-closed':
+            old_pin=store.capture_pin()
+            store.commit(pin,commit_token='advance',version_changes=(),changes=(),new_segments=(),metadata=metadata(2))
+            pin=old_pin
+        ordinal={'lookahead':4,'predecessor':1,'end-boundary':15}.get(case,2)
+        row=store.db.execute('SELECT namespace,index_name,index_value,record_key,ordinal FROM lazy_query_versions '
+            'WHERE ordinal=?',(ordinal,)).fetchone()
+        end=pin.captured_head+1 if case in ('hidden-closed','previous-closed') else None
+        checksum=_query_checksum(*row,0,end)
+        store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',(*row,0,end,checksum))
+        store.db.commit()
+        kwargs={'limit':4} if case=='lookahead' else {'after':(1,store.codec.encode(0)),'limit':4} if case=='predecessor' else {'after':(99,b'')} if case=='end-boundary' else {}
+>       with pytest.raises(StoreIntegrityError):q.read_query_page(store,pin,cert,expected,**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_query.py:169: Failed
+__ test_each_fetched_position_rejects_hidden_visible_intervals[end-boundary] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_each_fetched_position_rej2')
+case = 'end-boundary'
+
+    @pytest.mark.parametrize('case', ['lookahead', 'predecessor', 'end-boundary', 'hidden-closed', 'previous-closed'])
+    def test_each_fetched_position_rejects_hidden_visible_intervals(tmp_path,case):
+        q=query_module();store,pin=make_store(tmp_path/'source.sqlite')
+        cert,expected=construct_certificate(store,pin)
+        if case=='previous-closed':
+            old_pin=store.capture_pin()
+            store.commit(pin,commit_token='advance',version_changes=(),changes=(),new_segments=(),metadata=metadata(2))
+            pin=old_pin
+        ordinal={'lookahead':4,'predecessor':1,'end-boundary':15}.get(case,2)
+        row=store.db.execute('SELECT namespace,index_name,index_value,record_key,ordinal FROM lazy_query_versions '
+            'WHERE ordinal=?',(ordinal,)).fetchone()
+        end=pin.captured_head+1 if case in ('hidden-closed','previous-closed') else None
+        checksum=_query_checksum(*row,0,end)
+        store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',(*row,0,end,checksum))
+        store.db.commit()
+        kwargs={'limit':4} if case=='lookahead' else {'after':(1,store.codec.encode(0)),'limit':4} if case=='predecessor' else {'after':(99,b'')} if case=='end-boundary' else {}
+>       with pytest.raises(StoreIntegrityError):q.read_query_page(store,pin,cert,expected,**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_query.py:169: Failed
+__ test_each_fetched_position_rejects_hidden_visible_intervals[hidden-closed] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_each_fetched_position_rej3')
+case = 'hidden-closed'
+
+    @pytest.mark.parametrize('case', ['lookahead', 'predecessor', 'end-boundary', 'hidden-closed', 'previous-closed'])
+    def test_each_fetched_position_rejects_hidden_visible_intervals(tmp_path,case):
+        q=query_module();store,pin=make_store(tmp_path/'source.sqlite')
+        cert,expected=construct_certificate(store,pin)
+        if case=='previous-closed':
+            old_pin=store.capture_pin()
+            store.commit(pin,commit_token='advance',version_changes=(),changes=(),new_segments=(),metadata=metadata(2))
+            pin=old_pin
+        ordinal={'lookahead':4,'predecessor':1,'end-boundary':15}.get(case,2)
+        row=store.db.execute('SELECT namespace,index_name,index_value,record_key,ordinal FROM lazy_query_versions '
+            'WHERE ordinal=?',(ordinal,)).fetchone()
+        end=pin.captured_head+1 if case in ('hidden-closed','previous-closed') else None
+        checksum=_query_checksum(*row,0,end)
+        store.db.execute('INSERT INTO lazy_query_versions VALUES(?,?,?,?,?,?,?,?)',(*row,0,end,checksum))
+        store.db.commit()
+        kwargs={'limit':4} if case=='lookahead' else {'after':(1,store.codec.encode(0)),'limit':4} if case=='predecessor' else {'after':(99,b'')} if case=='end-boundary' else {}
+>       with pytest.raises(StoreIntegrityError):q.read_query_page(store,pin,cert,expected,**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_query.py:169: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_each_fetched_position_rejects_hidden_visible_intervals[lookahead]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_each_fetched_position_rejects_hidden_visible_intervals[predecessor]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_each_fetched_position_rejects_hidden_visible_intervals[end-boundary]
+FAILED simulation/tests/test_stage_0_5_proof_query.py::test_each_fetched_position_rejects_hidden_visible_intervals[hidden-closed]
+4 failed, 1 passed, 31 deselected in 0.57s
