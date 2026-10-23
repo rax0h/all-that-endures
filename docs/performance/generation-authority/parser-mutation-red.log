@@ -1,0 +1,166 @@
+.FFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+_______________ test_ingress_bytes_and_expected_reject[trailing] _______________
+
+fault = 'trailing'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field','genesis-parent'])
+    def test_ingress_bytes_and_expected_reject(fault):
+        m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+        if fault=='expected':expected=b'x'*32
+        elif fault=='trailing':raw+=b'\x00'
+        elif fault=='truncated':raw=raw[:-1]
+        elif fault=='tag':raw=b'OTHER'+raw[5:]
+        elif fault=='huge-field':raw=raw[:5]+(2**32-1).to_bytes(4,'big')+raw[9:]
+        elif fault=='genesis-parent':
+            raw=m.encode_manifest(specimen(0));start=5+4+5+4+8+4+8
+            raw=raw[:start]+(32).to_bytes(4,'big')+b'p'*32+raw[start+4:]
+        else:
+            # First field length5 + frame4, generation8 +frame4, then parent frame.
+            start=5+4+5+4+8+4;raw=raw[:start]+(9).to_bytes(8,'big')+raw[start+8:]
+        if fault!='expected':
+            tag=b'ate-generation-manifest/1'
+            expected=hashlib.sha256(len(tag).to_bytes(8,'big')+tag+len(raw).to_bytes(8,'big')+raw).digest()
+>       with pytest.raises(StoreIntegrityError):m.decode_manifest(raw,expected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_generation.py:81: Failed
+______________ test_ingress_bytes_and_expected_reject[truncated] _______________
+
+fault = 'truncated'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field','genesis-parent'])
+    def test_ingress_bytes_and_expected_reject(fault):
+        m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+        if fault=='expected':expected=b'x'*32
+        elif fault=='trailing':raw+=b'\x00'
+        elif fault=='truncated':raw=raw[:-1]
+        elif fault=='tag':raw=b'OTHER'+raw[5:]
+        elif fault=='huge-field':raw=raw[:5]+(2**32-1).to_bytes(4,'big')+raw[9:]
+        elif fault=='genesis-parent':
+            raw=m.encode_manifest(specimen(0));start=5+4+5+4+8+4+8
+            raw=raw[:start]+(32).to_bytes(4,'big')+b'p'*32+raw[start+4:]
+        else:
+            # First field length5 + frame4, generation8 +frame4, then parent frame.
+            start=5+4+5+4+8+4;raw=raw[:start]+(9).to_bytes(8,'big')+raw[start+8:]
+        if fault!='expected':
+            tag=b'ate-generation-manifest/1'
+            expected=hashlib.sha256(len(tag).to_bytes(8,'big')+tag+len(raw).to_bytes(8,'big')+raw).digest()
+>       with pytest.raises(StoreIntegrityError):m.decode_manifest(raw,expected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_generation.py:81: Failed
+_________________ test_ingress_bytes_and_expected_reject[tag] __________________
+
+fault = 'tag'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field','genesis-parent'])
+    def test_ingress_bytes_and_expected_reject(fault):
+        m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+        if fault=='expected':expected=b'x'*32
+        elif fault=='trailing':raw+=b'\x00'
+        elif fault=='truncated':raw=raw[:-1]
+        elif fault=='tag':raw=b'OTHER'+raw[5:]
+        elif fault=='huge-field':raw=raw[:5]+(2**32-1).to_bytes(4,'big')+raw[9:]
+        elif fault=='genesis-parent':
+            raw=m.encode_manifest(specimen(0));start=5+4+5+4+8+4+8
+            raw=raw[:start]+(32).to_bytes(4,'big')+b'p'*32+raw[start+4:]
+        else:
+            # First field length5 + frame4, generation8 +frame4, then parent frame.
+            start=5+4+5+4+8+4;raw=raw[:start]+(9).to_bytes(8,'big')+raw[start+8:]
+        if fault!='expected':
+            tag=b'ate-generation-manifest/1'
+            expected=hashlib.sha256(len(tag).to_bytes(8,'big')+tag+len(raw).to_bytes(8,'big')+raw).digest()
+>       with pytest.raises(StoreIntegrityError):m.decode_manifest(raw,expected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_generation.py:81: Failed
+__________ test_ingress_bytes_and_expected_reject[parent-generation] ___________
+
+fault = 'parent-generation'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field','genesis-parent'])
+    def test_ingress_bytes_and_expected_reject(fault):
+        m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+        if fault=='expected':expected=b'x'*32
+        elif fault=='trailing':raw+=b'\x00'
+        elif fault=='truncated':raw=raw[:-1]
+        elif fault=='tag':raw=b'OTHER'+raw[5:]
+        elif fault=='huge-field':raw=raw[:5]+(2**32-1).to_bytes(4,'big')+raw[9:]
+        elif fault=='genesis-parent':
+            raw=m.encode_manifest(specimen(0));start=5+4+5+4+8+4+8
+            raw=raw[:start]+(32).to_bytes(4,'big')+b'p'*32+raw[start+4:]
+        else:
+            # First field length5 + frame4, generation8 +frame4, then parent frame.
+            start=5+4+5+4+8+4;raw=raw[:start]+(9).to_bytes(8,'big')+raw[start+8:]
+        if fault!='expected':
+            tag=b'ate-generation-manifest/1'
+            expected=hashlib.sha256(len(tag).to_bytes(8,'big')+tag+len(raw).to_bytes(8,'big')+raw).digest()
+>       with pytest.raises(StoreIntegrityError):m.decode_manifest(raw,expected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_generation.py:81: Failed
+______________ test_ingress_bytes_and_expected_reject[huge-field] ______________
+
+fault = 'huge-field'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field','genesis-parent'])
+    def test_ingress_bytes_and_expected_reject(fault):
+        m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+        if fault=='expected':expected=b'x'*32
+        elif fault=='trailing':raw+=b'\x00'
+        elif fault=='truncated':raw=raw[:-1]
+        elif fault=='tag':raw=b'OTHER'+raw[5:]
+        elif fault=='huge-field':raw=raw[:5]+(2**32-1).to_bytes(4,'big')+raw[9:]
+        elif fault=='genesis-parent':
+            raw=m.encode_manifest(specimen(0));start=5+4+5+4+8+4+8
+            raw=raw[:start]+(32).to_bytes(4,'big')+b'p'*32+raw[start+4:]
+        else:
+            # First field length5 + frame4, generation8 +frame4, then parent frame.
+            start=5+4+5+4+8+4;raw=raw[:start]+(9).to_bytes(8,'big')+raw[start+8:]
+        if fault!='expected':
+            tag=b'ate-generation-manifest/1'
+            expected=hashlib.sha256(len(tag).to_bytes(8,'big')+tag+len(raw).to_bytes(8,'big')+raw).digest()
+>       with pytest.raises(StoreIntegrityError):m.decode_manifest(raw,expected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_generation.py:81: Failed
+____________ test_ingress_bytes_and_expected_reject[genesis-parent] ____________
+
+fault = 'genesis-parent'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field','genesis-parent'])
+    def test_ingress_bytes_and_expected_reject(fault):
+        m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+        if fault=='expected':expected=b'x'*32
+        elif fault=='trailing':raw+=b'\x00'
+        elif fault=='truncated':raw=raw[:-1]
+        elif fault=='tag':raw=b'OTHER'+raw[5:]
+        elif fault=='huge-field':raw=raw[:5]+(2**32-1).to_bytes(4,'big')+raw[9:]
+        elif fault=='genesis-parent':
+            raw=m.encode_manifest(specimen(0));start=5+4+5+4+8+4+8
+            raw=raw[:start]+(32).to_bytes(4,'big')+b'p'*32+raw[start+4:]
+        else:
+            # First field length5 + frame4, generation8 +frame4, then parent frame.
+            start=5+4+5+4+8+4;raw=raw[:start]+(9).to_bytes(8,'big')+raw[start+8:]
+        if fault!='expected':
+            tag=b'ate-generation-manifest/1'
+            expected=hashlib.sha256(len(tag).to_bytes(8,'big')+tag+len(raw).to_bytes(8,'big')+raw).digest()
+>       with pytest.raises(StoreIntegrityError):m.decode_manifest(raw,expected)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_generation.py:81: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[trailing]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[truncated]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[tag]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[parent-generation]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[huge-field]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[genesis-parent]
+6 failed, 1 passed, 53 deselected in 0.16s

@@ -61,7 +61,7 @@ def test_malformed_fields_reject(fault):
     with pytest.raises(StoreIntegrityError):m.encode_manifest(v)
 
 
-@pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field'])
+@pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field','genesis-parent'])
 def test_ingress_bytes_and_expected_reject(fault):
     m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
     if fault=='expected':expected=b'x'*32
@@ -69,9 +69,15 @@ def test_ingress_bytes_and_expected_reject(fault):
     elif fault=='truncated':raw=raw[:-1]
     elif fault=='tag':raw=b'OTHER'+raw[5:]
     elif fault=='huge-field':raw=raw[:5]+(2**32-1).to_bytes(4,'big')+raw[9:]
+    elif fault=='genesis-parent':
+        raw=m.encode_manifest(specimen(0));start=5+4+5+4+8+4+8
+        raw=raw[:start]+(32).to_bytes(4,'big')+b'p'*32+raw[start+4:]
     else:
         # First field length5 + frame4, generation8 +frame4, then parent frame.
         start=5+4+5+4+8+4;raw=raw[:start]+(9).to_bytes(8,'big')+raw[start+8:]
+    if fault!='expected':
+        tag=b'ate-generation-manifest/1'
+        expected=hashlib.sha256(len(tag).to_bytes(8,'big')+tag+len(raw).to_bytes(8,'big')+raw).digest()
     with pytest.raises(StoreIntegrityError):m.decode_manifest(raw,expected)
 
 
@@ -94,7 +100,8 @@ def test_source_current_retained_and_zero_body_reads(tmp_path):
     m=module();store,pin,pair=make_generation_store(tmp_path/'manifest.sqlite');old=store.capture_pin();sql=[]
     store.db.set_trace_callback(sql.append);store.reset_diagnostics()
     assert m.read_generation_manifest(store,pin,pair[1])==pair[0]
-    assert store.diagnostics().payload_reads==0 and not any('then payload end' in s.lower() for s in sql)
+    assert store.diagnostics().payload_reads==0
+    assert not any('from '+table in s.lower() for s in sql for table in ('lazy_record_versions','records','sealed_segments'))
     writer=store.commit(pin,commit_token='next',version_changes=(VersionChange('archive',0,b'new'),),changes=(),new_segments=(),metadata=metadata(2)).pin
     successor=install(store,writer,pair[1])
     assert m.read_generation_manifest(store,old,pair[1])==pair[0]

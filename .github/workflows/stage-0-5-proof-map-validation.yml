@@ -65,6 +65,7 @@ jobs:
           python -m pytest -q simulation/tests/test_stage_0_5_proof_projection.py --junitxml=evidence/projection-tests.xml 2>&1 | tee evidence/projection-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_projection_scaling.py --output evidence/projection-scaling 2>&1 | tee evidence/projection-scaling.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_query_seek.py simulation/tests/test_stage_0_5_proof_identity_group.py --junitxml=evidence/group-tests.xml 2>&1 | tee evidence/group-tests.log
+          python -m pytest -q simulation/tests/test_stage_0_5_proof_generation.py --junitxml=evidence/generation-tests.xml 2>&1 | tee evidence/generation-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_identity_group_scaling.py --output evidence/group-scaling 2>&1 | tee evidence/group-scaling.log
       - uses: actions/upload-artifact@v4
         if: always()

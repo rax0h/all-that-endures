@@ -24,19 +24,21 @@
 
 ## Task1: canonical manifest and successor binding
 
-- [ ] Write tests with independent framing vectors, round trip, field mutation and malformed types/lengths/parent/receipt/token/context.
-- [ ] Run RED for missing module.
-- [ ] Implement persistence_proof_generation.py closed types/codec and adjacent successor validation.
-- [ ] Run all task tests GREEN, then commit.
+- [x] Write tests with independent framing vectors, round trip, field mutation and malformed types/lengths/parent/receipt/token/context.
+- [x] Run RED for missing module.
+- [x] Implement persistence_proof_generation.py closed types/codec and adjacent successor validation.
+- [x] Run all task tests GREEN, then commit.
 
 ## Task2: retained source and protected-root inventory
 
-- [ ] Add test-only manifest-table construction and real source fixtures. Write RED for source corruption/context/budgets/retained head/receipt, and protection conflicts/missing roles.
-- [ ] Implement read_generation_manifest and retained_roots; no writer or schema constructor in production.
-- [ ] Run focused/affected tests GREEN; commit and checkpoint GitHub.
+- [x] Add test-only manifest-table construction and real source fixtures. Write RED for source corruption/context/budgets/retained head/receipt, and protection conflicts/missing roles.
+- [x] Implement read_generation_manifest and retained_roots; no writer or schema constructor in production.
+- [x] Run focused/affected tests GREEN; commit and checkpoint GitHub.
 
 ## Task3: final review, receipts, exact-tree CI
 
-- [ ] One independent branch review; substantive findings get one RED/GREEN fix pass and affected suite.
-- [ ] Add dedicated tests to existing CI; preserve full suite and all9scaling matrices.
-- [ ] Record source/evidence, update NEXT_INTEGRATION, publish candidate/launch receipt. Full suite acceptance pending until authenticated. No long polling/endurance/main merge.
+- [x] One independent branch review; substantive findings get one RED/GREEN fix pass and affected suite.
+- [x] Add dedicated tests to existing CI; preserve full suite and all9scaling matrices.
+- [x] Record source/evidence, update NEXT_INTEGRATION, publish candidate/launch receipt. Full suite acceptance pending until authenticated. No long polling/endurance/main merge.
+
+Local implementation/review/verification completed. Final checkbox includes candidate launch, not full CI acceptance; launch receipt and ledger track the pending full suite.
