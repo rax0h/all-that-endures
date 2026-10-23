@@ -9,3 +9,5 @@ Pre-flight: tasks 1/2 share QueryScope/root reader and closed snapshot/codec hel
 Prior independent reviewer failed on a usage limit without producing a review. No independent-review approval is claimed.
 
 Task 1: complete — reconstructed root-selected query source and shared closed metadata preflight; 20 missing-module RED cases, followed by 63 query/projection tests GREEN in 9.39s. Tests cover actual newer populations 1k/10k, closed old intervals and empty roots. A local registry attribute naming error was corrected before the final green run.
+
+Task 2: complete — 41 missing-module RED cases followed by 41 group cases GREEN in 9.14s. Selected owner TEXT/BLOB interval rejection is included. Retained reanchor, live-empty versus range-retired absence, coherent cross-root inconsistencies, canonical links, exact owner paths and byte/member budgets are covered.

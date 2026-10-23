@@ -1,0 +1,2035 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                [100%]
+=================================== FAILURES ===================================
+__________ test_literal_group_without_owner_payloads_or_world_decode ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_literal_group_without_own0')
+
+    def test_literal_group_without_owner_payloads_or_world_decode(tmp_path):
+        store,pin,pairs=make_group_store(tmp_path/'group.sqlite',1000)
+        sql=[];store.reset_diagnostics();store.db.set_trace_callback(sql.append)
+>       got=read_group(store,pin,pairs);enc=store.codec.encode
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________________ test_retained_and_successor_reanchor _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_retained_and_successor_re0')
+
+    def test_retained_and_successor_reanchor(tmp_path):
+        store,pin,pairs=make_group_store(tmp_path/'group.sqlite');old=store.capture_pin();writer=reanchor(store,pin)
+>       assert len(read_group(store,old,pairs).occurrences)==2
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_live_empty_and_proved_retired_absence __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_live_empty_and_proved_ret0')
+
+    def test_live_empty_and_proved_retired_absence(tmp_path):
+        store,pin,pairs=make_group_store(tmp_path/'empty.sqlite',inc=3)
+>       live=read_group(store,pin,pairs);assert live.occurrences==live.links==() and live.anchor is None and not live.retired
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_missing_selected_metadata_rejected[aux.lazy.identity.catalog] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_missing_selected_metadata0')
+namespace = 'aux.lazy.identity.catalog'
+
+    @pytest.mark.parametrize('namespace',catalog.CATALOG_NAMESPACES[:-1])
+    def test_missing_selected_metadata_rejected(tmp_path,namespace):
+        store,pin,pairs=make_group_store(tmp_path/'missing.sqlite')
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=?',(namespace,));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_missing_selected_metadata_rejected[aux.lazy.identity.groups] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_missing_selected_metadata1')
+namespace = 'aux.lazy.identity.groups'
+
+    @pytest.mark.parametrize('namespace',catalog.CATALOG_NAMESPACES[:-1])
+    def test_missing_selected_metadata_rejected(tmp_path,namespace):
+        store,pin,pairs=make_group_store(tmp_path/'missing.sqlite')
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=?',(namespace,));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_missing_selected_metadata_rejected[aux.lazy.identity.owners] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_missing_selected_metadata2')
+namespace = 'aux.lazy.identity.owners'
+
+    @pytest.mark.parametrize('namespace',catalog.CATALOG_NAMESPACES[:-1])
+    def test_missing_selected_metadata_rejected(tmp_path,namespace):
+        store,pin,pairs=make_group_store(tmp_path/'missing.sqlite')
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=?',(namespace,));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_missing_selected_metadata_rejected[aux.lazy.identity.owner_tree] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_missing_selected_metadata3')
+namespace = 'aux.lazy.identity.owner_tree'
+
+    @pytest.mark.parametrize('namespace',catalog.CATALOG_NAMESPACES[:-1])
+    def test_missing_selected_metadata_rejected(tmp_path,namespace):
+        store,pin,pairs=make_group_store(tmp_path/'missing.sqlite')
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=?',(namespace,));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_missing_selected_metadata_rejected[aux.lazy.identity.retired] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_missing_selected_metadata4')
+namespace = 'aux.lazy.identity.retired'
+
+    @pytest.mark.parametrize('namespace',catalog.CATALOG_NAMESPACES[:-1])
+    def test_missing_selected_metadata_rejected(tmp_path,namespace):
+        store,pin,pairs=make_group_store(tmp_path/'missing.sqlite')
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=?',(namespace,));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_missing_selected_metadata_rejected[world_identity_links] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_missing_selected_metadata5')
+namespace = 'world_identity_links'
+
+    @pytest.mark.parametrize('namespace',catalog.CATALOG_NAMESPACES[:-1])
+    def test_missing_selected_metadata_rejected(tmp_path,namespace):
+        store,pin,pairs=make_group_store(tmp_path/'missing.sqlite')
+        store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=?',(namespace,));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_independently_committed_inconsistent_catalog_rejected[group-count] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i0')
+fault = 'group-count'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_independently_committed_inconsistent_catalog_rejected[group-digest] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i1')
+fault = 'group-digest'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_independently_committed_inconsistent_catalog_rejected[group-anchor] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i2')
+fault = 'group-anchor'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_independently_committed_inconsistent_catalog_rejected[owner-count] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i3')
+fault = 'owner-count'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_independently_committed_inconsistent_catalog_rejected[owner-leaf] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i4')
+fault = 'owner-leaf'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____ test_independently_committed_inconsistent_catalog_rejected[link-inc] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i5')
+fault = 'link-inc'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_independently_committed_inconsistent_catalog_rejected[link-anchor] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i6')
+fault = 'link-anchor'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_independently_committed_inconsistent_catalog_rejected[link-membership] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i7')
+fault = 'link-membership'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_independently_committed_inconsistent_catalog_rejected[allocator] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i8')
+fault = 'allocator'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_independently_committed_inconsistent_catalog_rejected[empty-count] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i9')
+fault = 'empty-count'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_independently_committed_inconsistent_catalog_rejected[empty-link-count] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_independently_committed_i10')
+fault = 'empty-link-count'
+
+    @pytest.mark.parametrize('fault',['group-count','group-digest','group-anchor','owner-count','owner-leaf','link-inc','link-anchor','link-membership','allocator','empty-count','empty-link-count'])
+    def test_independently_committed_inconsistent_catalog_rejected(tmp_path,fault):
+        def mutate(changes,codec):
+            owner_digest=None
+            if fault=='owner-leaf':
+                for c in changes:
+                    if c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):
+                        owner_digest=catalog.node_commit(codec,('owner-leaf/v1',(),2))[1]
+            for c in changes:
+                v=c.value
+                if c.namespace==catalog.GROUP_NAMESPACE and c.key==(3 if fault.startswith('empty-') else 1):
+                    v=list(v)
+                    if fault=='group-count':v[2]=3
+                    elif fault=='group-digest':v[3]='0'*64
+                    elif fault=='group-anchor':v[6]=('people',2)
+                    elif fault=='empty-count':v[2]=False
+                    elif fault=='empty-link-count':v[4]=False
+                    v=tuple(v)
+                if c.namespace==catalog.OWNER_NAMESPACE and c.key==(NS,1):
+                    v=list(v)
+                    if fault=='owner-count':v[7]=2
+                    elif fault=='owner-leaf':v[8]=owner_digest
+                    v=tuple(v)
+                if fault=='owner-leaf' and c.namespace==catalog.OWNER_TREE_NAMESPACE and c.key[:2]==(NS,1):v=('owner-leaf/v1',(),2)
+                if c.namespace==catalog.LINK_NAMESPACE and not c.delete:
+                    if fault=='link-inc':v=('identity-link/v1',2,('people',1))
+                    elif fault=='link-anchor':v=('identity-link/v1',1,('people',2))
+                    elif fault=='link-membership':c=replace(c,memberships=c.memberships+(Membership('extra',1,0),))
+                if fault=='allocator' and c.namespace==catalog.CATALOG_NAMESPACE:v=(v[0],v[1],5,v[3],v[4])
+                yield replace(c,value=v)
+        store,pin,pairs=make_group_store(tmp_path/'bad.sqlite',catalog_mutator=mutate,inc=3 if fault.startswith('empty-') else 1)
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_selected_owner_source_interval_storage_class_rejected[bad0] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_selected_owner_source_int0')
+end = 'bad'
+
+    @pytest.mark.parametrize('end',['bad',b'bad'])
+    def test_selected_owner_source_interval_storage_class_rejected(tmp_path,end):
+        store,pin,pairs=make_group_store(tmp_path/'interval.sqlite')
+        store.db.execute('UPDATE lazy_record_versions SET valid_to=? WHERE namespace=? AND typed_key=?',(end,NS,store.codec.encode(1)));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_selected_owner_source_interval_storage_class_rejected[bad1] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_selected_owner_source_int1')
+end = b'bad'
+
+    @pytest.mark.parametrize('end',['bad',b'bad'])
+    def test_selected_owner_source_interval_storage_class_rejected(tmp_path,end):
+        store,pin,pairs=make_group_store(tmp_path/'interval.sqlite')
+        store.db.execute('UPDATE lazy_record_versions SET valid_to=? WHERE namespace=? AND typed_key=?',(end,NS,store.codec.encode(1)));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_group(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_authority_and_context_rejected[missing-owner] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej0')
+fault = 'missing-owner'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_authority_and_context_rejected[duplicate-owner] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej1')
+fault = 'duplicate-owner'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_authority_and_context_rejected[extra-owner] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej2')
+fault = 'extra-owner'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_authority_and_context_rejected[wrong-owner-root] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej3')
+fault = 'wrong-owner-root'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_authority_and_context_rejected[query-scope] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej4')
+fault = 'query-scope'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_authority_and_context_rejected[expected] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej5')
+fault = 'expected'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_authority_and_context_rejected[generation] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej6')
+fault = 'generation'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_authority_and_context_rejected[cached-index] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej7')
+fault = 'cached-index'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_authority_and_context_rejected[physical-index] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej8')
+fault = 'physical-index'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_authority_and_context_rejected[released] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej9')
+fault = 'released'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_authority_and_context_rejected[transaction] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej10')
+fault = 'transaction'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_authority_and_context_rejected[hook] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_authority_and_context_rej11')
+fault = 'hook'
+
+    @pytest.mark.parametrize('fault',['missing-owner','duplicate-owner','extra-owner','wrong-owner-root','query-scope','expected','generation','cached-index','physical-index','released','transaction','hook'])
+    def test_authority_and_context_rejected(tmp_path,fault):
+        store,pin,pairs=make_group_store(tmp_path/'authority.sqlite');pairs=list(pairs)
+        if fault=='missing-owner':pairs[3]=pairs[3][1:]
+        elif fault=='duplicate-owner':pairs[3]=pairs[3]+pairs[3][:1]
+        elif fault=='extra-owner':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            pairs[3]+=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))
+        elif fault=='wrong-owner-root':
+            from simulation.tests.proof_occurrence_seek_fixtures import construct_seek_certificates
+            other=construct_seek_certificates(store,pin,(OwnerScope(NS,store.codec.encode(3)),))[0][0]
+            cert=replace(pairs[3][0][0],root=other.root);pairs[3]=((cert,occurrence_commitment(cert)),)+pairs[3][1:]
+        elif fault=='query-scope':
+            from simulation.tests.proof_query_seek_fixtures import construct_query_seek
+            pairs[2]=construct_query_seek(store,pin,replace(pairs[2][0].scope,index_value=store.codec.encode(2)))
+        elif fault=='expected':pairs[0]=(pairs[0][0],b'x'*32)
+        elif fault=='generation':
+            cert=replace(pairs[1][0],generation=0);pairs[1]=(cert,occurrence_commitment(cert))
+        elif fault=='cached-index':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='physical-index':store.db.execute('DROP INDEX lazy_record_interval');store.db.commit()
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='transaction':store.db.execute('BEGIN')
+        else:store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+>       with pytest.raises((StoreError,StoreIntegrityError,StoreConflictError)):read_group(store,pin,tuple(pairs))
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________________ test_explicit_budget_errors[kwargs0] _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_explicit_budget_errors_kw0')
+kwargs = {'max_members': 1}
+
+    @pytest.mark.parametrize('kwargs',[{'max_members':1},{'max_bytes':1},{'max_source_bytes':1},{'max_metadata_bytes':1}])
+    def test_explicit_budget_errors(tmp_path,kwargs):
+        store,pin,pairs=make_group_store(tmp_path/'budget.sqlite')
+>       with pytest.raises(group_module().GroupProofBudgetError):read_group(store,pin,pairs,**kwargs)
+                           ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________________ test_explicit_budget_errors[kwargs1] _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_explicit_budget_errors_kw1')
+kwargs = {'max_bytes': 1}
+
+    @pytest.mark.parametrize('kwargs',[{'max_members':1},{'max_bytes':1},{'max_source_bytes':1},{'max_metadata_bytes':1}])
+    def test_explicit_budget_errors(tmp_path,kwargs):
+        store,pin,pairs=make_group_store(tmp_path/'budget.sqlite')
+>       with pytest.raises(group_module().GroupProofBudgetError):read_group(store,pin,pairs,**kwargs)
+                           ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________________ test_explicit_budget_errors[kwargs2] _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_explicit_budget_errors_kw2')
+kwargs = {'max_source_bytes': 1}
+
+    @pytest.mark.parametrize('kwargs',[{'max_members':1},{'max_bytes':1},{'max_source_bytes':1},{'max_metadata_bytes':1}])
+    def test_explicit_budget_errors(tmp_path,kwargs):
+        store,pin,pairs=make_group_store(tmp_path/'budget.sqlite')
+>       with pytest.raises(group_module().GroupProofBudgetError):read_group(store,pin,pairs,**kwargs)
+                           ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________________ test_explicit_budget_errors[kwargs3] _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_explicit_budget_errors_kw3')
+kwargs = {'max_metadata_bytes': 1}
+
+    @pytest.mark.parametrize('kwargs',[{'max_members':1},{'max_bytes':1},{'max_source_bytes':1},{'max_metadata_bytes':1}])
+    def test_explicit_budget_errors(tmp_path,kwargs):
+        store,pin,pairs=make_group_store(tmp_path/'budget.sqlite')
+>       with pytest.raises(group_module().GroupProofBudgetError):read_group(store,pin,pairs,**kwargs)
+                           ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_large_owner_point_and_canonical_link_order ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_large_owner_point_and_can0')
+
+    def test_large_owner_point_and_canonical_link_order(tmp_path):
+        store,pin,pairs=make_group_store(tmp_path/'wide.sqlite',wide_owner=1000,aux_peer=True)
+>       store.reset_diagnostics();got=read_group(store,pin,pairs)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_selected_retirement_range_checked[missing] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_selected_retirement_range0')
+fault = 'missing'
+
+    @pytest.mark.parametrize('fault',['missing','changed'])
+    def test_selected_retirement_range_checked(tmp_path,fault):
+        store,pin,_=make_group_store(tmp_path/'retired.sqlite');writer=retire_empty(store,pin);pairs=group_authorities(store,writer,3)
+        ns=catalog.RETIRED_NODE_NAMESPACE
+        if fault=='missing':store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=?',(ns,));store.db.commit()
+        else:
+            # A valid replacement source/root still disagrees with descriptor range.
+            from ate_sim.persistence_lazy_store import VersionChange
+            from simulation.tests.proof_identity_group_fixtures import metadata
+            writer=store.commit(writer,commit_token='range-corruption',version_changes=(VersionChange(ns,3,('retired-range/v1',3,4,None,None)),),
+                changes=(),new_segments=(),metadata=metadata(3)).pin
+            pairs=group_authorities(store,writer,3)
+>       with pytest.raises(StoreIntegrityError):read_group(store,writer,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_selected_retirement_range_checked[changed] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_selected_retirement_range1')
+fault = 'changed'
+
+    @pytest.mark.parametrize('fault',['missing','changed'])
+    def test_selected_retirement_range_checked(tmp_path,fault):
+        store,pin,_=make_group_store(tmp_path/'retired.sqlite');writer=retire_empty(store,pin);pairs=group_authorities(store,writer,3)
+        ns=catalog.RETIRED_NODE_NAMESPACE
+        if fault=='missing':store.db.execute('DELETE FROM lazy_record_versions WHERE namespace=?',(ns,));store.db.commit()
+        else:
+            # A valid replacement source/root still disagrees with descriptor range.
+            from ate_sim.persistence_lazy_store import VersionChange
+            from simulation.tests.proof_identity_group_fixtures import metadata
+            writer=store.commit(writer,commit_token='range-corruption',version_changes=(VersionChange(ns,3,('retired-range/v1',3,4,None,None)),),
+                changes=(),new_segments=(),metadata=metadata(3)).pin
+            pairs=group_authorities(store,writer,3)
+>       with pytest.raises(StoreIntegrityError):read_group(store,writer,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_identity_group.py:157: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_identity_group_fixtures.py:71: in read_group
+    return group_module().read_identity_group_proof(store,pin,*pairs[0],*pairs[1],*pairs[2],pairs[3],**kwargs)
+           ^^^^^^^^^^^^^^
+simulation/tests/proof_identity_group_fixtures.py:17: in group_module
+    def group_module():return importlib.import_module('ate_sim.persistence_proof_identity_group')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_identity_group'
+import_ = <function _gcd_import at 0x7fa28eec40e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_identity_group'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_literal_group_without_owner_payloads_or_world_decode
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_retained_and_successor_reanchor
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_live_empty_and_proved_retired_absence
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_missing_selected_metadata_rejected[aux.lazy.identity.catalog]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_missing_selected_metadata_rejected[aux.lazy.identity.groups]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_missing_selected_metadata_rejected[aux.lazy.identity.owners]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_missing_selected_metadata_rejected[aux.lazy.identity.owner_tree]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_missing_selected_metadata_rejected[aux.lazy.identity.retired]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_missing_selected_metadata_rejected[world_identity_links]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[group-count]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[group-digest]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[group-anchor]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[owner-count]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[owner-leaf]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[link-inc]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[link-anchor]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[link-membership]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[allocator]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[empty-count]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_independently_committed_inconsistent_catalog_rejected[empty-link-count]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_selected_owner_source_interval_storage_class_rejected[bad0]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_selected_owner_source_interval_storage_class_rejected[bad1]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[missing-owner]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[duplicate-owner]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[extra-owner]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[wrong-owner-root]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[query-scope]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[expected]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[generation]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[cached-index]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[physical-index]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[released]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[transaction]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_authority_and_context_rejected[hook]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_explicit_budget_errors[kwargs0]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_explicit_budget_errors[kwargs1]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_explicit_budget_errors[kwargs2]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_explicit_budget_errors[kwargs3]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_large_owner_point_and_canonical_link_order
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_selected_retirement_range_checked[missing]
+FAILED simulation/tests/test_stage_0_5_proof_identity_group.py::test_selected_retirement_range_checked[changed]
+41 failed in 8.93s
