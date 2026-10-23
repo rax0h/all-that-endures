@@ -1,0 +1,1078 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                          [100%]
+=================================== FAILURES ===================================
+________________ test_exact_order_entry_and_descriptor_vectors _________________
+
+    def test_exact_order_entry_and_descriptor_vectors():
+>       c, _, _, root, entries, commitment = fixture()
+                                             ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_query_order_key_matches_sql_with_ties_and_repeated_records ________
+
+    def test_query_order_key_matches_sql_with_ties_and_repeated_records():
+>       c = module(); db = sqlite3.connect(':memory:')
+            ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_full_partial_ranged_and_empty_pages[None-None-128-positions0-None] ____
+
+after = None, before = None, limit = 128, positions = [0, 1, 2, 3, 4]
+boundary = None
+
+    @pytest.mark.parametrize('after,before,limit,positions,boundary', [
+        (None,None,128,[0,1,2,3,4],None), (b'a',None,2,[2,3],None),
+        (b'b',None,128,[4],None), (None,b'aa',128,[0,1],None),
+        (b'ab',b'b',128,[],2), (None,b'',128,[],0),
+        (b'c',None,128,[],4), (b'a',b'a',128,[],None),
+    ])
+    def test_full_partial_ranged_and_empty_pages(after,before,limit,positions,boundary):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_full_partial_ranged_and_empty_pages[a-None-2-positions1-None] ______
+
+after = b'a', before = None, limit = 2, positions = [2, 3], boundary = None
+
+    @pytest.mark.parametrize('after,before,limit,positions,boundary', [
+        (None,None,128,[0,1,2,3,4],None), (b'a',None,2,[2,3],None),
+        (b'b',None,128,[4],None), (None,b'aa',128,[0,1],None),
+        (b'ab',b'b',128,[],2), (None,b'',128,[],0),
+        (b'c',None,128,[],4), (b'a',b'a',128,[],None),
+    ])
+    def test_full_partial_ranged_and_empty_pages(after,before,limit,positions,boundary):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____ test_full_partial_ranged_and_empty_pages[b-None-128-positions2-None] _____
+
+after = b'b', before = None, limit = 128, positions = [4], boundary = None
+
+    @pytest.mark.parametrize('after,before,limit,positions,boundary', [
+        (None,None,128,[0,1,2,3,4],None), (b'a',None,2,[2,3],None),
+        (b'b',None,128,[4],None), (None,b'aa',128,[0,1],None),
+        (b'ab',b'b',128,[],2), (None,b'',128,[],0),
+        (b'c',None,128,[],4), (b'a',b'a',128,[],None),
+    ])
+    def test_full_partial_ranged_and_empty_pages(after,before,limit,positions,boundary):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_full_partial_ranged_and_empty_pages[None-aa-128-positions3-None] _____
+
+after = None, before = b'aa', limit = 128, positions = [0, 1], boundary = None
+
+    @pytest.mark.parametrize('after,before,limit,positions,boundary', [
+        (None,None,128,[0,1,2,3,4],None), (b'a',None,2,[2,3],None),
+        (b'b',None,128,[4],None), (None,b'aa',128,[0,1],None),
+        (b'ab',b'b',128,[],2), (None,b'',128,[],0),
+        (b'c',None,128,[],4), (b'a',b'a',128,[],None),
+    ])
+    def test_full_partial_ranged_and_empty_pages(after,before,limit,positions,boundary):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_full_partial_ranged_and_empty_pages[ab-b-128-positions4-2] ________
+
+after = b'ab', before = b'b', limit = 128, positions = [], boundary = 2
+
+    @pytest.mark.parametrize('after,before,limit,positions,boundary', [
+        (None,None,128,[0,1,2,3,4],None), (b'a',None,2,[2,3],None),
+        (b'b',None,128,[4],None), (None,b'aa',128,[0,1],None),
+        (b'ab',b'b',128,[],2), (None,b'',128,[],0),
+        (b'c',None,128,[],4), (b'a',b'a',128,[],None),
+    ])
+    def test_full_partial_ranged_and_empty_pages(after,before,limit,positions,boundary):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_full_partial_ranged_and_empty_pages[None--128-positions5-0] _______
+
+after = None, before = b'', limit = 128, positions = [], boundary = 0
+
+    @pytest.mark.parametrize('after,before,limit,positions,boundary', [
+        (None,None,128,[0,1,2,3,4],None), (b'a',None,2,[2,3],None),
+        (b'b',None,128,[4],None), (None,b'aa',128,[0,1],None),
+        (b'ab',b'b',128,[],2), (None,b'',128,[],0),
+        (b'c',None,128,[],4), (b'a',b'a',128,[],None),
+    ])
+    def test_full_partial_ranged_and_empty_pages(after,before,limit,positions,boundary):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_full_partial_ranged_and_empty_pages[c-None-128-positions6-4] _______
+
+after = b'c', before = None, limit = 128, positions = [], boundary = 4
+
+    @pytest.mark.parametrize('after,before,limit,positions,boundary', [
+        (None,None,128,[0,1,2,3,4],None), (b'a',None,2,[2,3],None),
+        (b'b',None,128,[4],None), (None,b'aa',128,[0,1],None),
+        (b'ab',b'b',128,[],2), (None,b'',128,[],0),
+        (b'c',None,128,[],4), (b'a',b'a',128,[],None),
+    ])
+    def test_full_partial_ranged_and_empty_pages(after,before,limit,positions,boundary):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_full_partial_ranged_and_empty_pages[a-a-128-positions7-None] _______
+
+after = b'a', before = b'a', limit = 128, positions = [], boundary = None
+
+    @pytest.mark.parametrize('after,before,limit,positions,boundary', [
+        (None,None,128,[0,1,2,3,4],None), (b'a',None,2,[2,3],None),
+        (b'b',None,128,[4],None), (None,b'aa',128,[0,1],None),
+        (b'ab',b'b',128,[],2), (None,b'',128,[],0),
+        (b'c',None,128,[],4), (b'a',b'a',128,[],None),
+    ])
+    def test_full_partial_ranged_and_empty_pages(after,before,limit,positions,boundary):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions0] __
+
+positions = [1, 2, 3, 4]
+
+    @pytest.mark.parametrize('positions', [[1,2,3,4], [0,2,3,4], [0,1,2,3], [0,1,1,2,3,4], [0,2,1,3,4]])
+    def test_omission_duplicate_reorder_and_truncated_tail_are_rejected(positions):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions1] __
+
+positions = [0, 2, 3, 4]
+
+    @pytest.mark.parametrize('positions', [[1,2,3,4], [0,2,3,4], [0,1,2,3], [0,1,1,2,3,4], [0,2,1,3,4]])
+    def test_omission_duplicate_reorder_and_truncated_tail_are_rejected(positions):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions2] __
+
+positions = [0, 1, 2, 3]
+
+    @pytest.mark.parametrize('positions', [[1,2,3,4], [0,2,3,4], [0,1,2,3], [0,1,1,2,3,4], [0,2,1,3,4]])
+    def test_omission_duplicate_reorder_and_truncated_tail_are_rejected(positions):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions3] __
+
+positions = [0, 1, 1, 2, 3, 4]
+
+    @pytest.mark.parametrize('positions', [[1,2,3,4], [0,2,3,4], [0,1,2,3], [0,1,1,2,3,4], [0,2,1,3,4]])
+    def test_omission_duplicate_reorder_and_truncated_tail_are_rejected(positions):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions4] __
+
+positions = [0, 2, 1, 3, 4]
+
+    @pytest.mark.parametrize('positions', [[1,2,3,4], [0,2,3,4], [0,1,2,3], [0,1,1,2,3,4], [0,2,1,3,4]])
+    def test_omission_duplicate_reorder_and_truncated_tail_are_rejected(positions):
+>       c,_,m,root,entries,expected = fixture()
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__ test_forged_roots_entries_and_false_empty_results_are_rejected[descriptor] __
+
+bad = 'descriptor'
+
+    @pytest.mark.parametrize('bad', ['descriptor','neighbors','value','key','empty','surplus-boundary','range','domain'])
+    def test_forged_roots_entries_and_false_empty_results_are_rejected(bad):
+>       c,_,m,root,entries,expected = fixture(); rows = list(entries); kwargs = {}
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__ test_forged_roots_entries_and_false_empty_results_are_rejected[neighbors] ___
+
+bad = 'neighbors'
+
+    @pytest.mark.parametrize('bad', ['descriptor','neighbors','value','key','empty','surplus-boundary','range','domain'])
+    def test_forged_roots_entries_and_false_empty_results_are_rejected(bad):
+>       c,_,m,root,entries,expected = fixture(); rows = list(entries); kwargs = {}
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_forged_roots_entries_and_false_empty_results_are_rejected[value] _____
+
+bad = 'value'
+
+    @pytest.mark.parametrize('bad', ['descriptor','neighbors','value','key','empty','surplus-boundary','range','domain'])
+    def test_forged_roots_entries_and_false_empty_results_are_rejected(bad):
+>       c,_,m,root,entries,expected = fixture(); rows = list(entries); kwargs = {}
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____ test_forged_roots_entries_and_false_empty_results_are_rejected[key] ______
+
+bad = 'key'
+
+    @pytest.mark.parametrize('bad', ['descriptor','neighbors','value','key','empty','surplus-boundary','range','domain'])
+    def test_forged_roots_entries_and_false_empty_results_are_rejected(bad):
+>       c,_,m,root,entries,expected = fixture(); rows = list(entries); kwargs = {}
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_forged_roots_entries_and_false_empty_results_are_rejected[empty] _____
+
+bad = 'empty'
+
+    @pytest.mark.parametrize('bad', ['descriptor','neighbors','value','key','empty','surplus-boundary','range','domain'])
+    def test_forged_roots_entries_and_false_empty_results_are_rejected(bad):
+>       c,_,m,root,entries,expected = fixture(); rows = list(entries); kwargs = {}
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_forged_roots_entries_and_false_empty_results_are_rejected[surplus-boundary] _
+
+bad = 'surplus-boundary'
+
+    @pytest.mark.parametrize('bad', ['descriptor','neighbors','value','key','empty','surplus-boundary','range','domain'])
+    def test_forged_roots_entries_and_false_empty_results_are_rejected(bad):
+>       c,_,m,root,entries,expected = fixture(); rows = list(entries); kwargs = {}
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_forged_roots_entries_and_false_empty_results_are_rejected[range] _____
+
+bad = 'range'
+
+    @pytest.mark.parametrize('bad', ['descriptor','neighbors','value','key','empty','surplus-boundary','range','domain'])
+    def test_forged_roots_entries_and_false_empty_results_are_rejected(bad):
+>       c,_,m,root,entries,expected = fixture(); rows = list(entries); kwargs = {}
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_forged_roots_entries_and_false_empty_results_are_rejected[domain] ____
+
+bad = 'domain'
+
+    @pytest.mark.parametrize('bad', ['descriptor','neighbors','value','key','empty','surplus-boundary','range','domain'])
+    def test_forged_roots_entries_and_false_empty_results_are_rejected(bad):
+>       c,_,m,root,entries,expected = fixture(); rows = list(entries); kwargs = {}
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_stale_page_does_not_authenticate_against_successor_root _________
+
+    def test_stale_page_does_not_authenticate_against_successor_root():
+>       c,_,m,root,entries,_ = fixture()
+                               ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_empty_root_and_empty_byte_endpoints_remain_distinct ___________
+
+    def test_empty_root_and_empty_byte_endpoints_remain_distinct():
+>       c = module(); m=proof_map(MemoryNodes()); root=c.OrderRoot(m.empty,None,None)
+            ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_page_limit_stops_unbounded_input_after_one_surplus_row __________
+
+    def test_page_limit_stops_unbounded_input_after_one_surplus_row():
+>       c,_,m,root,entries,expected = fixture(); consumed=[]
+                                      ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:119: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_malformed_order_proof_fields_are_rejected[pointer-type] _________
+
+bad = 'pointer-type'
+
+    @pytest.mark.parametrize('bad', ['pointer-type','pointer-order','value-type','root-count','root-extrema'])
+    def test_malformed_order_proof_fields_are_rejected(bad):
+>       c,_,m,root,entries,_=fixture()
+                             ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_malformed_order_proof_fields_are_rejected[pointer-order] _________
+
+bad = 'pointer-order'
+
+    @pytest.mark.parametrize('bad', ['pointer-type','pointer-order','value-type','root-count','root-extrema'])
+    def test_malformed_order_proof_fields_are_rejected(bad):
+>       c,_,m,root,entries,_=fixture()
+                             ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_malformed_order_proof_fields_are_rejected[value-type] __________
+
+bad = 'value-type'
+
+    @pytest.mark.parametrize('bad', ['pointer-type','pointer-order','value-type','root-count','root-extrema'])
+    def test_malformed_order_proof_fields_are_rejected(bad):
+>       c,_,m,root,entries,_=fixture()
+                             ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_malformed_order_proof_fields_are_rejected[root-count] __________
+
+bad = 'root-count'
+
+    @pytest.mark.parametrize('bad', ['pointer-type','pointer-order','value-type','root-count','root-extrema'])
+    def test_malformed_order_proof_fields_are_rejected(bad):
+>       c,_,m,root,entries,_=fixture()
+                             ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_malformed_order_proof_fields_are_rejected[root-extrema] _________
+
+bad = 'root-extrema'
+
+    @pytest.mark.parametrize('bad', ['pointer-type','pointer-order','value-type','root-count','root-extrema'])
+    def test_malformed_order_proof_fields_are_rejected(bad):
+>       c,_,m,root,entries,_=fixture()
+                             ^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_order.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_order.py:32: in fixture
+    c = module(); storage = MemoryNodes(); m = proof_map(storage)
+        ^^^^^^^^
+simulation/tests/test_stage_0_5_proof_order.py:15: in module
+    return importlib.import_module('ate_sim.persistence_proof_order')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_order'
+import_ = <function _gcd_import at 0x7f1eaa6040e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_order'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_exact_order_entry_and_descriptor_vectors
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_query_order_key_matches_sql_with_ties_and_repeated_records
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_full_partial_ranged_and_empty_pages[None-None-128-positions0-None]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_full_partial_ranged_and_empty_pages[a-None-2-positions1-None]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_full_partial_ranged_and_empty_pages[b-None-128-positions2-None]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_full_partial_ranged_and_empty_pages[None-aa-128-positions3-None]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_full_partial_ranged_and_empty_pages[ab-b-128-positions4-2]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_full_partial_ranged_and_empty_pages[None--128-positions5-0]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_full_partial_ranged_and_empty_pages[c-None-128-positions6-4]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_full_partial_ranged_and_empty_pages[a-a-128-positions7-None]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions0]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions1]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions2]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions3]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_omission_duplicate_reorder_and_truncated_tail_are_rejected[positions4]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_forged_roots_entries_and_false_empty_results_are_rejected[descriptor]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_forged_roots_entries_and_false_empty_results_are_rejected[neighbors]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_forged_roots_entries_and_false_empty_results_are_rejected[value]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_forged_roots_entries_and_false_empty_results_are_rejected[key]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_forged_roots_entries_and_false_empty_results_are_rejected[empty]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_forged_roots_entries_and_false_empty_results_are_rejected[surplus-boundary]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_forged_roots_entries_and_false_empty_results_are_rejected[range]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_forged_roots_entries_and_false_empty_results_are_rejected[domain]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_stale_page_does_not_authenticate_against_successor_root
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_empty_root_and_empty_byte_endpoints_remain_distinct
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_page_limit_stops_unbounded_input_after_one_surplus_row
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_malformed_order_proof_fields_are_rejected[pointer-type]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_malformed_order_proof_fields_are_rejected[pointer-order]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_malformed_order_proof_fields_are_rejected[value-type]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_malformed_order_proof_fields_are_rejected[root-count]
+FAILED simulation/tests/test_stage_0_5_proof_order.py::test_malformed_order_proof_fields_are_rejected[root-extrema]
+31 failed in 0.37s

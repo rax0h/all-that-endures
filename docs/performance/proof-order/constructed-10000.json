@@ -1,0 +1,27 @@
+{
+  "construction": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 0,
+      "read_nodes": 0,
+      "read_requests": 0,
+      "write_requests": 13784,
+      "written_bytes": 1302720,
+      "written_nodes": 13784
+    },
+    "python_peak_bytes": 331970,
+    "wall_seconds": 1.491871213999957
+  },
+  "keys": 10000,
+  "setup": {
+    "wall_seconds": 0.032404626000015924
+  },
+  "source": {
+    "driver_sha256": "51f3f7091edee67f6f6513f4d8aa5f77fd7e98ca8ab05ed3043c3a6b25b92aab",
+    "head": "0aa776e263933575ae6ae8fd09d747ddfe57e8a2",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "python": "3.12.14",
+    "runtime_tree": "d22ff20b5b6ca33f804b0a065da4435d56a907ec",
+    "sqlite": "3.53.1"
+  }
+}

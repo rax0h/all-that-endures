@@ -1,0 +1,20 @@
+{
+  "clean_python_cache_bytes": 0,
+  "instrumentation": "point-tracemalloc-v1",
+  "schema": "ate-proof-map-source/1",
+  "scope": "immutable-map primitive; no World/save integration",
+  "sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "source": {
+    "driver_sha256": "fdb0dbee4e682f185737c86a97fe6cce98f38ff7002c0ab06a8c2163345a47d3",
+    "head": "c4f5318f11c99f382b47b5f9fd562262348bc3d8",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "ffac58e621ffe05e060f97ff7be8f030c5dfe303",
+    "sqlite": "3.45.1"
+  },
+  "sqlite_cache_kib": 2048
+}

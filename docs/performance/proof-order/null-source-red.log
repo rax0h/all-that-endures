@@ -1,0 +1,34 @@
+....FF                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_bad_construction_stream_rolls_back[bad_rows4] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_bad_construction_stream_r4')
+bad_rows = [None, (b'a', b'\xca\x97\x81\x12\xca\x1b\xbd\xca\xfa\xc21\xb3\x9a#\xdcM\xa7\x86\xef\xf8\x14|Nr\xb9\x80w\x85\xaf\xeeH\xbb')]
+
+    @pytest.mark.parametrize('bad_rows', [[(b'b',value('b')),(b'a',value('a'))],[(b'a',value('a')),(b'a',value('a'))],[(b'a',True)],[(b'a',)],
+                                       [None,(b'a',value('a'))],[(b'a',value('a')),None,(b'b',value('b'))]])
+    def test_bad_construction_stream_rolls_back(tmp_path,bad_rows):
+        e,db,_,m=setup(tmp_path);db.execute('BEGIN')
+>       with pytest.raises(StoreIntegrityError):e.build_ordered(m,db,iter(bad_rows))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_order_edit.py:139: Failed
+______________ test_bad_construction_stream_rolls_back[bad_rows5] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_bad_construction_stream_r5')
+bad_rows = [(b'a', b'\xca\x97\x81\x12\xca\x1b\xbd\xca\xfa\xc21\xb3\x9a#\xdcM\xa7\x86\xef\xf8\x14|Nr\xb9\x80w\x85\xaf\xeeH\xbb'), None, (b'b', b'>#\xe8\x16\x009YJ3\x89Oed\xe1\xb14\x8b\xbdz\x00\x88\xd4,J\xcbs\xee\xae\xd5\x9c\x00\x9d')]
+
+    @pytest.mark.parametrize('bad_rows', [[(b'b',value('b')),(b'a',value('a'))],[(b'a',value('a')),(b'a',value('a'))],[(b'a',True)],[(b'a',)],
+                                       [None,(b'a',value('a'))],[(b'a',value('a')),None,(b'b',value('b'))]])
+    def test_bad_construction_stream_rolls_back(tmp_path,bad_rows):
+        e,db,_,m=setup(tmp_path);db.execute('BEGIN')
+>       with pytest.raises(StoreIntegrityError):e.build_ordered(m,db,iter(bad_rows))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_order_edit.py:139: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_order_edit.py::test_bad_construction_stream_rolls_back[bad_rows4]
+FAILED simulation/tests/test_stage_0_5_proof_order_edit.py::test_bad_construction_stream_rolls_back[bad_rows5]
+2 failed, 4 passed, 19 deselected in 0.17s

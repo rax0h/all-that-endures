@@ -1,0 +1,55 @@
+{
+  "schema": "ate-proof-transition-ci-acceptance/1",
+  "run_id": 39866293343,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/39866293343",
+  "source": {
+    "head": "c4f5318f11c99f382b47b5f9fd562262348bc3d8",
+    "python": "3.12.15",
+    "runtime_tree": "ffac58e621ffe05e060f97ff7be8f030c5dfe303",
+    "sqlite": "3.45.1"
+  },
+  "full_suite": {
+    "conclusion": "success",
+    "summary": "3164 passed, 1 warning, 2 subtests passed in 5262.29s (1:27:42)",
+    "junit": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "3166",
+      "time": "5262.185",
+      "timestamp": "2026-10-22T22:37:33.300076+00:00",
+      "hostname": "runnervm8k3b6"
+    }
+  },
+  "proof_map": {
+    "conclusion": "success",
+    "keys": [
+      1000,
+      10000,
+      100000
+    ]
+  },
+  "batch_scaling": {
+    "conclusion": "success",
+    "keys": [
+      1000,
+      10000,
+      100000
+    ]
+  },
+  "artifacts": [
+    {
+      "id": 12467983340,
+      "sha256": "fd2a13ea2793c41ab549b786526479bc8d9d02d5acb07393620b3b564aa74dd3"
+    },
+    {
+      "id": 12463957286,
+      "sha256": "ce0cae71fc7419579859904ce3e7a5d9c30c026e0d73036635ae000b2127c1ce"
+    }
+  ],
+  "limits": [
+    "No World proof authority activated.",
+    "No mature speed or equivalence result from these primitives."
+  ]
+}
