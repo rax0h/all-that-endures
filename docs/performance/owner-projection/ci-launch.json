@@ -1,0 +1,16 @@
+{
+  "schema": "ate-owner-projection-ci-launch/1",
+  "repository": "rax0h/all-that-endures",
+  "branch": "sol/durable-proof-map",
+  "expected_parent": "2ab7b26aa026bb45ad1fd8a1b3b3804a1a368ccb",
+  "candidate": "5da550512eb21bad44ea902612f0b1235fe0ad8b",
+  "local_equivalent": "51b3297f8ccbf2bb13b67d468d66af271bc7d725",
+  "exact_tree": "58e6149064ce5c3ec49327d2e41dd50cf0ab2cb5",
+  "runtime_tree": "c7c87217e0fb7ec67a93a49003767ef0d785480a",
+  "measured_source": "1dec047bf3b9262fa86b13b631eff970cecd4259",
+  "run_id": 39981711210,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/39981711210",
+  "observed_status": "queued",
+  "acceptance": "pending; authenticate this candidate's source/artifacts on green; parent acceptance is separate",
+  "next": "Complete owner/group/link/catalog/radix/target/retirement consistency, namespace/manifests/retention/publication/World admission gates. No main merge, endurance or mature speed claim."
+}

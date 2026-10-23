@@ -39,3 +39,7 @@ Raw pytest logs are retained verbatim and contain trailing whitespace. Source/co
 Complete owner/group/link/reference cross-consistency, owner catalog/radix agreement, target existence/kind, retirement/absence, namespace proofs, manifests, retained roots AND ordinary payload availability, verified-copy/writer fencing, atomic existing row/root/head/receipt publication and canonical World admission/consumption. Unselected surplus physical rows never enter a result and still require complete inventory audit. Ordinary World owners/custom codecs need separate checked paths. No format activation, main merge, endurance or mature speed claim; open<=10s/save<=2s/warm year<=1s remain unmeasured.
 
 Successor full-suite and eight diagnostics CI awaits publication/launch. Parent acceptance remains separate; authenticate the new artifacts on green. No long-test polling.
+
+## Published successor
+
+Exact-tree candidate5da550512eb21bad44ea902612f0b1235fe0ad8b matches local51b3297f8ccbf2bb13b67d468d66af271bc7d725 tree58e6149064ce5c3ec49327d2e41dd50cf0ab2cb5 and measured runtimec7c87217e0fb7ec67a93a49003767ef0d785480a. Only sol/durable-proof-map advanced with the exact expected-parent lease. [Run39981711210](https://github.com/rax0h/all-that-endures/actions/runs/39981711210) is queued for the full simulation suite and eight diagnostics. Acceptance is pending; [launch/resume receipt](owner-projection/ci-launch.json). Authenticate new source/artifacts on green, inspect this run on failure. No long polling or predecessor-success substitution.

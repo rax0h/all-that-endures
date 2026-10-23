@@ -41,7 +41,7 @@
   Expected: three complete exact receipts with source/runtime hashes and zero unrelated payloads.
 - [x] Fresh whole-package review (one required reviewer), one Important/Critical RED/GREEN repair pass; retain every ruling and deferred minor. Run syntax/diff and affected suite.
   Expected: green tests and no unresolved Important/Critical findings.
-- [ ] Publish exact tree with expected-parent branch lease, launch successor full suite plus diagnostics, retain actual pending launch receipt. Do not poll long CI.
+- [x] Publish exact tree with expected-parent branch lease, launch successor full suite plus diagnostics, retain actual pending launch receipt. Do not poll long CI.
   Expected: exact tree equality and actual CI link, no parent-success substitution.
 
 ## Ledger
@@ -55,3 +55,5 @@ Task1:30 missing-module RED cases;36 focused cases after API guard additions and
 Final review: three Important findings accepted and reproduced by6 RED regressions: inherited head mutable restoration/instance hooks, surrogate encoding outside StoreError, delegated budget exception types. Repaired once; pre-repair matrix superseded. Minor deferred: raw pytest evidence whitespace; source/doc diff check excludes *.log. All declined-to-judge rulings and costs in owner-projection/final-review.md. Initial affected XML442 tests/0 failures/0 errors, exit0; console log partial. Successor suite must validate repaired runtime.
 
 Repaired source1dec047 runtime c7c87217e0fb7ec67a93a49003767ef0d785480a:43 projection/449 affected cases pass,209.69s. Six original review regressions RED→GREEN plus delegated field-budget test. Clean-source repaired1k/10k/100k matrix exact; one selected source payload check/SELECT each and zero unrelated payloads. Source/schema/snapshot bounds remain explicit; no World performance claim. Syntax checks and scoped whitespace check pass. Task2 final check validates these receipts and actual CI launch without repeating passed tests.
+
+Published candidate5da550512eb21bad44ea902612f0b1235fe0ad8b exact tree58e6149064ce5c3ec49327d2e41dd50cf0ab2cb5 with expected-parent lease. CI39981711210 launched queued; acceptance pending. Branch/workspace retained per ongoing user authorization; no main merge/endurance.
