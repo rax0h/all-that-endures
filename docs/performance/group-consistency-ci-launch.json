@@ -1,0 +1,20 @@
+{
+  "schema": "ate-group-ci-launch/1",
+  "run_id": 40013683423,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/40013683423",
+  "status_at_launch": "queued",
+  "candidate": "09b8dc251fe9c0073de2c0e7cd88be727c1db6fe",
+  "candidate_tree": "2159b9e10b4071c868e2145471a7a52958fe32eb",
+  "runtime_tree": "985952d8566b1f292dbde17f0b664608104d4d95",
+  "measured_local_head": "acc08147df546a0e7d257156de2e80b2f8ce40e9",
+  "measured_runtime_tree": "985952d8566b1f292dbde17f0b664608104d4d95",
+  "local_candidate_equivalent": "3a09f4350a8f09841a80d1b3b128c52630686cc0",
+  "affected_tests": 521,
+  "scaling_sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "full_suite_acceptance": "pending",
+  "world_performance_acceptance": "unmeasured"
+}

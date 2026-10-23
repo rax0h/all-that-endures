@@ -34,3 +34,5 @@ Two discarded local repeats under primary runtime SQLite3.53.1 failed in fixture
 This establishes raw affected-group consistency, not World admission, target existence/kind, complete topology or namespace/allocator inventory. Unselected physical surplus still requires full audit. Historical ordinary overwritten bodies remain unavailable; only their retained metadata is proved. Accepted generation manifests, retention/reachability, fencing, atomic publication and canonical object admission remain subsequent integration work. No new full World startup/save/year timing or target acceptance is claimed.
 
 Independent review and all scope rulings: group-consistency-review.md and group-consistency-ledger.md.
+
+Candidate CI: [40013683423](https://github.com/rax0h/all-that-endures/actions/runs/40013683423), candidate`09b8dc251fe9c0073de2c0e7cd88be727c1db6fe`, runtime`985952d8566b1f292dbde17f0b664608104d4d95`. Queued at launch; acceptance pending.
