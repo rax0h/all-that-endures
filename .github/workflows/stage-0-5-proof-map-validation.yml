@@ -12,6 +12,7 @@ name: Stage 0.5 durable proof map validation
       - .github/tests/run_proof_version_scaling.py
       - .github/tests/run_proof_occurrence_scaling.py
       - .github/tests/run_proof_seek_scaling.py
+      - .github/tests/run_proof_projection_scaling.py
       - .github/workflows/stage-0-5-proof-map-validation.yml
 permissions:
   contents: read
@@ -47,6 +48,8 @@ jobs:
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_occurrence_scaling.py --output evidence/occurrence-scaling 2>&1 | tee evidence/occurrence-scaling.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_seek.py simulation/tests/test_stage_0_5_proof_occurrence_seek.py --junitxml=evidence/seek-tests.xml 2>&1 | tee evidence/seek-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_seek_scaling.py --output evidence/seek-scaling 2>&1 | tee evidence/seek-scaling.log
+          python -m pytest -q simulation/tests/test_stage_0_5_proof_projection.py --junitxml=evidence/projection-tests.xml 2>&1 | tee evidence/projection-tests.log
+          timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_projection_scaling.py --output evidence/projection-scaling 2>&1 | tee evidence/projection-scaling.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:

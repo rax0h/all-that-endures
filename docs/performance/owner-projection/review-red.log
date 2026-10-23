@@ -1,0 +1,259 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_changed_head_metadata_cannot_restore_native_records[simulation_position] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_changed_head_metadata_can0')
+column = 'simulation_position'
+
+    @pytest.mark.parametrize('column',['simulation_position','next_ids'])
+    def test_changed_head_metadata_cannot_restore_native_records(tmp_path,column):
+        from ate_sim.core import Event
+        from ate_sim.incremental_store import _head_checksum
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+        blob=store.codec.encode(Event(99,0,'metadata',Layer.REALITY))
+        store.db.execute(f'UPDATE save_head SET {column}=? WHERE singleton=1',(blob,))
+        row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+        store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_projection.py:186: Failed
+______ test_changed_head_metadata_cannot_restore_native_records[next_ids] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_changed_head_metadata_can1')
+column = 'next_ids'
+
+    @pytest.mark.parametrize('column',['simulation_position','next_ids'])
+    def test_changed_head_metadata_cannot_restore_native_records(tmp_path,column):
+        from ate_sim.core import Event
+        from ate_sim.incremental_store import _head_checksum
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+        blob=store.codec.encode(Event(99,0,'metadata',Layer.REALITY))
+        store.db.execute(f'UPDATE save_head SET {column}=? WHERE singleton=1',(blob,))
+        row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+        store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),));store.db.commit()
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_projection.py:186: Failed
+_________________ test_instance_codec_hooks_are_never_invoked __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_instance_codec_hooks_are_0')
+
+    def test_instance_codec_hooks_are_never_invoked(tmp_path):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite');calls=[];original=store.codec.decode
+        store.codec.decode=lambda payload:(calls.append(payload),original(payload))[1]
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_projection.py:193: Failed
+____________ test_surrogate_schema_encoding_is_an_integrity_failure ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_surrogate_schema_encoding0')
+
+    def test_surrogate_schema_encoding_is_an_integrity_failure(tmp_path):
+        from ate_sim.incremental_store import _framed_sha
+        value=(frozenset((Ref('x',NonreflexiveKeyReference(2)),)),)
+        paths=(((('index',0),('key',next(iter(value[0]))),('field','id')),2),)
+        store,pin,_pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=paths)
+        ns,key,start,end,schema,codec,members,payload=store.db.execute(
+            'SELECT namespace,typed_key,valid_from,valid_to,record_schema,codec_version,memberships,payload FROM lazy_record_versions').fetchone()
+        payload=payload.replace(b'"x"',b'"\\ud800"')
+        store.db.execute('UPDATE lazy_record_versions SET payload=?,payload_checksum=?,row_checksum=?',
+            (payload,_framed_sha(b'lazy-payload-v1',payload),_version_checksum(ns,key,schema,codec,start,end,members,payload)))
+        store.db.commit();pairs=authorities(store,pin)
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_projection.py:112: in read_owner_projection
+    encoded=codec.encode(path)
+            ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_proof_projection._ProjectionCodec object at 0x7f074d10c950>
+value = (('index', 0), ('key', Ref(kind='\ud800', id=NonreflexiveKeyReference(incarnation=2))), ('field', 'id'))
+
+    def encode(self, value: Any) -> bytes:
+        node = self._encode_value(value, set(), set())
+>       return json.dumps(node, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       UnicodeEncodeError: 'utf-8' codec can't encode character '\ud800' in position 115: surrogates not allowed
+
+simulation/ate_sim/incremental_store.py:139: UnicodeEncodeError
+__________ test_delegated_budgets_have_projection_error_type[kwargs0] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_delegated_budgets_have_pr0')
+kwargs = {'max_bytes': 1}
+
+    @pytest.mark.parametrize('kwargs',[{'max_bytes':1},{'max_metadata_bytes':1}])
+    def test_delegated_budgets_have_projection_error_type(tmp_path,kwargs):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+>       with pytest.raises(projection_module().ProjectionProofBudgetError):read_projection(store,pin,pairs,**kwargs)
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:215: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_projection.py:94: in read_owner_projection
+    source=read_version_bytes(store,pin,version_certificate,expected_version,scope.namespace,scope.typed_key,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f074d087b00>
+pin = GenerationPin(token='15897294-c952-4a04-be69-0a1165c28580', store_identity='0f025b0d-794d-4689-a330-1c3d07be43ec', captured_head=1)
+certificate = VersionCertificate(store_identity='0f025b0d-794d-4689-a330-1c3d07be43ec', generation=1, codec_version=1, content=Root(digest=b'\xce\\\x19\xe1-\x89U\xec|4y\x8d\x9a\xa5\xdf\xc8c\xb11X\x0eA\xf1CR=\xb1=\xc5w|\x00', count=1))
+expected_commitment = b'\xbf\x97\x88\xd1\x89\x94\xba~\xd7\xb3\x07P=\xfd\x81l\xc1\xde\xec\xda\xac\x9b{\xfd<P\x19?\xdd\xf6\xab3'
+namespace = 'aux.lazy.nested.list_pages'
+typed_key = b'["tuple",[["int","1"],["int","0"]]]', expected_record_schema = 1
+max_bytes = 1, max_metadata_bytes = 1048576
+
+    def read_version_bytes(store, pin, certificate, expected_commitment, namespace, typed_key,
+                           *, expected_record_schema, max_bytes=1048576, max_metadata_bytes=1048576):
+        """Return exact retained source bytes or authenticated absence in one snapshot.
+    
+        Raw bytes still require reference/topology and canonical identity admission
+        before any World object can be exposed. Every call checks actual fetched
+        data and proof paths; no object-lifetime or generation-only reuse flag.
+        """
+        actual = certificate_commitment(certificate)
+        if type(expected_commitment) is not bytes or len(expected_commitment) != 32 or expected_commitment != actual:
+            raise StoreIntegrityError('version certificate commitment disagreement')
+        if (certificate.store_identity != store.store_identity or certificate.store_identity != pin.store_identity
+                or certificate.generation != pin.captured_head or certificate.codec_version != store.codec.version):
+            raise StoreConflictError('version certificate store/codec/pin disagreement')
+        encoded = version_key(namespace, typed_key)
+        if (type(expected_record_schema) is not int or expected_record_schema <= 0
+                or type(max_bytes) is not int or not 1 <= max_bytes <= 64*1024*1024
+                or type(max_metadata_bytes) is not int or not 1 <= max_metadata_bytes <= 64*1024*1024):
+            raise StoreIntegrityError('invalid version schema/read budget')
+        if (store.db.in_transaction and not store._active_read_transaction
+                and not getattr(store, '_checked_snapshot_depth', 0)):
+            raise StoreError('version proof reader cannot borrow an arbitrary transaction')
+        with store.read_snapshot(pin, _preflight=lambda: _guard_operational_metadata(store, max_metadata_bytes)) as generation:
+            head = int(store._checked_head_row()[0])
+            if generation not in (head, head-1):
+                raise StoreConflictError('version pin exceeds two-snapshot visibility')
+            domain = version_domain(certificate.store_identity, certificate.codec_version)
+            nodes = ProofNodeStore(store.db)
+            proof_map = ProofMap(domain, lambda d: nodes.read(domain, d), None)
+            wanted = proof_map.get(certificate.content, encoded)
+            # SQL guards run BEFORE transfer, including for malformed TEXT with NUL.
+            body_ok = ("typeof(payload)='blob' AND typeof(memberships)='blob' "
+                       f'AND length(payload)+length(memberships)<={max_bytes}')
+            columns = ("CASE WHEN typeof(valid_from)='integer' THEN valid_from END,"
+                "CASE WHEN typeof(valid_to)='integer' THEN valid_to END,typeof(valid_to),"
+                f'CASE WHEN {body_ok} THEN payload END,'
+                f'CASE WHEN {body_ok} THEN memberships END,'
+                "CASE WHEN typeof(payload)='blob' THEN length(payload) END,"
+                "CASE WHEN typeof(memberships)='blob' THEN length(memberships) END,"
+                "CASE WHEN typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 THEN payload_checksum END,"
+                "CASE WHEN typeof(row_checksum)='text' AND length(CAST(row_checksum AS BLOB))=64 THEN row_checksum END,"
+                "CASE WHEN typeof(codec_version)='integer' THEN codec_version END,"
+                "CASE WHEN typeof(record_schema)='integer' THEN record_schema END")
+            rows = store._interval_rows('lazy_record_versions', columns, ('namespace', 'typed_key'),
+                (namespace, typed_key), generation, 'lazy_record_interval', limit=2)
+            store._metadata_rows += len(rows)
+            if len(rows) > 1:
+                raise StoreIntegrityError('overlapping visible proof record versions')
+            if not rows:
+                if wanted is not None:
+                    raise StoreIntegrityError('accepted version is missing from source')
+                return None
+            start, end, end_type, payload, memberships, payload_size, membership_size, payload_hash, row_hash, codec, schema = rows[0]
+            if (type(start) is not int or not 0 <= start <= generation
+                    or end_type not in ('null', 'integer')
+                    or end_type == 'integer' and (type(end) is not int or end <= generation or end <= start)
+                    or codec != certificate.codec_version or schema != expected_record_schema
+                    or type(payload_size) is not int or type(membership_size) is not int
+                    or type(payload_hash) is not str or type(row_hash) is not str):
+                raise StoreIntegrityError('invalid physical version metadata')
+            if payload_size + membership_size > max_bytes:
+>               raise VersionProofBudgetError('version body exceeds explicit proof-read budget')
+E               ate_sim.persistence_proof_version.VersionProofBudgetError: version body exceeds explicit proof-read budget
+
+simulation/ate_sim/persistence_proof_version.py:159: VersionProofBudgetError
+__________ test_delegated_budgets_have_projection_error_type[kwargs1] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_delegated_budgets_have_pr1')
+kwargs = {'max_metadata_bytes': 1}
+
+    @pytest.mark.parametrize('kwargs',[{'max_bytes':1},{'max_metadata_bytes':1}])
+    def test_delegated_budgets_have_projection_error_type(tmp_path,kwargs):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+>       with pytest.raises(projection_module().ProjectionProofBudgetError):read_projection(store,pin,pairs,**kwargs)
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:215: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_projection.py:87: in read_owner_projection
+    with store.read_snapshot(pin,_preflight=lambda:_guard_operational_metadata(store,max_metadata_bytes)):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1283: in read_snapshot
+    generation = self._read_snapshot_start(pin, _preflight=_preflight)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:1259: in _read_snapshot_start
+    _preflight()
+simulation/ate_sim/persistence_proof_projection.py:87: in <lambda>
+    with store.read_snapshot(pin,_preflight=lambda:_guard_operational_metadata(store,max_metadata_bytes)):
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f074d72cce0>
+max_metadata_bytes = 1
+
+    def _guard_operational_metadata(store, max_metadata_bytes):
+        """Probe constant-size facts inside the snapshot BEFORE inherited fetches.
+    
+        No second transaction or authority. Limit all inventories before the
+        existing validators materialize them; variable legitimate fields share an
+        explicit caller budget, rather than a new format restriction.
+        """
+        total = 0
+        head = store.db.execute("SELECT typeof(generation)='integer' "
+            "AND typeof(parent_generation) IN ('integer','null') AND typeof(seed) IN ('integer','null') "
+            "AND typeof(head_checksum)='text' AND length(CAST(head_checksum AS BLOB))=64 "
+            "AND typeof(simulation_position)='blob' AND typeof(next_ids)='blob' "
+            "AND typeof(namespace_inventory)='blob' AND typeof(namespace_counts)='blob',"
+            "length(simulation_position)+length(next_ids)+length(namespace_inventory)+length(namespace_counts) "
+            'FROM save_head WHERE singleton=1').fetchone()
+        store._metadata_rows += int(head is not None)
+        if head is None or head[0] != 1 or type(head[1]) is not int:
+            raise StoreIntegrityError('invalid proof snapshot head metadata')
+        total += head[1]
+        # Fixed schema literals only. Each probe transfers booleans/counts, never
+        # a token/checksum/blob. Capacity is the store's existing MAX_PINS bound.
+        layouts = (
+            ('generation_pins', ('token', 'store_uuid'), (), "typeof(generation)='integer'"),
+            ('pin_receipts', ('pin_token', 'outcome'), ('commit_token',),
+             "typeof(generation)='integer' AND typeof(parent_generation)='integer'"),
+            ('pin_attempts', ('pin_token', 'state'), ('commit_token',),
+             "typeof(parent_generation)='integer' AND typeof(generation) IN ('integer','null')"),
+        )
+        if total > max_metadata_bytes:
+>           raise VersionProofBudgetError('snapshot metadata exceeds explicit proof-read budget')
+E           ate_sim.persistence_proof_version.VersionProofBudgetError: snapshot metadata exceeds explicit proof-read budget
+
+simulation/ate_sim/persistence_proof_version.py:81: VersionProofBudgetError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_changed_head_metadata_cannot_restore_native_records[simulation_position]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_changed_head_metadata_cannot_restore_native_records[next_ids]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_instance_codec_hooks_are_never_invoked
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_surrogate_schema_encoding_is_an_integrity_failure
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_delegated_budgets_have_projection_error_type[kwargs0]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_delegated_budgets_have_projection_error_type[kwargs1]
+6 failed, 36 deselected in 3.91s

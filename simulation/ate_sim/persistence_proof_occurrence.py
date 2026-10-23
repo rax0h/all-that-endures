@@ -6,7 +6,7 @@ Both owner/group views still need full topology transition cross-consistency.
 from dataclasses import dataclass
 
 from .incremental_store import StoreError, StoreConflictError, StoreIntegrityError
-from .persistence_lazy_store import _identity_occurrence_checksum, _identity_state_checksum, INTERVAL_INDEXES
+from .persistence_lazy_store import _identity_occurrence_checksum, _identity_state_checksum, INTERVAL_INDEXES, INTERVAL_TABLES
 from .persistence_proof_content import _namespace, _integer, _bytes
 from .persistence_proof_nodes import _digest
 from .persistence_proof_map import ProofMap
@@ -74,12 +74,12 @@ def create_occurrence_indexes(db):
     _require_indexes(db)
 
 
-def _require_indexes(db,*,include_order=True):
-    requirements=(INDEXES if include_order else ())+tuple((name,INTERVAL_INDEXES[name],False) for name in REQUIRED_INTERVALS)
+def _require_indexes(db,*,include_order=True,intervals=REQUIRED_INTERVALS):
+    requirements=(INDEXES if include_order else ())+tuple((name,INTERVAL_INDEXES[name],False) for name in intervals)
     for name, fields, partial in requirements:
         row = db.execute("SELECT CASE WHEN typeof(sql)='text' AND length(CAST(sql AS BLOB))<=8192 THEN sql END "
                          "FROM sqlite_schema WHERE type='index' AND name=?", (name,)).fetchone()
-        table='lazy_identity_state' if name=='lazy_identity_state_interval' else 'lazy_identity_occurrence_versions'
+        table=INTERVAL_TABLES[name] if name in INTERVAL_TABLES else 'lazy_identity_occurrence_versions'
         expected = f'CREATE INDEX {name} ON {table}('+','.join(fields)+')'+(
             ' WHERE valid_to IS NULL' if partial else '')
         # Column names alone miss collation, DESC and a changed partial predicate;

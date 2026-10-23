@@ -1,0 +1,37 @@
+{
+  "schema": "ate-proof-ci-acceptance/1",
+  "run_id": 39961497870,
+  "candidate": "641a0c23c83b0cc097a799e284890f61493d5bc1",
+  "runtime_tree": "dcea4f0686b6ceb7bc4eaacc3441236c4ad08327",
+  "status": "accepted",
+  "full_suite": {
+    "passed": 3407,
+    "subtests_passed": 2,
+    "warnings": 1,
+    "seconds": 6587.44,
+    "xml_tests": 3409
+  },
+  "proof_cases": 313,
+  "diagnostics": [
+    "scaling",
+    "batch-scaling",
+    "order-scaling",
+    "query-scaling",
+    "version-scaling",
+    "occurrence-scaling",
+    "seek-scaling"
+  ],
+  "artifacts": [
+    {
+      "id": 12512101237,
+      "name": "stage-0-5-proof-map-suite-641a0c23c83b0cc097a799e284890f61493d5bc1",
+      "digest": "sha256:bd2e1928d87fe4a205c1982714fbca135cd7922b5c0d254fb8a618805f14e0aa"
+    },
+    {
+      "id": 12505700202,
+      "name": "stage-0-5-proof-map-641a0c23c83b0cc097a799e284890f61493d5bc1",
+      "digest": "sha256:ca9819f8dffe7963ec6cd401740e5ecf46f4fd183f2710f264a344601475b4f7"
+    }
+  ],
+  "authentication": "Downloaded ZIP SHA256 match GitHub artifact digests; all source head/runtime receipts match candidate; XML has zero failures/errors; each diagnostic summary complete."
+}

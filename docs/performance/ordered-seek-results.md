@@ -39,3 +39,7 @@ Successor full-suite and seven diagnostics CI awaits publication/launch. Parent 
 ## Published successor
 
 Exact-tree candidate641a0c23c83b0cc097a799e284890f61493d5bc1 matches local964113f95d8a0789b94bdc3d2724bdc99721a4b3 treeafc3b4c678078b6ee7af4d69146c1d7f1e2d231b and measured runtimedcea4f0686b6ceb7bc4eaacc3441236c4ad08327. Only sol/durable-proof-map advanced using the exact expected-parent lease. [Run39961497870](https://github.com/rax0h/all-that-endures/actions/runs/39961497870) is in_progress with the full simulation suite and seven bounded-work diagnostics. Acceptance is pending; [launch/resume receipt](ordered-seek/ci-launch.json). Authenticate successor artifacts/source on green before continuing integration; inspect this run on failure. No long-test polling or predecessor-success substitution.
+
+## Successor accepted
+
+Run39961497870 completed green:3407 tests plus2 subtests,1 warning,6587.44s;313 proof cases and all seven diagnostics. Downloaded SHA256 digests, source head/runtime receipts and corrected newer-frontier populations match. [Acceptance and raw evidence](run-39961497870/acceptance.json). This supersedes pending status above.

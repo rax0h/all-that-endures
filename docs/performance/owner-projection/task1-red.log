@@ -1,0 +1,1226 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                           [100%]
+=================================== FAILURES ===================================
+______ test_selected_body_references_match_exact_root_without_child_reads ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_body_references_0')
+
+    def test_selected_body_references_match_exact_root_without_child_reads(tmp_path):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',30);sql=[];store.reset_diagnostics();store.db.set_trace_callback(sql.append)
+>       checked=read_projection(store,pin,pairs)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_all_existing_physical_adapters[aux.lazy.nested.entries-key0-value0-placements0-memberships0] _
+
+namespace = 'aux.lazy.nested.entries', key = (1, 'a')
+value = (0, 'a', RecordReference(incarnation=2))
+placements = (((('index', 2),), 2),)
+memberships = (Membership(index_name='incarnation', value=1, ordinal=0),)
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_all_existing_physical_ada0')
+
+    @pytest.mark.parametrize('namespace,key,value,placements,memberships',[
+        ('aux.lazy.nested.entries',(1,'a'),(0,'a',RecordReference(2)),(((('index',2),),2),),(Membership('incarnation',1,0),)),
+        ('aux.lazy.sequence.nodes',(1,1),('leaf',((17,HistoryReference('list',2)),(19,RecordReference(3)))),
+            (((('key',17),),2),((('key',19),),3)),()),
+        ('aux.lazy.records.headers',(1,0),('recursive-record/v1','core.Event/v1',
+            (1,0,'fixture',Layer.REALITY,(),None,(),HistoryReference('map',2)),(True,True)),
+            (((('field','data'),),2),),()),
+        ('aux.lazy.keys.nan_atoms',(1,0),('native-nan-key/v1',bytes.fromhex('fff8000000000042')),(),()),
+    ])
+    def test_all_existing_physical_adapters(namespace,key,value,placements,memberships,tmp_path):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',namespace=namespace,key=key,value=value,placements=placements,memberships=memberships)
+>       result=read_projection(store,pin,pairs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_all_existing_physical_adapters[aux.lazy.sequence.nodes-key1-value1-placements1-memberships1] _
+
+namespace = 'aux.lazy.sequence.nodes', key = (1, 1)
+value = ('leaf', ((17, HistoryReference(kind='list', incarnation=2)), (19, RecordReference(incarnation=3))))
+placements = (((('key', 17),), 2), ((('key', 19),), 3)), memberships = ()
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_all_existing_physical_ada1')
+
+    @pytest.mark.parametrize('namespace,key,value,placements,memberships',[
+        ('aux.lazy.nested.entries',(1,'a'),(0,'a',RecordReference(2)),(((('index',2),),2),),(Membership('incarnation',1,0),)),
+        ('aux.lazy.sequence.nodes',(1,1),('leaf',((17,HistoryReference('list',2)),(19,RecordReference(3)))),
+            (((('key',17),),2),((('key',19),),3)),()),
+        ('aux.lazy.records.headers',(1,0),('recursive-record/v1','core.Event/v1',
+            (1,0,'fixture',Layer.REALITY,(),None,(),HistoryReference('map',2)),(True,True)),
+            (((('field','data'),),2),),()),
+        ('aux.lazy.keys.nan_atoms',(1,0),('native-nan-key/v1',bytes.fromhex('fff8000000000042')),(),()),
+    ])
+    def test_all_existing_physical_adapters(namespace,key,value,placements,memberships,tmp_path):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',namespace=namespace,key=key,value=value,placements=placements,memberships=memberships)
+>       result=read_projection(store,pin,pairs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_all_existing_physical_adapters[aux.lazy.records.headers-key2-value2-placements2-memberships2] _
+
+namespace = 'aux.lazy.records.headers', key = (1, 0)
+value = ('recursive-record/v1', 'core.Event/v1', (1, 0, 'fixture', <Layer.REALITY: 'reality'>, (), None, ...), (True, True))
+placements = (((('field', 'data'),), 2),), memberships = ()
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_all_existing_physical_ada2')
+
+    @pytest.mark.parametrize('namespace,key,value,placements,memberships',[
+        ('aux.lazy.nested.entries',(1,'a'),(0,'a',RecordReference(2)),(((('index',2),),2),),(Membership('incarnation',1,0),)),
+        ('aux.lazy.sequence.nodes',(1,1),('leaf',((17,HistoryReference('list',2)),(19,RecordReference(3)))),
+            (((('key',17),),2),((('key',19),),3)),()),
+        ('aux.lazy.records.headers',(1,0),('recursive-record/v1','core.Event/v1',
+            (1,0,'fixture',Layer.REALITY,(),None,(),HistoryReference('map',2)),(True,True)),
+            (((('field','data'),),2),),()),
+        ('aux.lazy.keys.nan_atoms',(1,0),('native-nan-key/v1',bytes.fromhex('fff8000000000042')),(),()),
+    ])
+    def test_all_existing_physical_adapters(namespace,key,value,placements,memberships,tmp_path):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',namespace=namespace,key=key,value=value,placements=placements,memberships=memberships)
+>       result=read_projection(store,pin,pairs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_all_existing_physical_adapters[aux.lazy.keys.nan_atoms-key3-value3-placements3-memberships3] _
+
+namespace = 'aux.lazy.keys.nan_atoms', key = (1, 0)
+value = ('native-nan-key/v1', b'\xff\xf8\x00\x00\x00\x00\x00B'), placements = ()
+memberships = ()
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_all_existing_physical_ada3')
+
+    @pytest.mark.parametrize('namespace,key,value,placements,memberships',[
+        ('aux.lazy.nested.entries',(1,'a'),(0,'a',RecordReference(2)),(((('index',2),),2),),(Membership('incarnation',1,0),)),
+        ('aux.lazy.sequence.nodes',(1,1),('leaf',((17,HistoryReference('list',2)),(19,RecordReference(3)))),
+            (((('key',17),),2),((('key',19),),3)),()),
+        ('aux.lazy.records.headers',(1,0),('recursive-record/v1','core.Event/v1',
+            (1,0,'fixture',Layer.REALITY,(),None,(),HistoryReference('map',2)),(True,True)),
+            (((('field','data'),),2),),()),
+        ('aux.lazy.keys.nan_atoms',(1,0),('native-nan-key/v1',bytes.fromhex('fff8000000000042')),(),()),
+    ])
+    def test_all_existing_physical_adapters(namespace,key,value,placements,memberships,tmp_path):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',namespace=namespace,key=key,value=value,placements=placements,memberships=memberships)
+>       result=read_projection(store,pin,pairs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_key_side_nan_frozenset_and_repeated_references_keep_raw_paths ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_key_side_nan_frozenset_an0')
+
+    def test_key_side_nan_frozenset_and_repeated_references_keep_raw_paths(tmp_path):
+        atom=NonreflexiveKeyReference(2);key=frozenset((atom,3));value=(0,key,(HistoryReference('list',4),HistoryReference('list',4),-0.0))
+        paths=(((('index',1),('key',atom)),2),((('index',2),('index',0)),4),((('index',2),('index',1)),4))
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',namespace='aux.lazy.nested.entries',key=(1,key),value=value,
+            placements=paths,memberships=(Membership('incarnation',1,0),))
+>       result=read_projection(store,pin,pairs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__ test_independently_valid_authorities_must_agree_on_all_references[missing] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_independently_valid_autho0')
+fault = 'missing'
+
+    @pytest.mark.parametrize('fault',['missing','surplus','replacement'])
+    def test_independently_valid_authorities_must_agree_on_all_references(tmp_path,fault):
+        placements=PAGE_PLACEMENTS[:-1] if fault=='missing' else PAGE_PLACEMENTS+(((('index',9),),2),) if fault=='surplus' else PAGE_PLACEMENTS[:-1]+((PAGE_PLACEMENTS[-1][0],6),)
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',placements=placements)
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__ test_independently_valid_authorities_must_agree_on_all_references[surplus] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_independently_valid_autho1')
+fault = 'surplus'
+
+    @pytest.mark.parametrize('fault',['missing','surplus','replacement'])
+    def test_independently_valid_authorities_must_agree_on_all_references(tmp_path,fault):
+        placements=PAGE_PLACEMENTS[:-1] if fault=='missing' else PAGE_PLACEMENTS+(((('index',9),),2),) if fault=='surplus' else PAGE_PLACEMENTS[:-1]+((PAGE_PLACEMENTS[-1][0],6),)
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',placements=placements)
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_independently_valid_authorities_must_agree_on_all_references[replacement] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_independently_valid_autho2')
+fault = 'replacement'
+
+    @pytest.mark.parametrize('fault',['missing','surplus','replacement'])
+    def test_independently_valid_authorities_must_agree_on_all_references(tmp_path,fault):
+        placements=PAGE_PLACEMENTS[:-1] if fault=='missing' else PAGE_PLACEMENTS+(((('index',9),),2),) if fault=='surplus' else PAGE_PLACEMENTS[:-1]+((PAGE_PLACEMENTS[-1][0],6),)
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',placements=placements)
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_empty_and_absent_owner_do_not_hide_orphans[False-placements0-True] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_and_absent_owner_do0')
+present = False, placements = (), valid = True
+
+    @pytest.mark.parametrize('present,placements,valid',[(False,(),True),(False,PAGE_PLACEMENTS,False),(True,(),True)])
+    def test_empty_and_absent_owner_do_not_hide_orphans(tmp_path,present,placements,valid):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',present=present,value=(1,-0.0),placements=placements)
+        if valid:
+>           r=read_projection(store,pin,pairs);assert r.reference_count==0 and (r.source is None)==(not present)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_empty_and_absent_owner_do_not_hide_orphans[False-placements1-False] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_and_absent_owner_do1')
+present = False
+placements = (((('index', 0),), 2), ((('index', 1), ('index', 0)), 3), ((('index', 1), ('index', 1)), 4), ((('index', 2), ('field', 'kind')), 5))
+valid = False
+
+    @pytest.mark.parametrize('present,placements,valid',[(False,(),True),(False,PAGE_PLACEMENTS,False),(True,(),True)])
+    def test_empty_and_absent_owner_do_not_hide_orphans(tmp_path,present,placements,valid):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',present=present,value=(1,-0.0),placements=placements)
+        if valid:
+            r=read_projection(store,pin,pairs);assert r.reference_count==0 and (r.source is None)==(not present)
+        else:
+>           with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_empty_and_absent_owner_do_not_hide_orphans[True-placements2-True] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_empty_and_absent_owner_do2')
+present = True, placements = (), valid = True
+
+    @pytest.mark.parametrize('present,placements,valid',[(False,(),True),(False,PAGE_PLACEMENTS,False),(True,(),True)])
+    def test_empty_and_absent_owner_do_not_hide_orphans(tmp_path,present,placements,valid):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',present=present,value=(1,-0.0),placements=placements)
+        if valid:
+>           r=read_projection(store,pin,pairs);assert r.reference_count==0 and (r.source is None)==(not present)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value0-memberships0] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_storage_values_me0')
+value = [1], memberships = ()
+
+    @pytest.mark.parametrize('value,memberships',[
+        ([1],()),(({'a':1},),()),((set((1,)),),()),((RecordReference(10),),()),
+        ((1,),(Membership('wrong',2,0),)),
+    ])
+    def test_invalid_storage_values_memberships_and_unallocated_targets_rejected(tmp_path,value,memberships):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=(),memberships=memberships)
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value1-memberships1] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_storage_values_me1')
+value = ({'a': 1},), memberships = ()
+
+    @pytest.mark.parametrize('value,memberships',[
+        ([1],()),(({'a':1},),()),((set((1,)),),()),((RecordReference(10),),()),
+        ((1,),(Membership('wrong',2,0),)),
+    ])
+    def test_invalid_storage_values_memberships_and_unallocated_targets_rejected(tmp_path,value,memberships):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=(),memberships=memberships)
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value2-memberships2] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_storage_values_me2')
+value = ({1},), memberships = ()
+
+    @pytest.mark.parametrize('value,memberships',[
+        ([1],()),(({'a':1},),()),((set((1,)),),()),((RecordReference(10),),()),
+        ((1,),(Membership('wrong',2,0),)),
+    ])
+    def test_invalid_storage_values_memberships_and_unallocated_targets_rejected(tmp_path,value,memberships):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=(),memberships=memberships)
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value3-memberships3] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_storage_values_me3')
+value = (RecordReference(incarnation=10),), memberships = ()
+
+    @pytest.mark.parametrize('value,memberships',[
+        ([1],()),(({'a':1},),()),((set((1,)),),()),((RecordReference(10),),()),
+        ((1,),(Membership('wrong',2,0),)),
+    ])
+    def test_invalid_storage_values_memberships_and_unallocated_targets_rejected(tmp_path,value,memberships):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=(),memberships=memberships)
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_ test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value4-memberships4] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_invalid_storage_values_me4')
+value = (1,)
+memberships = (Membership(index_name='wrong', value=2, ordinal=0),)
+
+    @pytest.mark.parametrize('value,memberships',[
+        ([1],()),(({'a':1},),()),((set((1,)),),()),((RecordReference(10),),()),
+        ((1,),(Membership('wrong',2,0),)),
+    ])
+    def test_invalid_storage_values_memberships_and_unallocated_targets_rejected(tmp_path,value,memberships):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=(),memberships=memberships)
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,pairs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_multiple_root_pages_and_reference_budget _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_multiple_root_pages_and_r0')
+
+    def test_multiple_root_pages_and_reference_budget(tmp_path):
+        value=(tuple(HistoryReference('list',2) for i in range(130)),)
+        placements=tuple(((('index',0),('index',i)),2) for i in range(130))
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=placements)
+>       assert read_projection(store,pin,pairs).reference_count==130
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_explicit_work_budgets_fail_closed[body] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_explicit_work_budgets_fai0')
+kind = 'body'
+
+    @pytest.mark.parametrize('kind',['body','depth','nodes','path'])
+    def test_explicit_work_budgets_fail_closed(tmp_path,kind):
+        value=(1,);placements=()
+        if kind=='depth':
+            for _ in range(66):value=(value,)
+        elif kind=='nodes':value=(tuple(1 for _ in range(17000)),)
+        elif kind=='path':
+            value=(frozenset((Ref('x'*4200,NonreflexiveKeyReference(2)),)),)
+            placements=(((('index',0),('key',next(iter(value[0]))),('field','id')),2),)
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=placements)
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs,**({'max_bytes':1} if kind=='body' else {}))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_explicit_work_budgets_fail_closed[depth] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_explicit_work_budgets_fai1')
+kind = 'depth'
+
+    @pytest.mark.parametrize('kind',['body','depth','nodes','path'])
+    def test_explicit_work_budgets_fail_closed(tmp_path,kind):
+        value=(1,);placements=()
+        if kind=='depth':
+            for _ in range(66):value=(value,)
+        elif kind=='nodes':value=(tuple(1 for _ in range(17000)),)
+        elif kind=='path':
+            value=(frozenset((Ref('x'*4200,NonreflexiveKeyReference(2)),)),)
+            placements=(((('index',0),('key',next(iter(value[0]))),('field','id')),2),)
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=placements)
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs,**({'max_bytes':1} if kind=='body' else {}))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_explicit_work_budgets_fail_closed[nodes] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_explicit_work_budgets_fai2')
+kind = 'nodes'
+
+    @pytest.mark.parametrize('kind',['body','depth','nodes','path'])
+    def test_explicit_work_budgets_fail_closed(tmp_path,kind):
+        value=(1,);placements=()
+        if kind=='depth':
+            for _ in range(66):value=(value,)
+        elif kind=='nodes':value=(tuple(1 for _ in range(17000)),)
+        elif kind=='path':
+            value=(frozenset((Ref('x'*4200,NonreflexiveKeyReference(2)),)),)
+            placements=(((('index',0),('key',next(iter(value[0]))),('field','id')),2),)
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=placements)
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs,**({'max_bytes':1} if kind=='body' else {}))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_explicit_work_budgets_fail_closed[path] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_explicit_work_budgets_fai3')
+kind = 'path'
+
+    @pytest.mark.parametrize('kind',['body','depth','nodes','path'])
+    def test_explicit_work_budgets_fail_closed(tmp_path,kind):
+        value=(1,);placements=()
+        if kind=='depth':
+            for _ in range(66):value=(value,)
+        elif kind=='nodes':value=(tuple(1 for _ in range(17000)),)
+        elif kind=='path':
+            value=(frozenset((Ref('x'*4200,NonreflexiveKeyReference(2)),)),)
+            placements=(((('index',0),('key',next(iter(value[0]))),('field','id')),2),)
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite',value=value,placements=placements)
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs,**({'max_bytes':1} if kind=='body' else {}))
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_authority_context_and_codec_hooks_are_rejected ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authority_context_and_cod0')
+
+    def test_authority_context_and_codec_hooks_are_rejected(tmp_path):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+>       with pytest.raises(StoreIntegrityError):read_projection(store,pin,((pairs[0][0],b'x'*32),pairs[1]))
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_capability_snapshot_and_fetched_corruption[cached] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_capability_snapshot_and_f0')
+fault = 'cached'
+
+    @pytest.mark.parametrize('fault',['cached','missing','definition','transaction','released','payload'])
+    def test_capability_snapshot_and_fetched_corruption(tmp_path,fault):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+        if fault=='cached':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='missing':store.db.execute('DROP INDEX lazy_record_interval')
+        elif fault=='definition':
+            store.db.execute('DROP INDEX lazy_record_interval');store.db.execute('CREATE INDEX lazy_record_interval ON lazy_record_versions(namespace,typed_key,valid_from,valid_to)')
+        elif fault=='transaction':store.db.execute('BEGIN')
+        elif fault=='released':store.release_pin(pin)
+        else:store.db.execute("UPDATE lazy_record_versions SET payload=? WHERE namespace=?",(b'corrupt',PAGE))
+        if fault!='transaction':store.db.commit()
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_capability_snapshot_and_fetched_corruption[missing] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_capability_snapshot_and_f1')
+fault = 'missing'
+
+    @pytest.mark.parametrize('fault',['cached','missing','definition','transaction','released','payload'])
+    def test_capability_snapshot_and_fetched_corruption(tmp_path,fault):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+        if fault=='cached':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='missing':store.db.execute('DROP INDEX lazy_record_interval')
+        elif fault=='definition':
+            store.db.execute('DROP INDEX lazy_record_interval');store.db.execute('CREATE INDEX lazy_record_interval ON lazy_record_versions(namespace,typed_key,valid_from,valid_to)')
+        elif fault=='transaction':store.db.execute('BEGIN')
+        elif fault=='released':store.release_pin(pin)
+        else:store.db.execute("UPDATE lazy_record_versions SET payload=? WHERE namespace=?",(b'corrupt',PAGE))
+        if fault!='transaction':store.db.commit()
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_capability_snapshot_and_fetched_corruption[definition] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_capability_snapshot_and_f2')
+fault = 'definition'
+
+    @pytest.mark.parametrize('fault',['cached','missing','definition','transaction','released','payload'])
+    def test_capability_snapshot_and_fetched_corruption(tmp_path,fault):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+        if fault=='cached':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='missing':store.db.execute('DROP INDEX lazy_record_interval')
+        elif fault=='definition':
+            store.db.execute('DROP INDEX lazy_record_interval');store.db.execute('CREATE INDEX lazy_record_interval ON lazy_record_versions(namespace,typed_key,valid_from,valid_to)')
+        elif fault=='transaction':store.db.execute('BEGIN')
+        elif fault=='released':store.release_pin(pin)
+        else:store.db.execute("UPDATE lazy_record_versions SET payload=? WHERE namespace=?",(b'corrupt',PAGE))
+        if fault!='transaction':store.db.commit()
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_capability_snapshot_and_fetched_corruption[transaction] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_capability_snapshot_and_f3')
+fault = 'transaction'
+
+    @pytest.mark.parametrize('fault',['cached','missing','definition','transaction','released','payload'])
+    def test_capability_snapshot_and_fetched_corruption(tmp_path,fault):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+        if fault=='cached':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='missing':store.db.execute('DROP INDEX lazy_record_interval')
+        elif fault=='definition':
+            store.db.execute('DROP INDEX lazy_record_interval');store.db.execute('CREATE INDEX lazy_record_interval ON lazy_record_versions(namespace,typed_key,valid_from,valid_to)')
+        elif fault=='transaction':store.db.execute('BEGIN')
+        elif fault=='released':store.release_pin(pin)
+        else:store.db.execute("UPDATE lazy_record_versions SET payload=? WHERE namespace=?",(b'corrupt',PAGE))
+        if fault!='transaction':store.db.commit()
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_capability_snapshot_and_fetched_corruption[released] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_capability_snapshot_and_f4')
+fault = 'released'
+
+    @pytest.mark.parametrize('fault',['cached','missing','definition','transaction','released','payload'])
+    def test_capability_snapshot_and_fetched_corruption(tmp_path,fault):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+        if fault=='cached':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='missing':store.db.execute('DROP INDEX lazy_record_interval')
+        elif fault=='definition':
+            store.db.execute('DROP INDEX lazy_record_interval');store.db.execute('CREATE INDEX lazy_record_interval ON lazy_record_versions(namespace,typed_key,valid_from,valid_to)')
+        elif fault=='transaction':store.db.execute('BEGIN')
+        elif fault=='released':store.release_pin(pin)
+        else:store.db.execute("UPDATE lazy_record_versions SET payload=? WHERE namespace=?",(b'corrupt',PAGE))
+        if fault!='transaction':store.db.commit()
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_capability_snapshot_and_fetched_corruption[payload] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_capability_snapshot_and_f5')
+fault = 'payload'
+
+    @pytest.mark.parametrize('fault',['cached','missing','definition','transaction','released','payload'])
+    def test_capability_snapshot_and_fetched_corruption(tmp_path,fault):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite')
+        if fault=='cached':store._interval_indexes.discard('lazy_record_interval')
+        elif fault=='missing':store.db.execute('DROP INDEX lazy_record_interval')
+        elif fault=='definition':
+            store.db.execute('DROP INDEX lazy_record_interval');store.db.execute('CREATE INDEX lazy_record_interval ON lazy_record_versions(namespace,typed_key,valid_from,valid_to)')
+        elif fault=='transaction':store.db.execute('BEGIN')
+        elif fault=='released':store.release_pin(pin)
+        else:store.db.execute("UPDATE lazy_record_versions SET payload=? WHERE namespace=?",(b'corrupt',PAGE))
+        if fault!='transaction':store.db.commit()
+>       with pytest.raises(StoreError):read_projection(store,pin,pairs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_retained_source_and_placements_after_replacement_and_delete _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_retained_source_and_place0')
+
+    def test_retained_source_and_placements_after_replacement_and_delete(tmp_path):
+        store,pin,pairs=make_projection_store(tmp_path/'p.sqlite');old=store.capture_pin()
+        writer=store.commit(pin,commit_token='change',version_changes=(VersionChange(PAGE,(1,0),(HistoryReference('list',6),)),),
+            identity_changes=tuple(IdentityOccurrenceChange(PAGE,(1,0),path,delete=True) for path,_ in PAGE_PLACEMENTS[1:])+
+                (IdentityOccurrenceChange(PAGE,(1,0),PAGE_PLACEMENTS[0][0],6),),
+            next_incarnation_id=10,changes=(),new_segments=(),metadata=metadata(2)).pin
+>       assert read_projection(store,old,pairs).source.payload==store.codec.encode(PAGE_VALUE)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_projection.py:143: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_projection_fixtures.py:44: in read_projection
+    return projection_module().read_owner_projection(store,pin,*pairs[0],*pairs[1],**kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+simulation/tests/proof_projection_fixtures.py:20: in projection_module
+    def projection_module():return importlib.import_module('ate_sim.persistence_proof_projection')
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_projection'
+import_ = <function _gcd_import at 0x7f59d89d80e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_projection'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_selected_body_references_match_exact_root_without_child_reads
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_all_existing_physical_adapters[aux.lazy.nested.entries-key0-value0-placements0-memberships0]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_all_existing_physical_adapters[aux.lazy.sequence.nodes-key1-value1-placements1-memberships1]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_all_existing_physical_adapters[aux.lazy.records.headers-key2-value2-placements2-memberships2]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_all_existing_physical_adapters[aux.lazy.keys.nan_atoms-key3-value3-placements3-memberships3]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_key_side_nan_frozenset_and_repeated_references_keep_raw_paths
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_independently_valid_authorities_must_agree_on_all_references[missing]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_independently_valid_authorities_must_agree_on_all_references[surplus]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_independently_valid_authorities_must_agree_on_all_references[replacement]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_empty_and_absent_owner_do_not_hide_orphans[False-placements0-True]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_empty_and_absent_owner_do_not_hide_orphans[False-placements1-False]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_empty_and_absent_owner_do_not_hide_orphans[True-placements2-True]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value0-memberships0]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value1-memberships1]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value2-memberships2]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value3-memberships3]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_invalid_storage_values_memberships_and_unallocated_targets_rejected[value4-memberships4]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_multiple_root_pages_and_reference_budget
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_explicit_work_budgets_fail_closed[body]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_explicit_work_budgets_fail_closed[depth]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_explicit_work_budgets_fail_closed[nodes]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_explicit_work_budgets_fail_closed[path]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_authority_context_and_codec_hooks_are_rejected
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_capability_snapshot_and_fetched_corruption[cached]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_capability_snapshot_and_fetched_corruption[missing]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_capability_snapshot_and_fetched_corruption[definition]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_capability_snapshot_and_fetched_corruption[transaction]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_capability_snapshot_and_fetched_corruption[released]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_capability_snapshot_and_fetched_corruption[payload]
+FAILED simulation/tests/test_stage_0_5_proof_projection.py::test_retained_source_and_placements_after_replacement_and_delete
+30 failed in 15.95s
