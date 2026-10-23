@@ -19,3 +19,16 @@ Author fix: Python equality aliases bool/int in decoded link IDs, group anchors 
 Parent acceptance restored: authenticated run39981711210 succeeded for5da5505, runtime c7c8721. Both artifact ZIP SHA256 digests matched; XML has3450 testcase elements and3452 declared cases including2subtests, no errors/failures;356 dedicated proof cases. This accepts only the prior package.
 
 Task 2 extended verification:68 query/group tests passed in14.04s after the three typed-alias RED reproductions and hardening. Includes explicit selected/lookahead large-key budget, nested checked snapshot, coherently checksummed native head metadata rejection, and ordinary current/retained metadata without old-body admission. Fresh matrix will bind this hardened runtime.
+
+Final review: independent fresh-context review c4cfe473..53fa319. No Critical/Minor findings; one Important embedded retirement-header typed alias. Four regression cases failed before the fix. Final affected run521 passed in53.71s after strict checked_header + encoded comparison. Full suite is delegated to candidate CI and remains pending until that run is authenticated; no full-suite-green claim for this package.
+
+Final: fixed embedded retirement-header aliases — test_embedded_retirement_header_rejects_bool_aliases (directory/root count, height and population)4 RED→GREEN cases within affected521/521.
+
+Final: Ruling: World admission, target existence/kind, full topology remain gated — this component returns raw checked metadata only — cost if misread is unsafe object admission; no production World caller selects it.
+Final: Ruling: production authority/publication/fencing/manifests/collection remain subsequent integration — expected commitments must come from existing verified outer authority — cost if ignored is accepting unauthoritative roots or unsafe collection.
+Final: Ruling: unselected physical inventory remains separate full audit — accepted roots select logical results — cost if ignored is treating bounded reads as a physical corruption scrub.
+Final: Ruling: descriptor/range counts do not prove complete allocator inventory — complete inventory/publication checks remain required — cost if ignored is missing global topology inconsistencies outside the requested group.
+Final: Ruling: historical ordinary bodies remain unavailable — retained group metadata cannot admit overwritten ordinary payloads — cost if ignored is restoring the wrong generation's object body.
+Final: Ruling: final scaling/full CI require their own exact-source receipts — independent focused review is not performance or full-suite acceptance — cost if ignored is overstating unmeasured World behavior.
+
+Scaling investigation: two hardened repeats failed during fixture construction under primary Python's SQLite3.53.1 (SQLITE_READONLY; later SQLITE_CORRUPT invalid rootpage). The first database reopened with quick_check OK and accepted a rolled-back write probe. The second persisted a seek-table rootpage beyond its file page count. Neither failed run is accepted performance evidence. System /usr/bin/python3 has SQLite3.45.1, matching hosted CI. Next matrix uses that interpreter; root cause of the primary-runtime database failures remains unresolved, with no speculative production fix.

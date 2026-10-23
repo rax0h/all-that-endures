@@ -225,3 +225,22 @@ def test_ordinary_source_metadata_current_and_retained_without_body_admission(tm
     assert len(read_group(store,old,pairs).occurrences)==2
     assert len(read_group(store,writer,group_authorities(store,writer)).occurrences)==1
     store.close()
+
+
+@pytest.mark.parametrize('field',['directory-count','root-count','root-height','root-population'])
+def test_embedded_retirement_header_rejects_bool_aliases(tmp_path,field):
+    from ate_sim.persistence_lazy_store import VersionChange
+    from simulation.tests.proof_identity_group_fixtures import metadata
+    store,pin,_=make_group_store(tmp_path/'retirement-alias.sqlite');writer=retire_empty(store,pin)
+    descriptor=list(store.read_version(writer,catalog.CATALOG_NAMESPACE,0,expected_record_schema=1).value)
+    embedded=list(descriptor[4])
+    if field=='directory-count':embedded[1]=True
+    else:
+        root=list(embedded[2]);index={'root-count':1,'root-height':3,'root-population':6}[field]
+        root[index]=bool(root[index]);embedded[2]=tuple(root)
+    descriptor[4]=tuple(embedded)
+    writer=store.commit(writer,commit_token='typed-retirement-corruption',version_changes=(VersionChange(catalog.CATALOG_NAMESPACE,0,tuple(descriptor)),),
+        changes=(),new_segments=(),metadata=metadata(3)).pin
+    pairs=group_authorities(store,writer,3)
+    with pytest.raises(StoreIntegrityError):read_group(store,writer,pairs)
+    store.close()

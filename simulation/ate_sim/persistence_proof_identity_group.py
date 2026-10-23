@@ -175,7 +175,8 @@ def _read(store,pin,version_certificate,expected_version,group_certificate,expec
         checked_header(retired_header)
         if (type(descriptor) is not tuple or len(descriptor)!=5 or descriptor[0]!=catalog.CATALOG_TAG or descriptor[1]!=catalog.FEATURES
                 or type(descriptor[2]) is not int or descriptor[2]!=allocator or type(descriptor[3]) is not int or descriptor[3]<0
-                or descriptor[4]!=retired_header or descriptor[3]+(retired_header[2][6] if retired_header[2] else 0)!=allocator-1
+                or codec.encode(checked_header(descriptor[4]))!=codec.encode(retired_header)
+                or descriptor[3]+(retired_header[2][6] if retired_header[2] else 0)!=allocator-1
                 or retired_header[2] is not None and retired_header[2][5]>=allocator):
             raise StoreIntegrityError('group catalog allocator/retirement disagreement')
         retired=RetiredIdentityRanges(_RetiredSource(sources),pin,header=retired_header).contains(inc)
