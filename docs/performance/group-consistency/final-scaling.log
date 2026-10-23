@@ -1,0 +1,24 @@
+1000: exact group current/old/new; metadata payloads8/8/5; owner/archive bodies0; old nonempty/empty query VM<=999/799
+10000: exact group current/old/new; metadata payloads8/8/5; owner/archive bodies0; old nonempty/empty query VM<=999/799
+Traceback (most recent call last):
+  File "/workspace/scratch/757e611173bc/ate/.github/tests/run_proof_identity_group_scaling.py", line 130, in <module>
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',required=True,type=Path);run(parser.parse_args().output)
+                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/.github/tests/run_proof_identity_group_scaling.py", line 119, in run
+    group=group_case(output,size,source);query=query_case(output,size,source)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/.github/tests/run_proof_identity_group_scaling.py", line 57, in group_case
+    start=time.perf_counter();store,pin,pairs=make_group_store(output/f'group-{size}.sqlite',size)
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/simulation/tests/proof_identity_group_fixtures.py", line 52, in make_group_store
+    return store,pin,group_authorities(store,pin,inc)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/simulation/tests/proof_identity_group_fixtures.py", line 30, in group_authorities
+    occurrences=construct_seek_certificates(store,pin,scopes)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/simulation/tests/proof_occurrence_seek_fixtures.py", line 18, in construct_seek_certificates
+    m=OrderedSeekMap(store.db,s.seek_domain(store.store_identity,store.codec.version,scope));m.create_schema()
+                                                                                             ^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/simulation/ate_sim/persistence_proof_seek.py", line 94, in create_schema
+    self.db.execute('CREATE TABLE IF NOT EXISTS ate_ordered_seek_nodes('
+sqlite3.OperationalError: attempt to write a readonly database

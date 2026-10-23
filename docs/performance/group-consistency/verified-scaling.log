@@ -1,0 +1,24 @@
+1000: exact group current/old/new; metadata payloads8/8/5; owner/archive bodies0; old nonempty/empty query VM<=999/799
+Traceback (most recent call last):
+  File "/workspace/scratch/757e611173bc/ate/.github/tests/run_proof_identity_group_scaling.py", line 130, in <module>
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',required=True,type=Path);run(parser.parse_args().output)
+                                                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/.github/tests/run_proof_identity_group_scaling.py", line 119, in run
+    group=group_case(output,size,source);query=query_case(output,size,source)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/.github/tests/run_proof_identity_group_scaling.py", line 68, in group_case
+    start=time.perf_counter();newpairs=group_authorities(store,writer);construction=time.perf_counter()-start
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/simulation/tests/proof_identity_group_fixtures.py", line 31, in group_authorities
+    query=construct_query_seek(store,pin,QueryScope(catalog.LINK_NAMESPACE,'incarnation',store.codec.encode(inc)))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/simulation/tests/proof_query_seek_fixtures.py", line 14, in construct_query_seek
+    store._require_pin(pin);store.verify_all()
+    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/simulation/ate_sim/persistence_lazy_store.py", line 780, in _require_pin
+    _, generation, _ = self._checked_pin_row(pin.token)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/757e611173bc/ate/simulation/ate_sim/persistence_lazy_store.py", line 761, in _checked_pin_row
+    row = self.db.execute(
+          ^^^^^^^^^^^^^^^^
+sqlite3.DatabaseError: malformed database schema (ate_ordered_seek_nodes) - invalid rootpage

@@ -35,6 +35,19 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest pyyaml
+      - name: Record proof job candidate source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python - <<'PY'
+          import platform, sqlite3, subprocess
+          from pathlib import Path
+          from simulation import continuation_receipts as r
+          def git(*args):return subprocess.check_output(['git',*args],text=True).strip()
+          if git('status','--porcelain','--untracked-files=no'):raise ValueError('tracked execution source is dirty')
+          r.publish_receipt(Path('evidence/source.json'),dict(head=git('rev-parse','HEAD'),runtime_tree=git('rev-parse','HEAD:simulation/ate_sim'),python=platform.python_version(),sqlite=sqlite3.sqlite_version))
+          PY
       - name: Verify proof primitives and bounded 1k/10k/100k work
         shell: bash
         run: |
