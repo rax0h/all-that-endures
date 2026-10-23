@@ -1,0 +1,51 @@
+{
+  "run_id": 40013683423,
+  "status": "accepted",
+  "candidate": "09b8dc251fe9c0073de2c0e7cd88be727c1db6fe",
+  "runtime_tree": "985952d8566b1f292dbde17f0b664608104d4d95",
+  "source_receipts": [
+    "suite/source.json",
+    "proof-map/source.json",
+    "proof-map/scaling/source.json",
+    "proof-map/order-scaling/source.json",
+    "proof-map/version-scaling/source.json",
+    "proof-map/batch-scaling/source.json",
+    "proof-map/query-scaling/source.json",
+    "proof-map/seek-scaling/source.json",
+    "proof-map/projection-scaling/source.json",
+    "proof-map/occurrence-scaling/source.json",
+    "proof-map/group-scaling/source.json"
+  ],
+  "xml": {
+    "suite/full-suite.xml": {
+      "cases": 3522,
+      "declared": 3524
+    },
+    "proof-map/projection-tests.xml": {
+      "cases": 43,
+      "declared": 43
+    },
+    "proof-map/seek-tests.xml": {
+      "cases": 53,
+      "declared": 53
+    },
+    "proof-map/group-tests.xml": {
+      "cases": 72,
+      "declared": 72
+    },
+    "proof-map/proof-tests.xml": {
+      "cases": 260,
+      "declared": 260
+    }
+  },
+  "artifacts": [
+    {
+      "id": 12530911631,
+      "sha256": "215a2b7647bbaf887a662ae23b57a6d0caf492619221a78d6be539d6393a6b16"
+    },
+    {
+      "id": 12527094917,
+      "sha256": "cd6b4232c6bf0ad6ea44e79128daeb6f6c37c1b59fc22594ab4d7438c140e40d"
+    }
+  ]
+}

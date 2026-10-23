@@ -1,0 +1,42 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_source_authority_context_corruption[uuid] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_source_authority_context_0')
+fault = 'uuid'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','uuid','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='uuid':store.db.execute("UPDATE store_metadata SET value='other-store' WHERE key='store_uuid'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_generation.py:133: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[uuid]
+1 failed, 58 deselected in 0.28s

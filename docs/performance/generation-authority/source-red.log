@@ -1,0 +1,729 @@
+..................................FFFFFFFFFFFFFFFFFFFFFFFF               [100%]
+=================================== FAILURES ===================================
+_______________ test_source_current_retained_and_zero_body_reads _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_current_retained_a0')
+
+    def test_source_current_retained_and_zero_body_reads(tmp_path):
+        from simulation.tests.proof_generation_fixtures import make_generation_store,metadata,install
+        from ate_sim.persistence_lazy_store import VersionChange
+        m=module();store,pin,pair=make_generation_store(tmp_path/'manifest.sqlite');old=store.capture_pin();sql=[]
+        store.db.set_trace_callback(sql.append);store.reset_diagnostics()
+>       assert m.read_generation_manifest(store,pin,pair[1])==pair[0]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:96: AttributeError
+______________ test_source_authority_context_corruption[missing] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_0')
+fault = 'missing'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+_______________ test_source_authority_context_corruption[bytes] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_1')
+fault = 'bytes'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+_______________ test_source_authority_context_corruption[digest] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_2')
+fault = 'digest'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+________________ test_source_authority_context_corruption[text] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_3')
+fault = 'text'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+________________ test_source_authority_context_corruption[head] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_4')
+fault = 'head'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+_____________ test_source_authority_context_corruption[allocator] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_5')
+fault = 'allocator'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+_______________ test_source_authority_context_corruption[format] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_6')
+fault = 'format'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+______________ test_source_authority_context_corruption[expected] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_7')
+fault = 'expected'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+______________ test_source_authority_context_corruption[released] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_8')
+fault = 'released'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+____________ test_source_authority_context_corruption[transaction] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_9')
+fault = 'transaction'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+________________ test_source_authority_context_corruption[hook] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_10')
+fault = 'hook'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+_______________ test_source_authority_context_corruption[budget] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_11')
+fault = 'budget'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+__________ test_source_authority_context_corruption[metadata-budget] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_12')
+fault = 'metadata-budget'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+_______________ test_source_authority_context_corruption[schema] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_source_authority_context_13')
+fault = 'schema'
+
+    @pytest.mark.parametrize('fault',['missing','bytes','digest','text','head','allocator','format','expected','released','transaction','hook','budget','metadata-budget','schema'])
+    def test_source_authority_context_corruption(tmp_path,fault):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        from ate_sim.incremental_store import _head_checksum
+        m=module();store,pin,pair=make_generation_store(tmp_path/'bad.sqlite');expected=pair[1];kwargs={}
+        if fault=='missing':store.db.execute('DELETE FROM ate_generation_manifests WHERE generation=1')
+        elif fault=='bytes':store.db.execute("UPDATE ate_generation_manifests SET manifest=x'00' WHERE generation=1")
+        elif fault=='digest':store.db.execute('UPDATE ate_generation_manifests SET commitment=? WHERE generation=1',(b'x'*32,))
+        elif fault=='text':store.db.execute("UPDATE ate_generation_manifests SET manifest='x' WHERE generation=1")
+        elif fault=='head':
+            store.db.execute('UPDATE save_head SET seed=8');row=store.db.execute('SELECT generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts FROM save_head').fetchone()
+            store.db.execute('UPDATE save_head SET head_checksum=?',(_head_checksum(*row),))
+        elif fault=='allocator':
+            changed=replace(pair[0],head=replace(pair[0].head,next_incarnation_id=5));expected=m.manifest_commitment(changed)
+            store.db.execute('UPDATE ate_generation_manifests SET commitment=?,manifest=? WHERE generation=1',(expected,m.encode_manifest(changed)))
+        elif fault=='format':store.db.execute("UPDATE store_metadata SET value='5' WHERE key='format_version'")
+        elif fault=='expected':expected=b'x'*32
+        elif fault=='released':store.release_pin(pin)
+        elif fault=='hook':store.codec.decode=lambda _:pytest.fail('caller hook invoked')
+        elif fault=='budget':kwargs['max_bytes']=1
+        elif fault=='metadata-budget':kwargs['max_metadata_bytes']=1
+        elif fault=='schema':
+            store.db.execute('ALTER TABLE ate_generation_manifests RENAME TO old_manifests')
+            store.db.execute('CREATE TABLE ate_generation_manifests AS SELECT * FROM old_manifests')
+        store.db.commit()
+        if fault=='transaction':store.db.execute('BEGIN')
+>       with pytest.raises(StoreError):m.read_generation_manifest(store,pin,expected,**kwargs)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:132: AttributeError
+_______________ test_nested_snapshot_and_released_writer_receipt _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_nested_snapshot_and_relea0')
+
+    def test_nested_snapshot_and_released_writer_receipt(tmp_path):
+        from simulation.tests.proof_generation_fixtures import make_generation_store
+        m=module();store,pin,pair=make_generation_store(tmp_path/'nested.sqlite');reader=store.capture_pin();store.release_pin(pin)
+        with store.read_transaction():
+>           with store.read_snapshot(reader):assert m.read_generation_manifest(store,reader,pair[1])==pair[0]
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'read_generation_manifest'. Did you mean: 'GenerationManifest'?
+
+simulation/tests/test_stage_0_5_proof_generation.py:141: AttributeError
+_________ test_protected_root_inventory_exact_roles_and_deduplication __________
+
+    def test_protected_root_inventory_exact_roles_and_deduplication():
+        m=module();parent=specimen();p=m.manifest_commitment(parent);child=specimen(2,p);c=m.manifest_commitment(child)
+>       result=m.retained_roots(((parent,p),(child,c)),head=c,pins=(p,),unresolved=((p,c),),checkpoints=(p,))
+               ^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'retained_roots'
+
+simulation/tests/test_stage_0_5_proof_generation.py:147: AttributeError
+_______________ test_protection_inventory_fails_closed[missing] ________________
+
+fault = 'missing'
+
+    @pytest.mark.parametrize('fault',['missing','conflict','foreign','old-pin','unused','bad-unresolved','types'])
+    def test_protection_inventory_fails_closed(fault):
+        m=module();parent=specimen();p=m.manifest_commitment(parent);child=specimen(2,p);c=m.manifest_commitment(child)
+        pairs=((parent,p),(child,c));kwargs=dict(head=c,pins=(p,))
+        if fault=='missing':pairs=pairs[1:]
+        elif fault=='conflict':
+            other=replace(child,head=replace(child.head,seed=8));d=m.manifest_commitment(other);pairs+=((other,d),);kwargs['checkpoints']=(d,)
+        elif fault=='foreign':
+            other=replace(parent,store_identity='other');d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='old-pin':
+            other=specimen(0);d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='unused':kwargs['pins']=()
+        elif fault=='bad-unresolved':kwargs['unresolved']=((c,p),)
+        else:kwargs['pins']=[p]
+>       with pytest.raises(StoreError):m.retained_roots(pairs,**kwargs)
+                                       ^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'retained_roots'
+
+simulation/tests/test_stage_0_5_proof_generation.py:166: AttributeError
+_______________ test_protection_inventory_fails_closed[conflict] _______________
+
+fault = 'conflict'
+
+    @pytest.mark.parametrize('fault',['missing','conflict','foreign','old-pin','unused','bad-unresolved','types'])
+    def test_protection_inventory_fails_closed(fault):
+        m=module();parent=specimen();p=m.manifest_commitment(parent);child=specimen(2,p);c=m.manifest_commitment(child)
+        pairs=((parent,p),(child,c));kwargs=dict(head=c,pins=(p,))
+        if fault=='missing':pairs=pairs[1:]
+        elif fault=='conflict':
+            other=replace(child,head=replace(child.head,seed=8));d=m.manifest_commitment(other);pairs+=((other,d),);kwargs['checkpoints']=(d,)
+        elif fault=='foreign':
+            other=replace(parent,store_identity='other');d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='old-pin':
+            other=specimen(0);d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='unused':kwargs['pins']=()
+        elif fault=='bad-unresolved':kwargs['unresolved']=((c,p),)
+        else:kwargs['pins']=[p]
+>       with pytest.raises(StoreError):m.retained_roots(pairs,**kwargs)
+                                       ^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'retained_roots'
+
+simulation/tests/test_stage_0_5_proof_generation.py:166: AttributeError
+_______________ test_protection_inventory_fails_closed[foreign] ________________
+
+fault = 'foreign'
+
+    @pytest.mark.parametrize('fault',['missing','conflict','foreign','old-pin','unused','bad-unresolved','types'])
+    def test_protection_inventory_fails_closed(fault):
+        m=module();parent=specimen();p=m.manifest_commitment(parent);child=specimen(2,p);c=m.manifest_commitment(child)
+        pairs=((parent,p),(child,c));kwargs=dict(head=c,pins=(p,))
+        if fault=='missing':pairs=pairs[1:]
+        elif fault=='conflict':
+            other=replace(child,head=replace(child.head,seed=8));d=m.manifest_commitment(other);pairs+=((other,d),);kwargs['checkpoints']=(d,)
+        elif fault=='foreign':
+            other=replace(parent,store_identity='other');d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='old-pin':
+            other=specimen(0);d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='unused':kwargs['pins']=()
+        elif fault=='bad-unresolved':kwargs['unresolved']=((c,p),)
+        else:kwargs['pins']=[p]
+>       with pytest.raises(StoreError):m.retained_roots(pairs,**kwargs)
+                                       ^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'retained_roots'
+
+simulation/tests/test_stage_0_5_proof_generation.py:166: AttributeError
+_______________ test_protection_inventory_fails_closed[old-pin] ________________
+
+fault = 'old-pin'
+
+    @pytest.mark.parametrize('fault',['missing','conflict','foreign','old-pin','unused','bad-unresolved','types'])
+    def test_protection_inventory_fails_closed(fault):
+        m=module();parent=specimen();p=m.manifest_commitment(parent);child=specimen(2,p);c=m.manifest_commitment(child)
+        pairs=((parent,p),(child,c));kwargs=dict(head=c,pins=(p,))
+        if fault=='missing':pairs=pairs[1:]
+        elif fault=='conflict':
+            other=replace(child,head=replace(child.head,seed=8));d=m.manifest_commitment(other);pairs+=((other,d),);kwargs['checkpoints']=(d,)
+        elif fault=='foreign':
+            other=replace(parent,store_identity='other');d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='old-pin':
+            other=specimen(0);d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='unused':kwargs['pins']=()
+        elif fault=='bad-unresolved':kwargs['unresolved']=((c,p),)
+        else:kwargs['pins']=[p]
+>       with pytest.raises(StoreError):m.retained_roots(pairs,**kwargs)
+                                       ^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'retained_roots'
+
+simulation/tests/test_stage_0_5_proof_generation.py:166: AttributeError
+________________ test_protection_inventory_fails_closed[unused] ________________
+
+fault = 'unused'
+
+    @pytest.mark.parametrize('fault',['missing','conflict','foreign','old-pin','unused','bad-unresolved','types'])
+    def test_protection_inventory_fails_closed(fault):
+        m=module();parent=specimen();p=m.manifest_commitment(parent);child=specimen(2,p);c=m.manifest_commitment(child)
+        pairs=((parent,p),(child,c));kwargs=dict(head=c,pins=(p,))
+        if fault=='missing':pairs=pairs[1:]
+        elif fault=='conflict':
+            other=replace(child,head=replace(child.head,seed=8));d=m.manifest_commitment(other);pairs+=((other,d),);kwargs['checkpoints']=(d,)
+        elif fault=='foreign':
+            other=replace(parent,store_identity='other');d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='old-pin':
+            other=specimen(0);d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='unused':kwargs['pins']=()
+        elif fault=='bad-unresolved':kwargs['unresolved']=((c,p),)
+        else:kwargs['pins']=[p]
+>       with pytest.raises(StoreError):m.retained_roots(pairs,**kwargs)
+                                       ^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'retained_roots'
+
+simulation/tests/test_stage_0_5_proof_generation.py:166: AttributeError
+____________ test_protection_inventory_fails_closed[bad-unresolved] ____________
+
+fault = 'bad-unresolved'
+
+    @pytest.mark.parametrize('fault',['missing','conflict','foreign','old-pin','unused','bad-unresolved','types'])
+    def test_protection_inventory_fails_closed(fault):
+        m=module();parent=specimen();p=m.manifest_commitment(parent);child=specimen(2,p);c=m.manifest_commitment(child)
+        pairs=((parent,p),(child,c));kwargs=dict(head=c,pins=(p,))
+        if fault=='missing':pairs=pairs[1:]
+        elif fault=='conflict':
+            other=replace(child,head=replace(child.head,seed=8));d=m.manifest_commitment(other);pairs+=((other,d),);kwargs['checkpoints']=(d,)
+        elif fault=='foreign':
+            other=replace(parent,store_identity='other');d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='old-pin':
+            other=specimen(0);d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='unused':kwargs['pins']=()
+        elif fault=='bad-unresolved':kwargs['unresolved']=((c,p),)
+        else:kwargs['pins']=[p]
+>       with pytest.raises(StoreError):m.retained_roots(pairs,**kwargs)
+                                       ^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'retained_roots'
+
+simulation/tests/test_stage_0_5_proof_generation.py:166: AttributeError
+________________ test_protection_inventory_fails_closed[types] _________________
+
+fault = 'types'
+
+    @pytest.mark.parametrize('fault',['missing','conflict','foreign','old-pin','unused','bad-unresolved','types'])
+    def test_protection_inventory_fails_closed(fault):
+        m=module();parent=specimen();p=m.manifest_commitment(parent);child=specimen(2,p);c=m.manifest_commitment(child)
+        pairs=((parent,p),(child,c));kwargs=dict(head=c,pins=(p,))
+        if fault=='missing':pairs=pairs[1:]
+        elif fault=='conflict':
+            other=replace(child,head=replace(child.head,seed=8));d=m.manifest_commitment(other);pairs+=((other,d),);kwargs['checkpoints']=(d,)
+        elif fault=='foreign':
+            other=replace(parent,store_identity='other');d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='old-pin':
+            other=specimen(0);d=m.manifest_commitment(other);pairs=((other,d),(child,c));kwargs['pins']=(d,)
+        elif fault=='unused':kwargs['pins']=()
+        elif fault=='bad-unresolved':kwargs['unresolved']=((c,p),)
+        else:kwargs['pins']=[p]
+>       with pytest.raises(StoreError):m.retained_roots(pairs,**kwargs)
+                                       ^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_generation' has no attribute 'retained_roots'
+
+simulation/tests/test_stage_0_5_proof_generation.py:166: AttributeError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_current_retained_and_zero_body_reads
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[missing]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[bytes]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[digest]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[text]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[head]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[allocator]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[format]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[expected]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[released]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[transaction]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[hook]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[budget]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[metadata-budget]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_source_authority_context_corruption[schema]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_nested_snapshot_and_released_writer_receipt
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_protected_root_inventory_exact_roles_and_deduplication
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_protection_inventory_fails_closed[missing]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_protection_inventory_fails_closed[conflict]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_protection_inventory_fails_closed[foreign]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_protection_inventory_fails_closed[old-pin]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_protection_inventory_fails_closed[unused]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_protection_inventory_fails_closed[bad-unresolved]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_protection_inventory_fails_closed[types]
+24 failed, 34 passed in 2.31s

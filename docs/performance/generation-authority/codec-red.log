@@ -1,0 +1,1073 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                       [100%]
+=================================== FAILURES ===================================
+__________________ test_independent_binary_vector_and_digest ___________________
+
+    def test_independent_binary_vector_and_digest():
+>       m=module();value=specimen();raw=m.encode_manifest(value)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________________________ test_round_trip[0] ______________________________
+
+generation = 0
+
+    @pytest.mark.parametrize('generation',[0,1,2,2**63-1])
+    def test_round_trip(generation):
+>       m=module();v=specimen(generation);assert m.decode_manifest(m.encode_manifest(v),m.manifest_commitment(v))==v
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________________________ test_round_trip[1] ______________________________
+
+generation = 1
+
+    @pytest.mark.parametrize('generation',[0,1,2,2**63-1])
+    def test_round_trip(generation):
+>       m=module();v=specimen(generation);assert m.decode_manifest(m.encode_manifest(v),m.manifest_commitment(v))==v
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________________________ test_round_trip[2] ______________________________
+
+generation = 2
+
+    @pytest.mark.parametrize('generation',[0,1,2,2**63-1])
+    def test_round_trip(generation):
+>       m=module();v=specimen(generation);assert m.decode_manifest(m.encode_manifest(v),m.manifest_commitment(v))==v
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________________ test_round_trip[9223372036854775807] _____________________
+
+generation = 9223372036854775807
+
+    @pytest.mark.parametrize('generation',[0,1,2,2**63-1])
+    def test_round_trip(generation):
+>       m=module();v=specimen(generation);assert m.decode_manifest(m.encode_manifest(v),m.manifest_commitment(v))==v
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________________ test_malformed_fields_reject[gen-bool] ____________________
+
+fault = 'gen-bool'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________________ test_malformed_fields_reject[negative] ____________________
+
+fault = 'negative'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_malformed_fields_reject[parent-missing] _________________
+
+fault = 'parent-missing'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_malformed_fields_reject[gen0-parent] ___________________
+
+fault = 'gen0-parent'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________________ test_malformed_fields_reject[codec-bool] ___________________
+
+fault = 'codec-bool'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_malformed_fields_reject[store-empty] ___________________
+
+fault = 'store-empty'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________________ test_malformed_fields_reject[store-nul] ____________________
+
+fault = 'store-nul'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_malformed_fields_reject[schema-surrogate] ________________
+
+fault = 'schema-surrogate'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_malformed_fields_reject[format-empty] __________________
+
+fault = 'format-empty'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_malformed_fields_reject[allocator-bool] _________________
+
+fault = 'allocator-bool'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________________ test_malformed_fields_reject[seed-bool] ____________________
+
+fault = 'seed-bool'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_malformed_fields_reject[root-count-bool] _________________
+
+fault = 'root-count-bool'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_malformed_fields_reject[root-digest] ___________________
+
+fault = 'root-digest'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_malformed_fields_reject[root-missing] __________________
+
+fault = 'root-missing'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________________ test_malformed_fields_reject[root-list] ____________________
+
+fault = 'root-list'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_malformed_fields_reject[receipt-missing] _________________
+
+fault = 'receipt-missing'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_malformed_fields_reject[receipt-token] __________________
+
+fault = 'receipt-token'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_malformed_fields_reject[receipt-checksum] ________________
+
+fault = 'receipt-checksum'
+
+    @pytest.mark.parametrize('fault',['gen-bool','negative','parent-missing','gen0-parent','codec-bool','store-empty','store-nul','schema-surrogate','format-empty',
+        'allocator-bool','seed-bool','root-count-bool','root-digest','root-missing','root-list','receipt-missing','receipt-token','receipt-checksum'])
+    def test_malformed_fields_reject(fault):
+>       m=module();v=specimen()
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_ingress_bytes_and_expected_reject[expected] _______________
+
+fault = 'expected'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field'])
+    def test_ingress_bytes_and_expected_reject(fault):
+>       m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_ingress_bytes_and_expected_reject[trailing] _______________
+
+fault = 'trailing'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field'])
+    def test_ingress_bytes_and_expected_reject(fault):
+>       m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_ingress_bytes_and_expected_reject[truncated] _______________
+
+fault = 'truncated'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field'])
+    def test_ingress_bytes_and_expected_reject(fault):
+>       m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_ingress_bytes_and_expected_reject[tag] __________________
+
+fault = 'tag'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field'])
+    def test_ingress_bytes_and_expected_reject(fault):
+>       m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_ingress_bytes_and_expected_reject[parent-generation] ___________
+
+fault = 'parent-generation'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field'])
+    def test_ingress_bytes_and_expected_reject(fault):
+>       m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_ingress_bytes_and_expected_reject[huge-field] ______________
+
+fault = 'huge-field'
+
+    @pytest.mark.parametrize('fault',['expected','trailing','truncated','tag','parent-generation','huge-field'])
+    def test_ingress_bytes_and_expected_reject(fault):
+>       m=module();v=specimen();raw=m.encode_manifest(v);expected=m.manifest_commitment(v)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_successor_exact_parent_token_context[parent] _______________
+
+fault = 'parent'
+
+    @pytest.mark.parametrize('fault',['parent','token','store','rules','allocator'])
+    def test_successor_exact_parent_token_context(fault):
+>       m=module();parent=specimen();expected=m.manifest_commitment(parent);child=specimen(2,expected)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_successor_exact_parent_token_context[token] _______________
+
+fault = 'token'
+
+    @pytest.mark.parametrize('fault',['parent','token','store','rules','allocator'])
+    def test_successor_exact_parent_token_context(fault):
+>       m=module();parent=specimen();expected=m.manifest_commitment(parent);child=specimen(2,expected)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_successor_exact_parent_token_context[store] _______________
+
+fault = 'store'
+
+    @pytest.mark.parametrize('fault',['parent','token','store','rules','allocator'])
+    def test_successor_exact_parent_token_context(fault):
+>       m=module();parent=specimen();expected=m.manifest_commitment(parent);child=specimen(2,expected)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_successor_exact_parent_token_context[rules] _______________
+
+fault = 'rules'
+
+    @pytest.mark.parametrize('fault',['parent','token','store','rules','allocator'])
+    def test_successor_exact_parent_token_context(fault):
+>       m=module();parent=specimen();expected=m.manifest_commitment(parent);child=specimen(2,expected)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_successor_exact_parent_token_context[allocator] _____________
+
+fault = 'allocator'
+
+    @pytest.mark.parametrize('fault',['parent','token','store','rules','allocator'])
+    def test_successor_exact_parent_token_context(fault):
+>       m=module();parent=specimen();expected=m.manifest_commitment(parent);child=specimen(2,expected)
+          ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_generation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_generation.py:11: in module
+    def module():return importlib.import_module('ate_sim.persistence_proof_generation')
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_generation'
+import_ = <function _gcd_import at 0x7fc91fb880e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_generation'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_independent_binary_vector_and_digest
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_round_trip[0]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_round_trip[1]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_round_trip[2]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_round_trip[9223372036854775807]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[gen-bool]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[negative]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[parent-missing]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[gen0-parent]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[codec-bool]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[store-empty]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[store-nul]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[schema-surrogate]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[format-empty]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[allocator-bool]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[seed-bool]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[root-count-bool]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[root-digest]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[root-missing]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[root-list]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[receipt-missing]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[receipt-token]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_malformed_fields_reject[receipt-checksum]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[expected]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[trailing]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[truncated]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[tag]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[parent-generation]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_ingress_bytes_and_expected_reject[huge-field]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_successor_exact_parent_token_context[parent]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_successor_exact_parent_token_context[token]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_successor_exact_parent_token_context[store]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_successor_exact_parent_token_context[rules]
+FAILED simulation/tests/test_stage_0_5_proof_generation.py::test_successor_exact_parent_token_context[allocator]
+34 failed in 0.36s
