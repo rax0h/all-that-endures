@@ -45,7 +45,7 @@
 
 - [x] Commit driver; on clean source run1k/10k/100k node-update and old/new source diagnostics, no payload work and exact results. Distinguish root-authority logical results from full physical scrub.
 - [x] Fresh whole-package review; fix Important/Critical RED/GREEN once; retain every ruling/minor. AST/YAML/bash and affected suite GREEN.
-- [ ] Publish exact-tree expected-parent branch lease, launch full successor CI and retain link/pending state. No parent-result substitution.
+- [x] Publish exact-tree expected-parent branch lease, launch full successor CI and retain link/pending state. No parent-result substitution.
 
 ## Ledger
 
@@ -59,3 +59,5 @@ Implementation: 36 focused cases pass. Reusable TEMP workspace is prepared befor
 Fresh review: no runtime defects/Critical; Important evidence gap accepted (large frontier only reached old empty group), RED population assertions reproduced2 failures, fixed test+driver so each measured group gets size newer placements. Minor parser coverage accepted and added in same pass. No runtime edits. Corrected clean-source matrix supersedes initial receipts; all exclusions ruled explicitly in ordered-seek/final-review.md.
 
 Corrected clean-source matrix2746c5b:1k/10k/100k entries; point node reads/writes4/4,5/5,6/6. Both old groups have exactly size newer placements. Group/owner/empty VM upper bounds1799/1699/999 at every size, exact pages, zero payloads and budget rejection.53 focused and406 affected tests pass; syntax/diff pass. Source runtime dcea4f0686b6ceb7bc4eaacc3441236c4ad08327. Receipts retain construction/full-audit/transition/database/RSS separately.
+
+Published exact treeafc3b4c678078b6ee7af4d69146c1d7f1e2d231b as candidate641a0c23c83b0cc097a799e284890f61493d5bc1 via expected-parent lease. Successor CI39961497870 launched; acceptance pending. All package tasks complete; World adoption remains gated.

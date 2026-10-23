@@ -1,0 +1,16 @@
+{
+  "schema": "ate-ordered-seek-ci-launch/1",
+  "repository": "rax0h/all-that-endures",
+  "branch": "sol/durable-proof-map",
+  "expected_parent": "05c755ded89bb8cdde986308f0274380dec60745",
+  "candidate": "641a0c23c83b0cc097a799e284890f61493d5bc1",
+  "local_equivalent": "964113f95d8a0789b94bdc3d2724bdc99721a4b3",
+  "exact_tree": "afc3b4c678078b6ee7af4d69146c1d7f1e2d231b",
+  "runtime_tree": "dcea4f0686b6ceb7bc4eaacc3441236c4ad08327",
+  "measured_source": "2746c5b0261a4299377fef5ab01437a4aa3c34a4",
+  "run_id": 39961497870,
+  "url": "https://github.com/rax0h/all-that-endures/actions/runs/39961497870",
+  "observed_status": "in_progress",
+  "acceptance": "pending; authenticate successor artifacts on green; predecessor acceptance is separate",
+  "next": "On green authenticate this run; then specify complete topology/reference projection and publication contracts before World adoption. No long polling, main merge, endurance or mature speed claim."
+}
