@@ -1,0 +1,55 @@
+{
+  "active_owners": 8,
+  "archive_records": 10000,
+  "baseline": {
+    "payload_check_bytes": 328,
+    "payload_check_reads": 8,
+    "payload_reads": 0,
+    "python_peak_bytes": 9023,
+    "sql_selects": {
+      "other": 6,
+      "payload": 8,
+      "proof": 0,
+      "query": 9
+    },
+    "wall_seconds": 0.0025567620000401803
+  },
+  "certificate_commitment": "5f7abad838f3daf6c8178b64307046941e36d501bb034eec3b9c616c571e4f72",
+  "construction_seconds": 0.1077340040000081,
+  "exact": true,
+  "fixture_seconds": 0.2910226509999916,
+  "limitations": [
+    "Raw membership metadata only, no admitted objects or World save/open integration.",
+    "Proof construction includes one explicit full store verification outside query timers.",
+    "SQLite caches are warm/uncontrolled between sequential matched reads; no latency distribution.",
+    "Source fixture/schema are real, archive contents and active owners are synthetic.",
+    "RSS is lifetime peak including fixture, verification and prior cases."
+  ],
+  "process_peak_rss_bytes": 37425152,
+  "proof": {
+    "payload_check_bytes": 0,
+    "payload_check_reads": 0,
+    "payload_reads": 0,
+    "python_peak_bytes": 19411,
+    "sql_selects": {
+      "other": 6,
+      "payload": 0,
+      "proof": 21,
+      "query": 11
+    },
+    "wall_seconds": 0.007269421999978931
+  },
+  "query_entries": 16,
+  "returned_positions": 8,
+  "schema": "ate-proof-query-scaling/1",
+  "source": {
+    "driver_sha256": "abc2c2be3deb7f01230c2c17260bcadbd6d496d93b7263bac72e5c4ca62d32b0",
+    "fixture_sha256": "91db0628226f6f633412a52f6560bacada852647c66c1b90ea770c54d15c6831",
+    "head": "1573bd1bc3b702542aea3de2d512d349828756fa",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "4233da09ca3b5057ef5a4dda6e4bd0bde3e52714",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete"
+}

@@ -1,0 +1,48 @@
+{
+  "run_id": 40098756156,
+  "status": "accepted",
+  "head": "1573bd1bc3b702542aea3de2d512d349828756fa",
+  "runtime": "4233da09ca3b5057ef5a4dda6e4bd0bde3e52714",
+  "xml": {
+    "proof-map/record-tests.xml": 60,
+    "proof-map/group-tests.xml": 72,
+    "proof-map/proof-tests.xml": 260,
+    "proof-map/projection-tests.xml": 43,
+    "proof-map/generation-tests.xml": 60,
+    "proof-map/publication-tests.xml": 67,
+    "proof-map/scope-tests.xml": 55,
+    "proof-map/seek-tests.xml": 53,
+    "suite/full-suite.xml": 3764
+  },
+  "source_receipts": [
+    "proof-map/source.json",
+    "suite/source.json",
+    "proof-map/projection-scaling/source.json",
+    "proof-map/group-scaling/source.json",
+    "proof-map/scope-scaling/source.json",
+    "proof-map/record-scaling/source.json",
+    "proof-map/scaling/source.json",
+    "proof-map/version-scaling/source.json",
+    "proof-map/publication-scaling/source.json",
+    "proof-map/occurrence-scaling/source.json",
+    "proof-map/order-scaling/source.json",
+    "proof-map/seek-scaling/source.json",
+    "proof-map/batch-scaling/source.json",
+    "proof-map/query-scaling/source.json"
+  ],
+  "artifacts": [
+    {
+      "id": 12564665957,
+      "sha256": "7d2c2ebb7127886b941907d0a29c3343a9a6b9c2cfd4cbf8a2ea711e568f4923"
+    },
+    {
+      "id": 12561699887,
+      "sha256": "c05fd7cccd5ef9aa5b4453df739932cff13d21753ae8e4d83af6b7aac67f06c6"
+    }
+  ],
+  "hosted_unified_save_ms": [
+    132.12,
+    143.99,
+    160.27
+  ]
+}

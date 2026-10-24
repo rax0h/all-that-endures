@@ -1,0 +1,29 @@
+{
+  "construction_seconds": 26.292270774999906,
+  "current": {
+    "checked_source_bytes": 1547,
+    "checked_source_payloads": 8,
+    "python_peak_bytes": 47734,
+    "seconds": 0.04237152500002139,
+    "selects": {
+      "metadata_payload": 8,
+      "other": 131,
+      "proof": 60,
+      "unrelated_payload": 0
+    },
+    "sqlite_vm_step_upper_bound": 8899,
+    "store_world_decode_counter": 0
+  },
+  "exact": true,
+  "size": 100000,
+  "source": {
+    "driver_sha256": "8885fde0d94187a14a570ae745d219969716c6d52eed2a5f2a4fd94f45f02dd9",
+    "group_fixture_sha256": "6c3fd014aba6ac61248b42220a76adf6d969fe5da93d0060f6079b6ebf384675",
+    "head": "1573bd1bc3b702542aea3de2d512d349828756fa",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "query_fixture_sha256": "82901f5a64a150f64b2bf105745009738703806108935a030ddb7a441f8e90fd",
+    "runtime_tree": "4233da09ca3b5057ef5a4dda6e4bd0bde3e52714",
+    "sqlite": "3.45.1"
+  }
+}

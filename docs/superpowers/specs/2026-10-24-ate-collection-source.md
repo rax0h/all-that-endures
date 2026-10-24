@@ -1,0 +1,5 @@
+# Collection order source authority
+
+Explicit full-audited current-snapshot construction supplies a per-namespace ordered radix root and exact namespace state (declared/absent, member_count, next_ordinal). External expected certificate authority is mandatory. Generation-independent member hashes bind namespace, encoded key and ordinal. Raw bounded pages select positions from the accepted root, then check exact physical order intervals/checksums and namespace counters in one checked snapshot, without owner payload reads. Empty declared namespaces differ from absent namespaces. Keys/names above4096bytes require another checked path. Guard all inherited full-audit sources before construction; reject temporary shadows/triggers and arbitrary transactions, caller codec hooks and legacy index fallback.
+
+This package constructs and reads collection authority. It does not publish successor order roots, construct a global namespace directory/target inventory, supply the full generation manifest, activate a World format or select World paths. Existing writer remains unchanged. Complete incremental publication is the next integration gate.

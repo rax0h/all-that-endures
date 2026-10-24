@@ -1,0 +1,26 @@
+{
+  "limits": [
+    "Full fixture/full audit and four complete scope directories outside measured operations.",
+    "Existing actual commit changes one lazy owner membership and one placement; complete old query-owner witness checked.",
+    "No complete generation manifest, World admission or full World performance result."
+  ],
+  "python_clean_proof_cache_bytes": 0,
+  "schema": "ate-scope-proof-source/1",
+  "sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "source": {
+    "driver_sha256": "c1b8ed3323866c6d6ae43414011282457e3427b6256a4678702b2a8161d1e5e0",
+    "fixture_sha256": "8645e07e026108cb2da90385c971d5552fc9e7dd8e063c4b9d20fd0b44f629b3",
+    "head": "1573bd1bc3b702542aea3de2d512d349828756fa",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "4233da09ca3b5057ef5a4dda6e4bd0bde3e52714",
+    "sqlite": "3.45.1"
+  },
+  "sqlite_main_cache_kib": 2048,
+  "sqlite_temp_cache_kib": 2048,
+  "temp_store": "FILE"
+}
