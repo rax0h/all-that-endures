@@ -22,6 +22,7 @@ from .persistence_proof_query import QueryScope,query_domain,member_commitment a
 from .persistence_proof_query_seek import SeekQueryCertificate,seek_domain as query_seek_domain,certificate_commitment as query_certificate_commitment
 from .persistence_proof_order import query_order_key
 from .persistence_proof_projection import _require_closed_codec,_closed_snapshot_preflight
+from .persistence_sqlite_guard import require_persistent_sources
 
 MAX_FIELD_BYTES=4096
 _DESCRIPTOR_SCHEMA='CREATE TABLE ate_scope_descriptors(commitment BLOB PRIMARY KEY,root_digest BLOB NOT NULL,root_count INTEGER NOT NULL) WITHOUT ROWID'
@@ -111,8 +112,7 @@ def _authority(store,pin,cert,expected):
 
 
 def _schemas(db):
-    for schema in ('sqlite_schema','sqlite_temp_schema'):
-        if db.execute("SELECT 1 FROM "+schema+" WHERE type='trigger' LIMIT 1").fetchone() is not None:raise StoreError('scope proof source cannot contain database triggers')
+    require_persistent_sources(db)
     for sql in (_DESCRIPTOR_SCHEMA,_ROOT_SCHEMA,_NODE_SCHEMA,_SEEK_SCHEMA):
         name=sql.split('(')[0].split()[2]
         row=db.execute("SELECT CASE WHEN typeof(sql)='text' AND length(CAST(sql AS BLOB))<=4096 THEN sql END FROM sqlite_schema WHERE type='table' AND name=?",(name,)).fetchone()

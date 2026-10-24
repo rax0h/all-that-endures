@@ -1,0 +1,15 @@
+# Independent content publication review
+
+Fresh read-only reviewer review_content_publication reviewed ba360fc..2ad91a0; independently64publication/content tests passed6.17s. Two Important findings, no Critical/Minor. One fix pass, no re-review.
+
+1. TEMP object shadowing: canonical schema validation inspected main while unqualified source/root writes could use temporary copies. Reproduced a successful unified generation2 commit whose durable main content roots remained generation1. Fix: shared require_persistent_sources rejects TEMP table/view names colliding with main objects under SQLite's ASCII case-insensitive identifier rules. Composed content/scope/ordinary schema checks use it; all main/temp triggers still rejected. Content construction invokes it before inherited audit; recovery invokes it before existing resolution. Proof workspace TEMP names remain distinct and permitted.
+2. Full audit source guard gap: content bootstrap guarded versions/events, but inherited verify_all also transferred ordinary payloads, query membership and identity/order/namespace metadata. Reproduced an oversized ordinary body being transferred before rejection. Fix: pre-audit type/byte/counter/checksum probes cover every table transferred by the inherited audit, plus bounded operational/head preflight. Archive row count/materialization remains full audit work, with individual body/metadata fields bounded by explicit limits.
+
+Regressions:17RED failures covering10shadowed persistent objects (including uppercase root name, proof nodes, ordinary/scoped roots and content sources) and7inherited audit sources. After the one fix pass67focused cases passed8.43s. Broader suite and final exact-runtime matrix recorded in ledger/results. No second review.
+
+Declined-to-judge rulings and costs:
+
+- Completed larger scaling and hosted CI: reviewer inspected the driver before results were available. Executor authenticates all3final source/size receipts and exact CI separately. Cost of treating review as execution would be claiming unmeasured performance or unaccepted CI.
+- Complete conceptual seven-root manifest, topology/target/order/inventory authority, World admission, writer fencing, collection and endurance: remain gated. Cost of activating this component as complete authority is invalid targets/aliases or incomplete generation state. No endurance requested.
+- Arbitrary trusted Python replacements/malicious generators altering unrelated state: guards restrict SQL callbacks and physical source admission, not arbitrary in-process Python. Tests replace private writers to challenge actual changed-row checks; cost of a broader claim is false sandbox guarantees.
+- Coherent replacement of an entire committed history/root/receipt after publication: local receipt resolution follows the existing exact parent/token protocol and does not provide an independent external successor anchor. Cost of assuming otherwise is accepting forged recovery authority under an unspecified whole-store adversary.

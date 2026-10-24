@@ -15,6 +15,7 @@ from .persistence_proof_batch import update_sorted
 from .persistence_proof_projection import _require_closed_codec,_closed_snapshot_preflight
 from .persistence_proof_version import VersionCertificate,RawVersion,version_domain,certificate_commitment as version_certificate_commitment,read_version_bytes
 from .persistence_proof_occurrence import _require_indexes
+from .persistence_sqlite_guard import require_persistent_sources
 
 MAX_BODY_BYTES=64*1024*1024
 _ROOT_SCHEMA='CREATE TABLE ate_content_generations(generation INTEGER PRIMARY KEY,roots BLOB NOT NULL,certificate BLOB NOT NULL,parent_commitment BLOB,pin_token TEXT NOT NULL,commit_token BLOB NOT NULL,row_checksum BLOB NOT NULL)'
@@ -65,8 +66,7 @@ def _authority(store,pin,cert,expected):
 
 
 def _schemas(db):
-    for schema in ('sqlite_schema','sqlite_temp_schema'):
-        if db.execute("SELECT 1 FROM "+schema+" WHERE type='trigger' LIMIT 1").fetchone() is not None:raise StoreError('content proof source cannot contain database triggers')
+    require_persistent_sources(db)
     for sql in (_ROOT_SCHEMA,_NODE_SCHEMA):
         name=sql.split('(')[0].split()[2]
         row=db.execute("SELECT CASE WHEN typeof(sql)='text' AND length(CAST(sql AS BLOB))<=8192 THEN sql END FROM sqlite_schema WHERE type='table' AND name=?",(name,)).fetchone()
@@ -162,6 +162,24 @@ def _guard_construction(store,generation,body,metadata):
     event=fixed+" AND length(CAST(namespace AS BLOB))<="+str(metadata)+" AND typeof(ordinal)='integer' AND ordinal>=0 AND typeof(payload)='blob' AND length(payload)<="+str(body)+" AND typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 AND typeof(first_id)='blob' AND typeof(last_id)='blob' AND length(first_id)+length(last_id)<="+str(metadata)+" AND typeof(element_count)='integer' AND element_count>=0 AND typeof(created_generation)='integer' AND created_generation>=0 AND created_generation<="+str(generation)
     for table,valid in (('lazy_record_versions',version),('segments',event)):
         if store.db.execute('SELECT 1 FROM '+table+' WHERE NOT('+valid+') LIMIT 1').fetchone() is not None:raise ContentProofBudgetError('invalid or oversized construction content source')
+    # The inherited full audit also transfers ordinary and relational sources.
+    # Archive row count may scale; every individual fetched field is bounded.
+    def text(field):return f"typeof({field})='text' AND length(CAST({field} AS BLOB)) BETWEEN 1 AND {metadata} AND instr({field},char(0))=0"
+    def blob(field):return f"typeof({field})='blob' AND length({field})<={metadata}"
+    def integer(field,minimum=0):return f"typeof({field})='integer' AND {field}>={minimum}"
+    checksum="typeof(row_checksum)='text' AND length(CAST(row_checksum AS BLOB))=64"
+    interval=integer('valid_from')+f" AND valid_from<={generation} AND typeof(valid_to) IN ('null','integer')"
+    layouts=(
+        ('records',(text('namespace'),blob('typed_key'),f"typeof(payload)='blob' AND length(payload)<={body}","typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64",integer('codec_version',1),f'codec_version={store.codec.version}',integer('record_schema',1),integer('last_changed_generation'),f'last_changed_generation<={generation}')),
+        ('query_membership',(text('namespace'),text('index_name'),blob('index_value'),blob('record_key'),integer('ordinal'),integer('generation'),f'generation<={generation}')),
+        ('lazy_order_versions',(text('namespace'),blob('typed_key'),integer('ordinal'),interval,checksum)),
+        ('lazy_query_versions',(text('namespace'),text('index_name'),blob('index_value'),blob('record_key'),integer('ordinal'),interval,checksum)),
+        ('lazy_namespace_state',(text('namespace'),integer('member_count'),integer('next_ordinal'),interval,checksum)),
+        ('lazy_identity_occurrence_versions',(text('owner_namespace'),blob('owner_key'),blob('occurrence_path'),integer('incarnation_id',1),interval,checksum)),
+        ('lazy_identity_state',(integer('next_incarnation_id',1),interval,checksum)),
+    )
+    for table,checks in layouts:
+        if store.db.execute('SELECT 1 FROM '+table+' WHERE NOT('+' AND '.join(checks)+') LIMIT 1').fetchone() is not None:raise ContentProofBudgetError('inherited audit source exceeds explicit byte/type path')
 
 
 def bootstrap_content_proofs(store,pin,*,max_body_bytes=MAX_BODY_BYTES,max_metadata_bytes=1048576):
@@ -169,6 +187,7 @@ def bootstrap_content_proofs(store,pin,*,max_body_bytes=MAX_BODY_BYTES,max_metad
     if store.db.in_transaction or store._active_read_transaction:raise StoreError('content construction requires owned transaction')
     store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
     try:
+        require_persistent_sources(store.db)
         _closed_snapshot_preflight(store,max_metadata_bytes);generation=store._require_pin(pin)
         if generation!=int(store._checked_head_row()[0]):raise StoreConflictError('content construction requires current pin')
         _guard_construction(store,generation,max_body_bytes,max_metadata_bytes);store.verify_all()
@@ -335,6 +354,7 @@ def resolve_content_commit(store,pin,certificate,expected,*,scope_authority,reco
     _require_closed_codec(store,allow_typed=True);_authority(store,pin,certificate,expected)
     if any(type(p) is not tuple or len(p)!=2 for p in (scope_authority,record_authority)):raise StoreIntegrityError('unified recovery requires exact record and scope authorities')
     if store.db.in_transaction:raise StoreError('content recovery requires owned operation')
+    require_persistent_sources(store.db)
     encoded=store.codec.encode(commit_token)
     scope=resolve_scope_commit(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token);result=scope.commit
     if result.outcome=='conflict':return ContentProofCommit(result,None,None,scope)

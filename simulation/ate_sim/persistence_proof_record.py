@@ -13,6 +13,7 @@ from .persistence_proof_store import ProofNodeStore
 from .persistence_proof_batch import update_sorted
 from .persistence_proof_projection import _require_closed_codec,_closed_snapshot_preflight,ProjectionProofBudgetError
 from .persistence_proof_version import VersionProofBudgetError
+from .persistence_sqlite_guard import require_persistent_sources
 
 MAX_BODY_BYTES=64*1024*1024
 _BODY_SCHEMA=('CREATE TABLE ate_retained_records(commitment BLOB PRIMARY KEY,namespace TEXT NOT NULL,typed_key BLOB NOT NULL,'
@@ -65,6 +66,7 @@ def _authority(store,pin,cert,expected):
 
 
 def _schemas(db):
+    require_persistent_sources(db)
     for name,expected in (('ate_retained_records',_BODY_SCHEMA),('ate_record_roots',_ROOT_SCHEMA),('ate_proof_nodes',_NODE_SCHEMA)):
         row=db.execute("SELECT CASE WHEN typeof(sql)='text' AND length(CAST(sql AS BLOB))<=8192 THEN sql END "
             "FROM sqlite_schema WHERE type='table' AND name=?",(name,)).fetchone()

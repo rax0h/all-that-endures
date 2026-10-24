@@ -275,3 +275,26 @@ def test_content_certificate_rejects_type_aliases(tmp_path,field,value):
     p=publication_module();store,pin,a=make_publication_store(tmp_path/'strict.sqlite')
     with pytest.raises(StoreError):p.certificate_commitment(replace(a.content[0],**{field:value}))
     store.close()
+
+
+@pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+    store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+    store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+    with pytest.raises(StoreError):commit_publication(store,pin,a)
+    assert store.db.execute('SELECT generation FROM main.save_head WHERE singleton=1').fetchone()[0]==1
+    store.close()
+
+
+@pytest.mark.parametrize('table,field,body',[('records','payload',True),('query_membership','index_value',False),('lazy_query_versions','index_name',False),('lazy_order_versions','row_checksum',False),('lazy_namespace_state','row_checksum',False),('lazy_identity_occurrence_versions','occurrence_path',False),('lazy_identity_state','row_checksum',False)])
+def test_bootstrap_bounds_every_inherited_audit_source_before_transfer(tmp_path,table,field,body):
+    from ate_sim.incremental_store import Membership
+    p=publication_module();store,pin,_=make_publication_store(tmp_path/'audit-guard.sqlite',bootstrap=False)
+    if table=='query_membership':
+        store.db.execute('INSERT INTO query_membership VALUES(?,?,?,?,?,?)',('ordinary','index',store.codec.encode('x'),store.codec.encode(0),0,1))
+    if body:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(67108865)')
+    elif field in ('index_name','row_checksum'):store.db.execute('UPDATE '+table+' SET '+field+'=?',('a\0'+'x'*1048577,))
+    else:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(1048577)')
+    store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+    with pytest.raises(StoreError):p.bootstrap_content_proofs(store,pin)
+    store.close()

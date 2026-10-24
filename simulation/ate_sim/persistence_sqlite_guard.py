@@ -17,6 +17,20 @@ _READ_PRAGMAS={'schema_version','data_version','table_info','table_xinfo','index
 _ARGUMENT_PRAGMAS={'table_info','table_xinfo','index_info','index_xinfo','index_list','foreign_key_list'}
 
 
+def require_persistent_sources(db):
+    """Unqualified validated names must resolve to durable main objects.
+
+    SQLite resolves TEMP names first and identifiers ignore ASCII case.
+    Reject shadows across all composed sources, not merely one root table.
+    Proof workspaces use distinct temporary names and remain permitted.
+    """
+    if db.execute("SELECT 1 FROM sqlite_temp_schema AS t JOIN main.sqlite_schema AS m ON t.name=m.name COLLATE NOCASE WHERE t.type IN ('table','view') LIMIT 1").fetchone() is not None:
+        raise StoreError('proof source cannot shadow persistent SQLite objects')
+    for schema in ('main.sqlite_schema','sqlite_temp_schema'):
+        if db.execute("SELECT 1 FROM "+schema+" WHERE type='trigger' LIMIT 1").fetchone() is not None:
+            raise StoreError('proof source cannot contain database triggers')
+
+
 class GuardedConnection(sqlite3.Connection):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
