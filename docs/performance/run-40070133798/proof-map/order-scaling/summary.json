@@ -1,0 +1,137 @@
+{
+  "results": [
+    {
+      "canonical_rebuild": {
+        "equal": true,
+        "wall_seconds": 0.060416153999995004
+      },
+      "construction": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 0,
+          "read_nodes": 0,
+          "read_requests": 0,
+          "write_requests": 1355,
+          "written_bytes": 128816,
+          "written_nodes": 1355
+        },
+        "python_peak_bytes": 81233,
+        "wall_seconds": 0.20122038499994233
+      },
+      "keys": 1000,
+      "point": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 7500,
+          "read_nodes": 23,
+          "read_requests": 23,
+          "write_requests": 5,
+          "written_bytes": 1623,
+          "written_nodes": 5
+        },
+        "python_peak_bytes": 94284,
+        "sql_selects": {
+          "historical_payloads": 0,
+          "other": 0,
+          "proof": 23,
+          "relation": 9,
+          "staging": 7
+        },
+        "wall_seconds": 0.031261673000017254
+      },
+      "verified_page_rows": 16
+    },
+    {
+      "canonical_rebuild": {
+        "equal": true,
+        "wall_seconds": 0.6323315319999665
+      },
+      "construction": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 0,
+          "read_nodes": 0,
+          "read_requests": 0,
+          "write_requests": 13784,
+          "written_bytes": 1302720,
+          "written_nodes": 13784
+        },
+        "python_peak_bytes": 332026,
+        "wall_seconds": 1.855425336000053
+      },
+      "keys": 10000,
+      "point": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 10861,
+          "read_nodes": 27,
+          "read_requests": 27,
+          "write_requests": 5,
+          "written_bytes": 2074,
+          "written_nodes": 5
+        },
+        "python_peak_bytes": 98305,
+        "sql_selects": {
+          "historical_payloads": 0,
+          "other": 0,
+          "proof": 27,
+          "relation": 9,
+          "staging": 7
+        },
+        "wall_seconds": 0.03455543799998395
+      },
+      "verified_page_rows": 16
+    },
+    {
+      "canonical_rebuild": {
+        "equal": true,
+        "wall_seconds": 6.923256940999977
+      },
+      "construction": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 0,
+          "read_nodes": 0,
+          "read_requests": 0,
+          "write_requests": 137208,
+          "written_bytes": 13001729,
+          "written_nodes": 137208
+        },
+        "python_peak_bytes": 779032,
+        "wall_seconds": 19.72835954300001
+      },
+      "keys": 100000,
+      "point": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 14529,
+          "read_nodes": 33,
+          "read_requests": 33,
+          "write_requests": 6,
+          "written_bytes": 2658,
+          "written_nodes": 6
+        },
+        "python_peak_bytes": 103248,
+        "sql_selects": {
+          "historical_payloads": 0,
+          "other": 0,
+          "proof": 33,
+          "relation": 9,
+          "staging": 7
+        },
+        "wall_seconds": 0.03777050299993334
+      },
+      "verified_page_rows": 16
+    }
+  ],
+  "schema": "ate-proof-order-summary/1",
+  "source": {
+    "driver_sha256": "51f3f7091edee67f6f6513f4d8aa5f77fd7e98ca8ab05ed3043c3a6b25b92aab",
+    "head": "e3b7448daae6342a0edce5a98f202d9acf43955a",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "770b634ceddae1aa6542b98f3861da6f1f7b0de9",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete"
+}

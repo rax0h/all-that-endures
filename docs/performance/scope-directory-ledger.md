@@ -25,3 +25,5 @@ Final counter-correct matrix: measured head4627076/runtime770b634ceddae1aa6542b9
 Local completion:55focused and696affected XML cases zero failures/errors/skips. Independent review single fix pass complete; all6scope rulings/costs retained. Python/YAML/workflow shell syntax verified. Full candidate CI and11diagnostics pending launch/acceptance; no main merge/endurance/long polling.
 
 Publication complete: exact candidate e3b7448daae6342a0edce5a98f202d9acf43955a treec777314ec66b5169c17f72f2212584e96facba1e runtime770b634ceddae1aa6542b98f3861da6f1f7b0de9 equals local 82d4c8e89f188c64361ddac2e8750f8e75de7022 and final measured runtime. CI40070133798 queued at launch, full suite/11diagnostics acceptance pending. No main merge/endurance/long polling.
+
+Accepted exact CI40070133798 next turn:3697tests+2subtests,603proof cases,11diagnostics,13source receipts; both artifact digests/source hashes/XML verified. Hosted scope point saves[110.57, 112.23, 119.45]ms, zero unrelated bodies. Pruned checkout recovered from exact GitHub headcc76716; no source or receipts lost.

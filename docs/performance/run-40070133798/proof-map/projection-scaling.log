@@ -1,0 +1,3 @@
+1000: exact current/old/successor; selected payload checks1 each; unrelated payload SELECTs0; VM<=3099/3599/2999
+10000: exact current/old/successor; selected payload checks1 each; unrelated payload SELECTs0; VM<=3099/3599/2999
+100000: exact current/old/successor; selected payload checks1 each; unrelated payload SELECTs0; VM<=3099/3699/3099

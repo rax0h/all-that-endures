@@ -1,0 +1,121 @@
+{
+  "index": {
+    "construction": {
+      "node_io": {
+        "clean_cache_bytes": 0,
+        "read_bytes": 0,
+        "read_nodes": 0,
+        "read_requests": 0,
+        "written_bytes": 9546331,
+        "written_nodes": 106669
+      },
+      "seconds": 3.459127108999951
+    },
+    "database_bytes": 18264064,
+    "exact": true,
+    "point": {
+      "node_io": {
+        "clean_cache_bytes": 0,
+        "read_bytes": 2876,
+        "read_nodes": 6,
+        "read_requests": 6,
+        "written_bytes": 2876,
+        "written_nodes": 6
+      },
+      "payload_checks": 0,
+      "payload_decodes": 0,
+      "python_peak_bytes": 15274,
+      "sql_selects": {
+        "occurrence": 0,
+        "other": 1,
+        "payload": 0,
+        "proof": 6
+      },
+      "sqlite_vm_step_upper_bound": 499,
+      "wall_seconds": 0.007134606000022359
+    },
+    "rebuild_seconds": 4.829377975000057,
+    "size": 100000,
+    "source": {
+      "driver_sha256": "75167720b3b55c5d9f7d2e895f673bbfbc7127a6e7b92ba38aa316486d6ce2fa",
+      "fixture_sha256": "bb41d1cde1de22c4ff7ad1adc8a31715461b9ea4d2e87b3dd4acefc90707a0a3",
+      "head": "e3b7448daae6342a0edce5a98f202d9acf43955a",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "python": "3.12.15",
+      "runtime_tree": "770b634ceddae1aa6542b98f3861da6f1f7b0de9",
+      "sqlite": "3.45.1"
+    },
+    "verify_seconds": 62.98530039399998
+  },
+  "physical": {
+    "current_group_entries": 100006,
+    "exact": true,
+    "fixture_seconds": 19.439403390000052,
+    "genuine_transition_seconds": 13.8582578380001,
+    "newer_placements_per_scope": [
+      [
+        1,
+        100000
+      ],
+      [
+        2,
+        100000
+      ]
+    ],
+    "old_empty": {
+      "payload_checks": 0,
+      "payload_decodes": 0,
+      "python_peak_bytes": 5060,
+      "sql_selects": {
+        "occurrence": 0,
+        "other": 13,
+        "payload": 0,
+        "proof": 0
+      },
+      "sqlite_vm_step_upper_bound": 999,
+      "wall_seconds": 0.00078022700006386
+    },
+    "old_group": {
+      "payload_checks": 0,
+      "payload_decodes": 0,
+      "python_peak_bytes": 11757,
+      "sql_selects": {
+        "occurrence": 4,
+        "other": 13,
+        "payload": 0,
+        "proof": 21
+      },
+      "sqlite_vm_step_upper_bound": 1799,
+      "wall_seconds": 0.004323307000049681
+    },
+    "old_owner": {
+      "payload_checks": 0,
+      "payload_decodes": 0,
+      "python_peak_bytes": 8952,
+      "sql_selects": {
+        "occurrence": 2,
+        "other": 13,
+        "payload": 0,
+        "proof": 7
+      },
+      "sqlite_vm_step_upper_bound": 1699,
+      "wall_seconds": 0.0018418910000264077
+    },
+    "old_pin_budget_rejections": 0,
+    "size": 100000,
+    "verified_construction_seconds": 12.830606136000029
+  },
+  "process_peak_rss_bytes": 334749696,
+  "schema": "ate-root-ordered-selection-scaling/1",
+  "size": 100000,
+  "source": {
+    "driver_sha256": "75167720b3b55c5d9f7d2e895f673bbfbc7127a6e7b92ba38aa316486d6ce2fa",
+    "fixture_sha256": "bb41d1cde1de22c4ff7ad1adc8a31715461b9ea4d2e87b3dd4acefc90707a0a3",
+    "head": "e3b7448daae6342a0edce5a98f202d9acf43955a",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "770b634ceddae1aa6542b98f3861da6f1f7b0de9",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete"
+}
