@@ -1,0 +1,22 @@
+{
+  "fixed_ordinal": 500,
+  "python_clean_node_cache_bytes": 0,
+  "schema": "ate-proof-order-source/1",
+  "scope": "ordered relation primitive, no World save/open or physical source adapter",
+  "sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "source": {
+    "driver_sha256": "51f3f7091edee67f6f6513f4d8aa5f77fd7e98ca8ab05ed3043c3a6b25b92aab",
+    "head": "b80fd5a7c658e55963beba40123779287c8bae9b",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "fe161613a47b3a4eebebd58b1dd5c0b5da7dda8d",
+    "sqlite": "3.45.1"
+  },
+  "sqlite_main_cache_kib": 2048,
+  "sqlite_temp_cache_kib": 2048,
+  "temp_store": "FILE"
+}

@@ -1,0 +1,66 @@
+{
+  "run_id": 40051989785,
+  "status": "accepted",
+  "head": "b80fd5a7c658e55963beba40123779287c8bae9b",
+  "runtime": "fe161613a47b3a4eebebd58b1dd5c0b5da7dda8d",
+  "xml": {
+    "suite/full-suite.xml": {
+      "cases": 3642,
+      "declared": 3644
+    },
+    "proof-map/proof-tests.xml": {
+      "cases": 260,
+      "declared": 260
+    },
+    "proof-map/seek-tests.xml": {
+      "cases": 53,
+      "declared": 53
+    },
+    "proof-map/generation-tests.xml": {
+      "cases": 60,
+      "declared": 60
+    },
+    "proof-map/record-tests.xml": {
+      "cases": 60,
+      "declared": 60
+    },
+    "proof-map/group-tests.xml": {
+      "cases": 72,
+      "declared": 72
+    },
+    "proof-map/projection-tests.xml": {
+      "cases": 43,
+      "declared": 43
+    }
+  },
+  "source_receipts": [
+    "suite/source.json",
+    "proof-map/source.json",
+    "proof-map/record-scaling/source.json",
+    "proof-map/group-scaling/source.json",
+    "proof-map/projection-scaling/source.json",
+    "proof-map/scaling/source.json",
+    "proof-map/seek-scaling/source.json",
+    "proof-map/order-scaling/source.json",
+    "proof-map/occurrence-scaling/source.json",
+    "proof-map/version-scaling/source.json",
+    "proof-map/query-scaling/source.json",
+    "proof-map/batch-scaling/source.json"
+  ],
+  "artifact_sha256": [
+    {
+      "id": 12546750558,
+      "sha256": "8e3a9274141e1efd2d9e9161667d2c9d39f488dbb5a07c67bb3402a6bc3b37f0"
+    },
+    {
+      "id": 12544116700,
+      "sha256": "d697288490fc47486b918029b8924531f787a79c6da2735ed81ffc33b5504585"
+    }
+  ],
+  "hosted_ordinary_point_save_ms": [
+    27.5,
+    26.04,
+    31.63
+  ],
+  "world_performance": "unmeasured"
+}

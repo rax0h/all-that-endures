@@ -1,0 +1,105 @@
+{
+  "results": [
+    {
+      "archive_records": 1000,
+      "baseline": {
+        "payload_check_bytes": 328,
+        "payload_check_reads": 8,
+        "payload_reads": 0,
+        "python_peak_bytes": 10351,
+        "sql_selects": {
+          "other": 6,
+          "payload": 8,
+          "proof": 0,
+          "query": 9
+        },
+        "wall_seconds": 0.0017589629999861245
+      },
+      "exact": true,
+      "proof": {
+        "payload_check_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_reads": 0,
+        "python_peak_bytes": 21392,
+        "sql_selects": {
+          "other": 6,
+          "payload": 0,
+          "proof": 20,
+          "query": 11
+        },
+        "wall_seconds": 0.005272144999992179
+      }
+    },
+    {
+      "archive_records": 10000,
+      "baseline": {
+        "payload_check_bytes": 328,
+        "payload_check_reads": 8,
+        "payload_reads": 0,
+        "python_peak_bytes": 9023,
+        "sql_selects": {
+          "other": 6,
+          "payload": 8,
+          "proof": 0,
+          "query": 9
+        },
+        "wall_seconds": 0.0017784629999937351
+      },
+      "exact": true,
+      "proof": {
+        "payload_check_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_reads": 0,
+        "python_peak_bytes": 21632,
+        "sql_selects": {
+          "other": 6,
+          "payload": 0,
+          "proof": 24,
+          "query": 11
+        },
+        "wall_seconds": 0.005307283999968604
+      }
+    },
+    {
+      "archive_records": 100000,
+      "baseline": {
+        "payload_check_bytes": 328,
+        "payload_check_reads": 8,
+        "payload_reads": 0,
+        "python_peak_bytes": 9919,
+        "sql_selects": {
+          "other": 6,
+          "payload": 8,
+          "proof": 0,
+          "query": 9
+        },
+        "wall_seconds": 0.0017432980000080534
+      },
+      "exact": true,
+      "proof": {
+        "payload_check_bytes": 0,
+        "payload_check_reads": 0,
+        "payload_reads": 0,
+        "python_peak_bytes": 21752,
+        "sql_selects": {
+          "other": 6,
+          "payload": 0,
+          "proof": 19,
+          "query": 11
+        },
+        "wall_seconds": 0.00495349699997405
+      }
+    }
+  ],
+  "schema": "ate-proof-query-summary/1",
+  "source": {
+    "driver_sha256": "abc2c2be3deb7f01230c2c17260bcadbd6d496d93b7263bac72e5c4ca62d32b0",
+    "fixture_sha256": "91db0628226f6f633412a52f6560bacada852647c66c1b90ea770c54d15c6831",
+    "head": "b80fd5a7c658e55963beba40123779287c8bae9b",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "fe161613a47b3a4eebebd58b1dd5c0b5da7dda8d",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete"
+}

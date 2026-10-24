@@ -33,3 +33,7 @@ The bootstrap's inherited full lazy/segment audit is explicit archive work; only
 No new full World startup, mature-year save or warm-year measurement is supplied. The22ms-scale point save is not a full World save or acceptance of the2second target for the mature workload.
 
 Candidate CI [40051989785](https://github.com/rax0h/all-that-endures/actions/runs/40051989785), head`b80fd5a7c658e55963beba40123779287c8bae9b`, runtime`fe161613a47b3a4eebebd58b1dd5c0b5da7dda8d`; in progress at launch, full-suite acceptance pending.
+
+## Accepted CI
+
+Run40051989785 completed successfully on exact candidate b80fd5a7c658e55963beba40123779287c8bae9b/runtime fe161613a47b3a4eebebd58b1dd5c0b5da7dda8d. Both artifact ZIP SHA256 digests verified; all12source receipts, driver/fixture hashes and XML checked. Full suite3642passed plus2subtests;548dedicated proof cases; all10diagnostic matrices complete. Hosted ordinary point saves27.50/26.04/31.63ms at1k/10k/100k, zero unrelated body reads. Full World performance remains unmeasured. Raw acceptance: run-40051989785/acceptance.json.

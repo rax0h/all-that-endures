@@ -1,0 +1,77 @@
+{
+  "actual_point_save": {
+    "checked_payload_bytes": 41,
+    "checked_payloads": 1,
+    "python_peak_bytes": 110939,
+    "seconds": 0.03163163199997143,
+    "selects": {
+      "other": 52,
+      "proof": 5,
+      "selected_mutable_payload": 1,
+      "selected_retained_payload": 0,
+      "unrelated_payload": 0
+    },
+    "sqlite_vm_step_upper_bound": 2899,
+    "store_world_decode_counter": 0
+  },
+  "current": {
+    "checked_payload_bytes": 41,
+    "checked_payloads": 1,
+    "python_peak_bytes": 14093,
+    "seconds": 0.0032988390000809886,
+    "selects": {
+      "other": 15,
+      "proof": 5,
+      "selected_mutable_payload": 0,
+      "selected_retained_payload": 1,
+      "unrelated_payload": 0
+    },
+    "sqlite_vm_step_upper_bound": 1399,
+    "store_world_decode_counter": 0
+  },
+  "database_bytes": 99680256,
+  "exact": true,
+  "full_fixture_and_audited_bootstrap_seconds": 7.988257519999934,
+  "process_lifetime_peak_rss_bytes": 106999808,
+  "retained": {
+    "checked_payload_bytes": 41,
+    "checked_payloads": 1,
+    "python_peak_bytes": 13285,
+    "seconds": 0.002771384000084254,
+    "selects": {
+      "other": 15,
+      "proof": 5,
+      "selected_mutable_payload": 0,
+      "selected_retained_payload": 1,
+      "unrelated_payload": 0
+    },
+    "sqlite_vm_step_upper_bound": 1699,
+    "store_world_decode_counter": 0
+  },
+  "size": 100000,
+  "source": {
+    "driver_sha256": "810bf9e5fa72353ffc7a3e8fd560de07c0487d8f242b894b9554337c55b29fbb",
+    "fixture_sha256": "8f3289b5a410cf01b8a214bfc78999681c6d52fd8d04144ad70d7be35095d773",
+    "head": "b80fd5a7c658e55963beba40123779287c8bae9b",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "fe161613a47b3a4eebebd58b1dd5c0b5da7dda8d",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete",
+  "successor": {
+    "checked_payload_bytes": 41,
+    "checked_payloads": 1,
+    "python_peak_bytes": 12301,
+    "seconds": 0.0032121640000468688,
+    "selects": {
+      "other": 15,
+      "proof": 5,
+      "selected_mutable_payload": 0,
+      "selected_retained_payload": 1,
+      "unrelated_payload": 0
+    },
+    "sqlite_vm_step_upper_bound": 1599,
+    "store_world_decode_counter": 0
+  }
+}
