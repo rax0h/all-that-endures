@@ -72,7 +72,7 @@ def test_invalid_types_and_negative_counters_are_rejected(kind, fields):
     key = 4 if kind == 'segment' else b'key'
     for name, field in base.items():
         invalid = [True, -1, 1.0] if type(field) is int else [bytearray(field), 'text', None]
-        if name in ('codec_version', 'record_schema', 'element_count'):
+        if name in ('codec_version', 'record_schema'):
             invalid.append(0)
         for bad in invalid:
             changed = dict(base); changed[name] = bad

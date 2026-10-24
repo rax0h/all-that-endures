@@ -2621,6 +2621,7 @@ class LazyRecordStore:
         preparation_budget: tuple[int, int] | None = None,
         _record_proof=None,
         _scope_proof=None,
+        _content_proof=None,
     ) -> CommitResult:
         self._ensure_open()
         if _record_proof is not None:
@@ -2629,6 +2630,11 @@ class LazyRecordStore:
         if _scope_proof is not None:
             from .persistence_proof_scope import _check_request as _check_scope_request, _stage_scope_proof, _scope_parent_snapshot, _guard_scope_inputs
             _check_scope_request(self, pin, _scope_proof)
+        if _content_proof is not None:
+            from .persistence_proof_publication import _check_request as _check_content_request, _guard_content_parent, _stage_content_proof
+            if _scope_proof is None or _record_proof is None:
+                raise StoreIntegrityError('content publication requires unified record and scope requests')
+            _check_content_request(self, pin, _content_proof)
         if _record_proof is not None or _scope_proof is not None:
             from .persistence_proof_record import _checked_phase_hook
         def phase_hook(phase):
@@ -2646,6 +2652,8 @@ class LazyRecordStore:
             raise StoreConflictError('ordinary proof encoded token changed')
         if _scope_proof is not None and encoded_commit_token != _scope_proof.encoded_token:
             raise StoreConflictError('scope proof encoded token changed')
+        if _content_proof is not None and encoded_commit_token != _content_proof.encoded_token:
+            raise StoreConflictError('content proof encoded token changed')
         workspace = None
         if preparation_budget is not None:
             if type(preparation_budget) is not tuple or len(preparation_budget) != 2:
@@ -2782,6 +2790,8 @@ class LazyRecordStore:
 
                 counts = _namespace_counts(self.codec, locked[6])
                 new_generation = locked_generation + 1
+                if _content_proof is not None:
+                    _guard_content_parent(self, _content_proof, version_prepared, segment_prepared)
                 self._write_lazy_changes(
                     version_prepared,
                     locked_generation,
@@ -2905,6 +2915,9 @@ class LazyRecordStore:
                     _stage_record_proof(self, _record_proof, new_generation, ordinary_prepared, encoded_commit_token)
                 if _scope_proof is not None:
                     _stage_scope_proof(self, _scope_proof, new_generation, version_prepared, identity_prepared, encoded_commit_token)
+                if _content_proof is not None:
+                    _stage_content_proof(self, _content_proof, new_generation, version_prepared, segment_prepared, encoded_commit_token)
+                if _scope_proof is not None:
                     self._cleanup_expired(floor, row_budget=cleanup_budget)
                 try:
                     self._commit_sqlite()

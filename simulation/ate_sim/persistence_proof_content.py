@@ -72,4 +72,4 @@ def segment_commitment(namespace, ordinal, *, created_generation, codec_version,
                        element_count, first_id, last_id, payload) -> bytes:
     return _commitment(b'ate-proof-content-segment/1', _namespace(namespace),
         _integer(ordinal), _integer(created_generation), _integer(codec_version, 1),
-        _integer(element_count, 1), _bytes(first_id), _bytes(last_id), _bytes(payload))
+        _integer(element_count), _bytes(first_id), _bytes(last_id), _bytes(payload))
