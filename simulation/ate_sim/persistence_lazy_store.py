@@ -608,7 +608,8 @@ class LazyRecordStore:
         if not path.exists():
             raise FileNotFoundError(path)
         try:
-            db = sqlite3.connect(path, timeout=30.0)
+            from .persistence_sqlite_guard import GuardedConnection
+            db = sqlite3.connect(path, timeout=30.0, factory=GuardedConnection)
         except sqlite3.DatabaseError as exc:
             raise StoreFormatError("not a readable SQLite save store") from exc
         try:

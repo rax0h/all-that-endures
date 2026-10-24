@@ -1,0 +1,25 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____________ test_external_write_invalidates_parent_operation_epoch ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_external_write_invalidate0')
+
+    def test_external_write_invalidates_parent_operation_epoch(tmp_path):
+        import sqlite3
+        from ate_sim.incremental_store import _record_checksum
+        store,pin,pair=make_record_store(tmp_path/'external.sqlite')
+        def external(at):
+            if at=='before_transaction':
+                payload=store.codec.encode({'wealth':999});key=store.codec.encode(0)
+                with sqlite3.connect(store.path) as other:
+                    other.execute('UPDATE records SET payload=?,payload_checksum=? WHERE namespace=? AND typed_key=?',
+                        (payload,_record_checksum('people',key,1,store.codec.version,1,payload),'people',key))
+        store._phase_hook=external
+>       with pytest.raises(StoreConflictError):commit_proof(store,pin,pair)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreConflictError
+
+simulation/tests/test_stage_0_5_proof_record.py:201: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_external_write_invalidates_parent_operation_epoch
+1 failed, 30 deselected in 0.26s

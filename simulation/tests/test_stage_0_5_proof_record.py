@@ -171,3 +171,136 @@ def test_conflicting_retained_body_rejects_without_transferring_large_blob(tmp_p
     finally:tracemalloc.stop()
     assert peak<131072
     store.db.rollback();store.close()
+
+
+def test_actual_written_row_binding_is_independent_of_fault_hook_guard(tmp_path,monkeypatch):
+    from ate_sim.incremental_store import _record_checksum
+    store,pin,pair=make_record_store(tmp_path/'actual.sqlite');real=store._write_ordinary_changes
+    def wrong_write(*args,**kwargs):
+        result=real(*args,**kwargs);payload=store.codec.encode({'wealth':999});key=store.codec.encode(0)
+        store.db.execute('UPDATE records SET payload=?,payload_checksum=? WHERE namespace=? AND typed_key=?',
+            (payload,_record_checksum('people',key,1,store.codec.version,2,payload),'people',key))
+        return result
+    monkeypatch.setattr(store,'_write_ordinary_changes',wrong_write)
+    with pytest.raises(StoreIntegrityError):commit_proof(store,pin,pair)
+    assert store.generation==1
+    store.close()
+
+
+def test_external_write_invalidates_parent_operation_epoch(tmp_path):
+    import sqlite3
+    from ate_sim.incremental_store import _record_checksum
+    store,pin,pair=make_record_store(tmp_path/'external.sqlite')
+    def external(at):
+        if at=='before_transaction':
+            payload=store.codec.encode({'wealth':999});key=store.codec.encode(0)
+            with sqlite3.connect(store.path) as other:
+                other.execute('UPDATE records SET payload=?,payload_checksum=? WHERE namespace=? AND typed_key=?',
+                    (payload,_record_checksum('people',key,1,store.codec.version,1,payload),'people',key))
+    store._phase_hook=external
+    with pytest.raises(StoreConflictError):commit_proof(store,pin,pair)
+    assert store.generation==1 and store.db.execute('SELECT count(*) FROM ate_record_roots').fetchone()[0]==1
+    store.close()
+
+
+@pytest.mark.parametrize('phase',['during_ordinary_writes','before_head','before_commit'])
+@pytest.mark.parametrize('metadata_only',[False,True])
+@pytest.mark.parametrize('control',['commit','rollback-rebegin','executescript'])
+def test_hook_cannot_escape_original_writer_transaction(tmp_path,phase,metadata_only,control):
+    store,pin,pair=make_record_store(tmp_path/'escape.sqlite')
+    def escape(at):
+        if at==phase:
+            if control=='commit':store.db.commit()
+            elif control=='rollback-rebegin':store.db.rollback();store.db.execute('BEGIN IMMEDIATE')
+            else:store.db.executescript('SELECT 1;')
+    store._phase_hook=escape
+    with pytest.raises(StoreError):
+        if metadata_only:
+            record_module().commit_record_proof(store,pin,*pair,commit_token='metadata',changes=(),version_changes=(),new_segments=(),metadata=metadata(2))
+        else:commit_proof(store,pin,pair)
+    store._phase_hook=lambda _:None
+    assert store.generation==1 and store.read_record('people',0,expected_record_schema=1)=={'wealth':1}
+    assert store.db.execute('SELECT count(*) FROM ate_record_roots').fetchone()[0]==1
+    store.close()
+
+
+@pytest.mark.parametrize('phase',['before_transaction','after_commit'])
+def test_outside_transaction_hook_cannot_write_and_commit(tmp_path,phase):
+    store,pin,pair=make_record_store(tmp_path/'outside.sqlite')
+    def escape(at):
+        if at==phase:
+            store.db.execute("UPDATE records SET payload=x'00' WHERE namespace='people'");store.db.commit()
+    store._phase_hook=escape
+    with pytest.raises(StoreError):commit_proof(store,pin,pair)
+    store._phase_hook=lambda _:None
+    expected=1 if phase=='before_transaction' else 2
+    assert store.generation==expected
+    assert store.read_record('people',0,expected_record_schema=1)=={'wealth':expected}
+    assert store.db.execute('SELECT count(*) FROM ate_record_roots').fetchone()[0]==expected
+    store.close()
+
+
+@pytest.mark.parametrize('already_resolved',[False,True])
+def test_not_committed_recovery_rejects_stale_parent(tmp_path,already_resolved):
+    r=record_module();store,pin,old_pair=make_record_store(tmp_path/'stale-recovery.sqlite')
+    first=commit_proof(store,pin,old_pair);current=(first.certificate,first.commitment)
+    store._phase_hook=lambda at:(_ for _ in ()).throw(OSError('aborted latest attempt')) if at=='before_transaction' else None
+    with pytest.raises(OSError):commit_proof(store,first.commit.pin,current,token='abort')
+    store._phase_hook=lambda _:None
+    if already_resolved:store.resolve_commit(first.commit.pin,'abort')
+    with pytest.raises(StoreConflictError):r.resolve_record_commit(store,pin,*old_pair,commit_token='abort')
+    actual=r.resolve_record_commit(store,first.commit.pin,*current,commit_token='abort')
+    assert actual.commit.outcome=='not_committed' and actual.certificate.generation==actual.commit.generation==2
+    store.close()
+
+
+def test_bootstrap_rejects_future_revision_before_publishing(tmp_path):
+    from ate_sim.incremental_store import _record_checksum
+    r=record_module();store,pin,_=make_record_store(tmp_path/'future.sqlite',bootstrap=False)
+    key=store.codec.encode(0);payload=store.codec.encode({'wealth':1})
+    store.db.execute('UPDATE records SET last_changed_generation=2,payload_checksum=?',(_record_checksum('people',key,1,1,2,payload),));store.db.commit()
+    with pytest.raises(StoreIntegrityError):r.bootstrap_record_proofs(store,pin)
+    assert store.db.execute("SELECT 1 FROM sqlite_schema WHERE name='ate_record_roots'").fetchone() is None
+    store.close()
+
+
+@pytest.mark.parametrize('column',['payload_checksum','namespace','typed_key','record_schema'])
+def test_bootstrap_bounds_malformed_metadata_before_transfer(tmp_path,column):
+    import tracemalloc
+    r=record_module();store,pin,_=make_record_store(tmp_path/'metadata.sqlite',bootstrap=False)
+    # Embedded NUL defeats length(TEXT); metadata probes must use byte lengths.
+    large=('0'*64+'\x00'+'x'*2097152) if column!='typed_key' else b'x'*2097152
+    store.db.execute('UPDATE records SET '+column+'=?',(large,));store.db.commit()
+    tracemalloc.start()
+    try:
+        with pytest.raises(StoreError):r.bootstrap_record_proofs(store,pin)
+        peak=tracemalloc.get_traced_memory()[1]
+    finally:tracemalloc.stop()
+    assert peak<131072
+    store.close()
+
+
+def test_existing_authorizer_survives_readonly_hook_and_rejects_removal(tmp_path):
+    import sqlite3
+    store,pin,pair=make_record_store(tmp_path/'authorizer.sqlite')
+    store.db.execute('CREATE TABLE policy_secret(value)');store.db.execute('INSERT INTO policy_secret VALUES(1)');store.db.commit()
+    def policy(action,first,second,database,source):
+        return sqlite3.SQLITE_DENY if action==sqlite3.SQLITE_READ and first=='policy_secret' else sqlite3.SQLITE_OK
+    store.db.set_authorizer(policy)
+    store._phase_hook=lambda _:store.db.execute('SELECT 1').fetchone()
+    result=commit_proof(store,pin,pair)
+    assert result.commit.outcome=='committed'
+    with pytest.raises(sqlite3.DatabaseError):store.db.execute('SELECT value FROM policy_secret').fetchone()
+    store._phase_hook=lambda _:store.db.set_authorizer(None)
+    with pytest.raises(StoreError):commit_proof(store,result.commit.pin,(result.certificate,result.commitment),token='remove-policy')
+    with pytest.raises(sqlite3.DatabaseError):store.db.execute('SELECT value FROM policy_secret').fetchone()
+    store.close()
+
+
+def test_not_committed_recovery_requires_actual_parent_root(tmp_path):
+    r=record_module();store,pin,pair=make_record_store(tmp_path/'missing-recovery-root.sqlite')
+    store._phase_hook=lambda at:(_ for _ in ()).throw(OSError('aborted')) if at=='before_transaction' else None
+    with pytest.raises(OSError):commit_proof(store,pin,pair,token='abort')
+    store._phase_hook=lambda _:None;store.db.execute('DELETE FROM ate_record_roots');store.db.commit()
+    with pytest.raises(StoreIntegrityError):r.resolve_record_commit(store,pin,*pair,commit_token='abort')
+    store.close()

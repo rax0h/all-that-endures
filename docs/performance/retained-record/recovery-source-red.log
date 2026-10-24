@@ -1,0 +1,19 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_not_committed_recovery_requires_actual_parent_root ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-14/test_not_committed_recovery_re0')
+
+    def test_not_committed_recovery_requires_actual_parent_root(tmp_path):
+        r=record_module();store,pin,pair=make_record_store(tmp_path/'missing-recovery-root.sqlite')
+        store._phase_hook=lambda at:(_ for _ in ()).throw(OSError('aborted')) if at=='before_transaction' else None
+        with pytest.raises(OSError):commit_proof(store,pin,pair,token='abort')
+        store._phase_hook=lambda _:None;store.db.execute('DELETE FROM ate_record_roots');store.db.commit()
+>       with pytest.raises(StoreIntegrityError):r.resolve_record_commit(store,pin,*pair,commit_token='abort')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_record.py:305: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_not_committed_recovery_requires_actual_parent_root
+1 failed, 59 deselected in 0.23s

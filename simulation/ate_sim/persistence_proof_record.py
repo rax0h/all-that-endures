@@ -4,6 +4,7 @@ Full bootstrap is archive work. Raw reads require external accepted authority;
 content does not establish query membership, identity or complete World state.
 """
 from dataclasses import dataclass
+import sqlite3
 from .incremental_store import StoreError,StoreIntegrityError,StoreConflictError,_record_checksum
 from .persistence_proof_content import _namespace,_integer,record_key,record_commitment
 from .persistence_proof_nodes import Root,_digest,key_locator
@@ -125,21 +126,29 @@ def _retain_body(store,namespace,key,payload,checksum,codec,schema,revision):
     cursor.close();return wanted
 
 
-def bootstrap_record_proofs(store,pin,*,max_body_bytes=MAX_BODY_BYTES):
+def bootstrap_record_proofs(store,pin,*,max_body_bytes=MAX_BODY_BYTES,max_metadata_bytes=1048576):
     """Explicit full audited construction, never called by ordinary open/save."""
     _require_closed_codec(store,allow_typed=True)
     if type(max_body_bytes) is not int or not 1<=max_body_bytes<=MAX_BODY_BYTES:raise StoreIntegrityError('invalid record construction body budget')
+    if type(max_metadata_bytes) is not int or not 1<=max_metadata_bytes<=64*1024*1024:raise StoreIntegrityError('invalid record construction metadata budget')
     if store.db.in_transaction or store._active_read_transaction:raise StoreError('record bootstrap requires owned transaction')
     store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
     try:
-        _closed_snapshot_preflight(store,1048576);generation=store._require_pin(pin)
+        _closed_snapshot_preflight(store,max_metadata_bytes);generation=store._require_pin(pin)
         if generation!=int(store._checked_head_row()[0]):raise StoreConflictError('record bootstrap requires current generation')
         # Do not let the inherited full audit transfer unsupported bodies first.
-        probe=store.db.execute("SELECT typeof(payload),CASE WHEN typeof(payload)='blob' THEN length(payload) END "
-            "FROM records WHERE typeof(payload)!='blob' OR length(payload)>? LIMIT 1",(max_body_bytes,)).fetchone()
+        valid=("typeof(namespace)='text' AND length(CAST(namespace AS BLOB))>0 AND instr(namespace,char(0))=0 "
+            "AND typeof(typed_key)='blob' AND typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 "
+            "AND typeof(codec_version)='integer' AND codec_version="+str(store.codec.version)+
+            " AND typeof(record_schema)='integer' AND record_schema>0 AND typeof(last_changed_generation)='integer' "
+            "AND last_changed_generation>=0 AND last_changed_generation<="+str(generation))
+        locator="CASE WHEN typeof(namespace)='text' AND typeof(typed_key)='blob' THEN length(CAST(namespace AS BLOB))+length(typed_key) END"
+        probe=store.db.execute('SELECT '+valid+",CASE WHEN typeof(payload)='blob' THEN length(payload) END,"+locator+
+            ' FROM records WHERE NOT('+valid+") OR typeof(payload)!='blob' OR length(payload)>? OR "+locator+'>? LIMIT 1',
+            (max_body_bytes,max_metadata_bytes)).fetchone()
         if probe is not None:
-            if probe[0]=='blob':raise RecordProofBudgetError('ordinary source exceeds construction body budget')
-            raise StoreIntegrityError('invalid ordinary construction source body')
+            if probe[0]!=1 or type(probe[1]) is not int:raise StoreIntegrityError('invalid ordinary construction source metadata/body')
+            raise RecordProofBudgetError('ordinary source exceeds construction body/locator budget')
         store.verify_all()
         nodes=ProofNodeStore(store.db);nodes.create_schema()
         for sql in (_BODY_SCHEMA,_ROOT_SCHEMA):store.db.execute(sql.replace('CREATE TABLE','CREATE TABLE IF NOT EXISTS',1))
@@ -148,6 +157,7 @@ def bootstrap_record_proofs(store,pin,*,max_body_bytes=MAX_BODY_BYTES):
         cursor=store.db.execute('SELECT namespace,typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation FROM records')
         try:
             for ns,key,payload,checksum,codec,schema,revision in cursor:
+                if type(revision) is not int or not 0<=revision<=generation:raise StoreIntegrityError('ordinary source revision exceeds construction generation')
                 value=_retain_body(store,ns,key,payload,checksum,codec,schema,revision);encoded=record_key(ns,key)
                 store.db.execute('INSERT INTO ate_record_delta VALUES(?,?,?)',(key_locator(m.map_domain,encoded),encoded,value))
         finally:cursor.close()
@@ -215,6 +225,7 @@ class _RecordProofRequest:
     parent: RecordCertificate
     expected_parent: bytes
     encoded_token: bytes
+    data_version: int
     successor: tuple | None = None
 
 
@@ -222,8 +233,12 @@ def _check_request(store,pin,request):
     if type(request) is not _RecordProofRequest or request.store is not store or request.pin!=pin:
         raise StoreIntegrityError('invalid private ordinary proof request')
     _require_closed_codec(store,allow_typed=True);_authority(store,pin,request.parent,request.expected_parent)
+    from .persistence_sqlite_guard import GuardedConnection
+    if type(store.db) is not GuardedConnection:raise StoreError('ordinary proof save requires tracked SQL callback capability')
     if type(request.encoded_token) is not bytes or len(request.encoded_token)>65536:
         raise RecordProofBudgetError('ordinary proof commit token exceeds metadata path')
+    if store.db.execute('PRAGMA data_version').fetchone()[0]!=request.data_version:
+        raise StoreConflictError('external write invalidated ordinary proof parent operation')
 
 
 def _checked_phase_hook(store,phase):
@@ -231,7 +246,9 @@ def _checked_phase_hook(store,phase):
     db=store.db;was_transaction=db.in_transaction
     before=(db.total_changes,db.execute('PRAGMA schema_version').fetchone()[0])
     try:
-        store._phase_hook(phase)
+        try:
+            with db.readonly_callback():store._phase_hook(phase)
+        except sqlite3.DatabaseError as exc:raise StoreIntegrityError('proof-aware fault hook attempted unsupported SQL') from exc
         after=(db.total_changes,db.execute('PRAGMA schema_version').fetchone()[0])
         if after!=before:raise StoreIntegrityError('proof-aware phase hook changed physical source')
     except BaseException:
@@ -244,6 +261,10 @@ def _stage_record_proof(store,request,new_generation,prepared,encoded_token):
         raise StoreIntegrityError('ordinary proof publication requires existing writer transaction')
     if new_generation!=request.parent.generation+1 or encoded_token!=request.encoded_token:
         raise StoreConflictError('ordinary proof successor generation/token disagreement')
+    if store.db.execute('PRAGMA data_version').fetchone()[0]!=request.data_version:
+        raise StoreConflictError('external write invalidated ordinary proof publication')
+    if store.db.execute('SELECT generation,parent_generation FROM save_head WHERE singleton=1').fetchone()!=(new_generation,request.parent.generation):
+        raise StoreIntegrityError('ordinary proof writer transaction lost its successor head')
     _schemas(store.db)
     if _load_root(store,request.parent.generation)[0]!=(request.parent,request.expected_parent):
         raise StoreIntegrityError('ordinary proof accepted parent changed')
@@ -287,7 +308,8 @@ def commit_record_proof(store,pin,certificate,expected,*,commit_token,**argument
     with store.read_snapshot(pin,_preflight=lambda:_closed_snapshot_preflight(store,1048576)):
         _schemas(store.db)
         if _load_root(store,certificate.generation)[0]!=(certificate,expected):raise StoreIntegrityError('ordinary proof parent source disagreement')
-    request=_RecordProofRequest(store,pin,certificate,expected,store.codec.encode(commit_token))
+        data_version=store.db.execute('PRAGMA data_version').fetchone()[0]
+    request=_RecordProofRequest(store,pin,certificate,expected,store.codec.encode(commit_token),data_version)
     _check_request(store,pin,request)
     result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
     if result.outcome=='committed':
@@ -301,7 +323,15 @@ def resolve_record_commit(store,pin,certificate,expected,*,commit_token):
     _require_closed_codec(store,allow_typed=True);_authority(store,pin,certificate,expected)
     if store.db.in_transaction:raise StoreError('ordinary proof recovery requires owned operation')
     encoded=store.codec.encode(commit_token);result=store.resolve_commit(pin,commit_token)
-    if result.outcome!='committed':return RecordProofCommit(result,certificate if result.outcome=='not_committed' else None,expected if result.outcome=='not_committed' else None)
+    if result.outcome!='committed':
+        if result.outcome=='not_committed' and (result.generation!=certificate.generation or result.pin!=pin):
+            raise StoreConflictError('resolved noncommitted attempt does not match supplied ordinary parent')
+        if result.outcome=='not_committed':
+            with store.read_snapshot(result.pin,_preflight=lambda:_closed_snapshot_preflight(store,1048576)):
+                _schemas(store.db)
+                if _load_root(store,result.generation)[0]!=(certificate,expected):
+                    raise StoreIntegrityError('resolved noncommitted ordinary parent root is missing or changed')
+        return RecordProofCommit(result,certificate if result.outcome=='not_committed' else None,expected if result.outcome=='not_committed' else None)
     with store.read_snapshot(result.pin,_preflight=lambda:_closed_snapshot_preflight(store,1048576)):
         _schemas(store.db);pair,parent,writer,token=_load_root(store,result.generation)
         if (parent!=expected or writer!=pin.token or token!=encoded or result.generation!=certificate.generation+1):
