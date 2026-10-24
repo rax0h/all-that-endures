@@ -1,0 +1,85 @@
+{
+  "run_id": 40108320565,
+  "status": "accepted",
+  "head": "dfc6cbd1d935bdf1fbbc42843bc7ffc6c864fc6a",
+  "runtime": "b5da37e90bf5737b9d683f2da2aa6b65d3fbe4ba",
+  "xml": {
+    "proof-map/collection-publication-tests.xml": 12,
+    "proof-map/collection-tests.xml": 20,
+    "proof-map/generation-tests.xml": 60,
+    "proof-map/group-tests.xml": 72,
+    "proof-map/projection-tests.xml": 43,
+    "proof-map/proof-tests.xml": 260,
+    "proof-map/publication-tests.xml": 67,
+    "proof-map/record-tests.xml": 60,
+    "proof-map/scope-tests.xml": 55,
+    "proof-map/seek-tests.xml": 53,
+    "suite/full-suite.xml": 3796
+  },
+  "source_receipts": [
+    "proof-map/batch-scaling/source.json",
+    "proof-map/collection-publication-scaling/source.json",
+    "proof-map/collection-scaling/source.json",
+    "proof-map/group-scaling/source.json",
+    "proof-map/occurrence-scaling/source.json",
+    "proof-map/order-scaling/source.json",
+    "proof-map/projection-scaling/source.json",
+    "proof-map/publication-scaling/source.json",
+    "proof-map/query-scaling/source.json",
+    "proof-map/record-scaling/source.json",
+    "proof-map/scaling/source.json",
+    "proof-map/scope-scaling/source.json",
+    "proof-map/seek-scaling/source.json",
+    "proof-map/source.json",
+    "proof-map/version-scaling/source.json",
+    "suite/source.json"
+  ],
+  "diagnostic_matrices": [
+    "proof-map/batch-scaling/summary.json",
+    "proof-map/collection-publication-scaling/summary.json",
+    "proof-map/collection-scaling/summary.json",
+    "proof-map/group-scaling/summary.json",
+    "proof-map/occurrence-scaling/summary.json",
+    "proof-map/order-scaling/summary.json",
+    "proof-map/projection-scaling/summary.json",
+    "proof-map/publication-scaling/summary.json",
+    "proof-map/query-scaling/summary.json",
+    "proof-map/record-scaling/summary.json",
+    "proof-map/scaling/summary.json",
+    "proof-map/scope-scaling/summary.json",
+    "proof-map/seek-scaling/summary.json",
+    "proof-map/version-scaling/summary.json"
+  ],
+  "verified_drivers": [
+    ".github/tests/run_proof_batch_scaling.py",
+    ".github/tests/run_proof_collection_publication_scaling.py",
+    ".github/tests/run_proof_collection_scaling.py",
+    ".github/tests/run_proof_identity_group_scaling.py",
+    ".github/tests/run_proof_map_scaling.py",
+    ".github/tests/run_proof_occurrence_scaling.py",
+    ".github/tests/run_proof_order_scaling.py",
+    ".github/tests/run_proof_projection_scaling.py",
+    ".github/tests/run_proof_publication_scaling.py",
+    ".github/tests/run_proof_query_scaling.py",
+    ".github/tests/run_proof_record_scaling.py",
+    ".github/tests/run_proof_scope_scaling.py",
+    ".github/tests/run_proof_seek_scaling.py",
+    ".github/tests/run_proof_version_scaling.py"
+  ],
+  "artifacts": [
+    {
+      "id": 12569848824,
+      "sha256": "82cad17137274e6e91b6de8ae53f5b4eeeace69162479fd30d7d5e730ab9efd4"
+    },
+    {
+      "id": 12569450211,
+      "sha256": "91e6d5d72de28bed367a38bdbc613f9c66b739848e4ca624c76ceb4f510b0bc7"
+    }
+  ],
+  "hosted_collection_save_ms": [
+    84.83270099998208,
+    90.5336040000293,
+    101.03316499998982
+  ],
+  "world_targets": "unverified"
+}

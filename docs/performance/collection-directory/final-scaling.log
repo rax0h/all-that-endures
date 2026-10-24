@@ -1,0 +1,3 @@
+1000 9.62 ms; zero body reads
+10000 7.04 ms; zero body reads
+100000 8.67 ms; zero body reads

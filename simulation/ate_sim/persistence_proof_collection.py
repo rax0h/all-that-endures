@@ -55,6 +55,17 @@ def _schema(db):
     expected='CREATE TABLE ate_ordered_seek_nodes(domain BLOB NOT NULL,digest BLOB NOT NULL,raw BLOB NOT NULL,PRIMARY KEY(domain,digest)) WITHOUT ROWID'
     if row is None or type(row[0]) is not str or ''.join(row[0].lower().split())!=''.join(expected.lower().split()):raise StoreError('collection proof schema requires explicit construction')
 
+def _construct_collection(store,g,namespace):
+    declared,count,next_id=_state(store,g,namespace)
+    d=domain(store.store_identity,store.codec.version,namespace);m=OrderedSeekMap(store.db,d);m.create_schema();_schema(store.db)
+    rows=store.db.execute('SELECT typed_key,ordinal FROM lazy_order_versions WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY ordinal,typed_key',(namespace,g,g))
+    try:root=m.build((query_order_key(ordinal,key),member(d,key,ordinal)) for key,ordinal in rows)
+    finally:rows.close()
+    c=CollectionCertificate(store.store_identity,g,store.codec.version,namespace,declared,count,next_id,root);expected=certificate_commitment(c)
+    from .persistence_proof_collection_publish import persist_bootstrap
+    persist_bootstrap(store,c)
+    return c,expected
+
 def bootstrap_collection(store,pin,namespace,*,max_metadata_bytes=1048576):
     _require_closed_codec(store,allow_typed=True)
     if len(_namespace(namespace))>4096 or type(max_metadata_bytes) is not int or not 1<=max_metadata_bytes<=MAX_BODY_BYTES:raise StoreIntegrityError('invalid collection construction budget')
@@ -65,14 +76,8 @@ def bootstrap_collection(store,pin,namespace,*,max_metadata_bytes=1048576):
         if g!=int(store._checked_head_row()[0]):raise StoreConflictError('collection construction requires current pin')
         _indexes(store);_guard_construction(store,g,MAX_BODY_BYTES,max_metadata_bytes)
         if store.db.execute("SELECT 1 FROM lazy_order_versions WHERE namespace=? AND (typeof(typed_key)!='blob' OR length(typed_key)>4096) LIMIT 1",(namespace,)).fetchone():raise StoreError('collection keys require separately budgeted path')
-        store.verify_all();declared,count,next_id=_state(store,g,namespace)
-        d=domain(store.store_identity,store.codec.version,namespace);m=OrderedSeekMap(store.db,d);m.create_schema();_schema(store.db)
-        rows=store.db.execute('SELECT typed_key,ordinal FROM lazy_order_versions WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY ordinal,typed_key',(namespace,g,g))
-        try:root=m.build((query_order_key(ordinal,key),member(d,key,ordinal)) for key,ordinal in rows)
-        finally:rows.close()
-        c=CollectionCertificate(store.store_identity,g,store.codec.version,namespace,declared,count,next_id,root);expected=certificate_commitment(c)
-        from .persistence_proof_collection_publish import persist_bootstrap
-        persist_bootstrap(store,c)
+        store.verify_all()
+        c,expected=_construct_collection(store,g,namespace)
         store.db.commit();return c,expected
     except BaseException:
         if store.db.in_transaction:store.db.rollback()

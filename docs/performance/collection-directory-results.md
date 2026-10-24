@@ -1,0 +1,13 @@
+# Collection namespace directory results
+
+CI40108320565 accepted:3796 full cases,702 dedicated cases,16 source receipts and14 diagnostic matrices. Both ZIP digests, source/runtime/driver/fixture hashes, XML and complete matrices verified. Hosted order-changing unified saves84.83/90.53/101.03ms at1k/10k/100k, zero unrelated version-body reads. See run-40108320565/acceptance.json. This supersedes component coverage from prior pending40106928986; that older run was not independently accepted here.
+
+New inactive complete lazy collection namespace directory constructs every visible namespace and its order root in ONE audited snapshot. Fixed generation-independent descriptor bodies permit unchanged-root sharing. Bounded raw namespace pages and lookup return checked per-namespace authorities; checked absence rejects physical predecessor rows. Exact base source schemas and required indexes are checked before inherited metadata reads. No payloads are transferred by directory reads.
+
+Validation: initial17 missing-module RED;53 focused GREEN; independent reviewer53 GREEN and existing-proof rollback probe. Two Important findings fixed in one pass: source replacement/late guards and selected orphan absence. Six review regressions RED, one already GREEN. Final63 focused GREEN5.54s;811 affected GREEN79.70s. Full3827 tests collected; new full CI acceptance pending. AST/YAML/workflow bash syntax and scoped diff checks passed. Raw logs/XML/source receipts in collection-directory/. Initial RED redirect was partial and labeled accordingly.
+
+Final real archive diagnostic:1k/10k/100k members, fixed2 lazy namespaces, SQLite3.45.1,2MiB main/temp caches and FILE temp. One namespace page plus one present and one absent lookup:9.62/7.04/8.67ms,0 payload-body SELECTs/decodes/checks,3 namespace-state probes,17199 VM-step upper bound each; Python peak18866/17646/17318 bytes. Full construction outside timer0.29/2.55/23.74s. Measured localhead f137ff8d2d5ae1fc963fd4765efb6be621583849; runtimecadce590652033a9d14f1bc5f3d25c9473b45b73. Final candidate preserves this runtime and driver/fixture hashes.
+
+Rulings and review dispositions, including their costs if wrong, are in collection-directory-ledger.md. No deferred minor findings. The reviewer was not asked to re-review fixes; regressions and the affected suite validate them.
+
+Next: incremental successor directory publication through existing unified writer, separate save-head namespace/allocator/target inventory and complete topology, then full manifests, verified copy, old-writer fencing and World admission. No new full World open/save/year measurements. No format activation, main merge, endurance or history collection.

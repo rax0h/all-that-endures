@@ -1,0 +1,119 @@
+FF.FFFF                                                                  [100%]
+=================================== FAILURES ===================================
+_______ test_source_replacement_rejected_before_sql_callback[read-True] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_source_replacement_reject0')
+temporary = True, operation = 'read'
+
+    @pytest.mark.parametrize('temporary',[True,False])
+    @pytest.mark.parametrize('operation',['read','bootstrap'])
+    def test_source_replacement_rejected_before_sql_callback(tmp_path,temporary,operation):
+     m,s,p,a=setup(tmp_path);calls=[]
+     s.db.create_function('directory_hook',1,lambda value:(calls.append(value),value)[1])
+     if not temporary:s.db.execute('ALTER TABLE save_head RENAME TO saved_head')
+     source='main.save_head' if temporary else 'saved_head'
+     s.db.execute('CREATE '+('TEMP ' if temporary else '')+'VIEW save_head AS SELECT singleton,directory_hook(generation) AS generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts,head_checksum FROM '+source);s.db.commit()
+     with pytest.raises(StoreError):
+      if operation=='read':m.read_collection_namespace(s,p,*a,'archive')
+      else:m.bootstrap_collection_directory(s,p)
+>    assert calls==[];s.close()
+     ^^^^^^^^^^^^^^^^
+E    assert [1, 1, 1] == []
+E      
+E      Left contains 3 more items, first extra item: 1
+E      Use -v to get more diff
+
+simulation/tests/test_stage_0_5_proof_collection_directory.py:119: AssertionError
+_______ test_source_replacement_rejected_before_sql_callback[read-False] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_source_replacement_reject1')
+temporary = False, operation = 'read'
+
+    @pytest.mark.parametrize('temporary',[True,False])
+    @pytest.mark.parametrize('operation',['read','bootstrap'])
+    def test_source_replacement_rejected_before_sql_callback(tmp_path,temporary,operation):
+     m,s,p,a=setup(tmp_path);calls=[]
+     s.db.create_function('directory_hook',1,lambda value:(calls.append(value),value)[1])
+     if not temporary:s.db.execute('ALTER TABLE save_head RENAME TO saved_head')
+     source='main.save_head' if temporary else 'saved_head'
+     s.db.execute('CREATE '+('TEMP ' if temporary else '')+'VIEW save_head AS SELECT singleton,directory_hook(generation) AS generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts,head_checksum FROM '+source);s.db.commit()
+>    with pytest.raises(StoreError):
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_collection_directory.py:116: Failed
+____ test_source_replacement_rejected_before_sql_callback[bootstrap-False] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_source_replacement_reject3')
+temporary = False, operation = 'bootstrap'
+
+    @pytest.mark.parametrize('temporary',[True,False])
+    @pytest.mark.parametrize('operation',['read','bootstrap'])
+    def test_source_replacement_rejected_before_sql_callback(tmp_path,temporary,operation):
+     m,s,p,a=setup(tmp_path);calls=[]
+     s.db.create_function('directory_hook',1,lambda value:(calls.append(value),value)[1])
+     if not temporary:s.db.execute('ALTER TABLE save_head RENAME TO saved_head')
+     source='main.save_head' if temporary else 'saved_head'
+     s.db.execute('CREATE '+('TEMP ' if temporary else '')+'VIEW save_head AS SELECT singleton,directory_hook(generation) AS generation,parent_generation,simulation_position,seed,next_ids,namespace_inventory,namespace_counts,head_checksum FROM '+source);s.db.commit()
+>    with pytest.raises(StoreError):
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_collection_directory.py:116: Failed
+_______ test_absence_rejects_selected_orphan_source[lazy_order_versions] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_absence_rejects_selected_0')
+table = 'lazy_order_versions'
+
+    @pytest.mark.parametrize('table',['lazy_order_versions','lazy_record_versions'])
+    def test_absence_rejects_selected_orphan_source(tmp_path,table):
+     m,s,p,a=setup(tmp_path)
+     # Copy a structurally valid row into the queried, undeclared namespace. The
+     # presence rejection must precede any payload/checksum materialization.
+     columns=[v[1] for v in s.db.execute('PRAGMA table_info('+table+')')]
+     row=list(s.db.execute('SELECT * FROM '+table+" WHERE namespace='archive' LIMIT 1").fetchone());row[columns.index('namespace')]='orphan'
+     s.db.execute('INSERT INTO '+table+' VALUES('+','.join('?' for _ in columns)+')',row);s.db.commit()
+>    with pytest.raises(StoreError):m.read_collection_namespace(s,p,*a,'orphan')
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_collection_directory.py:129: Failed
+______ test_absence_rejects_selected_orphan_source[lazy_record_versions] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_absence_rejects_selected_1')
+table = 'lazy_record_versions'
+
+    @pytest.mark.parametrize('table',['lazy_order_versions','lazy_record_versions'])
+    def test_absence_rejects_selected_orphan_source(tmp_path,table):
+     m,s,p,a=setup(tmp_path)
+     # Copy a structurally valid row into the queried, undeclared namespace. The
+     # presence rejection must precede any payload/checksum materialization.
+     columns=[v[1] for v in s.db.execute('PRAGMA table_info('+table+')')]
+     row=list(s.db.execute('SELECT * FROM '+table+" WHERE namespace='archive' LIMIT 1").fetchone());row[columns.index('namespace')]='orphan'
+     s.db.execute('INSERT INTO '+table+' VALUES('+','.join('?' for _ in columns)+')',row);s.db.commit()
+>    with pytest.raises(StoreError):m.read_collection_namespace(s,p,*a,'orphan')
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_collection_directory.py:129: Failed
+________ test_old_absence_skips_large_new_namespace_and_requires_index _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_old_absence_skips_large_n0')
+
+    def test_old_absence_skips_large_new_namespace_and_requires_index(tmp_path):
+     m,s,p,a=setup(tmp_path);old=s.capture_pin()
+     out=s.commit(p,commit_token='future',version_changes=(VersionChange('future',i,{'v':i}) for i in range(1000)),changes=(),new_segments=(),metadata=dict(metadata(2),namespaces=('people','archive','ordinary','future')))
+     steps=[0]
+     def progress():steps[0]+=100;return 0
+     s.db.set_progress_handler(progress,100)
+     assert m.read_collection_namespace(s,old,*a,'future') is None
+     s.db.set_progress_handler(None,0);assert steps[0]<20000
+>    s.db.execute('DROP INDEX ate_directory_order_namespace_start');s.db.commit()
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    sqlite3.OperationalError: no such index: ate_directory_order_namespace_start
+
+simulation/tests/test_stage_0_5_proof_collection_directory.py:140: OperationalError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_collection_directory.py::test_source_replacement_rejected_before_sql_callback[read-True]
+FAILED simulation/tests/test_stage_0_5_proof_collection_directory.py::test_source_replacement_rejected_before_sql_callback[read-False]
+FAILED simulation/tests/test_stage_0_5_proof_collection_directory.py::test_source_replacement_rejected_before_sql_callback[bootstrap-False]
+FAILED simulation/tests/test_stage_0_5_proof_collection_directory.py::test_absence_rejects_selected_orphan_source[lazy_order_versions]
+FAILED simulation/tests/test_stage_0_5_proof_collection_directory.py::test_absence_rejects_selected_orphan_source[lazy_record_versions]
+FAILED simulation/tests/test_stage_0_5_proof_collection_directory.py::test_old_absence_skips_large_new_namespace_and_requires_index
+6 failed, 1 passed, 21 deselected in 0.95s
