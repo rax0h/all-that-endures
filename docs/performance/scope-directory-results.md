@@ -38,3 +38,5 @@ Every point save performed4descriptor write attempts, fetched2selected predecess
 ## Remaining gates
 
 Complete World topology/target existence and kind, version-content production/publication, ordinary order/event/namespace/allocator inventory roots and the full atomic seven-root generation manifest remain ahead. Format activation, old-writer fencing, canonical World admission and collection remain gated. No first-interaction/open, mature full-save or warm-year result is supplied; the full World performance targets remain unmeasured.
+
+Candidate CI [40070133798](https://github.com/rax0h/all-that-endures/actions/runs/40070133798), head`e3b7448daae6342a0edce5a98f202d9acf43955a`, tree`c777314ec66b5169c17f72f2212584e96facba1e`, runtime`770b634ceddae1aa6542b98f3861da6f1f7b0de9`; queued at launch. Full suite and all11diagnostics enabled; acceptance pending.
