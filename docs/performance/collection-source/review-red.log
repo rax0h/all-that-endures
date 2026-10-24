@@ -1,0 +1,112 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+______________ test_counter_type_checked_before_comparison[None] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_counter_type_checked_befo0')
+value = None
+
+    @pytest.mark.parametrize('value',[None,'8','comparison-hook'])
+    def test_counter_type_checked_before_comparison(tmp_path,value):
+     m,s,p,a=setup(tmp_path);calls=[]
+     class Counter:
+      def __ge__(self,other):calls.append(other);return True
+     if value=='comparison-hook':value=Counter()
+>    with pytest.raises(StoreError):m.certificate_commitment(replace(a[0],next_ordinal=value))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_collection.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+c = CollectionCertificate(store_identity='e826be21-2d98-4577-b07f-1997265f95cd', generation=1, codec_version=1, namespace=...ot(digest=b'\xd9AW\xe0m\x9e\x13\x8b\xcbr\x00\xe3\x1aO\x9f"\xc9\x0e.\xbe\xea$\xcd\xae\x9b\xbb\xb4wj\x82i\xd4', count=8))
+
+    def certificate_commitment(c):
+        if (type(c) is not CollectionCertificate or type(c.generation) is not int or not 0<=c.generation<2**63 or type(c.declared) is not bool
+>           or type(c.member_count) is not int or not 0<=c.member_count<=c.next_ordinal or type(c.next_ordinal) is not int or not 0<=c.next_ordinal<2**63
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: '<=' not supported between instances of 'int' and 'NoneType'
+
+simulation/ate_sim/persistence_proof_collection.py:30: TypeError
+________________ test_counter_type_checked_before_comparison[8] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_counter_type_checked_befo1')
+value = '8'
+
+    @pytest.mark.parametrize('value',[None,'8','comparison-hook'])
+    def test_counter_type_checked_before_comparison(tmp_path,value):
+     m,s,p,a=setup(tmp_path);calls=[]
+     class Counter:
+      def __ge__(self,other):calls.append(other);return True
+     if value=='comparison-hook':value=Counter()
+>    with pytest.raises(StoreError):m.certificate_commitment(replace(a[0],next_ordinal=value))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_collection.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+c = CollectionCertificate(store_identity='6045f54c-4c5f-4d8e-8eb5-9c1154cca9b4', generation=1, codec_version=1, namespace=...nal='8', root=Root(digest=b'l\xc4IN\xc9\xfbJd<g\x88\xe5\xea\xecfK\x93\x0c;\\l\x0b\x99Sh\x88n;\x0e\xaa\x99\\', count=8))
+
+    def certificate_commitment(c):
+        if (type(c) is not CollectionCertificate or type(c.generation) is not int or not 0<=c.generation<2**63 or type(c.declared) is not bool
+>           or type(c.member_count) is not int or not 0<=c.member_count<=c.next_ordinal or type(c.next_ordinal) is not int or not 0<=c.next_ordinal<2**63
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           TypeError: '<=' not supported between instances of 'int' and 'str'
+
+simulation/ate_sim/persistence_proof_collection.py:30: TypeError
+_________ test_counter_type_checked_before_comparison[comparison-hook] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_counter_type_checked_befo2')
+value = <test_stage_0_5_proof_collection.test_counter_type_checked_before_comparison.<locals>.Counter object at 0x7f67058635c0>
+
+    @pytest.mark.parametrize('value',[None,'8','comparison-hook'])
+    def test_counter_type_checked_before_comparison(tmp_path,value):
+     m,s,p,a=setup(tmp_path);calls=[]
+     class Counter:
+      def __ge__(self,other):calls.append(other);return True
+     if value=='comparison-hook':value=Counter()
+     with pytest.raises(StoreError):m.certificate_commitment(replace(a[0],next_ordinal=value))
+>    assert not calls;s.close()
+     ^^^^^^^^^^^^^^^^
+E    assert not [8]
+
+simulation/tests/test_stage_0_5_proof_collection.py:60: AssertionError
+__________ test_constructor_rejects_overridden_codec_helpers[_enter] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_constructor_rejects_overr0')
+helper = '_enter'
+
+    @pytest.mark.parametrize('helper',['_enter','_node_sort_key'])
+    def test_constructor_rejects_overridden_codec_helpers(tmp_path,helper):
+     from ate_sim.incremental_store import Membership
+     s,p=make_store(tmp_path/'helpers.sqlite');value=('tuple',1) if helper=='_enter' else frozenset({1,2})
+     out=s.commit(p,commit_token='membership',version_changes=(VersionChange('people',0,{'wealth':0},memberships=(Membership('index',value,0),)),),changes=(),new_segments=(),metadata=metadata(2))
+     original=getattr(s.codec,helper);calls=[]
+     def hook(*args,**kwargs):calls.append(1);return original(*args,**kwargs)
+     setattr(s.codec,helper,hook)
+>    with pytest.raises(StoreError):module().bootstrap_collection(s,out.pin,'people')
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_collection.py:70: Failed
+______ test_constructor_rejects_overridden_codec_helpers[_node_sort_key] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_constructor_rejects_overr1')
+helper = '_node_sort_key'
+
+    @pytest.mark.parametrize('helper',['_enter','_node_sort_key'])
+    def test_constructor_rejects_overridden_codec_helpers(tmp_path,helper):
+     from ate_sim.incremental_store import Membership
+     s,p=make_store(tmp_path/'helpers.sqlite');value=('tuple',1) if helper=='_enter' else frozenset({1,2})
+     out=s.commit(p,commit_token='membership',version_changes=(VersionChange('people',0,{'wealth':0},memberships=(Membership('index',value,0),)),),changes=(),new_segments=(),metadata=metadata(2))
+     original=getattr(s.codec,helper);calls=[]
+     def hook(*args,**kwargs):calls.append(1);return original(*args,**kwargs)
+     setattr(s.codec,helper,hook)
+>    with pytest.raises(StoreError):module().bootstrap_collection(s,out.pin,'people')
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_collection.py:70: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_collection.py::test_counter_type_checked_before_comparison[None]
+FAILED simulation/tests/test_stage_0_5_proof_collection.py::test_counter_type_checked_before_comparison[8]
+FAILED simulation/tests/test_stage_0_5_proof_collection.py::test_counter_type_checked_before_comparison[comparison-hook]
+FAILED simulation/tests/test_stage_0_5_proof_collection.py::test_constructor_rejects_overridden_codec_helpers[_enter]
+FAILED simulation/tests/test_stage_0_5_proof_collection.py::test_constructor_rejects_overridden_codec_helpers[_node_sort_key]
+5 failed, 15 deselected in 1.49s

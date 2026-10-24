@@ -49,3 +49,23 @@ def test_rejects_corrupt_or_unbounded_source(tmp_path,fault):
  with pytest.raises(StoreError):m.read_collection_page(s,p,*a,**kw)
  if s.db.in_transaction:s.db.rollback()
  s.close()
+
+@pytest.mark.parametrize('value',[None,'8','comparison-hook'])
+def test_counter_type_checked_before_comparison(tmp_path,value):
+ m,s,p,a=setup(tmp_path);calls=[]
+ class Counter:
+  def __ge__(self,other):calls.append(other);return True
+ if value=='comparison-hook':value=Counter()
+ with pytest.raises(StoreError):m.certificate_commitment(replace(a[0],next_ordinal=value))
+ assert not calls;s.close()
+
+@pytest.mark.parametrize('helper',['_enter','_node_sort_key'])
+def test_constructor_rejects_overridden_codec_helpers(tmp_path,helper):
+ from ate_sim.incremental_store import Membership
+ s,p=make_store(tmp_path/'helpers.sqlite');value=('tuple',1) if helper=='_enter' else frozenset({1,2})
+ out=s.commit(p,commit_token='membership',version_changes=(VersionChange('people',0,{'wealth':0},memberships=(Membership('index',value,0),)),),changes=(),new_segments=(),metadata=metadata(2))
+ original=getattr(s.codec,helper);calls=[]
+ def hook(*args,**kwargs):calls.append(1);return original(*args,**kwargs)
+ setattr(s.codec,helper,hook)
+ with pytest.raises(StoreError):module().bootstrap_collection(s,out.pin,'people')
+ assert not calls;s.close()

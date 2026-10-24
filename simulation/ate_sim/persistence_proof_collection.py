@@ -27,7 +27,7 @@ def domain(identity,codec,namespace):return _digest(b'ate-collection-domain/1',_
 def member(d,key,ordinal):return _digest(b'ate-collection-member/1',d,query_order_key(ordinal,key))
 def certificate_commitment(c):
     if (type(c) is not CollectionCertificate or type(c.generation) is not int or not 0<=c.generation<2**63 or type(c.declared) is not bool
-        or type(c.member_count) is not int or not 0<=c.member_count<=c.next_ordinal or type(c.next_ordinal) is not int or not 0<=c.next_ordinal<2**63
+        or type(c.member_count) is not int or type(c.next_ordinal) is not int or not 0<=c.member_count<=c.next_ordinal<2**63
         or not c.declared and (c.member_count or c.next_ordinal)):raise StoreIntegrityError('invalid collection certificate')
     d=domain(c.store_identity,c.codec_version,c.namespace);OrderedSeekMap(None,d)._reference(c.root)
     if c.root.count!=c.member_count:raise StoreIntegrityError('collection count/root disagreement')

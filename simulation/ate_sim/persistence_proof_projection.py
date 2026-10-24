@@ -76,6 +76,8 @@ def _require_closed_codec(store,*,allow_typed=False):
                 ('_encode_value',WorldCodec._encode_value if world else TypedCodec._encode_value),
                 ('_decode_value',WorldCodec._decode_value if world else TypedCodec._decode_value))):
         raise StoreError('proof source requires a closed codec without caller hooks')
+    if any(getattr(store.codec,name,None) is not getattr(TypedCodec,name) for name in ('_enter','_node_sort_key')):
+        raise StoreError('proof source requires closed codec helper functions')
     if plain and (store.codec._record_by_name or store.codec._enum_by_name):
         raise StoreError('generic proof source cannot use caller codec registries')
     if world:
