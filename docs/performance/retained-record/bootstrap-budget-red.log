@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ test_bootstrap_body_budget_precedes_full_audit ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_bootstrap_body_budget_pre0')
+
+    def test_bootstrap_body_budget_precedes_full_audit(tmp_path):
+        r=record_module();store,pin,_=make_record_store(tmp_path/'budget.sqlite')
+        store.verify_all=lambda:pytest.fail('full audit ran before rejecting unsupported body budget')
+>       with pytest.raises(r.RecordProofBudgetError):r.bootstrap_record_proofs(store,pin,max_body_bytes=1)
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: bootstrap_record_proofs() got an unexpected keyword argument 'max_body_bytes'
+
+simulation/tests/test_stage_0_5_proof_record.py:74: TypeError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_bootstrap_body_budget_precedes_full_audit
+1 failed, 18 deselected in 0.22s

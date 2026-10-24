@@ -1,0 +1,69 @@
+{
+  "construction": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 0,
+      "read_nodes": 0,
+      "read_requests": 0,
+      "write_requests": 13850,
+      "written_bytes": 1306081,
+      "written_nodes": 13850
+    },
+    "python_peak_bytes": 341242,
+    "wall_seconds": 0.7445005590000022
+  },
+  "database_bytes": 2523136,
+  "inventory": {
+    "physical_nodes": 13850,
+    "reachable_nodes": 13850,
+    "surplus_nodes": 0
+  },
+  "keys": 10000,
+  "limitations": [
+    "No World row, save, manifest, migration or GC exercised.",
+    "Staging sort spills to SQLite; batch peak excludes completed staging.",
+    "RSS includes all previous phases; no whole-process phase peak claimed.",
+    "Old and new roots are both intentionally retained."
+  ],
+  "point": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 2238,
+      "read_nodes": 5,
+      "read_requests": 5,
+      "write_requests": 5,
+      "written_bytes": 2238,
+      "written_nodes": 5
+    },
+    "python_peak_bytes": 78053,
+    "sql_selects": {
+      "other": 0,
+      "proof": 5
+    },
+    "wall_seconds": 0.005314948999995295
+  },
+  "process_peak_rss_bytes": 31866880,
+  "root_after": {
+    "count": 10000,
+    "digest": "a761d874f145346da8f4d884201bbb8b0a3a81da0a71e014d7401390b6c349a5"
+  },
+  "root_before": {
+    "count": 10000,
+    "digest": "4bf277394b4cc09a1906b3f2c9e681ff4e2914f63836c12bf011ba4020b0057d"
+  },
+  "schema": "ate-proof-batch-scaling/1",
+  "source": {
+    "driver_sha256": "177bc4e0e2b40943e2b64a828213f7da60fcb4e38ccf2b5ff3fd00b794b567dc",
+    "head": "6d8f2193fd67fe94adde409c39525384115ca57d",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "79a9ad08c0b77e09c24c23aef0573661af9353cf",
+    "sqlite": "3.45.1"
+  },
+  "staging": {
+    "temp_page_count": 154,
+    "temp_page_size": 4096,
+    "wall_seconds": 0.018371468000012214
+  },
+  "status": "complete"
+}

@@ -1,0 +1,574 @@
+FFFFFFFFFFFFFFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+_______________ test_framing_current_absence_and_no_world_decode _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_framing_current_absence_a0')
+
+    def test_framing_current_absence_and_no_world_decode(tmp_path):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'record.sqlite',1000);cert,expected=pair
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_old_body_survives_default_overwrite_but_missing_new_root_rejects _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_old_body_survives_default0')
+
+    def test_old_body_survives_default_overwrite_but_missing_new_root_rejects(tmp_path):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'old.sqlite');old=store.capture_pin()
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_corruption_authority_and_bounds[body] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_0')
+fault = 'body'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_corruption_authority_and_bounds[checksum] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_1')
+fault = 'checksum'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_corruption_authority_and_bounds[missing-body] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_2')
+fault = 'missing-body'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_corruption_authority_and_bounds[node] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_3')
+fault = 'node'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_corruption_authority_and_bounds[root-row] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_4')
+fault = 'root-row'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_corruption_authority_and_bounds[root-schema] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_5')
+fault = 'root-schema'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_corruption_authority_and_bounds[body-text] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_6')
+fault = 'body-text'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_corruption_authority_and_bounds[body-large] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_7')
+fault = 'body-large'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_corruption_authority_and_bounds[expected] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_8')
+fault = 'expected'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_corruption_authority_and_bounds[generation] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_9')
+fault = 'generation'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_corruption_authority_and_bounds[released] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_10')
+fault = 'released'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_corruption_authority_and_bounds[hook] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_11')
+fault = 'hook'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________ test_corruption_authority_and_bounds[transaction] _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_12')
+fault = 'transaction'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_corruption_authority_and_bounds[budget] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_13')
+fault = 'budget'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_corruption_authority_and_bounds[metadata-budget] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_authority_and_14')
+fault = 'metadata-budget'
+
+    @pytest.mark.parametrize('fault',['body','checksum','missing-body','node','root-row','root-schema','body-text','body-large','expected','generation','released','hook','transaction','budget','metadata-budget'])
+    def test_corruption_authority_and_bounds(tmp_path,fault):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_bootstrap_rejects_corrupt_source_and_arbitrary_transaction ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_bootstrap_rejects_corrupt0')
+
+    def test_bootstrap_rejects_corrupt_source_and_arbitrary_transaction(tmp_path):
+>       r=record_module();store,pin,pair=make_record_store(tmp_path/'import.sqlite')
+          ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_record_fixtures.py:8: in record_module
+    def record_module():return importlib.import_module('ate_sim.persistence_proof_record')
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_record'
+import_ = <function _gcd_import at 0x7f6b1f4ac0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_record'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_framing_current_absence_and_no_world_decode
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_old_body_survives_default_overwrite_but_missing_new_root_rejects
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[body]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[checksum]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[missing-body]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[node]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[root-row]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[root-schema]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[body-text]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[body-large]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[expected]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[generation]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[released]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[hook]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[transaction]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[budget]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_corruption_authority_and_bounds[metadata-budget]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_bootstrap_rejects_corrupt_source_and_arbitrary_transaction
+18 failed in 0.24s

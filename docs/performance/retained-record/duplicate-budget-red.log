@@ -1,0 +1,23 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_conflicting_retained_body_rejects_without_transferring_large_blob ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-5/test_conflicting_retained_body0')
+
+    def test_conflicting_retained_body_rejects_without_transferring_large_blob(tmp_path):
+        import tracemalloc
+        r=record_module();store,pin,pair=make_record_store(tmp_path/'duplicate.sqlite')
+        source=store.db.execute("SELECT namespace,typed_key,payload,payload_checksum,codec_version,record_schema,last_changed_generation FROM records WHERE namespace='people'").fetchone()
+        store.db.execute('UPDATE ate_retained_records SET payload=zeroblob(2097152)');store.db.commit()
+        tracemalloc.start()
+        try:
+            with pytest.raises(StoreIntegrityError):r._retain_body(store,*source)
+            peak=tracemalloc.get_traced_memory()[1]
+        finally:tracemalloc.stop()
+>       assert peak<131072
+E       assert 2099439 < 131072
+
+simulation/tests/test_stage_0_5_proof_record.py:172: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_conflicting_retained_body_rejects_without_transferring_large_blob
+1 failed, 28 deselected in 0.27s

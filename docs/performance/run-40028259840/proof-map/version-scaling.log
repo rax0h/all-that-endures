@@ -1,0 +1,3 @@
+1000: exact; presence/absence node SELECTs=5/3; payload checks=1/0
+10000: exact; presence/absence node SELECTs=5/5; payload checks=1/0
+100000: exact; presence/absence node SELECTs=6/4; payload checks=1/0

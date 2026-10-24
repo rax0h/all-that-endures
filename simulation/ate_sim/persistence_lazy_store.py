@@ -2618,8 +2618,16 @@ class LazyRecordStore:
         required_format_version: int = FORMAT_VERSION,
         cleanup_budget: int = 256,
         preparation_budget: tuple[int, int] | None = None,
+        _record_proof=None,
     ) -> CommitResult:
         self._ensure_open()
+        if _record_proof is not None:
+            from .persistence_proof_record import _check_request, _checked_phase_hook, _stage_record_proof
+            _check_request(self, pin, _record_proof)
+        def phase_hook(phase):
+            if _record_proof is None:
+                return self._phase_hook(phase)
+            return _checked_phase_hook(self, phase)
         if type(cleanup_budget) is not int or not 0 <= cleanup_budget <= 256:
             raise ValueError('ordinary commit cleanup budget must be between0 and256')
         if required_format_version not in SUPPORTED_FORMAT_VERSIONS:
@@ -2627,6 +2635,8 @@ class LazyRecordStore:
         if pin.token in self._recovery_required:
             raise StoreConflictError("pin has unresolved commit acknowledgement")
         encoded_commit_token = self.codec.encode(commit_token)
+        if _record_proof is not None and encoded_commit_token != _record_proof.encoded_token:
+            raise StoreConflictError('ordinary proof encoded token changed')
         workspace = None
         if preparation_budget is not None:
             if type(preparation_budget) is not tuple or len(preparation_budget) != 2:
@@ -2698,7 +2708,7 @@ class LazyRecordStore:
             self._register_attempt(
                 pin, encoded_commit_token, current_generation
             )
-            self._phase_hook("before_transaction")
+            phase_hook("before_transaction")
             self.db.execute("BEGIN IMMEDIATE")
             committed = False
             try:
@@ -2763,22 +2773,22 @@ class LazyRecordStore:
                     new_generation,
                     counts,
                 )
-                self._phase_hook("during_version_writes")
+                phase_hook("during_version_writes")
                 self._write_identity_changes(
                     identity_prepared,
                     locked_generation,
                     new_generation,
                     requested_next_incarnation_id=next_incarnation_id,
                 )
-                self._phase_hook("during_identity_writes")
+                phase_hook("during_identity_writes")
                 self._write_ordinary_changes(
                     ordinary_prepared, new_generation, counts
                 )
-                self._phase_hook("during_ordinary_writes")
+                phase_hook("during_ordinary_writes")
                 self._write_segments(
                     segment_prepared, new_generation, counts
                 )
-                self._phase_hook("during_segment_writes")
+                phase_hook("during_segment_writes")
 
                 missing = set(counts) - namespace_inventory
                 if missing:
@@ -2795,7 +2805,7 @@ class LazyRecordStore:
                     namespaces_blob,
                     counts_blob,
                 )
-                self._phase_hook("before_head")
+                phase_hook("before_head")
                 self.db.execute(
                     "UPDATE save_head SET generation=?,parent_generation=?,simulation_position=?,seed=?,next_ids=?,"
                     "namespace_inventory=?,namespace_counts=?,head_checksum=? WHERE singleton=1",
@@ -2871,7 +2881,9 @@ class LazyRecordStore:
                         "UPDATE store_metadata SET value=? WHERE key='format_version'",
                         (str(published_format),),
                     )
-                self._phase_hook("before_commit")
+                phase_hook("before_commit")
+                if _record_proof is not None:
+                    _stage_record_proof(self, _record_proof, new_generation, ordinary_prepared, encoded_commit_token)
                 try:
                     self._commit_sqlite()
                     committed = True
@@ -2891,7 +2903,7 @@ class LazyRecordStore:
                 pin.token, self.store_identity, new_generation
             )
             try:
-                self._phase_hook("after_commit")
+                phase_hook("after_commit")
                 self._acknowledge_attempt(
                     updated, encoded_commit_token, new_generation
                 )

@@ -1,0 +1,254 @@
+...................FFFFFFFFF                                             [100%]
+=================================== FAILURES ===================================
+____________ test_atomic_actual_commit_old_new_and_delete_reinsert _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_atomic_actual_commit_old_0')
+
+    def test_atomic_actual_commit_old_new_and_delete_reinsert(tmp_path):
+        r=record_module();store,pin,pair=make_record_store(tmp_path/'commit.sqlite',1000);old=store.capture_pin()
+>       result=commit_proof(store,pin,pair);new_pair=(result.certificate,result.commitment)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb3e7777980>
+pin = GenerationPin(token='c47b729d-7e94-402c-981f-eff6cf349b3b', store_identity='cd57b9c5-6850-47c1-a6e9-23ab23157f25', captured_head=1)
+pair = (RecordCertificate(store_identity='cd57b9c5-6850-47c1-a6e9-23ab23157f25', generation=1, codec_version=1, root=Root(dig...7/\xcc', count=1001)), b'\xc4\x13\xf1\xb2\xc1^F\xf6X\x16\x95z/\xcc\xb1\xf5\x19\x17c\xcd\x0b\x1dy\xad\xf5\xc6<L\xd2pX}')
+value = 2, token = 'next', kwargs = {}
+
+    def commit_proof(store,pin,pair,*,value=2,token='next',**kwargs):
+>       return record_module().commit_record_proof(store,pin,*pair,commit_token=token,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            changes=(RecordChange('people',0,{'wealth':value}),),version_changes=(),new_segments=(),metadata=metadata(pin.captured_head+1),**kwargs)
+E       AttributeError: module 'ate_sim.persistence_proof_record' has no attribute 'commit_record_proof'
+
+simulation/tests/test_stage_0_5_proof_record.py:79: AttributeError
+_ test_rollback_keeps_data_head_roots_and_bodies_together[during_ordinary_writes] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_rollback_keeps_data_head_0')
+phase = 'during_ordinary_writes'
+
+    @pytest.mark.parametrize('phase',['during_ordinary_writes','before_head','before_commit'])
+    def test_rollback_keeps_data_head_roots_and_bodies_together(tmp_path,phase):
+        store,pin,pair=make_record_store(tmp_path/'rollback.sqlite');before=store.db.execute('SELECT count(*) FROM ate_retained_records').fetchone()[0]
+        def fail(at):
+            if at==phase:raise OSError('injected rollback')
+        store._phase_hook=fail
+>       with pytest.raises(OSError):commit_proof(store,pin,pair)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb3e7777290>
+pin = GenerationPin(token='d3d758c5-6cd6-4512-8dda-262bb194370c', store_identity='99cc229f-c487-4deb-b744-fb0d7f82b59f', captured_head=1)
+pair = (RecordCertificate(store_identity='99cc229f-c487-4deb-b744-fb0d7f82b59f', generation=1, codec_version=1, root=Root(dig...3u', count=1)), b'\xfa\x0cJ\xc8V\x90Y\x10\xc1d\xbf\xff\xd8k\x1d\xef\xc4\xce\xda\x10\no\xae`T\x90\x16\x01\xac\xcfC\xb7')
+value = 2, token = 'next', kwargs = {}
+
+    def commit_proof(store,pin,pair,*,value=2,token='next',**kwargs):
+>       return record_module().commit_record_proof(store,pin,*pair,commit_token=token,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            changes=(RecordChange('people',0,{'wealth':value}),),version_changes=(),new_segments=(),metadata=metadata(pin.captured_head+1),**kwargs)
+E       AttributeError: module 'ate_sim.persistence_proof_record' has no attribute 'commit_record_proof'
+
+simulation/tests/test_stage_0_5_proof_record.py:79: AttributeError
+_____ test_rollback_keeps_data_head_roots_and_bodies_together[before_head] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_rollback_keeps_data_head_1')
+phase = 'before_head'
+
+    @pytest.mark.parametrize('phase',['during_ordinary_writes','before_head','before_commit'])
+    def test_rollback_keeps_data_head_roots_and_bodies_together(tmp_path,phase):
+        store,pin,pair=make_record_store(tmp_path/'rollback.sqlite');before=store.db.execute('SELECT count(*) FROM ate_retained_records').fetchone()[0]
+        def fail(at):
+            if at==phase:raise OSError('injected rollback')
+        store._phase_hook=fail
+>       with pytest.raises(OSError):commit_proof(store,pin,pair)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb3e767ca70>
+pin = GenerationPin(token='5e7922fc-d141-4245-9515-e93a58163523', store_identity='6c32ef82-64c5-4adf-ade0-0493981f3727', captured_head=1)
+pair = (RecordCertificate(store_identity='6c32ef82-64c5-4adf-ade0-0493981f3727', generation=1, codec_version=1, root=Root(dig...xdchN', count=1)), b'\xad\x8bX\xf0S\xaf\xd4Y\xdeR2\xe3\xe0M\xee\xe9\xbd\x82\xfa\x80g\x93k\xdf\xf4\\\x80\x1fy\xb8\x13|')
+value = 2, token = 'next', kwargs = {}
+
+    def commit_proof(store,pin,pair,*,value=2,token='next',**kwargs):
+>       return record_module().commit_record_proof(store,pin,*pair,commit_token=token,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            changes=(RecordChange('people',0,{'wealth':value}),),version_changes=(),new_segments=(),metadata=metadata(pin.captured_head+1),**kwargs)
+E       AttributeError: module 'ate_sim.persistence_proof_record' has no attribute 'commit_record_proof'
+
+simulation/tests/test_stage_0_5_proof_record.py:79: AttributeError
+____ test_rollback_keeps_data_head_roots_and_bodies_together[before_commit] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_rollback_keeps_data_head_2')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['during_ordinary_writes','before_head','before_commit'])
+    def test_rollback_keeps_data_head_roots_and_bodies_together(tmp_path,phase):
+        store,pin,pair=make_record_store(tmp_path/'rollback.sqlite');before=store.db.execute('SELECT count(*) FROM ate_retained_records').fetchone()[0]
+        def fail(at):
+            if at==phase:raise OSError('injected rollback')
+        store._phase_hook=fail
+>       with pytest.raises(OSError):commit_proof(store,pin,pair)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb3e767eea0>
+pin = GenerationPin(token='019c952c-fe93-4c68-8195-27d0f3b0409f', store_identity='1f41da78-c404-4aaf-a3c2-ee75fc0fe9c9', captured_head=1)
+pair = (RecordCertificate(store_identity='1f41da78-c404-4aaf-a3c2-ee75fc0fe9c9', generation=1, codec_version=1, root=Root(dig...eb\xc3|\xda7[\x8bg', count=1)), b'U\x11/\x88h\xae\x868oa[\xa2\xaa\x97\x9b2\x06\xf3Z\xda(\x1dW\xc4\x06\xf9dZ\x17vi\xd7')
+value = 2, token = 'next', kwargs = {}
+
+    def commit_proof(store,pin,pair,*,value=2,token='next',**kwargs):
+>       return record_module().commit_record_proof(store,pin,*pair,commit_token=token,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            changes=(RecordChange('people',0,{'wealth':value}),),version_changes=(),new_segments=(),metadata=metadata(pin.captured_head+1),**kwargs)
+E       AttributeError: module 'ate_sim.persistence_proof_record' has no attribute 'commit_record_proof'
+
+simulation/tests/test_stage_0_5_proof_record.py:79: AttributeError
+___________ test_failed_proof_write_rolls_back_already_written_data ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_failed_proof_write_rolls_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb3e7630b90>
+
+    def test_failed_proof_write_rolls_back_already_written_data(tmp_path,monkeypatch):
+        r=record_module();store,pin,pair=make_record_store(tmp_path/'proof-write.sqlite');real=r._retain_body
+        def fail(*args,**kwargs):
+            real(*args,**kwargs);raise OSError('proof body write failure')
+        monkeypatch.setattr(r,'_retain_body',fail)
+>       with pytest.raises(OSError):commit_proof(store,pin,pair)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb3e7630a10>
+pin = GenerationPin(token='ef954000-8cd8-4a81-aa27-ffa2105c0956', store_identity='0585dcf6-7eac-46f1-90c8-8f1fc7fd8ea3', captured_head=1)
+pair = (RecordCertificate(store_identity='0585dcf6-7eac-46f1-90c8-8f1fc7fd8ea3', generation=1, codec_version=1, root=Root(dig...xfd.\x1a', count=1)), b'\x0e.\xfeM\x16\x85\x85\\R\x12x\xa9\x8c\xb4\x01\x0c\xa2s#Ur]6\xe6\x95\x94\xac\xc6:\xc9\x11\x0e')
+value = 2, token = 'next', kwargs = {}
+
+    def commit_proof(store,pin,pair,*,value=2,token='next',**kwargs):
+>       return record_module().commit_record_proof(store,pin,*pair,commit_token=token,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            changes=(RecordChange('people',0,{'wealth':value}),),version_changes=(),new_segments=(),metadata=metadata(pin.captured_head+1),**kwargs)
+E       AttributeError: module 'ate_sim.persistence_proof_record' has no attribute 'commit_record_proof'
+
+simulation/tests/test_stage_0_5_proof_record.py:79: AttributeError
+_________ test_coherent_late_changed_row_tamper_rejected[before_head] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_coherent_late_changed_row0')
+phase = 'before_head'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit'])
+    def test_coherent_late_changed_row_tamper_rejected(tmp_path,phase):
+        from ate_sim.incremental_store import _record_checksum
+        store,pin,pair=make_record_store(tmp_path/'late.sqlite')
+        def tamper(at):
+            if at==phase:
+                payload=store.codec.encode({'wealth':999});key=store.codec.encode(0)
+                checksum=_record_checksum('people',key,1,store.codec.version,2,payload)
+                store.db.execute('UPDATE records SET payload=?,payload_checksum=? WHERE namespace=? AND typed_key=?',(payload,checksum,'people',key))
+        store._phase_hook=tamper
+>       with pytest.raises(StoreIntegrityError):commit_proof(store,pin,pair)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb3e7632630>
+pin = GenerationPin(token='6517bb26-627d-4334-ac07-abc497800922', store_identity='062187e3-cfd7-485f-a891-1b2396b793a6', captured_head=1)
+pair = (RecordCertificate(store_identity='062187e3-cfd7-485f-a891-1b2396b793a6', generation=1, codec_version=1, root=Root(dig...x1f\xd2\xf9', count=1)), b"8ny\x10k\xc8m~\xaf\xf4\x8f'Xz\xcb\x06\xf8\x86\xa3\xc7\xaa\xef\x01\x10\\\xa53Fk\x84\xbd\x08")
+value = 2, token = 'next', kwargs = {}
+
+    def commit_proof(store,pin,pair,*,value=2,token='next',**kwargs):
+>       return record_module().commit_record_proof(store,pin,*pair,commit_token=token,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            changes=(RecordChange('people',0,{'wealth':value}),),version_changes=(),new_segments=(),metadata=metadata(pin.captured_head+1),**kwargs)
+E       AttributeError: module 'ate_sim.persistence_proof_record' has no attribute 'commit_record_proof'
+
+simulation/tests/test_stage_0_5_proof_record.py:79: AttributeError
+________ test_coherent_late_changed_row_tamper_rejected[before_commit] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_coherent_late_changed_row1')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit'])
+    def test_coherent_late_changed_row_tamper_rejected(tmp_path,phase):
+        from ate_sim.incremental_store import _record_checksum
+        store,pin,pair=make_record_store(tmp_path/'late.sqlite')
+        def tamper(at):
+            if at==phase:
+                payload=store.codec.encode({'wealth':999});key=store.codec.encode(0)
+                checksum=_record_checksum('people',key,1,store.codec.version,2,payload)
+                store.db.execute('UPDATE records SET payload=?,payload_checksum=? WHERE namespace=? AND typed_key=?',(payload,checksum,'people',key))
+        store._phase_hook=tamper
+>       with pytest.raises(StoreIntegrityError):commit_proof(store,pin,pair)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb3e7630ef0>
+pin = GenerationPin(token='effae8d3-a83d-4a3d-988b-a885caada4d9', store_identity='dba6cc11-6db6-4a5a-a08b-8173d4f647b2', captured_head=1)
+pair = (RecordCertificate(store_identity='dba6cc11-6db6-4a5a-a08b-8173d4f647b2', generation=1, codec_version=1, root=Root(dig...\b\xa6', count=1)), b'X\x1d\xc1\xb3\xeeK\xa1\xa0V\xda\x8d\xb3\x0f\x8b\x04E0\x03lDM.\xab\xa4\x1eZ\x90@\xb7\xbe\x94\x93')
+value = 2, token = 'next', kwargs = {}
+
+    def commit_proof(store,pin,pair,*,value=2,token='next',**kwargs):
+>       return record_module().commit_record_proof(store,pin,*pair,commit_token=token,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            changes=(RecordChange('people',0,{'wealth':value}),),version_changes=(),new_segments=(),metadata=metadata(pin.captured_head+1),**kwargs)
+E       AttributeError: module 'ate_sim.persistence_proof_record' has no attribute 'commit_record_proof'
+
+simulation/tests/test_stage_0_5_proof_record.py:79: AttributeError
+____________ test_lost_ack_exact_token_resolves_root_without_replay ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_lost_ack_exact_token_reso0')
+
+    def test_lost_ack_exact_token_resolves_root_without_replay(tmp_path):
+        r=record_module();store,pin,pair=make_record_store(tmp_path/'ack.sqlite')
+        store._phase_hook=lambda at:(_ for _ in ()).throw(OSError('lost ack')) if at=='after_commit' else None
+>       with pytest.raises(OSError):commit_proof(store,pin,pair,token='lost')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_record.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb3e7632030>
+pin = GenerationPin(token='705645d3-7baa-4a17-97a7-e6876b40d46d', store_identity='d1acd07a-7a1a-4732-89cf-270d47074e87', captured_head=1)
+pair = (RecordCertificate(store_identity='d1acd07a-7a1a-4732-89cf-270d47074e87', generation=1, codec_version=1, root=Root(dig...03', count=1)), b'\xd0\x00>\x8b\x8f\x0e\xc1d\xea\xa7\xdfH\xd4x\xa4=\xee\xb0`\n\xc9F\x8az\xa5\xe5\xc1K\xd2\xb8\x08\x83')
+value = 2, token = 'lost', kwargs = {}
+
+    def commit_proof(store,pin,pair,*,value=2,token='next',**kwargs):
+>       return record_module().commit_record_proof(store,pin,*pair,commit_token=token,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            changes=(RecordChange('people',0,{'wealth':value}),),version_changes=(),new_segments=(),metadata=metadata(pin.captured_head+1),**kwargs)
+E       AttributeError: module 'ate_sim.persistence_proof_record' has no attribute 'commit_record_proof'
+
+simulation/tests/test_stage_0_5_proof_record.py:79: AttributeError
+_____________________ test_noop_and_spilled_prepared_rows ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_noop_and_spilled_prepared0')
+
+    def test_noop_and_spilled_prepared_rows(tmp_path):
+        r=record_module();store,pin,pair=make_record_store(tmp_path/'noop.sqlite')
+>       noop=r.commit_record_proof(store,pin,*pair,commit_token='noop',changes=(),version_changes=(),new_segments=(),metadata=metadata())
+             ^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_record' has no attribute 'commit_record_proof'
+
+simulation/tests/test_stage_0_5_proof_record.py:155: AttributeError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_atomic_actual_commit_old_new_and_delete_reinsert
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_rollback_keeps_data_head_roots_and_bodies_together[during_ordinary_writes]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_rollback_keeps_data_head_roots_and_bodies_together[before_head]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_rollback_keeps_data_head_roots_and_bodies_together[before_commit]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_failed_proof_write_rolls_back_already_written_data
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_coherent_late_changed_row_tamper_rejected[before_head]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_coherent_late_changed_row_tamper_rejected[before_commit]
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_lost_ack_exact_token_resolves_root_without_replay
+FAILED simulation/tests/test_stage_0_5_proof_record.py::test_noop_and_spilled_prepared_rows
+9 failed, 19 passed in 2.58s

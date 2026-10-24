@@ -1,0 +1,70 @@
+{
+  "canonical_rebuild": {
+    "equal": true,
+    "wall_seconds": 0.2749588840000001
+  },
+  "construction": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 0,
+      "read_nodes": 0,
+      "read_requests": 0,
+      "write_requests": 13784,
+      "written_bytes": 1302720,
+      "written_nodes": 13784
+    },
+    "python_peak_bytes": 332026,
+    "wall_seconds": 0.913427776000006
+  },
+  "database_bytes": 3780608,
+  "keys": 10000,
+  "limits": [
+    "Primitive relation metadata only, not World save/open/identity integration.",
+    "Historical payload table is synthetic; no mature workload result.",
+    "Source-row fixture setup and full rebuild are outside transition timer.",
+    "RSS is lifetime peak, including prior cases and construction."
+  ],
+  "point": {
+    "node_io": {
+      "clean_cache_bytes": 0,
+      "read_bytes": 10861,
+      "read_nodes": 27,
+      "read_requests": 27,
+      "write_requests": 5,
+      "written_bytes": 2074,
+      "written_nodes": 5
+    },
+    "python_peak_bytes": 98305,
+    "sql_selects": {
+      "historical_payloads": 0,
+      "other": 0,
+      "proof": 27,
+      "relation": 9,
+      "staging": 7
+    },
+    "wall_seconds": 0.01732718300000613
+  },
+  "process_peak_rss_bytes": 32436224,
+  "root_after": {
+    "count": 10000,
+    "digest": "79eafefa97ab39725912c7e84a4455040c17795dfe4d6e859843ff79c3a2ab37"
+  },
+  "root_before": {
+    "count": 10000,
+    "digest": "7bbe72f7b9a2dad165869aa5567b395a710e59f8bc26e5b7b9ba7ee1cfc4c1f8"
+  },
+  "schema": "ate-proof-order-scaling/1",
+  "setup": {
+    "wall_seconds": 0.02498158999999589
+  },
+  "source": {
+    "driver_sha256": "51f3f7091edee67f6f6513f4d8aa5f77fd7e98ca8ab05ed3043c3a6b25b92aab",
+    "head": "6d8f2193fd67fe94adde409c39525384115ca57d",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "79a9ad08c0b77e09c24c23aef0573661af9353cf",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete",
+  "verified_page_rows": 16
+}
