@@ -1,0 +1,766 @@
+FFFFFFFFFFFFFFFFFFFFFFFF                                                 [100%]
+=================================== FAILURES ===================================
+______ test_physical_store_empty_segment_has_an_exact_content_commitment _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_physical_store_empty_segm0')
+
+    def test_physical_store_empty_segment_has_an_exact_content_commitment(tmp_path):
+        from ate_sim.persistence_proof_content import segment_commitment
+        store,pin,_=make_publication_store(tmp_path/'empty-preimage.sqlite',bootstrap=False,empty_event=True)
+        payload,checksum,codec,count,first,last,generation=store.db.execute('SELECT payload,payload_checksum,codec_version,element_count,first_id,last_id,created_generation FROM segments').fetchone()
+        assert count==0 and store.verify_all()['segments']==1
+>       value=segment_commitment('events',0,created_generation=generation,codec_version=codec,element_count=count,first_id=first,last_id=last,payload=payload)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_content.py:75: in segment_commitment
+    _integer(element_count, 1), _bytes(first_id), _bytes(last_id), _bytes(payload))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 0, minimum = 1
+
+    def _integer(value, minimum=0):
+        if type(value) is not int or value < minimum:
+>           raise StoreIntegrityError('invalid proof content integer')
+E           ate_sim.incremental_store.StoreIntegrityError: invalid proof content integer
+
+simulation/ate_sim/persistence_proof_content.py:29: StoreIntegrityError
+________ test_real_constructor_exact_version_events_and_absence[False] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_real_constructor_exact_ve0')
+empty_event = False
+
+    @pytest.mark.parametrize('empty_event',[False,True])
+    def test_real_constructor_exact_version_events_and_absence(tmp_path,empty_event):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'content.sqlite',7,empty_event=empty_event)
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_real_constructor_exact_version_events_and_absence[True] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_real_constructor_exact_ve1')
+empty_event = True
+
+    @pytest.mark.parametrize('empty_event',[False,True])
+    def test_real_constructor_exact_version_events_and_absence(tmp_path,empty_event):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'content.sqlite',7,empty_event=empty_event)
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_selected_content_corruption_context_and_budgets[version-body] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti0')
+fault = 'version-body'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_selected_content_corruption_context_and_budgets[event-body] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti1')
+fault = 'event-body'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____ test_selected_content_corruption_context_and_budgets[event-checksum] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti2')
+fault = 'event-checksum'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_selected_content_corruption_context_and_budgets[event-large] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti3')
+fault = 'event-large'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_selected_content_corruption_context_and_budgets[event-text] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti4')
+fault = 'event-text'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_selected_content_corruption_context_and_budgets[root-row] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti5')
+fault = 'root-row'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_selected_content_corruption_context_and_budgets[root-schema] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti6')
+fault = 'root-schema'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_selected_content_corruption_context_and_budgets[nodes] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti7')
+fault = 'nodes'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_selected_content_corruption_context_and_budgets[expected] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti8')
+fault = 'expected'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_selected_content_corruption_context_and_budgets[released] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti9')
+fault = 'released'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_selected_content_corruption_context_and_budgets[transaction] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti10')
+fault = 'transaction'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______ test_selected_content_corruption_context_and_budgets[codec-hook] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti11')
+fault = 'codec-hook'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_selected_content_corruption_context_and_budgets[body-budget] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti12')
+fault = 'body-budget'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____ test_selected_content_corruption_context_and_budgets[metadata-budget] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_selected_content_corrupti13')
+fault = 'metadata-budget'
+
+    @pytest.mark.parametrize('fault',['version-body','event-body','event-checksum','event-large','event-text','root-row','root-schema','nodes','expected','released','transaction','codec-hook','body-budget','metadata-budget'])
+    def test_selected_content_corruption_context_and_budgets(tmp_path,fault):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_constructor_requires_current_owned_snapshot_and_cannot_repair ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_requires_curr0')
+
+    def test_constructor_requires_current_owned_snapshot_and_cannot_repair(tmp_path):
+>       p=publication_module();store,pin,a=make_publication_store(tmp_path/'owned.sqlite');old=store.capture_pin()
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________ test_constructor_guards_before_full_audit[version-large] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_guards_before0')
+fault = 'version-large'
+
+    @pytest.mark.parametrize('fault',['version-large','version-checksum','version-key','event-large','event-id','event-checksum'])
+    def test_constructor_guards_before_full_audit(tmp_path,fault):
+>       p=publication_module();store,pin,_=make_publication_store(tmp_path/'guard.sqlite',bootstrap=False)
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_constructor_guards_before_full_audit[version-checksum] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_guards_before1')
+fault = 'version-checksum'
+
+    @pytest.mark.parametrize('fault',['version-large','version-checksum','version-key','event-large','event-id','event-checksum'])
+    def test_constructor_guards_before_full_audit(tmp_path,fault):
+>       p=publication_module();store,pin,_=make_publication_store(tmp_path/'guard.sqlite',bootstrap=False)
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_constructor_guards_before_full_audit[version-key] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_guards_before2')
+fault = 'version-key'
+
+    @pytest.mark.parametrize('fault',['version-large','version-checksum','version-key','event-large','event-id','event-checksum'])
+    def test_constructor_guards_before_full_audit(tmp_path,fault):
+>       p=publication_module();store,pin,_=make_publication_store(tmp_path/'guard.sqlite',bootstrap=False)
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_constructor_guards_before_full_audit[event-large] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_guards_before3')
+fault = 'event-large'
+
+    @pytest.mark.parametrize('fault',['version-large','version-checksum','version-key','event-large','event-id','event-checksum'])
+    def test_constructor_guards_before_full_audit(tmp_path,fault):
+>       p=publication_module();store,pin,_=make_publication_store(tmp_path/'guard.sqlite',bootstrap=False)
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_constructor_guards_before_full_audit[event-id] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_guards_before4')
+fault = 'event-id'
+
+    @pytest.mark.parametrize('fault',['version-large','version-checksum','version-key','event-large','event-id','event-checksum'])
+    def test_constructor_guards_before_full_audit(tmp_path,fault):
+>       p=publication_module();store,pin,_=make_publication_store(tmp_path/'guard.sqlite',bootstrap=False)
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_constructor_guards_before_full_audit[event-checksum] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_guards_before5')
+fault = 'event-checksum'
+
+    @pytest.mark.parametrize('fault',['version-large','version-checksum','version-key','event-large','event-id','event-checksum'])
+    def test_constructor_guards_before_full_audit(tmp_path,fault):
+>       p=publication_module();store,pin,_=make_publication_store(tmp_path/'guard.sqlite',bootstrap=False)
+          ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:10: in publication_module
+    def publication_module():return importlib.import_module('ate_sim.persistence_proof_publication')
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_publication'
+import_ = <function _gcd_import at 0x7f7cde27c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_publication'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_physical_store_empty_segment_has_an_exact_content_commitment
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_real_constructor_exact_version_events_and_absence[False]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_real_constructor_exact_version_events_and_absence[True]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[version-body]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[event-body]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[event-checksum]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[event-large]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[event-text]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[root-row]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[root-schema]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[nodes]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[expected]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[released]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[transaction]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[codec-hook]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[body-budget]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_selected_content_corruption_context_and_budgets[metadata-budget]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_constructor_requires_current_owned_snapshot_and_cannot_repair
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_constructor_guards_before_full_audit[version-large]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_constructor_guards_before_full_audit[version-checksum]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_constructor_guards_before_full_audit[version-key]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_constructor_guards_before_full_audit[event-large]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_constructor_guards_before_full_audit[event-id]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_constructor_guards_before_full_audit[event-checksum]
+24 failed in 0.71s

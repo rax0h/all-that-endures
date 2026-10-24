@@ -1,0 +1,417 @@
+FFFFFFFFFFFFFFFFF                                                        [100%]
+=================================== FAILURES ===================================
+_ test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_content_generations] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c0')
+table = 'ate_content_generations'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: Failed
+_ test_temporary_source_shadow_cannot_make_publication_ephemeral[ATE_CONTENT_GENERATIONS] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c1')
+table = 'ATE_CONTENT_GENERATIONS'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: Failed
+_ test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_proof_nodes] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c2')
+table = 'ate_proof_nodes'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: Failed
+_ test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_record_roots] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c3')
+table = 'ate_record_roots'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: Failed
+_ test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_retained_records] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c4')
+table = 'ate_retained_records'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: Failed
+_ test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_scope_generations] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c5')
+table = 'ate_scope_generations'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: Failed
+_ test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_scope_descriptors] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c6')
+table = 'ate_scope_descriptors'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: Failed
+_ test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_ordered_seek_nodes] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c7')
+table = 'ate_ordered_seek_nodes'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: Failed
+___ test_temporary_source_shadow_cannot_make_publication_ephemeral[segments] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c8')
+table = 'segments'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: Failed
+_ test_temporary_source_shadow_cannot_make_publication_ephemeral[lazy_record_versions] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_temporary_source_shadow_c9')
+table = 'lazy_record_versions'
+
+    @pytest.mark.parametrize('table',['ate_content_generations','ATE_CONTENT_GENERATIONS','ate_proof_nodes','ate_record_roots','ate_retained_records','ate_scope_generations','ate_scope_descriptors','ate_ordered_seek_nodes','segments','lazy_record_versions'])
+    def test_temporary_source_shadow_cannot_make_publication_ephemeral(tmp_path,table):
+        store,pin,a=make_publication_store(tmp_path/'shadow.sqlite')
+        store.db.execute('CREATE TEMP TABLE '+table+' AS SELECT * FROM main.'+table);store.db.commit()
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_publication_fixtures.py:39: in commit_publication
+    return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+simulation/ate_sim/persistence_proof_publication.py:325: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:471: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:314: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2683: in commit
+    with (_scope_parent_snapshot(self, _scope_proof, version_prepared, identity_prepared)
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:320: in _scope_parent_snapshot
+    _guard_scope_inputs(store,request,version_prepared,identity_prepared)
+simulation/ate_sim/persistence_proof_scope.py:306: in _guard_scope_inputs
+    probe('lazy_record_versions','lazy_record_interval',('namespace','typed_key'),(ns,key),fixed+
+simulation/ate_sim/persistence_proof_scope.py:300: in probe
+    rows=store._interval_rows(table,'CASE WHEN '+valid+' THEN 1 ELSE 0 END',keys,args,generation,index,limit=2)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f425f8d50a0>
+table = 'lazy_record_versions'
+columns = "CASE WHEN typeof(valid_from)='integer' AND valid_from>=0 AND typeof(valid_to) IN ('null','integer') AND typeof(row_ch...record_schema)='integer' AND record_schema>0 AND typeof(codec_version)='integer' AND codec_version=1 THEN 1 ELSE 0 END"
+keys = ('namespace', 'typed_key'), values = ('people', b'["int","0"]')
+generation = 1, index = 'lazy_record_interval', order = None, limit = 2
+stream = False
+
+    def _interval_rows(self, table, columns, keys, values, generation, index, *, order=None, limit=None, stream=False):
+        """Exclude expired backlog by key/valid_to seeks, preserving overlap checks.
+    
+        Internal schema literals only; no user SQL identifiers enter here.
+        Legacy stores use their existing query until explicit copy upgrade.
+        """
+        where = ' AND '.join(f'{key}=?' for key in keys) or '1'
+        suffix = (f' ORDER BY {order}' if order else '') + (f' LIMIT {limit}' if limit is not None else '')
+        if index not in self._interval_indexes:
+            cursor = self.db.execute(f'SELECT {columns} FROM {table} WHERE {where} '
+                'AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)' + suffix,
+                tuple(values) + (generation, generation))
+            return cursor if stream else cursor.fetchall()
+>       cursor = self.db.execute(
+            f'SELECT {columns} FROM {table} INDEXED BY {index} WHERE {where} '
+            'AND valid_to IS NULL AND valid_from<=? UNION ALL '
+            f'SELECT {columns} FROM {table} INDEXED BY {index} WHERE {where} '
+            'AND valid_to>? AND valid_from<=?' + suffix,
+            tuple(values) + (generation,) + tuple(values) + (generation, generation))
+E       sqlite3.OperationalError: no such index: lazy_record_interval
+
+simulation/ate_sim/persistence_lazy_store.py:1315: OperationalError
+_ test_bootstrap_bounds_every_inherited_audit_source_before_transfer[records-payload-True] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_bootstrap_bounds_every_in0')
+table = 'records', field = 'payload', body = True
+
+    @pytest.mark.parametrize('table,field,body',[('records','payload',True),('query_membership','index_value',False),('lazy_query_versions','index_name',False),('lazy_order_versions','row_checksum',False),('lazy_namespace_state','row_checksum',False),('lazy_identity_occurrence_versions','occurrence_path',False),('lazy_identity_state','row_checksum',False)])
+    def test_bootstrap_bounds_every_inherited_audit_source_before_transfer(tmp_path,table,field,body):
+        from ate_sim.incremental_store import Membership
+        p=publication_module();store,pin,_=make_publication_store(tmp_path/'audit-guard.sqlite',bootstrap=False)
+        if table=='query_membership':
+            store.db.execute('INSERT INTO query_membership VALUES(?,?,?,?,?,?)',('ordinary','index',store.codec.encode('x'),store.codec.encode(0),0,1))
+        if body:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(67108865)')
+        elif field in ('index_name','row_checksum'):store.db.execute('UPDATE '+table+' SET '+field+'=?',('a\0'+'x'*1048577,))
+        else:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(1048577)')
+        store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+>       with pytest.raises(StoreError):p.bootstrap_content_proofs(store,pin)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_publication.py:174: in bootstrap_content_proofs
+    _guard_construction(store,generation,max_body_bytes,max_metadata_bytes);store.verify_all()
+                                                                            ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: inherited audit invoked before all-source byte guard
+
+simulation/tests/test_stage_0_5_proof_publication.py:298: Failed
+_ test_bootstrap_bounds_every_inherited_audit_source_before_transfer[query_membership-index_value-False] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_bootstrap_bounds_every_in1')
+table = 'query_membership', field = 'index_value', body = False
+
+    @pytest.mark.parametrize('table,field,body',[('records','payload',True),('query_membership','index_value',False),('lazy_query_versions','index_name',False),('lazy_order_versions','row_checksum',False),('lazy_namespace_state','row_checksum',False),('lazy_identity_occurrence_versions','occurrence_path',False),('lazy_identity_state','row_checksum',False)])
+    def test_bootstrap_bounds_every_inherited_audit_source_before_transfer(tmp_path,table,field,body):
+        from ate_sim.incremental_store import Membership
+        p=publication_module();store,pin,_=make_publication_store(tmp_path/'audit-guard.sqlite',bootstrap=False)
+        if table=='query_membership':
+            store.db.execute('INSERT INTO query_membership VALUES(?,?,?,?,?,?)',('ordinary','index',store.codec.encode('x'),store.codec.encode(0),0,1))
+        if body:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(67108865)')
+        elif field in ('index_name','row_checksum'):store.db.execute('UPDATE '+table+' SET '+field+'=?',('a\0'+'x'*1048577,))
+        else:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(1048577)')
+        store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+>       with pytest.raises(StoreError):p.bootstrap_content_proofs(store,pin)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_publication.py:174: in bootstrap_content_proofs
+    _guard_construction(store,generation,max_body_bytes,max_metadata_bytes);store.verify_all()
+                                                                            ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: inherited audit invoked before all-source byte guard
+
+simulation/tests/test_stage_0_5_proof_publication.py:298: Failed
+_ test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_query_versions-index_name-False] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_bootstrap_bounds_every_in2')
+table = 'lazy_query_versions', field = 'index_name', body = False
+
+    @pytest.mark.parametrize('table,field,body',[('records','payload',True),('query_membership','index_value',False),('lazy_query_versions','index_name',False),('lazy_order_versions','row_checksum',False),('lazy_namespace_state','row_checksum',False),('lazy_identity_occurrence_versions','occurrence_path',False),('lazy_identity_state','row_checksum',False)])
+    def test_bootstrap_bounds_every_inherited_audit_source_before_transfer(tmp_path,table,field,body):
+        from ate_sim.incremental_store import Membership
+        p=publication_module();store,pin,_=make_publication_store(tmp_path/'audit-guard.sqlite',bootstrap=False)
+        if table=='query_membership':
+            store.db.execute('INSERT INTO query_membership VALUES(?,?,?,?,?,?)',('ordinary','index',store.codec.encode('x'),store.codec.encode(0),0,1))
+        if body:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(67108865)')
+        elif field in ('index_name','row_checksum'):store.db.execute('UPDATE '+table+' SET '+field+'=?',('a\0'+'x'*1048577,))
+        else:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(1048577)')
+        store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+>       with pytest.raises(StoreError):p.bootstrap_content_proofs(store,pin)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_publication.py:174: in bootstrap_content_proofs
+    _guard_construction(store,generation,max_body_bytes,max_metadata_bytes);store.verify_all()
+                                                                            ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: inherited audit invoked before all-source byte guard
+
+simulation/tests/test_stage_0_5_proof_publication.py:298: Failed
+_ test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_order_versions-row_checksum-False] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_bootstrap_bounds_every_in3')
+table = 'lazy_order_versions', field = 'row_checksum', body = False
+
+    @pytest.mark.parametrize('table,field,body',[('records','payload',True),('query_membership','index_value',False),('lazy_query_versions','index_name',False),('lazy_order_versions','row_checksum',False),('lazy_namespace_state','row_checksum',False),('lazy_identity_occurrence_versions','occurrence_path',False),('lazy_identity_state','row_checksum',False)])
+    def test_bootstrap_bounds_every_inherited_audit_source_before_transfer(tmp_path,table,field,body):
+        from ate_sim.incremental_store import Membership
+        p=publication_module();store,pin,_=make_publication_store(tmp_path/'audit-guard.sqlite',bootstrap=False)
+        if table=='query_membership':
+            store.db.execute('INSERT INTO query_membership VALUES(?,?,?,?,?,?)',('ordinary','index',store.codec.encode('x'),store.codec.encode(0),0,1))
+        if body:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(67108865)')
+        elif field in ('index_name','row_checksum'):store.db.execute('UPDATE '+table+' SET '+field+'=?',('a\0'+'x'*1048577,))
+        else:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(1048577)')
+        store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+>       with pytest.raises(StoreError):p.bootstrap_content_proofs(store,pin)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_publication.py:174: in bootstrap_content_proofs
+    _guard_construction(store,generation,max_body_bytes,max_metadata_bytes);store.verify_all()
+                                                                            ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: inherited audit invoked before all-source byte guard
+
+simulation/tests/test_stage_0_5_proof_publication.py:298: Failed
+_ test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_namespace_state-row_checksum-False] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_bootstrap_bounds_every_in4')
+table = 'lazy_namespace_state', field = 'row_checksum', body = False
+
+    @pytest.mark.parametrize('table,field,body',[('records','payload',True),('query_membership','index_value',False),('lazy_query_versions','index_name',False),('lazy_order_versions','row_checksum',False),('lazy_namespace_state','row_checksum',False),('lazy_identity_occurrence_versions','occurrence_path',False),('lazy_identity_state','row_checksum',False)])
+    def test_bootstrap_bounds_every_inherited_audit_source_before_transfer(tmp_path,table,field,body):
+        from ate_sim.incremental_store import Membership
+        p=publication_module();store,pin,_=make_publication_store(tmp_path/'audit-guard.sqlite',bootstrap=False)
+        if table=='query_membership':
+            store.db.execute('INSERT INTO query_membership VALUES(?,?,?,?,?,?)',('ordinary','index',store.codec.encode('x'),store.codec.encode(0),0,1))
+        if body:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(67108865)')
+        elif field in ('index_name','row_checksum'):store.db.execute('UPDATE '+table+' SET '+field+'=?',('a\0'+'x'*1048577,))
+        else:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(1048577)')
+        store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+>       with pytest.raises(StoreError):p.bootstrap_content_proofs(store,pin)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_publication.py:174: in bootstrap_content_proofs
+    _guard_construction(store,generation,max_body_bytes,max_metadata_bytes);store.verify_all()
+                                                                            ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: inherited audit invoked before all-source byte guard
+
+simulation/tests/test_stage_0_5_proof_publication.py:298: Failed
+_ test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_identity_occurrence_versions-occurrence_path-False] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_bootstrap_bounds_every_in5')
+table = 'lazy_identity_occurrence_versions', field = 'occurrence_path'
+body = False
+
+    @pytest.mark.parametrize('table,field,body',[('records','payload',True),('query_membership','index_value',False),('lazy_query_versions','index_name',False),('lazy_order_versions','row_checksum',False),('lazy_namespace_state','row_checksum',False),('lazy_identity_occurrence_versions','occurrence_path',False),('lazy_identity_state','row_checksum',False)])
+    def test_bootstrap_bounds_every_inherited_audit_source_before_transfer(tmp_path,table,field,body):
+        from ate_sim.incremental_store import Membership
+        p=publication_module();store,pin,_=make_publication_store(tmp_path/'audit-guard.sqlite',bootstrap=False)
+        if table=='query_membership':
+            store.db.execute('INSERT INTO query_membership VALUES(?,?,?,?,?,?)',('ordinary','index',store.codec.encode('x'),store.codec.encode(0),0,1))
+        if body:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(67108865)')
+        elif field in ('index_name','row_checksum'):store.db.execute('UPDATE '+table+' SET '+field+'=?',('a\0'+'x'*1048577,))
+        else:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(1048577)')
+        store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+>       with pytest.raises(StoreError):p.bootstrap_content_proofs(store,pin)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_publication.py:174: in bootstrap_content_proofs
+    _guard_construction(store,generation,max_body_bytes,max_metadata_bytes);store.verify_all()
+                                                                            ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: inherited audit invoked before all-source byte guard
+
+simulation/tests/test_stage_0_5_proof_publication.py:298: Failed
+_ test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_identity_state-row_checksum-False] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_bootstrap_bounds_every_in6')
+table = 'lazy_identity_state', field = 'row_checksum', body = False
+
+    @pytest.mark.parametrize('table,field,body',[('records','payload',True),('query_membership','index_value',False),('lazy_query_versions','index_name',False),('lazy_order_versions','row_checksum',False),('lazy_namespace_state','row_checksum',False),('lazy_identity_occurrence_versions','occurrence_path',False),('lazy_identity_state','row_checksum',False)])
+    def test_bootstrap_bounds_every_inherited_audit_source_before_transfer(tmp_path,table,field,body):
+        from ate_sim.incremental_store import Membership
+        p=publication_module();store,pin,_=make_publication_store(tmp_path/'audit-guard.sqlite',bootstrap=False)
+        if table=='query_membership':
+            store.db.execute('INSERT INTO query_membership VALUES(?,?,?,?,?,?)',('ordinary','index',store.codec.encode('x'),store.codec.encode(0),0,1))
+        if body:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(67108865)')
+        elif field in ('index_name','row_checksum'):store.db.execute('UPDATE '+table+' SET '+field+'=?',('a\0'+'x'*1048577,))
+        else:store.db.execute('UPDATE '+table+' SET '+field+'=zeroblob(1048577)')
+        store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+>       with pytest.raises(StoreError):p.bootstrap_content_proofs(store,pin)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:299: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_publication.py:174: in bootstrap_content_proofs
+    _guard_construction(store,generation,max_body_bytes,max_metadata_bytes);store.verify_all()
+                                                                            ^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+>   store.db.commit();store.verify_all=lambda:pytest.fail('inherited audit invoked before all-source byte guard')
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: inherited audit invoked before all-source byte guard
+
+simulation/tests/test_stage_0_5_proof_publication.py:298: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_content_generations]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[ATE_CONTENT_GENERATIONS]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_proof_nodes]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_record_roots]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_retained_records]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_scope_generations]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_scope_descriptors]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[ate_ordered_seek_nodes]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[segments]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_temporary_source_shadow_cannot_make_publication_ephemeral[lazy_record_versions]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_bootstrap_bounds_every_inherited_audit_source_before_transfer[records-payload-True]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_bootstrap_bounds_every_inherited_audit_source_before_transfer[query_membership-index_value-False]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_query_versions-index_name-False]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_order_versions-row_checksum-False]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_namespace_state-row_checksum-False]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_identity_occurrence_versions-occurrence_path-False]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_bootstrap_bounds_every_inherited_audit_source_before_transfer[lazy_identity_state-row_checksum-False]
+17 failed, 50 deselected in 2.98s

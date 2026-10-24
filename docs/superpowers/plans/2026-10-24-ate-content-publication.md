@@ -11,3 +11,5 @@ Spec: ../specs/2026-10-24-ate-content-publication.md
 Pre-flight: task1 ContentCertificate roots feed task2 writer/recovery and task3 diagnostics; ordinary/scope certificates must share exact store/codec/pin/generation. Existing segment preimage rejects0 although physical NewSegment accepts0: extend only the admissible count range, preserving positive preimages. Existing scope request supplies closed preliminary snapshots, source guards and cleanup deferral; compose it rather than adding a second writer.
 
 Review focus: actual old version bytes with coherent physical checksum tampering; new version/segment source binding and zero segments; guards before inherited materialization; callbacks/triggers and epoch races; exact recovery parent/token; all roots atomic on injected faults; unchanged roots reused without archive payload reads. Tracked ledger: docs/performance/content-publication-ledger.md.
+
+Tasks1/2 complete. Task3 local tests, final exact-runtime matrix and single review/fix pass complete; candidate launch recorded in launch receipt. Full CI acceptance remains a next-turn gate.

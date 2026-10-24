@@ -1,0 +1,552 @@
+........................FFFFFFFFFFFFFFFF                                 [100%]
+=================================== FAILURES ===================================
+__________ test_unified_actual_save_and_retained_all_component_roots ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_unified_actual_save_and_r0')
+
+    def test_unified_actual_save_and_retained_all_component_roots(tmp_path):
+        from ate_sim.persistence_proof_record import read_record_proof_bytes
+        from ate_sim.persistence_proof_scope import read_scope_certificate
+        from ate_sim.persistence_proof_occurrence import GroupScope
+        from ate_sim.persistence_proof_occurrence_seek import read_occurrence_seek_page
+        store,pin,a=make_publication_store(tmp_path/'commit.sqlite',7);old=store.capture_pin()
+>       result=commit_publication(store,pin,a);new=next_authorities(result);writer=result.commit.pin
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4fa9640>
+pin = GenerationPin(token='a6d9f6c4-a561-4323-8632-fd77353af0ed', store_identity='f6df30b8-9afb-4083-8518-7580e64fafba', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='f6df30b8-9afb-4083-8518-7580e64fafba', generation=1, codec_ver...x02\x83\x8b\xf2', count=8))), b'\xb4\xc34=B\x8b\x7f\x19#\x8e\\z\xabU\xb2E\xa7\xbaj\xc60N\xf0[5\xc5\x93+\xa9\x9d\xd93'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+_______________ test_noop_and_metadata_only_share_content_roots ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_noop_and_metadata_only_sh0')
+
+    def test_noop_and_metadata_only_share_content_roots(tmp_path):
+        store,pin,a=make_publication_store(tmp_path/'shared.sqlite')
+        kwargs=dict(version_changes=(),identity_changes=(),changes=(),new_segments=())
+>       noop=commit_publication(store,pin,a,metadata=metadata(1),**kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4ddc8f0>
+pin = GenerationPin(token='c0fef302-326f-4602-b6fe-88bd8cdf7857', store_identity='1a30f69b-db6f-4c6d-912b-d6df169c6fda', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='1a30f69b-db6f-4c6d-912b-d6df169c6fda', generation=1, codec_ver...=1))), b'\xcc\x19mh\x9d\xa2\xbc\x80\x13d\xba\xc9\x18\xfb\xdf\xee/\xcc\xf6o\x04\x8d\xa3\xff\xb8L\x12\x86\xf5\xdb\xcef'))
+token = 'next'
+kwargs = {'metadata': {'simulation_position': 1, 'seed': 7, 'next_ids': {}, 'namespaces': ('people', 'archive', 'ordinary', 'events')}, 'version_changes': (), 'identity_changes': (), 'changes': (), ...}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+_____________ test_delete_and_reinsert_keeps_retained_exact_bytes ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_delete_and_reinsert_keeps0')
+
+    def test_delete_and_reinsert_keeps_retained_exact_bytes(tmp_path):
+        from ate_sim.persistence_lazy_store import VersionChange
+        store,pin,a=make_publication_store(tmp_path/'delete.sqlite');old=store.capture_pin()
+>       deleted=commit_publication(store,pin,a,version_changes=(VersionChange('people',0,delete=True),),identity_changes=(),changes=(),new_segments=())
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4ddc920>
+pin = GenerationPin(token='4541465a-494c-4d07-ba65-88af9ae8c006', store_identity='f4b0e7ad-52cb-40b1-bf7d-97d458646508', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='f4b0e7ad-52cb-40b1-bf7d-97d458646508', generation=1, codec_ver...=1))), b"\xf0'w47\x9a\x94\x92\xe1\xa1\x98\x82\x95\x088\xde\x12\xaeg\x86P\x1d\xf0\x97\xf9\xcc\xbe\xf9\xb0\x01\x15\xbd"))
+token = 'next'
+kwargs = {'version_changes': (VersionChange(namespace='people', key=0, value=None, record_schema=1, delete=True, memberships=(), reinsertion=False),), 'identity_changes': (), 'changes': (), 'new_segments': ()}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+__ test_unified_rollback_preserves_all_roots_and_data[during_version_writes] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_unified_rollback_preserve0')
+phase = 'during_version_writes'
+
+    @pytest.mark.parametrize('phase',['during_version_writes','during_segment_writes','before_head','before_commit'])
+    def test_unified_rollback_preserves_all_roots_and_data(tmp_path,phase):
+        store,pin,a=make_publication_store(tmp_path/'rollback.sqlite')
+        def fault(p):
+            if p==phase:raise RuntimeError('injected rollback')
+        store._phase_hook=fault
+>       with pytest.raises(RuntimeError):commit_publication(store,pin,a)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4ddf230>
+pin = GenerationPin(token='d33109e4-19ff-4d64-909a-70c12314b395', store_identity='722a461b-31c2-4aaf-a2d7-edc3b2579b11', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='722a461b-31c2-4aaf-a2d7-edc3b2579b11', generation=1, codec_ver...1c\x825]\xab\xf3', count=1))), b'_\x8dN\xf9\x85\x9di\x96h\x9b\xf62<\x874\xa0#\x83\xbbct=E\xed\xc1\x0fnC#\xe2\xe6\xa7'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+__ test_unified_rollback_preserves_all_roots_and_data[during_segment_writes] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_unified_rollback_preserve1')
+phase = 'during_segment_writes'
+
+    @pytest.mark.parametrize('phase',['during_version_writes','during_segment_writes','before_head','before_commit'])
+    def test_unified_rollback_preserves_all_roots_and_data(tmp_path,phase):
+        store,pin,a=make_publication_store(tmp_path/'rollback.sqlite')
+        def fault(p):
+            if p==phase:raise RuntimeError('injected rollback')
+        store._phase_hook=fault
+>       with pytest.raises(RuntimeError):commit_publication(store,pin,a)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4faaf60>
+pin = GenerationPin(token='71075616-5de7-4563-88d3-70b1e5626424', store_identity='c9343448-f3ee-47b4-b0ef-f71cbfd37eb5', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='c9343448-f3ee-47b4-b0ef-f71cbfd37eb5', generation=1, codec_ver...6', count=1))), b'\x17V\x07J\x01\xbc#o\xe3\xb1\xa6 \xea\xdd\xb7\x9e\xbf#\xa4\x19Y\x07\x1c\x864\xe7\x9b\xea?>\x8a\x80'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+_______ test_unified_rollback_preserves_all_roots_and_data[before_head] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_unified_rollback_preserve2')
+phase = 'before_head'
+
+    @pytest.mark.parametrize('phase',['during_version_writes','during_segment_writes','before_head','before_commit'])
+    def test_unified_rollback_preserves_all_roots_and_data(tmp_path,phase):
+        store,pin,a=make_publication_store(tmp_path/'rollback.sqlite')
+        def fault(p):
+            if p==phase:raise RuntimeError('injected rollback')
+        store._phase_hook=fault
+>       with pytest.raises(RuntimeError):commit_publication(store,pin,a)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a5b71b50>
+pin = GenerationPin(token='81a5233a-b4b9-4798-a775-a1b719008f91', store_identity='362429b9-ab99-4a93-8227-241fd375e928', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='362429b9-ab99-4a93-8227-241fd375e928', generation=1, codec_ver...2\xcd', count=1))), b'\xdfv\x1b\xc7\xeep9\t\x1dM\r\xe9\xffG\xeeI\xcd\x95k\x83\xd3\xc2)h\xb4\xedy\xcd\x00\xa9\xb3\x8d'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+______ test_unified_rollback_preserves_all_roots_and_data[before_commit] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_unified_rollback_preserve3')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['during_version_writes','during_segment_writes','before_head','before_commit'])
+    def test_unified_rollback_preserves_all_roots_and_data(tmp_path,phase):
+        store,pin,a=make_publication_store(tmp_path/'rollback.sqlite')
+        def fault(p):
+            if p==phase:raise RuntimeError('injected rollback')
+        store._phase_hook=fault
+>       with pytest.raises(RuntimeError):commit_publication(store,pin,a)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a5b29280>
+pin = GenerationPin(token='a09554da-eb7a-4173-bb3d-e3b3dba882fc', store_identity='21249c0a-4336-40c2-a22e-40d917959624', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='21249c0a-4336-40c2-a22e-40d917959624', generation=1, codec_ver...2\xbe!", count=1))), b'(?+\xa8\x87^\x95;f\n\xdf\xb0\xc4\xd7\xfar[\x1a\x7f\xa8\xf8Y\xf8\xba\xe5\x1f\x01FZ\xf1\x13\x82'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+______ test_last_content_root_fault_rolls_back_already_staged_components _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_last_content_root_fault_r0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f71a4dea2a0>
+
+    def test_last_content_root_fault_rolls_back_already_staged_components(tmp_path,monkeypatch):
+        p=publication_module();store,pin,a=make_publication_store(tmp_path/'last-root.sqlite')
+        def fail(*args,**kwargs):raise RuntimeError('last root fault')
+        monkeypatch.setattr(p,'_write_root',fail)
+>       with pytest.raises(RuntimeError):commit_publication(store,pin,a)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4deb170>
+pin = GenerationPin(token='1000ebff-4773-4bcd-9035-9cceed458d88', store_identity='f42da651-3eb8-4b2c-b898-0a0918ca4ba2', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='f42da651-3eb8-4b2c-b898-0a0918ca4ba2', generation=1, codec_ver...\xaa\xf6\x91\xb9', count=1))), b'\xdeP\xf1r4\xb6u\xb3\xc5BW\xfc\xda\x81B\xb3\xe5\x93\xe7\x0e\x9f95B\x91\x155x:\xec+L'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+__________ test_actual_parent_content_rejects_coherent_payload_tamper __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_actual_parent_content_rej0')
+
+    def test_actual_parent_content_rejects_coherent_payload_tamper(tmp_path):
+        from ate_sim.incremental_store import _framed_sha
+        from ate_sim.persistence_lazy_store import _version_checksum
+        store,pin,a=make_publication_store(tmp_path/'parent.sqlite');key=store.codec.encode(0);payload=store.codec.encode({'wealth':999})
+        members=store.db.execute("SELECT memberships FROM lazy_record_versions WHERE namespace='people'").fetchone()[0]
+        store.db.execute("UPDATE lazy_record_versions SET payload=?,payload_checksum=?,row_checksum=? WHERE namespace='people'",(payload,_framed_sha(b'lazy-payload-v1',payload),_version_checksum('people',key,1,store.codec.version,1,None,members,payload)))
+        store.db.commit();store.verify_all()
+>       with pytest.raises(StoreIntegrityError):commit_publication(store,pin,a)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4deb770>
+pin = GenerationPin(token='5aad4224-524b-49e4-af29-a543a1ec856f', store_identity='6230888e-7f4a-4d69-ba08-1694b28a4824', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='6230888e-7f4a-4d69-ba08-1694b28a4824', generation=1, codec_ver...13\xc5\xf5\x9b\xfdW', count=1))), b'^\xdbZ\xd5\xe9\x12/\xaa\x9fk\xf1b\x944\x13vd\xb6\x8f\xdc\x92\xf5MN:D\x1cm8W\xb1P'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+_______ test_actual_successor_bytes_checked_outside_phase_hooks[version] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_actual_successor_bytes_ch0')
+kind = 'version'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f71a5b71610>
+
+    @pytest.mark.parametrize('kind',['version','event'])
+    def test_actual_successor_bytes_checked_outside_phase_hooks(tmp_path,kind,monkeypatch):
+        from ate_sim.persistence_lazy_store import LazyRecordStore,_version_checksum
+        from ate_sim.incremental_store import _framed_sha,_segment_checksum
+        store,pin,a=make_publication_store(tmp_path/'written.sqlite');name='_write_lazy_changes' if kind=='version' else '_write_segments';original=getattr(LazyRecordStore,name)
+        def corrupt(self,*args,**kwargs):
+            result=original(self,*args,**kwargs);payload=self.codec.encode({'wrong':True})
+            if kind=='version':
+                key=self.codec.encode(0);members=self.db.execute("SELECT memberships FROM lazy_record_versions WHERE namespace='people' AND valid_to IS NULL").fetchone()[0]
+                self.db.execute("UPDATE lazy_record_versions SET payload=?,payload_checksum=?,row_checksum=? WHERE namespace='people' AND valid_to IS NULL",(payload,_framed_sha(b'lazy-payload-v1',payload),_version_checksum('people',key,1,self.codec.version,2,None,members,payload)))
+            else:
+                first=last=self.codec.encode(1000001)
+                self.db.execute('UPDATE segments SET payload=?,payload_checksum=? WHERE ordinal=1000001',(payload,_segment_checksum('events',1000001,first,last,1,self.codec.version,2,payload)))
+            return result
+        monkeypatch.setattr(LazyRecordStore,name,corrupt)
+>       with pytest.raises(StoreIntegrityError):commit_publication(store,pin,a)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a5b72630>
+pin = GenerationPin(token='5ae60ad0-763f-49e4-b941-465e5694ca94', store_identity='f24d4299-ad3f-42fc-9ec7-325a9e687709', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='f24d4299-ad3f-42fc-9ec7-325a9e687709', generation=1, codec_ver...f8\xc6', count=1))), b'E\xab-\x17\xaf\t2B\x9b\x8bL\xe9\xd3\x13\xcf$\x07\x98\x0b\x9c\xc3\x08\xf2a\xf8\xce\xa91N\xd6)B'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+________ test_actual_successor_bytes_checked_outside_phase_hooks[event] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_actual_successor_bytes_ch1')
+kind = 'event'
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f71a5b28d10>
+
+    @pytest.mark.parametrize('kind',['version','event'])
+    def test_actual_successor_bytes_checked_outside_phase_hooks(tmp_path,kind,monkeypatch):
+        from ate_sim.persistence_lazy_store import LazyRecordStore,_version_checksum
+        from ate_sim.incremental_store import _framed_sha,_segment_checksum
+        store,pin,a=make_publication_store(tmp_path/'written.sqlite');name='_write_lazy_changes' if kind=='version' else '_write_segments';original=getattr(LazyRecordStore,name)
+        def corrupt(self,*args,**kwargs):
+            result=original(self,*args,**kwargs);payload=self.codec.encode({'wrong':True})
+            if kind=='version':
+                key=self.codec.encode(0);members=self.db.execute("SELECT memberships FROM lazy_record_versions WHERE namespace='people' AND valid_to IS NULL").fetchone()[0]
+                self.db.execute("UPDATE lazy_record_versions SET payload=?,payload_checksum=?,row_checksum=? WHERE namespace='people' AND valid_to IS NULL",(payload,_framed_sha(b'lazy-payload-v1',payload),_version_checksum('people',key,1,self.codec.version,2,None,members,payload)))
+            else:
+                first=last=self.codec.encode(1000001)
+                self.db.execute('UPDATE segments SET payload=?,payload_checksum=? WHERE ordinal=1000001',(payload,_segment_checksum('events',1000001,first,last,1,self.codec.version,2,payload)))
+            return result
+        monkeypatch.setattr(LazyRecordStore,name,corrupt)
+>       with pytest.raises(StoreIntegrityError):commit_publication(store,pin,a)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a5b70f20>
+pin = GenerationPin(token='280ad1ca-40d6-475e-b2e9-93d98411e569', store_identity='855d71f6-07fd-4449-80b9-107696887461', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='855d71f6-07fd-4449-80b9-107696887461', generation=1, codec_ver...92\x0bvY\x04<', count=1))), b'8\x0e:\xab6}\xdf\x06|\xe4\xac\x83}m\xb6\xaf*\xb2\xa20\xa2\x8d\xda|\xcc\xb6R1q\xaf\xbel'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+__________ test_lost_ack_recovers_exact_unified_roots_without_replay ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_lost_ack_recovers_exact_u0')
+
+    def test_lost_ack_recovers_exact_unified_roots_without_replay(tmp_path):
+        p=publication_module();store,pin,a=make_publication_store(tmp_path/'ack.sqlite')
+        def fault(phase):
+            if phase=='after_commit':raise RuntimeError('lost acknowledgement')
+        store._phase_hook=fault
+>       with pytest.raises(RuntimeError):commit_publication(store,pin,a)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:185: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4dde330>
+pin = GenerationPin(token='6bdda800-40c1-4148-af59-edefa309c35e', store_identity='b738880d-6acc-409b-a0e8-e2a2105c31db', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='b738880d-6acc-409b-a0e8-e2a2105c31db', generation=1, codec_ver...\x90@4\xeb\xd0\x16', count=1))), b"\xbf\xf6j\xb6Ac\x90.\x94\xd0\x9bL\x08\xf6,W/\t#c\x81\xd6`\xcb\x9ek\xed6O\x8d\xe7'"))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+_______________ test_spilled_preparation_and_default_writer_gap ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_spilled_preparation_and_d0')
+
+    def test_spilled_preparation_and_default_writer_gap(tmp_path):
+        p=publication_module();store,pin,a=make_publication_store(tmp_path/'spill.sqlite')
+>       result=commit_publication(store,pin,a,preparation_budget=(1,1));new=next_authorities(result)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:197: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4fa9010>
+pin = GenerationPin(token='26b6d079-6057-4ac1-a02d-adeb521bcfbd', store_identity='9bc44e11-5771-4126-855d-d28b03cc213c', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='9bc44e11-5771-4126-855d-d28b03cc213c', generation=1, codec_ver...a3\x85\xd6t\x8e\xf0', count=1))), b'\xed\x04j4%\x1c\xcd_?\xc5\x83?\xc1\x97f,\xc1*\xcb4\x07\xcc\xb5\xdb#\x94\xa6*TP|m'))
+token = 'next', kwargs = {'preparation_budget': (1, 1)}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+_________ test_unified_sql_callbacks_are_read_only[before_transaction] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_unified_sql_callbacks_are0')
+phase = 'before_transaction'
+
+    @pytest.mark.parametrize('phase',['before_transaction','before_commit','after_commit'])
+    def test_unified_sql_callbacks_are_read_only(tmp_path,phase):
+        store,pin,a=make_publication_store(tmp_path/'hook.sqlite')
+        def fault(p):
+            if p==phase:store.db.execute('COMMIT')
+        store._phase_hook=fault
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4e5b500>
+pin = GenerationPin(token='f9f762bd-6290-4405-bd66-1d0b4464d923', store_identity='dea04c22-cdb0-4a2d-b6c3-2300c64f4de3', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='dea04c22-cdb0-4a2d-b6c3-2300c64f4de3', generation=1, codec_ver...ch8\x98', count=1))), b'\xc1\x98<\x059\xfa\x1f\x9ftx0$"\x7fz\xc9\xbe\x19\xa3-\xae\xd6\x9f^IL\xde\xa7\xa7\x82\xd0\xb2'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+___________ test_unified_sql_callbacks_are_read_only[before_commit] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_unified_sql_callbacks_are1')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['before_transaction','before_commit','after_commit'])
+    def test_unified_sql_callbacks_are_read_only(tmp_path,phase):
+        store,pin,a=make_publication_store(tmp_path/'hook.sqlite')
+        def fault(p):
+            if p==phase:store.db.execute('COMMIT')
+        store._phase_hook=fault
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4fa9340>
+pin = GenerationPin(token='1c4eb0af-b4e6-4581-974f-b1a4d64e19a8', store_identity='66b7b448-0aa2-4e3a-91f7-0edac827aaec', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='66b7b448-0aa2-4e3a-91f7-0edac827aaec', generation=1, codec_ver...xd3D}\x8dc\x0fP\xd0', count=1))), b'K%c,\xad>)v\xac\xbd\xa0 \x8e\xb0g\x00\xf5\xec\x12\xfbgL\x0f0;\xe0\x0cN\x842\xe6O'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+____________ test_unified_sql_callbacks_are_read_only[after_commit] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_unified_sql_callbacks_are2')
+phase = 'after_commit'
+
+    @pytest.mark.parametrize('phase',['before_transaction','before_commit','after_commit'])
+    def test_unified_sql_callbacks_are_read_only(tmp_path,phase):
+        store,pin,a=make_publication_store(tmp_path/'hook.sqlite')
+        def fault(p):
+            if p==phase:store.db.execute('COMMIT')
+        store._phase_hook=fault
+>       with pytest.raises(StoreError):commit_publication(store,pin,a)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_publication.py:211: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f71a4e5b800>
+pin = GenerationPin(token='8287303d-78f0-446b-9474-111438634f7d', store_identity='1760afa0-8dc2-4ea3-b988-9f878c63bf82', captured_head=1)
+authorities = Authorities(content=(ContentCertificate(store_identity='1760afa0-8dc2-4ea3-b988-9f878c63bf82', generation=1, codec_ver...x1cz', count=1))), b'\x99\xf4:\xd1h\xa3%\xfd\x84B:\x85F/\xa9\x9c\x01\xc5\xfe\xc2q\xbf\x91\xe8:\xf4\xc0\xf9m\x81\x19c'))
+token = 'next', kwargs = {}
+
+    def commit_publication(store,pin,authorities,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(RecordChange('ordinary',0,{'value':2}),),
+            new_segments=(NewSegment('events',1000001,['second'],element_count=1,first_id=1000001,last_id=1000001),),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return publication_module().commit_content_proof(store,pin,*authorities.content,record_authority=authorities.record,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            scope_authority=authorities.scope,commit_token=token,**arguments)
+E       AttributeError: module 'ate_sim.persistence_proof_publication' has no attribute 'commit_content_proof'
+
+simulation/tests/proof_publication_fixtures.py:39: AttributeError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_unified_actual_save_and_retained_all_component_roots
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_noop_and_metadata_only_share_content_roots
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_delete_and_reinsert_keeps_retained_exact_bytes
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_unified_rollback_preserves_all_roots_and_data[during_version_writes]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_unified_rollback_preserves_all_roots_and_data[during_segment_writes]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_unified_rollback_preserves_all_roots_and_data[before_head]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_unified_rollback_preserves_all_roots_and_data[before_commit]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_last_content_root_fault_rolls_back_already_staged_components
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_actual_parent_content_rejects_coherent_payload_tamper
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_actual_successor_bytes_checked_outside_phase_hooks[version]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_actual_successor_bytes_checked_outside_phase_hooks[event]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_lost_ack_recovers_exact_unified_roots_without_replay
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_spilled_preparation_and_default_writer_gap
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_unified_sql_callbacks_are_read_only[before_transaction]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_unified_sql_callbacks_are_read_only[before_commit]
+FAILED simulation/tests/test_stage_0_5_proof_publication.py::test_unified_sql_callbacks_are_read_only[after_commit]
+16 failed, 24 passed in 5.14s
