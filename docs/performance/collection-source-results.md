@@ -11,3 +11,5 @@ Final measured source41c62f6. One instrumented three-member page per size; full 
 Next gate: incremental successor order-root publication, global namespace/allocator/target inventory, complete topology and conceptual seven-root manifests, verified-copy construction, writer fencing and canonical World integration. Existing writer is unchanged by this package. No World path activation, GC or endurance. Full World targets remain unverified.
 
 Final affected suite768passed136.15s; complete XML and console retained. Python/workflow syntax checks passed. Full candidate CI acceptance pending.
+
+Exact CI [40106928986](https://github.com/rax0h/all-that-endures/actions/runs/40106928986), candidated1bbcdf95bae58b1d83cc5578af9292a48f18175, treed773240a1ccde49e004d4b50f952ecb7ff2a83c1, runtime24a87e67b4b3306ede9c09a561237aa3ca4d355c; queued at launch. Full candidate/all13diagnostics acceptance pending; no main merge/endurance/long polling.
