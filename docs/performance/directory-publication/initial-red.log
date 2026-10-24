@@ -1,0 +1,252 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+______________ test_successor_directory_is_complete_and_retained _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_successor_directory_is_co0')
+
+    def test_successor_directory_is_complete_and_retained(tmp_path):
+     s,p,a,d=setup(tmp_path);old=s.capture_pin()
+>    r=save(s,p,a,d,changes=(VersionChange('people',0,{'wealth':2},reinsertion=True),VersionChange('people',1,{})))
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_directory_publication.py:13: in save
+    return m().commit_directory(s,p,*d,*a.content,namespaces=names,scope_authority=a.scope,record_authority=a.record,commit_token=token,version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_directory_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_directory_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_directory_publish'
+import_ = <function _gcd_import at 0x7fb89d1300e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_directory_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_atomic_failure_recovery[before_head] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_atomic_failure_recovery_b0')
+phase = 'before_head'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit','after_commit'])
+    def test_atomic_failure_recovery(tmp_path,phase):
+>    s,p,a,d=setup(tmp_path);before=s.db.execute('SELECT count(*) FROM ate_directory_generations').fetchone()
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    sqlite3.OperationalError: no such table: ate_directory_generations
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:28: OperationalError
+_________________ test_atomic_failure_recovery[before_commit] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_atomic_failure_recovery_b1')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit','after_commit'])
+    def test_atomic_failure_recovery(tmp_path,phase):
+>    s,p,a,d=setup(tmp_path);before=s.db.execute('SELECT count(*) FROM ate_directory_generations').fetchone()
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    sqlite3.OperationalError: no such table: ate_directory_generations
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:28: OperationalError
+__________________ test_atomic_failure_recovery[after_commit] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_atomic_failure_recovery_a0')
+phase = 'after_commit'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit','after_commit'])
+    def test_atomic_failure_recovery(tmp_path,phase):
+>    s,p,a,d=setup(tmp_path);before=s.db.execute('SELECT count(*) FROM ate_directory_generations').fetchone()
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    sqlite3.OperationalError: no such table: ate_directory_generations
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:28: OperationalError
+_____________ test_untouched_namespace_remains_usable_on_next_save _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_untouched_namespace_remai0')
+
+    def test_untouched_namespace_remains_usable_on_next_save(tmp_path):
+>    s,p,a,d=setup(tmp_path);r=save(s,p,a,d,changes=(VersionChange('people',1,{}),))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_directory_publication.py:13: in save
+    return m().commit_directory(s,p,*d,*a.content,namespaces=names,scope_authority=a.scope,record_authority=a.record,commit_token=token,version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_directory_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_directory_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_directory_publish'
+import_ = <function _gcd_import at 0x7fb89d1300e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_directory_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_introduced_namespace_and_metadata_only[changes0] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_introduced_namespace_and_0')
+changes = ()
+
+    @pytest.mark.parametrize('changes',[(),(VersionChange('archive',99,delete=True),),(VersionChange('archive',99,{}),)])
+    def test_introduced_namespace_and_metadata_only(tmp_path,changes):
+     s,p,a=make_publication_store(tmp_path/'new.sqlite');d=bootstrap_collection_directory(s,p)
+>    r=save(s,p,a,d,names=('archive',) if changes else (),changes=changes)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_directory_publication.py:13: in save
+    return m().commit_directory(s,p,*d,*a.content,namespaces=names,scope_authority=a.scope,record_authority=a.record,commit_token=token,version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_directory_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_directory_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_directory_publish'
+import_ = <function _gcd_import at 0x7fb89d1300e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_directory_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_introduced_namespace_and_metadata_only[changes1] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_introduced_namespace_and_1')
+changes = (VersionChange(namespace='archive', key=99, value=None, record_schema=1, delete=True, memberships=(), reinsertion=False),)
+
+    @pytest.mark.parametrize('changes',[(),(VersionChange('archive',99,delete=True),),(VersionChange('archive',99,{}),)])
+    def test_introduced_namespace_and_metadata_only(tmp_path,changes):
+     s,p,a=make_publication_store(tmp_path/'new.sqlite');d=bootstrap_collection_directory(s,p)
+>    r=save(s,p,a,d,names=('archive',) if changes else (),changes=changes)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_directory_publication.py:13: in save
+    return m().commit_directory(s,p,*d,*a.content,namespaces=names,scope_authority=a.scope,record_authority=a.record,commit_token=token,version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_directory_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_directory_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_directory_publish'
+import_ = <function _gcd_import at 0x7fb89d1300e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_directory_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_introduced_namespace_and_metadata_only[changes2] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_introduced_namespace_and_2')
+changes = (VersionChange(namespace='archive', key=99, value={}, record_schema=1, delete=False, memberships=(), reinsertion=False),)
+
+    @pytest.mark.parametrize('changes',[(),(VersionChange('archive',99,delete=True),),(VersionChange('archive',99,{}),)])
+    def test_introduced_namespace_and_metadata_only(tmp_path,changes):
+     s,p,a=make_publication_store(tmp_path/'new.sqlite');d=bootstrap_collection_directory(s,p)
+>    r=save(s,p,a,d,names=('archive',) if changes else (),changes=changes)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_directory_publication.py:13: in save
+    return m().commit_directory(s,p,*d,*a.content,namespaces=names,scope_authority=a.scope,record_authority=a.record,commit_token=token,version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_directory_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_directory_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_directory_publish'
+import_ = <function _gcd_import at 0x7fb89d1300e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_directory_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_unlisted_changed_namespace_fails_without_partial_publication _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_unlisted_changed_namespac0')
+
+    def test_unlisted_changed_namespace_fails_without_partial_publication(tmp_path):
+     s,p,a,d=setup(tmp_path)
+>    with pytest.raises(StoreError):save(s,p,a,d,changes=(VersionChange('archive',0,delete=True),))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_directory_publication.py:13: in save
+    return m().commit_directory(s,p,*d,*a.content,namespaces=names,scope_authority=a.scope,record_authority=a.record,commit_token=token,version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_directory_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_directory_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_directory_publish'
+import_ = <function _gcd_import at 0x7fb89d1300e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_directory_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_successor_directory_is_complete_and_retained
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_atomic_failure_recovery[before_head]
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_atomic_failure_recovery[before_commit]
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_atomic_failure_recovery[after_commit]
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_untouched_namespace_remains_usable_on_next_save
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_introduced_namespace_and_metadata_only[changes0]
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_introduced_namespace_and_metadata_only[changes1]
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_introduced_namespace_and_metadata_only[changes2]
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_unlisted_changed_namespace_fails_without_partial_publication
+9 failed in 1.15s

@@ -1,0 +1,86 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+____________ test_first_save_from_completely_empty_directory[False] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_first_save_from_completel0')
+new_namespace = False
+
+    @pytest.mark.parametrize('new_namespace',[False,True])
+    def test_first_save_from_completely_empty_directory(tmp_path,new_namespace):
+     from ate_sim.incremental_store import TypedCodec
+     from ate_sim.persistence_lazy_store import LazyRecordStore
+     from ate_sim.persistence_proof_record import bootstrap_record_proofs
+     from ate_sim.persistence_proof_scope import bootstrap_scope_proofs
+     from ate_sim.persistence_proof_publication import bootstrap_content_proofs
+     s=LazyRecordStore.create(tmp_path/'empty.sqlite',codec=TypedCodec(),simulation_schema='8',rules_id='empty')
+     p=s.capture_pin();record=bootstrap_record_proofs(s,p);scope=bootstrap_scope_proofs(s,p);a=Authorities(bootstrap_content_proofs(s,p),record,scope);d=bootstrap_collection_directory(s,p)
+     assert d[0].root.count==0
+>    r=save(s,p,a,d,names=('people',) if new_namespace else (),changes=(VersionChange('people',0,{}),) if new_namespace else ())
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_directory_publication.py:13: in save
+    return m().commit_directory(s,p,*d,*a.content,namespaces=names,scope_authority=a.scope,record_authority=a.record,commit_token=token,version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:100: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:147: in commit_collections
+    _schema_rows(store.db)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db = <ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f7c4481a950>
+
+    def _schema_rows(db):
+     _schema(db)
+     row=db.execute("SELECT CASE WHEN typeof(sql)='text' AND length(CAST(sql AS BLOB))<=4096 THEN sql END FROM main.sqlite_schema WHERE name='ate_collection_generations' AND type='table'").fetchone()
+>    if row is None or type(row[0]) is not str or ''.join(row[0].lower().split())!=''.join(_SCHEMA.lower().split()):raise StoreError('collection publication requires verified construction')
+                                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    ate_sim.incremental_store.StoreError: collection publication requires verified construction
+
+simulation/ate_sim/persistence_proof_collection_publish.py:21: StoreError
+____________ test_first_save_from_completely_empty_directory[True] _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-10/test_first_save_from_completel1')
+new_namespace = True
+
+    @pytest.mark.parametrize('new_namespace',[False,True])
+    def test_first_save_from_completely_empty_directory(tmp_path,new_namespace):
+     from ate_sim.incremental_store import TypedCodec
+     from ate_sim.persistence_lazy_store import LazyRecordStore
+     from ate_sim.persistence_proof_record import bootstrap_record_proofs
+     from ate_sim.persistence_proof_scope import bootstrap_scope_proofs
+     from ate_sim.persistence_proof_publication import bootstrap_content_proofs
+     s=LazyRecordStore.create(tmp_path/'empty.sqlite',codec=TypedCodec(),simulation_schema='8',rules_id='empty')
+     p=s.capture_pin();record=bootstrap_record_proofs(s,p);scope=bootstrap_scope_proofs(s,p);a=Authorities(bootstrap_content_proofs(s,p),record,scope);d=bootstrap_collection_directory(s,p)
+     assert d[0].root.count==0
+>    r=save(s,p,a,d,names=('people',) if new_namespace else (),changes=(VersionChange('people',0,{}),) if new_namespace else ())
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_directory_publication.py:105: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_directory_publication.py:13: in save
+    return m().commit_directory(s,p,*d,*a.content,namespaces=names,scope_authority=a.scope,record_authority=a.record,commit_token=token,version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:100: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:147: in commit_collections
+    _schema_rows(store.db)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+db = <ate_sim.persistence_sqlite_guard.GuardedConnection object at 0x7f7c44904150>
+
+    def _schema_rows(db):
+     _schema(db)
+     row=db.execute("SELECT CASE WHEN typeof(sql)='text' AND length(CAST(sql AS BLOB))<=4096 THEN sql END FROM main.sqlite_schema WHERE name='ate_collection_generations' AND type='table'").fetchone()
+>    if row is None or type(row[0]) is not str or ''.join(row[0].lower().split())!=''.join(_SCHEMA.lower().split()):raise StoreError('collection publication requires verified construction')
+                                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    ate_sim.incremental_store.StoreError: collection publication requires verified construction
+
+simulation/ate_sim/persistence_proof_collection_publish.py:21: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_first_save_from_completely_empty_directory[False]
+FAILED simulation/tests/test_stage_0_5_proof_directory_publication.py::test_first_save_from_completely_empty_directory[True]
+2 failed, 20 deselected in 0.31s

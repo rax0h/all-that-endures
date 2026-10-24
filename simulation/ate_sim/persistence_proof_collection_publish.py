@@ -48,6 +48,7 @@ class _Request:
  pairs:tuple
  token:bytes
  epoch:int
+ directory:object=None
  states:object=None
  successor:object=None
 
@@ -72,10 +73,14 @@ def _order(store,g,ns,key):
  return ordinal
 
 def _guard(store,r,prepared,content_parent):
- _check(store,r.pin,r);_schema_rows(store.db);_indexes(store)
+ _check(store,r.pin,r)
+ if r.directory is not None:
+  from .persistence_proof_directory_publish import _guard as guard_directory
+  guard_directory(store,r)
+ _schema_rows(store.db);_indexes(store)
  parents={c.namespace:c for c,e in r.pairs};states={ns:[c.declared,c.member_count,c.next_ordinal] for ns,c in parents.items()}
  for c,e in r.pairs:
-  if _load(store,c.generation,c.namespace)[0]!=(c,e) or _state(store,c.generation,c.namespace)!=(c.declared,c.member_count,c.next_ordinal):raise StoreIntegrityError('collection accepted parent changed')
+  if r.directory is None and _load(store,c.generation,c.namespace)[0]!=(c,e) or _state(store,c.generation,c.namespace)!=(c.declared,c.member_count,c.next_ordinal):raise StoreIntegrityError('collection accepted parent changed')
  store.db.execute('CREATE TEMP TABLE ate_collection_pub_delta(namespace TEXT,key BLOB,old_position BLOB,new_position BLOB,PRIMARY KEY(namespace,key)) WITHOUT ROWID')
  for item in prepared:
   ns,key=item['namespace'],item['typed_key'];change=item['change']
@@ -102,7 +107,7 @@ def _stage(store,r,g,token):
  if token!=r.token or g!=r.pin.captured_head+1 or not store.db.in_transaction:raise StoreIntegrityError('collection successor context disagreement')
  out=[]
  for c,e in r.pairs:
-  if _load(store,c.generation,c.namespace)[0]!=(c,e):raise StoreIntegrityError('collection parent row changed')
+  if r.directory is None and _load(store,c.generation,c.namespace)[0]!=(c,e):raise StoreIntegrityError('collection parent row changed')
   state=tuple(r.states[c.namespace])
   if _state(store,g,c.namespace)!=state:raise StoreIntegrityError('actual collection successor counters disagree')
   m=OrderedSeekMap(store.db,domain(c.store_identity,c.codec_version,c.namespace));m.create_schema();root=c.root
@@ -119,9 +124,12 @@ def _stage(store,r,g,token):
   finally:rows.close()
   child=CollectionCertificate(c.store_identity,g,c.codec_version,c.namespace,*state,root);out.append(_write(store,child,parent=e,writer=r.pin.token,token=token))
  store.db.execute('DROP TABLE ate_collection_pub_delta');r.successor=tuple(out)
+ if r.directory is not None:
+  from .persistence_proof_directory_publish import _stage as stage_directory
+  stage_directory(store,r,g,token)
 
-def _pairs(store,pin,pairs):
- if type(pairs) is not tuple or not 1<=len(pairs)<=128:raise StoreError('collection authority inventory exceeds bound')
+def _pairs(store,pin,pairs,*,allow_empty=False):
+ if type(pairs) is not tuple or not (0 if allow_empty else 1)<=len(pairs)<=128:raise StoreError('collection authority inventory exceeds bound')
  seen=set()
  for pair in pairs:
   if type(pair) is not tuple or len(pair)!=2:raise StoreIntegrityError('invalid collection authority pair')
@@ -131,16 +139,16 @@ def _pairs(store,pin,pairs):
   if c.namespace in seen:raise StoreIntegrityError('duplicate collection namespace')
   seen.add(c.namespace)
 
-def commit_collections(store,pin,collections,certificate,expected,*,commit_token,**arguments):
- _require_closed_codec(store,allow_typed=True);_pairs(store,pin,collections)
+def commit_collections(store,pin,collections,certificate,expected,*,commit_token,_directory=None,**arguments):
+ _require_closed_codec(store,allow_typed=True);_pairs(store,pin,collections,allow_empty=_directory is not None)
  if any(k.startswith('_') for k in arguments):raise StoreError('private collection arguments forbidden')
  if store.db.in_transaction:raise StoreError('collection save requires owned operation')
  with store.read_snapshot(pin,_preflight=lambda:_closed_snapshot_preflight(store,1048576)):
   _schema_rows(store.db)
   for c,e in collections:
-   if _load(store,c.generation,c.namespace)[0]!=(c,e):raise StoreIntegrityError('collection parent source disagreement')
+   if _directory is None and _load(store,c.generation,c.namespace)[0]!=(c,e):raise StoreIntegrityError('collection parent source disagreement')
   epoch=store.db.execute('PRAGMA data_version').fetchone()[0]
- r=_Request(store,pin,collections,store.codec.encode(commit_token),epoch)
+ r=_Request(store,pin,collections,store.codec.encode(commit_token),epoch,directory=_directory)
  content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
  if content.commit.outcome=='committed':
   if r.successor is None:raise StoreIntegrityError('missing collection successor')

@@ -1,0 +1,23 @@
+{
+  "run": 40126096856,
+  "head": "41467a4f887bc63dbe730ed7d4def3f610931b72",
+  "counts": {
+    "suite/full-suite.xml": 3829,
+    "proof/proof-tests.xml": 260,
+    "proof/scope-tests.xml": 55,
+    "proof/group-tests.xml": 72,
+    "proof/generation-tests.xml": 60,
+    "proof/collection-tests.xml": 20,
+    "proof/projection-tests.xml": 43,
+    "proof/collection-directory-tests.xml": 31,
+    "proof/seek-tests.xml": 53,
+    "proof/collection-publication-tests.xml": 12,
+    "proof/publication-tests.xml": 67,
+    "proof/record-tests.xml": 60
+  },
+  "zip_sha256": [
+    "3db563bba78d5057982ec592bf713d98f79f12f1ac7d9bb50997f2a9be9bb7a3",
+    "ef8dfb47f4d3374d864c5a830656da5d6af02fe0bcfd134419b343a1d2d39912"
+  ],
+  "checked": "ZIP digests, zero-failure XML, source/runtime hashes, driver/fixture hashes and complete 1k/10k/100k matrices"
+}

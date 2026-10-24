@@ -1,7 +1,7 @@
 """Complete audited lazy namespace source and bounded raw directory reads.
 
-Inactive authority: successor directory publication, save-head inventory,
-allocators, topology and World admission require separate integration.
+Inactive authority: directory successors compose in the unified writer.
+Save-head inventory, allocators, topology and World admission remain gated.
 """
 from dataclasses import dataclass
 from .incremental_store import StoreError,StoreIntegrityError,StoreConflictError
@@ -101,6 +101,8 @@ def bootstrap_collection_directory(store,pin,*,max_metadata_bytes=1048576):
         store.verify_all()
         d=domain(store.store_identity,store.codec.version);m=OrderedSeekMap(store.db,d);m.create_schema()
         store.db.execute(_SCHEMA.replace('CREATE TABLE','CREATE TABLE IF NOT EXISTS',1));_schemas(store.db)
+        from . import persistence_proof_collection_publish as publication
+        store.db.execute(publication._SCHEMA.replace('CREATE TABLE','CREATE TABLE IF NOT EXISTS',1));publication._schema_rows(store.db)
         rows=store.db.execute('SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY CAST(namespace AS BLOB)',(g,g))
         def values():
             for (ns,) in rows:
@@ -109,6 +111,8 @@ def bootstrap_collection_directory(store,pin,*,max_metadata_bytes=1048576):
         try:root=m.build(values())
         finally:rows.close()
         c=CollectionDirectoryCertificate(store.store_identity,g,store.codec.version,root);expected=certificate_commitment(c)
+        from .persistence_proof_directory_publish import persist_bootstrap
+        persist_bootstrap(store,c)
         store.db.commit();return c,expected
     except BaseException:
         if store.db.in_transaction:store.db.rollback()
@@ -144,18 +148,22 @@ def _selected(store,c,key,value):
     return child,expected
 
 def read_collection_namespace(store,pin,certificate,expected,namespace,*,max_metadata_bytes=1048576):
-    c=certificate;_preflight(store,pin,c,expected,max_metadata_bytes);key=_key(namespace)
+    c=certificate;_preflight(store,pin,c,expected,max_metadata_bytes);_key(namespace)
     with store.read_snapshot(pin,_preflight=lambda:_read_preflight(store,max_metadata_bytes)) as g:
-        _snapshot(store,g);m=OrderedSeekMap(store.db,domain(c.store_identity,c.codec_version));value=m.get(c.root,key)
-        if value is None:
-            if collection._state(store,g,namespace)!=(False,0,0):raise StoreIntegrityError('directory absence/source disagreement')
-            # A namespace stays declared once introduced. Thus an accepted
-            # absence cannot have any predecessor source, even an expired
-            # orphan. Future-only rows remain valid for a retained old pin.
-            for table,kind in (('lazy_order_versions','order'),('lazy_record_versions','record')):
-                if store.db.execute('SELECT 1 FROM '+table+' INDEXED BY ate_directory_'+kind+'_namespace_start WHERE namespace=? AND valid_from<=? LIMIT 1',(namespace,g)).fetchone():raise StoreIntegrityError('directory absence has orphan predecessor source')
-            return None
-        return _selected(store,c,key,value)
+        _snapshot(store,g);return _lookup(store,c,namespace)
+
+def _lookup(store,c,namespace):
+    key=_key(namespace);g=c.generation
+    value=OrderedSeekMap(store.db,domain(c.store_identity,c.codec_version)).get(c.root,key)
+    if value is None:
+        if collection._state(store,g,namespace)!=(False,0,0):raise StoreIntegrityError('directory absence/source disagreement')
+        # A namespace stays declared once introduced. Thus an accepted
+        # absence cannot have any predecessor source, even an expired
+        # orphan. Future-only rows remain valid for a retained old pin.
+        for table,kind in (('lazy_order_versions','order'),('lazy_record_versions','record')):
+            if store.db.execute('SELECT 1 FROM '+table+' INDEXED BY ate_directory_'+kind+'_namespace_start WHERE namespace=? AND valid_from<=? LIMIT 1',(namespace,g)).fetchone():raise StoreIntegrityError('directory absence has orphan predecessor source')
+        return None
+    return _selected(store,c,key,value)
 
 def read_collection_namespaces(store,pin,certificate,expected,*,after=None,limit=128,max_metadata_bytes=1048576):
     c=certificate;_preflight(store,pin,c,expected,max_metadata_bytes)

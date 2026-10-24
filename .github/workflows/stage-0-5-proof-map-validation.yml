@@ -20,6 +20,7 @@ name: Stage 0.5 durable proof map validation
       - .github/tests/run_proof_collection_scaling.py
       - .github/tests/run_proof_collection_publication_scaling.py
       - .github/tests/run_proof_collection_directory_scaling.py
+      - .github/tests/run_proof_directory_publication_scaling.py
       - .github/workflows/stage-0-5-proof-map-validation.yml
 permissions:
   contents: read
@@ -84,6 +85,8 @@ jobs:
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_collection_publication_scaling.py --output evidence/collection-publication-scaling 2>&1 | tee evidence/collection-publication-scaling.log
           python -m pytest -q --capture=sys simulation/tests/test_stage_0_5_proof_collection_directory.py --junitxml=evidence/collection-directory-tests.xml 2>&1 | tee evidence/collection-directory-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_collection_directory_scaling.py --output evidence/collection-directory-scaling 2>&1 | tee evidence/collection-directory-scaling.log
+          python -m pytest -q simulation/tests/test_stage_0_5_proof_directory_publication.py --junitxml=evidence/directory-publication-tests.xml 2>&1 | tee evidence/directory-publication-tests.log
+          timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_directory_publication_scaling.py --output evidence/directory-publication-scaling 2>&1 | tee evidence/directory-publication-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_identity_group_scaling.py --output evidence/group-scaling 2>&1 | tee evidence/group-scaling.log
       - uses: actions/upload-artifact@v4
         if: always()
