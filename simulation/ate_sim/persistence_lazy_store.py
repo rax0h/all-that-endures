@@ -5,7 +5,7 @@ import sqlite3
 import tempfile
 import time
 import uuid
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Iterator, Mapping
@@ -2627,7 +2627,7 @@ class LazyRecordStore:
             from .persistence_proof_record import _check_request, _checked_phase_hook, _stage_record_proof
             _check_request(self, pin, _record_proof)
         if _scope_proof is not None:
-            from .persistence_proof_scope import _check_request as _check_scope_request, _stage_scope_proof
+            from .persistence_proof_scope import _check_request as _check_scope_request, _stage_scope_proof, _scope_parent_snapshot, _guard_scope_inputs
             _check_scope_request(self, pin, _scope_proof)
         if _record_proof is not None or _scope_proof is not None:
             from .persistence_proof_record import _checked_phase_hook
@@ -2670,49 +2670,53 @@ class LazyRecordStore:
             position, seed, next_ids, namespaces_blob = _head_values(self.codec, metadata)
             namespace_inventory = set(self.codec.decode(namespaces_blob))
 
-            current = self._checked_head_row()
-            current_generation = int(current[0])
-            if pin.store_identity != self.store_identity:
-                raise StoreConflictError("generation pin belongs to another store")
-            try:
-                registered_generation = self._require_pin(pin)
-            except StoreConflictError:
-                return CommitResult("conflict", current_generation, pin, stale=True)
-            if registered_generation != current_generation:
-                return CommitResult("conflict", current_generation, pin, stale=True)
-            identity_effective = self._identity_changes_would_change(
-                identity_prepared,
-                current_generation,
-                next_incarnation_id,
-            )
-            if (
-                not version_prepared
-                and not identity_effective
-                and not ordinary_prepared
-                and not segment_prepared
-                and current[2:6]
-                == (position, seed, next_ids, namespaces_blob)
-            ):
-                return CommitResult(
-                    "not_committed", current_generation, pin, stale=False
+            # Hold one snapshot through preliminary inherited predecessor
+            # reads; the scope preflight must precede identity_effective too.
+            with (_scope_parent_snapshot(self, _scope_proof, version_prepared, identity_prepared)
+                  if _scope_proof is not None else nullcontext()):
+                current = self._checked_head_row()
+                current_generation = int(current[0])
+                if pin.store_identity != self.store_identity:
+                    raise StoreConflictError("generation pin belongs to another store")
+                try:
+                    registered_generation = self._require_pin(pin)
+                except StoreConflictError:
+                    return CommitResult("conflict", current_generation, pin, stale=True)
+                if registered_generation != current_generation:
+                    return CommitResult("conflict", current_generation, pin, stale=True)
+                identity_effective = self._identity_changes_would_change(
+                    identity_prepared,
+                    current_generation,
+                    next_incarnation_id,
                 )
+                if (
+                    not version_prepared
+                    and not identity_effective
+                    and not ordinary_prepared
+                    and not segment_prepared
+                    and current[2:6]
+                    == (position, seed, next_ids, namespaces_blob)
+                ):
+                    return CommitResult(
+                        "not_committed", current_generation, pin, stale=False
+                    )
 
-            pins, _, attempts = self._checked_operational_rows(current_generation)
-            existing_attempt = next(
-                (row for row in attempts if row[0] == pin.token), None
-            )
-            if (
-                existing_attempt is not None
-                and existing_attempt[3] in {"pending", "committed"}
-            ):
-                raise StoreConflictError("pin has an unresolved commit attempt")
-            other_generations = [
-                int(row[2]) for row in pins if row[0] != pin.token
-            ]
-            if other_generations and min(other_generations) < current_generation:
-                raise GenerationPressureError(
-                    current_generation, min(other_generations)
+                pins, _, attempts = self._checked_operational_rows(current_generation)
+                existing_attempt = next(
+                    (row for row in attempts if row[0] == pin.token), None
                 )
+                if (
+                    existing_attempt is not None
+                    and existing_attempt[3] in {"pending", "committed"}
+                ):
+                    raise StoreConflictError("pin has an unresolved commit attempt")
+                other_generations = [
+                    int(row[2]) for row in pins if row[0] != pin.token
+                ]
+                if other_generations and min(other_generations) < current_generation:
+                    raise GenerationPressureError(
+                        current_generation, min(other_generations)
+                    )
 
             self._register_attempt(
                 pin, encoded_commit_token, current_generation
@@ -2721,6 +2725,8 @@ class LazyRecordStore:
             self.db.execute("BEGIN IMMEDIATE")
             committed = False
             try:
+                if _scope_proof is not None:
+                    _guard_scope_inputs(self, _scope_proof, version_prepared, identity_prepared)
                 locked = self._checked_head_row()
                 locked_generation = int(locked[0])
                 pins, _, attempts = self._checked_operational_rows(

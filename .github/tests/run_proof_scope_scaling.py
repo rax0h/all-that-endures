@@ -21,13 +21,14 @@ def git(*args):return subprocess.check_output(['git',*args],text=True).strip()
 
 
 def measure(store,operation):
-    counts=dict(selected_payload=0,unrelated_payload=0,proof=0,other=0,descriptor_write_attempts=0);steps=0
+    counts=dict(selected_payload=0,unrelated_payload=0,proof=0,other=0,descriptor_write_attempts=0,body_size_probes=0);steps=0
     def trace(sql):
         sql=sql.lower()
         if sql.startswith('insert or ignore into ate_scope_descriptors'):counts['descriptor_write_attempts']+=1
         if not sql.lstrip().startswith('select'):return
         if re.search(r'\bpayload\b',sql) and any('from '+table in sql for table in ('lazy_record_versions','records','ate_retained_records')):
-            counts['selected_payload' if "namespace='people'" in sql else 'unrelated_payload']+=1
+            if 'then 1 else 0 end' in sql:counts['body_size_probes']+=1
+            else:counts['selected_payload' if "namespace='people'" in sql else 'unrelated_payload']+=1
         elif any('from '+table in sql for table in ('ate_proof_nodes','ate_ordered_seek_nodes','ate_scope_descriptors','ate_scope_generations')):counts['proof']+=1
         else:counts['other']+=1
     def progress():

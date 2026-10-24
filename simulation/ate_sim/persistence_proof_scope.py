@@ -5,6 +5,7 @@ shared. The externally accepted directory certificate binds both. All writes
 belong to the existing store transaction; bootstrap is explicit archive work.
 """
 from dataclasses import dataclass
+from contextlib import contextmanager
 from itertools import groupby
 import sqlite3
 
@@ -110,6 +111,8 @@ def _authority(store,pin,cert,expected):
 
 
 def _schemas(db):
+    for schema in ('sqlite_schema','sqlite_temp_schema'):
+        if db.execute("SELECT 1 FROM "+schema+" WHERE type='trigger' LIMIT 1").fetchone() is not None:raise StoreError('scope proof source cannot contain database triggers')
     for sql in (_DESCRIPTOR_SCHEMA,_ROOT_SCHEMA,_NODE_SCHEMA,_SEEK_SCHEMA):
         name=sql.split('(')[0].split()[2]
         row=db.execute("SELECT CASE WHEN typeof(sql)='text' AND length(CAST(sql AS BLOB))<=4096 THEN sql END FROM sqlite_schema WHERE type='table' AND name=?",(name,)).fetchone()
@@ -278,6 +281,46 @@ def _interval_ok(start,end,generation):
     return type(start) is int and 0<=start<=generation and (end is None or type(end) is int and end>generation and end>start)
 
 
+def _guard_scope_inputs(store,request,version_prepared,identity_prepared):
+    """Guard before inherited reads, inside one caller-owned stable snapshot.
+
+    Repeat after BEGIN IMMEDIATE: preparation and attempt registration must
+    not create a gap in which unbounded predecessor bytes can be transferred.
+    The inherited writer still checks all checksums and owner projections.
+    """
+    _check_request(store,request.pin,request);_closed_snapshot_preflight(store,1048576);_schemas(store.db)
+    required=('lazy_query_owner_interval','lazy_identity_occurrence_interval','lazy_identity_state_interval',
+        'lazy_record_interval','lazy_order_interval','lazy_namespace_interval')
+    if any(i not in store._interval_indexes for i in required):raise StoreError('scope save cannot use legacy interval fallback')
+    _require_indexes(store.db,include_order=False,intervals=required)
+    generation=request.parent.generation;_check_allocator(store,generation,request.parent.next_incarnation_id)
+    fixed=("typeof(valid_from)='integer' AND valid_from>=0 AND typeof(valid_to) IN ('null','integer') "
+        "AND typeof(row_checksum)='text' AND length(CAST(row_checksum AS BLOB))=64")
+    def probe(table,index,keys,args,valid):
+        rows=store._interval_rows(table,'CASE WHEN '+valid+' THEN 1 ELSE 0 END',keys,args,generation,index,limit=2)
+        if len(rows)>1 or any(row!=(1,) for row in rows):raise StoreIntegrityError('invalid or oversized affected scope predecessor')
+    for item in version_prepared:
+        ns,key=item['namespace'],item['typed_key'];_scope_key(OwnerScope(ns,key))
+        probe('lazy_namespace_state','lazy_namespace_interval',('namespace',),(ns,),fixed+" AND typeof(member_count)='integer' AND member_count>=0 AND typeof(next_ordinal)='integer' AND next_ordinal>=0")
+        probe('lazy_order_versions','lazy_order_interval',('namespace','typed_key'),(ns,key),fixed+" AND typeof(ordinal)='integer' AND ordinal>=0")
+        probe('lazy_record_versions','lazy_record_interval',('namespace','typed_key'),(ns,key),fixed+
+            " AND typeof(payload)='blob' AND typeof(memberships)='blob' AND length(payload)+length(memberships)<=67108864 "
+            "AND typeof(payload_checksum)='text' AND length(CAST(payload_checksum AS BLOB))=64 "
+            "AND typeof(record_schema)='integer' AND record_schema>0 AND typeof(codec_version)='integer' AND codec_version="+str(store.codec.version))
+        for _ in _query_source(store,generation,ns,key):pass
+    for item in identity_prepared:
+        ns,key,path=item['owner_namespace'],item['owner_key'],item['occurrence_path'];_scope_key(OwnerScope(ns,key))
+        if type(path) is not bytes or len(path)>MAX_FIELD_BYTES:raise ScopeProofBudgetError('changed occurrence exceeds scope path')
+        _identity_source(store,generation,ns,key,path,request.parent.next_incarnation_id)
+
+
+@contextmanager
+def _scope_parent_snapshot(store,request,version_prepared,identity_prepared):
+    with store.read_snapshot(request.pin,_preflight=lambda:_closed_snapshot_preflight(store,1048576)):
+        _guard_scope_inputs(store,request,version_prepared,identity_prepared)
+        yield
+
+
 def _query_source(store,generation,namespace,key):
     from .persistence_lazy_store import _query_checksum
     columns=("CASE WHEN typeof(index_name)='text' AND length(CAST(index_name AS BLOB)) BETWEEN 1 AND 4096 AND instr(index_name,char(0))=0 THEN index_name END,"
@@ -369,7 +412,10 @@ def _stage_scope_proof(store,request,new_generation,version_prepared,identity_pr
     if _load_root(store,request.parent.generation)[0]!=(request.parent,request.expected_parent):raise StoreIntegrityError('accepted scope parent changed')
     _require_indexes(store.db,include_order=False,intervals=('lazy_query_owner_interval','lazy_identity_occurrence_interval','lazy_identity_state_interval'))
     _check_allocator(store,request.parent.generation,request.parent.next_incarnation_id)
-    allocator=store._identity_state_at(new_generation)[0];_check_allocator(store,new_generation,allocator)
+    # Probe fixed-size allocator metadata before any inherited transfer.
+    rows=store._interval_rows('lazy_identity_state',"CASE WHEN typeof(next_incarnation_id)='integer' THEN next_incarnation_id END",(),(),new_generation,'lazy_identity_state_interval',limit=2)
+    if len(rows)!=1 or type(rows[0][0]) is not int:raise StoreIntegrityError('invalid successor scope allocator')
+    allocator=rows[0][0];_check_allocator(store,new_generation,allocator)
     if allocator<request.parent.next_incarnation_id:raise StoreIntegrityError('scope successor allocator moved backwards')
     OrderedSeekMap(store.db,b'').create_schema()
     store.db.execute('CREATE TEMP TABLE ate_scope_touched(scope BLOB PRIMARY KEY) WITHOUT ROWID')

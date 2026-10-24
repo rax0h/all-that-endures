@@ -307,3 +307,50 @@ def test_combined_lost_ack_recovers_both_component_roots(tmp_path):
     result=s.resolve_scope_commit(store,pin,*pair,commit_token='next',record_authority=records)
     assert result.record.commit==result.commit and result.certificate.generation==result.record.certificate.generation==2
     store.close()
+
+
+@pytest.mark.parametrize('field',['query-name','query-checksum','identity-checksum','namespace-checksum','order-checksum','old-version-body'])
+def test_predecessor_source_guard_precedes_inherited_transfer(tmp_path,field):
+    import tracemalloc
+    store,pin,pair=make_scope_store(tmp_path/'predecessor-budget.sqlite')
+    if field=='query-name':store.db.execute('UPDATE lazy_query_versions SET index_name=?',('a\0'+'x'*(8*1024*1024),))
+    elif field=='old-version-body':store.db.execute('UPDATE lazy_record_versions SET payload=zeroblob(67108865)')
+    else:
+        table={'query-checksum':'lazy_query_versions','identity-checksum':'lazy_identity_occurrence_versions','namespace-checksum':'lazy_namespace_state','order-checksum':'lazy_order_versions'}[field]
+        store.db.execute('UPDATE '+table+' SET row_checksum=?',('x'*(8*1024*1024),))
+    store.db.commit();tracemalloc.start()
+    try:
+        with pytest.raises(StoreError):commit_scope(store,pin,pair)
+        _,peak=tracemalloc.get_traced_memory()
+    finally:tracemalloc.stop()
+    assert peak<2*1024*1024
+    assert store.generation==1
+    store.close()
+
+
+@pytest.mark.parametrize('temporary',[False,True])
+def test_database_trigger_cannot_mutate_source_after_root_staging(tmp_path,temporary):
+    store,pin,pair=make_scope_store(tmp_path/'trigger.sqlite')
+    store.db.execute("CREATE "+('TEMP ' if temporary else '')+"TRIGGER corrupt_scope_source AFTER INSERT ON ate_scope_generations BEGIN DELETE FROM lazy_query_versions WHERE namespace='people'; END")
+    store.db.commit()
+    with pytest.raises(StoreError):commit_scope(store,pin,pair)
+    assert store.generation==1
+    store.close()
+
+
+def test_affected_source_guard_rechecks_inside_actual_writer_transaction(tmp_path,monkeypatch):
+    import tracemalloc
+    from ate_sim.persistence_lazy_store import LazyRecordStore
+    store,pin,pair=make_scope_store(tmp_path/'guard-recheck.sqlite');original=LazyRecordStore._register_attempt
+    def corrupt(self,*args):
+        original(self,*args)
+        self.db.execute('UPDATE lazy_identity_occurrence_versions SET row_checksum=CAST(zeroblob(8388608) AS TEXT)')
+        self.db.commit()
+    monkeypatch.setattr(LazyRecordStore,'_register_attempt',corrupt)
+    tracemalloc.start()
+    try:
+        with pytest.raises(StoreError):commit_scope(store,pin,pair)
+        _,peak=tracemalloc.get_traced_memory()
+    finally:tracemalloc.stop()
+    assert peak<2*1024*1024 and store.generation==1
+    store.close()
