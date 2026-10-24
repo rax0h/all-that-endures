@@ -26,3 +26,5 @@ Final actual scaling: measured local48e7623/runtimefe161613. At1k/10k/100k unrel
 Task3 local verification/review/scaling complete. Full candidate suite and all10scaling matrices will run in existing CI; full World timing/admission remain gated. Candidate/launch receipt below. No main merge/endurance/long polling.
 
 CI allocation: proof job now has10full scaling matrices including an audited100k-record bootstrap. Increased aggregate job budget20→30minutes; each individual diagnostic retains its15minute bound. Workflow change launches the exact candidate after incremental skip-CI checkpoints; runtime is unchanged from verified scaling.
+
+Task3 publication complete: candidate b80fd5a7c658e55963beba40123779287c8bae9b tree 853f88de5b0a315ac5725005bd32952edcfb8571 runtime fe161613a47b3a4eebebd58b1dd5c0b5da7dda8d matches exact local candidate and measured runtime. CI 40051989785 in progress at launch. Full-suite acceptance pending; no main merge/endurance/long polling. All implementation/receipts checkpointed on GitHub.

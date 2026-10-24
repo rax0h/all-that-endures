@@ -31,3 +31,5 @@ This closes actual retained ordinary body availability for the component's live 
 The bootstrap's inherited full lazy/segment audit is explicit archive work; only the ordinary source body/metadata transfer limits are newly enforced here. The SQL callback guard preserves an existing authorizer but is not an arbitrary-Python sandbox. All review scope rulings/costs: retained-record-ledger.md and retained-record-review.md.
 
 No new full World startup, mature-year save or warm-year measurement is supplied. The22ms-scale point save is not a full World save or acceptance of the2second target for the mature workload.
+
+Candidate CI [40051989785](https://github.com/rax0h/all-that-endures/actions/runs/40051989785), head`b80fd5a7c658e55963beba40123779287c8bae9b`, runtime`fe161613a47b3a4eebebd58b1dd5c0b5da7dda8d`; in progress at launch, full-suite acceptance pending.
