@@ -1,0 +1,20 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_expected_type_rejected_without_comparison_hook ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_expected_type_rejected_wi0')
+
+    def test_expected_type_rejected_without_comparison_hook(tmp_path):
+     s,p,a,c=setup(tmp_path);calls=[]
+     class Expected:
+      def __eq__(self,other):calls.append(1);return True
+     bad=(c[0],Expected())
+     with pytest.raises(StoreError):save(s,p,a,bad,())
+>    assert not calls;s.close()
+     ^^^^^^^^^^^^^^^^
+E    assert not [1]
+
+simulation/tests/test_stage_0_5_proof_collection_publication.py:58: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_collection_publication.py::test_expected_type_rejected_without_comparison_hook
+1 failed, 1 passed, 7 deselected in 0.85s

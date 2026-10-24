@@ -1,0 +1,258 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+________________ test_atomic_order_successor_and_retained_page _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_atomic_order_successor_an0')
+
+    def test_atomic_order_successor_and_retained_page(tmp_path):
+     s,p,a,c=setup(tmp_path);old=s.capture_pin()
+>    r=save(s,p,a,c,(VersionChange('people',0,{'wealth':2},reinsertion=True),VersionChange('people',1,{'wealth':3})))
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_collection_publication.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_collection_publication.py:13: in save
+    return m().commit_collections(s,p,(c,),*a.content,scope_authority=a.scope,record_authority=a.record,commit_token='next',version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_collection_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_collection_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_collection_publish'
+import_ = <function _gcd_import at 0x7f7b09b780e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_collection_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________________ test_value_only_reuses_root __________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_value_only_reuses_root0')
+
+    def test_value_only_reuses_root(tmp_path):
+>    s,p,a,c=setup(tmp_path);r=save(s,p,a,c,(VersionChange('people',0,{'wealth':2}),))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_collection_publication.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_collection_publication.py:13: in save
+    return m().commit_collections(s,p,(c,),*a.content,scope_authority=a.scope,record_authority=a.record,commit_token='next',version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_collection_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_collection_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_collection_publish'
+import_ = <function _gcd_import at 0x7f7b09b780e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_collection_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_failure_and_exact_recovery[before_head] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_failure_and_exact_recover0')
+phase = 'before_head'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit','after_commit'])
+    def test_failure_and_exact_recovery(tmp_path,phase):
+     s,p,a,c=setup(tmp_path)
+     def fault(at):
+      if at==phase:raise RuntimeError('injected')
+     s._phase_hook=fault
+>    with pytest.raises(RuntimeError):save(s,p,a,c,(VersionChange('people',0,{'wealth':2},reinsertion=True),))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_collection_publication.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_collection_publication.py:13: in save
+    return m().commit_collections(s,p,(c,),*a.content,scope_authority=a.scope,record_authority=a.record,commit_token='next',version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_collection_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_collection_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_collection_publish'
+import_ = <function _gcd_import at 0x7f7b09b780e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_collection_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_failure_and_exact_recovery[before_commit] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_failure_and_exact_recover1')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit','after_commit'])
+    def test_failure_and_exact_recovery(tmp_path,phase):
+     s,p,a,c=setup(tmp_path)
+     def fault(at):
+      if at==phase:raise RuntimeError('injected')
+     s._phase_hook=fault
+>    with pytest.raises(RuntimeError):save(s,p,a,c,(VersionChange('people',0,{'wealth':2},reinsertion=True),))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_collection_publication.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_collection_publication.py:13: in save
+    return m().commit_collections(s,p,(c,),*a.content,scope_authority=a.scope,record_authority=a.record,commit_token='next',version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_collection_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_collection_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_collection_publish'
+import_ = <function _gcd_import at 0x7f7b09b780e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_collection_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_failure_and_exact_recovery[after_commit] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_failure_and_exact_recover2')
+phase = 'after_commit'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit','after_commit'])
+    def test_failure_and_exact_recovery(tmp_path,phase):
+     s,p,a,c=setup(tmp_path)
+     def fault(at):
+      if at==phase:raise RuntimeError('injected')
+     s._phase_hook=fault
+>    with pytest.raises(RuntimeError):save(s,p,a,c,(VersionChange('people',0,{'wealth':2},reinsertion=True),))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_collection_publication.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_collection_publication.py:13: in save
+    return m().commit_collections(s,p,(c,),*a.content,scope_authority=a.scope,record_authority=a.record,commit_token='next',version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_collection_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_collection_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_collection_publish'
+import_ = <function _gcd_import at 0x7f7b09b780e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_collection_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_missing_namespace_authority_rejects_before_writes ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_missing_namespace_authori0')
+
+    def test_missing_namespace_authority_rejects_before_writes(tmp_path):
+     s,p,a,c=setup(tmp_path)
+>    with pytest.raises(StoreError):save(s,p,a,c,(VersionChange('archive',0,{'new':1}),))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_collection_publication.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_collection_publication.py:13: in save
+    return m().commit_collections(s,p,(c,),*a.content,scope_authority=a.scope,record_authority=a.record,commit_token='next',version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_collection_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_collection_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_collection_publish'
+import_ = <function _gcd_import at 0x7f7b09b780e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_collection_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________________ test_coherent_old_order_tamper_rejected ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-7/test_coherent_old_order_tamper0')
+
+    def test_coherent_old_order_tamper_rejected(tmp_path):
+     from ate_sim.persistence_lazy_store import _order_checksum
+     s,p,a,c=setup(tmp_path);key=s.codec.encode(0)
+     s.db.execute("UPDATE lazy_order_versions SET ordinal=9,row_checksum=? WHERE namespace='people'",(_order_checksum('people',key,9,1,None),));s.db.commit()
+>    with pytest.raises(StoreIntegrityError):save(s,p,a,c,(VersionChange('people',0,{'wealth':2}),))
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_collection_publication.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_collection_publication.py:13: in save
+    return m().commit_collections(s,p,(c,),*a.content,scope_authority=a.scope,record_authority=a.record,commit_token='next',version_changes=changes,identity_changes=(),changes=(),new_segments=(),metadata=metadata(p.captured_head+1),**kw)
+           ^^^
+simulation/tests/test_stage_0_5_proof_collection_publication.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_collection_publish')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_collection_publish'
+import_ = <function _gcd_import at 0x7f7b09b780e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_collection_publish'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_collection_publication.py::test_atomic_order_successor_and_retained_page
+FAILED simulation/tests/test_stage_0_5_proof_collection_publication.py::test_value_only_reuses_root
+FAILED simulation/tests/test_stage_0_5_proof_collection_publication.py::test_failure_and_exact_recovery[before_head]
+FAILED simulation/tests/test_stage_0_5_proof_collection_publication.py::test_failure_and_exact_recovery[before_commit]
+FAILED simulation/tests/test_stage_0_5_proof_collection_publication.py::test_failure_and_exact_recovery[after_commit]
+FAILED simulation/tests/test_stage_0_5_proof_collection_publication.py::test_missing_namespace_authority_rejects_before_writes
+FAILED simulation/tests/test_stage_0_5_proof_collection_publication.py::test_coherent_old_order_tamper_rejected
+7 failed in 3.62s

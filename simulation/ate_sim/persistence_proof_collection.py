@@ -71,6 +71,8 @@ def bootstrap_collection(store,pin,namespace,*,max_metadata_bytes=1048576):
         try:root=m.build((query_order_key(ordinal,key),member(d,key,ordinal)) for key,ordinal in rows)
         finally:rows.close()
         c=CollectionCertificate(store.store_identity,g,store.codec.version,namespace,declared,count,next_id,root);expected=certificate_commitment(c)
+        from .persistence_proof_collection_publish import persist_bootstrap
+        persist_bootstrap(store,c)
         store.db.commit();return c,expected
     except BaseException:
         if store.db.in_transaction:store.db.rollback()

@@ -2622,6 +2622,7 @@ class LazyRecordStore:
         _record_proof=None,
         _scope_proof=None,
         _content_proof=None,
+        _collection_proof=None,
     ) -> CommitResult:
         self._ensure_open()
         if _record_proof is not None:
@@ -2635,6 +2636,10 @@ class LazyRecordStore:
             if _scope_proof is None or _record_proof is None:
                 raise StoreIntegrityError('content publication requires unified record and scope requests')
             _check_content_request(self, pin, _content_proof)
+        if _collection_proof is not None:
+            from .persistence_proof_collection_publish import _check as _check_collection, _guard as _guard_collection, _stage as _stage_collection
+            if _content_proof is None:raise StoreIntegrityError('collection publication requires unified content request')
+            _check_collection(self,pin,_collection_proof)
         if _record_proof is not None or _scope_proof is not None:
             from .persistence_proof_record import _checked_phase_hook
         def phase_hook(phase):
@@ -2791,6 +2796,7 @@ class LazyRecordStore:
                 counts = _namespace_counts(self.codec, locked[6])
                 new_generation = locked_generation + 1
                 if _content_proof is not None:
+                    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent)
                     _guard_content_parent(self, _content_proof, version_prepared, segment_prepared)
                 self._write_lazy_changes(
                     version_prepared,
@@ -2917,6 +2923,7 @@ class LazyRecordStore:
                     _stage_scope_proof(self, _scope_proof, new_generation, version_prepared, identity_prepared, encoded_commit_token)
                 if _content_proof is not None:
                     _stage_content_proof(self, _content_proof, new_generation, version_prepared, segment_prepared, encoded_commit_token)
+                if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
                 if _scope_proof is not None:
                     self._cleanup_expired(floor, row_budget=cleanup_budget)
                 try:

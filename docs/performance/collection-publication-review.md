@@ -1,0 +1,7 @@
+# Independent collection publication review
+
+Fresh read-only review_collection_publication inspectedeb939bc..9da877. No Critical/Important/Minor findings. Independently96tests passed26.95s (collection, collection publication, existing content publication). Independent temporary probes passed interleaved regular/spilled allocation, delete-all, retained reinsertion, absent-key deletion, missing predecessor order/record, coherent successor counter corruption and final collection-root write failure. Each fault retained generation1 and one row in all4authority tables. An initial reinsertion probe correctly rejected after cleanup removed history; preserving history exercised the intended case.
+
+Parent added3tests after reviewed head: metadata/no-op sharing, spilled multi-namespace absent deletion, actual new ordinal tampering.32combined focused cases passed19.11s. Runtime unchanged; no re-review or fix pass needed.
+
+Rulings/costs: previous full CI40106928986 was pending at start and is not accepted here; completed performance/affected results are independently authenticated by executor rather than inferred from driver review; global inventory/topology/full manifest/World activation/fencing/collection/endurance remain gated (otherwise incomplete authority could be exposed); arbitrary Python monkeypatching is not a security boundary (SQL guard is not a Python sandbox). These are all reviewer declined-to-judge cases.
