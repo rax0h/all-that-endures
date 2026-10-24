@@ -2620,13 +2620,19 @@ class LazyRecordStore:
         cleanup_budget: int = 256,
         preparation_budget: tuple[int, int] | None = None,
         _record_proof=None,
+        _scope_proof=None,
     ) -> CommitResult:
         self._ensure_open()
         if _record_proof is not None:
             from .persistence_proof_record import _check_request, _checked_phase_hook, _stage_record_proof
             _check_request(self, pin, _record_proof)
+        if _scope_proof is not None:
+            from .persistence_proof_scope import _check_request as _check_scope_request, _stage_scope_proof
+            _check_scope_request(self, pin, _scope_proof)
+        if _record_proof is not None or _scope_proof is not None:
+            from .persistence_proof_record import _checked_phase_hook
         def phase_hook(phase):
-            if _record_proof is None:
+            if _record_proof is None and _scope_proof is None:
                 return self._phase_hook(phase)
             return _checked_phase_hook(self, phase)
         if type(cleanup_budget) is not int or not 0 <= cleanup_budget <= 256:
@@ -2638,6 +2644,8 @@ class LazyRecordStore:
         encoded_commit_token = self.codec.encode(commit_token)
         if _record_proof is not None and encoded_commit_token != _record_proof.encoded_token:
             raise StoreConflictError('ordinary proof encoded token changed')
+        if _scope_proof is not None and encoded_commit_token != _scope_proof.encoded_token:
+            raise StoreConflictError('scope proof encoded token changed')
         workspace = None
         if preparation_budget is not None:
             if type(preparation_budget) is not tuple or len(preparation_budget) != 2:
@@ -2862,7 +2870,11 @@ class LazyRecordStore:
                 )
                 self._pin_rows += 2
                 floor = self._validated_retention_floor(new_generation)
-                self._cleanup_expired(floor, row_budget=cleanup_budget)
+                # Scope proofs authenticate the actual parent rows as well as
+                # the successor. Keep those rows until their final stage; the
+                # same bounded cleanup still belongs to this transaction.
+                if _scope_proof is None:
+                    self._cleanup_expired(floor, row_budget=cleanup_budget)
                 format_row = self.db.execute(
                     "SELECT value FROM store_metadata WHERE key='format_version'"
                 ).fetchone()
@@ -2885,6 +2897,9 @@ class LazyRecordStore:
                 phase_hook("before_commit")
                 if _record_proof is not None:
                     _stage_record_proof(self, _record_proof, new_generation, ordinary_prepared, encoded_commit_token)
+                if _scope_proof is not None:
+                    _stage_scope_proof(self, _scope_proof, new_generation, version_prepared, identity_prepared, encoded_commit_token)
+                    self._cleanup_expired(floor, row_budget=cleanup_budget)
                 try:
                     self._commit_sqlite()
                     committed = True
