@@ -37,3 +37,5 @@ Full fixture and all audited component bootstraps are excluded from operation ti
 Complete topology and target existence/kind, collection order and namespace/allocator inventory, one verified-copy snapshot establishing every component, complete atomic conceptual seven-root manifests, writer fencing/format activation and canonical World consumption remain required. No node collection or endurance is implemented. Existing local recovery does not independently authenticate a coherently replaced whole-store successor history; complete externally accepted generation authority remains required.
 
 Full World performance targets remain unmeasured. Exact candidate CI and all twelve diagnostics are pending launch/acceptance.
+
+Candidate CI [40098756156](https://github.com/rax0h/all-that-endures/actions/runs/40098756156), head`1573bd1bc3b702542aea3de2d512d349828756fa`, tree`f6197cb21f50a2ad7f85d2c99e403e2429c6aaa5`, runtime`4233da09ca3b5057ef5a4dda6e4bd0bde3e52714`; in_progress at launch. Full candidate suite and all12diagnostics enabled; acceptance pending.
