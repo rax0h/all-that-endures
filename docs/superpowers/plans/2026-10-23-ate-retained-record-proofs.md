@@ -24,18 +24,20 @@
 
 ## Task1: explicit constructor and retained reader
 
-- [ ] Write missing-module RED for framing, current/old bytes/absence, source/node/body corruption, context/index/budgets/hooks/transactions.
-- [ ] Implement persistence_proof_record.py bootstrap/certificate/raw reader using existing preimages; full verify outside ordinary paths.
-- [ ] Focused GREEN, commit and checkpoint.
+- [x] Write missing-module RED for framing, current/old bytes/absence, source/node/body corruption, context/index/budgets/hooks/transactions.
+- [x] Implement persistence_proof_record.py bootstrap/certificate/raw reader using existing preimages; full verify outside ordinary paths.
+- [x] Focused GREEN, commit and checkpoint.
 
 ## Task2: actual commit/recovery integration
 
-- [ ] Add RED for opt-in commit, actual changed-row binding, no-op/conflict, rollback phases, lost acknowledgement/exact token, default-writer gap, delete/reinsert and frozen/spilled prepared inputs.
-- [ ] Add private LazyRecordStore.commit request stage after before_commit; implement wrapper and existing resolve_commit composition.
-- [ ] GREEN focused and affected suite; commit/checkpoint.
+- [x] Add RED for opt-in commit, actual changed-row binding, no-op/conflict, rollback phases, lost acknowledgement/exact token, default-writer gap, delete/reinsert and frozen/spilled prepared inputs.
+- [x] Add private LazyRecordStore.commit request stage after before_commit; implement wrapper and existing resolve_commit composition.
+- [x] GREEN focused and affected suite; commit/checkpoint.
 
 ## Task3: measured scaling and review
 
-- [ ] Driver at1k/10k/100k genuine unrelated ordinary records; separately report full bootstrap, actual point save and raw retained reads. Assert exact old/new results and zero unrelated payload SELECTs.
-- [ ] One independent review; substantive fix pass RED/GREEN +affected suite. Record every declined scope ruling.
-- [ ] Publish exact-tree CI candidate with full suite/all existing diagnostics, receipts and pending acceptance. No long polling/main merge/endurance.
+- [x] Driver at1k/10k/100k genuine unrelated ordinary records; separately report full bootstrap, actual point save and raw retained reads. Assert exact old/new results and zero unrelated payload SELECTs.
+- [x] One independent review; substantive fix pass RED/GREEN +affected suite. Record every declined scope ruling.
+- [x] Publish exact-tree CI candidate with full suite/all existing diagnostics, receipts and pending acceptance. No long polling/main merge/endurance.
+
+Implementation/review/local gates complete; final publication checkbox denotes CI launch, not CI acceptance. Launch receipt/ledger record pending full suite.
