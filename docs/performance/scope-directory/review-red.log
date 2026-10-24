@@ -1,0 +1,161 @@
+FFFFFFF                                                                  [100%]
+=================================== FAILURES ===================================
+____ test_predecessor_source_guard_precedes_inherited_transfer[query-name] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_predecessor_source_guard_0')
+field = 'query-name'
+
+    @pytest.mark.parametrize('field',['query-name','query-checksum','identity-checksum','namespace-checksum','order-checksum','old-version-body'])
+    def test_predecessor_source_guard_precedes_inherited_transfer(tmp_path,field):
+        import tracemalloc
+        store,pin,pair=make_scope_store(tmp_path/'predecessor-budget.sqlite')
+        if field=='query-name':store.db.execute('UPDATE lazy_query_versions SET index_name=?',('a\0'+'x'*(8*1024*1024),))
+        elif field=='old-version-body':store.db.execute('UPDATE lazy_record_versions SET payload=zeroblob(67108865)')
+        else:
+            table={'query-checksum':'lazy_query_versions','identity-checksum':'lazy_identity_occurrence_versions','namespace-checksum':'lazy_namespace_state','order-checksum':'lazy_order_versions'}[field]
+            store.db.execute('UPDATE '+table+' SET row_checksum=?',('x'*(8*1024*1024),))
+        store.db.commit();tracemalloc.start()
+        try:
+            with pytest.raises(StoreError):commit_scope(store,pin,pair)
+            _,peak=tracemalloc.get_traced_memory()
+        finally:tracemalloc.stop()
+>       assert peak<2*1024*1024
+E       assert 16922314 < ((2 * 1024) * 1024)
+
+simulation/tests/test_stage_0_5_proof_scope.py:326: AssertionError
+__ test_predecessor_source_guard_precedes_inherited_transfer[query-checksum] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_predecessor_source_guard_1')
+field = 'query-checksum'
+
+    @pytest.mark.parametrize('field',['query-name','query-checksum','identity-checksum','namespace-checksum','order-checksum','old-version-body'])
+    def test_predecessor_source_guard_precedes_inherited_transfer(tmp_path,field):
+        import tracemalloc
+        store,pin,pair=make_scope_store(tmp_path/'predecessor-budget.sqlite')
+        if field=='query-name':store.db.execute('UPDATE lazy_query_versions SET index_name=?',('a\0'+'x'*(8*1024*1024),))
+        elif field=='old-version-body':store.db.execute('UPDATE lazy_record_versions SET payload=zeroblob(67108865)')
+        else:
+            table={'query-checksum':'lazy_query_versions','identity-checksum':'lazy_identity_occurrence_versions','namespace-checksum':'lazy_namespace_state','order-checksum':'lazy_order_versions'}[field]
+            store.db.execute('UPDATE '+table+' SET row_checksum=?',('x'*(8*1024*1024),))
+        store.db.commit();tracemalloc.start()
+        try:
+            with pytest.raises(StoreError):commit_scope(store,pin,pair)
+            _,peak=tracemalloc.get_traced_memory()
+        finally:tracemalloc.stop()
+>       assert peak<2*1024*1024
+E       assert 8402435 < ((2 * 1024) * 1024)
+
+simulation/tests/test_stage_0_5_proof_scope.py:326: AssertionError
+_ test_predecessor_source_guard_precedes_inherited_transfer[identity-checksum] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_predecessor_source_guard_2')
+field = 'identity-checksum'
+
+    @pytest.mark.parametrize('field',['query-name','query-checksum','identity-checksum','namespace-checksum','order-checksum','old-version-body'])
+    def test_predecessor_source_guard_precedes_inherited_transfer(tmp_path,field):
+        import tracemalloc
+        store,pin,pair=make_scope_store(tmp_path/'predecessor-budget.sqlite')
+        if field=='query-name':store.db.execute('UPDATE lazy_query_versions SET index_name=?',('a\0'+'x'*(8*1024*1024),))
+        elif field=='old-version-body':store.db.execute('UPDATE lazy_record_versions SET payload=zeroblob(67108865)')
+        else:
+            table={'query-checksum':'lazy_query_versions','identity-checksum':'lazy_identity_occurrence_versions','namespace-checksum':'lazy_namespace_state','order-checksum':'lazy_order_versions'}[field]
+            store.db.execute('UPDATE '+table+' SET row_checksum=?',('x'*(8*1024*1024),))
+        store.db.commit();tracemalloc.start()
+        try:
+            with pytest.raises(StoreError):commit_scope(store,pin,pair)
+            _,peak=tracemalloc.get_traced_memory()
+        finally:tracemalloc.stop()
+>       assert peak<2*1024*1024
+E       assert 8397967 < ((2 * 1024) * 1024)
+
+simulation/tests/test_stage_0_5_proof_scope.py:326: AssertionError
+_ test_predecessor_source_guard_precedes_inherited_transfer[namespace-checksum] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_predecessor_source_guard_3')
+field = 'namespace-checksum'
+
+    @pytest.mark.parametrize('field',['query-name','query-checksum','identity-checksum','namespace-checksum','order-checksum','old-version-body'])
+    def test_predecessor_source_guard_precedes_inherited_transfer(tmp_path,field):
+        import tracemalloc
+        store,pin,pair=make_scope_store(tmp_path/'predecessor-budget.sqlite')
+        if field=='query-name':store.db.execute('UPDATE lazy_query_versions SET index_name=?',('a\0'+'x'*(8*1024*1024),))
+        elif field=='old-version-body':store.db.execute('UPDATE lazy_record_versions SET payload=zeroblob(67108865)')
+        else:
+            table={'query-checksum':'lazy_query_versions','identity-checksum':'lazy_identity_occurrence_versions','namespace-checksum':'lazy_namespace_state','order-checksum':'lazy_order_versions'}[field]
+            store.db.execute('UPDATE '+table+' SET row_checksum=?',('x'*(8*1024*1024),))
+        store.db.commit();tracemalloc.start()
+        try:
+            with pytest.raises(StoreError):commit_scope(store,pin,pair)
+            _,peak=tracemalloc.get_traced_memory()
+        finally:tracemalloc.stop()
+>       assert peak<2*1024*1024
+E       assert 8399630 < ((2 * 1024) * 1024)
+
+simulation/tests/test_stage_0_5_proof_scope.py:326: AssertionError
+__ test_predecessor_source_guard_precedes_inherited_transfer[order-checksum] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_predecessor_source_guard_4')
+field = 'order-checksum'
+
+    @pytest.mark.parametrize('field',['query-name','query-checksum','identity-checksum','namespace-checksum','order-checksum','old-version-body'])
+    def test_predecessor_source_guard_precedes_inherited_transfer(tmp_path,field):
+        import tracemalloc
+        store,pin,pair=make_scope_store(tmp_path/'predecessor-budget.sqlite')
+        if field=='query-name':store.db.execute('UPDATE lazy_query_versions SET index_name=?',('a\0'+'x'*(8*1024*1024),))
+        elif field=='old-version-body':store.db.execute('UPDATE lazy_record_versions SET payload=zeroblob(67108865)')
+        else:
+            table={'query-checksum':'lazy_query_versions','identity-checksum':'lazy_identity_occurrence_versions','namespace-checksum':'lazy_namespace_state','order-checksum':'lazy_order_versions'}[field]
+            store.db.execute('UPDATE '+table+' SET row_checksum=?',('x'*(8*1024*1024),))
+        store.db.commit();tracemalloc.start()
+        try:
+            with pytest.raises(StoreError):commit_scope(store,pin,pair)
+            _,peak=tracemalloc.get_traced_memory()
+        finally:tracemalloc.stop()
+>       assert peak<2*1024*1024
+E       assert 8400088 < ((2 * 1024) * 1024)
+
+simulation/tests/test_stage_0_5_proof_scope.py:326: AssertionError
+_ test_predecessor_source_guard_precedes_inherited_transfer[old-version-body] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_predecessor_source_guard_5')
+field = 'old-version-body'
+
+    @pytest.mark.parametrize('field',['query-name','query-checksum','identity-checksum','namespace-checksum','order-checksum','old-version-body'])
+    def test_predecessor_source_guard_precedes_inherited_transfer(tmp_path,field):
+        import tracemalloc
+        store,pin,pair=make_scope_store(tmp_path/'predecessor-budget.sqlite')
+        if field=='query-name':store.db.execute('UPDATE lazy_query_versions SET index_name=?',('a\0'+'x'*(8*1024*1024),))
+        elif field=='old-version-body':store.db.execute('UPDATE lazy_record_versions SET payload=zeroblob(67108865)')
+        else:
+            table={'query-checksum':'lazy_query_versions','identity-checksum':'lazy_identity_occurrence_versions','namespace-checksum':'lazy_namespace_state','order-checksum':'lazy_order_versions'}[field]
+            store.db.execute('UPDATE '+table+' SET row_checksum=?',('x'*(8*1024*1024),))
+        store.db.commit();tracemalloc.start()
+        try:
+            with pytest.raises(StoreError):commit_scope(store,pin,pair)
+            _,peak=tracemalloc.get_traced_memory()
+        finally:tracemalloc.stop()
+>       assert peak<2*1024*1024
+E       assert 67120687 < ((2 * 1024) * 1024)
+
+simulation/tests/test_stage_0_5_proof_scope.py:326: AssertionError
+________ test_database_trigger_cannot_mutate_source_after_root_staging _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_database_trigger_cannot_m0')
+
+    def test_database_trigger_cannot_mutate_source_after_root_staging(tmp_path):
+        store,pin,pair=make_scope_store(tmp_path/'trigger.sqlite')
+        store.db.execute("CREATE TRIGGER corrupt_scope_source AFTER INSERT ON ate_scope_generations BEGIN DELETE FROM lazy_query_versions WHERE namespace='people'; END")
+        store.db.commit()
+>       with pytest.raises(StoreError):commit_scope(store,pin,pair)
+E       Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_scope.py:335: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_predecessor_source_guard_precedes_inherited_transfer[query-name]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_predecessor_source_guard_precedes_inherited_transfer[query-checksum]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_predecessor_source_guard_precedes_inherited_transfer[identity-checksum]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_predecessor_source_guard_precedes_inherited_transfer[namespace-checksum]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_predecessor_source_guard_precedes_inherited_transfer[order-checksum]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_predecessor_source_guard_precedes_inherited_transfer[old-version-body]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_database_trigger_cannot_mutate_source_after_root_staging
+7 failed, 46 deselected in 3.06s

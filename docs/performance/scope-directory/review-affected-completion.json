@@ -1,0 +1,12 @@
+{
+  "schema": "ate-scope-affected-completion/1",
+  "command_session": 83313,
+  "exit_code": 0,
+  "test_cases": 696,
+  "xml_failures": 0,
+  "xml_errors": 0,
+  "xml_skips": 0,
+  "xml_seconds": 91.805,
+  "verified_runtime_tree": "770b634ceddae1aa6542b98f3861da6f1f7b0de9",
+  "log_limitation": "Overlapping background redirected logs exposed stale earlier invalid-fixture failure output. Final passed command exit and final zero-failure XML are retained; no full final passing log is claimed."
+}

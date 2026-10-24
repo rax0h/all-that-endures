@@ -1,0 +1,3 @@
+1000: scoped point save 99.26ms; unrelated bodies0; allocator root sharing exact
+10000: scoped point save 97.08ms; unrelated bodies0; allocator root sharing exact
+100000: scoped point save 100.64ms; unrelated bodies0; allocator root sharing exact

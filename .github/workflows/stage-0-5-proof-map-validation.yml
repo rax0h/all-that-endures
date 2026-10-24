@@ -70,7 +70,7 @@ jobs:
           python -m pytest -q simulation/tests/test_stage_0_5_proof_generation.py --junitxml=evidence/generation-tests.xml 2>&1 | tee evidence/generation-tests.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_record.py --junitxml=evidence/record-tests.xml 2>&1 | tee evidence/record-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_record_scaling.py --output evidence/record-scaling 2>&1 | tee evidence/record-scaling.log
-          python -m pytest -q simulation/tests/test_stage_0_5_proof_scope.py --junitxml=evidence/scope-tests.xml 2>&1 | tee evidence/scope-tests.log
+          python -m pytest -q --capture=sys simulation/tests/test_stage_0_5_proof_scope.py --junitxml=evidence/scope-tests.xml 2>&1 | tee evidence/scope-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_scope_scaling.py --output evidence/scope-scaling 2>&1 | tee evidence/scope-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_identity_group_scaling.py --output evidence/group-scaling 2>&1 | tee evidence/group-scaling.log
       - uses: actions/upload-artifact@v4

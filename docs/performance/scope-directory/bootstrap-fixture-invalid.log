@@ -1,0 +1,604 @@
+FFFFFFFFFFFFFFFFF                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_complete_constructor_and_existing_raw_pages _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_complete_constructor_and_0')
+
+    def test_complete_constructor_and_existing_raw_pages(tmp_path):
+>       store,pin,pair=make_scope_store(tmp_path/'complete.sqlite',20)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:19: in make_scope_store
+    pin=store.commit(store.capture_pin(),commit_token='seed',version_changes=versions(),identity_changes=placements(),
+simulation/ate_sim/persistence_lazy_store.py:2785: in commit
+    self._write_ordinary_changes(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fe125c79100>
+prepared = ({'change': RecordChange(namespace='people', key=1, value={'ordinary': 1}, record_schema=1, delete=False, memberships=()), 'namespace': 'people', 'typed_key': b'["int","1"]', 'payload': b'["dict",[[["str","ordinary"],["int","1"]]]]', ...},)
+new_generation = 1, counts = {'people': (1, 0), 'archive': (20, 0)}
+
+    def _write_ordinary_changes(
+        self,
+        prepared: tuple[dict[str, Any], ...],
+        new_generation: int,
+        counts: dict[str, tuple[int, int]],
+    ) -> tuple[int, int]:
+        writes = deletes = 0
+        checked_namespaces = set()
+        for item in prepared:
+            change: RecordChange = item["change"]
+            namespace = item["namespace"]
+            typed_key = item["typed_key"]
+            if namespace not in checked_namespaces:
+                # Historical declaration still forbids an authority switch.
+                # Probe only affected namespaces; DISTINCT over namespace
+                # history scans an expired backlog even for no ordinary writes.
+                declared = self.db.execute('SELECT 1 FROM lazy_namespace_state WHERE namespace=? LIMIT 1',
+                                           (namespace,)).fetchone()
+                self._metadata_rows += int(declared is not None)
+                if declared is not None:
+>                   raise StoreConflictError('ordinary record change targets a declared lazy namespace')
+E                   ate_sim.incremental_store.StoreConflictError: ordinary record change targets a declared lazy namespace
+
+simulation/ate_sim/persistence_lazy_store.py:2487: StoreConflictError
+____________________ test_authenticated_empty_scopes[owner] ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authenticated_empty_scope0')
+kind = 'owner'
+
+    @pytest.mark.parametrize('kind',['owner','group','query'])
+    def test_authenticated_empty_scopes(tmp_path,kind):
+>       store,pin,pair=make_scope_store(tmp_path/'empty.sqlite')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:19: in make_scope_store
+    pin=store.commit(store.capture_pin(),commit_token='seed',version_changes=versions(),identity_changes=placements(),
+simulation/ate_sim/persistence_lazy_store.py:2785: in commit
+    self._write_ordinary_changes(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fe125ca2570>
+prepared = ({'change': RecordChange(namespace='people', key=1, value={'ordinary': 1}, record_schema=1, delete=False, memberships=()), 'namespace': 'people', 'typed_key': b'["int","1"]', 'payload': b'["dict",[[["str","ordinary"],["int","1"]]]]', ...},)
+new_generation = 1, counts = {'people': (1, 0)}
+
+    def _write_ordinary_changes(
+        self,
+        prepared: tuple[dict[str, Any], ...],
+        new_generation: int,
+        counts: dict[str, tuple[int, int]],
+    ) -> tuple[int, int]:
+        writes = deletes = 0
+        checked_namespaces = set()
+        for item in prepared:
+            change: RecordChange = item["change"]
+            namespace = item["namespace"]
+            typed_key = item["typed_key"]
+            if namespace not in checked_namespaces:
+                # Historical declaration still forbids an authority switch.
+                # Probe only affected namespaces; DISTINCT over namespace
+                # history scans an expired backlog even for no ordinary writes.
+                declared = self.db.execute('SELECT 1 FROM lazy_namespace_state WHERE namespace=? LIMIT 1',
+                                           (namespace,)).fetchone()
+                self._metadata_rows += int(declared is not None)
+                if declared is not None:
+>                   raise StoreConflictError('ordinary record change targets a declared lazy namespace')
+E                   ate_sim.incremental_store.StoreConflictError: ordinary record change targets a declared lazy namespace
+
+simulation/ate_sim/persistence_lazy_store.py:2487: StoreConflictError
+____________________ test_authenticated_empty_scopes[group] ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authenticated_empty_scope1')
+kind = 'group'
+
+    @pytest.mark.parametrize('kind',['owner','group','query'])
+    def test_authenticated_empty_scopes(tmp_path,kind):
+>       store,pin,pair=make_scope_store(tmp_path/'empty.sqlite')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:19: in make_scope_store
+    pin=store.commit(store.capture_pin(),commit_token='seed',version_changes=versions(),identity_changes=placements(),
+simulation/ate_sim/persistence_lazy_store.py:2785: in commit
+    self._write_ordinary_changes(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fe125ca38c0>
+prepared = ({'change': RecordChange(namespace='people', key=1, value={'ordinary': 1}, record_schema=1, delete=False, memberships=()), 'namespace': 'people', 'typed_key': b'["int","1"]', 'payload': b'["dict",[[["str","ordinary"],["int","1"]]]]', ...},)
+new_generation = 1, counts = {'people': (1, 0)}
+
+    def _write_ordinary_changes(
+        self,
+        prepared: tuple[dict[str, Any], ...],
+        new_generation: int,
+        counts: dict[str, tuple[int, int]],
+    ) -> tuple[int, int]:
+        writes = deletes = 0
+        checked_namespaces = set()
+        for item in prepared:
+            change: RecordChange = item["change"]
+            namespace = item["namespace"]
+            typed_key = item["typed_key"]
+            if namespace not in checked_namespaces:
+                # Historical declaration still forbids an authority switch.
+                # Probe only affected namespaces; DISTINCT over namespace
+                # history scans an expired backlog even for no ordinary writes.
+                declared = self.db.execute('SELECT 1 FROM lazy_namespace_state WHERE namespace=? LIMIT 1',
+                                           (namespace,)).fetchone()
+                self._metadata_rows += int(declared is not None)
+                if declared is not None:
+>                   raise StoreConflictError('ordinary record change targets a declared lazy namespace')
+E                   ate_sim.incremental_store.StoreConflictError: ordinary record change targets a declared lazy namespace
+
+simulation/ate_sim/persistence_lazy_store.py:2487: StoreConflictError
+____________________ test_authenticated_empty_scopes[query] ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_authenticated_empty_scope2')
+kind = 'query'
+
+    @pytest.mark.parametrize('kind',['owner','group','query'])
+    def test_authenticated_empty_scopes(tmp_path,kind):
+>       store,pin,pair=make_scope_store(tmp_path/'empty.sqlite')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:19: in make_scope_store
+    pin=store.commit(store.capture_pin(),commit_token='seed',version_changes=versions(),identity_changes=placements(),
+simulation/ate_sim/persistence_lazy_store.py:2785: in commit
+    self._write_ordinary_changes(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fe125ca3c50>
+prepared = ({'change': RecordChange(namespace='people', key=1, value={'ordinary': 1}, record_schema=1, delete=False, memberships=()), 'namespace': 'people', 'typed_key': b'["int","1"]', 'payload': b'["dict",[[["str","ordinary"],["int","1"]]]]', ...},)
+new_generation = 1, counts = {'people': (1, 0)}
+
+    def _write_ordinary_changes(
+        self,
+        prepared: tuple[dict[str, Any], ...],
+        new_generation: int,
+        counts: dict[str, tuple[int, int]],
+    ) -> tuple[int, int]:
+        writes = deletes = 0
+        checked_namespaces = set()
+        for item in prepared:
+            change: RecordChange = item["change"]
+            namespace = item["namespace"]
+            typed_key = item["typed_key"]
+            if namespace not in checked_namespaces:
+                # Historical declaration still forbids an authority switch.
+                # Probe only affected namespaces; DISTINCT over namespace
+                # history scans an expired backlog even for no ordinary writes.
+                declared = self.db.execute('SELECT 1 FROM lazy_namespace_state WHERE namespace=? LIMIT 1',
+                                           (namespace,)).fetchone()
+                self._metadata_rows += int(declared is not None)
+                if declared is not None:
+>                   raise StoreConflictError('ordinary record change targets a declared lazy namespace')
+E                   ate_sim.incremental_store.StoreConflictError: ordinary record change targets a declared lazy namespace
+
+simulation/ate_sim/persistence_lazy_store.py:2487: StoreConflictError
+________________ test_corruption_context_and_bounds[descriptor] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_context_and_bo0')
+fault = 'descriptor'
+
+    @pytest.mark.parametrize('fault',['descriptor','missing-descriptor','node','row','expected','released','transaction','hook','budget'])
+    def test_corruption_context_and_bounds(tmp_path,fault):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_corruption_context_and_bounds[missing-descriptor] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_context_and_bo1')
+fault = 'missing-descriptor'
+
+    @pytest.mark.parametrize('fault',['descriptor','missing-descriptor','node','row','expected','released','transaction','hook','budget'])
+    def test_corruption_context_and_bounds(tmp_path,fault):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________________ test_corruption_context_and_bounds[node] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_context_and_bo2')
+fault = 'node'
+
+    @pytest.mark.parametrize('fault',['descriptor','missing-descriptor','node','row','expected','released','transaction','hook','budget'])
+    def test_corruption_context_and_bounds(tmp_path,fault):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________________ test_corruption_context_and_bounds[row] ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_context_and_bo3')
+fault = 'row'
+
+    @pytest.mark.parametrize('fault',['descriptor','missing-descriptor','node','row','expected','released','transaction','hook','budget'])
+    def test_corruption_context_and_bounds(tmp_path,fault):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_corruption_context_and_bounds[expected] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_context_and_bo4')
+fault = 'expected'
+
+    @pytest.mark.parametrize('fault',['descriptor','missing-descriptor','node','row','expected','released','transaction','hook','budget'])
+    def test_corruption_context_and_bounds(tmp_path,fault):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_corruption_context_and_bounds[released] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_context_and_bo5')
+fault = 'released'
+
+    @pytest.mark.parametrize('fault',['descriptor','missing-descriptor','node','row','expected','released','transaction','hook','budget'])
+    def test_corruption_context_and_bounds(tmp_path,fault):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_corruption_context_and_bounds[transaction] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_context_and_bo6')
+fault = 'transaction'
+
+    @pytest.mark.parametrize('fault',['descriptor','missing-descriptor','node','row','expected','released','transaction','hook','budget'])
+    def test_corruption_context_and_bounds(tmp_path,fault):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___________________ test_corruption_context_and_bounds[hook] ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_context_and_bo7')
+fault = 'hook'
+
+    @pytest.mark.parametrize('fault',['descriptor','missing-descriptor','node','row','expected','released','transaction','hook','budget'])
+    def test_corruption_context_and_bounds(tmp_path,fault):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_corruption_context_and_bounds[budget] __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_corruption_context_and_bo8')
+fault = 'budget'
+
+    @pytest.mark.parametrize('fault',['descriptor','missing-descriptor','node','row','expected','released','transaction','hook','budget'])
+    def test_corruption_context_and_bounds(tmp_path,fault):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'bad.sqlite');kwargs={}
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_constructor_current_pin_owned_transaction_and_no_repair _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_current_pin_o0')
+
+    def test_constructor_current_pin_owned_transaction_and_no_repair(tmp_path):
+>       s=scope_module();store,pin,pair=make_scope_store(tmp_path/'owned.sqlite')
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_constructor_guards_scope_metadata_before_full_audit[oversize] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_guards_scope_0')
+fault = 'oversize'
+
+    @pytest.mark.parametrize('fault',['oversize','nul-text','wrong-affinity'])
+    def test_constructor_guards_scope_metadata_before_full_audit(tmp_path,fault):
+>       s=scope_module();store,pin,_=make_scope_store(tmp_path/'guard.sqlite',bootstrap=False)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______ test_constructor_guards_scope_metadata_before_full_audit[nul-text] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_guards_scope_1')
+fault = 'nul-text'
+
+    @pytest.mark.parametrize('fault',['oversize','nul-text','wrong-affinity'])
+    def test_constructor_guards_scope_metadata_before_full_audit(tmp_path,fault):
+>       s=scope_module();store,pin,_=make_scope_store(tmp_path/'guard.sqlite',bootstrap=False)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+___ test_constructor_guards_scope_metadata_before_full_audit[wrong-affinity] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_constructor_guards_scope_2')
+fault = 'wrong-affinity'
+
+    @pytest.mark.parametrize('fault',['oversize','nul-text','wrong-affinity'])
+    def test_constructor_guards_scope_metadata_before_full_audit(tmp_path,fault):
+>       s=scope_module();store,pin,_=make_scope_store(tmp_path/'guard.sqlite',bootstrap=False)
+          ^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/proof_scope_fixtures.py:7: in scope_module
+    def scope_module():return importlib.import_module('ate_sim.persistence_proof_scope')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_scope'
+import_ = <function _gcd_import at 0x7fe1276980e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_scope'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_complete_constructor_and_existing_raw_pages
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_authenticated_empty_scopes[owner]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_authenticated_empty_scopes[group]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_authenticated_empty_scopes[query]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_corruption_context_and_bounds[descriptor]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_corruption_context_and_bounds[missing-descriptor]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_corruption_context_and_bounds[node]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_corruption_context_and_bounds[row]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_corruption_context_and_bounds[expected]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_corruption_context_and_bounds[released]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_corruption_context_and_bounds[transaction]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_corruption_context_and_bounds[hook]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_corruption_context_and_bounds[budget]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_constructor_current_pin_owned_transaction_and_no_repair
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_constructor_guards_scope_metadata_before_full_audit[oversize]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_constructor_guards_scope_metadata_before_full_audit[nul-text]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_constructor_guards_scope_metadata_before_full_audit[wrong-affinity]
+17 failed in 1.03s

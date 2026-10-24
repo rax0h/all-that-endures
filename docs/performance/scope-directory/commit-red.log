@@ -1,0 +1,401 @@
+.................FFFFFFFFFFF.FF                                          [100%]
+=================================== FAILURES ===================================
+____ test_actual_atomic_membership_move_old_new_and_stable_unrelated_scope _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_actual_atomic_membership_0')
+
+    def test_actual_atomic_membership_move_old_new_and_stable_unrelated_scope(tmp_path):
+        store,pin,pair=make_scope_store(tmp_path/'commit.sqlite',20);old=store.capture_pin()
+        unrelated=OwnerScope('archive',store.codec.encode(10));before=read_scope(store,pin,pair,unrelated)[0].root
+>       result=commit_scope(store,pin,pair);new=result_pair(result);writer=result.commit.pin
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207be6bc80>
+pin = GenerationPin(token='65f8b602-3e0b-4ad8-8e1e-e7921b6a7b72', store_identity='3b6df446-546f-49d8-8953-4cd66b3fdeef', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='3b6df446-546f-49d8-8953-4cd66b3fdeef', generation=1, codec_version=1, next_...e', count=21))), b'v\xae\xc0Z\x94\x88\xe6\x85\xb8\x8dmX\x02\xcb\xc1\xb9\xce\x19x6\xd8\xef5{\xa1\xb8\x0b1\xa1\xbb\x98U')
+token = 'next', kwargs = {}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+____________ test_allocator_metadata_and_noop_share_all_scope_roots ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_allocator_metadata_and_no0')
+
+    def test_allocator_metadata_and_noop_share_all_scope_roots(tmp_path):
+        store,pin,pair=make_scope_store(tmp_path/'shared.sqlite',20)
+>       result=commit_scope(store,pin,pair,version_changes=(),identity_changes=(),next_incarnation_id=100)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207be6a150>
+pin = GenerationPin(token='7ad4e4fb-fa9c-401c-9665-5c878d3b2b69', store_identity='dc8bd317-813f-4fc2-a225-d2cb35fe4c2b', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='dc8bd317-813f-4fc2-a225-d2cb35fe4c2b', generation=1, codec_version=1, next_...\x80\x86(\xd13\xb5\xdfA\x08\xcfm', count=21))), b'Z*\tY\xebJN\x87{*\xe4\xe2\x18\\{\xe9\x93}K\xa2\x9f) \xf4F\xf2Fl*9B4')
+token = 'next'
+kwargs = {'version_changes': (), 'identity_changes': (), 'next_incarnation_id': 100}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+___________________ test_last_members_removed_then_reinsert ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_last_members_removed_then0')
+
+    def test_last_members_removed_then_reinsert(tmp_path):
+        from ate_sim.persistence_lazy_store import VersionChange,IdentityOccurrenceChange
+        from ate_sim.incremental_store import Membership
+        store,pin,pair=make_scope_store(tmp_path/'delete.sqlite')
+>       result=commit_scope(store,pin,pair,version_changes=(VersionChange('people',0,delete=True),),identity_changes=(IdentityOccurrenceChange('people',0,(),delete=True),))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:112: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207be99010>
+pin = GenerationPin(token='07481298-d603-4eeb-82c9-f1d091015868', store_identity='7532e8f7-dfc0-484f-8f39-9ee66d84cff8', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='7532e8f7-dfc0-484f-8f39-9ee66d84cff8', generation=1, codec_version=1, next_..., b'\xb5X\xa9\xa2\x11\x15*\x06"\xf1\xf7\x93\xce\xd0\xbc\xe3w\x96\x06\xbd\x0c\x8c\xd5\xcc\x12\xc15\x12\x81\xfd\xde\x15')
+token = 'next'
+kwargs = {'version_changes': (VersionChange(namespace='people', key=0, value=None, record_schema=1, delete=True, memberships=()...dentityOccurrenceChange(owner_namespace='people', owner_key=0, occurrence_path=(), incarnation_id=None, delete=True),)}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+_____ test_transaction_fault_retains_old_authority[during_version_writes] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_transaction_fault_retains0')
+phase = 'during_version_writes'
+
+    @pytest.mark.parametrize('phase',['during_version_writes','during_identity_writes','before_head','before_commit'])
+    def test_transaction_fault_retains_old_authority(tmp_path,phase):
+        store,pin,pair=make_scope_store(tmp_path/'fault.sqlite');before=store.db.execute('SELECT count(*) FROM ate_scope_descriptors').fetchone()[0]
+        def hook(p):
+            if p==phase:raise RuntimeError('injected')
+        store._phase_hook=hook
+>       with pytest.raises(RuntimeError,match='injected'):commit_scope(store,pin,pair)
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207beb6c60>
+pin = GenerationPin(token='984efebc-0b28-43c0-b1de-5d096eb250c4', store_identity='64303942-44c8-4e86-9f7d-185ab9a0d5ac', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='64303942-44c8-4e86-9f7d-185ab9a0d5ac', generation=1, codec_version=1, next_...\xd2\x13})', count=1))), b'\xf4\xa4?;\xc6\x8f6s\x8c\x93\x04\x17\x10\xbcs+\x02\xd0\xd5\xa9\xd6\xe5\xa6\xec[<^\xe1\\ [}')
+token = 'next', kwargs = {}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+_____ test_transaction_fault_retains_old_authority[during_identity_writes] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_transaction_fault_retains1')
+phase = 'during_identity_writes'
+
+    @pytest.mark.parametrize('phase',['during_version_writes','during_identity_writes','before_head','before_commit'])
+    def test_transaction_fault_retains_old_authority(tmp_path,phase):
+        store,pin,pair=make_scope_store(tmp_path/'fault.sqlite');before=store.db.execute('SELECT count(*) FROM ate_scope_descriptors').fetchone()[0]
+        def hook(p):
+            if p==phase:raise RuntimeError('injected')
+        store._phase_hook=hook
+>       with pytest.raises(RuntimeError,match='injected'):commit_scope(store,pin,pair)
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207beb5e80>
+pin = GenerationPin(token='30f71917-4b33-455e-be83-acb27866a9c4', store_identity='ecf737c8-bb9a-4da4-aabe-828800386db9', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='ecf737c8-bb9a-4da4-aabe-828800386db9', generation=1, codec_version=1, next_..., count=1))), b'\xb3\xbe\xdf\xb4{4\xed\xb2`Q\xaa\xea\x98JqV\xb0\xe6\x13g\xd75\xe0\xb8\xe4\xed\xe8\xd0\xab\xe0\x95\xa7')
+token = 'next', kwargs = {}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+__________ test_transaction_fault_retains_old_authority[before_head] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_transaction_fault_retains2')
+phase = 'before_head'
+
+    @pytest.mark.parametrize('phase',['during_version_writes','during_identity_writes','before_head','before_commit'])
+    def test_transaction_fault_retains_old_authority(tmp_path,phase):
+        store,pin,pair=make_scope_store(tmp_path/'fault.sqlite');before=store.db.execute('SELECT count(*) FROM ate_scope_descriptors').fetchone()[0]
+        def hook(p):
+            if p==phase:raise RuntimeError('injected')
+        store._phase_hook=hook
+>       with pytest.raises(RuntimeError,match='injected'):commit_scope(store,pin,pair)
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207beaa6c0>
+pin = GenerationPin(token='93687a6f-c229-4af7-b856-343d9fa63494', store_identity='99fc48c9-050a-40ac-876a-ec7911100469', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='99fc48c9-050a-40ac-876a-ec7911100469', generation=1, codec_version=1, next_...0\x00$\x8e', count=1))), b'F\xbc\xd5\xab\x16e\x12\xaf\xba\xa6\xdfX\xba`\rCp"\x11\x7f\xa80\x90;^-\x7f\x95\x1a\xe1\x183')
+token = 'next', kwargs = {}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+_________ test_transaction_fault_retains_old_authority[before_commit] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_transaction_fault_retains3')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['during_version_writes','during_identity_writes','before_head','before_commit'])
+    def test_transaction_fault_retains_old_authority(tmp_path,phase):
+        store,pin,pair=make_scope_store(tmp_path/'fault.sqlite');before=store.db.execute('SELECT count(*) FROM ate_scope_descriptors').fetchone()[0]
+        def hook(p):
+            if p==phase:raise RuntimeError('injected')
+        store._phase_hook=hook
+>       with pytest.raises(RuntimeError,match='injected'):commit_scope(store,pin,pair)
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207cab6330>
+pin = GenerationPin(token='91984ebc-41fa-4487-a3cb-ff4730848395', store_identity='73a7c6b6-a188-42a9-bae8-fab543f2664b', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='73a7c6b6-a188-42a9-bae8-fab543f2664b', generation=1, codec_version=1, next_...\xce\xa3', count=1))), b'aU\xeb\x15S\x7f\xda\xdd*U\xa1\x9a\x93N#7\x14\xc6\xb2\xa8\xd8Z]\xc9\xbf\x86\xd7c+\xce\xa7\xa7')
+token = 'next', kwargs = {}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+_______ test_sql_callback_cannot_escape_publication[before_transaction] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_sql_callback_cannot_escap0')
+phase = 'before_transaction'
+
+    @pytest.mark.parametrize('phase',['before_transaction','before_commit','after_commit'])
+    def test_sql_callback_cannot_escape_publication(tmp_path,phase):
+        store,pin,pair=make_scope_store(tmp_path/'escape.sqlite')
+        def hook(p):
+            if p==phase:store.db.execute('COMMIT')
+        store._phase_hook=hook
+>       with pytest.raises(StoreError):commit_scope(store,pin,pair)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207cab74a0>
+pin = GenerationPin(token='01490bc1-0208-4d1e-97a9-84b49ced3759', store_identity='9d31fa76-6dba-4cac-b1a7-4a85fc57be39', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='9d31fa76-6dba-4cac-b1a7-4a85fc57be39', generation=1, codec_version=1, next_...%\xddi\xee0', count=1))), b'\xc2I\xa3\xd15S\xc7\xb1\x0f\xd7w\x90q!\xc7)A\xfb\xda[3\x18\xa5\xa1\xfd\x91\x13$\xadHA\x1b')
+token = 'next', kwargs = {}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+__________ test_sql_callback_cannot_escape_publication[before_commit] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_sql_callback_cannot_escap1')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['before_transaction','before_commit','after_commit'])
+    def test_sql_callback_cannot_escape_publication(tmp_path,phase):
+        store,pin,pair=make_scope_store(tmp_path/'escape.sqlite')
+        def hook(p):
+            if p==phase:store.db.execute('COMMIT')
+        store._phase_hook=hook
+>       with pytest.raises(StoreError):commit_scope(store,pin,pair)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207ca47dd0>
+pin = GenerationPin(token='4c8beaf2-bf7d-4393-a031-25846bc5d9f3', store_identity='f1d95558-5cee-4a26-b792-d128653b80a6', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='f1d95558-5cee-4a26-b792-d128653b80a6', generation=1, codec_version=1, next_... count=1))), b'\xb9\x89\x81\xe4\x82\xe7\xec+{[\xe1\xaa\xb7\x96\x88! \xae\x10n\xa89\x18\xa3\x96\xb5A\x85\x01\n\xc0\xc0')
+token = 'next', kwargs = {}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+__________ test_sql_callback_cannot_escape_publication[after_commit] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_sql_callback_cannot_escap2')
+phase = 'after_commit'
+
+    @pytest.mark.parametrize('phase',['before_transaction','before_commit','after_commit'])
+    def test_sql_callback_cannot_escape_publication(tmp_path,phase):
+        store,pin,pair=make_scope_store(tmp_path/'escape.sqlite')
+        def hook(p):
+            if p==phase:store.db.execute('COMMIT')
+        store._phase_hook=hook
+>       with pytest.raises(StoreError):commit_scope(store,pin,pair)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207beb7110>
+pin = GenerationPin(token='7b035b81-da0b-438e-91af-c26cec3c024f', store_identity='6216544e-e0c5-40b1-bcd7-46e48ba388b2', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='6216544e-e0c5-40b1-bcd7-46e48ba388b2', generation=1, codec_version=1, next_...a8', count=1))), b'h\x8f#\xb2\x9a1/\xe4\xfey\xd3\xfb)o0\x85\x12\x92\x9f\x8c\xb1\xc6\x8f\xf9)\x10\x1cl\xc2\xbc\x02\x10')
+token = 'next', kwargs = {}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+____________________ test_lost_ack_exact_recovery_no_replay ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_lost_ack_exact_recovery_n0')
+
+    def test_lost_ack_exact_recovery_no_replay(tmp_path):
+        store,pin,pair=make_scope_store(tmp_path/'ack.sqlite')
+        def hook(p):
+            if p=='after_commit':raise RuntimeError('lost ack')
+        store._phase_hook=hook
+>       with pytest.raises(RuntimeError):commit_scope(store,pin,pair)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:154: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207beb62d0>
+pin = GenerationPin(token='f2f5a894-5c1d-4d86-90ad-ff6078b340ea', store_identity='d84add47-daeb-43eb-9000-1cce5b99a407', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='d84add47-daeb-43eb-9000-1cce5b99a407', generation=1, codec_version=1, next_...\xe8\x89', count=1))), b'4\xc5:j#\x94\x93\x97\xe2\x08;\xbbf\xc2\x946\x15\x93q\xae>\xcb\x87\x17\x9d/\xec\xc0K\xb2R\xa7')
+token = 'next', kwargs = {}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+_________ test_combined_ordinary_root_and_scope_roots_share_one_commit _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_combined_ordinary_root_an0')
+
+    def test_combined_ordinary_root_and_scope_roots_share_one_commit(tmp_path):
+        from ate_sim.incremental_store import RecordChange
+        from ate_sim.persistence_proof_record import bootstrap_record_proofs,read_record_proof_bytes
+        store,pin,pair=make_scope_store(tmp_path/'combined.sqlite');records=bootstrap_record_proofs(store,pin);old=store.capture_pin()
+>       result=commit_scope(store,pin,pair,record_authority=records,changes=(RecordChange('ordinary',1,{'ordinary':2}),))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:180: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207be9a270>
+pin = GenerationPin(token='583812cb-6021-46e5-8c11-604446b3e1ce', store_identity='4c6d124d-9300-4faa-8d9d-3a394ff9df7b', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='4c6d124d-9300-4faa-8d9d-3a394ff9df7b', generation=1, codec_version=1, next_...0S\x00lQ', count=1))), b'\x9fin\xf5\x04E\x1c\x8a&\x91\xde\xe8\xb7\xa4pz\x13un\xad\xb1v-\x12\x8cE\xcf\xe2\xba`\xde\x02')
+token = 'next'
+kwargs = {'record_authority': (RecordCertificate(store_identity='4c6d124d-9300-4faa-8d9d-3a394ff9df7b', generation=1, codec_ver...s': (RecordChange(namespace='ordinary', key=1, value={'ordinary': 2}, record_schema=1, delete=False, memberships=()),)}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+_______________ test_spilled_changed_inputs_publish_same_scopes ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-3/test_spilled_changed_inputs_pu0')
+
+    def test_spilled_changed_inputs_publish_same_scopes(tmp_path):
+        store,pin,pair=make_scope_store(tmp_path/'spill.sqlite')
+>       result=commit_scope(store,pin,pair,preparation_budget=(0,0))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_scope.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f207be9a390>
+pin = GenerationPin(token='d217900f-3ab7-4741-bd23-e0f714738430', store_identity='26c799f0-aa72-445c-ad74-3904b1ecb1b8', captured_head=1)
+pair = (ScopeDirectoryCertificate(store_identity='26c799f0-aa72-445c-ad74-3904b1ecb1b8', generation=1, codec_version=1, next_...eb\x1bx', count=1))), b'\x97\xb6\x16\xc3\xc2\r\xf7\xee\xb3\x11\xaa\xed\xe3i_\x1a\xb3m%m\x8cW\x8c\x11\x14p\xdb/DE\xa0s')
+token = 'next', kwargs = {'preparation_budget': (0, 0)}
+
+    def commit_scope(store,pin,pair,*,token='next',**kwargs):
+        arguments=dict(version_changes=(VersionChange('people',0,{'wealth':2},memberships=(Membership('cohort','new',7),)),),
+            identity_changes=(IdentityOccurrenceChange('people',0,(),2),),changes=(),new_segments=(),metadata=metadata(pin.captured_head+1))
+        arguments.update(kwargs)
+>       return scope_module().commit_scope_proof(store,pin,*pair,commit_token=token,**arguments)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'ate_sim.persistence_proof_scope' has no attribute 'commit_scope_proof'
+
+simulation/tests/proof_scope_fixtures.py:38: AttributeError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_actual_atomic_membership_move_old_new_and_stable_unrelated_scope
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_allocator_metadata_and_noop_share_all_scope_roots
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_last_members_removed_then_reinsert
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_transaction_fault_retains_old_authority[during_version_writes]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_transaction_fault_retains_old_authority[during_identity_writes]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_transaction_fault_retains_old_authority[before_head]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_transaction_fault_retains_old_authority[before_commit]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_sql_callback_cannot_escape_publication[before_transaction]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_sql_callback_cannot_escape_publication[before_commit]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_sql_callback_cannot_escape_publication[after_commit]
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_lost_ack_exact_recovery_no_replay
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_combined_ordinary_root_and_scope_roots_share_one_commit
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_spilled_changed_inputs_publish_same_scopes
+13 failed, 18 passed in 3.20s

@@ -1,0 +1,34 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_______ test_missing_actual_parent_placement_cannot_preserve_ghost_root ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_missing_actual_parent_pla0')
+
+    def test_missing_actual_parent_placement_cannot_preserve_ghost_root(tmp_path):
+        from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+        store,pin,pair=make_scope_store(tmp_path/'missing-old-placement.sqlite')
+        store.db.execute("DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace='people'");store.db.commit()
+>       with pytest.raises(StoreIntegrityError):commit_scope(store,pin,pair,version_changes=(),identity_changes=(IdentityOccurrenceChange('people',0,(),delete=True),))
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_scope.py:198: Failed
+________ test_coherently_removed_parent_query_still_rejects_ghost_root _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_coherently_removed_parent0')
+
+    def test_coherently_removed_parent_query_still_rejects_ghost_root(tmp_path):
+        from ate_sim.persistence_lazy_store import VersionChange,_version_checksum
+        store,pin,pair=make_scope_store(tmp_path/'missing-old-query.sqlite');key=store.codec.encode(0)
+        row=store.db.execute("SELECT record_schema,codec_version,valid_from,valid_to,payload FROM lazy_record_versions WHERE namespace='people'").fetchone()
+        schema,codec,start,end,payload=row;members=store.codec.encode(())
+        store.db.execute("UPDATE lazy_record_versions SET memberships=?,row_checksum=? WHERE namespace='people'",(members,_version_checksum('people',key,schema,codec,start,end,members,payload)))
+        store.db.execute("DELETE FROM lazy_query_versions WHERE namespace='people'");store.db.commit()
+        store.verify_all()  # Coherent physical rows are insufficient accepted-root authority.
+>       with pytest.raises(StoreIntegrityError):commit_scope(store,pin,pair,version_changes=(VersionChange('people',0,{'wealth':2}),),identity_changes=())
+E       Failed: DID NOT RAISE StoreIntegrityError
+
+simulation/tests/test_stage_0_5_proof_scope.py:211: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_missing_actual_parent_placement_cannot_preserve_ghost_root
+FAILED simulation/tests/test_stage_0_5_proof_scope.py::test_coherently_removed_parent_query_still_rejects_ghost_root
+2 failed, 31 deselected in 0.48s
