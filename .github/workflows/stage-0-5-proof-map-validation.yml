@@ -26,6 +26,7 @@ name: Stage 0.5 durable proof map validation
       - .github/tests/run_proof_owner_targets_scaling.py
       - .github/tests/run_proof_target_group_scaling.py
       - .github/tests/run_proof_target_incoming_scaling.py
+      - .github/tests/run_proof_child_extents_scaling.py
       - .github/workflows/stage-0-5-proof-map-validation.yml
 permissions:
   contents: read
@@ -102,6 +103,8 @@ jobs:
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_target_group_scaling.py --output evidence/target-group-scaling 2>&1 | tee evidence/target-group-scaling.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_target_incoming.py --junitxml=evidence/target-incoming-tests.xml 2>&1 | tee evidence/target-incoming-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_target_incoming_scaling.py --output evidence/target-incoming-scaling 2>&1 | tee evidence/target-incoming-scaling.log
+          python -m pytest -q simulation/tests/test_stage_0_5_proof_child_extents.py --junitxml=evidence/child-extents-tests.xml 2>&1 | tee evidence/child-extents-tests.log
+          timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_child_extents_scaling.py --output evidence/child-extents-scaling 2>&1 | tee evidence/child-extents-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_identity_group_scaling.py --output evidence/group-scaling 2>&1 | tee evidence/group-scaling.log
       - uses: actions/upload-artifact@v4
         if: always()

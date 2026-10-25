@@ -1,0 +1,21 @@
+{
+  "clean_python_cache_bytes": 0,
+  "schema": "ate-proof-batch-source/1",
+  "scope": "immutable map construction and point replacement, not World persistence",
+  "sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "source": {
+    "driver_sha256": "177bc4e0e2b40943e2b64a828213f7da60fcb4e38ccf2b5ff3fd00b794b567dc",
+    "head": "2ce0745c870ae2dd659172a0a252c992f5bb7240",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "9bd36379c162ddc5589f8f96764f17e87b1f9eff",
+    "sqlite": "3.45.1"
+  },
+  "sqlite_main_cache_kib": 2048,
+  "sqlite_temp_cache_kib": 2048,
+  "temp_store": "FILE"
+}

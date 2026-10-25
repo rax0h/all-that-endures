@@ -1,0 +1,21 @@
+{
+  "active_owners": 8,
+  "archive_sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "memberships_per_owner": 2,
+  "query_limit": 8,
+  "schema": "ate-proof-query-source/1",
+  "scope": "actual store metadata read; no World adoption or mature save/year result",
+  "source": {
+    "driver_sha256": "abc2c2be3deb7f01230c2c17260bcadbd6d496d93b7263bac72e5c4ca62d32b0",
+    "fixture_sha256": "91db0628226f6f633412a52f6560bacada852647c66c1b90ea770c54d15c6831",
+    "head": "2ce0745c870ae2dd659172a0a252c992f5bb7240",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "9bd36379c162ddc5589f8f96764f17e87b1f9eff",
+    "sqlite": "3.45.1"
+  }
+}

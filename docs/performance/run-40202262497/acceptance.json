@@ -1,0 +1,141 @@
+{
+  "head": "2ce0745c870ae2dd659172a0a252c992f5bb7240",
+  "runtime_tree": "9bd36379c162ddc5589f8f96764f17e87b1f9eff",
+  "run_id": 40202262497,
+  "jobs": {
+    "full-suite": "success",
+    "proof-map": "success"
+  },
+  "digests": [
+    "c7f734eaaef19e32d9b8c7d5d8a279e4e818196ad7a9926c0ff197b62c6eb0a5",
+    "4db6e74c8b3b417d4cfb9a8c57e33e8a43384eadb43b40fb56b600a00a36003e"
+  ],
+  "suites": {
+    "full-suite.xml": 4006,
+    "collection-tests.xml": 20,
+    "collection-publication-tests.xml": 12,
+    "seek-tests.xml": 53,
+    "target-tests.xml": 33,
+    "projection-tests.xml": 43,
+    "publication-tests.xml": 67,
+    "inventory-tests.xml": 34,
+    "owner-target-tests.xml": 17,
+    "target-incoming-tests.xml": 40,
+    "target-group-tests.xml": 31,
+    "directory-publication-tests.xml": 22,
+    "collection-directory-tests.xml": 31,
+    "proof-tests.xml": 260,
+    "scope-tests.xml": 55,
+    "group-tests.xml": 72,
+    "record-tests.xml": 60,
+    "generation-tests.xml": 60
+  },
+  "proof_tests": 910,
+  "matrices": {
+    "group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "seek-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "occurrence-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "directory-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "batch-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-directory-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scope-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "order-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "record-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "query-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-incoming-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "projection-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "owner-target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "version-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "inventory-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-scaling": [
+      1000,
+      10000,
+      100000
+    ]
+  }
+}

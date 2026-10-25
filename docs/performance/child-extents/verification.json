@@ -1,0 +1,12 @@
+{
+  "checkpoint": "6349c9f4ddfed3f227dfcbc776d1e97e5c7fce6d",
+  "runtime_tree": "f35ce9f4d3b5f8aa3cd39a8a6291c6c2005a10d4",
+  "proof_tests": 945,
+  "proof_failures": 0,
+  "proof_errors": 0,
+  "proof_xml_sha256": "870a3423cc0d5ed8560f30430975a234674c7fa14d46af2eed13565ecd5e2cc2",
+  "ci_acceptance": "pending",
+  "runtime_policy_tests": 67,
+  "runtime_policy_failures": 0,
+  "runtime_xml_sha256": "a4b11083839ebb73e95392d6600a5c66340a20ca05c7e4d545864a4ccb4ad6fd"
+}

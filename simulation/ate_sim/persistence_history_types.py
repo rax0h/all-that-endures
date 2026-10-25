@@ -152,3 +152,12 @@ def verify_type_witnesses(store, pin):
     if descriptors != witnesses:
         raise StoreIntegrityError('history type witness inventory is incomplete or extra')
     return len(witnesses)
+
+
+def incoming_owner_policy(namespace,path):
+    """Existing runtime incoming member policy, shared by raw proof validation."""
+    from .persistence_lazy_graph_buckets import BUCKET_SPECS
+    if not path and namespace in BUCKET_SPECS:
+        return 'lineage_pair' if namespace=='world.lineage.children' else 'int'
+    field={'world.magic_resources.resources':'transfers','world.materials.lots':'transfers','world.social.edges':'shared_history'}.get(namespace)
+    return 'int' if field is not None and path==(('field',field),) else None

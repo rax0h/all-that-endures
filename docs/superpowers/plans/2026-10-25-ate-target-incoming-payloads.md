@@ -34,4 +34,6 @@ This is selected-target incoming storage-reference semantics, not complete World
 - [x] Implement shared parent source charging and private checked snapshot seam. Existing public reader remains owned-snapshot only.
 - [x] Implement inert closed World schema decoder and complete selected-reference projection; reuse auxiliary adapters, preserve implicit Event-ID owner-zero route.
 - [x] Run focused/affected proof tests; add clean1k/10k/100k archive diagnostic with source hashes, exact paths, zero archive bodies, bounded Python allocation and untimed interval-one VM enforcement.
-- [ ] One fresh review; fix blockers with RED→GREEN evidence; retain results; publish candidate and stop after starting longer CI.
+- [x] One fresh review; fix blockers with RED→GREEN evidence; retain results; publish candidate and stop after starting longer CI.
+
+Acceptance: CI40202262497 verified on2ce0745:4006 full-suite/910 proof tests,21 complete matrices. Hosted incoming126.10/141.87/155.29ms, zero archive bodies. Receipts: docs/performance/run-40202262497/acceptance.json.

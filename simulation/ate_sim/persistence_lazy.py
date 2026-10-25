@@ -12279,14 +12279,8 @@ class LazyWorldSession:
 
     @staticmethod
     def _history_owner_policy(occurrence):
-        if not occurrence.path and occurrence.owner_namespace in BUCKET_SPECS:
-            return 'lineage_pair' if occurrence.owner_namespace == LINEAGE_CHILD_NAMESPACE else 'int'
-        integer_fields = {
-            RESOURCE_NAMESPACE: 'transfers', MATERIAL_LOT_NAMESPACE: 'transfers',
-            SOCIAL_EDGE_NAMESPACE: 'shared_history',
-        }
-        field = integer_fields.get(occurrence.owner_namespace)
-        return 'int' if field is not None and occurrence.path == (("field", field),) else None
+        from .persistence_history_types import incoming_owner_policy
+        return incoming_owner_policy(occurrence.owner_namespace,occurrence.path)
 
     def _preflight_history_owner(self, value, occurrence):
         policy = self._history_owner_policy(occurrence)

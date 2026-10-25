@@ -78,7 +78,9 @@ class HistoryOwnerAdapter:
                      and all(type(v) is tuple and len(v) == 2 and _positive(v[0]) and _stored_value(v[1]) for v in value[1])
                      and len({v[0] for v in value[1]}) == len(value[1]))
             expected_members = ()
-        if not valid or tuple(source.memberships) != expected_members:
+        # SQLite query keys use typed encoding: float/bool equality must never
+        # substitute for the exact integer parent or ordinal projection.
+        if not valid or codec.encode(tuple((m.index_name,m.value,m.ordinal) for m in source.memberships)) != codec.encode(tuple((m.index_name,m.value,m.ordinal) for m in expected_members)):
             raise StoreIntegrityError('invalid physical history owner payload or projection')
 
     def reference_placements(self, value):

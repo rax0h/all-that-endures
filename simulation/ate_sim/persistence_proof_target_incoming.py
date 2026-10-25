@@ -79,7 +79,7 @@ def _paths(s,namespace,key,raw,backing,max_members):
 
 
 def _read(store,pin,reference,content_pair,scope_pair,inventory_pair,*,record_authority,
-          max_members,max_bytes,max_source_bytes,max_metadata_bytes):
+          max_members,max_bytes,max_source_bytes,max_metadata_bytes,_after=None):
     options=dict(max_members=max_members,max_bytes=max_bytes,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes)
     groups._check(store,pin,reference,content_pair,scope_pair,inventory_pair,**options)
     if record_authority is not None:
@@ -100,7 +100,8 @@ def _read(store,pin,reference,content_pair,scope_pair,inventory_pair,*,record_au
             paths=_paths(s,namespace,key,raw,result.target,max_members)
             if paths!=tuple(sorted(expected)):raise StoreIntegrityError('incoming body references disagree with complete target group')
             checked.append(RawIncomingOwner(namespace,typed,header[2],raw,paths))
-        return RawTargetIncoming(result.target,result.group,tuple(checked))
+        value=RawTargetIncoming(result.target,result.group,tuple(checked))
+        return value if _after is None else _after(value,s)
 
 
 def read_target_incoming(store,pin,reference,content_authority,scope_authority,inventory_authority,*,record_authority=None,
