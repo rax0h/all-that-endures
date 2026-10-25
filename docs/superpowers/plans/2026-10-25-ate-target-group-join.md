@@ -34,6 +34,8 @@ This proves the complete incoming physical group metadata and backing descriptor
 - [x] Implement exact certificate derivation and bounded group discovery; pass only remaining source bytes to existing complete group verifier. Expected GREEN: focused target/group tests pass.
 - [x] Add a clean 1k/10k/100k diagnostic and workflow steps, with source hashes, exact group results, VM/memory/SQL bounds and zero archive-body reads. Construction is outside reader timing.
 - [x] Run affected proof suite; retain results; request one fresh whole-package review and fix blocking findings with RED/GREEN tests.
-- [ ] Publish candidate and launch full-suite/scaling CI. Report remaining gates and stop without polling.
+- [x] Publish candidate and launch full-suite/scaling CI. Report remaining gates and stop without polling.
 
 Review fix: add test_stage_0_5_proof_target_group_scaling.py to the dedicated workflow test step. Guard test RED→GREEN; replace sampled instruction estimate with an interval-one guarded replay outside latency timing. Final full proof suite and clean archive-size diagnostic are rerun after this fix.
+
+Acceptance: CI40171262930 verified on9d78631:3965 full-suite/869 proof tests,20 complete matrices. Hosted target/group107.33/119.10/130.22ms, zero archive bodies. Receipts: docs/performance/run-40171262930/acceptance.json.

@@ -38,13 +38,15 @@ def _context(store,pin,cert):
 
 
 class _Sources:
-    def __init__(self,store,pin,certificate,expected,codec,max_bytes,source_limit,metadata_limit):
+    def __init__(self,store,pin,certificate,expected,codec,max_bytes,source_limit,metadata_limit,*,budget=None):
         self.store,self.pin,self.certificate,self.expected,self.codec=store,pin,certificate,expected,codec
         self.remaining,self.source_limit,self.metadata_limit=max_bytes,source_limit,metadata_limit
+        self.budget=budget
 
     def charge(self,size):
         self.remaining-=size
         if self.remaining<0:raise GroupProofBudgetError('complete group exceeds aggregate byte budget')
+        if self.budget is not None:self.budget.charge(size)
 
     def value(self,namespace,key,*,absent=False):
         typed=self.codec.encode(key);self.charge(len(namespace.encode('utf-8'))+len(typed))
@@ -135,7 +137,7 @@ def _owner_point(sources,owner,path,inc,header):
 
 
 def _read(store,pin,version_certificate,expected_version,group_certificate,expected_group,link_certificate,expected_links,
-          owner_certificates,*,max_members,max_bytes,max_source_bytes,max_metadata_bytes):
+          owner_certificates,*,max_members,max_bytes,max_source_bytes,max_metadata_bytes,_budget=None):
     for cert,expected,commitment in ((version_certificate,expected_version,version_commitment),
             (group_certificate,expected_group,occurrence_commitment),(link_certificate,expected_links,query_commitment)):
         _authority(cert,expected,commitment);_context(store,pin,cert)
@@ -149,7 +151,7 @@ def _read(store,pin,version_certificate,expected_version,group_certificate,expec
     if type(owner_certificates) is not tuple:raise StoreIntegrityError('invalid owner authority bundle')
     if group_certificate.root.count>max_members or len(owner_certificates)>max_members:raise GroupProofBudgetError('complete group exceeds member budget')
     owners={}
-    sources=_Sources(store,pin,version_certificate,expected_version,codec,max_bytes,max_source_bytes,max_metadata_bytes)
+    sources=_Sources(store,pin,version_certificate,expected_version,codec,max_bytes,max_source_bytes,max_metadata_bytes,budget=_budget)
     for pair in owner_certificates:
         if type(pair) is not tuple or len(pair)!=2:raise StoreIntegrityError('invalid owner authority pair')
         cert,expected=pair;_authority(cert,expected,occurrence_commitment);_context(store,pin,cert)
@@ -231,9 +233,15 @@ def _read(store,pin,version_certificate,expected_version,group_certificate,expec
         return RawIdentityGroup(inc,tuple(rows),tuple((p[0],paths[0][0]) for p in paths[1:]),paths[0][0] if paths else None,False)
 
 
-def read_identity_group_proof(store,pin,version_certificate,expected_version,group_certificate,expected_group,link_certificate,expected_links,
-        owner_certificates,*,max_members=4096,max_bytes=2097152,max_source_bytes=1048576,max_metadata_bytes=1048576):
+def _read_normalized(store,pin,version_certificate,expected_version,group_certificate,expected_group,link_certificate,expected_links,
+        owner_certificates,*,max_members=4096,max_bytes=2097152,max_source_bytes=1048576,max_metadata_bytes=1048576,_budget=None):
     try:return _read(store,pin,version_certificate,expected_version,group_certificate,expected_group,link_certificate,expected_links,
-        owner_certificates,max_members=max_members,max_bytes=max_bytes,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes)
+        owner_certificates,max_members=max_members,max_bytes=max_bytes,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes,_budget=_budget)
     except (VersionProofBudgetError,OccurrenceProofBudgetError,ProjectionProofBudgetError,QuerySeekBudgetError) as exc:raise GroupProofBudgetError(str(exc)) from exc
     except (CodecError,StoreFormatError,ValueError,TypeError,UnicodeError,RecursionError,IndexError) as exc:raise StoreIntegrityError('invalid group proof metadata/schema') from exc
+
+
+def read_identity_group_proof(store,pin,version_certificate,expected_version,group_certificate,expected_group,link_certificate,expected_links,
+        owner_certificates,*,max_members=4096,max_bytes=2097152,max_source_bytes=1048576,max_metadata_bytes=1048576):
+    return _read_normalized(store,pin,version_certificate,expected_version,group_certificate,expected_group,link_certificate,expected_links,
+        owner_certificates,max_members=max_members,max_bytes=max_bytes,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes)

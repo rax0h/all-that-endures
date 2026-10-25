@@ -1,0 +1,72 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "9d78631dcc910a0f2837986227190524b3fae3c9",
+    "runtime_tree": "cded2e0a15607189e1eb768280080369a71a461e",
+    "driver_sha256": "6a84c8308c59ee9648a38e176be8221745fc7e8b0179a115c0217b0131f77454",
+    "fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+    "sqlite": "3.45.1"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "source": {
+        "head": "9d78631dcc910a0f2837986227190524b3fae3c9",
+        "runtime_tree": "cded2e0a15607189e1eb768280080369a71a461e",
+        "driver_sha256": "6a84c8308c59ee9648a38e176be8221745fc7e8b0179a115c0217b0131f77454",
+        "fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+        "sqlite": "3.45.1"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 0.489641064999887,
+      "target_read_ms": 43.7675709999894,
+      "python_peak_bytes": 47652,
+      "sqlite_vm_step_upper_bound": 40099,
+      "sql": {
+        "unrelated_payload": 0,
+        "selected_metadata": 7
+      }
+    },
+    {
+      "size": 10000,
+      "source": {
+        "head": "9d78631dcc910a0f2837986227190524b3fae3c9",
+        "runtime_tree": "cded2e0a15607189e1eb768280080369a71a461e",
+        "driver_sha256": "6a84c8308c59ee9648a38e176be8221745fc7e8b0179a115c0217b0131f77454",
+        "fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+        "sqlite": "3.45.1"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 4.206313019000163,
+      "target_read_ms": 47.75560600000972,
+      "python_peak_bytes": 48412,
+      "sqlite_vm_step_upper_bound": 40199,
+      "sql": {
+        "unrelated_payload": 0,
+        "selected_metadata": 7
+      }
+    },
+    {
+      "size": 100000,
+      "source": {
+        "head": "9d78631dcc910a0f2837986227190524b3fae3c9",
+        "runtime_tree": "cded2e0a15607189e1eb768280080369a71a461e",
+        "driver_sha256": "6a84c8308c59ee9648a38e176be8221745fc7e8b0179a115c0217b0131f77454",
+        "fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+        "sqlite": "3.45.1"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 44.41275938400008,
+      "target_read_ms": 50.898386999961076,
+      "python_peak_bytes": 36497,
+      "sqlite_vm_step_upper_bound": 40299,
+      "sql": {
+        "unrelated_payload": 0,
+        "selected_metadata": 7
+      }
+    }
+  ]
+}

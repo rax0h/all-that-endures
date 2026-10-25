@@ -1,0 +1,135 @@
+{
+  "head": "9d78631dcc910a0f2837986227190524b3fae3c9",
+  "runtime_tree": "cded2e0a15607189e1eb768280080369a71a461e",
+  "run_id": 40171262930,
+  "jobs": {
+    "full-suite": "success",
+    "proof-map": "success"
+  },
+  "digests": [
+    "9103aa42e36575e411d830832e0fc5e91e84c832e3c68bef3feecf1b47519be2",
+    "5dca8327162d9e66f594654e5a219699d6e3552922a0e89f2a79390cae8b97b4"
+  ],
+  "suites": {
+    "full-suite.xml": 3965,
+    "seek-tests.xml": 53,
+    "collection-directory-tests.xml": 31,
+    "target-tests.xml": 33,
+    "collection-publication-tests.xml": 12,
+    "publication-tests.xml": 67,
+    "group-tests.xml": 72,
+    "collection-tests.xml": 20,
+    "proof-tests.xml": 260,
+    "inventory-tests.xml": 34,
+    "projection-tests.xml": 43,
+    "directory-publication-tests.xml": 22,
+    "record-tests.xml": 60,
+    "generation-tests.xml": 60,
+    "scope-tests.xml": 55,
+    "owner-target-tests.xml": 17,
+    "target-group-tests.xml": 30
+  },
+  "proof_tests": 869,
+  "matrices": {
+    "order-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "projection-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-directory-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "occurrence-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "record-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "inventory-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "version-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "query-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "seek-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scope-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "batch-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "owner-target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "directory-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ]
+  }
+}
