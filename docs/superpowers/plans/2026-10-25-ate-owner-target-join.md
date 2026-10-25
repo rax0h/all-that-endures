@@ -13,6 +13,8 @@ Preserve exact values/history/identity. Existing isolated branch/inline authoriz
 - [x] Write RED tests for valid repeated targets, wrong kind with same ID, missing target/placement, absent/no-reference owner, bounds and retained snapshots.
 - [x] Extract the existing target snapshot resolver without weakening its public owned-snapshot gate; share its source budget for the join.
 - [x] Implement read_owner_targets(store,pin,namespace,typed_key,content_authority,scope_authority,inventory_authority,*,max_bytes=4194304,max_source_bytes=1048576,max_metadata_bytes=1048576,max_references=128). Return raw owner source, all encoded path/incarnation pairs, and distinct raw targets.
-- [ ] Focused/affected verification, one fresh review/fix pass, archive-size diagnostic and final candidate CI; retain evidence.
+- [x] Focused/affected verification, one fresh review/fix pass, archive-size diagnostic and final candidate CI; retain evidence.
 
 Execution:839 proof tests and full clean archive matrix passed; fresh review no blocking issues, deferred test-coverage minor in ledger. Candidate CI owns full simulation/hosted scaling acceptance.
+
+Acceptance: CI40166092367 verified on fdbed24:3935 full-suite/839 proof tests,19 complete matrices. Owner-target hosted join53.99/59.73/62.34ms, zero archive bodies. Receipts: docs/performance/run-40166092367/acceptance.json.

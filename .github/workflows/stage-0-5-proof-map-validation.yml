@@ -24,6 +24,7 @@ name: Stage 0.5 durable proof map validation
       - .github/tests/run_proof_inventory_scaling.py
       - .github/tests/run_proof_target_scaling.py
       - .github/tests/run_proof_owner_targets_scaling.py
+      - .github/tests/run_proof_target_group_scaling.py
       - .github/workflows/stage-0-5-proof-map-validation.yml
 permissions:
   contents: read
@@ -36,7 +37,7 @@ env:
 jobs:
   proof-map:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -96,6 +97,8 @@ jobs:
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_target_scaling.py --output evidence/target-scaling 2>&1 | tee evidence/target-scaling.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_owner_targets.py --junitxml=evidence/owner-target-tests.xml 2>&1 | tee evidence/owner-target-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_owner_targets_scaling.py --output evidence/owner-target-scaling 2>&1 | tee evidence/owner-target-scaling.log
+          python -m pytest -q simulation/tests/test_stage_0_5_proof_target_group.py simulation/tests/test_stage_0_5_proof_target_group_scaling.py --junitxml=evidence/target-group-tests.xml 2>&1 | tee evidence/target-group-tests.log
+          timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_target_group_scaling.py --output evidence/target-group-scaling 2>&1 | tee evidence/target-group-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_identity_group_scaling.py --output evidence/group-scaling 2>&1 | tee evidence/group-scaling.log
       - uses: actions/upload-artifact@v4
         if: always()

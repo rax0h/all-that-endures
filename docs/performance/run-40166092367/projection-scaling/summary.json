@@ -1,0 +1,201 @@
+{
+  "results": [
+    {
+      "current": {
+        "python_peak_bytes": 141229,
+        "seconds": 0.023313443000006373,
+        "selects": {
+          "other": 40,
+          "proof": 20,
+          "selected_payload": 1,
+          "unrelated_payload": 0
+        },
+        "source_payload_check_bytes": 187,
+        "source_payload_checks": 1,
+        "sqlite_vm_step_upper_bound": 3099,
+        "store_world_decode_counter": 0
+      },
+      "database_bytes": 1777664,
+      "exact": true,
+      "fixture_and_verified_construction_seconds": 0.2806250779999573,
+      "full_successor_construction_seconds": 0.22587630799995395,
+      "genuine_owner_transition_seconds": 0.005029158000013467,
+      "old_pin": {
+        "python_peak_bytes": 19613,
+        "seconds": 0.007927649000009751,
+        "selects": {
+          "other": 40,
+          "proof": 20,
+          "selected_payload": 1,
+          "unrelated_payload": 0
+        },
+        "source_payload_check_bytes": 187,
+        "source_payload_checks": 1,
+        "sqlite_vm_step_upper_bound": 3599,
+        "store_world_decode_counter": 0
+      },
+      "process_lifetime_peak_rss_bytes": 32239616,
+      "schema": "ate-owner-projection-scaling/1",
+      "size": 1000,
+      "source": {
+        "driver_sha256": "8e959dc620e10a409307b85b3d06c36ba6c3cc96fecabc8854c3f64375506a73",
+        "fixture_sha256": "1740764c6ddc935e67f0ae4d54bfb5357c9dc97da5cf3381d5320edd9d4c20a6",
+        "head": "fdbed24ad33e1752ec4fca56880d757c8ed3eb31",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15",
+        "runtime_tree": "2b39a007c4425633b7c22eafc057cd2222fc27bb",
+        "sqlite": "3.45.1"
+      },
+      "status": "complete",
+      "successor": {
+        "python_peak_bytes": 16228,
+        "seconds": 0.005553894999991371,
+        "selects": {
+          "other": 37,
+          "proof": 6,
+          "selected_payload": 1,
+          "unrelated_payload": 0
+        },
+        "source_payload_check_bytes": 41,
+        "source_payload_checks": 1,
+        "sqlite_vm_step_upper_bound": 2999,
+        "store_world_decode_counter": 0
+      }
+    },
+    {
+      "current": {
+        "python_peak_bytes": 28474,
+        "seconds": 0.009416970000017955,
+        "selects": {
+          "other": 40,
+          "proof": 21,
+          "selected_payload": 1,
+          "unrelated_payload": 0
+        },
+        "source_payload_check_bytes": 187,
+        "source_payload_checks": 1,
+        "sqlite_vm_step_upper_bound": 3099,
+        "store_world_decode_counter": 0
+      },
+      "database_bytes": 15380480,
+      "exact": true,
+      "fixture_and_verified_construction_seconds": 2.349237285000015,
+      "full_successor_construction_seconds": 2.282175832000007,
+      "genuine_owner_transition_seconds": 0.005429801999980555,
+      "old_pin": {
+        "python_peak_bytes": 19093,
+        "seconds": 0.008331548000001021,
+        "selects": {
+          "other": 40,
+          "proof": 21,
+          "selected_payload": 1,
+          "unrelated_payload": 0
+        },
+        "source_payload_check_bytes": 187,
+        "source_payload_checks": 1,
+        "sqlite_vm_step_upper_bound": 3599,
+        "store_world_decode_counter": 0
+      },
+      "process_lifetime_peak_rss_bytes": 45371392,
+      "schema": "ate-owner-projection-scaling/1",
+      "size": 10000,
+      "source": {
+        "driver_sha256": "8e959dc620e10a409307b85b3d06c36ba6c3cc96fecabc8854c3f64375506a73",
+        "fixture_sha256": "1740764c6ddc935e67f0ae4d54bfb5357c9dc97da5cf3381d5320edd9d4c20a6",
+        "head": "fdbed24ad33e1752ec4fca56880d757c8ed3eb31",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15",
+        "runtime_tree": "2b39a007c4425633b7c22eafc057cd2222fc27bb",
+        "sqlite": "3.45.1"
+      },
+      "status": "complete",
+      "successor": {
+        "python_peak_bytes": 16636,
+        "seconds": 0.0061021310000342055,
+        "selects": {
+          "other": 37,
+          "proof": 7,
+          "selected_payload": 1,
+          "unrelated_payload": 0
+        },
+        "source_payload_check_bytes": 41,
+        "source_payload_checks": 1,
+        "sqlite_vm_step_upper_bound": 3099,
+        "store_world_decode_counter": 0
+      }
+    },
+    {
+      "current": {
+        "python_peak_bytes": 23834,
+        "seconds": 0.009581728000000567,
+        "selects": {
+          "other": 40,
+          "proof": 21,
+          "selected_payload": 1,
+          "unrelated_payload": 0
+        },
+        "source_payload_check_bytes": 187,
+        "source_payload_checks": 1,
+        "sqlite_vm_step_upper_bound": 3099,
+        "store_world_decode_counter": 0
+      },
+      "database_bytes": 153284608,
+      "exact": true,
+      "fixture_and_verified_construction_seconds": 24.607282150000003,
+      "full_successor_construction_seconds": 23.71115700300004,
+      "genuine_owner_transition_seconds": 0.004892573999995875,
+      "old_pin": {
+        "python_peak_bytes": 19677,
+        "seconds": 0.008743124999966767,
+        "selects": {
+          "other": 40,
+          "proof": 21,
+          "selected_payload": 1,
+          "unrelated_payload": 0
+        },
+        "source_payload_check_bytes": 187,
+        "source_payload_checks": 1,
+        "sqlite_vm_step_upper_bound": 3599,
+        "store_world_decode_counter": 0
+      },
+      "process_lifetime_peak_rss_bytes": 150003712,
+      "schema": "ate-owner-projection-scaling/1",
+      "size": 100000,
+      "source": {
+        "driver_sha256": "8e959dc620e10a409307b85b3d06c36ba6c3cc96fecabc8854c3f64375506a73",
+        "fixture_sha256": "1740764c6ddc935e67f0ae4d54bfb5357c9dc97da5cf3381d5320edd9d4c20a6",
+        "head": "fdbed24ad33e1752ec4fca56880d757c8ed3eb31",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "python": "3.12.15",
+        "runtime_tree": "2b39a007c4425633b7c22eafc057cd2222fc27bb",
+        "sqlite": "3.45.1"
+      },
+      "status": "complete",
+      "successor": {
+        "python_peak_bytes": 15844,
+        "seconds": 0.006560290000038549,
+        "selects": {
+          "other": 37,
+          "proof": 7,
+          "selected_payload": 1,
+          "unrelated_payload": 0
+        },
+        "source_payload_check_bytes": 41,
+        "source_payload_checks": 1,
+        "sqlite_vm_step_upper_bound": 3099,
+        "store_world_decode_counter": 0
+      }
+    }
+  ],
+  "schema": "ate-owner-projection-summary/1",
+  "source": {
+    "driver_sha256": "8e959dc620e10a409307b85b3d06c36ba6c3cc96fecabc8854c3f64375506a73",
+    "fixture_sha256": "1740764c6ddc935e67f0ae4d54bfb5357c9dc97da5cf3381d5320edd9d4c20a6",
+    "head": "fdbed24ad33e1752ec4fca56880d757c8ed3eb31",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "2b39a007c4425633b7c22eafc057cd2222fc27bb",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete"
+}

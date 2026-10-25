@@ -1,0 +1,13 @@
+{
+  "checkpoint": "91ddda473f0f1e788bb0a75b78bbe005738725bb",
+  "runtime_tree": "cded2e0a15607189e1eb768280080369a71a461e",
+  "proof_tests": 869,
+  "proof_failures": 0,
+  "proof_errors": 0,
+  "proof_xml_sha256": "01cecf409c09c7c2d47969efa0a4be0d5a11a64bb6e7432beb7ad62188623195",
+  "commands": [
+    "PYTHONPATH=.:simulation python -m pytest -q simulation/tests/test_stage_0_5_proof_*.py --junitxml=/tmp/target-group-final.xml",
+    "PYTHONPATH=.:simulation python .github/tests/run_proof_target_group_scaling.py --output /tmp/target-group-final-scaling"
+  ],
+  "ci_acceptance": "pending"
+}
