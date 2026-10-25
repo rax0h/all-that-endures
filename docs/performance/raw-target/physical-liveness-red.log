@@ -1,0 +1,17 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_live_group_requires_one_checked_physical_placement ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-5/test_live_group_requires_one_c0')
+
+    def test_live_group_requires_one_checked_physical_placement(tmp_path):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite')
+     s.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE incarnation_id=2');s.db.commit()
+>    with pytest.raises(StoreError):read(s,p,ref,a)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_target.py:92: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_live_group_requires_one_checked_physical_placement
+1 failed, 32 deselected in 0.27s

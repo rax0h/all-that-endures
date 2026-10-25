@@ -1,0 +1,639 @@
+FFFFFFFFFFFFFFFFFF                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_each_closed_reference_has_one_checked_target[list] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_closed_reference_has0')
+kind = 'list'
+
+    @pytest.mark.parametrize('kind',KINDS)
+    def test_each_closed_reference_has_one_checked_target(tmp_path,kind):
+>    s,p,ref,a=make_target_store(tmp_path/'target.sqlite',kind);r=read(s,p,ref,a)
+                                                                  ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_each_closed_reference_has_one_checked_target[map] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_closed_reference_has1')
+kind = 'map'
+
+    @pytest.mark.parametrize('kind',KINDS)
+    def test_each_closed_reference_has_one_checked_target(tmp_path,kind):
+>    s,p,ref,a=make_target_store(tmp_path/'target.sqlite',kind);r=read(s,p,ref,a)
+                                                                  ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________ test_each_closed_reference_has_one_checked_target[set] ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_closed_reference_has2')
+kind = 'set'
+
+    @pytest.mark.parametrize('kind',KINDS)
+    def test_each_closed_reference_has_one_checked_target(tmp_path,kind):
+>    s,p,ref,a=make_target_store(tmp_path/'target.sqlite',kind);r=read(s,p,ref,a)
+                                                                  ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_each_closed_reference_has_one_checked_target[sequence] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_closed_reference_has3')
+kind = 'sequence'
+
+    @pytest.mark.parametrize('kind',KINDS)
+    def test_each_closed_reference_has_one_checked_target(tmp_path,kind):
+>    s,p,ref,a=make_target_store(tmp_path/'target.sqlite',kind);r=read(s,p,ref,a)
+                                                                  ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_each_closed_reference_has_one_checked_target[frozen-list] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_closed_reference_has4')
+kind = 'frozen-list'
+
+    @pytest.mark.parametrize('kind',KINDS)
+    def test_each_closed_reference_has_one_checked_target(tmp_path,kind):
+>    s,p,ref,a=make_target_store(tmp_path/'target.sqlite',kind);r=read(s,p,ref,a)
+                                                                  ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________ test_each_closed_reference_has_one_checked_target[frozen-map] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_closed_reference_has5')
+kind = 'frozen-map'
+
+    @pytest.mark.parametrize('kind',KINDS)
+    def test_each_closed_reference_has_one_checked_target(tmp_path,kind):
+>    s,p,ref,a=make_target_store(tmp_path/'target.sqlite',kind);r=read(s,p,ref,a)
+                                                                  ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_each_closed_reference_has_one_checked_target[record] ___________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_closed_reference_has6')
+kind = 'record'
+
+    @pytest.mark.parametrize('kind',KINDS)
+    def test_each_closed_reference_has_one_checked_target(tmp_path,kind):
+>    s,p,ref,a=make_target_store(tmp_path/'target.sqlite',kind);r=read(s,p,ref,a)
+                                                                  ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________ test_each_closed_reference_has_one_checked_target[nan-key] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_closed_reference_has7')
+kind = 'nan-key'
+
+    @pytest.mark.parametrize('kind',KINDS)
+    def test_each_closed_reference_has_one_checked_target(tmp_path,kind):
+>    s,p,ref,a=make_target_store(tmp_path/'target.sqlite',kind);r=read(s,p,ref,a)
+                                                                  ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________ test_each_closed_reference_has_one_checked_target[event-ids] _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_each_closed_reference_has8')
+kind = 'event-ids'
+
+    @pytest.mark.parametrize('kind',KINDS)
+    def test_each_closed_reference_has_one_checked_target(tmp_path,kind):
+>    s,p,ref,a=make_target_store(tmp_path/'target.sqlite',kind);r=read(s,p,ref,a)
+                                                                  ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________ test_mismatched_kind_and_missing_target_rejected _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_mismatched_kind_and_missi0')
+
+    def test_mismatched_kind_and_missing_target_rejected(tmp_path):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite')
+>    with pytest.raises(StoreError):read(s,p,HistoryReference('map',2),a)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________________ test_competing_backing_kinds_rejected _____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_competing_backing_kinds_r0')
+
+    def test_competing_backing_kinds_rejected(tmp_path):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite',extra=(VersionChange(NAN,(2,0),nonreflexive_key_header(float('nan'))),))
+>    with pytest.raises(StoreError):read(s,p,ref,a)
+                                    ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_malformed_or_wrong_descriptor_rejected[value0] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_malformed_or_wrong_descri0')
+value = ('list', 1, 0)
+
+    @pytest.mark.parametrize('value',[('list',1,0),('map',0,0),('list',False,0)])
+    def test_malformed_or_wrong_descriptor_rejected(tmp_path,value):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite',descriptor=value)
+>    with pytest.raises(StoreError):read(s,p,ref,a)
+                                    ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_malformed_or_wrong_descriptor_rejected[value1] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_malformed_or_wrong_descri1')
+value = ('map', 0, 0)
+
+    @pytest.mark.parametrize('value',[('list',1,0),('map',0,0),('list',False,0)])
+    def test_malformed_or_wrong_descriptor_rejected(tmp_path,value):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite',descriptor=value)
+>    with pytest.raises(StoreError):read(s,p,ref,a)
+                                    ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_____________ test_malformed_or_wrong_descriptor_rejected[value2] ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_malformed_or_wrong_descri2')
+value = ('list', False, 0)
+
+    @pytest.mark.parametrize('value',[('list',1,0),('map',0,0),('list',False,0)])
+    def test_malformed_or_wrong_descriptor_rejected(tmp_path,value):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite',descriptor=value)
+>    with pytest.raises(StoreError):read(s,p,ref,a)
+                                    ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________________ test_explicit_byte_budgets[kw0] ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_explicit_byte_budgets_kw00')
+kw = {'max_bytes': 1}
+
+    @pytest.mark.parametrize('kw',[{'max_bytes':1},{'max_source_bytes':1},{'max_metadata_bytes':1},{'max_bytes':True}])
+    def test_explicit_byte_budgets(tmp_path,kw):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite')
+>    with pytest.raises(StoreError):read(s,p,ref,a,**kw)
+                                    ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________________ test_explicit_byte_budgets[kw1] ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_explicit_byte_budgets_kw10')
+kw = {'max_source_bytes': 1}
+
+    @pytest.mark.parametrize('kw',[{'max_bytes':1},{'max_source_bytes':1},{'max_metadata_bytes':1},{'max_bytes':True}])
+    def test_explicit_byte_budgets(tmp_path,kw):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite')
+>    with pytest.raises(StoreError):read(s,p,ref,a,**kw)
+                                    ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________________ test_explicit_byte_budgets[kw2] ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_explicit_byte_budgets_kw20')
+kw = {'max_metadata_bytes': 1}
+
+    @pytest.mark.parametrize('kw',[{'max_bytes':1},{'max_source_bytes':1},{'max_metadata_bytes':1},{'max_bytes':True}])
+    def test_explicit_byte_budgets(tmp_path,kw):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite')
+>    with pytest.raises(StoreError):read(s,p,ref,a,**kw)
+                                    ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________________ test_explicit_byte_budgets[kw3] ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_explicit_byte_budgets_kw30')
+kw = {'max_bytes': True}
+
+    @pytest.mark.parametrize('kw',[{'max_bytes':1},{'max_source_bytes':1},{'max_metadata_bytes':1},{'max_bytes':True}])
+    def test_explicit_byte_budgets(tmp_path,kw):
+     s,p,ref,a=make_target_store(tmp_path/'target.sqlite')
+>    with pytest.raises(StoreError):read(s,p,ref,a,**kw)
+                                    ^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_target.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_target.py:10: in read
+    def read(s,p,ref,a,**kw):return m().read_reference_target(s,p,ref,*a,**kw)
+                                    ^^^
+simulation/tests/test_stage_0_5_proof_target.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_target')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_target'
+import_ = <function _gcd_import at 0x7f2c1c81c0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_target'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_each_closed_reference_has_one_checked_target[list]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_each_closed_reference_has_one_checked_target[map]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_each_closed_reference_has_one_checked_target[set]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_each_closed_reference_has_one_checked_target[sequence]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_each_closed_reference_has_one_checked_target[frozen-list]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_each_closed_reference_has_one_checked_target[frozen-map]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_each_closed_reference_has_one_checked_target[record]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_each_closed_reference_has_one_checked_target[nan-key]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_each_closed_reference_has_one_checked_target[event-ids]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_mismatched_kind_and_missing_target_rejected
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_competing_backing_kinds_rejected
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_malformed_or_wrong_descriptor_rejected[value0]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_malformed_or_wrong_descriptor_rejected[value1]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_malformed_or_wrong_descriptor_rejected[value2]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_explicit_byte_budgets[kw0]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_explicit_byte_budgets[kw1]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_explicit_byte_budgets[kw2]
+FAILED simulation/tests/test_stage_0_5_proof_target.py::test_explicit_byte_budgets[kw3]
+18 failed in 1.92s
