@@ -1,0 +1,47 @@
+{
+  "runtime_checkpoint": "6e767881eabe4839c4a838870e8ac3139871e946",
+  "runtime_tree": "4c3f14e5af503dfb5a1a5ebc9ed80ff3c32b4d32",
+  "tests": {
+    "proof": {
+      "tests": 991,
+      "seconds": 168.175,
+      "junit_sha256": "d4e4e0c3563b9b165ed1d3ed39641c4de479e1670073f75fd5ee1ecbf684d9eb"
+    },
+    "runtime": {
+      "tests": 159,
+      "seconds": 58.741,
+      "junit_sha256": "b45788433283a7c48f60c64fbb13cc630d258455c2903709912b2bb03aea26fc"
+    },
+    "focused": {
+      "tests": 83,
+      "seconds": 26.251,
+      "junit_sha256": "237ecf5468128c09aca88ca84b85e619c1f29c5258e64f5d3423f580e6dbe2fd"
+    }
+  },
+  "review": {
+    "model": "gpt-6-astra",
+    "effort": "high",
+    "critical": 0,
+    "important": 0,
+    "deferred_minor": 1,
+    "independent_extent_tests": 79,
+    "independent_extent_seconds": 26.63,
+    "independent_dependency_transition_probe": "reviewer reported pass; not a committed regression",
+    "passes": 1
+  },
+  "scaling_source": {
+    "head": "6e767881eabe4839c4a838870e8ac3139871e946",
+    "runtime_tree": "4c3f14e5af503dfb5a1a5ebc9ed80ff3c32b4d32",
+    "sqlite": "3.53.1",
+    "driver_sha256": "6499fa8c55d9d3a0616c04962fde0ed9cce43027236479b6ce13d4effb855c35",
+    "fixture_sha256": "bcaf1aab68f7610728a150eb056f9faef90c904a78161177f84df12df8f7d588",
+    "target_fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+    "child_fixture_sha256": "b4187ec94e674d8e1e4ffdc495e23020aed675f4d0f6c941fa5f7fd5a24b5713"
+  },
+  "full_simulation": "Next hosted CI; baseline4041 tests accepted separately",
+  "limits": [
+    "Inactive bounded raw extent/reference validation only",
+    "One-hop frozen certification, not transitive truth/closure",
+    "No World activation, format capability, merge or World latency acceptance"
+  ]
+}

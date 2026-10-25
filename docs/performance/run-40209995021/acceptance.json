@@ -1,0 +1,150 @@
+{
+  "head": "49f64643583da8fbc0da2d665eb521e0bfed163e",
+  "runtime_tree": "f35ce9f4d3b5f8aa3cd39a8a6291c6c2005a10d4",
+  "run_id": 40209995021,
+  "jobs": {
+    "full-suite": "success",
+    "proof-map": "success"
+  },
+  "digests": [
+    "4caac747c7227919bd0546d1bda04d8c8c9d5a37ff5cb98e8e5c6955dd29917d",
+    "4691f50f6da94f11d9c03ff62e8b39a235e8dcc844c5dcd8a9eea95e38278825"
+  ],
+  "suites": {
+    "full-suite.xml": 4041,
+    "owner-target-tests.xml": 17,
+    "seek-tests.xml": 53,
+    "collection-directory-tests.xml": 31,
+    "generation-tests.xml": 60,
+    "scope-tests.xml": 55,
+    "target-incoming-tests.xml": 40,
+    "child-extents-tests.xml": 34,
+    "inventory-tests.xml": 34,
+    "publication-tests.xml": 67,
+    "collection-publication-tests.xml": 12,
+    "directory-publication-tests.xml": 22,
+    "record-tests.xml": 60,
+    "target-tests.xml": 33,
+    "collection-tests.xml": 20,
+    "target-group-tests.xml": 32,
+    "proof-tests.xml": 260,
+    "group-tests.xml": 72,
+    "projection-tests.xml": 43
+  },
+  "proof_tests": 945,
+  "matrices": {
+    "collection-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-incoming-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "seek-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "query-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "batch-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "inventory-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "child-extents-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scope-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "directory-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "version-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "record-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "occurrence-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "order-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-directory-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "owner-target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "projection-scaling": [
+      1000,
+      10000,
+      100000
+    ]
+  },
+  "limits": [
+    "Inactive components only; no World activation, native admission, complete topology or World latency acceptance."
+  ]
+}

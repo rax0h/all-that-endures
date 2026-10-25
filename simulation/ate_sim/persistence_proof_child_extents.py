@@ -1,7 +1,7 @@
-"""Inactive bounded mutable history extent/type validator; raw values only.
+"""Inactive bounded selected history/fixed-body extent validator; raw values only.
 
 Full selected-target reference/audit work, not ordinary open/save admission.
-Sequence/frozen/record/Event-ID extents and recursive semantics remain gated.
+Sequence/Event-ID extents and recursive semantics remain gated.
 """
 from dataclasses import dataclass
 from .incremental_store import StoreError,StoreIntegrityError,CodecError,Membership
@@ -21,15 +21,22 @@ class RawTargetMembers:
     members: tuple
     member_counts: tuple
     child_locators: tuple
+    certification_targets: tuple = ()
 
 
-def _finish(value,s,scope_pair,max_children,max_values):
+def _finish(value,s,scope_pair,max_children,max_values,max_certification_targets):
     backing=value.target;kind=backing.kind;inc=backing.incarnation
-    if kind not in ('list','map','set'):raise StoreError('extent kind requires a separate checked path')
-    count=backing.descriptor[1]
+    base=kind.removeprefix('frozen-');fixed=kind in ('record','nan-key')
+    if base not in ('list','map','set') and not fixed:raise StoreError('extent kind requires a separate checked path')
+    if kind=='record':
+        from .persistence_record_headers import checked_record_header
+        from .persistence_schema import RECORD_FIELDS
+        cls,fields,_state=checked_record_header(backing.descriptor);count=len(fields)
+    elif kind=='nan-key':count=0
+    else:count=backing.descriptor[1]
     if count>max_values:raise StoreError('selected history exceeds value budget')
     scope=scopes.ChildScope(inc);root=scopes._resolve(s.store,scope_pair[0],scope)
-    expected=(count+127)//128 if kind=='list' else count
+    expected=1 if fixed else (count+127)//128 if base=='list' else count
     if root.count!=expected:raise StoreIntegrityError('complete physical child count disagrees with target extent')
     if root.count>max_children:raise StoreError('selected history exceeds child budget')
     m=OrderedSeekMap(s.store.db,scopes._seek_domain(s.store,scope));locators=[];after=None
@@ -39,50 +46,66 @@ def _finish(value,s,scope_pair,max_children,max_values):
             if not position or position[0]>=len(scopes._CHILD_NAMES) or commitment!=scopes._child_member(m.domain,position):raise StoreIntegrityError('invalid child locator proof')
             ns=scopes._CHILD_NAMES[position[0]];typed=position[1:];key=s.codec.decode(typed)
             if scopes._child_locator(ns,typed)!=(scope,position):raise StoreIntegrityError('child locator parent disagreement')
-            if ns!=(PAGE_NAMESPACE if kind=='list' else ENTRY_NAMESPACE):raise StoreIntegrityError('target has competing child backing family')
+            expected_ns=backing.namespace if fixed else PAGE_NAMESPACE if base=='list' else ENTRY_NAMESPACE
+            if ns!=expected_ns:raise StoreIntegrityError('target has competing child backing family')
             s.charge(len(position)+32);locators.append((ns,key))
         if len(rows)<128:break
         after=rows[-1][0]
     if len(locators)!=expected:raise StoreIntegrityError('incomplete child inventory traversal')
+    if fixed:
+        if tuple(locators)!=((backing.namespace,(inc,0)),):raise StoreIntegrityError('fixed target has a competing child locator')
+        items=tuple(zip(RECORD_FIELDS[cls],fields)) if kind=='record' else ()
+        actual=member_counts(fields) if kind=='record' else (0,0,0)
+        _check_policies(value,s,kind,actual)
+        return RawTargetMembers(value,items,actual,tuple(locators))
     s.read_limit+=max_children+1;items=[];ordered=[]
     for ns,key in locators:
         data,members,raw,typed=s.value(ns,key)
         change=VersionChange(ns,key,data,record_schema=raw.record_schema,memberships=tuple(Membership(*r) for r in members))
         AUXILIARY_OWNER_FAMILIES[ns].validate_source(change,'lazy',s.codec)
-        if kind=='list':
+        if base=='list':
             number=key[1]
             if not 0<=number<expected or len(data)!=min(128,count-128*number):raise StoreIntegrityError('list page number/shape disagrees with exact extent')
             ordered.append((number,data))
         else:
             ordinal,member,payload=data
-            if ordinal>=backing.descriptor[2] or kind=='set' and payload is not None:raise StoreIntegrityError('scalar child ordinal/value disagrees with descriptor')
+            if ordinal>=backing.descriptor[2] or base=='set' and payload is not None:raise StoreIntegrityError('scalar child ordinal/value disagrees with descriptor')
             ordered.append((ordinal,(member,payload)))
     ordered.sort(key=lambda x:x[0])
     if len({i for i,_ in ordered})!=len(ordered):raise StoreIntegrityError('duplicate history child ordinal')
-    if kind=='list':
+    if base=='list':
         if tuple(i for i,_ in ordered)!=tuple(range(expected)):raise StoreIntegrityError('list extent has missing interior pages')
         for _,page in ordered:items.extend(page)
-    else:items=[entry[0] if kind=='set' else entry for _,entry in ordered]
+    else:items=[entry[0] if base=='set' else entry for _,entry in ordered]
     if len(items)!=count:raise StoreIntegrityError('history members disagree with extent count')
-    actual=member_counts([entry[0] for entry in items] if kind=='map' else items)
+    actual=member_counts([entry[0] for entry in items] if base=='map' else items)
     witness=s.metadata(TYPES,inc)
-    if (type(witness) is not tuple or len(witness)!=3 or witness[:2]!=(TAG,kind)
+    if (type(witness) is not tuple or len(witness)!=3 or witness[:2]!=(TAG,base)
             or type(witness[2]) is not tuple or len(witness[2])!=3 or any(type(n) is not int or n<0 for n in witness[2]) or witness[2]!=actual):
         raise StoreIntegrityError('member witness disagrees with actual complete values')
+    _check_policies(value,s,kind,actual)
+    dependencies=()
+    if kind.startswith('frozen-'):
+        from .persistence_proof_frozen_extents import check_frozen_members
+        dependencies=check_frozen_members(s,scope_pair,backing,items,max_certification_targets)
+    return RawTargetMembers(value,tuple(items),actual,tuple(locators),dependencies)
+
+
+def _check_policies(value,s,kind,actual):
     for row in value.group.occurrences:
         path=s.codec.decode(row.path);policy=incoming_owner_policy(row.namespace,path)
         if policy is None:continue
+        if kind in ('record','nan-key'):raise StoreIntegrityError('incoming history owner requires a history target')
         if not path and row.namespace in BUCKET_SPECS and kind!=BUCKET_SPECS[row.namespace][0]:raise StoreIntegrityError('incoming bucket has wrong history kind')
         allowed=0 if policy=='int' else 1
         if actual[allowed]!=sum(actual):raise StoreIntegrityError('actual history values violate incoming member policy')
-    return RawTargetMembers(value,tuple(items),actual,tuple(locators))
 
 
 def read_target_members(store,pin,reference,content_authority,scope_authority,inventory_authority,*,record_authority=None,
-                        max_children=4096,max_values=65536,max_members=4096,max_bytes=8388608,max_source_bytes=1048576,max_metadata_bytes=1048576):
-    for n,limit in ((max_children,4096),(max_values,65536)):
+                        max_children=4096,max_values=65536,max_certification_targets=128,max_members=4096,max_bytes=8388608,max_source_bytes=1048576,max_metadata_bytes=1048576):
+    for n,limit in ((max_children,4096),(max_values,65536),(max_certification_targets,4096)):
         if type(n) is not int or not 1<=n<=limit:raise StoreIntegrityError('invalid extent budget')
     try:return incoming._read(store,pin,reference,content_authority,scope_authority,inventory_authority,record_authority=record_authority,
         max_members=max_members,max_bytes=max_bytes,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes,
-        _after=lambda value,s:_finish(value,s,scope_authority,max_children,max_values))
+        _after=lambda value,s:_finish(value,s,scope_authority,max_children,max_values,max_certification_targets))
     except (CodecError,ValueError,TypeError,UnicodeError,RecursionError,IndexError,AttributeError) as exc:raise StoreIntegrityError('invalid child extent source') from exc

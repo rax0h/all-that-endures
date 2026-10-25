@@ -17,4 +17,4 @@ Tests must reject far-out surplus pages, holes, wrong family, scalar count/key/o
 - [x] Implement optional fifth scope directory and same-writer transition/recovery support, preserving four-root certificate behavior.
 - [x] Implement bounded raw mutable-history member/extent reader and centralized existing incoming member policy.
 - [x] Run affected tests, clean1k/10k/100k unrelated-parent diagnostic and one fresh review; retain evidence.
-- [ ] Publish candidate, start longer CI, return link and stop without polling.
+- [x] Published49f6464, CI40209995021 accepted on the next user green (4041 full/945 proof tests;22 complete matrices).
