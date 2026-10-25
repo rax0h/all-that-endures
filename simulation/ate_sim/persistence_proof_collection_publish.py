@@ -72,11 +72,11 @@ def _order(store,g,ns,key):
  if type(ordinal) is not int or not 0<=ordinal<2**63 or type(start) is not int or not 0<=start<=g or et not in ('null','integer') or et=='integer' and (type(end) is not int or end<=g or end<=start) or checksum!=_order_checksum(ns,key,ordinal,start,end):raise StoreIntegrityError('invalid collection order source')
  return ordinal
 
-def _guard(store,r,prepared,content_parent):
+def _guard(store,r,prepared,content_parent,ordinary=(),segments=()):
  _check(store,r.pin,r)
  if r.directory is not None:
   from .persistence_proof_directory_publish import _guard as guard_directory
-  guard_directory(store,r)
+  guard_directory(store,r,prepared,ordinary,segments)
  _schema_rows(store.db);_indexes(store)
  parents={c.namespace:c for c,e in r.pairs};states={ns:[c.declared,c.member_count,c.next_ordinal] for ns,c in parents.items()}
  for c,e in r.pairs:

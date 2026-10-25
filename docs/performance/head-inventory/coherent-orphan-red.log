@@ -1,0 +1,52 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_bootstrap_rejects_checksummed_orphan_namespace[lazy_record_versions] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_bootstrap_rejects_checksu0')
+table = 'lazy_record_versions'
+
+    @pytest.mark.parametrize('table',['lazy_record_versions','lazy_order_versions'])
+    def test_bootstrap_rejects_checksummed_orphan_namespace(tmp_path,table):
+     from ate_sim.persistence_lazy_store import _order_checksum,_version_checksum
+     from ate_sim.incremental_store import _record_checksum
+     s,p,a,d,i=setup(tmp_path);columns=[v[1] for v in s.db.execute('PRAGMA table_info('+table+')')]
+     row=dict(zip(columns,s.db.execute('SELECT * FROM '+table+" WHERE namespace='people' LIMIT 1").fetchone()));row['namespace']='ghost'
+     if table=='lazy_order_versions':row['row_checksum']=_order_checksum(row['namespace'],row['typed_key'],row['ordinal'],row['valid_from'],row['valid_to'])
+     else:
+      row['row_checksum']=_version_checksum(row['namespace'],row['typed_key'],row['record_schema'],row['codec_version'],row['valid_from'],row['valid_to'],row['memberships'],row['payload'])
+     s.db.execute('INSERT INTO '+table+' VALUES('+','.join('?' for _ in columns)+')',[row[k] for k in columns]);s.db.commit()
+     # Characterize the inherited audit gap; the constructor must supplement it.
+     s.verify_all()
+     before=s.db.execute('SELECT * FROM ate_inventory_generations ORDER BY generation').fetchall()
+>    with pytest.raises(StoreError):m().bootstrap_inventory(s,p)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_inventory.py:163: Failed
+___ test_bootstrap_rejects_checksummed_orphan_namespace[lazy_order_versions] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-9/test_bootstrap_rejects_checksu1')
+table = 'lazy_order_versions'
+
+    @pytest.mark.parametrize('table',['lazy_record_versions','lazy_order_versions'])
+    def test_bootstrap_rejects_checksummed_orphan_namespace(tmp_path,table):
+     from ate_sim.persistence_lazy_store import _order_checksum,_version_checksum
+     from ate_sim.incremental_store import _record_checksum
+     s,p,a,d,i=setup(tmp_path);columns=[v[1] for v in s.db.execute('PRAGMA table_info('+table+')')]
+     row=dict(zip(columns,s.db.execute('SELECT * FROM '+table+" WHERE namespace='people' LIMIT 1").fetchone()));row['namespace']='ghost'
+     if table=='lazy_order_versions':row['row_checksum']=_order_checksum(row['namespace'],row['typed_key'],row['ordinal'],row['valid_from'],row['valid_to'])
+     else:
+      row['row_checksum']=_version_checksum(row['namespace'],row['typed_key'],row['record_schema'],row['codec_version'],row['valid_from'],row['valid_to'],row['memberships'],row['payload'])
+     s.db.execute('INSERT INTO '+table+' VALUES('+','.join('?' for _ in columns)+')',[row[k] for k in columns]);s.db.commit()
+     # Characterize the inherited audit gap; the constructor must supplement it.
+     s.verify_all()
+     before=s.db.execute('SELECT * FROM ate_inventory_generations ORDER BY generation').fetchall()
+>    with pytest.raises(StoreError):m().bootstrap_inventory(s,p)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_inventory.py:163: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_bootstrap_rejects_checksummed_orphan_namespace[lazy_record_versions]
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_bootstrap_rejects_checksummed_orphan_namespace[lazy_order_versions]
+2 failed, 30 deselected in 0.38s

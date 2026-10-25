@@ -1,0 +1,208 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+______________ test_complete_raw_inventory_and_empty_declarations ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_complete_raw_inventory_an0')
+
+    def test_complete_raw_inventory_and_empty_declarations(tmp_path):
+>    s,p,a,d,i=setup(tmp_path);s.reset_diagnostics()
+               ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_inventory.py:10: in setup
+    s,p,a=make_publication_store(tmp_path/'i.sqlite',3);d=bootstrap_collection_directory(s,p);i=m().bootstrap_inventory(s,p);return s,p,a,d,i
+                                                                                                ^^^
+simulation/tests/test_stage_0_5_proof_inventory.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_inventory')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_inventory'
+import_ = <function _gcd_import at 0x7fc5308dc0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_inventory'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+__________________ test_atomic_mixed_counts_and_retained_head __________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_atomic_mixed_counts_and_r0')
+
+    def test_atomic_mixed_counts_and_retained_head(tmp_path):
+>    s,p,a,d,i=setup(tmp_path);old=s.capture_pin()
+               ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_inventory.py:10: in setup
+    s,p,a=make_publication_store(tmp_path/'i.sqlite',3);d=bootstrap_collection_directory(s,p);i=m().bootstrap_inventory(s,p);return s,p,a,d,i
+                                                                                                ^^^
+simulation/tests/test_stage_0_5_proof_inventory.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_inventory')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_inventory'
+import_ = <function _gcd_import at 0x7fc5308dc0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_inventory'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________ test_failure_and_exact_recovery[before_head] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_failure_and_exact_recover0')
+phase = 'before_head'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit','after_commit'])
+    def test_failure_and_exact_recovery(tmp_path,phase):
+>    s,p,a,d,i=setup(tmp_path)
+               ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_inventory.py:10: in setup
+    s,p,a=make_publication_store(tmp_path/'i.sqlite',3);d=bootstrap_collection_directory(s,p);i=m().bootstrap_inventory(s,p);return s,p,a,d,i
+                                                                                                ^^^
+simulation/tests/test_stage_0_5_proof_inventory.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_inventory')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_inventory'
+import_ = <function _gcd_import at 0x7fc5308dc0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_inventory'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_failure_and_exact_recovery[before_commit] ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_failure_and_exact_recover1')
+phase = 'before_commit'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit','after_commit'])
+    def test_failure_and_exact_recovery(tmp_path,phase):
+>    s,p,a,d,i=setup(tmp_path)
+               ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_inventory.py:10: in setup
+    s,p,a=make_publication_store(tmp_path/'i.sqlite',3);d=bootstrap_collection_directory(s,p);i=m().bootstrap_inventory(s,p);return s,p,a,d,i
+                                                                                                ^^^
+simulation/tests/test_stage_0_5_proof_inventory.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_inventory')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_inventory'
+import_ = <function _gcd_import at 0x7fc5308dc0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_inventory'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________ test_failure_and_exact_recovery[after_commit] _________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_failure_and_exact_recover2')
+phase = 'after_commit'
+
+    @pytest.mark.parametrize('phase',['before_head','before_commit','after_commit'])
+    def test_failure_and_exact_recovery(tmp_path,phase):
+>    s,p,a,d,i=setup(tmp_path)
+               ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_inventory.py:10: in setup
+    s,p,a=make_publication_store(tmp_path/'i.sqlite',3);d=bootstrap_collection_directory(s,p);i=m().bootstrap_inventory(s,p);return s,p,a,d,i
+                                                                                                ^^^
+simulation/tests/test_stage_0_5_proof_inventory.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_inventory')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_inventory'
+import_ = <function _gcd_import at 0x7fc5308dc0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_inventory'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________________ test_metadata_only_and_noop __________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_metadata_only_and_noop0')
+
+    def test_metadata_only_and_noop(tmp_path):
+>    s,p,a,d,i=setup(tmp_path);r=save(s,p,a,d,i,namespaces=())
+               ^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_inventory.py:10: in setup
+    s,p,a=make_publication_store(tmp_path/'i.sqlite',3);d=bootstrap_collection_directory(s,p);i=m().bootstrap_inventory(s,p);return s,p,a,d,i
+                                                                                                ^^^
+simulation/tests/test_stage_0_5_proof_inventory.py:8: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_inventory')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_inventory'
+import_ = <function _gcd_import at 0x7fc5308dc0e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_inventory'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_complete_raw_inventory_and_empty_declarations
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_atomic_mixed_counts_and_retained_head
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_failure_and_exact_recovery[before_head]
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_failure_and_exact_recovery[before_commit]
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_failure_and_exact_recovery[after_commit]
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_metadata_only_and_noop
+6 failed in 0.74s

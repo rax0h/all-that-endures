@@ -48,6 +48,7 @@ def persist_bootstrap(store,c):
 @dataclass
 class _DirectoryRequest:
     parent:tuple
+    inventory:object=None
     successor:object=None
 
 @dataclass(frozen=True)
@@ -70,7 +71,7 @@ def _parents(store,pin,authority,namespaces):
             pairs.append(pair)
         return tuple(pairs)
 
-def _guard(store,r):
+def _guard(store,r,versions,ordinary,segments):
     if type(r.directory) is not _DirectoryRequest:raise StoreIntegrityError('invalid private directory request')
     c,e=r.directory.parent
     directory._read_preflight(store,1048576)
@@ -81,6 +82,9 @@ def _guard(store,r):
             empty=OrderedSeekMap(None,collection.domain(c.store_identity,c.codec_version,parent.namespace)).empty
             if parent.declared or parent.root!=empty:raise StoreIntegrityError('directory absence certificate disagreement')
         elif actual!=(parent,expected):raise StoreIntegrityError('directory selected parent disagreement')
+    if r.directory.inventory is not None:
+        from .persistence_proof_inventory import _guard as guard_inventory
+        guard_inventory(store,r.directory.inventory,versions,ordinary,segments)
 
 def _stage(store,r,g,token):
     c,e=r.directory.parent
@@ -92,11 +96,14 @@ def _stage(store,r,g,token):
         elif m.get(root,key) is not None:raise StoreIntegrityError('declared namespace cannot disappear')
     child=directory.CollectionDirectoryCertificate(c.store_identity,g,c.codec_version,root)
     r.directory.successor=_write(store,child,parent=e,writer=r.pin.token,token=token)
+    if r.directory.inventory is not None:
+        from .persistence_proof_inventory import _stage as stage_inventory
+        stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
 
-def commit_directory(store,pin,certificate,expected,content_certificate,content_expected,*,namespaces,commit_token,**arguments):
+def commit_directory(store,pin,certificate,expected,content_certificate,content_expected,*,namespaces,commit_token,_inventory=None,**arguments):
     if any(k.startswith('_') for k in arguments):raise StoreError('private directory arguments forbidden')
     if store.db.in_transaction:raise StoreError('directory save requires owned operation')
-    authority=certificate,expected;pairs=_parents(store,pin,authority,namespaces);request=_DirectoryRequest(authority)
+    authority=certificate,expected;pairs=_parents(store,pin,authority,namespaces);request=_DirectoryRequest(authority,inventory=_inventory)
     result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
     outcome=result.content.commit.outcome
     if outcome=='committed' and request.successor is None:raise StoreIntegrityError('missing directory successor')

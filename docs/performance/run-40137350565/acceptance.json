@@ -1,0 +1,25 @@
+{
+  "run": 40137350565,
+  "head": "df55c1a070eb54b26df8b34c51c9847c67b8644b",
+  "counts": {
+    "full-suite.xml": 3851,
+    "generation-tests.xml": 60,
+    "collection-tests.xml": 20,
+    "projection-tests.xml": 43,
+    "collection-publication-tests.xml": 12,
+    "group-tests.xml": 72,
+    "proof-tests.xml": 260,
+    "directory-publication-tests.xml": 22,
+    "record-tests.xml": 60,
+    "collection-directory-tests.xml": 31,
+    "seek-tests.xml": 53,
+    "publication-tests.xml": 67,
+    "scope-tests.xml": 55
+  },
+  "matrices": 16,
+  "checked": "ZIP digests, XML, source/runtime/driver/fixture hashes, complete matrices",
+  "zip_sha256": [
+    "6227a2bf48485292b506880b89ed4a33b0e048432fe74fa331151d8b490d0937",
+    "a1022d01053180d46884318c6f82f97189235ca71a43024d94757ed6c3602f31"
+  ]
+}

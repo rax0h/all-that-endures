@@ -83,6 +83,12 @@ def _persist(store,d,key,c):
     if row is None or row[0]!=raw:raise StoreIntegrityError('cannot repair divergent directory descriptor')
     return h
 
+def _audit_namespace_inventory(store,g):
+    # The inherited audit iterates declared states. Explicitly reject source
+    # rows outside that inventory, including coherent orphan namespaces.
+    for table in ('lazy_order_versions','lazy_record_versions'):
+        if store.db.execute('SELECT 1 FROM '+table+' AS source WHERE source.valid_from<=? AND (source.valid_to IS NULL OR ?<source.valid_to) AND NOT EXISTS(SELECT 1 FROM lazy_namespace_state AS state WHERE state.namespace=source.namespace AND state.valid_from<=? AND (state.valid_to IS NULL OR ?<state.valid_to)) LIMIT 1',(g,g,g,g)).fetchone():raise StoreIntegrityError('source namespace outside declared collection inventory')
+
 def bootstrap_collection_directory(store,pin,*,max_metadata_bytes=1048576):
     _budget(max_metadata_bytes);_require_closed_codec(store,allow_typed=True)
     if store.db.in_transaction or store._active_read_transaction:raise StoreError('directory construction requires owned transaction')
@@ -94,10 +100,7 @@ def bootstrap_collection_directory(store,pin,*,max_metadata_bytes=1048576):
         for table in ('lazy_namespace_state','lazy_order_versions','lazy_record_versions'):
             if store.db.execute('SELECT 1 FROM '+table+' WHERE length(CAST(namespace AS BLOB))>4096 LIMIT 1').fetchone():raise StoreError('directory namespace exceeds field path')
         if store.db.execute("SELECT 1 FROM lazy_order_versions WHERE typeof(typed_key)!='blob' OR length(typed_key)>4096 LIMIT 1").fetchone():raise StoreError('directory collection key exceeds field path')
-        # The inherited audit iterates declared states. Explicitly reject source
-        # rows outside that inventory, including coherent orphan namespaces.
-        for table in ('lazy_order_versions','lazy_record_versions'):
-            if store.db.execute('SELECT 1 FROM '+table+' AS source WHERE source.valid_from<=? AND (source.valid_to IS NULL OR ?<source.valid_to) AND NOT EXISTS(SELECT 1 FROM lazy_namespace_state AS state WHERE state.namespace=source.namespace AND state.valid_from<=? AND (state.valid_to IS NULL OR ?<state.valid_to)) LIMIT 1',(g,g,g,g)).fetchone():raise StoreIntegrityError('source namespace outside declared collection inventory')
+        _audit_namespace_inventory(store,g)
         store.verify_all()
         d=domain(store.store_identity,store.codec.version);m=OrderedSeekMap(store.db,d);m.create_schema()
         store.db.execute(_SCHEMA.replace('CREATE TABLE','CREATE TABLE IF NOT EXISTS',1));_schemas(store.db)

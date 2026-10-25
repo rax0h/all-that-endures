@@ -1,0 +1,59 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_________ test_node_source_replacement_rejected_before_callback[read] __________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_node_source_replacement_r0')
+operation = 'read'
+
+    @pytest.mark.parametrize('operation',['read','bootstrap'])
+    def test_node_source_replacement_rejected_before_callback(tmp_path,operation):
+     s,p,a,d,i=setup(tmp_path);calls=[]
+     s.db.create_function('inventory_node_hook',1,lambda value:(calls.append(value),value)[1])
+     s.db.execute('ALTER TABLE ate_ordered_seek_nodes RENAME TO saved_nodes')
+     s.db.execute('CREATE VIEW ate_ordered_seek_nodes AS SELECT domain,digest,inventory_node_hook(raw) AS raw FROM saved_nodes');s.db.commit()
+>    with pytest.raises(StoreError):
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_inventory.py:172: Failed
+_______ test_node_source_replacement_rejected_before_callback[bootstrap] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_node_source_replacement_r1')
+operation = 'bootstrap'
+
+    @pytest.mark.parametrize('operation',['read','bootstrap'])
+    def test_node_source_replacement_rejected_before_callback(tmp_path,operation):
+     s,p,a,d,i=setup(tmp_path);calls=[]
+     s.db.create_function('inventory_node_hook',1,lambda value:(calls.append(value),value)[1])
+     s.db.execute('ALTER TABLE ate_ordered_seek_nodes RENAME TO saved_nodes')
+     s.db.execute('CREATE VIEW ate_ordered_seek_nodes AS SELECT domain,digest,inventory_node_hook(raw) AS raw FROM saved_nodes');s.db.commit()
+     with pytest.raises(StoreError):
+      if operation=='read':m().read_inventory_namespaces(s,p,*i)
+>     else:m().bootstrap_inventory(s,p)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_inventory.py:121: in bootstrap_inventory
+    root=m.build((_key(ns),_member(m.domain,ns,counts.get(ns,(0,0)))) for ns in names)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_seek.py:234: in build
+    pending=self._write(_Leaf(key,value));pending_prefix=symbols;previous=key
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_proof_seek.OrderedSeekMap object at 0x7f7911bae960>
+node = _Leaf(key=b'archive', value=b'\x9f\xc9N\x10\xc5L\xc8\x98\xb5\xd1\xac\xae\x8abr\x1c\n\xa2\xa3\x16\xdb\xff\x1e\x15t|\x7f\xa4\xc8\xb8\x0f\x8f')
+
+    def _write(self,node):
+        if not self.db.in_transaction:raise StoreError('ordered seek write requires caller transaction')
+        raw=_encode(node);digest=_digest(b'ate-ordered-seek-node/1',self.domain,raw);ref=Root(digest,_count(node))
+>       cursor=self.db.execute('INSERT OR IGNORE INTO ate_ordered_seek_nodes VALUES(?,?,?)',(self.domain,digest,raw))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: cannot modify ate_ordered_seek_nodes because it is a view
+
+simulation/ate_sim/persistence_proof_seek.py:134: OperationalError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_node_source_replacement_rejected_before_callback[read]
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_node_source_replacement_rejected_before_callback[bootstrap]
+2 failed, 32 deselected in 0.60s

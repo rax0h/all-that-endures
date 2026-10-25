@@ -1,0 +1,263 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+______ test_auxiliary_lazy_records_preserve_head_count_semantics[insert] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_auxiliary_lazy_records_pr0')
+operation = 'insert'
+
+    @pytest.mark.parametrize('operation',['insert','update','delete'])
+    def test_auxiliary_lazy_records_preserve_head_count_semantics(tmp_path,operation):
+     from simulation.tests.proof_publication_fixtures import Authorities
+     s,p,a,d,i=setup(tmp_path)
+     if operation!='insert':
+      first=save(s,p,a,d,i,namespaces=('aux.lazy.test',),version_changes=(VersionChange('aux.lazy.test',0,{}),))
+      p=first.content.commit.pin;d=first.directory;i=first.inventory
+      a=Authorities((first.content.certificate,first.content.commitment),(first.content.scope.record.certificate,first.content.scope.record.commitment),(first.content.scope.certificate,first.content.scope.commitment))
+>    r=save(s,p,a,d,i,namespaces=('aux.lazy.test',),commit_token='aux-final',version_changes=(VersionChange('aux.lazy.test',0,{'new':1},delete=operation=='delete'),))
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_inventory.py:14: in save
+    return m().commit_inventory(s,p,*i,d,a.content,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_inventory.py:202: in commit_inventory
+    request=_Request((certificate,expected));result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:471: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2926: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f3143bab980>
+request = _Request(parent=(InventoryCertificate(store_identity='59944b5e-28ab-4af4-94b1-6330451e84dc', generation=1, codec_versi...s={'archive': (3, 0), 'events': (0, 4), 'ordinary': (1, 0), 'people': (1, 0), 'aux.lazy.test': (1, 0)}, successor=None)
+g = 2, writer = 'b5fda9f4-26f0-42b9-9480-96465600b5a8'
+token = b'["str","aux-final"]'
+
+    def _stage(store,request,g,writer,token):
+        c,e=request.parent
+        if _load(store,c.generation)[0]!=(c,e) or g!=c.generation+1 or not store.db.in_transaction:raise StoreIntegrityError('inventory successor context disagreement')
+        h=_physical_head(store,g);names,counts=_head(h)
+>       if counts!=request.counts or h.next_incarnation_id<c.head.next_incarnation_id:raise StoreIntegrityError('inventory successor count/allocator transition disagreement')
+                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ate_sim.incremental_store.StoreIntegrityError: inventory successor count/allocator transition disagreement
+
+simulation/ate_sim/persistence_proof_inventory.py:187: StoreIntegrityError
+______ test_auxiliary_lazy_records_preserve_head_count_semantics[update] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_auxiliary_lazy_records_pr1')
+operation = 'update'
+
+    @pytest.mark.parametrize('operation',['insert','update','delete'])
+    def test_auxiliary_lazy_records_preserve_head_count_semantics(tmp_path,operation):
+     from simulation.tests.proof_publication_fixtures import Authorities
+     s,p,a,d,i=setup(tmp_path)
+     if operation!='insert':
+>     first=save(s,p,a,d,i,namespaces=('aux.lazy.test',),version_changes=(VersionChange('aux.lazy.test',0,{}),))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_inventory.py:14: in save
+    return m().commit_inventory(s,p,*i,d,a.content,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_inventory.py:202: in commit_inventory
+    request=_Request((certificate,expected));result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:471: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2926: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f31438ec2f0>
+request = _Request(parent=(InventoryCertificate(store_identity='076818f7-f522-4666-a940-b9842a6db27f', generation=1, codec_versi...s={'archive': (3, 0), 'events': (0, 4), 'ordinary': (1, 0), 'people': (1, 0), 'aux.lazy.test': (1, 0)}, successor=None)
+g = 2, writer = '8908fe84-a51b-4fed-9817-e02bdac45377'
+token = b'["str","next"]'
+
+    def _stage(store,request,g,writer,token):
+        c,e=request.parent
+        if _load(store,c.generation)[0]!=(c,e) or g!=c.generation+1 or not store.db.in_transaction:raise StoreIntegrityError('inventory successor context disagreement')
+        h=_physical_head(store,g);names,counts=_head(h)
+>       if counts!=request.counts or h.next_incarnation_id<c.head.next_incarnation_id:raise StoreIntegrityError('inventory successor count/allocator transition disagreement')
+                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ate_sim.incremental_store.StoreIntegrityError: inventory successor count/allocator transition disagreement
+
+simulation/ate_sim/persistence_proof_inventory.py:187: StoreIntegrityError
+______ test_auxiliary_lazy_records_preserve_head_count_semantics[delete] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_auxiliary_lazy_records_pr2')
+operation = 'delete'
+
+    @pytest.mark.parametrize('operation',['insert','update','delete'])
+    def test_auxiliary_lazy_records_preserve_head_count_semantics(tmp_path,operation):
+     from simulation.tests.proof_publication_fixtures import Authorities
+     s,p,a,d,i=setup(tmp_path)
+     if operation!='insert':
+>     first=save(s,p,a,d,i,namespaces=('aux.lazy.test',),version_changes=(VersionChange('aux.lazy.test',0,{}),))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_inventory.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_inventory.py:14: in save
+    return m().commit_inventory(s,p,*i,d,a.content,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_inventory.py:202: in commit_inventory
+    request=_Request((certificate,expected));result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:471: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2926: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f31438ef1a0>
+request = _Request(parent=(InventoryCertificate(store_identity='d10b6b23-f047-482c-93d3-dec825cb0f76', generation=1, codec_versi...s={'archive': (3, 0), 'events': (0, 4), 'ordinary': (1, 0), 'people': (1, 0), 'aux.lazy.test': (1, 0)}, successor=None)
+g = 2, writer = '3d5f0529-934c-461d-8859-a1dd80934171'
+token = b'["str","next"]'
+
+    def _stage(store,request,g,writer,token):
+        c,e=request.parent
+        if _load(store,c.generation)[0]!=(c,e) or g!=c.generation+1 or not store.db.in_transaction:raise StoreIntegrityError('inventory successor context disagreement')
+        h=_physical_head(store,g);names,counts=_head(h)
+>       if counts!=request.counts or h.next_incarnation_id<c.head.next_incarnation_id:raise StoreIntegrityError('inventory successor count/allocator transition disagreement')
+                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ate_sim.incremental_store.StoreIntegrityError: inventory successor count/allocator transition disagreement
+
+simulation/ate_sim/persistence_proof_inventory.py:187: StoreIntegrityError
+__ test_bootstrap_rejects_checksummed_orphan_namespace[lazy_record_versions] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_bootstrap_rejects_checksu0')
+table = 'lazy_record_versions'
+
+    @pytest.mark.parametrize('table',['lazy_record_versions','lazy_order_versions'])
+    def test_bootstrap_rejects_checksummed_orphan_namespace(tmp_path,table):
+     from ate_sim.persistence_lazy_store import _order_checksum,_version_checksum
+     from ate_sim.incremental_store import _record_checksum
+     s,p,a,d,i=setup(tmp_path);columns=[v[1] for v in s.db.execute('PRAGMA table_info('+table+')')]
+     row=dict(zip(columns,s.db.execute('SELECT * FROM '+table+" WHERE namespace='people' LIMIT 1").fetchone()));row['namespace']='ghost'
+     if table=='lazy_order_versions':row['row_checksum']=_order_checksum(row['namespace'],row['typed_key'],row['ordinal'],row['valid_from'],row['valid_to'])
+     else:
+      row['payload_checksum']=_record_checksum(row['namespace'],row['typed_key'],row['record_schema'],row['codec_version'],row['valid_from'],row['payload'])
+      row['row_checksum']=_version_checksum(row['namespace'],row['typed_key'],row['record_schema'],row['codec_version'],row['valid_from'],row['valid_to'],row['memberships'],row['payload'])
+     s.db.execute('INSERT INTO '+table+' VALUES('+','.join('?' for _ in columns)+')',[row[k] for k in columns]);s.db.commit()
+     # Characterize the inherited audit gap; the constructor must supplement it.
+>    s.verify_all()
+
+simulation/tests/test_stage_0_5_proof_inventory.py:162: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy_store.py:3206: in verify_all
+    return self._verify_all_in_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:3303: in _verify_all_in_snapshot
+    self._check_record_row(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f314404e630>
+namespace = 'ghost', typed_key = b'["int","0"]'
+row = (1, None, b'["dict",[[["str","wealth"],["int","1"]]]]', '478120173bfee41e6f617d8786b76e2ca66ce60787b1660bf1ffbd594eb6daef', 1, 1, ...)
+decode = True
+
+    def _check_record_row(
+        self, namespace: str, typed_key: bytes, row: tuple[Any, ...], *, decode: bool
+    ) -> tuple[Any, int, int, int | None, tuple[tuple[str, Any, int], ...]]:
+        valid_from, valid_to, payload, payload_checksum, codec_version, record_schema, memberships_blob, row_checksum = row
+        if type(valid_from) is not int or valid_from < 0 or (
+            valid_to is not None and (type(valid_to) is not int or valid_to <= valid_from)
+        ):
+            raise StoreIntegrityError("invalid record validity interval")
+        if codec_version != self.codec.version:
+            raise StoreFormatError("payload codec version mismatch")
+        self._payload_check_reads += 1
+        self._payload_check_bytes += len(payload)
+        if payload_checksum != _framed_sha(b"lazy-payload-v1", payload):
+>           raise StoreIntegrityError("lazy payload checksum mismatch")
+E           ate_sim.incremental_store.StoreIntegrityError: lazy payload checksum mismatch
+
+simulation/ate_sim/persistence_lazy_store.py:1345: StoreIntegrityError
+___ test_bootstrap_rejects_checksummed_orphan_namespace[lazy_order_versions] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_bootstrap_rejects_checksu1')
+table = 'lazy_order_versions'
+
+    @pytest.mark.parametrize('table',['lazy_record_versions','lazy_order_versions'])
+    def test_bootstrap_rejects_checksummed_orphan_namespace(tmp_path,table):
+     from ate_sim.persistence_lazy_store import _order_checksum,_version_checksum
+     from ate_sim.incremental_store import _record_checksum
+     s,p,a,d,i=setup(tmp_path);columns=[v[1] for v in s.db.execute('PRAGMA table_info('+table+')')]
+     row=dict(zip(columns,s.db.execute('SELECT * FROM '+table+" WHERE namespace='people' LIMIT 1").fetchone()));row['namespace']='ghost'
+     if table=='lazy_order_versions':row['row_checksum']=_order_checksum(row['namespace'],row['typed_key'],row['ordinal'],row['valid_from'],row['valid_to'])
+     else:
+      row['payload_checksum']=_record_checksum(row['namespace'],row['typed_key'],row['record_schema'],row['codec_version'],row['valid_from'],row['payload'])
+      row['row_checksum']=_version_checksum(row['namespace'],row['typed_key'],row['record_schema'],row['codec_version'],row['valid_from'],row['valid_to'],row['memberships'],row['payload'])
+     s.db.execute('INSERT INTO '+table+' VALUES('+','.join('?' for _ in columns)+')',[row[k] for k in columns]);s.db.commit()
+     # Characterize the inherited audit gap; the constructor must supplement it.
+     s.verify_all()
+     before=s.db.execute('SELECT * FROM ate_inventory_generations ORDER BY generation').fetchall()
+>    with pytest.raises(StoreError):m().bootstrap_inventory(s,p)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_inventory.py:164: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_auxiliary_lazy_records_preserve_head_count_semantics[insert]
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_auxiliary_lazy_records_preserve_head_count_semantics[update]
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_auxiliary_lazy_records_preserve_head_count_semantics[delete]
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_bootstrap_rejects_checksummed_orphan_namespace[lazy_record_versions]
+FAILED simulation/tests/test_stage_0_5_proof_inventory.py::test_bootstrap_rejects_checksummed_orphan_namespace[lazy_order_versions]
+5 failed, 27 deselected in 1.03s

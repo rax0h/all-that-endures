@@ -2796,7 +2796,7 @@ class LazyRecordStore:
                 counts = _namespace_counts(self.codec, locked[6])
                 new_generation = locked_generation + 1
                 if _content_proof is not None:
-                    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent)
+                    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent,ordinary_prepared,segment_prepared)
                     _guard_content_parent(self, _content_proof, version_prepared, segment_prepared)
                 self._write_lazy_changes(
                     version_prepared,
