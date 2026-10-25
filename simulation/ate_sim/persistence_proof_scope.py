@@ -42,6 +42,11 @@ class ChildScope:
     incarnation_id: int
 
 
+@dataclass(frozen=True)
+class SequenceScope:
+    incarnation_id: int
+
+
 class ScopeProofBudgetError(StoreError):pass
 
 
@@ -58,6 +63,7 @@ def _scope_key(scope):
     if type(scope) is OwnerScope:tag,parts=0,(_namespace(scope.namespace),scope.typed_key)
     elif type(scope) is GroupScope:tag,parts=1,(_integer(scope.incarnation_id,1),)
     elif type(scope) is ChildScope:tag,parts=4,(_integer(scope.incarnation_id,1),)
+    elif type(scope) is SequenceScope:tag,parts=5,(_integer(scope.incarnation_id,1),)
     elif type(scope) is _QueryOwnerScope:tag,parts=3,(_namespace(scope.namespace),scope.typed_key)
     elif type(scope) is QueryScope:tag,parts=2,(_namespace(scope.namespace),_namespace(scope.index_name),scope.index_value)
     else:raise StoreIntegrityError('invalid directory scope')
@@ -67,9 +73,9 @@ def _scope_key(scope):
 
 
 def _parse_scope(raw):
-    if type(raw) is not bytes or not raw or raw[0]>4:raise StoreIntegrityError('invalid scope encoding')
+    if type(raw) is not bytes or not raw or raw[0]>5:raise StoreIntegrityError('invalid scope encoding')
     fields=[];offset=1
-    for _ in range((2,1,3,2,1)[raw[0]]):
+    for _ in range((2,1,3,2,1,1)[raw[0]]):
         if offset+4>len(raw):raise StoreIntegrityError('truncated scope encoding')
         size=int.from_bytes(raw[offset:offset+4],'big');offset+=4
         if size>MAX_FIELD_BYTES or offset+size>len(raw):raise StoreIntegrityError('invalid scope frame')
@@ -77,7 +83,7 @@ def _parse_scope(raw):
     if offset!=len(raw):raise StoreIntegrityError('surplus scope bytes')
     try:
         if raw[0] in (0,3):scope=(OwnerScope if raw[0]==0 else _QueryOwnerScope)(fields[0].decode('utf-8'),fields[1])
-        elif raw[0] in (1,4):scope=(GroupScope if raw[0]==1 else ChildScope)(int(fields[0]))
+        elif raw[0] in (1,4,5):scope=({1:GroupScope,4:ChildScope,5:SequenceScope}[raw[0]])(int(fields[0]))
         else:scope=QueryScope(fields[0].decode('utf-8'),fields[1].decode('utf-8'),fields[2])
     except (ValueError,UnicodeError) as exc:raise StoreIntegrityError('invalid scope fields') from exc
     if _scope_key(scope)!=raw:raise StoreIntegrityError('noncanonical scope bytes')
@@ -85,7 +91,7 @@ def _parse_scope(raw):
 
 
 def directory_domain(store_identity,codec_version,kind):
-    if type(kind) is not int or not 0<=kind<5:raise StoreIntegrityError('invalid directory kind')
+    if type(kind) is not int or not 0<=kind<6:raise StoreIntegrityError('invalid directory kind')
     return _digest(b'ate-scope-directory-domain/1',_namespace(store_identity),_integer(codec_version,1),bytes([kind]))
 
 
@@ -95,6 +101,7 @@ def _map(store,kind):
 
 
 def _seek_domain(store,scope):
+    if type(scope) is SequenceScope:return _digest(b'ate-sequence-locator-seek-domain/1',_namespace(store.store_identity),_integer(store.codec.version,1),_scope_key(scope))
     if type(scope) is ChildScope:return _digest(b'ate-child-locator-seek-domain/1',_namespace(store.store_identity),_integer(store.codec.version,1),_scope_key(scope))
     if type(scope) is _QueryOwnerScope:return _digest(b'ate-query-owner-seek-domain/1',_namespace(store.store_identity),_integer(store.codec.version,1),_scope_key(scope))
     return (query_seek_domain if type(scope) is QueryScope else occurrence_seek_domain)(store.store_identity,store.codec.version,scope)
@@ -106,9 +113,9 @@ def _roots_bytes(cert):return b''.join(r.digest+r.count.to_bytes(8,'big') for r 
 def certificate_commitment(cert):
     if (type(cert) is not ScopeDirectoryCertificate or type(cert.generation) is not int or not 0<=cert.generation<2**63
             or type(cert.next_incarnation_id) is not int or not 1<=cert.next_incarnation_id<2**63
-            or type(cert.roots) is not tuple or len(cert.roots) not in (4,5)):raise StoreIntegrityError('invalid scope directory certificate')
+            or type(cert.roots) is not tuple or len(cert.roots) not in (4,5,6)):raise StoreIntegrityError('invalid scope directory certificate')
     for kind,root in enumerate(cert.roots):ProofMap(directory_domain(cert.store_identity,cert.codec_version,kind),None,None)._reference(root)
-    return _digest(b'ate-scope-directory-certificate/1' if len(cert.roots)==4 else b'ate-scope-directory-certificate/2',_namespace(cert.store_identity),_integer(cert.codec_version,1),
+    return _digest({4:b'ate-scope-directory-certificate/1',5:b'ate-scope-directory-certificate/2',6:b'ate-scope-directory-certificate/3'}[len(cert.roots)],_namespace(cert.store_identity),_integer(cert.codec_version,1),
         cert.generation.to_bytes(8,'big'),cert.next_incarnation_id.to_bytes(8,'big'),_roots_bytes(cert))
 
 
@@ -140,7 +147,8 @@ def _write_descriptor(store,scope,root):
 
 def _resolve(store,cert,scope):
     encoded=_scope_key(scope);kind=encoded[0]
-    if kind==4 and len(cert.roots)!=5:raise StoreError('child inventory requires explicit verified construction')
+    if kind==4 and len(cert.roots)<5:raise StoreError('child inventory requires explicit verified construction')
+    if kind==5 and len(cert.roots)!=6:raise StoreError('sequence inventory requires explicit verified construction')
     if kind==1 and scope.incarnation_id>=cert.next_incarnation_id:raise StoreIntegrityError('directory group exceeds allocator')
     wanted=_map(store,kind).get(cert.roots[kind],encoded)
     if wanted is None:return OrderedSeekMap(None,_seek_domain(store,scope)).empty
@@ -162,7 +170,7 @@ def _write_root(store,cert,*,parent=None,pin_token='',token=b''):
 
 
 def _load_root(store,generation):
-    row=store.db.execute("SELECT CASE WHEN typeof(next_incarnation_id)='integer' THEN next_incarnation_id END,CASE WHEN typeof(roots)='blob' AND length(roots) IN (160,200) THEN roots END,CASE WHEN typeof(certificate)='blob' AND length(certificate)=32 THEN certificate END,CASE WHEN typeof(parent_commitment)='blob' AND length(parent_commitment)=32 THEN parent_commitment END,typeof(parent_commitment),CASE WHEN typeof(pin_token)='text' AND length(CAST(pin_token AS BLOB))<=4096 THEN pin_token END,CASE WHEN typeof(commit_token)='blob' AND length(commit_token)<=65536 THEN commit_token END,CASE WHEN typeof(row_checksum)='blob' AND length(row_checksum)=32 THEN row_checksum END FROM ate_scope_generations WHERE generation=?",(generation,)).fetchone()
+    row=store.db.execute("SELECT CASE WHEN typeof(next_incarnation_id)='integer' THEN next_incarnation_id END,CASE WHEN typeof(roots)='blob' AND length(roots) IN (160,200,240) THEN roots END,CASE WHEN typeof(certificate)='blob' AND length(certificate)=32 THEN certificate END,CASE WHEN typeof(parent_commitment)='blob' AND length(parent_commitment)=32 THEN parent_commitment END,typeof(parent_commitment),CASE WHEN typeof(pin_token)='text' AND length(CAST(pin_token AS BLOB))<=4096 THEN pin_token END,CASE WHEN typeof(commit_token)='blob' AND length(commit_token)<=65536 THEN commit_token END,CASE WHEN typeof(row_checksum)='blob' AND length(row_checksum)=32 THEN row_checksum END FROM ate_scope_generations WHERE generation=?",(generation,)).fetchone()
     if row is None:raise StoreIntegrityError('missing current/retained scope directory')
     allocator,roots,expected,parent,parent_type,writer,token,checksum=row
     if type(roots) is not bytes or parent_type not in ('null','blob') or parent_type=='blob' and parent is None or type(writer) is not str or type(token) is not bytes:raise StoreIntegrityError('invalid scope generation source')
@@ -181,9 +189,9 @@ def _guard_construction(db):
         if db.execute('SELECT 1 FROM '+table+' WHERE NOT('+valid+') LIMIT 1').fetchone() is not None:raise ScopeProofBudgetError('invalid or oversized scope construction source metadata')
 
 
-def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_children=False):
+def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_children=False,include_sequence=False):
     _require_closed_codec(store,allow_typed=True)
-    if type(include_children) is not bool:raise StoreIntegrityError('invalid child construction option')
+    if type(include_children) is not bool or type(include_sequence) is not bool or include_sequence and not include_children:raise StoreIntegrityError('invalid child/sequence construction option')
     if type(max_metadata_bytes) is not int or not 1<=max_metadata_bytes<=64*1024*1024:raise StoreIntegrityError('invalid scope metadata budget')
     if store.db.in_transaction or store._active_read_transaction:raise StoreError('scope construction requires owned transaction')
     store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
@@ -191,6 +199,7 @@ def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_childr
         if include_children:
             from .persistence_proof_collection_directory import _source_schemas
             _source_schemas(store.db);_guard_child_keys(store)
+            if include_sequence:_guard_sequence_keys(store)
         _closed_snapshot_preflight(store,max_metadata_bytes);generation=store._require_pin(pin)
         if generation!=int(store._checked_head_row()[0]):raise StoreConflictError('scope construction requires current pin')
         _guard_construction(store.db);store.verify_all()
@@ -202,20 +211,21 @@ def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_childr
         if store.db.execute('SELECT 1 FROM ate_scope_generations WHERE generation=?',(generation,)).fetchone() is not None:raise StoreIntegrityError('scope constructor cannot replace existing generation')
         store.db.execute('CREATE TEMP TABLE ate_scope_directory_delta(kind INTEGER,locator BLOB,key BLOB,value BLOB,PRIMARY KEY(kind,locator)) WITHOUT ROWID')
         if include_children:_construct_child_spool(store,generation)
+        if include_sequence:_construct_sequence_spool(store,generation)
         roots=[]
-        for kind in range(5 if include_children else 4):
+        for kind in range(6 if include_sequence else 5 if include_children else 4):
             if kind<2:
                 columns='owner_namespace,owner_key,occurrence_path,incarnation_id';table='lazy_identity_occurrence_versions'
                 order='owner_namespace,owner_key,occurrence_path' if kind==0 else 'incarnation_id,owner_namespace,owner_key,occurrence_path'
                 scope_for=(lambda r:OwnerScope(r[0],r[1])) if kind==0 else (lambda r:GroupScope(r[3]))
-            elif kind==4:
-                columns='parent,position';table='ate_scope_child_spool';order='parent,position';scope_for=lambda r:ChildScope(r[0])
+            elif kind in (4,5):
+                columns='parent,position';table='ate_scope_child_spool' if kind==4 else 'ate_scope_sequence_spool';order='parent,position';scope_for=(lambda r:ChildScope(r[0])) if kind==4 else (lambda r:SequenceScope(r[0]))
             else:
                 columns='namespace,index_name,index_value,record_key,ordinal';table='lazy_query_versions';order=columns
                 # Query position ordering is ordinal then record_key within a scope.
                 order='namespace,index_name,index_value,ordinal,record_key';scope_for=lambda r:QueryScope(*r[:3])
                 if kind==3:order='namespace,record_key,index_name,index_value,ordinal';scope_for=lambda r:_QueryOwnerScope(r[0],r[3])
-            cursor=(store.db.execute('SELECT parent,position FROM ate_scope_child_spool ORDER BY parent,position') if kind==4 else
+            cursor=(store.db.execute('SELECT parent,position FROM '+table+' ORDER BY parent,position') if kind in (4,5) else
                     store.db.execute('SELECT '+columns+' FROM '+table+' WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY '+order,(generation,generation)))
             directory=_map(store,kind)
             try:
@@ -224,7 +234,7 @@ def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_childr
                     domain=(query_domain if kind==2 else occurrence_domain)(store.store_identity,store.codec.version,scope) if kind<3 else None
                     def entries():
                         for row in rows:
-                            if kind==4:yield row[1],_child_member(m.domain,row[1])
+                            if kind in (4,5):yield row[1],_child_member(m.domain,row[1])
                             elif kind==2:yield query_order_key(row[4],row[3]),query_member(domain,row[3],row[4])
                             elif kind==3:
                                 query=QueryScope(*row[:3]);d=query_domain(store.store_identity,store.codec.version,query)
@@ -240,6 +250,7 @@ def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_childr
             finally:delta.close()
         store.db.execute('DROP TABLE ate_scope_directory_delta')
         if include_children:store.db.execute('DROP TABLE ate_scope_child_spool')
+        if include_sequence:store.db.execute('DROP TABLE ate_scope_sequence_spool')
         result=_write_root(store,ScopeDirectoryCertificate(store.store_identity,generation,store.codec.version,allocator,tuple(roots)))
         store.db.commit();return result
     except BaseException:
@@ -250,7 +261,7 @@ def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_childr
 
 def read_scope_certificate(store,pin,certificate,expected,scope,*,max_metadata_bytes=1048576):
     _require_closed_codec(store,allow_typed=True);_authority(store,pin,certificate,expected);_scope_key(scope)
-    if type(scope) in (_QueryOwnerScope,ChildScope):raise StoreError('internal scope requires its dedicated checked reader')
+    if type(scope) in (_QueryOwnerScope,ChildScope,SequenceScope):raise StoreError('internal scope requires its dedicated checked reader')
     if type(max_metadata_bytes) is not int or not 1<=max_metadata_bytes<=64*1024*1024:raise StoreIntegrityError('invalid directory metadata budget')
     if store.db.in_transaction and not store._active_read_transaction and not getattr(store,'_checked_snapshot_depth',0):raise StoreError('scope reader cannot borrow arbitrary transaction')
     with store.read_snapshot(pin,_preflight=lambda:_closed_snapshot_preflight(store,max_metadata_bytes)) as generation:
@@ -440,10 +451,11 @@ def _stage_scope_proof(store,request,new_generation,version_prepared,identity_pr
     store.db.execute('CREATE TEMP TABLE ate_scope_member_delta(scope BLOB,position BLOB,old BLOB,new BLOB,PRIMARY KEY(scope,position)) WITHOUT ROWID')
     store.db.execute('CREATE TEMP TABLE ate_scope_expected_members(name TEXT,value BLOB,ordinal INTEGER,seen INTEGER,PRIMARY KEY(name,value,ordinal)) WITHOUT ROWID')
     store.db.execute('CREATE TEMP TABLE ate_scope_directory_delta(kind INTEGER,locator BLOB,key BLOB,value BLOB,PRIMARY KEY(kind,locator)) WITHOUT ROWID')
-    if len(request.parent.roots)==5:
+    if len(request.parent.roots)>=5:
         if 'lazy_record_interval' not in store._interval_indexes:raise StoreError('child inventory cannot use legacy interval fallback')
         _require_indexes(store.db,include_order=False,intervals=('lazy_record_interval',))
         _stage_children(store,request,new_generation,version_prepared)
+        if len(request.parent.roots)==6:_stage_children(store,request,new_generation,version_prepared,locator_for=_sequence_locator)
     _stage_queries(store,request,new_generation,version_prepared);_stage_placements(store,request,new_generation,allocator,identity_prepared)
     cursor=store.db.execute('SELECT scope FROM ate_scope_touched ORDER BY scope')
     try:
@@ -551,9 +563,9 @@ def _child_present(store,g,namespace,key):
     if len(rows)>1:raise StoreIntegrityError('overlapping physical child locator')
     return bool(rows)
 
-def _stage_children(store,request,g,prepared):
+def _stage_children(store,request,g,prepared,*,locator_for=_child_locator):
     for item in prepared:
-        namespace,key=item['namespace'],item['typed_key'];locator=_child_locator(namespace,key)
+        namespace,key=item['namespace'],item['typed_key'];locator=locator_for(namespace,key)
         if locator is None:continue
         scope,position=locator;d=_seek_domain(store,scope)
         old=_child_present(store,request.parent.generation,namespace,key);new=_child_present(store,g,namespace,key)
@@ -562,3 +574,31 @@ def _stage_children(store,request,g,prepared):
         if m.get(_resolve(store,request.parent,scope),position)!=wanted:raise StoreIntegrityError('old physical child disagrees with accepted locator inventory')
         if old:_delta(store,scope,position,wanted,'old')
         if new:_delta(store,scope,position,_child_member(d,position),'new')
+
+
+# Version3 adds a separate directory; version2 child-family tags never change.
+_SEQUENCE_NAMES=('aux.lazy.sequence.parents','aux.lazy.sequence.occurrences','aux.lazy.sequence.members','aux.lazy.sequence.member_directory')
+
+def _sequence_locator(namespace,key):
+    from .persistence_proof_projection import _ProjectionCodec
+    if namespace not in _SEQUENCE_NAMES:return None
+    if type(key) is not bytes or len(key)>4096:raise ScopeProofBudgetError('sequence key exceeds field budget')
+    codec=_ProjectionCodec(metadata=True);value=codec.decode(key)
+    if (type(value) is not tuple or len(value)!=2 or type(value[0]) is not int or not 0<value[0]<2**63
+            or (type(value[1]) is not bytes or len(value[1])>32 if namespace==_SEQUENCE_NAMES[3] else type(value[1]) is not int or value[1]<1)
+            or codec.encode(value)!=key):raise StoreIntegrityError('invalid sequence physical key')
+    scope=SequenceScope(value[0]);return scope,bytes([_SEQUENCE_NAMES.index(namespace)])+key
+
+def _guard_sequence_keys(store):
+    names=','.join('?' for _ in _SEQUENCE_NAMES)
+    if store.db.execute("SELECT 1 FROM lazy_record_versions WHERE namespace IN ("+names+") AND (typeof(typed_key)!='blob' OR length(typed_key)>4096) LIMIT 1",_SEQUENCE_NAMES).fetchone():raise ScopeProofBudgetError('invalid sequence construction key')
+
+def _construct_sequence_spool(store,g):
+    store.db.execute('CREATE TEMP TABLE ate_scope_sequence_spool(parent INTEGER,position BLOB,PRIMARY KEY(parent,position)) WITHOUT ROWID')
+    names=','.join('?' for _ in _SEQUENCE_NAMES)
+    rows=store.db.execute('SELECT namespace,typed_key FROM lazy_record_versions WHERE namespace IN ('+names+') AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)',(*_SEQUENCE_NAMES,g,g))
+    try:
+        for ns,key in rows:
+            scope,position=_sequence_locator(ns,key)
+            store.db.execute('INSERT INTO ate_scope_sequence_spool VALUES(?,?)',(scope.incarnation_id,position))
+    finally:rows.close()

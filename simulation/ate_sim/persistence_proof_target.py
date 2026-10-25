@@ -123,6 +123,26 @@ def _validate_descriptor(kind,inc,value):
     else:check_compact_authority(value)
 
 
+def _event_owner(s,scope_pair):
+    from .persistence_event_ids import EXCEPTION_TAG
+    owner,expected=scope.read_scope_certificate(s.store,s.pin,*scope_pair,OwnerScope('world.event_ids',s.codec.encode(0)),max_metadata_bytes=s.metadata_limit)
+    if not owner.root.count:return None
+    if owner.root.count not in (1,3):raise StoreIntegrityError('Event-ID owner-zero has wrong fixed slot count')
+    page=read_occurrence_seek_page(s.store,s.pin,owner,expected,limit=4,max_metadata_bytes=s.metadata_limit)
+    if len(page.rows)!=owner.root.count or page.next_after is not None:raise StoreIntegrityError('incomplete Event-ID owner slots')
+    slots={row.path:row.incarnation_id for row in page.rows}
+    for row in page.rows:s.charge(len(row.namespace.encode())+len(row.typed_key)+len(row.path)+8)
+    root=slots.get(s.codec.encode(()))
+    if root is None:raise StoreIntegrityError('Event-ID owner has no root slot')
+    value,members,raw,typed=s.value('world.event_ids',0);check_compact_authority(value)
+    if members:raise StoreIntegrityError('Event-ID descriptor has unexpected memberships')
+    wanted={s.codec.encode(()):root}
+    if value[0]==EXCEPTION_TAG:
+        wanted.update({s.codec.encode((('field','_exact'),('field',name))):ref.incarnation for name,ref in zip(('removed','added'),value[2:4])})
+    if slots!=wanted or len(slots)!=len(page.rows) or root in [v for k,v in wanted.items() if k!=s.codec.encode(())]:raise StoreIntegrityError('Event-ID descriptor and fixed owner slots disagree')
+    return root,value,raw,typed
+
+
 def _resolve_target(s,scope_pair,reference,allocator):
     store,pin=s.store,s.pin;max_metadata_bytes=s.metadata_limit
     kind,inc=_reference(reference)
@@ -136,16 +156,10 @@ def _resolve_target(s,scope_pair,reference,allocator):
             if members:raise StoreIntegrityError('target descriptor has unexpected memberships')
             actual=value[0] if expected_kind=='history' and type(value) is tuple and value else expected_kind
             candidates.append((actual,ns,typed,raw.payload,value))
-    owner,expected=scope.read_scope_certificate(store,pin,*scope_pair,OwnerScope('world.event_ids',s.codec.encode(0)),max_metadata_bytes=max_metadata_bytes)
-    if owner.root.count:
-        if owner.root.count!=1:raise StoreIntegrityError('Event-ID owner-zero binding is not singular')
-        page=read_occurrence_seek_page(store,pin,owner,expected,limit=2,max_metadata_bytes=max_metadata_bytes)
-        if len(page.rows)!=1 or page.next_after is not None or page.rows[0].path!=s.codec.encode(()):raise StoreIntegrityError('Event-ID owner-zero root placement disagreement')
-        for row in page.rows:s.charge(len(row.namespace.encode())+len(row.typed_key)+len(row.path)+8)
-        if page.rows[0].incarnation_id==inc:
-            value,members,raw,typed=s.value('world.event_ids',0)
-            if members:raise StoreIntegrityError('Event-ID descriptor has unexpected memberships')
-            candidates.append(('event-ids','world.event_ids',typed,raw.payload,value))
+    event=_event_owner(s,scope_pair)
+    if event is not None:
+        event_inc,value,raw,typed=event
+        if event_inc==inc:candidates.append(('event-ids','world.event_ids',typed,raw.payload,value))
     if len(candidates)!=1 or candidates[0][0]!=kind:raise StoreIntegrityError('missing, competing or wrong-kind target descriptor')
     actual,ns,typed,payload,value=candidates[0];_validate_descriptor(kind,inc,value)
     return RawReferenceTarget(store.store_identity,pin.captured_head,inc,kind,ns,typed,payload,value)

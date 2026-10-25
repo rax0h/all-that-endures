@@ -1,7 +1,7 @@
 """Inactive bounded selected history/fixed-body extent validator; raw values only.
 
 Full selected-target reference/audit work, not ordinary open/save admission.
-Sequence/Event-ID extents and recursive semantics remain gated.
+Recursive graph semantics and World admission remain gated.
 """
 from dataclasses import dataclass
 from .incremental_store import StoreError,StoreIntegrityError,CodecError,Membership
@@ -10,8 +10,6 @@ from .persistence_lazy_nested_history import PAGE_NAMESPACE,ENTRY_NAMESPACE
 from .persistence_history_owner_adapters import AUXILIARY_OWNER_FAMILIES
 from .persistence_history_types import NAMESPACE as TYPES,TAG,member_counts,incoming_owner_policy
 from .persistence_lazy_graph_buckets import BUCKET_SPECS
-from .persistence_proof_seek import OrderedSeekMap
-from . import persistence_proof_scope as scopes
 from . import persistence_proof_target_incoming as incoming
 
 
@@ -22,10 +20,35 @@ class RawTargetMembers:
     member_counts: tuple
     child_locators: tuple
     certification_targets: tuple = ()
+    components: tuple = ()
+
+
+@dataclass(frozen=True)
+class RawBackingExtent:
+    target: object
+    members: tuple
+    member_counts: tuple
+    child_locators: tuple
+    certification_targets: tuple = ()
+    components: tuple = ()
 
 
 def _finish(value,s,scope_pair,max_children,max_values,max_certification_targets):
-    backing=value.target;kind=backing.kind;inc=backing.incarnation
+    from .persistence_proof_extent_inventory import ExtentWork
+    body=_physical(value.target,s,scope_pair,ExtentWork(max_children,max_values),max_certification_targets)
+    _check_policies(value,s,value.target.kind,body.member_counts)
+    return RawTargetMembers(value,body.members,body.member_counts,body.child_locators,body.certification_targets,body.components)
+
+
+def _physical(backing,s,scope_pair,budget,max_certification_targets):
+    from .persistence_proof_extent_inventory import physical_locators
+    kind=backing.kind;inc=backing.incarnation
+    if kind=='sequence':
+        from .persistence_proof_sequence_extents import read_sequence_extent
+        return read_sequence_extent(backing,s,scope_pair,budget)
+    if kind=='event-ids':
+        from .persistence_proof_event_extents import read_event_extent
+        return read_event_extent(backing,s,scope_pair,budget,max_certification_targets)
     base=kind.removeprefix('frozen-');fixed=kind in ('record','nan-key')
     if base not in ('list','map','set') and not fixed:raise StoreError('extent kind requires a separate checked path')
     if kind=='record':
@@ -34,31 +57,17 @@ def _finish(value,s,scope_pair,max_children,max_values,max_certification_targets
         cls,fields,_state=checked_record_header(backing.descriptor);count=len(fields)
     elif kind=='nan-key':count=0
     else:count=backing.descriptor[1]
-    if count>max_values:raise StoreError('selected history exceeds value budget')
-    scope=scopes.ChildScope(inc);root=scopes._resolve(s.store,scope_pair[0],scope)
+    budget.take_values(count)
+    locators=physical_locators(s,scope_pair,inc,budget)
     expected=1 if fixed else (count+127)//128 if base=='list' else count
-    if root.count!=expected:raise StoreIntegrityError('complete physical child count disagrees with target extent')
-    if root.count>max_children:raise StoreError('selected history exceeds child budget')
-    m=OrderedSeekMap(s.store.db,scopes._seek_domain(s.store,scope));locators=[];after=None
-    while True:
-        rows=m.page(root,after=after,limit=128)
-        for position,commitment in rows:
-            if not position or position[0]>=len(scopes._CHILD_NAMES) or commitment!=scopes._child_member(m.domain,position):raise StoreIntegrityError('invalid child locator proof')
-            ns=scopes._CHILD_NAMES[position[0]];typed=position[1:];key=s.codec.decode(typed)
-            if scopes._child_locator(ns,typed)!=(scope,position):raise StoreIntegrityError('child locator parent disagreement')
-            expected_ns=backing.namespace if fixed else PAGE_NAMESPACE if base=='list' else ENTRY_NAMESPACE
-            if ns!=expected_ns:raise StoreIntegrityError('target has competing child backing family')
-            s.charge(len(position)+32);locators.append((ns,key))
-        if len(rows)<128:break
-        after=rows[-1][0]
-    if len(locators)!=expected:raise StoreIntegrityError('incomplete child inventory traversal')
+    expected_ns=backing.namespace if fixed else PAGE_NAMESPACE if base=='list' else ENTRY_NAMESPACE
+    if len(locators)!=expected or any(ns!=expected_ns for ns,key in locators):raise StoreIntegrityError('complete physical children disagree with target extent/family')
     if fixed:
         if tuple(locators)!=((backing.namespace,(inc,0)),):raise StoreIntegrityError('fixed target has a competing child locator')
         items=tuple(zip(RECORD_FIELDS[cls],fields)) if kind=='record' else ()
         actual=member_counts(fields) if kind=='record' else (0,0,0)
-        _check_policies(value,s,kind,actual)
-        return RawTargetMembers(value,items,actual,tuple(locators))
-    s.read_limit+=max_children+1;items=[];ordered=[]
+        return RawBackingExtent(backing,items,actual,tuple(locators))
+    items=[];ordered=[]
     for ns,key in locators:
         data,members,raw,typed=s.value(ns,key)
         change=VersionChange(ns,key,data,record_schema=raw.record_schema,memberships=tuple(Membership(*r) for r in members))
@@ -79,23 +88,26 @@ def _finish(value,s,scope_pair,max_children,max_values,max_certification_targets
     else:items=[entry[0] if base=='set' else entry for _,entry in ordered]
     if len(items)!=count:raise StoreIntegrityError('history members disagree with extent count')
     actual=member_counts([entry[0] for entry in items] if base=='map' else items)
-    witness=s.metadata(TYPES,inc)
-    if (type(witness) is not tuple or len(witness)!=3 or witness[:2]!=(TAG,base)
-            or type(witness[2]) is not tuple or len(witness[2])!=3 or any(type(n) is not int or n<0 for n in witness[2]) or witness[2]!=actual):
-        raise StoreIntegrityError('member witness disagrees with actual complete values')
-    _check_policies(value,s,kind,actual)
+    _check_witness(s,inc,base,actual)
     dependencies=()
     if kind.startswith('frozen-'):
         from .persistence_proof_frozen_extents import check_frozen_members
         dependencies=check_frozen_members(s,scope_pair,backing,items,max_certification_targets)
-    return RawTargetMembers(value,tuple(items),actual,tuple(locators),dependencies)
+    return RawBackingExtent(backing,tuple(items),actual,tuple(locators),dependencies)
+
+
+def _check_witness(s,inc,base,actual):
+    witness=s.metadata(TYPES,inc)
+    if (type(witness) is not tuple or len(witness)!=3 or witness[:2]!=(TAG,base)
+            or type(witness[2]) is not tuple or len(witness[2])!=3 or any(type(n) is not int or n<0 for n in witness[2]) or witness[2]!=actual):
+        raise StoreIntegrityError('member witness disagrees with actual complete values')
 
 
 def _check_policies(value,s,kind,actual):
     for row in value.group.occurrences:
         path=s.codec.decode(row.path);policy=incoming_owner_policy(row.namespace,path)
         if policy is None:continue
-        if kind in ('record','nan-key'):raise StoreIntegrityError('incoming history owner requires a history target')
+        if kind in ('record','nan-key','event-ids'):raise StoreIntegrityError('incoming history owner requires a history target')
         if not path and row.namespace in BUCKET_SPECS and kind!=BUCKET_SPECS[row.namespace][0]:raise StoreIntegrityError('incoming bucket has wrong history kind')
         allowed=0 if policy=='int' else 1
         if actual[allowed]!=sum(actual):raise StoreIntegrityError('actual history values violate incoming member policy')

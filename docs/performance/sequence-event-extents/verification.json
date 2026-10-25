@@ -1,0 +1,48 @@
+{
+  "source": {
+    "head": "3863ecc529baeae515f177163a4f1a9ecca01c03",
+    "runtime_tree": "bedbe56bb84fbf3f4bb7c1881c456f5bbcc99c56",
+    "sqlite": "3.53.1",
+    "driver_sha256": "481335e0e5b9cbb5d5755b35f2f2953773546b07528da2ff66352038508c2e2c",
+    "fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+  },
+  "tests": {
+    "proof": {
+      "tests": 1039,
+      "seconds": 119.418,
+      "junit_sha256": "8ec93e5442f792e051113d3fbf86f622ae560782b2b787ca76b62bd8311c9aeb"
+    },
+    "runtime": {
+      "tests": 106,
+      "seconds": 190.225,
+      "junit_sha256": "2000ea85b0fb48fc2134b46d62c793153a0b204630a2fbd22d12c02469017d83"
+    },
+    "focused": {
+      "tests": 248,
+      "seconds": 32.088,
+      "junit_sha256": "48a8d1c3c3c2b4e93119bf78b9460a0ed908646d2c74b93dfe1885e1322b50d7"
+    },
+    "added": {
+      "tests": 47,
+      "seconds": 7.884,
+      "junit_sha256": "d968a03920d5b4de5cc2552826845d1b99c100441c8b0d8e8b9546221b56462e"
+    }
+  },
+  "full_simulation": "pending next hosted CI",
+  "limits": [
+    "Inactive bounded raw extents only",
+    "Recursive/World integration remains gated"
+  ],
+  "review": {
+    "model": "gpt-6-astra",
+    "effort": "high",
+    "base": "c7c5846ad590cb8d5348f112cfffdda018f5c31d",
+    "head": "3863ecc529baeae515f177163a4f1a9ecca01c03",
+    "critical": 0,
+    "important": 0,
+    "minor": 0,
+    "independent_tests": 47,
+    "independent_seconds": 8.04,
+    "passes": 1
+  }
+}

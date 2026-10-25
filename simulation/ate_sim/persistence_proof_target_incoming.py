@@ -71,10 +71,18 @@ def _paths(s,namespace,key,raw,backing,max_members):
     if namespace not in FAMILIES:raise StoreIntegrityError('incoming owner family is unregistered')
     if raw.record_schema!=FAMILIES[namespace].record_schema:raise StoreIntegrityError('incoming World owner schema disagreement')
     if namespace=='world.event_ids':
-        if key!=0 or type(key) is not int or backing.kind!='event-ids':raise StoreIntegrityError('incoming Event-ID owner is not sole root authority')
+        from .persistence_event_ids import EXCEPTION_TAG
+        if key!=0 or type(key) is not int:raise StoreIntegrityError('incoming Event-ID owner is not owner zero')
         value=codec.decode(raw.payload);check_compact_authority(value)
-        if raw.payload!=backing.payload:raise StoreIntegrityError('incoming Event-ID owner/target bytes disagree')
-        encoded=codec.encode(());s.charge(len(encoded)+8);return (encoded,)
+        if backing.kind=='event-ids':
+            if raw.payload!=backing.payload:raise StoreIntegrityError('incoming Event-ID owner/target bytes disagree')
+            path=()
+        elif value[0]==EXCEPTION_TAG:
+            matches=[(('field','_exact'),('field',name)) for name,ref in zip(('removed','added'),value[2:4]) if ref.incarnation==backing.incarnation and ref.kind==backing.kind]
+            if len(matches)!=1:raise StoreIntegrityError('incoming Event-ID backing slot kind/ID disagreement')
+            path=matches[0]
+        else:raise StoreIntegrityError('range Event-ID owner has no history slots')
+        encoded=codec.encode(path);s.charge(len(encoded)+8);return (encoded,)
     return world_target_paths(raw.payload,backing.kind,backing.incarnation,max_members=max_members,charge=s.charge)
 
 

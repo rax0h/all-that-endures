@@ -1,0 +1,149 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "c7c5846ad590cb8d5348f112cfffdda018f5c31d",
+    "runtime_tree": "4c3f14e5af503dfb5a1a5ebc9ed80ff3c32b4d32",
+    "sqlite": "3.45.1",
+    "driver_sha256": "6499fa8c55d9d3a0616c04962fde0ed9cce43027236479b6ce13d4effb855c35",
+    "fixture_sha256": "bcaf1aab68f7610728a150eb056f9faef90c904a78161177f84df12df8f7d588",
+    "target_fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+    "child_fixture_sha256": "b4187ec94e674d8e1e4ffdc495e23020aed675f4d0f6c941fa5f7fd5a24b5713"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "source": {
+        "head": "c7c5846ad590cb8d5348f112cfffdda018f5c31d",
+        "runtime_tree": "4c3f14e5af503dfb5a1a5ebc9ed80ff3c32b4d32",
+        "sqlite": "3.45.1",
+        "driver_sha256": "6499fa8c55d9d3a0616c04962fde0ed9cce43027236479b6ce13d4effb855c35",
+        "fixture_sha256": "bcaf1aab68f7610728a150eb056f9faef90c904a78161177f84df12df8f7d588",
+        "target_fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+        "child_fixture_sha256": "b4187ec94e674d8e1e4ffdc495e23020aed675f4d0f6c941fa5f7fd5a24b5713"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 0.38975532300003124,
+      "operations": {
+        "frozen-list": {
+          "extent_ms": 70.38833900003283,
+          "python_peak_bytes": 68024,
+          "sqlite_vm_steps": 82029,
+          "sql": {
+            "unrelated_child_payload": 0,
+            "selected_metadata": 24
+          }
+        },
+        "record": {
+          "extent_ms": 47.541949999981625,
+          "python_peak_bytes": 47363,
+          "sqlite_vm_steps": 60328,
+          "sql": {
+            "unrelated_child_payload": 0,
+            "selected_metadata": 15
+          }
+        },
+        "nan-key": {
+          "extent_ms": 56.22382500007461,
+          "python_peak_bytes": 53813,
+          "sqlite_vm_steps": 62668,
+          "sql": {
+            "unrelated_child_payload": 0,
+            "selected_metadata": 18
+          }
+        }
+      },
+      "vm_measurement": "untimed interval-one guarded replay"
+    },
+    {
+      "size": 10000,
+      "source": {
+        "head": "c7c5846ad590cb8d5348f112cfffdda018f5c31d",
+        "runtime_tree": "4c3f14e5af503dfb5a1a5ebc9ed80ff3c32b4d32",
+        "sqlite": "3.45.1",
+        "driver_sha256": "6499fa8c55d9d3a0616c04962fde0ed9cce43027236479b6ce13d4effb855c35",
+        "fixture_sha256": "bcaf1aab68f7610728a150eb056f9faef90c904a78161177f84df12df8f7d588",
+        "target_fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+        "child_fixture_sha256": "b4187ec94e674d8e1e4ffdc495e23020aed675f4d0f6c941fa5f7fd5a24b5713"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 3.272152479000056,
+      "operations": {
+        "frozen-list": {
+          "extent_ms": 79.45777199995518,
+          "python_peak_bytes": 72669,
+          "sqlite_vm_steps": 82623,
+          "sql": {
+            "unrelated_child_payload": 0,
+            "selected_metadata": 24
+          }
+        },
+        "record": {
+          "extent_ms": 51.83108500000344,
+          "python_peak_bytes": 48542,
+          "sqlite_vm_steps": 60787,
+          "sql": {
+            "unrelated_child_payload": 0,
+            "selected_metadata": 15
+          }
+        },
+        "nan-key": {
+          "extent_ms": 60.10921400002189,
+          "python_peak_bytes": 55063,
+          "sqlite_vm_steps": 63154,
+          "sql": {
+            "unrelated_child_payload": 0,
+            "selected_metadata": 18
+          }
+        }
+      },
+      "vm_measurement": "untimed interval-one guarded replay"
+    },
+    {
+      "size": 100000,
+      "source": {
+        "head": "c7c5846ad590cb8d5348f112cfffdda018f5c31d",
+        "runtime_tree": "4c3f14e5af503dfb5a1a5ebc9ed80ff3c32b4d32",
+        "sqlite": "3.45.1",
+        "driver_sha256": "6499fa8c55d9d3a0616c04962fde0ed9cce43027236479b6ce13d4effb855c35",
+        "fixture_sha256": "bcaf1aab68f7610728a150eb056f9faef90c904a78161177f84df12df8f7d588",
+        "target_fixture_sha256": "a8a34a7f9d5ba6e2dee236910183763c08196fb5557bf07701ea37a7690df513",
+        "child_fixture_sha256": "b4187ec94e674d8e1e4ffdc495e23020aed675f4d0f6c941fa5f7fd5a24b5713"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 34.86715758599996,
+      "operations": {
+        "frozen-list": {
+          "extent_ms": 82.71724900009758,
+          "python_peak_bytes": 57978,
+          "sqlite_vm_steps": 83109,
+          "sql": {
+            "unrelated_child_payload": 0,
+            "selected_metadata": 24
+          }
+        },
+        "record": {
+          "extent_ms": 54.03293300014411,
+          "python_peak_bytes": 45456,
+          "sqlite_vm_steps": 61084,
+          "sql": {
+            "unrelated_child_payload": 0,
+            "selected_metadata": 15
+          }
+        },
+        "nan-key": {
+          "extent_ms": 62.36141800013684,
+          "python_peak_bytes": 48092,
+          "sqlite_vm_steps": 63478,
+          "sql": {
+            "unrelated_child_payload": 0,
+            "selected_metadata": 18
+          }
+        }
+      },
+      "vm_measurement": "untimed interval-one guarded replay"
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "head": "c7c5846ad590cb8d5348f112cfffdda018f5c31d",
+  "runtime_tree": "4c3f14e5af503dfb5a1a5ebc9ed80ff3c32b4d32",
+  "run_id": 40226255502,
+  "jobs": {
+    "full-suite": "success",
+    "proof-map": "success"
+  },
+  "digests": [
+    "b6947b1e105e29f4271a996b5f1b27918ee86781a8a590536ff4ec8ba5d8981c",
+    "15be4710e91a25e573b8706c33d6c1d75e0e3666311e0593f5ddb095c0f7dff7"
+  ],
+  "suites": {
+    "group-tests.xml": 72,
+    "record-tests.xml": 60,
+    "collection-tests.xml": 20,
+    "target-group-tests.xml": 33,
+    "seek-tests.xml": 53,
+    "directory-publication-tests.xml": 22,
+    "generation-tests.xml": 60,
+    "inventory-tests.xml": 34,
+    "collection-publication-tests.xml": 12,
+    "target-tests.xml": 33,
+    "publication-tests.xml": 67,
+    "proof-tests.xml": 260,
+    "collection-directory-tests.xml": 31,
+    "owner-target-tests.xml": 17,
+    "frozen-extents-tests.xml": 45,
+    "child-extents-tests.xml": 34,
+    "projection-tests.xml": 43,
+    "scope-tests.xml": 55,
+    "target-incoming-tests.xml": 40,
+    "full-suite.xml": 4087
+  },
+  "proof_tests": 991,
+  "matrices": {
+    "target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-directory-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "order-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "directory-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "occurrence-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "version-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scope-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "child-extents-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "query-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "seek-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "batch-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-incoming-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "frozen-extents-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "record-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "projection-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "owner-target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "inventory-scaling": [
+      1000,
+      10000,
+      100000
+    ]
+  }
+}
