@@ -1,0 +1,27 @@
+{
+  "run": 40156752319,
+  "head": "43da14be8870d612ec40c2ec735d97bb71cd9111",
+  "counts": {
+    "full-suite.xml": 3918,
+    "collection-publication-tests.xml": 12,
+    "collection-directory-tests.xml": 31,
+    "target-tests.xml": 33,
+    "collection-tests.xml": 20,
+    "directory-publication-tests.xml": 22,
+    "record-tests.xml": 60,
+    "scope-tests.xml": 55,
+    "publication-tests.xml": 67,
+    "proof-tests.xml": 260,
+    "projection-tests.xml": 43,
+    "group-tests.xml": 72,
+    "inventory-tests.xml": 34,
+    "generation-tests.xml": 60,
+    "seek-tests.xml": 53
+  },
+  "matrices": 18,
+  "zip_sha256": [
+    "da53fabafdd9890055dfc9dd9e08a9d104ced5c5c88898cd79f945e07b10366f",
+    "c3cc8c73df918b6582933a839bbd7f4992e23409d2257bec7bccb133d7a5388a"
+  ],
+  "checked": "ZIP/XML/source/runtime/driver/fixture/complete matrices"
+}

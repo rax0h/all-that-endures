@@ -61,15 +61,15 @@ def _preflight(store,budget):
     _closed_snapshot_preflight(store,budget);inventory._preflight(store)
 
 class _Sources:
-    def __init__(self,store,pin,pair,aggregate,per_source,metadata):
+    def __init__(self,store,pin,pair,aggregate,per_source,metadata,*,read_limit=128):
         self.store,self.pin,self.pair=store,pin,pair;self.codec=_ProjectionCodec(metadata=True)
-        self.remaining,self.per_source,self.metadata_limit=aggregate,per_source,metadata;self.reads=0
+        self.remaining,self.per_source,self.metadata_limit=aggregate,per_source,metadata;self.reads=0;self.read_limit=read_limit
     def charge(self,n):
         self.remaining-=n
         if self.remaining<0:raise TargetProofBudgetError('target sources exceed aggregate budget')
     def value(self,ns,key,*,absent=False):
         self.reads+=1
-        if self.reads>128:raise TargetProofBudgetError('target metadata traversal exceeds128sources')
+        if self.reads>self.read_limit:raise TargetProofBudgetError('target metadata traversal exceeds source budget')
         typed=self.codec.encode(key);self.charge(len(ns.encode())+len(typed))
         if self.remaining<1:raise TargetProofBudgetError('target sources exceed aggregate budget')
         raw=content.read_version_content_bytes(self.store,self.pin,*self.pair,ns,typed,expected_record_schema=1,max_bytes=min(self.per_source,self.remaining),max_metadata_bytes=self.metadata_limit)
@@ -123,6 +123,33 @@ def _validate_descriptor(kind,inc,value):
     else:check_compact_authority(value)
 
 
+def _resolve_target(s,scope_pair,reference,allocator):
+    store,pin=s.store,s.pin;max_metadata_bytes=s.metadata_limit
+    kind,inc=_reference(reference)
+    if inc>=allocator:raise StoreIntegrityError('target exceeds identity allocator')
+    _live_group(s,scope_pair,inc,allocator)
+    candidates=[]
+    for ns,key,expected_kind in ((HISTORY,inc,'history'),(SEQUENCE,inc,'sequence'),(RECORDS,(inc,0),'record'),(NAN,(inc,0),'nan-key')):
+        found=s.value(ns,key,absent=True)
+        if found is not None:
+            value,members,raw,typed=found
+            if members:raise StoreIntegrityError('target descriptor has unexpected memberships')
+            actual=value[0] if expected_kind=='history' and type(value) is tuple and value else expected_kind
+            candidates.append((actual,ns,typed,raw.payload,value))
+    owner,expected=scope.read_scope_certificate(store,pin,*scope_pair,OwnerScope('world.event_ids',s.codec.encode(0)),max_metadata_bytes=max_metadata_bytes)
+    if owner.root.count:
+        if owner.root.count!=1:raise StoreIntegrityError('Event-ID owner-zero binding is not singular')
+        page=read_occurrence_seek_page(store,pin,owner,expected,limit=2,max_metadata_bytes=max_metadata_bytes)
+        if len(page.rows)!=1 or page.next_after is not None or page.rows[0].path!=s.codec.encode(()):raise StoreIntegrityError('Event-ID owner-zero root placement disagreement')
+        for row in page.rows:s.charge(len(row.namespace.encode())+len(row.typed_key)+len(row.path)+8)
+        if page.rows[0].incarnation_id==inc:
+            value,members,raw,typed=s.value('world.event_ids',0)
+            if members:raise StoreIntegrityError('Event-ID descriptor has unexpected memberships')
+            candidates.append(('event-ids','world.event_ids',typed,raw.payload,value))
+    if len(candidates)!=1 or candidates[0][0]!=kind:raise StoreIntegrityError('missing, competing or wrong-kind target descriptor')
+    actual,ns,typed,payload,value=candidates[0];_validate_descriptor(kind,inc,value)
+    return RawReferenceTarget(store.store_identity,pin.captured_head,inc,kind,ns,typed,payload,value)
+
 def _read(store,pin,reference,content_pair,scope_pair,inventory_pair,*,max_bytes,max_source_bytes,max_metadata_bytes):
     _require_closed_codec(store);kind,inc=_reference(reference)
     for n,maximum in ((max_bytes,64*1024*1024),(max_source_bytes,64*1024*1024),(max_metadata_bytes,1048576)):
@@ -132,28 +159,7 @@ def _read(store,pin,reference,content_pair,scope_pair,inventory_pair,*,max_bytes
     if store.db.in_transaction:raise StoreError('target reader requires owned snapshot')
     with store.read_snapshot(pin,_preflight=lambda:_preflight(store,max_metadata_bytes)):
         inventory._snapshot_checks(store,*inventory_pair);s=_Sources(store,pin,content_pair,max_bytes,max_source_bytes,max_metadata_bytes)
-        _live_group(s,scope_pair,inc,allocator)
-        candidates=[]
-        for ns,key,expected_kind in ((HISTORY,inc,'history'),(SEQUENCE,inc,'sequence'),(RECORDS,(inc,0),'record'),(NAN,(inc,0),'nan-key')):
-            found=s.value(ns,key,absent=True)
-            if found is not None:
-                value,members,raw,typed=found
-                if members:raise StoreIntegrityError('target descriptor has unexpected memberships')
-                actual=value[0] if expected_kind=='history' and type(value) is tuple and value else expected_kind
-                candidates.append((actual,ns,typed,raw.payload,value))
-        owner,expected=scope.read_scope_certificate(store,pin,*scope_pair,OwnerScope('world.event_ids',s.codec.encode(0)),max_metadata_bytes=max_metadata_bytes)
-        if owner.root.count:
-            if owner.root.count!=1:raise StoreIntegrityError('Event-ID owner-zero binding is not singular')
-            page=read_occurrence_seek_page(store,pin,owner,expected,limit=2,max_metadata_bytes=max_metadata_bytes)
-            if len(page.rows)!=1 or page.next_after is not None or page.rows[0].path!=s.codec.encode(()):raise StoreIntegrityError('Event-ID owner-zero root placement disagreement')
-            for row in page.rows:s.charge(len(row.namespace.encode())+len(row.typed_key)+len(row.path)+8)
-            if page.rows[0].incarnation_id==inc:
-                value,members,raw,typed=s.value('world.event_ids',0)
-                if members:raise StoreIntegrityError('Event-ID descriptor has unexpected memberships')
-                candidates.append(('event-ids','world.event_ids',typed,raw.payload,value))
-        if len(candidates)!=1 or candidates[0][0]!=kind:raise StoreIntegrityError('missing, competing or wrong-kind target descriptor')
-        actual,ns,typed,payload,value=candidates[0];_validate_descriptor(kind,inc,value)
-        return RawReferenceTarget(store.store_identity,pin.captured_head,inc,kind,ns,typed,payload,value)
+        return _resolve_target(s,scope_pair,reference,allocator)
 
 
 def read_reference_target(store,pin,reference,content_authority,scope_authority,inventory_authority,*,max_bytes=2097152,max_source_bytes=1048576,max_metadata_bytes=1048576):

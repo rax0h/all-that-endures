@@ -1,0 +1,379 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+____________________ test_all_paths_and_one_distinct_target ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_all_paths_and_one_distinc0')
+
+    def test_all_paths_and_one_distinct_target(tmp_path):
+>    s,p,ref,a=make_owner_target_store(tmp_path/'o.sqlite');r=read(s,p,a)
+                                                              ^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_owner_targets.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_owner_targets.py:10: in read
+    def read(s,p,a,**kw):return m().read_owner_targets(s,p,PAGE,s.codec.encode((3,0)),*a,**kw)
+                                ^^^
+simulation/tests/test_stage_0_5_proof_owner_targets.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_owner_targets')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_owner_targets'
+import_ = <function _gcd_import at 0x7ffb7c9a00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_owner_targets'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+____________________ test_wrong_kind_same_identity_rejected ____________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_wrong_kind_same_identity_0')
+
+    def test_wrong_kind_same_identity_rejected(tmp_path):
+     s,p,ref,a=make_owner_target_store(tmp_path/'o.sqlite',wrong_kind=True)
+>    with pytest.raises(StoreError):read(s,p,a)
+                                    ^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_owner_targets.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_owner_targets.py:10: in read
+    def read(s,p,a,**kw):return m().read_owner_targets(s,p,PAGE,s.codec.encode((3,0)),*a,**kw)
+                                ^^^
+simulation/tests/test_stage_0_5_proof_owner_targets.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_owner_targets')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_owner_targets'
+import_ = <function _gcd_import at 0x7ffb7c9a00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_owner_targets'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________________ test_join_fail_closed[target] _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_join_fail_closed_target_0')
+fault = 'target'
+
+    @pytest.mark.parametrize('fault',['target','placement','limit','bytes','source','metadata','transaction'])
+    def test_join_fail_closed(tmp_path,fault):
+     s,p,ref,a=make_owner_target_store(tmp_path/'o.sqlite');kw={}
+     if fault=='target':
+      p=s.commit(p,commit_token='delete',version_changes=(VersionChange(DESCRIPTOR_NAMESPACE,2,delete=True),),changes=(),new_segments=(),metadata=s.head_metadata()).pin;a=authorities(s,p)
+     elif fault=='placement':s.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=?',(PAGE,));s.db.commit()
+     elif fault=='limit':kw['max_references']=1
+     elif fault=='bytes':kw['max_bytes']=1
+     elif fault=='source':kw['max_source_bytes']=1
+     elif fault=='metadata':kw['max_metadata_bytes']=1
+     elif fault=='transaction':s.db.execute('BEGIN')
+>    with pytest.raises(StoreError):read(s,p,a,**kw)
+                                    ^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_owner_targets.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_owner_targets.py:10: in read
+    def read(s,p,a,**kw):return m().read_owner_targets(s,p,PAGE,s.codec.encode((3,0)),*a,**kw)
+                                ^^^
+simulation/tests/test_stage_0_5_proof_owner_targets.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_owner_targets')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_owner_targets'
+import_ = <function _gcd_import at 0x7ffb7c9a00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_owner_targets'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________________ test_join_fail_closed[placement] _______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_join_fail_closed_placemen0')
+fault = 'placement'
+
+    @pytest.mark.parametrize('fault',['target','placement','limit','bytes','source','metadata','transaction'])
+    def test_join_fail_closed(tmp_path,fault):
+     s,p,ref,a=make_owner_target_store(tmp_path/'o.sqlite');kw={}
+     if fault=='target':
+      p=s.commit(p,commit_token='delete',version_changes=(VersionChange(DESCRIPTOR_NAMESPACE,2,delete=True),),changes=(),new_segments=(),metadata=s.head_metadata()).pin;a=authorities(s,p)
+     elif fault=='placement':s.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=?',(PAGE,));s.db.commit()
+     elif fault=='limit':kw['max_references']=1
+     elif fault=='bytes':kw['max_bytes']=1
+     elif fault=='source':kw['max_source_bytes']=1
+     elif fault=='metadata':kw['max_metadata_bytes']=1
+     elif fault=='transaction':s.db.execute('BEGIN')
+>    with pytest.raises(StoreError):read(s,p,a,**kw)
+                                    ^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_owner_targets.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_owner_targets.py:10: in read
+    def read(s,p,a,**kw):return m().read_owner_targets(s,p,PAGE,s.codec.encode((3,0)),*a,**kw)
+                                ^^^
+simulation/tests/test_stage_0_5_proof_owner_targets.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_owner_targets')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_owner_targets'
+import_ = <function _gcd_import at 0x7ffb7c9a00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_owner_targets'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________________ test_join_fail_closed[limit] _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_join_fail_closed_limit_0')
+fault = 'limit'
+
+    @pytest.mark.parametrize('fault',['target','placement','limit','bytes','source','metadata','transaction'])
+    def test_join_fail_closed(tmp_path,fault):
+     s,p,ref,a=make_owner_target_store(tmp_path/'o.sqlite');kw={}
+     if fault=='target':
+      p=s.commit(p,commit_token='delete',version_changes=(VersionChange(DESCRIPTOR_NAMESPACE,2,delete=True),),changes=(),new_segments=(),metadata=s.head_metadata()).pin;a=authorities(s,p)
+     elif fault=='placement':s.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=?',(PAGE,));s.db.commit()
+     elif fault=='limit':kw['max_references']=1
+     elif fault=='bytes':kw['max_bytes']=1
+     elif fault=='source':kw['max_source_bytes']=1
+     elif fault=='metadata':kw['max_metadata_bytes']=1
+     elif fault=='transaction':s.db.execute('BEGIN')
+>    with pytest.raises(StoreError):read(s,p,a,**kw)
+                                    ^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_owner_targets.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_owner_targets.py:10: in read
+    def read(s,p,a,**kw):return m().read_owner_targets(s,p,PAGE,s.codec.encode((3,0)),*a,**kw)
+                                ^^^
+simulation/tests/test_stage_0_5_proof_owner_targets.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_owner_targets')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_owner_targets'
+import_ = <function _gcd_import at 0x7ffb7c9a00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_owner_targets'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_________________________ test_join_fail_closed[bytes] _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_join_fail_closed_bytes_0')
+fault = 'bytes'
+
+    @pytest.mark.parametrize('fault',['target','placement','limit','bytes','source','metadata','transaction'])
+    def test_join_fail_closed(tmp_path,fault):
+     s,p,ref,a=make_owner_target_store(tmp_path/'o.sqlite');kw={}
+     if fault=='target':
+      p=s.commit(p,commit_token='delete',version_changes=(VersionChange(DESCRIPTOR_NAMESPACE,2,delete=True),),changes=(),new_segments=(),metadata=s.head_metadata()).pin;a=authorities(s,p)
+     elif fault=='placement':s.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=?',(PAGE,));s.db.commit()
+     elif fault=='limit':kw['max_references']=1
+     elif fault=='bytes':kw['max_bytes']=1
+     elif fault=='source':kw['max_source_bytes']=1
+     elif fault=='metadata':kw['max_metadata_bytes']=1
+     elif fault=='transaction':s.db.execute('BEGIN')
+>    with pytest.raises(StoreError):read(s,p,a,**kw)
+                                    ^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_owner_targets.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_owner_targets.py:10: in read
+    def read(s,p,a,**kw):return m().read_owner_targets(s,p,PAGE,s.codec.encode((3,0)),*a,**kw)
+                                ^^^
+simulation/tests/test_stage_0_5_proof_owner_targets.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_owner_targets')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_owner_targets'
+import_ = <function _gcd_import at 0x7ffb7c9a00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_owner_targets'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+________________________ test_join_fail_closed[source] _________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_join_fail_closed_source_0')
+fault = 'source'
+
+    @pytest.mark.parametrize('fault',['target','placement','limit','bytes','source','metadata','transaction'])
+    def test_join_fail_closed(tmp_path,fault):
+     s,p,ref,a=make_owner_target_store(tmp_path/'o.sqlite');kw={}
+     if fault=='target':
+      p=s.commit(p,commit_token='delete',version_changes=(VersionChange(DESCRIPTOR_NAMESPACE,2,delete=True),),changes=(),new_segments=(),metadata=s.head_metadata()).pin;a=authorities(s,p)
+     elif fault=='placement':s.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=?',(PAGE,));s.db.commit()
+     elif fault=='limit':kw['max_references']=1
+     elif fault=='bytes':kw['max_bytes']=1
+     elif fault=='source':kw['max_source_bytes']=1
+     elif fault=='metadata':kw['max_metadata_bytes']=1
+     elif fault=='transaction':s.db.execute('BEGIN')
+>    with pytest.raises(StoreError):read(s,p,a,**kw)
+                                    ^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_owner_targets.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_owner_targets.py:10: in read
+    def read(s,p,a,**kw):return m().read_owner_targets(s,p,PAGE,s.codec.encode((3,0)),*a,**kw)
+                                ^^^
+simulation/tests/test_stage_0_5_proof_owner_targets.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_owner_targets')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_owner_targets'
+import_ = <function _gcd_import at 0x7ffb7c9a00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_owner_targets'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+_______________________ test_join_fail_closed[metadata] ________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_join_fail_closed_metadata0')
+fault = 'metadata'
+
+    @pytest.mark.parametrize('fault',['target','placement','limit','bytes','source','metadata','transaction'])
+    def test_join_fail_closed(tmp_path,fault):
+     s,p,ref,a=make_owner_target_store(tmp_path/'o.sqlite');kw={}
+     if fault=='target':
+      p=s.commit(p,commit_token='delete',version_changes=(VersionChange(DESCRIPTOR_NAMESPACE,2,delete=True),),changes=(),new_segments=(),metadata=s.head_metadata()).pin;a=authorities(s,p)
+     elif fault=='placement':s.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=?',(PAGE,));s.db.commit()
+     elif fault=='limit':kw['max_references']=1
+     elif fault=='bytes':kw['max_bytes']=1
+     elif fault=='source':kw['max_source_bytes']=1
+     elif fault=='metadata':kw['max_metadata_bytes']=1
+     elif fault=='transaction':s.db.execute('BEGIN')
+>    with pytest.raises(StoreError):read(s,p,a,**kw)
+                                    ^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_owner_targets.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_owner_targets.py:10: in read
+    def read(s,p,a,**kw):return m().read_owner_targets(s,p,PAGE,s.codec.encode((3,0)),*a,**kw)
+                                ^^^
+simulation/tests/test_stage_0_5_proof_owner_targets.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_owner_targets')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_owner_targets'
+import_ = <function _gcd_import at 0x7ffb7c9a00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_owner_targets'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+______________________ test_join_fail_closed[transaction] ______________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_join_fail_closed_transact0')
+fault = 'transaction'
+
+    @pytest.mark.parametrize('fault',['target','placement','limit','bytes','source','metadata','transaction'])
+    def test_join_fail_closed(tmp_path,fault):
+     s,p,ref,a=make_owner_target_store(tmp_path/'o.sqlite');kw={}
+     if fault=='target':
+      p=s.commit(p,commit_token='delete',version_changes=(VersionChange(DESCRIPTOR_NAMESPACE,2,delete=True),),changes=(),new_segments=(),metadata=s.head_metadata()).pin;a=authorities(s,p)
+     elif fault=='placement':s.db.execute('DELETE FROM lazy_identity_occurrence_versions WHERE owner_namespace=?',(PAGE,));s.db.commit()
+     elif fault=='limit':kw['max_references']=1
+     elif fault=='bytes':kw['max_bytes']=1
+     elif fault=='source':kw['max_source_bytes']=1
+     elif fault=='metadata':kw['max_metadata_bytes']=1
+     elif fault=='transaction':s.db.execute('BEGIN')
+>    with pytest.raises(StoreError):read(s,p,a,**kw)
+                                    ^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_owner_targets.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_owner_targets.py:10: in read
+    def read(s,p,a,**kw):return m().read_owner_targets(s,p,PAGE,s.codec.encode((3,0)),*a,**kw)
+                                ^^^
+simulation/tests/test_stage_0_5_proof_owner_targets.py:9: in m
+    def m():return importlib.import_module('ate_sim.persistence_proof_owner_targets')
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/importlib/__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<frozen importlib._bootstrap>:1387: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:1360: in _find_and_load
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name = 'ate_sim.persistence_proof_owner_targets'
+import_ = <function _gcd_import at 0x7ffb7c9a00e0>
+
+>   ???
+E   ModuleNotFoundError: No module named 'ate_sim.persistence_proof_owner_targets'
+
+<frozen importlib._bootstrap>:1324: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_owner_targets.py::test_all_paths_and_one_distinct_target
+FAILED simulation/tests/test_stage_0_5_proof_owner_targets.py::test_wrong_kind_same_identity_rejected
+FAILED simulation/tests/test_stage_0_5_proof_owner_targets.py::test_join_fail_closed[target]
+FAILED simulation/tests/test_stage_0_5_proof_owner_targets.py::test_join_fail_closed[placement]
+FAILED simulation/tests/test_stage_0_5_proof_owner_targets.py::test_join_fail_closed[limit]
+FAILED simulation/tests/test_stage_0_5_proof_owner_targets.py::test_join_fail_closed[bytes]
+FAILED simulation/tests/test_stage_0_5_proof_owner_targets.py::test_join_fail_closed[source]
+FAILED simulation/tests/test_stage_0_5_proof_owner_targets.py::test_join_fail_closed[metadata]
+FAILED simulation/tests/test_stage_0_5_proof_owner_targets.py::test_join_fail_closed[transaction]
+9 failed in 1.37s
