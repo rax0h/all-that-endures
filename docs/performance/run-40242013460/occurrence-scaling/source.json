@@ -1,0 +1,26 @@
+{
+  "owner_paths": 2,
+  "page_size": 4,
+  "python_clean_node_cache_bytes": 0,
+  "requested_group_placements": 8,
+  "requested_owners": 4,
+  "schema": "ate-proof-occurrence-source/1",
+  "scope": "Synthetic placements in real store schema, not World topology activation or save latency",
+  "sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "source": {
+    "driver_sha256": "680d435ef7016c73c5072a7416a3a3c9a9de163e80b2c5d4ecedae97134f8f2d",
+    "fixture_sha256": "f5582e20fc390e36fe15015f597560d246f48db1225249dc3ca628c8ebd3ad4f",
+    "head": "7a3f30a09f158094ae6b702db3d6ddba90830384",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "bedbe56bb84fbf3f4bb7c1881c456f5bbcc99c56",
+    "sqlite": "3.45.1"
+  },
+  "sqlite_main_cache_kib": 2048,
+  "sqlite_temp_cache_kib": 2048,
+  "temp_store": "FILE"
+}

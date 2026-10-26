@@ -97,20 +97,27 @@ def _read(store,pin,reference,content_pair,scope_pair,inventory_pair,*,record_au
         if record_authority is not None:
             records._schemas(store.db)
             if records._load_root(store,pin.captured_head)[0]!=record_authority:raise StoreIntegrityError('incoming accepted record source root disagreement')
-        result,s=groups._read_checked(store,pin,reference,content_pair,scope_pair,inventory_pair,**options)
-        s.read_limit+=max_members
-        owners={}
-        for row in result.group.occurrences:owners.setdefault((row.namespace,row.typed_key),[]).append(row.path)
-        checked=[]
-        for (namespace,typed),expected in sorted(owners.items()):
-            key=s.codec.decode(typed);header=s.metadata(target.catalog.OWNER_NAMESPACE,(namespace,key))
-            raw=_body(s,namespace,typed,key,header,record_authority)
-            paths=_paths(s,namespace,key,raw,result.target,max_members)
-            if paths!=tuple(sorted(expected)):raise StoreIntegrityError('incoming body references disagree with complete target group')
-            checked.append(RawIncomingOwner(namespace,typed,header[2],raw,paths))
-        value=RawTargetIncoming(result.target,result.group,tuple(checked))
+        value,s=_read_checked(store,pin,reference,content_pair,scope_pair,inventory_pair,record_authority=record_authority,**options)
         return value if _after is None else _after(value,s)
 
+
+def _read_checked(store,pin,reference,content_pair,scope_pair,inventory_pair,*,record_authority,
+                  max_members,max_bytes,max_source_bytes,max_metadata_bytes,_sources=None):
+    if not getattr(store,'_checked_snapshot_depth',0):raise StoreError('incoming composition requires checked snapshot')
+    options=dict(max_members=max_members,max_bytes=max_bytes,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes)
+    result,s=groups._read_checked(store,pin,reference,content_pair,scope_pair,inventory_pair,**options,_sources=_sources)
+    s.read_limit+=max_members
+    owners={}
+    for row in result.group.occurrences:owners.setdefault((row.namespace,row.typed_key),[]).append(row.path)
+    checked=[]
+    for (namespace,typed),expected in sorted(owners.items()):
+        key=s.codec.decode(typed);header=s.metadata(target.catalog.OWNER_NAMESPACE,(namespace,key))
+        raw=_body(s,namespace,typed,key,header,record_authority)
+        paths=_paths(s,namespace,key,raw,result.target,max_members)
+        if paths!=tuple(sorted(expected)):raise StoreIntegrityError('incoming body references disagree with complete target group')
+        checked.append(RawIncomingOwner(namespace,typed,header[2],raw,paths))
+    value=RawTargetIncoming(result.target,result.group,tuple(checked))
+    return value,s
 
 def read_target_incoming(store,pin,reference,content_authority,scope_authority,inventory_authority,*,record_authority=None,
                          max_members=4096,max_bytes=8388608,max_source_bytes=1048576,max_metadata_bytes=1048576):

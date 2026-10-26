@@ -5,7 +5,8 @@ from . import persistence_proof_scope as scopes
 
 
 class ExtentWork:
-    def __init__(self,children,values):self.children,self.values=children,values
+    def __init__(self,children,values,*,memoize=False):
+        self.children,self.values=children,values;self.extents={} if memoize else None
     def take_values(self,n):
         self.values-=n
         if self.values<0:raise StoreError('selected extents exceed value-work budget')

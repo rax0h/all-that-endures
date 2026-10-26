@@ -41,6 +41,16 @@ def _finish(value,s,scope_pair,max_children,max_values,max_certification_targets
 
 
 def _physical(backing,s,scope_pair,budget,max_certification_targets):
+    if budget.extents is not None and backing.incarnation in budget.extents:
+        result=budget.extents[backing.incarnation];old=result.target
+        if (old.store_identity,old.generation,old.kind,old.namespace,old.typed_key,old.payload)!=(backing.store_identity,backing.generation,backing.kind,backing.namespace,backing.typed_key,backing.payload):raise StoreIntegrityError('cached extent authority disagreement')
+        return result
+    result=_physical_uncached(backing,s,scope_pair,budget,max_certification_targets)
+    if budget.extents is not None:budget.extents[backing.incarnation]=result
+    return result
+
+
+def _physical_uncached(backing,s,scope_pair,budget,max_certification_targets):
     from .persistence_proof_extent_inventory import physical_locators
     kind=backing.kind;inc=backing.incarnation
     if kind=='sequence':

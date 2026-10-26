@@ -1,0 +1,27 @@
+{
+  "limits": [
+    "Full fixture and all explicit full-audited component bootstraps outside operation timers.",
+    "Actual existing save changes one version/membership/placement/ordinary body and appends one event.",
+    "All implemented roots share one existing transaction/receipt; this is not the complete seven-root manifest.",
+    "No World admission or full World/year performance acceptance."
+  ],
+  "python_clean_proof_cache_bytes": 0,
+  "schema": "ate-content-publication-source/1",
+  "sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "source": {
+    "driver_sha256": "c68c36a85d92802102f9f03c52f2725be2392e18177132376de2636ae9f3cb6d",
+    "fixture_sha256": "f7e7ae9885fee7801956a5e32d0ce861d7230389d5a5c9ee462a8f26e0d2c463",
+    "head": "7a3f30a09f158094ae6b702db3d6ddba90830384",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "bedbe56bb84fbf3f4bb7c1881c456f5bbcc99c56",
+    "sqlite": "3.45.1"
+  },
+  "sqlite_main_cache_kib": 2048,
+  "sqlite_temp_cache_kib": 2048,
+  "temp_store": "FILE"
+}

@@ -27,4 +27,4 @@ Existing dedicated branch/inline execution authorized. No World activation, main
 - [x] Verify focused/all proof and affected existing runtime suites; test sixth-root add/delete/sharing/retained/exact failure recovery.
 - [x] Run clean1k/10k/100k unrelated-internal-parent scaling with zero unrelated payloads, bounded metadata/memory and interval-one VM guard.
 - [x] One fresh independent review; fix Important/Critical findings in one RED→GREEN pass. Retain minor findings and decisions.
-- [ ] Publish candidate, launch long CI, return link and stop.
+- [x] Published7a3f30a; CI40242013460 accepted4135full/1039proof/24matrices on the next green.

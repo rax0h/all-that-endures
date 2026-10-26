@@ -1,0 +1,46 @@
+{
+  "source": {
+    "head": "610ff15d32a8bc0a40b6d32507f9dda646436851",
+    "runtime_tree": "540afb1728f78a976aff49b28a490b5415677d7b",
+    "sqlite": "3.53.1",
+    "driver_sha256": "14f44af7309df3b1d6c9435294b64320059421057cd96d68c8fe0f3cd4721cb3",
+    "fixture_sha256": "8d6a76ef26a880d16e897fb711e752beb241ab5fb9fa848ac35423d2818d5916",
+    "authority_fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+  },
+  "tests": {
+    "proof": {
+      "tests": 1074,
+      "seconds": 120.507,
+      "junit_sha256": "42f5508075302039d05501420ffe954f8b31ff69b46b03d49a9cb6cf9befb01b"
+    },
+    "runtime": {
+      "tests": 128,
+      "seconds": 33.847,
+      "junit_sha256": "0599fb3b2503b268a8cbf0e750f2156f980b81e274b500c8d1d1725cf92344eb"
+    },
+    "review_green": {
+      "tests": 136,
+      "seconds": 27.629,
+      "junit_sha256": "3ac3286019868f1ff7be1c6ddae3b9ed0e4f58b77d00dd425fab9b762c7ec40d"
+    }
+  },
+  "review": {
+    "model": "gpt-6-astra",
+    "effort": "high",
+    "base": "7a3f30a09f158094ae6b702db3d6ddba90830384",
+    "review_head": "20fdbdaad0d050c944a2861d541f6449c532f452",
+    "critical": 0,
+    "important_found": 1,
+    "important_fixed": 1,
+    "minor_deferred": 1,
+    "independent_pre_fix_tests": 33,
+    "independent_pre_fix_seconds": 6.23,
+    "passes": 1
+  },
+  "full_simulation": "pending next hosted CI",
+  "limits": [
+    "Inactive bounded directed raw closure only",
+    "Frozen certification cycles unsupported; mutable cycles accepted",
+    "No whole-store/native/World/performance/semantic transition activation"
+  ]
+}

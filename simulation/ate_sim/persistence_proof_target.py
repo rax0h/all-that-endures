@@ -61,24 +61,34 @@ def _preflight(store,budget):
     _closed_snapshot_preflight(store,budget);inventory._preflight(store)
 
 class _Sources:
-    def __init__(self,store,pin,pair,aggregate,per_source,metadata,*,read_limit=128):
+    def __init__(self,store,pin,pair,aggregate,per_source,metadata,*,read_limit=128,memoize=False):
         self.store,self.pin,self.pair=store,pin,pair;self.codec=_ProjectionCodec(metadata=True)
-        self.remaining,self.per_source,self.metadata_limit=aggregate,per_source,metadata;self.reads=0;self.read_limit=read_limit
+        self.remaining,self.per_source,self.metadata_limit=aggregate,per_source,metadata;self.reads=0;self.read_limit=read_limit;self._memo={} if memoize else None
     def charge(self,n):
         self.remaining-=n
         if self.remaining<0:raise TargetProofBudgetError('target sources exceed aggregate budget')
     def value(self,ns,key,*,absent=False):
+        typed=self.codec.encode(key);marker=ns,typed
+        if self._memo is not None and marker in self._memo:
+            cached=self._memo[marker]
+            if cached is None and not absent:raise StoreIntegrityError('missing required target source')
+            return cached
+        # Memo hits perform no source traversal; closure child/edge budgets
+        # independently bound their logical visits. Legacy readers do not memoize.
         self.reads+=1
         if self.reads>self.read_limit:raise TargetProofBudgetError('target metadata traversal exceeds source budget')
-        typed=self.codec.encode(key);self.charge(len(ns.encode())+len(typed))
+        self.charge(len(ns.encode())+len(typed))
         if self.remaining<1:raise TargetProofBudgetError('target sources exceed aggregate budget')
         raw=content.read_version_content_bytes(self.store,self.pin,*self.pair,ns,typed,expected_record_schema=1,max_bytes=min(self.per_source,self.remaining),max_metadata_bytes=self.metadata_limit)
         if raw is None:
+            if self._memo is not None:self._memo[marker]=None
             if absent:return None
             raise StoreIntegrityError('missing required target source')
         self.charge(len(raw.payload)+len(raw.memberships));value=self.codec.decode(raw.payload);members=self.codec.decode(raw.memberships)
         if type(members) is not tuple or any(type(row) is not tuple or len(row)!=3 or type(row[0]) is not str or type(row[2]) is not int or row[2]<0 for row in members):raise StoreIntegrityError('invalid target source memberships')
-        return value,members,raw,typed
+        result=value,members,raw,typed
+        if self._memo is not None:self._memo[marker]=result
+        return result
     def metadata(self,ns,key):
         value,members,*_=self.value(ns,key)
         if members:raise StoreIntegrityError('unexpected target metadata memberships')

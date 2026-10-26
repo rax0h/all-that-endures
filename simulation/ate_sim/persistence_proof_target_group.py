@@ -33,7 +33,7 @@ def _check(store, pin, reference, content_pair, scope_pair, inventory_pair, *,
         raise StoreError('target/group join requires owned snapshot')
 
 def _read_checked(store, pin, reference, content_pair, scope_pair, inventory_pair, *,
-                  max_members, max_bytes, max_source_bytes, max_metadata_bytes):
+                  max_members, max_bytes, max_source_bytes, max_metadata_bytes, _sources=None):
     """Private composition seam; caller has validated arguments and owns snapshot."""
     if not getattr(store, '_checked_snapshot_depth', 0):
         raise StoreError('target/group composition requires checked snapshot')
@@ -47,7 +47,13 @@ def _read_checked(store, pin, reference, content_pair, scope_pair, inventory_pai
         store, pin, *scope_pair, GroupScope(incarnation), max_metadata_bytes=max_metadata_bytes)
     if group_pair[0].root.count > max_members:
         raise GroupProofBudgetError('complete incoming group exceeds member budget')
-    sources = target._Sources(store, pin, content_pair, max_bytes, max_source_bytes, max_metadata_bytes)
+    if _sources is None:sources=target._Sources(store,pin,content_pair,max_bytes,max_source_bytes,max_metadata_bytes)
+    else:
+        sources=_sources
+        if (type(sources) is not target._Sources or sources.store is not store or sources.pin!=pin
+                or sources.pair!=content_pair or sources.per_source!=max_source_bytes or sources.metadata_limit!=max_metadata_bytes
+                or sources.remaining!=max_bytes):raise StoreIntegrityError('shared target source context disagreement')
+        sources.read_limit+=128
     backing = target._resolve_target(sources, scope_pair, reference, inventory_pair[0].head.next_incarnation_id)
     # Discover authority exclusively from authenticated group pages. SQL
     # DISTINCT over live owners would be an unauthenticated completeness claim.
