@@ -1,0 +1,64 @@
+{
+  "status": "local_checks_passed_hosted_pending",
+  "baseline": "046992d22136fdb8079a760c8e935b641788677a",
+  "reviewed_checkpoint": "b920b786ecb5742dba964787721bd3f5d939c179",
+  "python": "3.12.14",
+  "sqlite": "3.53.1",
+  "source_files_sha256": {
+    ".github/tests/run_proof_world_manifest_scaling.py": "6da3edbb8fd9f6afe6601a07c73b6406961687dd7d80223ffbd570e1e51faf8f",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "77da6aa78bac99a507fc572468b41c026df52dc9d39376258b5689965dc7af97",
+    "simulation/ate_sim/persistence_complete_format.py": "1eeccd75e1879dc2e512322335807aae31246b7570f0446105647387b9c4afbe",
+    "simulation/ate_sim/persistence_lazy_store.py": "25a6b897b0f49947f464e8f6e680c711de3ca96d3d6efbf30a030b7551e83d7c",
+    "simulation/ate_sim/persistence_proof_inventory.py": "7839f181c6db62dcc854cff05fef28bfc08e20f7a543e3964b43c3ac95128938",
+    "simulation/ate_sim/persistence_proof_manifest_publish.py": "9ba700e1874c9d61d7925bd701ae75edf81a345eee894a3e0a742880c473ea73",
+    "simulation/ate_sim/persistence_proof_scope.py": "cf8b3ee7af27447e0dc9d736cf07fa2d976d74aece21063ee1e2998f0dff3584",
+    "simulation/ate_sim/persistence_proof_world.py": "4382f0b2988de0db0a9844d5377180bb86a98326b2c3878b72da6ae308678246",
+    "simulation/ate_sim/persistence_proof_world_copy.py": "e813b9cf1b2e62487f6c2bf697f966bd31821e5f8c85e24ceef8f09e7cce800a",
+    "simulation/tests/proof_world_fixtures.py": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+    "simulation/tests/test_stage_0_5_proof_target_group_scaling.py": "6c795803be119835243184244c1e96469116fad0dfbf4f411cbbdea2cbede871",
+    "simulation/tests/test_stage_0_5_proof_world.py": "c79d86f913f647b3c17789dd0791badaf7c12ea85c93af2dfab6360e12803156"
+  },
+  "suites": {
+    "proof": {
+      "tests": 1151,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 565.029,
+      "xml_sha256": "b887257317015dcc3c8b482f6f005583804679883631f4a324bcbadaa4bffe1c",
+      "log_sha256": "d6dc6e8ee482cd20668789f4660734770d746f661d32af5d4a81505c742800af",
+      "world_cases": 35
+    },
+    "runtime_copy": {
+      "tests": 125,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0,
+      "seconds": 216.121,
+      "xml_sha256": "60393ca1a9a1492fac04490c18fa17624da773d2dfb66d8b59d77aa618291ab1",
+      "log_sha256": "9187600ec651652e8c005e1811973fac61ebbdde18a3b0f4806d7f3a8ffc8f5c",
+      "world_cases": 0
+    }
+  },
+  "proof_command": "PYTHONPATH=.:simulation python -m pytest -q simulation/tests/test_stage_0_5_proof_*.py -o junit_family=legacy --junitxml=/tmp/world-proof-final.xml",
+  "runtime_command": "PYTHONPATH=.:simulation python -m pytest -q simulation/tests/test_persistence_lazy_store_failures.py simulation/tests/test_stage_0_5_final_catalog_copy.py simulation/tests/test_stage_0_5_final_complete_format.py simulation/tests/test_stage_0_5_final_copy_graph_integrity.py simulation/tests/test_stage_0_5_final_native_copy_input.py simulation/tests/test_stage_0_5_final_frozen_snapshot_authority.py simulation/tests/test_stage_0_5_final_world_event_id_placements.py -o junit_family=legacy --junitxml=/tmp/world-runtime-final.xml",
+  "review": {
+    "critical": 0,
+    "important": 4,
+    "minor": 0,
+    "fix_passes": 1,
+    "second_review": false
+  },
+  "hosted_full_simulation_suite": "not run locally; next candidate CI required",
+  "ordinary_format7_world_activation": false,
+  "interactive_save_performance": "not established",
+  "local_source_checkpoint": "ad48f201ffa959b709f61ac356a72513c287aad1",
+  "runtime_tree": "18bccc1a775299e6770c051437e8be7035b9173d",
+  "scaling_status": "complete",
+  "scaling_sizes": [
+    1000,
+    10000,
+    100000
+  ],
+  "expected_hosted_full_test_count": 4247
+}

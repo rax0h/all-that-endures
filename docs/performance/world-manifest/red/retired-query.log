@@ -1,0 +1,116 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_genesis_rebase_keeps_retired_group_query_and_membership_ordinals_equal __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_genesis_rebase_keeps_reti0')
+
+    def test_genesis_rebase_keeps_retired_group_query_and_membership_ordinals_equal(tmp_path):
+     from ate_sim import persistence_lazy_identity_catalog as cat
+     from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+     from ate_sim.persistence_adapters import META,COLLECTION_LAYOUT,_read_cold_manifest
+     from ate_sim.incremental_store import RecordChange
+     s,p,a,ra,d=make_world(tmp_path/'source');owners=tuple(VersionChange('world.skills.skills',k,delete=True) for k in ((1,'craft'),(2,'craft')))
+     paths=tuple(IdentityOccurrenceChange('world.skills.skills',k,path,delete=True) for k in ((1,'craft'),(2,'craft')) for path,_ in cat.IdentityCatalog(s).read_owner_identity(p,('world.skills.skills',k)).occurrences)
+     layout=dict(_read_cold_manifest(s)['collections']);kind,_,chunks=layout['world.skills.skills'];layout['world.skills.skills']=(kind,0,chunks)
+     p=_catalog_edit(s,p,owners,paths,(RecordChange(META,COLLECTION_LAYOUT,layout),))
+     assert tuple(s.query_memberships(p,cat.GROUP_NAMESPACE,'retired',True))
+     _audit_current(s,p)
+     source=s.path;s.release_pin(p);s.close()
+>    result=copy_api().copy_world_with_proofs(source,tmp_path/'proof.sqlite',rules_id='private-catalog-copy')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world.py:360: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_proof_world_copy.py:95: in copy_world_with_proofs
+    with LazyRecordStore.open(private,codec=WorldCodec(identity_links_recorded=True),expected_simulation_schema=SCHEMA,expected_rules_id=rules_id) as store:_rebase_private_snapshot(store)
+                                                                                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_copy.py:66: in _rebase_private_snapshot
+    db.commit();store.verify_all()
+                ^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:3215: in verify_all
+    return self._verify_all_in_snapshot()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:3246: in _verify_all_in_snapshot
+    lazy_counts = self._verify_lazy_generation(generation)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f55cdb5b2c0>
+generation = 0
+
+    def _verify_lazy_generation(self, generation: int) -> dict[str, int]:
+        namespaces = [
+            row[0]
+            for row in self.db.execute(
+                "SELECT namespace FROM lazy_namespace_state WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+                (generation, generation),
+            )
+        ]
+        counts: dict[str, int] = {}
+        for namespace in namespaces:
+            state = self._namespace_state_at(namespace, generation)
+            if state is None:
+                raise StoreIntegrityError("visible lazy namespace has no state")
+            expected_count, next_ordinal = state[:2]
+            records = self.db.execute(
+                "SELECT typed_key,valid_from,valid_to,payload,payload_checksum,codec_version,record_schema,memberships,row_checksum "
+                "FROM lazy_record_versions WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+                (namespace, generation, generation),
+            ).fetchall()
+            seen_keys = set()
+            expected_queries = set()
+            for typed_key, valid_from, valid_to, payload, payload_checksum, codec_version, record_schema, memberships, row_checksum in records:
+                if typed_key in seen_keys:
+                    raise StoreIntegrityError("overlapping visible lazy record versions")
+                seen_keys.add(typed_key)
+                self.codec.decode(typed_key)
+                self._check_record_row(
+                    namespace,
+                    typed_key,
+                    (valid_from, valid_to, payload, payload_checksum, codec_version, record_schema, memberships, row_checksum),
+                    decode=True,
+                )
+                for name, value, ordinal in self._decode_memberships(memberships):
+                    expected_queries.add((name, self.codec.encode(value), typed_key, ordinal))
+            if len(records) != expected_count:
+                raise StoreIntegrityError("lazy namespace count does not match visible records")
+            orders = self.db.execute(
+                "SELECT typed_key,ordinal,valid_from,valid_to,row_checksum FROM lazy_order_versions "
+                "WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+                (namespace, generation, generation),
+            ).fetchall()
+            if len(orders) != expected_count:
+                raise StoreIntegrityError("lazy collection order is incomplete")
+            seen_ordinals = set()
+            order_keys = set()
+            for typed_key, ordinal, valid_from, valid_to, checksum in orders:
+                if checksum != _order_checksum(namespace, typed_key, ordinal, valid_from, valid_to):
+                    raise StoreIntegrityError("lazy order checksum mismatch")
+                if ordinal in seen_ordinals:
+                    raise StoreIntegrityError("duplicate visible collection ordinal")
+                seen_ordinals.add(ordinal)
+                order_keys.add(typed_key)
+                if ordinal >= next_ordinal:
+                    raise StoreIntegrityError("collection ordinal is outside namespace counter")
+            if order_keys != seen_keys:
+                raise StoreIntegrityError("lazy collection order does not match visible owners")
+            actual_queries = set()
+            qrows = self.db.execute(
+                "SELECT index_name,index_value,record_key,ordinal,valid_from,valid_to,row_checksum FROM lazy_query_versions "
+                "WHERE namespace=? AND valid_from<=? AND (valid_to IS NULL OR ?<valid_to)",
+                (namespace, generation, generation),
+            ).fetchall()
+            for index_name, index_value, record_key, ordinal, valid_from, valid_to, checksum in qrows:
+                if checksum != _query_checksum(
+                    namespace, index_name, index_value, record_key, ordinal, valid_from, valid_to
+                ):
+                    raise StoreIntegrityError("lazy query checksum mismatch")
+                actual_queries.add((index_name, index_value, record_key, ordinal))
+            if actual_queries != expected_queries:
+>               raise StoreIntegrityError("lazy query membership is incomplete or contains extra rows")
+E               ate_sim.incremental_store.StoreIntegrityError: lazy query membership is incomplete or contains extra rows
+
+simulation/ate_sim/persistence_lazy_store.py:3205: StoreIntegrityError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world.py::test_genesis_rebase_keeps_retired_group_query_and_membership_ordinals_equal
+1 failed, 34 deselected in 3.60s

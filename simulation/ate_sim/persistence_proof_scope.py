@@ -209,54 +209,62 @@ def bootstrap_scope_proofs(store,pin,*,max_metadata_bytes=1048576,include_childr
         for sql in (_DESCRIPTOR_SCHEMA,_ROOT_SCHEMA):store.db.execute(sql.replace('CREATE TABLE','CREATE TABLE IF NOT EXISTS',1))
         _schemas(store.db)
         if store.db.execute('SELECT 1 FROM ate_scope_generations WHERE generation=?',(generation,)).fetchone() is not None:raise StoreIntegrityError('scope constructor cannot replace existing generation')
-        store.db.execute('CREATE TEMP TABLE ate_scope_directory_delta(kind INTEGER,locator BLOB,key BLOB,value BLOB,PRIMARY KEY(kind,locator)) WITHOUT ROWID')
-        if include_children:_construct_child_spool(store,generation)
-        if include_sequence:_construct_sequence_spool(store,generation)
-        roots=[]
-        for kind in range(6 if include_sequence else 5 if include_children else 4):
-            if kind<2:
-                columns='owner_namespace,owner_key,occurrence_path,incarnation_id';table='lazy_identity_occurrence_versions'
-                order='owner_namespace,owner_key,occurrence_path' if kind==0 else 'incarnation_id,owner_namespace,owner_key,occurrence_path'
-                scope_for=(lambda r:OwnerScope(r[0],r[1])) if kind==0 else (lambda r:GroupScope(r[3]))
-            elif kind in (4,5):
-                columns='parent,position';table='ate_scope_child_spool' if kind==4 else 'ate_scope_sequence_spool';order='parent,position';scope_for=(lambda r:ChildScope(r[0])) if kind==4 else (lambda r:SequenceScope(r[0]))
-            else:
-                columns='namespace,index_name,index_value,record_key,ordinal';table='lazy_query_versions';order=columns
-                # Query position ordering is ordinal then record_key within a scope.
-                order='namespace,index_name,index_value,ordinal,record_key';scope_for=lambda r:QueryScope(*r[:3])
-                if kind==3:order='namespace,record_key,index_name,index_value,ordinal';scope_for=lambda r:_QueryOwnerScope(r[0],r[3])
-            cursor=(store.db.execute('SELECT parent,position FROM '+table+' ORDER BY parent,position') if kind in (4,5) else
-                    store.db.execute('SELECT '+columns+' FROM '+table+' WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY '+order,(generation,generation)))
-            directory=_map(store,kind)
-            try:
-                for scope,rows in groupby(cursor,scope_for):
-                    encoded=_scope_key(scope);m=OrderedSeekMap(store.db,_seek_domain(store,scope))
-                    domain=(query_domain if kind==2 else occurrence_domain)(store.store_identity,store.codec.version,scope) if kind<3 else None
-                    def entries():
-                        for row in rows:
-                            if kind in (4,5):yield row[1],_child_member(m.domain,row[1])
-                            elif kind==2:yield query_order_key(row[4],row[3]),query_member(domain,row[3],row[4])
-                            elif kind==3:
-                                query=QueryScope(*row[:3]);d=query_domain(store.store_identity,store.codec.version,query)
-                                yield group_order_key(row[1],row[2],row[4].to_bytes(8,'big')),query_member(d,row[3],row[4])
-                            else:
-                                if not 0<row[3]<allocator:raise StoreIntegrityError('scope placement exceeds allocator')
-                                yield row[2] if kind==0 else group_order_key(*row[:3]),occurrence_member(domain,RawOccurrence(*row))
-                    root=m.build(entries());value=_write_descriptor(store,scope,root)
-                    store.db.execute('INSERT INTO ate_scope_directory_delta VALUES(?,?,?,?)',(kind,key_locator(directory.map_domain,encoded),encoded,value))
-            finally:cursor.close()
-            delta=store.db.execute('SELECT key,value FROM ate_scope_directory_delta WHERE kind=? ORDER BY locator',(kind,))
-            try:roots.append(update_sorted(directory,directory.empty,delta))
-            finally:delta.close()
-        store.db.execute('DROP TABLE ate_scope_directory_delta')
-        if include_children:store.db.execute('DROP TABLE ate_scope_child_spool')
-        if include_sequence:store.db.execute('DROP TABLE ate_scope_sequence_spool')
+        roots=_construct_roots(store,generation,allocator,include_children=include_children,include_sequence=include_sequence)
         result=_write_root(store,ScopeDirectoryCertificate(store.store_identity,generation,store.codec.version,allocator,tuple(roots)))
         store.db.commit();return result
     except BaseException:
         if store.db.in_transaction:store.db.rollback()
         raise
     finally:store._active_read_transaction=False
+
+
+
+def _construct_roots(store,generation,allocator,*,include_children,include_sequence):
+    """Private full-audit construction inside an already owned writer snapshot."""
+    if not store.db.in_transaction:raise StoreError('scope construction requires transaction')
+    store.db.execute('CREATE TEMP TABLE ate_scope_directory_delta(kind INTEGER,locator BLOB,key BLOB,value BLOB,PRIMARY KEY(kind,locator)) WITHOUT ROWID')
+    if include_children:_construct_child_spool(store,generation)
+    if include_sequence:_construct_sequence_spool(store,generation)
+    roots=[]
+    for kind in range(6 if include_sequence else 5 if include_children else 4):
+        if kind<2:
+            columns='owner_namespace,owner_key,occurrence_path,incarnation_id';table='lazy_identity_occurrence_versions'
+            order='owner_namespace,owner_key,occurrence_path' if kind==0 else 'incarnation_id,owner_namespace,owner_key,occurrence_path'
+            scope_for=(lambda r:OwnerScope(r[0],r[1])) if kind==0 else (lambda r:GroupScope(r[3]))
+        elif kind in (4,5):
+            columns='parent,position';table='ate_scope_child_spool' if kind==4 else 'ate_scope_sequence_spool';order='parent,position';scope_for=(lambda r:ChildScope(r[0])) if kind==4 else (lambda r:SequenceScope(r[0]))
+        else:
+            columns='namespace,index_name,index_value,record_key,ordinal';table='lazy_query_versions';order=columns
+            # Query position ordering is ordinal then record_key within a scope.
+            order='namespace,index_name,index_value,ordinal,record_key';scope_for=lambda r:QueryScope(*r[:3])
+            if kind==3:order='namespace,record_key,index_name,index_value,ordinal';scope_for=lambda r:_QueryOwnerScope(r[0],r[3])
+        cursor=(store.db.execute('SELECT parent,position FROM '+table+' ORDER BY parent,position') if kind in (4,5) else
+                store.db.execute('SELECT '+columns+' FROM '+table+' WHERE valid_from<=? AND (valid_to IS NULL OR ?<valid_to) ORDER BY '+order,(generation,generation)))
+        directory=_map(store,kind)
+        try:
+            for scope,rows in groupby(cursor,scope_for):
+                encoded=_scope_key(scope);m=OrderedSeekMap(store.db,_seek_domain(store,scope))
+                domain=(query_domain if kind==2 else occurrence_domain)(store.store_identity,store.codec.version,scope) if kind<3 else None
+                def entries():
+                    for row in rows:
+                        if kind in (4,5):yield row[1],_child_member(m.domain,row[1])
+                        elif kind==2:yield query_order_key(row[4],row[3]),query_member(domain,row[3],row[4])
+                        elif kind==3:
+                            query=QueryScope(*row[:3]);d=query_domain(store.store_identity,store.codec.version,query)
+                            yield group_order_key(row[1],row[2],row[4].to_bytes(8,'big')),query_member(d,row[3],row[4])
+                        else:
+                            if not 0<row[3]<allocator:raise StoreIntegrityError('scope placement exceeds allocator')
+                            yield row[2] if kind==0 else group_order_key(*row[:3]),occurrence_member(domain,RawOccurrence(*row))
+                root=m.build(entries());value=_write_descriptor(store,scope,root)
+                store.db.execute('INSERT INTO ate_scope_directory_delta VALUES(?,?,?,?)',(kind,key_locator(directory.map_domain,encoded),encoded,value))
+        finally:cursor.close()
+        delta=store.db.execute('SELECT key,value FROM ate_scope_directory_delta WHERE kind=? ORDER BY locator',(kind,))
+        try:roots.append(update_sorted(directory,directory.empty,delta))
+        finally:delta.close()
+    store.db.execute('DROP TABLE ate_scope_directory_delta')
+    if include_children:store.db.execute('DROP TABLE ate_scope_child_spool')
+    if include_sequence:store.db.execute('DROP TABLE ate_scope_sequence_spool')
+    return tuple(roots)
 
 
 def read_scope_certificate(store,pin,certificate,expected,scope,*,max_metadata_bytes=1048576):

@@ -1,0 +1,91 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "046992d22136fdb8079a760c8e935b641788677a",
+    "runtime_tree": "1d197771f5c4c6975f4f66ed0e42dd2d6c54da5c",
+    "sqlite": "3.45.1",
+    "driver_sha256": "573dbc5074af99cc740696309ab5d6d72864ee037476dd70bdb9052b64e1938d",
+    "fixture_sha256": "8d6a76ef26a880d16e897fb711e752beb241ab5fb9fa848ac35423d2818d5916",
+    "authority_fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "source": {
+        "head": "046992d22136fdb8079a760c8e935b641788677a",
+        "runtime_tree": "1d197771f5c4c6975f4f66ed0e42dd2d6c54da5c",
+        "sqlite": "3.45.1",
+        "driver_sha256": "573dbc5074af99cc740696309ab5d6d72864ee037476dd70bdb9052b64e1938d",
+        "fixture_sha256": "8d6a76ef26a880d16e897fb711e752beb241ab5fb9fa848ac35423d2818d5916",
+        "authority_fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 0.41623374499999954,
+      "point_edit_ms": 113.66935299997749,
+      "python_peak_bytes": 137110,
+      "sql": {
+        "graph_payload": 0,
+        "unrelated_archive_payload": 0,
+        "changed_payload": 2,
+        "proof_nodes": 151
+      },
+      "metadata_reuse_vm_steps": 228707,
+      "rebuilt": 0,
+      "reused": 1,
+      "vm_measurement": "interval-one guarded metadata-only successor"
+    },
+    {
+      "size": 10000,
+      "source": {
+        "head": "046992d22136fdb8079a760c8e935b641788677a",
+        "runtime_tree": "1d197771f5c4c6975f4f66ed0e42dd2d6c54da5c",
+        "sqlite": "3.45.1",
+        "driver_sha256": "573dbc5074af99cc740696309ab5d6d72864ee037476dd70bdb9052b64e1938d",
+        "fixture_sha256": "8d6a76ef26a880d16e897fb711e752beb241ab5fb9fa848ac35423d2818d5916",
+        "authority_fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 3.2767419659999177,
+      "point_edit_ms": 123.03510199990342,
+      "python_peak_bytes": 142423,
+      "sql": {
+        "graph_payload": 0,
+        "unrelated_archive_payload": 0,
+        "changed_payload": 2,
+        "proof_nodes": 179
+      },
+      "metadata_reuse_vm_steps": 229301,
+      "rebuilt": 0,
+      "reused": 1,
+      "vm_measurement": "interval-one guarded metadata-only successor"
+    },
+    {
+      "size": 100000,
+      "source": {
+        "head": "046992d22136fdb8079a760c8e935b641788677a",
+        "runtime_tree": "1d197771f5c4c6975f4f66ed0e42dd2d6c54da5c",
+        "sqlite": "3.45.1",
+        "driver_sha256": "573dbc5074af99cc740696309ab5d6d72864ee037476dd70bdb9052b64e1938d",
+        "fixture_sha256": "8d6a76ef26a880d16e897fb711e752beb241ab5fb9fa848ac35423d2818d5916",
+        "authority_fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 34.08837540500008,
+      "point_edit_ms": 135.0113120001879,
+      "python_peak_bytes": 129085,
+      "sql": {
+        "graph_payload": 0,
+        "unrelated_archive_payload": 0,
+        "changed_payload": 2,
+        "proof_nodes": 208
+      },
+      "metadata_reuse_vm_steps": 230003,
+      "rebuilt": 0,
+      "reused": 1,
+      "vm_measurement": "interval-one guarded metadata-only successor"
+    }
+  ]
+}

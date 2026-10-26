@@ -1,0 +1,161 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_ test_world_family_value_contract_rejects_coherent_wrong_kind[world.currency.wallets] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_world_family_value_contra0')
+namespace = 'world.currency.wallets'
+
+    @pytest.mark.parametrize('namespace',['world.currency.wallets','world.genealogy.children','world.knowledge.claim_index'])
+    def test_world_family_value_contract_rejects_coherent_wrong_kind(tmp_path,namespace):
+     from ate_sim.persistence_lazy_nested_history import HistoryReference
+     from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+     def configure(w):
+      w.currency.wallets[1]={}
+      w.genealogy.children[1]=[2]
+      w.knowledge.claim_index['a','b']=1
+     s,p,a,ra,d=make_world(tmp_path/'world',configure=configure)
+     key=('a','b') if namespace=='world.knowledge.claim_index' else 1
+     skill=s.read_version(p,'world.skills.skills',(1,'craft'),expected_record_schema=1).value
+     # Existing complete backing, correct occurrences/catalog and all source roots;
+     # only the consuming family's declared type is wrong.
+     ref=skill.provenance if namespace!='world.genealogy.children' else s.read_version(p,'world.currency.wallets',1,expected_record_schema=1).value
+     assert type(ref) is HistoryReference
+     owners=(VersionChange(namespace,key,ref),)
+     paths=(IdentityOccurrenceChange(namespace,key,(),ref.incarnation),)
+     p=_catalog_edit(s,p,owners,paths)
+>    with pytest.raises(StoreError,match='family value'):_audit_current(s,p)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world.py:320: Failed
+_ test_world_family_value_contract_rejects_coherent_wrong_kind[world.genealogy.children] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_world_family_value_contra1')
+namespace = 'world.genealogy.children'
+
+    @pytest.mark.parametrize('namespace',['world.currency.wallets','world.genealogy.children','world.knowledge.claim_index'])
+    def test_world_family_value_contract_rejects_coherent_wrong_kind(tmp_path,namespace):
+     from ate_sim.persistence_lazy_nested_history import HistoryReference
+     from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+     def configure(w):
+      w.currency.wallets[1]={}
+      w.genealogy.children[1]=[2]
+      w.knowledge.claim_index['a','b']=1
+     s,p,a,ra,d=make_world(tmp_path/'world',configure=configure)
+     key=('a','b') if namespace=='world.knowledge.claim_index' else 1
+     skill=s.read_version(p,'world.skills.skills',(1,'craft'),expected_record_schema=1).value
+     # Existing complete backing, correct occurrences/catalog and all source roots;
+     # only the consuming family's declared type is wrong.
+     ref=skill.provenance if namespace!='world.genealogy.children' else s.read_version(p,'world.currency.wallets',1,expected_record_schema=1).value
+     assert type(ref) is HistoryReference
+     owners=(VersionChange(namespace,key,ref),)
+     paths=(IdentityOccurrenceChange(namespace,key,(),ref.incarnation),)
+     p=_catalog_edit(s,p,owners,paths)
+>    with pytest.raises(StoreError,match='family value'):_audit_current(s,p)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world.py:320: Failed
+_ test_world_family_value_contract_rejects_coherent_wrong_kind[world.knowledge.claim_index] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_world_family_value_contra2')
+namespace = 'world.knowledge.claim_index'
+
+    @pytest.mark.parametrize('namespace',['world.currency.wallets','world.genealogy.children','world.knowledge.claim_index'])
+    def test_world_family_value_contract_rejects_coherent_wrong_kind(tmp_path,namespace):
+     from ate_sim.persistence_lazy_nested_history import HistoryReference
+     from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+     def configure(w):
+      w.currency.wallets[1]={}
+      w.genealogy.children[1]=[2]
+      w.knowledge.claim_index['a','b']=1
+     s,p,a,ra,d=make_world(tmp_path/'world',configure=configure)
+     key=('a','b') if namespace=='world.knowledge.claim_index' else 1
+     skill=s.read_version(p,'world.skills.skills',(1,'craft'),expected_record_schema=1).value
+     # Existing complete backing, correct occurrences/catalog and all source roots;
+     # only the consuming family's declared type is wrong.
+     ref=skill.provenance if namespace!='world.genealogy.children' else s.read_version(p,'world.currency.wallets',1,expected_record_schema=1).value
+     assert type(ref) is HistoryReference
+     owners=(VersionChange(namespace,key,ref),)
+     paths=(IdentityOccurrenceChange(namespace,key,(),ref.incarnation),)
+     p=_catalog_edit(s,p,owners,paths)
+>    with pytest.raises(StoreError,match='family value'):_audit_current(s,p)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world.py:320: Failed
+________ test_backed_record_field_contract_rejects_coherent_wrong_kind _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_backed_record_field_contr0')
+
+    def test_backed_record_field_contract_rejects_coherent_wrong_kind(tmp_path):
+     from ate_sim.persistence_lazy import open_lazy_world_session
+     from ate_sim.persistence_record_headers import NAMESPACE,checked_record_header
+     from ate_sim.persistence_schema import RECORD_FIELDS
+     from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+     from ate_sim.skills import SkillHistory
+     s,p,a,ra,d=make_world(tmp_path/'world',configure=lambda w:w.currency.wallets.update({1:{'iron':1}}));path=s.path;s.release_pin(p);s.close()
+     with open_lazy_world_session(path,rules_id='private-catalog-copy') as runtime:
+      runtime.world.settlements[1].memory['nested']=SkillHistory(9,'craft',teachers=[1])
+      runtime.save()
+     from simulation.tests.test_stage_0_5_final_catalog_copy import opened
+     s=opened(path);p=s.capture_pin()
+     key=next(k for k in s.iter_keys(p,NAMESPACE) if checked_record_header(s.read_version(p,NAMESPACE,k,expected_record_schema=1).value)[0] is SkillHistory)
+     header=list(s.read_version(p,NAMESPACE,key,expected_record_schema=1).value);values=list(header[2]);fields=RECORD_FIELDS[SkillHistory]
+     map_ref=s.read_version(p,'world.currency.wallets',1,expected_record_schema=1).value
+     values[fields.index('teachers')]=map_ref;header[2]=tuple(values)
+     owners=(VersionChange(NAMESPACE,key,tuple(header)),)
+     paths=(IdentityOccurrenceChange(NAMESPACE,key,(('field','teachers'),),map_ref.incarnation),)
+     p=_catalog_edit(s,p,owners,paths)
+>    with pytest.raises(StoreError,match='member kind'):_audit_current(s,p)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world.py:343: Failed
+_ test_genesis_rebase_keeps_retired_group_query_and_membership_ordinals_equal __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-1/test_genesis_rebase_keeps_reti0')
+
+    def test_genesis_rebase_keeps_retired_group_query_and_membership_ordinals_equal(tmp_path):
+     from ate_sim import persistence_lazy_identity_catalog as cat
+     from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+     from ate_sim.persistence_adapters import META,COLLECTION_LAYOUT,_read_cold_manifest
+     from ate_sim.incremental_store import RecordChange
+     s,p,a,ra,d=make_world(tmp_path/'source');owners=tuple(VersionChange('world.skills.skills',k,delete=True) for k in ((1,'craft'),(2,'craft')))
+     paths=tuple(IdentityOccurrenceChange('world.skills.skills',k,path,delete=True) for k in ((1,'craft'),(2,'craft')) for path,_ in cat.IdentityCatalog(s).read_owner_identity(p,('world.skills.skills',k)).occurrences)
+     layout=dict(_read_cold_manifest(s)['collections']);kind,_,chunks=layout['world.skills.skills'];layout['world.skills.skills']=(kind,0,chunks)
+>    p=_catalog_edit(s,p,owners,paths,(RecordChange(META,COLLECTION_LAYOUT,layout),))
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world.py:355: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/tests/test_stage_0_5_proof_world.py:298: in _catalog_edit
+    delta=cat.IdentityCatalog(s).prepare_delta(p,owners,paths,ordinary_changes=changes,next_incarnation_id=s.read_identity_state(p))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_identity_catalog.py:836: in prepare_delta
+    return _prepare_catalog_delta(self, pin, owner_versions, identity_changes,
+simulation/ate_sim/persistence_lazy_identity_catalog.py:1045: in _prepare_catalog_delta
+    sources = _owner_sources(self.codec, versions, ordinary)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+codec = <ate_sim.persistence_adapters.WorldCodec object at 0x7f506c4fcb60>
+owner_versions = (VersionChange(namespace='world.skills.skills', key=(1, 'craft'), value=None, record_schema=1, delete=True, membership...='world.skills.skills', key=(2, 'craft'), value=None, record_schema=1, delete=True, memberships=(), reinsertion=False))
+ordinary_changes = (RecordChange(namespace='world_snapshot', key='collections/v1', value={'world.seed': ('int', 1, 0), 'world.year': ('in... 1, 0), 'world.threat_ecology.resolutions': ('dict-scalar/v1', 0, 0)}, record_schema=1, delete=False, memberships=()),)
+
+    def _owner_sources(codec, owner_versions, ordinary_changes):
+        sources = {}
+        for kind, changes in (('lazy', owner_versions), ('ordinary', ordinary_changes)):
+            for source in changes:
+                if source.namespace not in IDENTITY_OWNER_FAMILIES:
+>                   raise StoreFormatError('identity source is not a declared family')
+E                   ate_sim.incremental_store.StoreFormatError: identity source is not a declared family
+
+simulation/ate_sim/persistence_lazy_identity_catalog.py:132: StoreFormatError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world.py::test_world_family_value_contract_rejects_coherent_wrong_kind[world.currency.wallets]
+FAILED simulation/tests/test_stage_0_5_proof_world.py::test_world_family_value_contract_rejects_coherent_wrong_kind[world.genealogy.children]
+FAILED simulation/tests/test_stage_0_5_proof_world.py::test_world_family_value_contract_rejects_coherent_wrong_kind[world.knowledge.claim_index]
+FAILED simulation/tests/test_stage_0_5_proof_world.py::test_backed_record_field_contract_rejects_coherent_wrong_kind
+FAILED simulation/tests/test_stage_0_5_proof_world.py::test_genesis_rebase_keeps_retired_group_query_and_membership_ordinals_equal
+5 failed, 30 deselected in 18.79s

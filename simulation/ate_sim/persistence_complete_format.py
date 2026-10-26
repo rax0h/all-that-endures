@@ -33,6 +33,16 @@ def check_open(store, pin, head, manifest):
     from .persistence_lazy import BUCKET_SPECS, BUCKET_KIND, SCALAR_RECORD_KINDS, SCALAR_NAMESPACES
     from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE, PACKED_LIST_KIND
     floor=int(store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
+    if floor>=7:raise StoreFormatError('proof World admission requires native integration')
+    return _check_fixed_contract(store,pin,head,manifest)
+
+
+def _check_fixed_contract(store,pin,head,manifest):
+    """Existing complete layout audit, also used by explicit proof construction."""
+    from .persistence_lazy_identity_catalog import IdentityCatalog,LINK_NAMESPACE
+    from .persistence_lazy import BUCKET_SPECS,BUCKET_KIND,SCALAR_RECORD_KINDS,SCALAR_NAMESPACES
+    from .persistence_adapters import AGENCY_ACTIONS_NAMESPACE,PACKED_LIST_KIND
+    floor=int(store.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()[0])
     if not selected(manifest,floor):return None
     IdentityCatalog(store)._descriptor(pin)
     if store.db.execute('SELECT 1 FROM records WHERE namespace=? LIMIT 1',(LINK_NAMESPACE,)).fetchone():

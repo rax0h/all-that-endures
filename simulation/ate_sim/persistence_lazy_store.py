@@ -39,9 +39,10 @@ FORMAT_VERSION = 3
 PAGED_REFERENCE_FORMAT_VERSION = 4
 BOUNDED_AUTHORITY_FORMAT_VERSION = 5
 COMPLETE_WORLD_FORMAT_VERSION = 6
+PROOF_WORLD_FORMAT_VERSION = 7
 SUPPORTED_FORMAT_VERSIONS = (
     FORMAT_VERSION, PAGED_REFERENCE_FORMAT_VERSION, BOUNDED_AUTHORITY_FORMAT_VERSION,
-    COMPLETE_WORLD_FORMAT_VERSION,
+    COMPLETE_WORLD_FORMAT_VERSION, PROOF_WORLD_FORMAT_VERSION,
 )
 MAX_PINS = 64
 MAX_PAGE_SIZE = 128
@@ -2625,6 +2626,14 @@ class LazyRecordStore:
         _collection_proof=None,
     ) -> CommitResult:
         self._ensure_open()
+        if type(required_format_version) is not int or required_format_version not in SUPPORTED_FORMAT_VERSIONS:raise StoreFormatError('unsupported required persistence format')
+        format_row=self.db.execute("SELECT value FROM store_metadata WHERE key='format_version'").fetchone()
+        if format_row is None:raise StoreIntegrityError('missing persistence format requirement')
+        try:physical_format=int(format_row[0])
+        except (TypeError,ValueError) as exc:raise StoreFormatError('invalid persistence format requirement') from exc
+        if required_format_version>=PROOF_WORLD_FORMAT_VERSION or physical_format>=PROOF_WORLD_FORMAT_VERSION:
+            request=getattr(getattr(getattr(_collection_proof,'directory',None),'inventory',None),'manifest',None)
+            if request is None:raise StoreFormatError('proof World writer requires exact manifest publication authority')
         if _record_proof is not None:
             from .persistence_proof_record import _check_request, _checked_phase_hook, _stage_record_proof
             _check_request(self, pin, _record_proof)
