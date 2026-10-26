@@ -1,0 +1,57 @@
+{
+  "source_commit": "d444dd1cfeed65695363272d0f182368466c3a81",
+  "runtime_tree": "1d197771f5c4c6975f4f66ed0e42dd2d6c54da5c",
+  "tests": {
+    "proof": {
+      "tests": 1115,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 116.241,
+      "xml_sha256": "9145d7bff82cc2306fa68569c6d5d71754b4988306af57670335d0e315cc2f78"
+    },
+    "runtime": {
+      "tests": 128,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 27.908,
+      "xml_sha256": "2f608e5a9a62f08a819739199b33d039f35d53acdac42baa0a21d8d0335a9ca0"
+    }
+  },
+  "files": {
+    "simulation/ate_sim/persistence_proof_reference.py": "082104fb2bff36a4924e933ca76c5e7923812a5d9329d5bf52d2f18d78819915",
+    "simulation/ate_sim/persistence_proof_reference_publish.py": "0e8208c35a2bb5ff6838e9315d8df33d74887fc7ec9ee68015742921ad2b21e9",
+    "simulation/tests/test_stage_0_5_proof_reference.py": "da69614243285e0f4ce5d7d3d479bb23a19972cd51c117d03504b96f17be84fa",
+    ".github/tests/run_proof_reference_scaling.py": "573dbc5074af99cc740696309ab5d6d72864ee037476dd70bdb9052b64e1938d"
+  },
+  "red_green": {
+    "initial_descriptor": "17 missing API failures ->51 descriptor/closure passes",
+    "publication": "12 missing writer failures ->197 focused passes",
+    "persisted_component_bindings": "4 false accepts demonstrated ->rejected by checked bindings"
+  },
+  "runtime_warnings": "4 existing PytestWarning record_property/xunit2 incompatibilities; all128 cases passed. Initial command used3 nonexistent filenames and ran zero tests, then corrected to existing files.",
+  "full_simulation": "Next hosted CI; no local full simulation run or long CI polling",
+  "resumed_reference_tests": {
+    "tests": 40,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 8.77,
+    "xml_sha256": "c649197b8920aef726fb7c3c821056c40241bc59ee9d817c9056aae45e3400a6",
+    "source_unchanged": true
+  },
+  "review": {
+    "model": "gpt-6-astra/high",
+    "base": "cfdb974499a6c397a7bb336936b05beba4264f6b",
+    "head": "d444dd1cfeed65695363272d0f182368466c3a81",
+    "critical": 0,
+    "important": 0,
+    "minor": 0,
+    "same_review_resumed_after_usage_limit": true,
+    "independent_probes": [
+      "selected type witness",
+      "retirement header",
+      "owner-radix node",
+      "link body"
+    ],
+    "independent_pytest": false
+  }
+}

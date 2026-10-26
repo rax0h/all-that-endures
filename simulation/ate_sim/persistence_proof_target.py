@@ -63,12 +63,13 @@ def _preflight(store,budget):
 class _Sources:
     def __init__(self,store,pin,pair,aggregate,per_source,metadata,*,read_limit=128,memoize=False):
         self.store,self.pin,self.pair=store,pin,pair;self.codec=_ProjectionCodec(metadata=True)
-        self.remaining,self.per_source,self.metadata_limit=aggregate,per_source,metadata;self.reads=0;self.read_limit=read_limit;self._memo={} if memoize else None
+        self.remaining,self.per_source,self.metadata_limit=aggregate,per_source,metadata;self.reads=0;self.read_limit=read_limit;self._memo={} if memoize else None;self.dependencies=set() if memoize else None
     def charge(self,n):
         self.remaining-=n
         if self.remaining<0:raise TargetProofBudgetError('target sources exceed aggregate budget')
     def value(self,ns,key,*,absent=False):
         typed=self.codec.encode(key);marker=ns,typed
+        if self.dependencies is not None:self.dependencies.add((0,ns,typed))
         if self._memo is not None and marker in self._memo:
             cached=self._memo[marker]
             if cached is None and not absent:raise StoreIntegrityError('missing required target source')

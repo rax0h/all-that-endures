@@ -42,6 +42,7 @@ class _Request:
     parent:tuple
     counts:object=None
     successor:object=None
+    reference:object=None
 
 @dataclass(frozen=True)
 class InventoryCommit:
@@ -183,6 +184,9 @@ def _guard(store,request,versions,ordinary,segments):
         _bump_count(counts,ns,records=-int(old) if item['change'].delete else int(not old))
     for item in segments:_bump_count(counts,item['namespace'],segments=1)
     request.counts=counts
+    if request.reference is not None:
+        from .persistence_proof_reference_publish import _guard as guard_reference
+        guard_reference(store,request.reference)
 
 def _stage(store,request,g,writer,token):
     c,e=request.parent
@@ -197,15 +201,23 @@ def _stage(store,request,g,writer,token):
             if m.get(root,_key(ns))!=old:raise StoreIntegrityError('inventory parent namespace path disagreement')
             root=m.set(root,_key(ns),new)
     child=InventoryCertificate(c.store_identity,g,c.codec_version,h,root);request.successor=_write(store,child,parent=e,writer=writer,token=token)
+    if request.reference is not None:
+        from .persistence_proof_reference_publish import _stage as stage_reference
+        stage_reference(store,request.reference,g,writer,token,request.successor)
 
-def commit_inventory(store,pin,certificate,expected,directory_authority,content_authority,**arguments):
+def _commit_inventory(store,pin,certificate,expected,directory_authority,content_authority,*,reference_request=None,**arguments):
     if any(k.startswith('_') for k in arguments):raise StoreError('private inventory arguments forbidden')
     _authority(store,pin,certificate,expected)
     if store.db.in_transaction:raise StoreError('inventory save requires owned operation')
     with store.read_snapshot(pin,_preflight=lambda:_preflight(store)):_snapshot_checks(store,certificate,expected)
-    request=_Request((certificate,expected));result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+    request=_Request((certificate,expected),reference=reference_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
     if outcome=='committed' and request.successor is None:raise StoreIntegrityError('missing inventory successor')
     return InventoryCommit(result.content,result.directory,request.successor if outcome=='committed' else request.parent if outcome=='not_committed' else ())
+
+def commit_inventory(store,pin,certificate,expected,directory_authority,content_authority,**arguments):
+    if any(k.startswith('_') or k=='reference_request' for k in arguments):raise StoreError('private inventory arguments forbidden')
+    return _commit_inventory(store,pin,certificate,expected,directory_authority,content_authority,**arguments)
+
 
 def resolve_inventory(store,pin,certificate,expected,directory_authority,content_authority,**arguments):
     if any(k.startswith('_') for k in arguments):raise StoreError('private inventory recovery arguments forbidden')

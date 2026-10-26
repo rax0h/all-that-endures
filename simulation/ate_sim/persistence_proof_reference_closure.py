@@ -96,6 +96,41 @@ def _immutable_targets(nodes):
     return tuple(sorted(actual.items()))
 
 
+def _read_checked(store,pin,reference,content_authority,scope_authority,inventory_authority,*,record_authority=None,
+        max_targets=128,max_edges=4096,max_members=4096,max_children=4096,max_values=65536,max_bytes=33554432,max_source_bytes=1048576,max_metadata_bytes=1048576):
+    """Private producer seam, under one already checked owned snapshot."""
+    if not getattr(store,'_checked_snapshot_depth',0):raise StoreError('closure producer requires checked snapshot')
+    target._pairs(store,pin,(content_authority,scope_authority,inventory_authority))
+    if len(scope_authority[0].roots)!=6:raise StoreError('reference closure requires explicit six-root authority')
+    if record_authority is not None:
+        incoming.records._authority(store,pin,*record_authority);incoming.records._schemas(store.db)
+        if incoming.records._load_root(store,pin.captured_head)[0]!=record_authority:raise StoreIntegrityError('closure record root disagreement')
+    s=target._Sources(store,pin,content_authority,max_bytes,max_source_bytes,max_metadata_bytes,memoize=True)
+    budget=ExtentWork(max_children,max_values,memoize=True);queue=deque();kinds={};nodes={};edges=[];members_left=max_members
+    def discover(ref):
+        kind,inc=target._reference(ref)
+        if inc in kinds:
+            if kinds[inc]!=kind:raise StoreIntegrityError('closure has conflicting kinds for one incarnation')
+            return
+        if len(kinds)>=max_targets:raise StoreError('reference closure exceeds target budget')
+        kinds[inc]=kind;queue.append(ref)
+    discover(reference)
+    while queue:
+        ref=queue.popleft();kind,inc=target._reference(ref)
+        if members_left<1:raise StoreError('closure exceeds aggregate incoming-member budget')
+        value,s=incoming._read_checked(store,pin,ref,content_authority,scope_authority,inventory_authority,record_authority=record_authority,
+            max_members=members_left,max_bytes=s.remaining,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes,_sources=s)
+        members_left-=len(value.group.occurrences)
+        body=extents._physical(value.target,s,scope_authority,budget,max_targets)
+        extents._check_policies(value,s,kind,body.member_counts)
+        node=extents.RawTargetMembers(value,body.members,body.member_counts,body.child_locators,body.certification_targets,body.components);nodes[inc]=node
+        for ns,typed,path,child in _owner_edges(s,scope_authority,body,max_edges-len(edges)):
+            child_kind,child_inc=target._reference(child);discover(child)
+            edges.append(RawReferenceEdge(inc,ns,typed,path,child_inc,child_kind))
+    frozen=_immutable_targets(nodes)
+    return RawReferenceClosure(reference,tuple(nodes[i] for i in sorted(nodes)),tuple(sorted(edges,key=lambda e:(e.source_incarnation,e.namespace,e.typed_key,e.path))),frozen),s
+
+
 def read_reference_closure(store,pin,reference,content_authority,scope_authority,inventory_authority,*,record_authority=None,
         max_targets=128,max_edges=4096,max_members=4096,max_children=4096,max_values=65536,max_bytes=33554432,max_source_bytes=1048576,max_metadata_bytes=1048576):
     for n,maximum in ((max_targets,1024),(max_edges,4096),(max_children,4096),(max_values,65536)):
@@ -108,31 +143,7 @@ def read_reference_closure(store,pin,reference,content_authority,scope_authority
         incoming.records._authority(store,pin,*record_authority)
     try:
         with store.read_snapshot(pin,_preflight=lambda:target._preflight(store,max_metadata_bytes)):
-            if record_authority is not None:
-                incoming.records._schemas(store.db)
-                if incoming.records._load_root(store,pin.captured_head)[0]!=record_authority:raise StoreIntegrityError('closure record root disagreement')
-            s=target._Sources(store,pin,content_authority,max_bytes,max_source_bytes,max_metadata_bytes,memoize=True)
-            budget=ExtentWork(max_children,max_values,memoize=True);queue=deque();kinds={};nodes={};edges=[];members_left=max_members
-            def discover(ref):
-                kind,inc=target._reference(ref)
-                if inc in kinds:
-                    if kinds[inc]!=kind:raise StoreIntegrityError('closure has conflicting kinds for one incarnation')
-                    return
-                if len(kinds)>=max_targets:raise StoreError('reference closure exceeds target budget')
-                kinds[inc]=kind;queue.append(ref)
-            discover(reference)
-            while queue:
-                ref=queue.popleft();kind,inc=target._reference(ref)
-                if members_left<1:raise StoreError('closure exceeds aggregate incoming-member budget')
-                value,s=incoming._read_checked(store,pin,ref,content_authority,scope_authority,inventory_authority,record_authority=record_authority,
-                    max_members=members_left,max_bytes=s.remaining,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes,_sources=s)
-                members_left-=len(value.group.occurrences)
-                body=extents._physical(value.target,s,scope_authority,budget,max_targets)
-                extents._check_policies(value,s,kind,body.member_counts)
-                node=extents.RawTargetMembers(value,body.members,body.member_counts,body.child_locators,body.certification_targets,body.components);nodes[inc]=node
-                for ns,typed,path,child in _owner_edges(s,scope_authority,body,max_edges-len(edges)):
-                    child_kind,child_inc=target._reference(child);discover(child)
-                    edges.append(RawReferenceEdge(inc,ns,typed,path,child_inc,child_kind))
-            frozen=_immutable_targets(nodes)
-            return RawReferenceClosure(reference,tuple(nodes[i] for i in sorted(nodes)),tuple(sorted(edges,key=lambda e:(e.source_incarnation,e.namespace,e.typed_key,e.path))),frozen)
+            return _read_checked(store,pin,reference,content_authority,scope_authority,inventory_authority,record_authority=record_authority,
+                max_targets=max_targets,max_edges=max_edges,max_members=max_members,max_children=max_children,max_values=max_values,
+                max_bytes=max_bytes,max_source_bytes=max_source_bytes,max_metadata_bytes=max_metadata_bytes)[0]
     except (CodecError,ValueError,TypeError,UnicodeError,RecursionError,IndexError,AttributeError,KeyError) as exc:raise StoreIntegrityError('invalid raw reference closure source') from exc

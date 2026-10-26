@@ -50,6 +50,7 @@ class _Sources:
 
     def value(self,namespace,key,*,absent=False):
         typed=self.codec.encode(key);self.charge(len(namespace.encode('utf-8'))+len(typed))
+        if self.budget is not None and getattr(self.budget,'dependencies',None) is not None:self.budget.dependencies.add((0,namespace,typed))
         if self.remaining<1:raise GroupProofBudgetError('group source exceeds aggregate byte budget')
         source=read_version_bytes(self.store,self.pin,self.certificate,self.expected,namespace,typed,
             expected_record_schema=1,max_bytes=min(self.source_limit,self.remaining),max_metadata_bytes=self.metadata_limit)

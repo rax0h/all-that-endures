@@ -34,6 +34,7 @@ class RawTargetIncoming:
 
 def _body(s,namespace,typed,key,header,record_pair):
     s.charge(len(namespace.encode())+len(typed))
+    if s.dependencies is not None:s.dependencies.add((0 if header[2]=='lazy' else 1,namespace,typed))
     if s.remaining<1:raise target.TargetProofBudgetError('incoming body exceeds aggregate budget')
     if header[2]=='lazy':
         raw=target.content.read_version_content_bytes(s.store,s.pin,*s.pair,namespace,typed,

@@ -1,0 +1,146 @@
+{
+  "results": [
+    {
+      "construction": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 0,
+          "read_nodes": 0,
+          "read_requests": 0,
+          "write_requests": 1350,
+          "written_bytes": 128567,
+          "written_nodes": 1350
+        },
+        "python_peak_bytes": 77312,
+        "wall_seconds": 0.10658303900001442
+      },
+      "database_bytes": 266240,
+      "inventory": {
+        "physical_nodes": 1350,
+        "reachable_nodes": 1350,
+        "surplus_nodes": 0
+      },
+      "keys": 1000,
+      "point": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 1654,
+          "read_nodes": 4,
+          "read_requests": 4,
+          "write_requests": 4,
+          "written_bytes": 1654,
+          "written_nodes": 4
+        },
+        "python_peak_bytes": 80271,
+        "sql_selects": {
+          "other": 0,
+          "proof": 4
+        },
+        "wall_seconds": 0.006739994000014349
+      },
+      "staging": {
+        "temp_page_count": 18,
+        "temp_page_size": 4096,
+        "wall_seconds": 0.0025539319999836607
+      }
+    },
+    {
+      "construction": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 0,
+          "read_nodes": 0,
+          "read_requests": 0,
+          "write_requests": 13850,
+          "written_bytes": 1306081,
+          "written_nodes": 13850
+        },
+        "python_peak_bytes": 341242,
+        "wall_seconds": 1.130560239999994
+      },
+      "database_bytes": 2523136,
+      "inventory": {
+        "physical_nodes": 13850,
+        "reachable_nodes": 13850,
+        "surplus_nodes": 0
+      },
+      "keys": 10000,
+      "point": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 2238,
+          "read_nodes": 5,
+          "read_requests": 5,
+          "write_requests": 5,
+          "written_bytes": 2238,
+          "written_nodes": 5
+        },
+        "python_peak_bytes": 78053,
+        "sql_selects": {
+          "other": 0,
+          "proof": 5
+        },
+        "wall_seconds": 0.007927523999995856
+      },
+      "staging": {
+        "temp_page_count": 154,
+        "temp_page_size": 4096,
+        "wall_seconds": 0.02511524500002338
+      }
+    },
+    {
+      "construction": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 0,
+          "read_nodes": 0,
+          "read_requests": 0,
+          "write_requests": 137297,
+          "written_bytes": 13006323,
+          "written_nodes": 137297
+        },
+        "python_peak_bytes": 783050,
+        "wall_seconds": 12.003641802999994
+      },
+      "database_bytes": 24809472,
+      "inventory": {
+        "physical_nodes": 137297,
+        "reachable_nodes": 137297,
+        "surplus_nodes": 0
+      },
+      "keys": 100000,
+      "point": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 2740,
+          "read_nodes": 6,
+          "read_requests": 6,
+          "write_requests": 6,
+          "written_bytes": 2740,
+          "written_nodes": 6
+        },
+        "python_peak_bytes": 81201,
+        "sql_selects": {
+          "other": 0,
+          "proof": 6
+        },
+        "wall_seconds": 0.01278368799998475
+      },
+      "staging": {
+        "temp_page_count": 1488,
+        "temp_page_size": 4096,
+        "wall_seconds": 0.3633785099999898
+      }
+    }
+  ],
+  "schema": "ate-proof-batch-summary/1",
+  "source": {
+    "driver_sha256": "177bc4e0e2b40943e2b64a828213f7da60fcb4e38ccf2b5ff3fd00b794b567dc",
+    "head": "cfdb974499a6c397a7bb336936b05beba4264f6b",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "540afb1728f78a976aff49b28a490b5415677d7b",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete"
+}
