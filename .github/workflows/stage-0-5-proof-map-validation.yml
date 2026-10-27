@@ -118,6 +118,7 @@ jobs:
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_reference_closure_scaling.py --output evidence/reference-closure-scaling 2>&1 | tee evidence/reference-closure-scaling.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_reference.py --junitxml=evidence/reference-tests.xml 2>&1 | tee evidence/reference-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_reference_scaling.py --output evidence/reference-scaling 2>&1 | tee evidence/reference-scaling.log
+          python -m pytest -q simulation/tests/test_stage_0_5_proof_world_session.py --junitxml=evidence/native-world-session-tests.xml 2>&1 | tee evidence/native-world-session-tests.log
           python -m pytest -q simulation/tests/test_stage_0_5_proof_world.py --junitxml=evidence/world-manifest-tests.xml 2>&1 | tee evidence/world-manifest-tests.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_world_manifest_scaling.py --output evidence/world-manifest-scaling 2>&1 | tee evidence/world-manifest-scaling.log
           timeout --signal=TERM --kill-after=30s 15m python .github/tests/run_proof_identity_group_scaling.py --output evidence/group-scaling 2>&1 | tee evidence/group-scaling.log

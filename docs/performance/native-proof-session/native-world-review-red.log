@@ -1,0 +1,147 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_native_epoch_rejects_untracked_schema_changes[CREATE TRIGGER untracked AFTER UPDATE ON records BEGIN SELECT 1; END] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_native_epoch_rejects_untr0')
+ddl = 'CREATE TRIGGER untracked AFTER UPDATE ON records BEGIN SELECT 1; END'
+
+    @pytest.mark.parametrize('ddl',["CREATE TRIGGER untracked AFTER UPDATE ON records BEGIN SELECT 1; END", "CREATE TEMP VIEW untracked AS SELECT 1"])
+    def test_native_epoch_rejects_untracked_schema_changes(tmp_path,ddl):
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      s.store.db.execute(ddl);s.store.db.commit()
+>     with pytest.raises(StoreError):s.proof_manifest
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+E     Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_session.py:173: Failed
+_ test_native_epoch_rejects_untracked_schema_changes[CREATE TEMP VIEW untracked AS SELECT 1] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_native_epoch_rejects_untr1')
+ddl = 'CREATE TEMP VIEW untracked AS SELECT 1'
+
+    @pytest.mark.parametrize('ddl',["CREATE TRIGGER untracked AFTER UPDATE ON records BEGIN SELECT 1; END", "CREATE TEMP VIEW untracked AS SELECT 1"])
+    def test_native_epoch_rejects_untracked_schema_changes(tmp_path,ddl):
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      s.store.db.execute(ddl);s.store.db.commit()
+>     with pytest.raises(StoreError):s.proof_manifest
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+E     Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_session.py:173: Failed
+___ test_closed_native_save_and_recovery_raise_native_lifecycle_error[save] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_closed_native_save_and_re0')
+operation = 'save'
+
+    @pytest.mark.parametrize('operation',['save','resolve_save'])
+    def test_closed_native_save_and_recovery_raise_native_lifecycle_error(tmp_path,operation):
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:pass
+>    with pytest.raises(StoreError):getattr(s,operation)()
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_session.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:59: in execute
+    if not(recovery and self.pending is not None):self.guard()
+                                                  ^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:28: in guard
+    if self._epoch()!=self.epoch:raise StoreConflictError('native proof authority invalidated by untracked SQL; reopen against accepted commitment')
+       ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_proof_world_session._WorldProofAuthority object at 0x7f2260af8350>
+
+    def _epoch(self):
+>       return self.store.db.execute('PRAGMA data_version').fetchone()[0],self.store.db.total_changes
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.ProgrammingError: Cannot operate on a closed database.
+
+simulation/ate_sim/persistence_proof_world_session.py:23: ProgrammingError
+_ test_closed_native_save_and_recovery_raise_native_lifecycle_error[resolve_save] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_closed_native_save_and_re1')
+operation = 'resolve_save'
+
+    @pytest.mark.parametrize('operation',['save','resolve_save'])
+    def test_closed_native_save_and_recovery_raise_native_lifecycle_error(tmp_path,operation):
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:pass
+>    with pytest.raises(StoreError):getattr(s,operation)()
+                                    ^^^^^^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_session.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16804: in resolve_save
+    return self._resolve_save_native() if authority is None else authority.execute(self,self._resolve_save_native,recovery=True)
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:59: in execute
+    if not(recovery and self.pending is not None):self.guard()
+                                                  ^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:28: in guard
+    if self._epoch()!=self.epoch:raise StoreConflictError('native proof authority invalidated by untracked SQL; reopen against accepted commitment')
+       ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_proof_world_session._WorldProofAuthority object at 0x7f2260d027b0>
+
+    def _epoch(self):
+>       return self.store.db.execute('PRAGMA data_version').fetchone()[0],self.store.db.total_changes
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.ProgrammingError: Cannot operate on a closed database.
+
+simulation/ate_sim/persistence_proof_world_session.py:23: ProgrammingError
+____ test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_frozen_token_disagreement0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f226073d0d0>
+
+    def test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt(tmp_path,monkeypatch):
+     from dataclasses import replace
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      s.skills[1,'craft'].level=.5;plan=s._prepare_hybrid_save()
+      altered=replace(plan,publication=replace(plan.publication,commit_token_bytes=s.store.codec.encode('f'*32)))
+      monkeypatch.setattr(s,'_prepare_hybrid_save',lambda:altered)
+      with pytest.raises(StoreError):s.save()
+>     assert s.store.generation==0
+E     assert 1 == 0
+E      +  where 1 = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f226075b1d0>.generation
+E      +    where <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f226075b1d0> = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f2260afb890>.store
+
+simulation/tests/test_stage_0_5_proof_world_session.py:192: AssertionError
+_____________ test_noop_does_not_accept_a_new_epoch_without_audit ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_noop_does_not_accept_a_ne0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f226088d010>
+
+    def test_noop_does_not_accept_a_new_epoch_without_audit(tmp_path,monkeypatch):
+     import sqlite3
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      authority=s.store._world_proof_authority;original=authority._epoch;calls=[]
+      def race():
+       captured=original();calls.append(True)
+       if len(calls)==2:
+        with sqlite3.connect(path) as db:db.execute("UPDATE records SET payload_checksum='corrupt' WHERE namespace='world.year'")
+       return captured
+      monkeypatch.setattr(authority,'_epoch',race)
+      assert s.save()==0
+>     with pytest.raises(StoreError):s.proof_manifest
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+E     Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_session.py:208: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_native_epoch_rejects_untracked_schema_changes[CREATE TRIGGER untracked AFTER UPDATE ON records BEGIN SELECT 1; END]
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_native_epoch_rejects_untracked_schema_changes[CREATE TEMP VIEW untracked AS SELECT 1]
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_closed_native_save_and_recovery_raise_native_lifecycle_error[save]
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_closed_native_save_and_recovery_raise_native_lifecycle_error[resolve_save]
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_noop_does_not_accept_a_new_epoch_without_audit
+6 failed, 21 deselected in 7.48s

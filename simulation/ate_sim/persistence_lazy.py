@@ -11048,6 +11048,8 @@ class LazyWorldSession:
 
     def _ensure_people_mutation_allowed(self):
         self._ensure_active()
+        authority=getattr(self.store,'_world_proof_authority',None)
+        if authority is not None:authority.guard()
         if self._state == "stale":
             raise StoreConflictError("lazy World session is stale")
         if self._state != "active":
@@ -16706,7 +16708,20 @@ class LazyWorldSession:
         self._pending_save = None
         self._state = "active"
 
+    @property
+    def proof_manifest(self):
+        self._ensure_active()
+        authority=getattr(self.store,'_world_proof_authority',None)
+        if authority is None:raise StoreError('native session has no accepted proof manifest')
+        if self._state!='active' or authority.busy:raise StoreError('native proof manifest is unavailable during publication')
+        authority.guard()
+        return authority.pair
+
     def save(self):
+        authority=getattr(self.store,'_world_proof_authority',None)
+        return self._save_native() if authority is None else authority.execute(self,self._save_native)
+
+    def _save_native(self):
         self._ensure_people_mutation_allowed()
         tracker = self._eager_tracker
         if tracker._cold_step_depth:
@@ -16733,8 +16748,9 @@ class LazyWorldSession:
         tracker._cold_publication_phase = "prepared"
         tracker._cold_state = "preparing"
         try:
-            result = self.store.commit(self.pin,
-                **plan.publication.commit_arguments(plan))
+            authority=getattr(self.store,'_world_proof_authority',None)
+            result = (self.store.commit(self.pin,**plan.publication.commit_arguments(plan))
+                if authority is None else authority.commit(self,plan))
         except Exception as error:
             encoded = self.store.codec.encode(plan.token)
             attempt = self.store._attempt_row(self.pin.token)
@@ -16784,6 +16800,10 @@ class LazyWorldSession:
             raise
 
     def resolve_save(self):
+        authority=getattr(self.store,'_world_proof_authority',None)
+        return self._resolve_save_native() if authority is None else authority.execute(self,self._resolve_save_native,recovery=True)
+
+    def _resolve_save_native(self):
         self._ensure_active()
         if self._state == "stale":
             raise StoreConflictError("lazy World session is stale")
@@ -16799,9 +16819,9 @@ class LazyWorldSession:
                 f"lazy save cannot resolve while {self._state}"
             )
 
-        result = self.store.resolve_commit(
-            self.pin, plan.token
-        )
+        authority=getattr(self.store,'_world_proof_authority',None)
+        result = (self.store.resolve_commit(self.pin,plan.token)
+            if authority is None else authority.resolve(self,plan))
         if result.outcome == "committed":
             return self._publish_committed_hybrid(plan, result)
         if result.outcome == "not_committed":
@@ -18043,7 +18063,7 @@ def _begin_matching_snapshot(store, pin):
     return head
 
 
-def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
+def open_lazy_world_session(path, *, rules_id, paged_household_members=None, _proof_admission=None):
     """Open P4 lazy World without decoding migrated record families."""
     path = Path(path)
     store = LazyRecordStore.open(
@@ -18056,6 +18076,11 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
     pin = None
     prefix = None
     try:
+        if _proof_admission is not None:
+            from .persistence_proof_world_session import _WorldProofAuthority
+            if type(_proof_admission) is not _WorldProofAuthority:raise StoreError('invalid private native proof admission')
+            _proof_admission.bind(store)
+            store._world_proof_authority=_proof_admission
         # A pin can allow one concurrent advance.  Retry until the ordinary
         # eager capture transaction is exactly the pin's generation.
         for _attempt in range(4):
@@ -18317,6 +18342,7 @@ def open_lazy_world_session(path, *, rules_id, paged_household_members=None):
             store._active_read_transaction = False
             if store.db.in_transaction:
                 store.db.rollback()
+            if _proof_admission is not None:_proof_admission.finish_admission()
     except Exception:
         if prefix is not None:
             prefix.close()

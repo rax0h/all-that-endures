@@ -1,0 +1,48 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt[token] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_frozen_token_disagreement0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4661729f40>
+mismatch = 'token'
+
+    @pytest.mark.parametrize('mismatch',['token','generation'])
+    def test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt(tmp_path,monkeypatch,mismatch):
+     from dataclasses import replace
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      s.skills[1,'craft'].level=.5;plan=s._prepare_hybrid_save()
+      changes=dict(commit_token_bytes=s.store.codec.encode('f'*32)) if mismatch=='token' else dict(target_generation=plan.target_generation+1)
+      altered=replace(plan,publication=replace(plan.publication,**changes))
+      monkeypatch.setattr(s,'_prepare_hybrid_save',lambda:altered)
+      with pytest.raises(StoreError):s.save()
+>     assert s.store.generation==0
+E     assert 1 == 0
+E      +  where 1 = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f4661688bf0>.generation
+E      +    where <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7f4661688bf0> = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7f46616e7bc0>.store
+
+simulation/tests/test_stage_0_5_proof_world_session.py:187: AssertionError
+_ test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt[generation] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-12/test_frozen_token_disagreement1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4662208ec0>
+mismatch = 'generation'
+
+    @pytest.mark.parametrize('mismatch',['token','generation'])
+    def test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt(tmp_path,monkeypatch,mismatch):
+     from dataclasses import replace
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      s.skills[1,'craft'].level=.5;plan=s._prepare_hybrid_save()
+      changes=dict(commit_token_bytes=s.store.codec.encode('f'*32)) if mismatch=='token' else dict(target_generation=plan.target_generation+1)
+      altered=replace(plan,publication=replace(plan.publication,**changes))
+      monkeypatch.setattr(s,'_prepare_hybrid_save',lambda:altered)
+>     with pytest.raises(StoreError):s.save()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+E     Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_session.py:186: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt[token]
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_frozen_token_disagreement_cannot_commit_an_unrecoverable_attempt[generation]
+2 failed, 24 deselected in 2.99s

@@ -1,0 +1,54 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____________ test_closed_native_session_does_not_expose_manifest ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_closed_native_session_doe0')
+
+    def test_closed_native_session_does_not_expose_manifest(tmp_path):
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:pass
+>    with pytest.raises(StoreError):s.proof_manifest
+                                    ^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_session.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16715: in proof_manifest
+    authority.guard()
+simulation/ate_sim/persistence_proof_world_session.py:28: in guard
+    if self._epoch()!=self.epoch:raise StoreConflictError('native proof authority invalidated by untracked SQL; reopen against accepted commitment')
+       ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_proof_world_session._WorldProofAuthority object at 0x7f5adda81ac0>
+
+    def _epoch(self):
+>       return self.store.db.execute('PRAGMA data_version').fetchone()[0],self.store.db.total_changes
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.ProgrammingError: Cannot operate on a closed database.
+
+simulation/ate_sim/persistence_proof_world_session.py:23: ProgrammingError
+_______ test_native_manifest_is_not_exposed_during_uncertain_publication _______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-8/test_native_manifest_is_not_ex0')
+
+    def test_native_manifest_is_not_exposed_during_uncertain_publication(tmp_path):
+     path,pair=fixture(tmp_path);seen=[]
+     with opened(path,pair) as s:
+      s.skills[1,'craft'].level=.5
+      def inspect(phase):
+       if phase=='before_commit':
+        try:s.proof_manifest
+        except StoreError:seen.append('blocked')
+        else:seen.append('exposed')
+      s.store._phase_hook=inspect;s.save()
+>     assert seen==['blocked']
+E     AssertionError: assert ['exposed'] == ['blocked']
+E       
+E       At index 0 diff: 'exposed' != 'blocked'
+E       Use -v to get more diff
+
+simulation/tests/test_stage_0_5_proof_world_session.py:165: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_closed_native_session_does_not_expose_manifest
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_native_manifest_is_not_exposed_during_uncertain_publication
+2 failed, 19 deselected in 3.00s

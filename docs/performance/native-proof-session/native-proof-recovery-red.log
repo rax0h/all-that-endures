@@ -1,0 +1,25 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_native_recovery_authenticates_unrelated_bodies_before_runtime_ack ____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-4/test_native_recovery_authentic0')
+
+    def test_native_recovery_authenticates_unrelated_bodies_before_runtime_ack(tmp_path):
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:
+      s.skills[1,'craft'].level=.5
+      def fault(at):
+       if at=='after_commit':raise RuntimeError('lost acknowledgement')
+      s.store._phase_hook=fault
+      with pytest.raises(RuntimeError):s.save()
+      s.store._phase_hook=lambda _:None
+      s.store.db.execute("UPDATE records SET payload_checksum='corrupt' WHERE namespace='world.settlements'");s.store.db.commit()
+      with pytest.raises(StoreError):s.resolve_save()
+>     assert s._pending_save is not None and s._state=='recovery-required'
+E     assert (None is not None)
+E      +  where None = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7efdc671a750>._pending_save
+
+simulation/tests/test_stage_0_5_proof_world_session.py:102: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_session.py::test_native_recovery_authenticates_unrelated_bodies_before_runtime_ack
+1 failed, 17 deselected in 1.81s

@@ -1,0 +1,54 @@
+{
+  "status": "local_checks_and_single_review_fix_pass_complete_hosted_pending",
+  "baseline": "032af75eb3403a36045df1e36f189b7df51b496b",
+  "reviewed_checkpoint": "790c62a5080f3cf9a4760e256ce41ec536578688",
+  "source_checkpoint": "6622c793ed5dc9f414593bf81ad04f33dc5e6d2d",
+  "runtime_tree": "40c93ec2522f2a434ab705189480f011399fd91f",
+  "source_files_sha256": {
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "08f89a1d8f465aa0d5b98af47cfad73cbabb240abe0adf24a74dbf40b844acb0",
+    "simulation/ate_sim/persistence_complete_format.py": "d2e8e4a145270ee7e70a99e89fa48e09e0bdc0e6f0d66bc6f84f1dc22fab560b",
+    "simulation/ate_sim/persistence_lazy.py": "857b53485e3e924790a6609caa8d70429544a53b1de0c115a3a48d4cbf5c4307",
+    "simulation/ate_sim/persistence_lazy_store.py": "f38e3fad10ebd9af4b76dce90c5254c1b8456f2fb59de403021d2232e3eb0ef2",
+    "simulation/ate_sim/persistence_proof_world_session.py": "eb55c2a1473f15d260d6d83b239ce96bd24ec4488403ce3c0b5cb5a91cc6c14e",
+    "simulation/tests/test_stage_0_5_proof_world_session.py": "8998edd128641a9eb6887df4169997acf9af4c1801d491b204e4d744a2733bc7"
+  },
+  "suites": {
+    "proof": {
+      "tests": 1177,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 192.007,
+      "xml_sha256": "3ebf603d098781912a6531a0f7a5097e15f9ab348167dc63177e3845be17935e"
+    },
+    "native_regression": {
+      "tests": 120,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 38.327,
+      "xml_sha256": "67e5a6b5c9f7ff313a8683e4b47053d41fe008f525148acc89761670cdbeb7ac"
+    },
+    "native_session": {
+      "tests": 26,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 33.275,
+      "xml_sha256": "89c7c46c6344fbd72968446afa1ea90c39cf842c68cc9f94e4e367a19c0a1641"
+    }
+  },
+  "review": {
+    "critical": 0,
+    "important": 3,
+    "important_fixed": 3,
+    "minor_deferred": 1,
+    "fix_passes": 1,
+    "second_review": false
+  },
+  "checkpoint_scaling": "three complete existing checkpoint cases, zero history bodies; not native session save performance",
+  "expected_hosted_full_tests": 4273,
+  "native_scope": "explicit full-audit admission/publication/recovery",
+  "interactive_save_performance": "not established",
+  "default_format7_activation": false
+}
