@@ -1,0 +1,24 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_sql_trace_callback_cannot_inject_unlisted_publisher_writes ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-17/test_sql_trace_callback_cannot0')
+
+    def test_sql_trace_callback_cannot_inject_unlisted_publisher_writes(tmp_path):
+     path,pair=fixture(tmp_path);s=opened(path,pair);attempts=[]
+     def trace(sql):
+      if sql.startswith('UPDATE save_head SET') and not attempts:
+       attempts.append(True)
+       s.store.db.execute("UPDATE records SET payload_checksum='trace-corrupt' WHERE namespace='world.settlements'")
+     try:
+      s.store.db.set_trace_callback(trace);s.skills[1,'craft'].level=.5
+      try:s.save()
+      except StoreError:pass
+      finally:s.store.db.set_trace_callback(None)
+>     assert attempts and s.store.db.execute("SELECT payload_checksum FROM records WHERE namespace='world.settlements'").fetchone()[0]!='trace-corrupt'
+E     AssertionError: assert ([True] and 'trace-corrupt' != 'trace-corrupt')
+
+simulation/tests/test_stage_0_5_proof_world_value.py:245: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_sql_trace_callback_cannot_inject_unlisted_publisher_writes
+1 failed, 23 deselected in 2.56s

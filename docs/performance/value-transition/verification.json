@@ -1,0 +1,64 @@
+{
+  "source_head": "17ed08c9b978a5e96938511662aea1110a06d2aa",
+  "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+  "files": {
+    ".github/tests/run_proof_native_value_scaling.py": "517187f09a0399e6d555f1d08041c68c43391fb786d9dec64910a167b4429afe",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "0ea9b1476430c0c4254739e3023652ce583fe3fca305860619d16b2bb363c869",
+    "simulation/ate_sim/persistence_proof_manifest_publish.py": "a0077cfa6af317aefafcd70e66e21d1df09735e33e31d46dc49ac9b5c9046795",
+    "simulation/ate_sim/persistence_proof_native_guard.py": "903897949755900b0cc7407f23080b35847c0ddf38df3ba12a5d86d7b697c7bb",
+    "simulation/ate_sim/persistence_proof_world_session.py": "8bc41485b8ccb52d51aba53a7fbda553a0741f11b2b65a97d16eac1608f42313",
+    "simulation/ate_sim/persistence_proof_world_value.py": "86207ecc5478ef188ec3e25b6804012d96119bd4003282b86ade65964baa64e0",
+    "simulation/ate_sim/persistence_sqlite_guard.py": "90d75e0d0ee871b2d004cdd853c18fe777a998298232df6fee26be9759b473cb",
+    "simulation/tests/test_stage_0_5_proof_target_group_scaling.py": "2b0bbfc65c84f6363add6d2d580cca27c5cd0f5192926cd799ce68317f50247b",
+    "simulation/tests/test_stage_0_5_proof_world.py": "359680c0f3712d48e5577f20d92f707c90e9052bbfa718ef16eb718efbc513c0",
+    "simulation/tests/test_stage_0_5_proof_world_value.py": "15368ef1ca43cb975e624136809b0de3e451f525f87cfbe9902c2d1e2c7c4cb2"
+  },
+  "checks": [
+    {
+      "name": "proof",
+      "tests": 1205,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "e727878918874210c0df86813c602e460af48900dfa2f7f0fff4e07efb732874"
+    },
+    {
+      "name": "native-regression",
+      "tests": 120,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "dd19610953f5fc84d7511660cecf3314cd417d6e8b24fef7094cecabacb3712c"
+    },
+    {
+      "name": "focused-value-and-native",
+      "tests": 53,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "9fc6843ec58a8d05102d938f726c050fc90793b8ca0b95054813742cd14c7df2"
+    }
+  ],
+  "matrix": {
+    "path": "native-scaling/summary.json",
+    "sha256": "fb61490e3f41f3252fce851273eb5329b974ffe5144d03e8aaf48f1fe58e134c",
+    "sizes": [
+      1000,
+      10000,
+      100000
+    ]
+  },
+  "review": {
+    "critical": 0,
+    "important": 2,
+    "important_fixed": 2,
+    "fresh_reviews": 1,
+    "fix_passes": 1,
+    "author_found_callback_and_frozen_byte_holes_fixed": true,
+    "deferred_minors": [
+      "stale authority header",
+      "closed-session error type"
+    ]
+  },
+  "hosted_full_suite": "required candidate acceptance gate; not locally claimed"
+}

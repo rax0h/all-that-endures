@@ -31,6 +31,11 @@ class _WorldProofAuthority:
         if self._epoch()!=self.epoch:raise StoreConflictError('native proof authority invalidated by untracked SQL; reopen against accepted commitment')
 
     def _audit(self,pin):
+        guard=getattr(self,'_write_guard',None)
+        if guard is None:return self._audit_inner(pin)
+        with guard.publisher():return self._audit_inner(pin)
+
+    def _audit_inner(self,pin):
         store=self.store;owned=not store.db.in_transaction;active=store._active_read_transaction
         if owned:store.db.execute('BEGIN IMMEDIATE');store._active_read_transaction=True
         try:
@@ -65,25 +70,46 @@ class _WorldProofAuthority:
         # data/codec/main-schema authority keeps its already verified epoch.
         if self.epoch is not None:self.epoch=(*self.epoch[:-1],self._admission_temp_schema)
 
-    def execute(self,session,callback,*,recovery=False):
-        if self.busy:raise StoreError('reentrant native proof operation')
-        if not(recovery and self.pending is not None):self.guard()
-        self.busy=True
+    def _settle(self,pin,entry):
+        from .persistence_sqlite_guard import require_persistent_sources
+        store=self.store
+        if store.db.in_transaction:raise StoreError('native proof acknowledgement left an open transaction')
+        store.db.execute('BEGIN IMMEDIATE');active=store._active_read_transaction;store._active_read_transaction=True
         try:
-            result=callback()
-            observed=self._epoch()
-            verified=self._audit(session.pin) if self.epoch!=observed else observed
-            self.pending=None;self.uncertain=False;self.epoch=verified
-            return result
+            self._write_guard.check();require_persistent_sources(store.db)
+            with store.read_snapshot(pin,_preflight=lambda:manifests._schemas(store)):
+                manifests._load(store,pin,self.pair)
+                verified=self._epoch()
+                if verified[:3]!=entry[:3] or verified[4]!=entry[4]:raise StoreConflictError('external source or schema changed during native proof save')
+            store.db.commit();return verified
         except BaseException:
-            self.uncertain=True
-            if session._state=='active' and session._pending_save is None:
-                # A known rolled-back attempt leaves journals dirty but the old
-                # manifest authoritative. Reauthenticate before permitting retry.
-                verified=self._audit(session.pin)
-                self.pending=None;self.uncertain=False;self.epoch=verified
+            if store.db.in_transaction:store.db.rollback()
             raise
-        finally:self.busy=False
+        finally:store._active_read_transaction=active
+
+    def execute(self,session,callback,*,recovery=False):
+        from .persistence_proof_native_guard import NativeWriteGuard
+        if self.busy:raise StoreError('reentrant native proof operation')
+        try:
+            with NativeWriteGuard(self.store.db) as guard:
+                self._write_guard=guard
+                if not(recovery and self.pending is not None):self.guard()
+                guard.check();entry=self.epoch;self.busy=True;self._can_settle=not recovery
+                try:
+                    result=callback();guard.check();observed=self._epoch()
+                    if self._can_settle:
+                        verified=observed if observed==entry else self._settle(session.pin,entry)
+                    else:verified=self._audit(session.pin) if self.epoch!=observed else observed
+                    self.pending=None;self.uncertain=False;self.epoch=verified
+                    return result
+                except BaseException as exc:
+                    self.uncertain=True
+                    if session._state=='active' and session._pending_save is None:
+                        verified=self._audit(session.pin)
+                        self.pending=None;self.uncertain=False;self.epoch=verified
+                    if guard.denied:raise StoreIntegrityError(guard.denied) from exc
+                    raise
+        finally:self._write_guard=None;self.busy=False
 
     def commit(self,session,plan):
         from .persistence_session import EVENT_STORAGE,COMMIT_DESCRIPTOR_KEY
@@ -98,16 +124,20 @@ class _WorldProofAuthority:
         args['changes']=tuple(c for c in changes if (c.namespace,c.key)!=marker)
         args['required_format_version']=7
         self.pending=plan.publication.parent_pin,self.pair,args['commit_token']
-        result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+        with self._write_guard.publisher():
+            result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
         if result.manifest:self.pair=result.manifest
-        if result.commit.outcome=='committed':self._audit(result.commit.pin)
+        self._can_settle=not result.reaudited
+        if result.commit.outcome=='committed' and result.reaudited:self._audit(result.commit.pin)
         return result.commit
 
     def resolve(self,session,plan):
         if not self.busy or self.pending is None:raise StoreError('native manifest lacks original recovery context')
         pin,parent,token=self.pending
         if token!=plan.token or pin!=plan.publication.parent_pin:raise StoreIntegrityError('native manifest recovery differs from frozen plan')
-        result=manifests.resolve_world_manifest(self.store,pin,*parent,commit_token=token)
+        self._can_settle=False
+        with self._write_guard.publisher():
+            result=manifests.resolve_world_manifest(self.store,pin,*parent,commit_token=token)
         if result.manifest:
             self.pair=result.manifest
             self._audit(result.commit.pin)

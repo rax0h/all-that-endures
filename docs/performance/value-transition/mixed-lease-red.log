@@ -1,0 +1,25 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_foreign_lease_release_cannot_hide_in_structural_fallback _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-13/test_foreign_lease_release_can0')
+
+    def test_foreign_lease_release_cannot_hide_in_structural_fallback(tmp_path):
+     from ate_sim import persistence_lazy_identity_catalog as cat
+     from ate_sim.persistence_lazy_store import IdentityOccurrenceChange
+     from ate_sim.persistence_history_dependencies import NAMESPACE as DEPS,dependency_value
+     s,p,pair=_proof_store(tmp_path)
+     r=manifest_api().commit_world_manifest(s,p,*pair,commit_token='a'*32,version_changes=(VersionChange(DEPS,5,dependency_value('list',(p.token,))),),changes=(),new_segments=(),metadata=s.head_metadata());p=r.commit.pin;pair=r.manifest;q=s.capture_pin()
+     old=s.read_version(q,'world.skills.skills',(1,'craft'),expected_record_schema=1).value
+     owners=(VersionChange('world.skills.skills',(1,'craft'),replace(old,teachers=old.provenance)),)
+     paths=(IdentityOccurrenceChange('world.skills.skills',(1,'craft'),(('field','teachers'),),old.provenance.incarnation),)
+     delta=cat.IdentityCatalog(s).prepare_delta(q,owners,paths,next_incarnation_id=s.read_identity_state(q))
+     versions=owners+delta.decode(s.codec)[0]+(VersionChange(DEPS,5,dependency_value('list')),)
+>    with pytest.raises(StoreError):manifest_api().commit_world_manifest(s,q,*pair,commit_token='b'*32,version_changes=versions,identity_changes=paths,changes=(),new_segments=(),metadata=s.head_metadata())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_value.py:230: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_foreign_lease_release_cannot_hide_in_structural_fallback
+1 failed, 22 deselected in 4.67s

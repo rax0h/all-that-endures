@@ -1,0 +1,34 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_value_reuse_cannot_invent_head_or_counter_envelope[world.year-value0] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_value_reuse_cannot_invent0')
+namespace = 'world.year', value = (0, 1)
+
+    @pytest.mark.parametrize('namespace,value',[('world.year',(0,1)),('world.institutions.next_notice',1)])
+    def test_value_reuse_cannot_invent_head_or_counter_envelope(tmp_path,namespace,value):
+     from ate_sim.incremental_store import RecordChange
+     s,p,pair=_proof_store(tmp_path)
+>    with pytest.raises(StoreError):manifest_api().commit_world_manifest(s,p,*pair,commit_token='a'*32,version_changes=(),changes=(RecordChange(namespace,0,value),),new_segments=(),metadata=s.head_metadata())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_value.py:131: Failed
+_ test_value_reuse_cannot_invent_head_or_counter_envelope[world.institutions.next_notice-1] _
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_value_reuse_cannot_invent1')
+namespace = 'world.institutions.next_notice', value = 1
+
+    @pytest.mark.parametrize('namespace,value',[('world.year',(0,1)),('world.institutions.next_notice',1)])
+    def test_value_reuse_cannot_invent_head_or_counter_envelope(tmp_path,namespace,value):
+     from ate_sim.incremental_store import RecordChange
+     s,p,pair=_proof_store(tmp_path)
+>    with pytest.raises(StoreError):manifest_api().commit_world_manifest(s,p,*pair,commit_token='a'*32,version_changes=(),changes=(RecordChange(namespace,0,value),),new_segments=(),metadata=s.head_metadata())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_value.py:131: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_value_reuse_cannot_invent_head_or_counter_envelope[world.year-value0]
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_value_reuse_cannot_invent_head_or_counter_envelope[world.institutions.next_notice-1]
+2 failed, 11 deselected in 7.71s

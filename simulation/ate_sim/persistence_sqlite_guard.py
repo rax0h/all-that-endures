@@ -31,17 +31,77 @@ def require_persistent_sources(db):
             raise StoreError('proof source cannot contain database triggers')
 
 
+class _NativeGuardCursor(sqlite3.Cursor):
+    def execute(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+        return super().execute(*args,**kwargs)
+    def executemany(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+        return super().executemany(*args,**kwargs)
+    def executescript(self,*args,**kwargs):
+        self.connection._reject_callback_sql()
+        return super().executescript(*args,**kwargs)
+
+
 class GuardedConnection(sqlite3.Connection):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self._known_authorizer=None
         self._callback_guard=False
 
+    def _reject_callback_sql(self):
+        guard=getattr(self,'_native_write_guard',None)
+        if guard is not None and getattr(self,'_native_sql_callback_depth',0):guard.reject('native SQLite callbacks cannot execute SQL')
+
+    def _invoke_sql_callback(self,callback,*args):
+        if getattr(self,'_native_write_guard',None) is None:return callback(*args)
+        self._native_sql_callback_depth=getattr(self,'_native_sql_callback_depth',0)+1
+        try:return callback(*args)
+        finally:self._native_sql_callback_depth-=1
+
+    def set_trace_callback(self,callback):
+        if callback is not None and not callable(callback):raise TypeError('trace callback must be callable')
+        return super().set_trace_callback(None if callback is None else lambda sql:self._invoke_sql_callback(callback,sql))
+
+    def set_progress_handler(self,callback,n):
+        if callback is not None and not callable(callback):raise TypeError('progress callback must be callable')
+        return super().set_progress_handler(None if callback is None else lambda:self._invoke_sql_callback(callback),n)
+
+    def cursor(self,factory=None):
+        if getattr(self,'_native_write_guard',None) is not None and factory is None:factory=_NativeGuardCursor
+        return super().cursor() if factory is None else super().cursor(factory)
+
+    def execute(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().execute(*args,**kwargs)
+        return super().execute(*args,**kwargs)
+
+    def executemany(self,*args,**kwargs):
+        self._reject_callback_sql()
+        if getattr(self,'_native_write_guard',None) is not None:return self.cursor().executemany(*args,**kwargs)
+        return super().executemany(*args,**kwargs)
+
+    def executescript(self,*args,**kwargs):
+        self._reject_callback_sql()
+        return super().executescript(*args,**kwargs)
+
+    def commit(self):
+        self._reject_callback_sql()
+        return super().commit()
+
+    def rollback(self):
+        self._reject_callback_sql()
+        return super().rollback()
+
     def set_authorizer(self,callback):
+        guard=getattr(self,'_native_write_guard',None)
+        if guard is not None:guard.reject('native proof operation cannot replace SQL authorizer')
         if self._callback_guard:raise StoreError('fault callback cannot replace SQL authorizer')
         result=super().set_authorizer(callback);self._known_authorizer=callback;return result
 
     def close(self):
+        guard=getattr(self,'_native_write_guard',None)
+        if guard is not None:guard.reject('native proof operation cannot close connection')
         if self._callback_guard:raise StoreError('fault callback cannot close guarded connection')
         return super().close()
 

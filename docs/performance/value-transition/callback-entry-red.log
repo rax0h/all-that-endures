@@ -1,0 +1,24 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_sql_trace_callback_cannot_write_during_entry_epoch_check _________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-19/test_sql_trace_callback_cannot0')
+
+    def test_sql_trace_callback_cannot_write_during_entry_epoch_check(tmp_path):
+     path,pair=fixture(tmp_path);s=opened(path,pair);attempts=[]
+     def trace(sql):
+      if sql=='PRAGMA main.schema_version' and not attempts:
+       attempts.append(True)
+       s.store.db.execute("UPDATE records SET payload_checksum='entry-corrupt' WHERE namespace='world.settlements'")
+     try:
+      s.store.db.set_trace_callback(trace)
+      try:s.save()
+      except StoreError:pass
+      finally:s.store.db.set_trace_callback(None)
+>     assert attempts and s.store.db.execute("SELECT payload_checksum FROM records WHERE namespace='world.settlements'").fetchone()[0]!='entry-corrupt'
+E     AssertionError: assert ([True] and 'entry-corrupt' != 'entry-corrupt')
+
+simulation/tests/test_stage_0_5_proof_world_value.py:260: AssertionError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_sql_trace_callback_cannot_write_during_entry_epoch_check
+1 failed, 26 deselected in 2.73s

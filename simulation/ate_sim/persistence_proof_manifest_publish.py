@@ -92,6 +92,7 @@ class _Request:
     epoch:int
     guarded:bool=False
     may_reuse:bool=False
+    value_only:bool=False
     successor:object=None
     reaudited:bool=False
 
@@ -109,7 +110,7 @@ def _guard(store,r,versions,ordinary,segments):
     from .persistence_session import EVENT_STORAGE,COMMIT_DESCRIPTOR_KEY
     scalars={root+'.'+field for root,fields in ROOT_FIELDS.items() for field,kind in fields.items() if kind=='int'}
     allowed={(EVENT_STORAGE,COMMIT_DESCRIPTOR_KEY)}
-    r.may_reuse=not versions and not segments and all(not i['change'].delete and (i['namespace'] in scalars and type(i['change'].value) is int or (i['namespace'],i['change'].key) in allowed) for i in ordinary)
+    r.may_reuse=not versions and not segments and all(not i['change'].delete and (i['namespace'],i['change'].key) in allowed for i in ordinary)
     # Immutable snapshots/atoms retain their content at a stable incarnation.
     from .persistence_proof_world import HISTORY,PAGE_NAMESPACE,ENTRY_NAMESPACE,RECORDS,NAN
     from .persistence_history_types import NAMESPACE as TYPES
@@ -129,6 +130,9 @@ def _guard(store,r,versions,ordinary,segments):
             if parent is not None:
                 d=codec.decode(parent.payload);frozen=type(d) is tuple and type(d[0]) is str and d[0].startswith('frozen-')
         if frozen and (old is None or old.payload!=item['payload'] or old.memberships!=item['memberships_blob']):raise StoreIntegrityError('manifest transition cannot edit an immutable backing')
+    from .persistence_proof_world_value import validate_value_transition,validate_lease_updates
+    validate_lease_updates(store,r,versions)
+    r.value_only=validate_value_transition(store,r,versions,ordinary,segments)
     r.guarded=True
 
 
@@ -155,8 +159,13 @@ def _stage(store,r,g,writer,token,inventory_pair):
         with store.read_snapshot(pin,_preflight=lambda:_schemas(store)):
             oldca,oldsa,oldia,oldra,oldda=r.pairs
             reuse=r.may_reuse and ca[0].versions==oldca[0].versions and ca[0].events==oldca[0].events and sa[0].roots==oldsa[0].roots and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id and da[0].root==oldda[0].root
+            structural=(sa[0].roots[:2]==oldsa[0].roots[:2] and sa[0].roots[4:]==oldsa[0].roots[4:]
+                and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id and da[0].root==oldda[0].root
+                and ca[0].versions.count==oldca[0].versions.count and ca[0].events==oldca[0].events
+                and ia[0].head.namespace_inventory==oldia[0].head.namespace_inventory and ia[0].head.namespace_counts==oldia[0].head.namespace_counts)
+            reuse=reuse or r.value_only and structural
             oldh=parent.head;newh=ia[0].head
-            if not reuse or (newh.seed,newh.simulation_position,newh.next_ids)!=(oldh.seed,oldh.simulation_position,oldh.next_ids):_check_head(store,pin,ra)
+            if not reuse or r.value_only and not r.may_reuse or (newh.seed,newh.simulation_position,newh.next_ids)!=(oldh.seed,oldh.simulation_position,oldh.next_ids):_check_head(store,pin,ra)
             if reuse:
                 facts=r.facts;topo=world._composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:],*facts[:2]));query=world._composite(store,b'queries',(*sa[0].roots[2:4],facts[2]))
                 orders=world._composite(store,b'orders',(da[0].root,facts[3],facts[4],sa[0].roots[2]))

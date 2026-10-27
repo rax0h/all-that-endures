@@ -1,0 +1,179 @@
+{
+  "run_id": 40429026742,
+  "head": "96ccb7c9c92f642d906fffbd32f8ed4318b101b9",
+  "runtime_tree": "40c93ec2522f2a434ab705189480f011399fd91f",
+  "jobs": {
+    "full-suite": "success",
+    "proof-map": "success"
+  },
+  "archive_digests": [
+    "ec14daf7b6ea79975053f3920ebc5ec84e030eac8e60beb6144d7dbe0af3e0fb",
+    "577305fcbd4c19a191e7290dcf36127bb84bca8eff7ef3984f67fbe015372f87"
+  ],
+  "suites": {
+    "full-suite.xml": 4273,
+    "collection-tests.xml": 20,
+    "inventory-tests.xml": 34,
+    "record-tests.xml": 60,
+    "scope-tests.xml": 55,
+    "group-tests.xml": 72,
+    "native-world-session-tests.xml": 26,
+    "target-group-tests.xml": 37,
+    "frozen-extents-tests.xml": 45,
+    "reference-closure-tests.xml": 34,
+    "target-tests.xml": 33,
+    "collection-directory-tests.xml": 31,
+    "proof-tests.xml": 260,
+    "sequence-event-extents-tests.xml": 47,
+    "world-manifest-tests.xml": 35,
+    "child-extents-tests.xml": 34,
+    "target-incoming-tests.xml": 40,
+    "directory-publication-tests.xml": 22,
+    "collection-publication-tests.xml": 12,
+    "projection-tests.xml": 43,
+    "seek-tests.xml": 53,
+    "reference-tests.xml": 40,
+    "publication-tests.xml": 67,
+    "owner-target-tests.xml": 17,
+    "generation-tests.xml": 60
+  },
+  "proof_tests": 1177,
+  "matrices": {
+    "target-group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "directory-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "version-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "projection-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "inventory-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "frozen-extents-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "reference-closure-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "query-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "publication-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "record-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "world-manifest-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "sequence-event-extents-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "scope-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "reference-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "occurrence-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "group-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "collection-directory-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "batch-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "target-incoming-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "owner-target-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "seek-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "child-extents-scaling": [
+      1000,
+      10000,
+      100000
+    ],
+    "order-scaling": [
+      1000,
+      10000,
+      100000
+    ]
+  },
+  "source_hashes_checked": 63
+}

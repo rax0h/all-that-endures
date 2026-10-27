@@ -1,0 +1,90 @@
+F
+=================================== FAILURES ===================================
+___________ test_actual_native_scalar_save_does_not_call_full_audit ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_actual_native_scalar_save0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc8527bffb0>
+
+    def test_actual_native_scalar_save_does_not_call_full_audit(tmp_path,monkeypatch):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:
+      def full(*a,**k):raise AssertionError('native scalar save walked full history')
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',full)
+       s.skills[1,'craft'].level=.5
+>      assert s.save()==1
+              ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_value.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:73: in execute
+    result=callback()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:103: in commit
+    if result.commit.outcome=='committed':self._audit(result.commit.pin)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:40: in _audit
+    proof=world._audit_world(store,pin,*pairs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fc8526b1760>, GenerationPin(token='a336444b-e2ca-49f6-97...\xfbQ\xa6N', count=34)), b'\r\xb2\xdahR\x97\xa8\x08)64\xcb\xbf\xba\xf9l\xed\xcb4\xbc\x05XH\xbf\x0f$8\x06r\x9ePL'), ...)
+k = {}
+
+>   def full(*a,**k):raise AssertionError('native scalar save walked full history')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: native scalar save walked full history
+
+simulation/tests/test_stage_0_5_proof_world_value.py:33: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-2/test_actual_native_scalar_save0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc8527bffb0>
+
+    def test_actual_native_scalar_save_does_not_call_full_audit(tmp_path,monkeypatch):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path)
+>    with opened(path,pair) as s:
+          ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_value.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7fc8525af6b0>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18009: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_actual_native_scalar_save_does_not_call_full_audit
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 2 deselected in 5.70s

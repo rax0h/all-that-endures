@@ -1,0 +1,73 @@
+FFF..F                                                                   [100%]
+=================================== FAILURES ===================================
+__ test_value_transition_preserves_event_counter_authority_with_matching_head __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_value_transition_preserve0')
+
+    def test_value_transition_preserves_event_counter_authority_with_matching_head(tmp_path):
+     from ate_sim.incremental_store import RecordChange
+     s,p,pair=_proof_store(tmp_path);metadata=s.head_metadata();metadata['next_ids']['next_event']=999
+>    with pytest.raises(StoreError):manifest_api().commit_world_manifest(s,p,*pair,commit_token='a'*32,version_changes=(),changes=(RecordChange('world.next_event',0,(0,999)),),new_segments=(),metadata=metadata)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_value.py:180: Failed
+___ test_value_transition_cannot_change_another_active_publishers_lease[add] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_value_transition_cannot_c0')
+direction = 'add'
+
+    @pytest.mark.parametrize('direction',['add','remove'])
+    def test_value_transition_cannot_change_another_active_publishers_lease(tmp_path,direction):
+     from ate_sim.persistence_history_dependencies import NAMESPACE as DEPS,dependency_value
+     s,p,pair=_proof_store(tmp_path)
+     if direction=='remove':
+      r=manifest_api().commit_world_manifest(s,p,*pair,commit_token='a'*32,version_changes=(VersionChange(DEPS,5,dependency_value('list',(p.token,))),),changes=(),new_segments=(),metadata=s.head_metadata());p=r.commit.pin;pair=r.manifest
+     q=s.capture_pin();tokens=(p.token,) if direction=='add' else ()
+>    with pytest.raises(StoreError):manifest_api().commit_world_manifest(s,q,*pair,commit_token='b'*32,version_changes=(VersionChange(DEPS,5,dependency_value('list',tokens)),),changes=(),new_segments=(),metadata=s.head_metadata())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_value.py:191: Failed
+_ test_value_transition_cannot_change_another_active_publishers_lease[remove] __
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_value_transition_cannot_c1')
+direction = 'remove'
+
+    @pytest.mark.parametrize('direction',['add','remove'])
+    def test_value_transition_cannot_change_another_active_publishers_lease(tmp_path,direction):
+     from ate_sim.persistence_history_dependencies import NAMESPACE as DEPS,dependency_value
+     s,p,pair=_proof_store(tmp_path)
+     if direction=='remove':
+      r=manifest_api().commit_world_manifest(s,p,*pair,commit_token='a'*32,version_changes=(VersionChange(DEPS,5,dependency_value('list',(p.token,))),),changes=(),new_segments=(),metadata=s.head_metadata());p=r.commit.pin;pair=r.manifest
+     q=s.capture_pin();tokens=(p.token,) if direction=='add' else ()
+>    with pytest.raises(StoreError):manifest_api().commit_world_manifest(s,q,*pair,commit_token='b'*32,version_changes=(VersionChange(DEPS,5,dependency_value('list',tokens)),),changes=(),new_segments=(),metadata=s.head_metadata())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_value.py:191: Failed
+____ test_semantic_validation_uses_frozen_payload_not_mutable_caller_value _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-11/test_semantic_validation_uses_0')
+
+    def test_semantic_validation_uses_frozen_payload_not_mutable_caller_value(tmp_path):
+     from ate_sim import persistence_lazy_identity_catalog as cat
+     s,p,pair=_proof_store(tmp_path);ns='world.skills.skills';key=(1,'craft')
+     old=s.read_version(p,ns,key,expected_record_schema=1).value
+     altered=replace(old,teachers=old.provenance)
+     header=list(s.read_version(p,cat.OWNER_NAMESPACE,(ns,key),expected_record_schema=1).value);header[3]=p.captured_head+1
+     versions=(VersionChange(ns,key,altered),VersionChange(cat.OWNER_NAMESPACE,(ns,key),tuple(header)))
+     def mutate(phase):
+      if phase=='before_transaction':altered.teachers=old.teachers
+     s._phase_hook=mutate
+>    with pytest.raises(StoreError):manifest_api().commit_world_manifest(s,p,*pair,commit_token='a'*32,version_changes=versions,changes=(),new_segments=(),metadata=s.head_metadata())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+E    Failed: DID NOT RAISE StoreError
+
+simulation/tests/test_stage_0_5_proof_world_value.py:215: Failed
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_value_transition_preserves_event_counter_authority_with_matching_head
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_value_transition_cannot_change_another_active_publishers_lease[add]
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_value_transition_cannot_change_another_active_publishers_lease[remove]
+FAILED simulation/tests/test_stage_0_5_proof_world_value.py::test_semantic_validation_uses_frozen_payload_not_mutable_caller_value
+4 failed, 2 passed, 16 deselected in 18.10s

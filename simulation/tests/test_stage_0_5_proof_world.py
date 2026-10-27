@@ -166,7 +166,7 @@ def test_world_query_memberships_are_derived_from_actual_owner_values(tmp_path):
  s.close()
 
 
-def test_native_scalar_edit_keeps_topology_root_and_reaudits_changed_world(tmp_path):
+def test_native_scalar_edit_keeps_topology_root_without_history_reaudit(tmp_path):
  from dataclasses import replace
  from ate_sim import persistence_lazy_identity_catalog as cat
  s,p,pair=_proof_store(tmp_path)
@@ -174,7 +174,7 @@ def test_native_scalar_edit_keeps_topology_root_and_reaudits_changed_world(tmp_p
  owners=(VersionChange('world.skills.skills',(1,'craft'),replace(old,level=.75)),)
  delta=cat.IdentityCatalog(s).prepare_delta(p,owners,(),next_incarnation_id=s.read_identity_state(p));versions=owners+delta.decode(s.codec)[0]
  result=manifest_api().commit_world_manifest(s,p,*pair,commit_token='a'*32,version_changes=versions,changes=(),new_segments=(),metadata=s.head_metadata())
- assert result.commit.outcome=='committed' and result.reaudited
+ assert result.commit.outcome=='committed' and not result.reaudited
  assert result.manifest[0].roots[0]!=pair[0].roots[0] and result.manifest[0].roots[2]==pair[0].roots[2]
  s.close()
 
