@@ -1,0 +1,77 @@
+{
+  "results": [
+    {
+      "keys": 1000,
+      "point": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 1654,
+          "read_nodes": 4,
+          "read_requests": 4,
+          "write_requests": 4,
+          "written_bytes": 1654,
+          "written_nodes": 4
+        },
+        "process_peak_rss_bytes": 30457856,
+        "python_peak_bytes": 15337,
+        "sql_selects": {
+          "other": 0,
+          "proof": 4
+        },
+        "wall_seconds": 0.004559845999999368
+      }
+    },
+    {
+      "keys": 10000,
+      "point": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 2308,
+          "read_nodes": 6,
+          "read_requests": 6,
+          "write_requests": 5,
+          "written_bytes": 2168,
+          "written_nodes": 4
+        },
+        "process_peak_rss_bytes": 32817152,
+        "python_peak_bytes": 18611,
+        "sql_selects": {
+          "other": 0,
+          "proof": 6
+        },
+        "wall_seconds": 0.005733131999996033
+      }
+    },
+    {
+      "keys": 100000,
+      "point": {
+        "node_io": {
+          "clean_cache_bytes": 0,
+          "read_bytes": 2810,
+          "read_nodes": 7,
+          "read_requests": 7,
+          "write_requests": 6,
+          "written_bytes": 2670,
+          "written_nodes": 5
+        },
+        "process_peak_rss_bytes": 32948224,
+        "python_peak_bytes": 21279,
+        "sql_selects": {
+          "other": 0,
+          "proof": 7
+        },
+        "wall_seconds": 0.0068121159999918746
+      }
+    }
+  ],
+  "schema": "ate-proof-map-scaling-summary/1",
+  "source": {
+    "driver_sha256": "fdb0dbee4e682f185737c86a97fe6cce98f38ff7002c0ab06a8c2163345a47d3",
+    "head": "edecf74cdb089ef1ffb79e55347e5d8ac3f310ff",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "b2d785dfdc9f0d27dd491cd57dc237c11e176d1f",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete"
+}

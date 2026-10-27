@@ -9,7 +9,7 @@ from .persistence_lazy_nested_history import DESCRIPTOR_NAMESPACE as HISTORY,PAG
 from .persistence_history_types import NAMESPACE as TYPES,TAG
 
 
-def prepare(store,request,versions):
+def _same_page(store,request,versions):
     codec=store.codec;eligible={};facts=list(request.facts)
     if len(versions)>512:return {},None
     by_key={(i['namespace'],i['typed_key']):i for i in versions}
@@ -39,7 +39,7 @@ def prepare(store,request,versions):
             mapping=world._map(store,label)
             if mapping.get(facts[index],key)!=wanted:raise StoreIntegrityError('tail predecessor lacks accepted semantic backing fact')
             facts[index]=mapping.set(facts[index],key,replacement)
-        eligible[inc]=page_key
+        eligible[inc]=(page_key,)
     return eligible,tuple(facts) if eligible else None
 
 
@@ -48,4 +48,12 @@ def metadata_allowed(request,namespace,key):
 
 
 def page_allowed(request,key):
-    return (request.tail or {}).get(key[0])==key
+    return key in (request.tail or {}).get(key[0],())
+
+
+def prepare(store,request,versions):
+    from .persistence_proof_world_tail_pages import prepare as pages
+    eligible,facts=_same_page(store,request,versions)
+    extra,next_facts,request.tail_new,request.tail_child_root=pages(store,request,versions,facts or request.facts)
+    eligible.update(extra)
+    return eligible,next_facts if eligible else None

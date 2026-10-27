@@ -1,0 +1,152 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______ test_regrowing_a_previously_removed_page_keeps_checked_fallback ________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_regrowing_a_previously_re0')
+
+    def test_regrowing_a_previously_removed_page_keeps_checked_fallback(tmp_path):
+     path,pair=fixture(tmp_path)
+     with opened(path,pair) as s:
+      values=s.skills[1,'craft'].provenance
+      values.extend(range(97));assert s.save()==1
+      assert values.pop()==96;assert s.save()==2
+>     values.append(97);assert s.save()==3;child=s.proof_manifest
+                               ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:208: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2810: in commit
+    if _collection_proof is not None:_guard_collection(self,_collection_proof,version_prepared,_content_proof.parent,ordinary_prepared,segment_prepared)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:79: in _guard
+    guard_directory(store,r,prepared,ordinary,segments)
+simulation/ate_sim/persistence_proof_directory_publish.py:87: in _guard
+    guard_inventory(store,r.directory.inventory,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_inventory.py:190: in _guard
+    guard_manifest(store,request.manifest,versions,ordinary,segments)
+simulation/ate_sim/persistence_proof_manifest_publish.py:140: in _guard
+    r.tail,r.tail_facts=prepare(store,r,versions)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_tail.py:57: in prepare
+    extra,next_facts,request.tail_new,request.tail_child_root=pages(store,request,versions,facts or request.facts)
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb6b7132a20>
+request = _Request(store=<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fb6b7132a20>, pin=GenerationPin(token='a24...se, value_only=False, tail=None, tail_facts=None, tail_new=None, tail_child_root=None, successor=None, reaudited=False)
+versions = ({'change': VersionChange(namespace='aux.lazy.history.member_types', key=5, value=('history-member-types/v1', 'list', ...77692d"],["none"],["int","0"],["str","2ebf20e6470d875b752bbeeeb5356e248cd0b854541a12d5ec7ba9af5adf1f01"]]]', ...}, ...)
+facts = [Root(digest=b'\xb2x\x96\x0f\xb6#~]\xd4\xf6x0\xf8U\x7fcE\xcf\x05\x11}\x89\x87\x88\xb8\r\xb1-9r\x8f\x83', count=6), Roo...\xca2\xdd\xa2\xab\xd5_\xba\xaeX\xca\xa5\xbc\xa7\xec$\xa2\xe0B\xbc\xd3\xe9\x9e#\xe9\x91\xbf\x90R\xce\xb6\x02', count=6)]
+
+    def prepare(store,request,versions,facts):
+        codec=store.codec;ca=request.pairs[0][0];sa=request.pairs[1][0]
+        child_directory=sa.roots[4];eligible={};new_rows={};facts=list(facts)
+        if len(versions)>512 or sum(len(i['payload'] or b'')+len(i['memberships_blob']) for i in versions)>4*1048576:return {},tuple(facts),{},child_directory
+        by_key={(i['namespace'],i['typed_key']):i for i in versions}
+        def clean(i):return i is not None and not i['change'].delete and not i['change'].reinsertion and i['change'].record_schema==1 and i['memberships_blob']==codec.encode(())
+        for item in versions:
+            if item['namespace']!=HISTORY or not clean(item) or len(item['payload'])>4096:continue
+            inc=codec.decode(item['typed_key']);new=codec.decode(item['payload'])
+            if type(inc) is not int or inc<=0 or type(new) is not tuple or len(new)!=3 or new[0]!='list' or any(type(n) is not int or n<=0 for n in new[1:]) or new[1]!=new[2]:continue
+            if content._map(store).get(ca.versions,version_key(HISTORY,item['typed_key'])) is None:continue
+            old=_parent(store,request,HISTORY,inc)
+            if type(old) is not tuple or len(old)!=3 or old[0]!='list' or type(old[1]) is not int or old[1]<=0 or old[1]!=old[2]:continue
+            old_pages=(old[1]+127)//128;new_pages=(new[1]+127)//128
+            if new_pages<=old_pages or new_pages-old_pages>128:continue
+            types=by_key.get((TYPES,codec.encode(inc)))
+            if not clean(types) or len(types['payload'])>4096:continue
+            if codec.encode(_parent(store,request,TYPES,inc))!=codec.encode((TAG,'list',(old[1],0,0))) or types['payload']!=codec.encode((TAG,'list',(new[1],0,0))):continue
+            affected=[];added={};valid=True
+            if old[1]%128:
+                key=(inc,old_pages-1);page=by_key.get((PAGES,codec.encode(key)))
+                if not clean(page):continue
+                before=_parent(store,request,PAGES,key);after=codec.decode(page['payload'])
+                if type(before) is not tuple or type(after) is not tuple or len(before)!=old[1]%128 or len(after)!=128 or any(type(v) is not int for v in (*before,*after)) or codec.encode(before)!=codec.encode(after[:len(before)]):continue
+                affected.append(key)
+            for number in range(old_pages,new_pages):
+                key=(inc,number);typed=codec.encode(key);page=by_key.get((PAGES,typed))
+                if not clean(page):valid=False;break
+                values=codec.decode(page['payload'])
+                if type(values) is not tuple or len(values)!=min(128,new[1]-128*number) or any(type(v) is not int for v in values):valid=False;break
+                header_key=codec.encode((PAGES,key));header=by_key.get((catalog.OWNER_NAMESPACE,header_key))
+                wanted=codec.encode(('identity-owner/v1',True,'lazy',request.pin.captured_head+1,1,_framed_sha(b'lazy-payload-v1',page['payload']),None,0,_framed_sha(b'identity-owner-empty-v1')))
+                if not clean(header) or header['payload']!=wanted:valid=False;break
+                for ns,k in ((PAGES,typed),(catalog.OWNER_NAMESPACE,header_key)):
+>                   if content._map(store).get(ca.versions,version_key(ns,k)) is not None:raise StoreIntegrityError('new tail source lacks accepted absence')
+                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   ate_sim.incremental_store.StoreIntegrityError: new tail source lacks accepted absence
+
+simulation/ate_sim/persistence_proof_world_tail_pages.py:49: StoreIntegrityError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-6/test_regrowing_a_previously_re0')
+
+    def test_regrowing_a_previously_removed_page_keeps_checked_fallback(tmp_path):
+     path,pair=fixture(tmp_path)
+>    with opened(path,pair) as s:
+          ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_page_growth.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7fb6b6f9f050>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18009: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_page_growth.py::test_regrowing_a_previously_removed_page_keeps_checked_fallback
+1 failed, 12 deselected in 2.63s

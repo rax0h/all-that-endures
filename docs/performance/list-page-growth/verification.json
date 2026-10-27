@@ -1,0 +1,41 @@
+{
+  "head": "b7b7378af729d194dbb98251a58397f2ea14c209",
+  "runtime_tree": "45db29e0786dd83901ddb71e2e455bb878eb0574",
+  "files": {
+    ".github/tests/run_proof_native_value_scaling.py": "4ab40694d3af6787fc44e32dcf1d7e12bb4e08bf71063c8c86e6b799a3730ca9",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "c576749d8f9627f47d88db8ef5e658b05b2470351dcab5fa34fbbe526b852765",
+    "simulation/ate_sim/persistence_proof_manifest_publish.py": "506538a634021db4ceec8e8aff72f92c3e0cf2310ff61f8538cc114932603334",
+    "simulation/ate_sim/persistence_proof_world_tail.py": "98dab885ec22bf4846a44d81d970bc73e5b233ab8163f896f6981493e8e8fe88",
+    "simulation/ate_sim/persistence_proof_world_tail_pages.py": "a9127cdea8c41e966933abee3a11955f43453ba46d38a1ff39f72d0ba1398afe",
+    "simulation/ate_sim/persistence_proof_world_value.py": "314aa504109661152cc5138f98f42077404df77edbfd9c5dffe8d0fcce9213a6",
+    "simulation/tests/test_stage_0_5_proof_world_page_growth.py": "f1bd74c285ef950796df06ca7cb39bfd93f328ebc789db380fddbe3059259e75",
+    "simulation/tests/test_stage_0_5_proof_world_tail.py": "d04a9ae45fff9d176d95fe330cf24b5c7f1468dd70b12764d0f377aa66335943"
+  },
+  "checks": [
+    {
+      "name": "related",
+      "tests": 121,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "540d68edb1c7321d8095614ce218cba9fb50c4c8d231c87283a262912b9bf01e"
+    },
+    {
+      "name": "native",
+      "tests": 120,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "544649df8fe254dbd25e78cc5c0cebeb40eac9074228c7e3704162c80d9c1d89"
+    }
+  ],
+  "matrix_sha256": "4ed394c68bdf5bffb3fd521a27afbb42f1b2fd04aa6a58a91285072d367a850a",
+  "review": {
+    "critical": 0,
+    "important": 0,
+    "new_minors": 0,
+    "prior_minors_deferred": 3,
+    "independent_reviews": 1
+  },
+  "hosted_acceptance": "all proof/full-suite/all28 matrices required; not claimed locally"
+}

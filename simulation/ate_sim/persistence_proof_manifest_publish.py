@@ -95,6 +95,8 @@ class _Request:
     value_only:bool=False
     tail:object=None
     tail_facts:object=None
+    tail_new:object=None
+    tail_child_root:object=None
     successor:object=None
     reaudited:bool=False
 
@@ -163,9 +165,10 @@ def _stage(store,r,g,writer,token,inventory_pair):
         with store.read_snapshot(pin,_preflight=lambda:_schemas(store)):
             oldca,oldsa,oldia,oldra,oldda=r.pairs
             reuse=r.may_reuse and ca[0].versions==oldca[0].versions and ca[0].events==oldca[0].events and sa[0].roots==oldsa[0].roots and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id and da[0].root==oldda[0].root
-            structural=(sa[0].roots[:2]==oldsa[0].roots[:2] and sa[0].roots[4:]==oldsa[0].roots[4:]
-                and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id and da[0].root==oldda[0].root
-                and ca[0].versions.count==oldca[0].versions.count and ca[0].events==oldca[0].events
+            structural=(sa[0].roots[:2]==oldsa[0].roots[:2] and sa[0].roots[4]==r.tail_child_root and sa[0].roots[5:]==oldsa[0].roots[5:]
+                and sa[0].next_incarnation_id==oldsa[0].next_incarnation_id
+                and (da[0].root.count==oldda[0].root.count if r.tail_new else da[0].root==oldda[0].root)
+                and ca[0].versions.count==oldca[0].versions.count+len(r.tail_new or {}) and ca[0].events==oldca[0].events
                 and ia[0].head.namespace_inventory==oldia[0].head.namespace_inventory and ia[0].head.namespace_counts==oldia[0].head.namespace_counts)
             reuse=reuse or r.value_only and structural
             oldh=parent.head;newh=ia[0].head

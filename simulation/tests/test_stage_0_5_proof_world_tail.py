@@ -69,13 +69,13 @@ def test_tail_resize_cannot_certify_inconsistent_frozen_rows(tmp_path,bad):
  finally:s.close()
 
 
-def test_native_cross_page_growth_keeps_full_audit_fallback(tmp_path,monkeypatch):
+def test_native_noninteger_cross_page_growth_keeps_full_audit_fallback(tmp_path,monkeypatch):
  from ate_sim import persistence_proof_world as world
  path,pair=fixture(tmp_path);calls=[];original=world._audit_world
  with opened(path,pair) as s:
   def audit(*args,**kw):calls.append(True);return original(*args,**kw)
   with monkeypatch.context() as m:
    m.setattr(world,'_audit_world',audit)
-   s.skills[1,'craft'].provenance.extend(range(97));assert s.save()==1
+   s.skills[1,'craft'].provenance.extend([.5]*97);assert s.save()==1
    assert calls;child=s.proof_manifest
  with opened(path,child) as s:assert len(s.skills[2,'craft'].provenance)==129

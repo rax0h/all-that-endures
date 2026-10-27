@@ -1,0 +1,114 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "edecf74cdb089ef1ffb79e55347e5d8ac3f310ff",
+    "runtime_tree": "b2d785dfdc9f0d27dd491cd57dc237c11e176d1f",
+    "sqlite": "3.45.1",
+    "driver_sha256": "481335e0e5b9cbb5d5755b35f2f2953773546b07528da2ff66352038508c2e2c",
+    "fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "source": {
+        "head": "edecf74cdb089ef1ffb79e55347e5d8ac3f310ff",
+        "runtime_tree": "b2d785dfdc9f0d27dd491cd57dc237c11e176d1f",
+        "sqlite": "3.45.1",
+        "driver_sha256": "481335e0e5b9cbb5d5755b35f2f2953773546b07528da2ff66352038508c2e2c",
+        "fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 0.7129569500000343,
+      "operations": {
+        "event-ids": {
+          "extent_ms": 287.1808830000191,
+          "python_peak_bytes": 168570,
+          "sqlite_vm_steps": 142528,
+          "sql": {
+            "unrelated_internal_payload": 0,
+            "selected_metadata": 52
+          }
+        },
+        "sequence": {
+          "extent_ms": 145.70654200019817,
+          "python_peak_bytes": 68190,
+          "sqlite_vm_steps": 82908,
+          "sql": {
+            "unrelated_internal_payload": 0,
+            "selected_metadata": 26
+          }
+        }
+      },
+      "vm_measurement": "untimed interval-one guarded replay"
+    },
+    {
+      "size": 10000,
+      "source": {
+        "head": "edecf74cdb089ef1ffb79e55347e5d8ac3f310ff",
+        "runtime_tree": "b2d785dfdc9f0d27dd491cd57dc237c11e176d1f",
+        "sqlite": "3.45.1",
+        "driver_sha256": "481335e0e5b9cbb5d5755b35f2f2953773546b07528da2ff66352038508c2e2c",
+        "fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 6.288640567999892,
+      "operations": {
+        "event-ids": {
+          "extent_ms": 320.472928000072,
+          "python_peak_bytes": 116245,
+          "sqlite_vm_steps": 144013,
+          "sql": {
+            "unrelated_internal_payload": 0,
+            "selected_metadata": 52
+          }
+        },
+        "sequence": {
+          "extent_ms": 162.3773369999526,
+          "python_peak_bytes": 72832,
+          "sqlite_vm_steps": 83556,
+          "sql": {
+            "unrelated_internal_payload": 0,
+            "selected_metadata": 26
+          }
+        }
+      },
+      "vm_measurement": "untimed interval-one guarded replay"
+    },
+    {
+      "size": 100000,
+      "source": {
+        "head": "edecf74cdb089ef1ffb79e55347e5d8ac3f310ff",
+        "runtime_tree": "b2d785dfdc9f0d27dd491cd57dc237c11e176d1f",
+        "sqlite": "3.45.1",
+        "driver_sha256": "481335e0e5b9cbb5d5755b35f2f2953773546b07528da2ff66352038508c2e2c",
+        "fixture_sha256": "95c093ee35a8846605f9386176210c5590d8d9e1bb6e6bfdfd2d5be3b9a227b7"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 66.55295451899997,
+      "operations": {
+        "event-ids": {
+          "extent_ms": 351.86489400007304,
+          "python_peak_bytes": 81303,
+          "sqlite_vm_steps": 145039,
+          "sql": {
+            "unrelated_internal_payload": 0,
+            "selected_metadata": 52
+          }
+        },
+        "sequence": {
+          "extent_ms": 178.50493700007064,
+          "python_peak_bytes": 48963,
+          "sqlite_vm_steps": 84096,
+          "sql": {
+            "unrelated_internal_payload": 0,
+            "selected_metadata": 26
+          }
+        }
+      },
+      "vm_measurement": "untimed interval-one guarded replay"
+    }
+  ]
+}

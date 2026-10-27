@@ -73,13 +73,17 @@ def validate_value_transition(store,request,versions,ordinary,segments):
         sizes=store._interval_rows('lazy_record_versions','length(payload)+length(memberships)',('namespace','typed_key'),(ns,key),g,'lazy_record_interval',limit=2)
         if len(sizes)==1 and type(sizes[0][0]) is int and sizes[0][0]+len(item['payload'])+len(item['memberships_blob'])+total>MAX_BYTES:return False
         old=content._source_version(store,g,ns,key,max_bytes=MAX_BYTES)
-        if old is None:return False
-        if content._map(store).get(ca.versions,version_key(ns,key))!=content._version_value(ns,key,old,codec.version):raise StoreIntegrityError('value transition old bytes lack accepted content')
-        total+=len(old.payload)+len(item['payload'])+len(old.memberships)+len(item['memberships_blob'])
-        if total>MAX_BYTES or old.record_schema!=item['change'].record_schema:return False
+        if old is None:
+            expected=(request.tail_new or {}).get((ns,key))
+            if expected is None:return False
+            if item['payload']!=expected or item['change'].record_schema!=1 or item['memberships_blob']!=codec.encode(()):raise StoreIntegrityError('new tail source differs from frozen authority')
+            if content._map(store).get(ca.versions,version_key(ns,key)) is not None:raise StoreIntegrityError('new tail source lacks accepted content absence')
+        if old is not None and content._map(store).get(ca.versions,version_key(ns,key))!=content._version_value(ns,key,old,codec.version):raise StoreIntegrityError('value transition old bytes lack accepted content')
+        total+=len(item['payload'])+len(item['memberships_blob'])+(len(old.payload)+len(old.memberships) if old is not None else 0)
+        if total>MAX_BYTES or old is not None and old.record_schema!=item['change'].record_schema:return False
         frozen=replace(item['change'],key=codec.decode(key),value=codec.decode(item['payload']),memberships=tuple(Membership(*m) for m in codec.decode(item['memberships_blob'])))
         item=dict(item,change=frozen)
-        value=codec.decode(old.payload);rows.append((item,old,value))
+        value=codec.decode(old.payload) if old is not None else ();rows.append((item,old,value))
         if ns in world.AUXILIARY_OWNER_FAMILIES:
             from .persistence_proof_world_backing_value import eligible
             if eligible(store,request,frozen,value):owners[(ns,key)]=frozen
@@ -130,6 +134,9 @@ def validate_value_transition(store,request,versions,ordinary,segments):
             if item['payload']!=old.payload or item['memberships_blob']!=old.memberships:return False
             continue
         kind='ordinary' if marker in ordinary_owners else 'lazy'
+        if old is None:
+            if (item['namespace'],item['typed_key']) not in (request.tail_new or {}):raise StoreIntegrityError('unproved new owner witness')
+            witnessed.add(marker);continue
         expected=list(value)
         if len(expected)!=9 or expected[0]!='identity-owner/v1' or expected[1] is not True or expected[2]!=kind:return False
         expected[3]=g+1;expected[4]=source.record_schema;expected[5]=catalog._source_commitment(codec,source,kind,g+1)

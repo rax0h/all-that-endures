@@ -1,0 +1,39 @@
+{
+  "run": 40532816410,
+  "receipts": [
+    {
+      "artifact_id": 12753804748,
+      "archive_sha256": "720b7ee7fd92ce635b86eb194d49ed1a7c20d771246dc2c650cb133692efa023",
+      "source": {
+        "head": "edecf74cdb089ef1ffb79e55347e5d8ac3f310ff",
+        "python": "3.12.15",
+        "runtime_tree": "b2d785dfdc9f0d27dd491cd57dc237c11e176d1f",
+        "sqlite": "3.45.1"
+      },
+      "tests": {
+        "tests": 4320,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "complete_matrices": 0
+    },
+    {
+      "artifact_id": 12750711055,
+      "archive_sha256": "5f52fbb735393116b22e4d34d3e11020b5181eabce930ec6de626b7f63f5af6d",
+      "source": {
+        "head": "edecf74cdb089ef1ffb79e55347e5d8ac3f310ff",
+        "python": "3.12.15",
+        "runtime_tree": "b2d785dfdc9f0d27dd491cd57dc237c11e176d1f",
+        "sqlite": "3.45.1"
+      },
+      "tests": {
+        "tests": 1224,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "complete_matrices": 28
+    }
+  ]
+}
