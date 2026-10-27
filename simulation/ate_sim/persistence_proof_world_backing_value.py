@@ -33,6 +33,8 @@ def eligible(store,request,change,old):
     descriptor=_parent(store,request,DESCRIPTOR_NAMESPACE,change.key[0])
     if descriptor[0] not in ('list','map'):return False
     if ns==PAGE_NAMESPACE:
+        from .persistence_proof_world_tail import page_allowed
+        if page_allowed(request,change.key):return True
         return descriptor[0]=='list' and len(old)==len(new) and member_counts(old)==member_counts(new)
     # Complete membership, native key bytes and insertion ordinal stay exact.
     # Map type counters describe keys; the exact old key preserves that witness.

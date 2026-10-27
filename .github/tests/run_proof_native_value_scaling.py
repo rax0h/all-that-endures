@@ -73,13 +73,32 @@ def run(output):
    try:session.skills[1,'craft'].provenance[0]=998;assert session.save()==5
    finally:session.store.db.set_progress_handler(None,0);world._audit_world=original
    final=session.proof_manifest
+   backing_body=dict(body)
    assert not calls and backing_vm.steps<=backing_vm.limit
+  finally:session.close()
+  # Resize the selected last page; authenticated descriptor/type facts change.
+  session=open_audited_proof_world_session(path_out,rules_id=RULES,expected_commitment=final[1])
+  selected=session.store.codec.encode((raw.provenance.incarnation,(n-1)//128)).hex().lower();body={'selected':0,'unrelated':0}
+  try:
+   session.store.db.set_trace_callback(history_trace);world._audit_world=no_full;start=time.perf_counter()
+   try:session.skills[1,'craft'].provenance.append(997);assert session.save()==6;tail_elapsed=time.perf_counter()-start
+   finally:session.store.db.set_trace_callback(None);world._audit_world=original
+   final=session.proof_manifest;tail_body=dict(body)
+   assert tail_body['selected']>0 and tail_body['unrelated']==0 and not calls
+  finally:session.close()
+  session=open_audited_proof_world_session(path_out,rules_id=RULES,expected_commitment=final[1]);tail_vm=_VMWorkBudget(6000000)
+  try:
+   session.store.db.set_progress_handler(tail_vm,1);world._audit_world=no_full
+   try:assert session.skills[1,'craft'].provenance.pop()==997;assert session.save()==7
+   finally:session.store.db.set_progress_handler(None,0);world._audit_world=original
+   final=session.proof_manifest
+   assert not calls and tail_vm.steps<=tail_vm.limit
   finally:session.close()
   with open_audited_proof_world_session(path_out,rules_id=RULES,expected_commitment=final[1]) as reopened:
    assert reopened.skills[1,'craft'].level==.875 and reopened.skills[1,'craft'].provenance is reopened.skills[2,'craft'].provenance
-   assert reopened.skills[2,'craft'].provenance[0]==998
-  row=dict(size=n,source=source,status='complete',exact=True,construction_seconds=construction,audited_admission_seconds=admission,native_first_access_and_save_ms=elapsed*1000,native_first_access_and_save_unprofiled_ms=raw_elapsed*1000,python_peak_bytes=peak,sqlite_vm_steps=vm.steps,vm_measurement='separate fresh-session first-access native save, interval-one guard',sql=counts,full_audits_during_save=0,backing_first_access_and_save_ms=backing_elapsed*1000,backing_sql=body,backing_vm_steps=backing_vm.steps,archive_unit='retained history values')
-  results.append(row);(output/f'size-{n}.json').write_text(json.dumps(row,indent=2));print(n,round(raw_elapsed*1000,2),'ms unprofiled native first-access save;',round(elapsed*1000,2),'ms with allocation profiling;',round(backing_elapsed*1000,2),'ms backing value save; zero unrelated history bodies',flush=True)
+   assert reopened.skills[2,'craft'].provenance[0]==998 and len(reopened.skills[2,'craft'].provenance)==n
+  row=dict(size=n,source=source,status='complete',exact=True,construction_seconds=construction,audited_admission_seconds=admission,native_first_access_and_save_ms=elapsed*1000,native_first_access_and_save_unprofiled_ms=raw_elapsed*1000,python_peak_bytes=peak,sqlite_vm_steps=vm.steps,vm_measurement='separate fresh-session first-access native save, interval-one guard',sql=counts,full_audits_during_save=0,backing_first_access_and_save_ms=backing_elapsed*1000,backing_sql=backing_body,backing_vm_steps=backing_vm.steps,tail_first_access_and_save_ms=tail_elapsed*1000,tail_sql=tail_body,tail_vm_steps=tail_vm.steps,archive_unit='retained history values')
+  results.append(row);(output/f'size-{n}.json').write_text(json.dumps(row,indent=2));print(n,round(raw_elapsed*1000,2),'ms unprofiled native first-access save;',round(elapsed*1000,2),'ms with allocation profiling;',round(backing_elapsed*1000,2),'ms backing value save;',round(tail_elapsed*1000,2),'ms tail resize; zero unrelated history bodies',flush=True)
  (output/'summary.json').write_text(json.dumps(dict(status='complete',source=source,results=results),indent=2))
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('--output',type=Path,required=True);run(p.parse_args().output)

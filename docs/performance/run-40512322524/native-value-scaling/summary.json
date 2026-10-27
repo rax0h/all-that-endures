@@ -1,0 +1,106 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "b1218654aa74978e8373c7591e1ddb217eb0cf30",
+    "runtime_tree": "774c1262f8b82ca7274f6ff4f79313035bbf06ea",
+    "sqlite": "3.45.1",
+    "driver_sha256": "0f5e24a9cd43716e7c7d849d3e3e90b69e71b6ebec42d70a892fa482e9534c3a",
+    "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+    "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "source": {
+        "head": "b1218654aa74978e8373c7591e1ddb217eb0cf30",
+        "runtime_tree": "774c1262f8b82ca7274f6ff4f79313035bbf06ea",
+        "sqlite": "3.45.1",
+        "driver_sha256": "0f5e24a9cd43716e7c7d849d3e3e90b69e71b6ebec42d70a892fa482e9534c3a",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 0.8834041059999436,
+      "audited_admission_seconds": 0.1041554000000815,
+      "native_first_access_and_save_ms": 359.27948499988815,
+      "native_first_access_and_save_unprofiled_ms": 77.89311300007284,
+      "python_peak_bytes": 487304,
+      "sqlite_vm_steps": 283090,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "backing_first_access_and_save_ms": 129.3440049998935,
+      "backing_sql": {
+        "selected": 9,
+        "unrelated": 0
+      },
+      "backing_vm_steps": 314973,
+      "archive_unit": "retained history values"
+    },
+    {
+      "size": 10000,
+      "source": {
+        "head": "b1218654aa74978e8373c7591e1ddb217eb0cf30",
+        "runtime_tree": "774c1262f8b82ca7274f6ff4f79313035bbf06ea",
+        "sqlite": "3.45.1",
+        "driver_sha256": "0f5e24a9cd43716e7c7d849d3e3e90b69e71b6ebec42d70a892fa482e9534c3a",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 2.456037500999855,
+      "audited_admission_seconds": 0.2643648000000667,
+      "native_first_access_and_save_ms": 358.6710890001541,
+      "native_first_access_and_save_unprofiled_ms": 76.33460300007755,
+      "python_peak_bytes": 334844,
+      "sqlite_vm_steps": 283228,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "backing_first_access_and_save_ms": 109.17953299986038,
+      "backing_sql": {
+        "selected": 9,
+        "unrelated": 0
+      },
+      "backing_vm_steps": 315735,
+      "archive_unit": "retained history values"
+    },
+    {
+      "size": 100000,
+      "source": {
+        "head": "b1218654aa74978e8373c7591e1ddb217eb0cf30",
+        "runtime_tree": "774c1262f8b82ca7274f6ff4f79313035bbf06ea",
+        "sqlite": "3.45.1",
+        "driver_sha256": "0f5e24a9cd43716e7c7d849d3e3e90b69e71b6ebec42d70a892fa482e9534c3a",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 18.022487488000024,
+      "audited_admission_seconds": 1.9205133620000652,
+      "native_first_access_and_save_ms": 386.2677640001948,
+      "native_first_access_and_save_unprofiled_ms": 81.58916699994734,
+      "python_peak_bytes": 339510,
+      "sqlite_vm_steps": 283822,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "backing_first_access_and_save_ms": 116.1961559998872,
+      "backing_sql": {
+        "selected": 9,
+        "unrelated": 0
+      },
+      "backing_vm_steps": 316355,
+      "archive_unit": "retained history values"
+    }
+  ]
+}

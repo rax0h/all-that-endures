@@ -93,6 +93,8 @@ class _Request:
     guarded:bool=False
     may_reuse:bool=False
     value_only:bool=False
+    tail:object=None
+    tail_facts:object=None
     successor:object=None
     reaudited:bool=False
 
@@ -132,6 +134,8 @@ def _guard(store,r,versions,ordinary,segments):
         if frozen and (old is None or old.payload!=item['payload'] or old.memberships!=item['memberships_blob']):raise StoreIntegrityError('manifest transition cannot edit an immutable backing')
     from .persistence_proof_world_value import validate_value_transition,validate_lease_updates
     validate_lease_updates(store,r,versions)
+    from .persistence_proof_world_tail import prepare
+    r.tail,r.tail_facts=prepare(store,r,versions)
     r.value_only=validate_value_transition(store,r,versions,ordinary,segments)
     r.guarded=True
 
@@ -167,7 +171,7 @@ def _stage(store,r,g,writer,token,inventory_pair):
             oldh=parent.head;newh=ia[0].head
             if not reuse or r.value_only and not r.may_reuse or (newh.seed,newh.simulation_position,newh.next_ids)!=(oldh.seed,oldh.simulation_position,oldh.next_ids):_check_head(store,pin,ra)
             if reuse:
-                facts=r.facts;topo=world._composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:],*facts[:2]));query=world._composite(store,b'queries',(*sa[0].roots[2:4],facts[2]))
+                facts=r.tail_facts if r.value_only and r.tail_facts is not None else r.facts;topo=world._composite(store,b'topology',(*sa[0].roots[:2],*sa[0].roots[4:],*facts[:2]));query=world._composite(store,b'queries',(*sa[0].roots[2:4],facts[2]))
                 orders=world._composite(store,b'orders',(da[0].root,facts[3],facts[4],sa[0].roots[2]))
                 roots=(ca[0].versions,ra[0].root,topo,query,orders,ca[0].events,ia[0].root)
             else:

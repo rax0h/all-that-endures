@@ -1,0 +1,864 @@
+{
+  "results": [
+    {
+      "archive_occurrences": 1000,
+      "baseline": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 12148,
+        "source_plans": [
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_incarnation_interval (incarnation_id=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_incarnation_interval (incarnation_id=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 5,
+          "other": 6,
+          "payload": 0,
+          "proof": 0
+        },
+        "sqlite_vm_step_upper_bound": 499,
+        "wall_seconds": 0.0008174150000002101
+      },
+      "exact": true,
+      "group": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 25287,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=? AND (owner_namespace,owner_key,occurrence_path)<(?,?,?))"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 7,
+          "other": 17,
+          "payload": 0,
+          "proof": 11
+        },
+        "sqlite_vm_step_upper_bound": 2599,
+        "wall_seconds": 0.002477704000000358
+      },
+      "newer_frontier_budget": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 11354,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_closed (incarnation_id=? AND valid_to=?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 2,
+          "other": 17,
+          "payload": 0,
+          "proof": 0
+        },
+        "sqlite_vm_step_upper_bound": 2599,
+        "wall_seconds": 0.0006301020000023527
+      },
+      "owner": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 15589,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=? AND occurrence_path<?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 4,
+          "other": 17,
+          "payload": 0,
+          "proof": 4
+        },
+        "sqlite_vm_step_upper_bound": 2799,
+        "wall_seconds": 0.0012128930000017135
+      },
+      "previous_group": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 27793,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_closed (incarnation_id=? AND valid_to=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=? AND (owner_namespace,owner_key,occurrence_path)<(?,?,?))"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_closed (incarnation_id=? AND valid_to=? AND (owner_namespace,owner_key,occurrence_path)<(?,?,?))"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 11,
+          "other": 17,
+          "payload": 0,
+          "proof": 11
+        },
+        "sqlite_vm_step_upper_bound": 3299,
+        "wall_seconds": 0.002481379000016659
+      },
+      "previous_owner": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 18650,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_owner_closed (owner_namespace=? AND owner_key=? AND valid_to=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=? AND occurrence_path<?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_owner_closed (owner_namespace=? AND owner_key=? AND valid_to=? AND occurrence_path<?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 6,
+          "other": 17,
+          "payload": 0,
+          "proof": 4
+        },
+        "sqlite_vm_step_upper_bound": 2999,
+        "wall_seconds": 0.001260263999995459
+      }
+    },
+    {
+      "archive_occurrences": 10000,
+      "baseline": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 10508,
+        "source_plans": [
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_incarnation_interval (incarnation_id=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_incarnation_interval (incarnation_id=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 5,
+          "other": 6,
+          "payload": 0,
+          "proof": 0
+        },
+        "sqlite_vm_step_upper_bound": 499,
+        "wall_seconds": 0.0008385270000133005
+      },
+      "exact": true,
+      "group": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 27074,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=? AND (owner_namespace,owner_key,occurrence_path)<(?,?,?))"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 7,
+          "other": 17,
+          "payload": 0,
+          "proof": 10
+        },
+        "sqlite_vm_step_upper_bound": 2599,
+        "wall_seconds": 0.0025006879999978082
+      },
+      "newer_frontier_budget": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 12755,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_closed (incarnation_id=? AND valid_to=?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 2,
+          "other": 17,
+          "payload": 0,
+          "proof": 0
+        },
+        "sqlite_vm_step_upper_bound": 2599,
+        "wall_seconds": 0.0006600380000065798
+      },
+      "owner": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 16237,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=? AND occurrence_path<?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 4,
+          "other": 17,
+          "payload": 0,
+          "proof": 4
+        },
+        "sqlite_vm_step_upper_bound": 2699,
+        "wall_seconds": 0.0012222469999869645
+      },
+      "previous_group": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 26623,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_closed (incarnation_id=? AND valid_to=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=? AND (owner_namespace,owner_key,occurrence_path)<(?,?,?))"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_closed (incarnation_id=? AND valid_to=? AND (owner_namespace,owner_key,occurrence_path)<(?,?,?))"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 11,
+          "other": 17,
+          "payload": 0,
+          "proof": 10
+        },
+        "sqlite_vm_step_upper_bound": 3299,
+        "wall_seconds": 0.002691946999988204
+      },
+      "previous_owner": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 18378,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_owner_closed (owner_namespace=? AND owner_key=? AND valid_to=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=? AND occurrence_path<?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_owner_closed (owner_namespace=? AND owner_key=? AND valid_to=? AND occurrence_path<?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 6,
+          "other": 17,
+          "payload": 0,
+          "proof": 4
+        },
+        "sqlite_vm_step_upper_bound": 2999,
+        "wall_seconds": 0.0012578399999938483
+      }
+    },
+    {
+      "archive_occurrences": 100000,
+      "baseline": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 10580,
+        "source_plans": [
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_incarnation_interval (incarnation_id=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_incarnation_interval (incarnation_id=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 5,
+          "other": 6,
+          "payload": 0,
+          "proof": 0
+        },
+        "sqlite_vm_step_upper_bound": 499,
+        "wall_seconds": 0.0009494250000159354
+      },
+      "exact": true,
+      "group": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 25867,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=? AND (owner_namespace,owner_key,occurrence_path)<(?,?,?))"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 7,
+          "other": 17,
+          "payload": 0,
+          "proof": 10
+        },
+        "sqlite_vm_step_upper_bound": 2599,
+        "wall_seconds": 0.0025220109999963825
+      },
+      "newer_frontier_budget": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 12379,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_closed (incarnation_id=? AND valid_to=?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 2,
+          "other": 17,
+          "payload": 0,
+          "proof": 0
+        },
+        "sqlite_vm_step_upper_bound": 2599,
+        "wall_seconds": 0.000668591000021479
+      },
+      "owner": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 15333,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=? AND occurrence_path<?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 4,
+          "other": 17,
+          "payload": 0,
+          "proof": 4
+        },
+        "sqlite_vm_step_upper_bound": 2699,
+        "wall_seconds": 0.0012596329999894351
+      },
+      "previous_group": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 28112,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_closed (incarnation_id=? AND valid_to=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_current (incarnation_id=? AND (owner_namespace,owner_key,occurrence_path)<(?,?,?))"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_group_closed (incarnation_id=? AND valid_to=? AND (owner_namespace,owner_key,occurrence_path)<(?,?,?))"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 11,
+          "other": 17,
+          "payload": 0,
+          "proof": 10
+        },
+        "sqlite_vm_step_upper_bound": 3299,
+        "wall_seconds": 0.002981836000003568
+      },
+      "previous_owner": {
+        "payload_checks": 0,
+        "payload_decodes": 0,
+        "python_peak_bytes": 18026,
+        "source_plans": [
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_owner_closed (owner_namespace=? AND owner_key=? AND valid_to=?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "COMPOUND QUERY",
+            "LEFT-MOST SUBQUERY",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to=? AND valid_from<?)",
+            "UNION ALL",
+            "SEARCH lazy_identity_occurrence_versions USING COVERING INDEX lazy_identity_occurrence_interval (owner_namespace=? AND owner_key=? AND occurrence_path=? AND valid_to>?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX lazy_identity_occurrence_current (owner_namespace=? AND owner_key=? AND occurrence_path<?)"
+          ],
+          [
+            "SEARCH lazy_identity_occurrence_versions USING INDEX ate_occurrence_owner_closed (owner_namespace=? AND owner_key=? AND valid_to=? AND occurrence_path<?)"
+          ]
+        ],
+        "sql_selects": {
+          "occurrence": 6,
+          "other": 17,
+          "payload": 0,
+          "proof": 4
+        },
+        "sqlite_vm_step_upper_bound": 2999,
+        "wall_seconds": 0.001326293999994732
+      }
+    }
+  ],
+  "schema": "ate-proof-occurrence-summary/1",
+  "source": {
+    "driver_sha256": "680d435ef7016c73c5072a7416a3a3c9a9de163e80b2c5d4ecedae97134f8f2d",
+    "fixture_sha256": "f5582e20fc390e36fe15015f597560d246f48db1225249dc3ca628c8ebd3ad4f",
+    "head": "b1218654aa74978e8373c7591e1ddb217eb0cf30",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "python": "3.12.15",
+    "runtime_tree": "774c1262f8b82ca7274f6ff4f79313035bbf06ea",
+    "sqlite": "3.45.1"
+  },
+  "status": "complete"
+}

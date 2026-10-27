@@ -1,0 +1,274 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_native_integer_tail_resize_does_not_audit_unrelated_history[append] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_native_integer_tail_resiz0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe99f2d5760>
+edit = 'append'
+
+    @pytest.mark.parametrize('edit',['append','pop'])
+    def test_native_integer_tail_resize_does_not_audit_unrelated_history(tmp_path,monkeypatch,edit):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('tail resize invoked full World audit'))
+       values=s.skills[1,'craft'].provenance
+       if edit=='append':values.append(99)
+       else:assert values.pop()==31
+>      assert s.save()==1;child=s.proof_manifest
+              ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_tail.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:201: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:174: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fe99f1d4200>, GenerationPin(token='7417144b-afed-44a7-b3...\xc2>]', count=34)), b's<n\xa6\xab\xdf\x97\xf7\xce\xb5\x98G;\xd6\xa1f\xb3|\x98\xd7\\\xfb\\\x00v\x85\xf9PE`+\xdb'), ...)
+k = {}
+
+>   m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('tail resize invoked full World audit'))
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: tail resize invoked full World audit
+
+simulation/tests/test_stage_0_5_proof_world_tail.py:10: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_native_integer_tail_resiz0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe99f2d5760>
+edit = 'append'
+
+    @pytest.mark.parametrize('edit',['append','pop'])
+    def test_native_integer_tail_resize_does_not_audit_unrelated_history(tmp_path,monkeypatch,edit):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('tail resize invoked full World audit'))
+       values=s.skills[1,'craft'].provenance
+       if edit=='append':values.append(99)
+       else:assert values.pop()==31
+       assert s.save()==1;child=s.proof_manifest
+     finally:
+      if s._state=='recovery-required':s.resolve_save()
+>     s.close()
+
+simulation/tests/test_stage_0_5_proof_world_tail.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18015: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7fe99f29b260>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+____ test_native_integer_tail_resize_does_not_audit_unrelated_history[pop] _____
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_native_integer_tail_resiz1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe99f0c0530>
+edit = 'pop'
+
+    @pytest.mark.parametrize('edit',['append','pop'])
+    def test_native_integer_tail_resize_does_not_audit_unrelated_history(tmp_path,monkeypatch,edit):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('tail resize invoked full World audit'))
+       values=s.skills[1,'craft'].provenance
+       if edit=='append':values.append(99)
+       else:assert values.pop()==31
+>      assert s.save()==1;child=s.proof_manifest
+              ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_tail.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:201: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:174: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fe99edd82f0>, GenerationPin(token='0054c85f-bfd7-429e-aa...cg", count=34)), b'\x93\xc1.\xdd\xbb20\x02\xe2\xb1\x0c\xc0\x9ba\x8a\x9f\xd1\xc2\xe5f\x98\xe7S\xe1 50F\xb7\xbeK9'), ...)
+k = {}
+
+>   m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('tail resize invoked full World audit'))
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: tail resize invoked full World audit
+
+simulation/tests/test_stage_0_5_proof_world_tail.py:10: Failed
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_native_integer_tail_resiz1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe99f0c0530>
+edit = 'pop'
+
+    @pytest.mark.parametrize('edit',['append','pop'])
+    def test_native_integer_tail_resize_does_not_audit_unrelated_history(tmp_path,monkeypatch,edit):
+     from ate_sim import persistence_proof_world as world
+     path,pair=fixture(tmp_path);s=opened(path,pair)
+     try:
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',lambda *a,**k:pytest.fail('tail resize invoked full World audit'))
+       values=s.skills[1,'craft'].provenance
+       if edit=='append':values.append(99)
+       else:assert values.pop()==31
+       assert s.save()==1;child=s.proof_manifest
+     finally:
+      if s._state=='recovery-required':s.resolve_save()
+>     s.close()
+
+simulation/tests/test_stage_0_5_proof_world_tail.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18015: in close
+    self._begin_lifecycle_operation("close", allow_stale=True)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7fe99ee9b9b0>
+operation = 'close', allow_stale = True
+
+    def _begin_lifecycle_operation(self, operation, *, allow_stale=False):
+        self._ensure_active()
+        # A caller can close the backing store directly. Public operations
+        # must reject before executing their user-observable callback.
+        self.store._ensure_open()
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                f"reentrant lazy session {operation} is not allowed"
+            )
+        tracker = self._eager_tracker
+        if tracker._cold_step_depth:
+            raise StoreError(
+                f"{operation} requires a completed simulation step"
+            )
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                f"{operation} cannot run inside current_people_scope"
+            )
+        allowed = self._state == "active" or (
+            allow_stale and self._state == "stale"
+        )
+        if not allowed:
+>           raise StoreError(
+                f"lazy session cannot {operation} while {self._state}"
+            )
+E           ate_sim.incremental_store.StoreError: lazy session cannot close while saving
+
+simulation/ate_sim/persistence_lazy.py:11087: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_tail.py::test_native_integer_tail_resize_does_not_audit_unrelated_history[append]
+FAILED simulation/tests/test_stage_0_5_proof_world_tail.py::test_native_integer_tail_resize_does_not_audit_unrelated_history[pop]
+2 failed in 30.41s

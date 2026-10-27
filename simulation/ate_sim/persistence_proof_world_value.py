@@ -62,6 +62,7 @@ def validate_value_transition(store,request,versions,ordinary,segments):
     from .persistence_history_dependencies import NAMESPACE as DEPENDENCIES
     from .persistence_session import EVENT_STORAGE,COMMIT_DESCRIPTOR_KEY
     from .core import Event
+    from .persistence_proof_world_tail import metadata_allowed
     if segments:return False
     codec=store.codec;g=request.pin.captured_head;ca=request.pairs[0][0];ra=request.pairs[3][0]
     rows=[];owners={};total=0
@@ -91,6 +92,8 @@ def validate_value_transition(store,request,versions,ordinary,segments):
             if ns not in world.AUXILIARY_OWNER_FAMILIES:world._check_queries(store,request.pin,change)
         elif ns==catalog.OWNER_NAMESPACE:
             headers.append((item,old,value))
+        elif metadata_allowed(request,ns,change.key):
+            pass
         elif ns==DEPENDENCIES:
             if old.memberships!=item['memberships_blob']:return False
         elif item['payload']!=old.payload or item['memberships_blob']!=old.memberships:return False
