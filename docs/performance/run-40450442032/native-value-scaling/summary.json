@@ -1,0 +1,88 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "fd62df8872dcec78ecbb6fab329f7393055d22c3",
+    "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+    "sqlite": "3.45.1",
+    "driver_sha256": "517187f09a0399e6d555f1d08041c68c43391fb786d9dec64910a167b4429afe",
+    "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+    "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "source": {
+        "head": "fd62df8872dcec78ecbb6fab329f7393055d22c3",
+        "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+        "sqlite": "3.45.1",
+        "driver_sha256": "517187f09a0399e6d555f1d08041c68c43391fb786d9dec64910a167b4429afe",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 1.521257916000195,
+      "audited_admission_seconds": 0.21612407500015252,
+      "native_first_access_and_save_ms": 671.2421889997131,
+      "native_first_access_and_save_unprofiled_ms": 157.88668599998346,
+      "python_peak_bytes": 486176,
+      "sqlite_vm_steps": 282957,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "archive_unit": "retained history values"
+    },
+    {
+      "size": 10000,
+      "source": {
+        "head": "fd62df8872dcec78ecbb6fab329f7393055d22c3",
+        "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+        "sqlite": "3.45.1",
+        "driver_sha256": "517187f09a0399e6d555f1d08041c68c43391fb786d9dec64910a167b4429afe",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 4.617304212999898,
+      "audited_admission_seconds": 0.5474071989997356,
+      "native_first_access_and_save_ms": 700.8030540000618,
+      "native_first_access_and_save_unprofiled_ms": 160.05878200030565,
+      "python_peak_bytes": 339692,
+      "sqlite_vm_steps": 283743,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "archive_unit": "retained history values"
+    },
+    {
+      "size": 100000,
+      "source": {
+        "head": "fd62df8872dcec78ecbb6fab329f7393055d22c3",
+        "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+        "sqlite": "3.45.1",
+        "driver_sha256": "517187f09a0399e6d555f1d08041c68c43391fb786d9dec64910a167b4429afe",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 35.64500417299996,
+      "audited_admission_seconds": 3.9831248860000414,
+      "native_first_access_and_save_ms": 694.8692880000635,
+      "native_first_access_and_save_unprofiled_ms": 162.31357200013008,
+      "python_peak_bytes": 357340,
+      "sqlite_vm_steps": 283931,
+      "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+      "sql": {
+        "history_body": 0
+      },
+      "full_audits_during_save": 0,
+      "archive_unit": "retained history values"
+    }
+  ]
+}

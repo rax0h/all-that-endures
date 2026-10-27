@@ -1,0 +1,28 @@
+{
+  "run": 40450442032,
+  "head": "fd62df8872dcec78ecbb6fab329f7393055d22c3",
+  "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+  "full_suite": {
+    "job_id": 122011646766,
+    "tests": 4301,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "artifact_id": 12713534599,
+    "archive_sha256": "7af5534582b509e4561a8c5102ee542a8fcfcde447a5550028fa0b42bfb41ded",
+    "xml_sha256": "a2f6596d047a40ab3a41e9f05000c3efceca42adf6535ecf49fd0886fd749339"
+  },
+  "proof": {
+    "job_id": 122011646678,
+    "conclusion": "cancelled at 40-minute job limit",
+    "tests": 1205,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "complete_matrices": 27,
+    "incomplete_matrix": "group-scaling",
+    "artifact_id": 12712071396,
+    "archive_sha256": "6ca7b0e02a265de9c43444c3bf28ff5cc4b7dbd4919965acb743e3092d663034"
+  },
+  "acceptance": "full suite verified; complete proof job still required"
+}
