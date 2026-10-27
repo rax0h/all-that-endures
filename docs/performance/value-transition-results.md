@@ -56,3 +56,10 @@ One fresh review found2 Important items, both fixed in one pass; two Minors
 (including the previous deferred Minor) remain documented. Author-found callback and
 frozen-byte holes were fixed in that same pass. Candidate hosted full-suite and all28
 scaling matrices remain the acceptance gate.
+
+Hosted acceptance complete: full-suite4301 tests passed on fd62df8 (run40450442032);
+proof1205 tests and all28 matrices passed on d1a853c (run40462604262). Exact
+source equality outside docs/retry workflow and runtime08fcaac were verified;
+archive digests, matrix driver/fixture hashes and XML counts are retained in
+run-40462604262/acceptance.json. The cancelled first proof job is superseded
+by this complete retry. No performance/default-admission scope was added.

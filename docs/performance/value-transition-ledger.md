@@ -59,3 +59,12 @@ are outside the prepared publication — cost is callbacks must remain SQL-free 
 window. This remains a SQL capability, not arbitrary Python isolation.
 
 Final verification on clean source 17ed08c9b978a5e96938511662aea1110a06d2aa: 1205 proof, 120 native-regression, 53 focused-value-and-native passed; corrected native1k/10k/100k matrix complete with0 unrelated history reads and0 measured full audits. Source hashes and exact metrics are in value-transition/verification.json and native-scaling/summary.json. Candidate full hosted suite remains required.
+
+Hosted acceptance:4301 full-suite tests +1205 proof tests +28 complete matrices,
+zero failures/errors/skips. See run-40462604262/acceptance.json for paired exact-source
+evidence. Task3 complete. Explicit native World integration and value-only save
+consumption are accepted. Fast-open/default admission, general structural optimization,
+matched mature performance and scrub progress remain outside this completed package.
+Ruling: close this integration package rather than invent another stage — the approved
+plans are implemented and green — the larger architecture's performance gates remain
+explicitly unfinished. No main merge, endurance or default format activation.

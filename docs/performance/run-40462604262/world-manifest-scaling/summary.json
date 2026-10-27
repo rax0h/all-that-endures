@@ -1,0 +1,89 @@
+{
+  "status": "complete",
+  "source": {
+    "head": "d1a853c9a97fd467d2d77cabde78dada5586ec01",
+    "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+    "sqlite": "3.45.1",
+    "driver_sha256": "6da3edbb8fd9f6afe6601a07c73b6406961687dd7d80223ffbd570e1e51faf8f",
+    "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+    "complete_fixture_sha256": "88281f0b2411223cb57bc2acf7ce20b99db7bd6f3b676634637b132a701b4cee",
+    "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+  },
+  "results": [
+    {
+      "size": 1000,
+      "source": {
+        "head": "d1a853c9a97fd467d2d77cabde78dada5586ec01",
+        "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+        "sqlite": "3.45.1",
+        "driver_sha256": "6da3edbb8fd9f6afe6601a07c73b6406961687dd7d80223ffbd570e1e51faf8f",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "complete_fixture_sha256": "88281f0b2411223cb57bc2acf7ce20b99db7bd6f3b676634637b132a701b4cee",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 1.5168544219995965,
+      "checkpoint_ms": 254.22796100019696,
+      "python_peak_bytes": 246618,
+      "sqlite_vm_steps": 175825,
+      "sql": {
+        "history_body": 0,
+        "commit_descriptor_body": 2
+      },
+      "reaudited": false,
+      "archive_unit": "retained history values",
+      "vm_measurement": "separate interval-one guarded checkpoint"
+    },
+    {
+      "size": 10000,
+      "source": {
+        "head": "d1a853c9a97fd467d2d77cabde78dada5586ec01",
+        "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+        "sqlite": "3.45.1",
+        "driver_sha256": "6da3edbb8fd9f6afe6601a07c73b6406961687dd7d80223ffbd570e1e51faf8f",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "complete_fixture_sha256": "88281f0b2411223cb57bc2acf7ce20b99db7bd6f3b676634637b132a701b4cee",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 4.620891609999944,
+      "checkpoint_ms": 255.26328000023568,
+      "python_peak_bytes": 214824,
+      "sqlite_vm_steps": 175825,
+      "sql": {
+        "history_body": 0,
+        "commit_descriptor_body": 2
+      },
+      "reaudited": false,
+      "archive_unit": "retained history values",
+      "vm_measurement": "separate interval-one guarded checkpoint"
+    },
+    {
+      "size": 100000,
+      "source": {
+        "head": "d1a853c9a97fd467d2d77cabde78dada5586ec01",
+        "runtime_tree": "08fcaac6f5cfc2258b4afc6be1ac4cacc0aab1f3",
+        "sqlite": "3.45.1",
+        "driver_sha256": "6da3edbb8fd9f6afe6601a07c73b6406961687dd7d80223ffbd570e1e51faf8f",
+        "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+        "complete_fixture_sha256": "88281f0b2411223cb57bc2acf7ce20b99db7bd6f3b676634637b132a701b4cee",
+        "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+      },
+      "status": "complete",
+      "exact": true,
+      "construction_seconds": 36.3531589309996,
+      "checkpoint_ms": 252.82788799995615,
+      "python_peak_bytes": 214174,
+      "sqlite_vm_steps": 175825,
+      "sql": {
+        "history_body": 0,
+        "commit_descriptor_body": 2
+      },
+      "reaudited": false,
+      "archive_unit": "retained history values",
+      "vm_measurement": "separate interval-one guarded checkpoint"
+    }
+  ]
+}

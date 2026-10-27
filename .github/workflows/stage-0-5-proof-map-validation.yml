@@ -65,11 +65,6 @@ jobs:
           from simulation import continuation_receipts as r
           def git(*args):return subprocess.check_output(['git',*args],text=True).strip()
           if git('status','--porcelain','--untracked-files=no'):raise ValueError('tracked execution source is dirty')
-          import json, os
-          event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
-          if event.get('head_commit',{}).get('message')=='Retry proof validation for fd62df8 (full suite already passed)':
-              subprocess.run(['git','fetch','--no-tags','origin','fd62df8872dcec78ecbb6fab329f7393055d22c3'],check=True)
-              subprocess.run(['git','diff','--exit-code','fd62df8872dcec78ecbb6fab329f7393055d22c3','HEAD','--','.',':(exclude)docs/**',':(exclude).github/workflows/stage-0-5-proof-map-validation.yml'],check=True)
           r.publish_receipt(Path('evidence/source.json'),dict(head=git('rev-parse','HEAD'),runtime_tree=git('rev-parse','HEAD:simulation/ate_sim'),python=platform.python_version(),sqlite=sqlite3.sqlite_version))
           PY
       - name: Verify proof primitives and bounded 1k/10k/100k work
@@ -141,8 +136,6 @@ jobs:
           retention-days: 14
           if-no-files-found: error
   full-suite:
-    # Exact-source retry only: proof job verifies source equality before testing.
-    if: github.event.head_commit.message != 'Retry proof validation for fd62df8 (full suite already passed)'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     steps:
