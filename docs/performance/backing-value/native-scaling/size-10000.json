@@ -1,0 +1,31 @@
+{
+  "size": 10000,
+  "source": {
+    "head": "f32ce732c7b789f7f85caefd888513bea130ed57",
+    "runtime_tree": "774c1262f8b82ca7274f6ff4f79313035bbf06ea",
+    "sqlite": "3.53.1",
+    "driver_sha256": "0f5e24a9cd43716e7c7d849d3e3e90b69e71b6ebec42d70a892fa482e9534c3a",
+    "fixture_sha256": "a052a794ce2ce0bb909b9fee6431f583593432bdd2b497aaa682d29e0c7fa171",
+    "authority_fixture_sha256": "be569da7106d11c7175eb5ff51a48b4aa9d202417ed42f964941866a034e684c"
+  },
+  "status": "complete",
+  "exact": true,
+  "construction_seconds": 4.848916927999994,
+  "audited_admission_seconds": 0.4796328200000062,
+  "native_first_access_and_save_ms": 711.2410810000256,
+  "native_first_access_and_save_unprofiled_ms": 149.58874199999173,
+  "python_peak_bytes": 319486,
+  "sqlite_vm_steps": 283114,
+  "vm_measurement": "separate fresh-session first-access native save, interval-one guard",
+  "sql": {
+    "history_body": 0
+  },
+  "full_audits_during_save": 0,
+  "backing_first_access_and_save_ms": 198.05557400002272,
+  "backing_sql": {
+    "selected": 9,
+    "unrelated": 0
+  },
+  "backing_vm_steps": 315425,
+  "archive_unit": "retained history values"
+}

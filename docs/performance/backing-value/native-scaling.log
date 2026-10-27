@@ -1,0 +1,3 @@
+1000 172.52 ms unprofiled native first-access save; 669.9 ms with allocation profiling; 225.44 ms backing value save; zero unrelated history bodies
+10000 149.59 ms unprofiled native first-access save; 711.24 ms with allocation profiling; 198.06 ms backing value save; zero unrelated history bodies
+100000 168.92 ms unprofiled native first-access save; 693.63 ms with allocation profiling; 301.01 ms backing value save; zero unrelated history bodies

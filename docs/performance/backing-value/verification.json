@@ -1,0 +1,38 @@
+{
+  "head": "f32ce732c7b789f7f85caefd888513bea130ed57",
+  "runtime_tree": "774c1262f8b82ca7274f6ff4f79313035bbf06ea",
+  "files": {
+    ".github/tests/run_proof_native_value_scaling.py": "0f5e24a9cd43716e7c7d849d3e3e90b69e71b6ebec42d70a892fa482e9534c3a",
+    ".github/workflows/stage-0-5-proof-map-validation.yml": "29d438cdf77513dc441cfd89f75e59b6ddc7e72bd10af954d683e4c48e825f84",
+    "simulation/ate_sim/persistence_proof_world_backing_value.py": "6fcf06e2d2687e6a75091f4bf515de9377dd1959228aa7d842c2c0207c5179a1",
+    "simulation/ate_sim/persistence_proof_world_value.py": "ee4749753de615bcdd40203b39c6b8645e2c60016f9839923fb4e30b4519c5af",
+    "simulation/tests/test_stage_0_5_proof_world_backing_value.py": "5594fad7bd06a29a9bc24dedf357be55e62229912f768e7f13cd776d4a0a10fb"
+  },
+  "checks": [
+    {
+      "name": "proof",
+      "tests": 1212,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "38ef4b751f1f43b4deb4dfdbe9d372e8f67ad327139eb7911cacc7dfcf45cb0e"
+    },
+    {
+      "name": "native",
+      "tests": 120,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "xml_sha256": "4be03166ca7d171951d5a18a3a837dc6818f4e974c6507bde7fe59443b72d1d2"
+    }
+  ],
+  "matrix_sha256": "ef22d3d27ed6ed80227b0a9e6f718f89dd0e435ac4e495f5eebdca04664ac22f",
+  "review": {
+    "critical": 0,
+    "important": 0,
+    "minor_deferred": 1,
+    "prior_minors_deferred": 2,
+    "independent_reviews": 1
+  },
+  "hosted_full_suite": "required candidate gate; not locally claimed"
+}

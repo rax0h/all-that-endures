@@ -1,0 +1,250 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_native_fixed_shape_shared_backing_save_keeps_full_history_cold[list] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_native_fixed_shape_shared0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fee22629df0>
+kind = 'list'
+
+    @pytest.mark.parametrize('kind',['list','map'])
+    def test_native_fixed_shape_shared_backing_save_keeps_full_history_cold(tmp_path,monkeypatch,kind):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.core import Settlement
+     def configure(w):w.settlements[1]=Settlement(1,0,0,memory={'war':.25})
+     path,pair=fixture(tmp_path,configure=configure)
+     with opened(path,pair) as s:
+      def full(*a,**k):raise AssertionError('fixed-shape backing save walked full World history')
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',full)
+       if kind=='list':s.skills[1,'craft'].provenance[0]=99
+       else:s.world.settlements[1].memory['war']=.5
+>      assert s.save()==1
+              ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_backing_value.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:201: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:174: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fee22375190>, GenerationPin(token='b95bf08f-ba0c-4d85-93...8\xee', count=34)), b'\xd9\xd0 ,\x8a.\xc5\x00\xf0y\xe5Z\xba:\xc5\xa8\xdaut\xf7\xda\xbe\x0c(J+\xc1["\xe7\xcf\x08'), ...)
+k = {}
+
+>   def full(*a,**k):raise AssertionError('fixed-shape backing save walked full World history')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: fixed-shape backing save walked full World history
+
+simulation/tests/test_stage_0_5_proof_world_backing_value.py:12: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_native_fixed_shape_shared0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fee22629df0>
+kind = 'list'
+
+    @pytest.mark.parametrize('kind',['list','map'])
+    def test_native_fixed_shape_shared_backing_save_keeps_full_history_cold(tmp_path,monkeypatch,kind):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.core import Settlement
+     def configure(w):w.settlements[1]=Settlement(1,0,0,memory={'war':.25})
+     path,pair=fixture(tmp_path,configure=configure)
+>    with opened(path,pair) as s:
+          ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_backing_value.py:11: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7fee223748f0>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18009: StoreError
+___ test_native_fixed_shape_shared_backing_save_keeps_full_history_cold[map] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_native_fixed_shape_shared1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fee22297e30>
+kind = 'map'
+
+    @pytest.mark.parametrize('kind',['list','map'])
+    def test_native_fixed_shape_shared_backing_save_keeps_full_history_cold(tmp_path,monkeypatch,kind):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.core import Settlement
+     def configure(w):w.settlements[1]=Settlement(1,0,0,memory={'war':.25})
+     path,pair=fixture(tmp_path,configure=configure)
+     with opened(path,pair) as s:
+      def full(*a,**k):raise AssertionError('fixed-shape backing save walked full World history')
+      with monkeypatch.context() as m:
+       m.setattr(world,'_audit_world',full)
+       if kind=='list':s.skills[1,'craft'].provenance[0]=99
+       else:s.world.settlements[1].memory['war']=.5
+>      assert s.save()==1
+              ^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_backing_value.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:16722: in save
+    return self._save_native() if authority is None else authority.execute(self,self._save_native)
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:99: in execute
+    result=callback();guard.check();observed=self._epoch()
+           ^^^^^^^^^^
+simulation/ate_sim/persistence_lazy.py:16753: in _save_native
+    if authority is None else authority.commit(self,plan))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_world_session.py:128: in commit
+    result=manifests.commit_world_manifest(self.store,plan.publication.parent_pin,*self.pair,**args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_manifest_publish.py:201: in commit_world_manifest
+    result=inventory._commit_inventory(store,pin,*ia,da,ca,scope_authority=sa,record_authority=ra,commit_token=commit_token,manifest_request=r,
+simulation/ate_sim/persistence_proof_inventory.py:220: in _commit_inventory
+    request=_Request((certificate,expected),reference=reference_request,manifest=manifest_request);result=directory.commit_directory(store,pin,*directory_authority,*content_authority,_inventory=request,**arguments);outcome=result.content.commit.outcome
+                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_directory_publish.py:107: in commit_directory
+    result=publication.commit_collections(store,pin,pairs,content_certificate,content_expected,commit_token=commit_token,_directory=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:152: in commit_collections
+    content=commit_content_proof(store,pin,certificate,expected,commit_token=commit_token,_collection_proof=r,**arguments)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_publication.py:344: in commit_content_proof
+    scope=commit_scope_proof(store,pin,*scope_authority,record_authority=record_authority,commit_token=commit_token,_content_proof=request,**arguments)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_scope.py:513: in commit_scope_proof
+    record=commit_record_proof(store,pin,*record_authority,commit_token=commit_token,_scope_proof=request,**arguments);result=record.commit
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_record.py:316: in commit_record_proof
+    result=store.commit(pin,commit_token=commit_token,_record_proof=request,**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_lazy_store.py:2937: in commit
+    if _collection_proof is not None:_stage_collection(self,_collection_proof,new_generation,encoded_commit_token)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+simulation/ate_sim/persistence_proof_collection_publish.py:129: in _stage
+    stage_directory(store,r,g,token)
+simulation/ate_sim/persistence_proof_directory_publish.py:101: in _stage
+    stage_inventory(store,r.directory.inventory,g,r.pin.token,token)
+simulation/ate_sim/persistence_proof_inventory.py:210: in _stage
+    stage_manifest(store,request.manifest,g,writer,token,request.successor)
+simulation/ate_sim/persistence_proof_manifest_publish.py:174: in _stage
+    proof=world._audit_world(store,pin,ca,sa,ia,ra,da);roots,facts=proof.roots,proof.facts;r.reaudited=True
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+a = (<ate_sim.persistence_lazy_store.LazyRecordStore object at 0x7fee222f96d0>, GenerationPin(token='a0798fe3-2562-4c22-84..., count=34)), b'\xd3\xc0s:\x9a\x1f\xa4\xbb\x86\xe1L\xd6\xae\xa7jW\xf2H\xd9\xd4\xff\xed+\x90\x88b\xee\x9d#>\x1b.'), ...)
+k = {}
+
+>   def full(*a,**k):raise AssertionError('fixed-shape backing save walked full World history')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: fixed-shape backing save walked full World history
+
+simulation/tests/test_stage_0_5_proof_world_backing_value.py:12: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_native_fixed_shape_shared1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fee22297e30>
+kind = 'map'
+
+    @pytest.mark.parametrize('kind',['list','map'])
+    def test_native_fixed_shape_shared_backing_save_keeps_full_history_cold(tmp_path,monkeypatch,kind):
+     from ate_sim import persistence_proof_world as world
+     from ate_sim.core import Settlement
+     def configure(w):w.settlements[1]=Settlement(1,0,0,memory={'war':.25})
+     path,pair=fixture(tmp_path,configure=configure)
+>    with opened(path,pair) as s:
+          ^^^^^^^^^^^^^^^^^
+
+simulation/tests/test_stage_0_5_proof_world_backing_value.py:11: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+simulation/ate_sim/persistence_lazy.py:18051: in __exit__
+    self.close()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <ate_sim.persistence_lazy.LazyWorldSession object at 0x7fee2212b9b0>
+
+    def close(self):
+        if not self._active:
+            return
+        if self._lifecycle_operation is not None:
+            raise StoreError(
+                "lazy close is blocked during "
+                f"{self._lifecycle_operation}"
+            )
+        if self._eager_tracker._cold_step_depth:
+            raise StoreError("lazy close requires a completed simulation step")
+        if self.world.__dict__.get("_index_current_people"):
+            raise StoreError(
+                "lazy close cannot run inside current_people_scope"
+            )
+        if self._state == "recovery-required":
+>           raise StoreError(
+                "resolve uncertain lazy save before closing the session"
+            )
+E           ate_sim.incremental_store.StoreError: resolve uncertain lazy save before closing the session
+
+simulation/ate_sim/persistence_lazy.py:18009: StoreError
+=========================== short test summary info ============================
+FAILED simulation/tests/test_stage_0_5_proof_world_backing_value.py::test_native_fixed_shape_shared_backing_save_keeps_full_history_cold[list]
+FAILED simulation/tests/test_stage_0_5_proof_world_backing_value.py::test_native_fixed_shape_shared_backing_save_keeps_full_history_cold[map]
+2 failed in 4.19s

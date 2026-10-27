@@ -13,9 +13,13 @@ MAX_ROWS=512
 MAX_BYTES=4*1048576
 
 
-def _projection(store,request,namespace,key,old,new):
+def _projection(store,request,namespace,key,old,new,ordinary=False):
     codec=store.codec;typed=codec.encode(key)
-    before=tuple(world._project(store,namespace,key,old,False));after=tuple(world._project(store,namespace,key,new,False))
+    if namespace in world.AUXILIARY_OWNER_FAMILIES:
+        from .persistence_proof_world_backing_value import projection
+        before=projection(store,namespace,old);after=projection(store,namespace,new)
+    else:
+        before=tuple(world._project(store,namespace,key,old,ordinary));after=tuple(world._project(store,namespace,key,new,ordinary))
     if len(before)!=len(after):return False
     mapping=world._map(store,b'owner-projections')
     for a,b in zip(before,after):
@@ -75,27 +79,21 @@ def validate_value_transition(store,request,versions,ordinary,segments):
         frozen=replace(item['change'],key=codec.decode(key),value=codec.decode(item['payload']),memberships=tuple(Membership(*m) for m in codec.decode(item['memberships_blob'])))
         item=dict(item,change=frozen)
         value=codec.decode(old.payload);rows.append((item,old,value))
+        if ns in world.AUXILIARY_OWNER_FAMILIES:
+            from .persistence_proof_world_backing_value import eligible
+            if eligible(store,request,frozen,value):owners[(ns,key)]=frozen
         if ns in world.FAMILIES and world._record_class(ns) not in (None,Event):owners[(ns,key)]=frozen
-    witnessed=set()
+    headers=[];ordinary_owners=set()
     for item,old,value in rows:
         ns,key=item['namespace'],item['typed_key'];change=item['change'];new=change.value
         if (ns,key) in owners:
             if not _projection(store,request,ns,change.key,value,new):return False
-            world._check_queries(store,request.pin,change)
+            if ns not in world.AUXILIARY_OWNER_FAMILIES:world._check_queries(store,request.pin,change)
         elif ns==catalog.OWNER_NAMESPACE:
-            owner_ns,owner_key=change.key;source=owners.get((owner_ns,codec.encode(owner_key)))
-            if source is None:
-                if item['payload']!=old.payload or item['memberships_blob']!=old.memberships:return False
-            else:
-                witnessed.add((owner_ns,codec.encode(owner_key)))
-                expected=list(value)
-                if len(expected)!=9 or expected[0]!='identity-owner/v1' or expected[1] is not True or expected[2]!='lazy':return False
-                expected[3]=g+1;expected[4]=source.record_schema;expected[5]=catalog._source_commitment(codec,source,'lazy',g+1)
-                if codec.encode(tuple(expected))!=item['payload'] or item['memberships_blob']!=old.memberships:raise StoreIntegrityError('value transition source witness differs from changed owner')
+            headers.append((item,old,value))
         elif ns==DEPENDENCIES:
             if old.memberships!=item['memberships_blob']:return False
         elif item['payload']!=old.payload or item['memberships_blob']!=old.memberships:return False
-    if witnessed!=set(owners):raise StoreIntegrityError('value transition lacks changed owner source witness')
     scalars={r+'.'+f for r,fields in ROOT_FIELDS.items() for f,k in fields.items() if k=='int'}
     count=0
     for item in ordinary:
@@ -115,5 +113,24 @@ def validate_value_transition(store,request,versions,ordinary,segments):
             if ns=='world.next_event' and item['payload']!=payload:return False
             v=change.value;before=codec.decode(payload)
             if change.key!=0 or type(v) is not tuple or len(v)!=2 or v[0]!=0 or type(v[0]) is not int or type(v[1]) is not int or type(before) is not tuple or before[0]!=0:return False
+        elif ns in world.FAMILIES and ns not in ('world.events','world.event_ids'):
+            before=codec.decode(payload);after=change.value
+            if (type(before) is not tuple or type(after) is not tuple or len(before)!=2 or len(after)!=2
+                    or type(before[0]) is not int or type(after[0]) is not int or before[0]!=after[0]):return False
+            if not _projection(store,request,ns,change.key,before,after,ordinary=True):return False
+            owners[(ns,key)]=change;ordinary_owners.add((ns,key))
         elif item['payload']!=payload:return False
+    witnessed=set()
+    for item,old,value in headers:
+        change=item['change'];owner_ns,owner_key=change.key;marker=owner_ns,codec.encode(owner_key);source=owners.get(marker)
+        if source is None:
+            if item['payload']!=old.payload or item['memberships_blob']!=old.memberships:return False
+            continue
+        kind='ordinary' if marker in ordinary_owners else 'lazy'
+        expected=list(value)
+        if len(expected)!=9 or expected[0]!='identity-owner/v1' or expected[1] is not True or expected[2]!=kind:return False
+        expected[3]=g+1;expected[4]=source.record_schema;expected[5]=catalog._source_commitment(codec,source,kind,g+1)
+        if codec.encode(tuple(expected))!=item['payload'] or item['memberships_blob']!=old.memberships:raise StoreIntegrityError('value transition source witness differs from changed owner')
+        witnessed.add(marker)
+    if witnessed!=set(owners):raise StoreIntegrityError('value transition lacks changed owner source witness')
     return True
